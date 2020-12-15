@@ -1,0 +1,121 @@
+import 'dart:convert';
+
+import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dan_xi/dio_utils.dart';
+import 'package:dan_xi/person.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:intl/intl.dart';
+
+class FudanDailyRepository {
+  Dio _dio = Dio();
+  dynamic _historyData;
+  DefaultCookieJar _cookieJar = DefaultCookieJar();
+  static const String LOGIN_URL =
+      "http://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Fsite%252Fncov%252FfudanDaily%253Ffrom%253Dhistory%26from%3Dwap";
+  static const String SAVE_URL =
+      "https://zlapp.fudan.edu.cn/ncov/wap/fudan/save";
+  static const String GET_INFO_URL =
+      "https://zlapp.fudan.edu.cn/ncov/wap/fudan/get-info";
+  PersonInfo _info;
+
+  FudanDailyRepository._() {
+    _dio.interceptors.add(CookieManager(_cookieJar));
+  }
+
+  static final _instance = FudanDailyRepository._();
+
+  factory FudanDailyRepository.getInstance() => _instance;
+
+  Future<dynamic> _getHistoryInfo(PersonInfo info, {int retryTimes = 5}) async {
+    for (int i = 0; i < retryTimes; i++) {
+      _info = info;
+      _cookieJar.deleteAll();
+      var data = {};
+      var res = await _dio.get(LOGIN_URL);
+      var soup = Beautifulsoup(res.data.toString());
+      var inputs = soup.find_all("input");
+      inputs.forEach((element) {
+        if (element.attributes['type'] != "button") {
+          data[element.attributes['name']] = element.attributes['value'];
+        }
+      });
+      data['username'] = _info.id;
+      data["password"] = _info.password;
+
+      res = await _dio.post(LOGIN_URL,
+          data: data.entries.map((p) => '${p.key}=${p.value}').join('&'),
+          options: Options(
+              contentType: Headers.formUrlEncodedContentType,
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 400;
+              }));
+      res = await DioUtils.processRedirect(_dio, res);
+
+      res = await _dio.get(GET_INFO_URL);
+      try {
+        return jsonDecode(res.data.toString())['d'];
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  Future<bool> hasTick(PersonInfo info) async {
+    if (_historyData == null) {
+      _historyData = await _getHistoryInfo(info);
+    }
+    print("Last Tick Date:${_historyData['info']['date']}");
+    return _historyData['info']['date'] ==
+        new DateFormat('yyyyMMdd').format(DateTime.now());
+  }
+
+  static String encodeMap(Map data) {
+    return data.keys.map((key) {
+      var k = key.toString();
+      var v = Uri.encodeComponent(data[key].toString());
+      return '$k=$v';
+    }).join('&');
+  }
+
+  Future<void> tick(PersonInfo info) async {
+    if (_historyData == null) {
+      _historyData = await _getHistoryInfo(info);
+    }
+    var headers = {
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
+      "Origin": "https://zlapp.fudan.edu.cn",
+      "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
+    };
+    var payload = _historyData['info'];
+    payload['ismoved'] = 0;
+    payload['number'] = _historyData['uinfo']['role']['number'];
+    payload['realname'] = _historyData['uinfo']['realname'];
+    payload['area'] = _historyData['oldInfo']['area'];
+    payload['city'] = _historyData['oldInfo']['city'];
+    payload['province'] = _historyData['oldInfo']['province'];
+    payload['sffsksfl'] = 0;
+    payload['sfjcgrq'] = 0;
+    payload['sfjcwhry'] = 0;
+    payload['sfjchbry'] = 0;
+    payload['sfcyglq'] = 0;
+    payload['sfzx'] = 1;
+    payload['sfcxzysx'] = 0;
+    payload['sfyyjc'] = 0;
+    payload['jcjgqr'] = 0;
+    payload['sfwztl'] = 0;
+    payload['sftztl'] = 0;
+
+    await _dio.post(SAVE_URL,
+        data: encodeMap(payload),
+        options: Options(
+            headers: headers,
+            contentType: Headers.formUrlEncodedContentType,
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 400;
+            }));
+  }
+}
