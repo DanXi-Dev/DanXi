@@ -6,6 +6,7 @@ class FDUWiFiConverter {
     "iFudan.1x": "教学区公共加密热点",
     "iFudanNG.1x": "教学区公共(下一代)加密热点",
     "iSJTU.stu": "405寝室热点",
+    "eduroam": "Eduroam 全球漫游服务热点"
   };
 
   static String recognizeWiFi(String wifiName) {

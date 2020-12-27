@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dan_xi/card_repository.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/fdu_wifi_detection.dart';
-import 'package:dan_xi/fudan_daily_repository.dart';
+import 'package:dan_xi/page/card_detail.dart';
+import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/person.dart';
+import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,13 +17,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(DanxiApp());
 }
 
-class MyApp extends StatelessWidget {
+class DanxiApp extends StatelessWidget {
   final Map<String, Function> routes = {
     '/card/detail': (context, {arguments}) =>
-        CardDetailPage(arguments: arguments)
+        CardDetailPage(arguments: arguments),
+    '/card/crowdData': (context, {arguments}) =>
+        CardCrowdData(arguments: arguments)
   };
 
   // This widget is the root of your application.
@@ -31,7 +36,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: MyHomePage(title: "旦兮"),
+      home: HomePage(title: "旦兮"),
       onGenerateRoute: (settings) {
         final String name = settings.name;
         final Function pageContentBuilder = this.routes[name];
@@ -47,31 +52,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+class HomePage extends StatefulWidget {
+  HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  String hello = "";
-  String connection = "无";
+class _HomePageState extends State<HomePage> {
+  String _helloQuote = "";
+  String _connectionStatus = "无";
   CardInfo _cardInfo;
   SharedPreferences _preferences;
-  PersonInfo personInfo;
-  bool fudanDailyTicked = true;
+  PersonInfo _personInfo;
+  bool _fudanDailyTicked = true;
 
   Connectivity _connectivity = Connectivity();
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
@@ -85,18 +81,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    //_dio.interceptors.add(CookieManager(cookieJar))
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen((_) => {_loadNetwork()});
+    _connectivitySubscription = _connectivity.onConnectivityChanged
+        .listen((_) => {_loadNetworkState()});
     _loadSharedPreference();
-    _loadNetwork();
+    _loadNetworkState();
   }
 
   Future<void> _loadSharedPreference({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
     if (!_preferences.containsKey("id") || forceLogin) {
-      var nameCtrler = new TextEditingController();
-      var pwdCtrler = new TextEditingController();
+      var nameController = new TextEditingController();
+      var pwdController = new TextEditingController();
       showDialog<Null>(
           context: context,
           barrierDismissible: false,
@@ -107,14 +102,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
-                    controller: nameCtrler,
+                    controller: nameController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                         labelText: "UIS账号", icon: Icon(Icons.perm_identity)),
                     autofocus: true,
                   ),
                   TextField(
-                    controller: pwdCtrler,
+                    controller: pwdController,
                     decoration: InputDecoration(
                         labelText: "UIS密码", icon: Icon(Icons.lock_outline)),
                     obscureText: true,
@@ -134,27 +129,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 FlatButton(
                   child: Text("登录"),
                   onPressed: () async {
-                    if (nameCtrler.text.length * pwdCtrler.text.length > 0) {
+                    if (nameController.text.length * pwdController.text.length >
+                        0) {
                       var progressDialog = showProgressDialog(
                           loadingText: "尝试登录中...", context: context);
                       var name = "";
                       await CardRepository.getInstance()
                           .login(new PersonInfo(
-                              nameCtrler.text, pwdCtrler.text, ""))
+                              nameController.text, pwdController.text, ""))
                           .then(
                               (_) async => {
                                     progressDialog.dismiss(),
                                     _preferences.setString(
-                                        "id", nameCtrler.text),
+                                        "id", nameController.text),
                                     _preferences.setString(
-                                        "password", pwdCtrler.text),
+                                        "password", pwdController.text),
                                     name = await CardRepository.getInstance()
                                         .getName(),
                                     _preferences.setString("name", name),
                                     setState(() {
-                                      personInfo = new PersonInfo(
-                                          nameCtrler.text,
-                                          pwdCtrler.text,
+                                      _personInfo = new PersonInfo(
+                                          nameController.text,
+                                          pwdController.text,
                                           name);
                                     }),
                                     Navigator.of(context).pop(),
@@ -172,15 +168,15 @@ class _MyHomePageState extends State<MyHomePage> {
           });
     } else {
       setState(() {
-        personInfo = new PersonInfo(_preferences.getString("id"),
+        _personInfo = new PersonInfo(_preferences.getString("id"),
             _preferences.getString("password"), _preferences.getString("name"));
       });
     }
   }
 
-  Future<dynamic> _getWiFiInfo(ConnectivityResult result) async {
-    var ans = {};
-    switch (result) {
+  Future<dynamic> _getWiFiInfo(ConnectivityResult connectivityResult) async {
+    var result = {};
+    switch (connectivityResult) {
       case ConnectivityResult.wifi:
         String wifiName, wifiIP;
 
@@ -207,22 +203,22 @@ class _MyHomePageState extends State<MyHomePage> {
         } on PlatformException {
           wifiName = null;
         }
-        ans['name'] = wifiName;
+        result['name'] = wifiName;
 
         try {
           wifiIP = await _connectivity.getWifiIP();
         } on PlatformException {
           wifiIP = null;
         }
-        ans['ip'] = wifiIP;
+        result['ip'] = wifiIP;
         break;
       default:
         break;
     }
-    return ans;
+    return result;
   }
 
-  Future<void> _loadNetwork() async {
+  Future<void> _loadNetworkState() async {
     var connectivity = await _connectivity.checkConnectivity();
     if (connectivity == ConnectivityResult.wifi) {
       var result;
@@ -232,19 +228,19 @@ class _MyHomePageState extends State<MyHomePage> {
         print(e);
       }
       setState(() {
-        connection = result == null || result['name'] == null
+        _connectionStatus = result == null || result['name'] == null
             ? "获取WiFi名称失败"
             : FDUWiFiConverter.recognizeWiFi(result['name']);
       });
     } else {
       setState(() {
-        connection = "没有链接到WiFi";
+        _connectionStatus = "没有链接到WiFi";
       });
     }
   }
 
   Future<String> _loadCard() async {
-    await CardRepository.getInstance().login(personInfo);
+    await CardRepository.getInstance().login(_personInfo);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(7);
     return _cardInfo.cash;
   }
@@ -253,19 +249,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
-      hello = "披星戴月，不负韶华";
+      _helloQuote = "披星戴月，不负韶华";
     } else if (time >= 5 && time <= 8) {
-      hello = "一日之计在于晨";
+      _helloQuote = "一日之计在于晨";
     } else if (time >= 9 && time <= 11) {
-      hello = "快到中午啦";
+      _helloQuote = "快到中午啦";
     } else if (time >= 12 && time <= 16) {
-      hello = "下午的悠闲时光~";
+      _helloQuote = "下午的悠闲时光~";
     } else if (time >= 17 && time <= 22) {
-      hello = "晚上好~";
+      _helloQuote = "晚上好~";
     }
 
     print("Start run");
-    return personInfo == null
+    return _personInfo == null
         ? Scaffold(
             appBar: AppBar(
             title: Text(widget.title),
@@ -282,17 +278,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 Card(
                     child: Column(
                   children: [
-                    new ListTile(
-                      title: Text("欢迎你,${personInfo?.name}"),
-                      subtitle: Text(hello),
+                    ListTile(
+                      title: Text("欢迎你,${_personInfo?.name}"),
+                      subtitle: Text(_helloQuote),
                     ),
                     Divider(),
-                    new ListTile(
+                    ListTile(
                       leading: Icon(Icons.wifi),
                       title: Text("当前连接"),
-                      subtitle: Text(connection),
+                      subtitle: Text(_connectionStatus),
                     ),
-                    new ListTile(
+                    ListTile(
                       leading: Icon(Icons.account_balance_wallet),
                       title: Text("饭卡余额"),
                       subtitle: FutureBuilder(
@@ -307,13 +303,28 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           }),
                       onTap: () {
-                        Navigator.of(context).pushNamed("/card/detail",
-                            arguments: {
-                              "cardInfo": _cardInfo,
-                              "personInfo": personInfo
-                            });
+                        if (_cardInfo != null) {
+                          Navigator.of(context).pushNamed("/card/detail",
+                              arguments: {
+                                "cardInfo": _cardInfo,
+                                "personInfo": _personInfo
+                              });
+                        }
                       },
                     ),
+                    ListTile(
+                      leading: Icon(Icons.stacked_line_chart),
+                      title: Text("食堂排队消费状况"),
+                      onTap: () {
+                        if (_cardInfo != null) {
+                          Navigator.of(context).pushNamed("/card/crowdData",
+                              arguments: {
+                                "cardInfo": _cardInfo,
+                                "personInfo": _personInfo
+                              });
+                        }
+                      },
+                    )
                   ],
                 )),
                 Card(
@@ -322,28 +333,29 @@ class _MyHomePageState extends State<MyHomePage> {
                     leading: Icon(Icons.cloud_upload),
                     subtitle: FutureBuilder(
                         future: FudanDailyRepository.getInstance()
-                            .hasTick(personInfo),
+                            .hasTick(_personInfo),
                         builder: (_, AsyncSnapshot<bool> snapshot) {
                           if (snapshot.hasData) {
-                            fudanDailyTicked = snapshot.data;
+                            _fudanDailyTicked = snapshot.data;
                             return Text(
-                                fudanDailyTicked ? "你今天已经上报过了哦！" : "点击上报");
+                                _fudanDailyTicked ? "你今天已经上报过了哦！" : "点击上报");
                           } else {
                             return Text("获取中...");
                           }
                         }),
                     onTap: () async {
-                      if (fudanDailyTicked) return;
+                      if (_fudanDailyTicked) return;
                       var progressDialog = showProgressDialog(
                           loadingText: "打卡中...", context: context);
                       await FudanDailyRepository.getInstance()
-                          .tick(personInfo)
-                          .then((value) => {
-                                progressDialog.dismiss(),
-                                setState(() {
-                                  personInfo = personInfo;
-                                })
-                              });
+                          .tick(_personInfo)
+                          .then(
+                              (value) =>
+                                  {progressDialog.dismiss(), setState(() {})},
+                              onError: (_) => {
+                                    progressDialog.dismiss(),
+                                    Fluttertoast.showToast(msg: "打卡失败，请检查网络连接~")
+                                  });
                     },
                   ),
                 )
@@ -353,53 +365,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 await _loadSharedPreference(forceLogin: true);
               },
-              tooltip: 'Increment',
+              tooltip: '切换账号',
               child: Icon(Icons.add),
-            ), // This trailing comma makes auto-formatting nicer for build methods.
+            ),
           );
-  }
-}
-
-class CardDetailPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
-
-  @override
-  _CardDetailPageState createState() => _CardDetailPageState();
-
-  CardDetailPage({Key key, this.arguments});
-}
-
-class _CardDetailPageState extends State<CardDetailPage> {
-  CardInfo _cardInfo;
-  PersonInfo _personInfo;
-
-  @override
-  void initState() {
-    _cardInfo = widget.arguments['cardInfo'];
-    _personInfo = widget.arguments['personInfo'];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("饭卡消费记录")),
-      body: ListView(
-        children: _getListWidgets(),
-      ),
-    );
-  }
-
-  List<Widget> _getListWidgets() {
-    List<Widget> widgets = [];
-    _cardInfo.records.forEach((element) {
-      widgets.add(ListTile(
-        leading: Icon(Icons.monetization_on),
-        title: Text(element.payment),
-        isThreeLine: true,
-        subtitle: Text("${element.location}\n${element.time.toString()}"),
-      ));
-    });
-
-    return widgets;
   }
 }

@@ -35,8 +35,9 @@ dependencies:
   shared_preferences: ^0.5.12+4
   flutter_progress_dialog: ^0.1.0
   fluttertoast: ^7.1.5
-  requests: ^3.3.0
   beautifulsoup: ^0.0.1
+  flutter_js: ^0.2.2+0
+  fl_chart: ^0.12.2
 
 dev_dependencies:
   flutter_test:

@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dan_xi/dio_utils.dart';
 import 'package:dan_xi/person.dart';
+import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:intl/intl.dart';
@@ -29,32 +28,10 @@ class FudanDailyRepository {
   factory FudanDailyRepository.getInstance() => _instance;
 
   Future<dynamic> _getHistoryInfo(PersonInfo info, {int retryTimes = 5}) async {
+    _info = info;
     for (int i = 0; i < retryTimes; i++) {
-      _info = info;
-      _cookieJar.deleteAll();
-      var data = {};
-      var res = await _dio.get(LOGIN_URL);
-      var soup = Beautifulsoup(res.data.toString());
-      var inputs = soup.find_all("input");
-      inputs.forEach((element) {
-        if (element.attributes['type'] != "button") {
-          data[element.attributes['name']] = element.attributes['value'];
-        }
-      });
-      data['username'] = _info.id;
-      data["password"] = _info.password;
-
-      res = await _dio.post(LOGIN_URL,
-          data: data.entries.map((p) => '${p.key}=${p.value}').join('&'),
-          options: Options(
-              contentType: Headers.formUrlEncodedContentType,
-              followRedirects: false,
-              validateStatus: (status) {
-                return status < 400;
-              }));
-      res = await DioUtils.processRedirect(_dio, res);
-
-      res = await _dio.get(GET_INFO_URL);
+      await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
+      var res = await _dio.get(GET_INFO_URL);
       try {
         return jsonDecode(res.data.toString())['d'];
       } catch (e) {}
@@ -63,9 +40,7 @@ class FudanDailyRepository {
   }
 
   Future<bool> hasTick(PersonInfo info) async {
-    if (_historyData == null) {
-      _historyData = await _getHistoryInfo(info);
-    }
+    _historyData = await _getHistoryInfo(info);
     print("Last Tick Date:${_historyData['info']['date']}");
     return _historyData['info']['date'] ==
         new DateFormat('yyyyMMdd').format(DateTime.now());

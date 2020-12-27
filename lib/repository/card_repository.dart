@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dan_xi/person.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -85,10 +86,10 @@ class CardRepository {
     };
     var userPageResponse = await http
         .get('http://ecard.fudan.edu.cn/web/guest/personal', headers: headers);
-    cardInfo.cash = _between(userPageResponse.body,
-        "余&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额：</span>", "元");
-    cardInfo.name = _between(userPageResponse.body,
-        "姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</span>", "</li>");
+    cardInfo.cash = userPageResponse.body
+        .between("余&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额：</span>", "元");
+    cardInfo.name = userPageResponse.body
+        .between("姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</span>", "</li>");
     //获取饭卡交易记录
     headers = {
       'User-Agent':
@@ -139,9 +140,55 @@ class CardRepository {
     return cardInfo;
   }
 
-  String _between(String str, String a, String b) {
-    return str.substring(
-        str.indexOf(a) + a.length, str.indexOf(b, str.indexOf(a) + a.length));
+  Future<TrafficInfo> loadTrafficInfo(String name) async {
+    if (_cookie == "") {
+      throw new LoginException();
+    }
+    TrafficInfo info = TrafficInfo(name);
+    var headers = {
+      'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0',
+      'Accept': 'application/json, text/javascript, */*; q=0.01',
+      'Accept-Language': 'zh-CN,en-US;q=0.7,en;q=0.3',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'X-Requested-With': 'XMLHttpRequest',
+      'Origin': 'http://ecard.fudan.edu.cn',
+      'DNT': '1',
+      'Connection': 'keep-alive',
+      'Referer':
+          'http://ecard.fudan.edu.cn/web/guest/accdata?p_p_id=pAccData_WAR_yktPortalportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1',
+      'Pragma': 'no-cache',
+      'Cache-Control': 'no-cache',
+      'Cookie': _cookie,
+      'Accept-Encoding': 'gzip',
+    };
+    var params = {
+      'p_p_id': 'pAccData_WAR_yktPortalportlet',
+      'p_p_lifecycle': '2',
+      'p_p_state': 'normal',
+      'p_p_mode': 'view',
+      'p_p_resource_id': 'last5m',
+      'p_p_cacheability': 'cacheLevelPage',
+      'p_p_col_id': 'column-1',
+      'p_p_col_count': '1',
+    };
+    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
+    var data =
+        '_pAccData_WAR_yktPortalportlet_businame=${Uri.encodeComponent(name)}';
+    var res = await http.post(
+        'http://ecard.fudan.edu.cn/web/guest/accdata?$query',
+        headers: headers,
+        body: data);
+    List<dynamic> json = jsonDecode(res.body);
+    json.forEach((element) {
+      if (element is List) {
+        var time = DateTime.now();
+        info.record[DateTime(time.year, time.month, time.day,
+                (element[1] as int) ~/ 100, (element[1] as int) % 100)] =
+            NumberRecordInfo(element[2], element[3]);
+      }
+    });
+    return info;
   }
 }
 
@@ -149,6 +196,23 @@ class CardInfo {
   String cash;
   String name;
   List<CardRecord> records;
+}
+
+class TrafficInfo {
+  String name;
+  Map<DateTime, NumberRecordInfo> record;
+
+  TrafficInfo(String name) {
+    this.name = name;
+    record = {};
+  }
+}
+
+class NumberRecordInfo {
+  int person;
+  int card;
+
+  NumberRecordInfo(this.person, this.card);
 }
 
 class CardRecord {

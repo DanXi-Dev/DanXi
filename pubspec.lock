@@ -78,13 +78,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.5.0"
-  convert:
-    dependency: transitive
-    description:
-      name: convert
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.1.1"
   cookie_jar:
     dependency: transitive
     description:
@@ -92,13 +85,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.1"
-  crypto:
-    dependency: transitive
-    description:
-      name: crypto
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.1.5"
   csslib:
     dependency: transitive
     description:
@@ -127,6 +113,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.2.5"
   fake_async:
     dependency: transitive
     description:
@@ -148,11 +141,25 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.0.0-nullsafety.4"
+  fl_chart:
+    dependency: "direct main"
+    description:
+      name: fl_chart
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.12.2"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_js:
+    dependency: "direct main"
+    description:
+      name: flutter_js
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.2+0"
   flutter_progress_dialog:
     dependency: "direct main"
     description:
@@ -177,13 +184,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "7.1.5"
-  hex:
-    dependency: transitive
-    description:
-      name: hex
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.1.2"
   html:
     dependency: transitive
     description:
@@ -219,13 +219,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.6.3-nullsafety.3"
-  logging:
-    dependency: transitive
-    description:
-      name: logging
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.11.4"
   matcher:
     dependency: transitive
     description:
@@ -247,6 +240,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.0-nullsafety.3"
+  path_drawing:
+    dependency: transitive
+    description:
+      name: path_drawing
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.1+1"
+  path_parsing:
+    dependency: transitive
+    description:
+      name: path_parsing
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.4"
   path_provider_linux:
     dependency: transitive
     description:
@@ -296,13 +303,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0-nullsafety.4"
-  requests:
-    dependency: "direct main"
-    description:
-      name: requests
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.3.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -378,6 +378,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.0-nullsafety.3"
+  sync_http:
+    dependency: transitive
+    description:
+      name: sync_http
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.0"
   term_glyph:
     dependency: transitive
     description:
