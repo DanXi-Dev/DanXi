@@ -6,6 +6,7 @@
 - 饭卡余额~~和消费记录~~ 
 - ~~食堂消费人数~~
 - 一键平安复旦
+- 快速显示复活码
 
 (复旦于2021年元旦前后大批量修改了API接口，导致某些功能失效)  
 目前这款应用仍处于最初的开发阶段,欢迎各位大佬加入开发~
@@ -16,4 +17,4 @@
 为了构建本应用，您需要按照`Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装`Flutter SDK`。    
 (如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。)  
 
-确定配置正确后，在项目根目录下运行`flutter run \[ios/android\]`即可运行应用。
+确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。

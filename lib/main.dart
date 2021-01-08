@@ -2,19 +2,25 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/fdu_wifi_detection.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/repository/qr_code_repository.dart';
+import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'file:///D:/StudioProjects/dan_xi/dan_xi/lib/util/fdu_wifi_detection.dart';
+
+final QuickActions quickActions = QuickActions();
 
 void main() {
   runApp(DanxiApp());
@@ -69,7 +75,6 @@ class _HomePageState extends State<HomePage> {
   PersonInfo _personInfo;
   bool _fudanDailyTicked = true;
 
-  Connectivity _connectivity = Connectivity();
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
@@ -81,10 +86,45 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _connectivitySubscription = _connectivity.onConnectivityChanged
+    _connectivitySubscription = WiFiUtils.getConnectivity()
+        .onConnectivityChanged
         .listen((_) => {_loadNetworkState()});
     _loadSharedPreference();
     _loadNetworkState();
+    quickActions.setShortcutItems(<ShortcutItem>[
+      const ShortcutItem(
+          type: 'action_qr_code', localizedTitle: '复活码', icon: 'ic_launcher'),
+    ]);
+
+    quickActions.initialize((shortcutType) {
+      if (shortcutType == 'action_qr_code') {
+        if (_personInfo != null) {
+          showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (BuildContext context) {
+                return new AlertDialog(
+                    title: Text("复活码"),
+                    content: Container(
+                        width: double.maxFinite,
+                        child: Center(
+                            child: FutureBuilder<String>(
+                                future: QRCodeRepository.getInstance()
+                                    .getQRCode(_personInfo),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.hasData) {
+                                    return QrImage(
+                                        data: snapshot.data, size: 200.0);
+                                  } else {
+                                    return Text("加载中...");
+                                  }
+                                }))));
+              });
+        }
+      }
+      // More handling code...
+    });
   }
 
   Future<void> _loadSharedPreference({bool forceLogin = false}) async {
@@ -174,56 +214,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<dynamic> _getWiFiInfo(ConnectivityResult connectivityResult) async {
-    var result = {};
-    switch (connectivityResult) {
-      case ConnectivityResult.wifi:
-        String wifiName, wifiIP;
-
-        try {
-          if (!kIsWeb && Platform.isIOS) {
-            LocationAuthorizationStatus status =
-                await _connectivity.getLocationServiceAuthorization();
-            if (status == LocationAuthorizationStatus.notDetermined) {
-              status =
-                  await _connectivity.requestLocationServiceAuthorization();
-            }
-            if (status == LocationAuthorizationStatus.authorizedAlways ||
-                status == LocationAuthorizationStatus.authorizedWhenInUse) {
-              wifiName = await _connectivity.getWifiName();
-            } else {
-              await _connectivity.requestLocationServiceAuthorization();
-              wifiName = await _connectivity.getWifiName();
-            }
-          } else {
-            wifiName = await _connectivity.getWifiName().catchError((_, stack) {
-              return null;
-            });
-          }
-        } on PlatformException {
-          wifiName = null;
-        }
-        result['name'] = wifiName;
-
-        try {
-          wifiIP = await _connectivity.getWifiIP();
-        } on PlatformException {
-          wifiIP = null;
-        }
-        result['ip'] = wifiIP;
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
-
   Future<void> _loadNetworkState() async {
-    var connectivity = await _connectivity.checkConnectivity();
+    var connectivity = await WiFiUtils.getConnectivity().checkConnectivity();
     if (connectivity == ConnectivityResult.wifi) {
       var result;
       try {
-        result = await _getWiFiInfo(connectivity);
+        result = await WiFiUtils.getWiFiInfo(connectivity);
       } catch (e) {
         print(e);
       }
@@ -366,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                 await _loadSharedPreference(forceLogin: true);
               },
               tooltip: '切换账号',
-              child: Icon(Icons.add),
+              child: Icon(Icons.login),
             ),
           );
   }

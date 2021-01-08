@@ -38,6 +38,8 @@ dependencies:
   beautifulsoup: ^0.0.1
   flutter_js: ^0.2.2+0
   fl_chart: ^0.12.2
+  quick_actions: ^0.4.0+10
+  qr_flutter: ^3.2.0
 
 dev_dependencies:
   flutter_test:
