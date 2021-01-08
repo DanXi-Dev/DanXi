@@ -6,3 +6,4 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 -keep class de.prosiebensat1digital.** { *; }
+-dontwarn io.flutter.embedding.**
