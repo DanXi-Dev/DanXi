@@ -8,6 +8,7 @@ import 'package:dan_xi/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
+import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'file:///D:/StudioProjects/dan_xi/dan_xi/lib/util/fdu_wifi_detection.dart';
 
 final QuickActions quickActions = QuickActions();
 
