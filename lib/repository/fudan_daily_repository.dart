@@ -6,6 +6,7 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 class FudanDailyRepository {
   Dio _dio = Dio();
@@ -46,14 +47,6 @@ class FudanDailyRepository {
         new DateFormat('yyyyMMdd').format(DateTime.now());
   }
 
-  static String encodeMap(Map data) {
-    return data.keys.map((key) {
-      var k = key.toString();
-      var v = Uri.encodeComponent(data[key].toString());
-      return '$k=$v';
-    }).join('&');
-  }
-
   Future<void> tick(PersonInfo info) async {
     if (_historyData == null) {
       _historyData = await _getHistoryInfo(info);
@@ -64,7 +57,7 @@ class FudanDailyRepository {
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };
-    var payload = _historyData['info'];
+    Map payload = _historyData['info'];
     payload['ismoved'] = 0;
     payload['number'] = _historyData['uinfo']['role']['number'];
     payload['realname'] = _historyData['uinfo']['realname'];
@@ -84,7 +77,7 @@ class FudanDailyRepository {
     payload['sftztl'] = 0;
 
     await _dio.post(SAVE_URL,
-        data: encodeMap(payload),
+        data: payload.encodeMap(),
         options: Options(
             headers: headers,
             contentType: Headers.formUrlEncodedContentType,

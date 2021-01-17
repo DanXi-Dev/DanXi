@@ -117,13 +117,13 @@ class _HomePageState extends State<HomePage> {
                                     return QrImage(
                                         data: snapshot.data, size: 200.0);
                                   } else {
-                                    return Text("加载中...");
+                                    return Text(
+                                        "加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)");
                                   }
                                 }))));
               });
         }
       }
-      // More handling code...
     });
   }
 

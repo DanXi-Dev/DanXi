@@ -1,10 +1,11 @@
 [中文版](README.md) English Version
 # DanXi
-日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)  
+日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
+  
 Maybe the best all-rounded service app for Fudan University students!    
 **Only support Chinese (Simplified) language at the moment. Come on to help us! **   
 
-- Campus card balance ~~and consumption records~~
+- Campus card balance and consumption records
 - ~~Dining hall traffic~~
 - Shortcut for Fudan Daily
 - Shortcut for Fudan QR Code
