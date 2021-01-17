@@ -1,5 +1,7 @@
 [中文版](README.md) English Version
 # DanXi
+![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)    
+  
 日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
   
 Maybe the best all-rounded service app for Fudan University students!    

@@ -1,5 +1,7 @@
 中文版 [English Version](README_EN.md)
 # 旦兮
+![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)  
+  
 日月光华，旦复旦兮.  
   
 可能是为FDUer准备的,最好的一站式服务APP!  

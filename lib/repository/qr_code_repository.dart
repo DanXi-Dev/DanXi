@@ -2,10 +2,9 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:http/http.dart';
 
-import '../person.dart';
-import 'uis_login_tool.dart';
+import 'package:dan_xi/person.dart';
+import 'package:dan_xi/repository/uis_login_tool.dart';
 
 class QRCodeRepository {
   Dio _dio = Dio();

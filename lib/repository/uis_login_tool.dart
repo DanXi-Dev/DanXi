@@ -1,6 +1,6 @@
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import 'file:///D:/StudioProjects/dan_xi/dan_xi/lib/util/dio_utils.dart';
+import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/person.dart';
 import 'package:dio/dio.dart';
 
