@@ -1,17 +1,18 @@
 import 'dart:convert';
 
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dan_xi/person.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
+import 'inpersistent_cookie_manager.dart';
+
 class FudanDailyRepository {
   Dio _dio = Dio();
   dynamic _historyData;
-  DefaultCookieJar _cookieJar = DefaultCookieJar();
+  NonpersistentCookieJar _cookieJar = NonpersistentCookieJar();
   static const String LOGIN_URL =
       "http://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Fsite%252Fncov%252FfudanDaily%253Ffrom%253Dhistory%26from%3Dwap";
   static const String SAVE_URL =
@@ -34,8 +35,10 @@ class FudanDailyRepository {
       await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
       var res = await _dio.get(GET_INFO_URL);
       try {
-        return jsonDecode(res.data.toString())['d'];
-      } catch (e) {}
+        return res.data['d'];
+      } catch (e) {
+        print(e);
+      }
     }
     return null;
   }

@@ -1,4 +1,4 @@
-import 'package:dan_xi/person.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:flutter/material.dart';
 

@@ -61,7 +61,8 @@ android {
             minifyEnabled true
             useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            // Only used when building a released work.
+            // signingConfig signingConfigs.release
         }
     }
 }

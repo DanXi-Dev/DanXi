@@ -1,6 +1,7 @@
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/person.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:flutter/material.dart';
 
 class CardCrowdData extends StatefulWidget {
@@ -15,8 +16,7 @@ class CardCrowdData extends StatefulWidget {
 class _CardCrowdDataState extends State<CardCrowdData> {
   CardInfo _cardInfo;
   PersonInfo _personInfo;
-  TrafficInfo _trafficInfo;
-
+  Map<String, TrafficInfo> _trafficInfos;
   String _selectItem = "请选择食堂~";
 
   @override
@@ -36,9 +36,10 @@ class _CardCrowdDataState extends State<CardCrowdData> {
             items: _getItems(),
             hint: Text(_selectItem),
             onChanged: (e) async {
-              setState(() => {_selectItem = e, _trafficInfo = null});
-              _trafficInfo =
-                  await CardRepository.getInstance().loadTrafficInfo((e));
+              setState(() => {_selectItem = e, _trafficInfos = null});
+              _trafficInfos =
+                  await DiningHallCrowdednessRepository.getInstance()
+                      .getCrowdednessInfo(_personInfo, 0);
               setState(() {});
             },
           ),
@@ -59,12 +60,12 @@ class _CardCrowdDataState extends State<CardCrowdData> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    if (_trafficInfo == null) return widgets;
-    _trafficInfo.record.forEach((key, value) {
+    if (_trafficInfos == null) return widgets;
+    _trafficInfos.forEach((key, value) {
       widgets.add(ListTile(
         leading: Icon(Icons.timelapse),
-        title: Text(value.person.toString()),
-        subtitle: Text(key.toString()),
+        title: Text(value.current.toString()),
+        subtitle: Text(key),
       ));
     });
     // _trafficInfo.record.forEach((element) {
