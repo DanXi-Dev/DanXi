@@ -146,7 +146,7 @@ class CardRepository {
     var userPageResponse = await _dio.get(USER_DETAIL_URL);
     cardInfo.cash =
         userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
-    cardInfo.name = userPageResponse.data.toString().between("<p>姓名：", "</p>");
+    cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");
 
     List<CardRecord> records =
         await Retryer.runAsyncWithRetry(() => loadCardRecord(logDays));

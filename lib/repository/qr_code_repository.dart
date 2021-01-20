@@ -1,5 +1,4 @@
 import 'package:beautifulsoup/beautifulsoup.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';

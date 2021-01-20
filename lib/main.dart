@@ -128,28 +128,26 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _tryLogin(String name, String pwd) async {
+  Future<void> _tryLogin(String id, String pwd) async {
     var progressDialog =
         showProgressDialog(loadingText: "尝试登录中...", context: context);
     var name = "";
-    await CardRepository.getInstance()
-        .login(new PersonInfo(name, pwd, ""))
-        .then(
-            (_) async => {
-                  progressDialog.dismiss(),
-                  _preferences.setString("id", name),
-                  _preferences.setString("password", pwd),
-                  name = await CardRepository.getInstance().getName(),
-                  _preferences.setString("name", name),
-                  setState(() {
-                    _personInfo = new PersonInfo(name, pwd, name);
-                  }),
-                  Navigator.of(context).pop(),
-                },
-            onError: (_) => {
-                  progressDialog.dismiss(),
-                  Fluttertoast.showToast(msg: "登录失败，请检查用户名和密码是否正确！")
-                });
+    await CardRepository.getInstance().login(new PersonInfo(id, pwd, "")).then(
+        (_) async => {
+              progressDialog.dismiss(),
+              _preferences.setString("id", id),
+              _preferences.setString("password", pwd),
+              name = await CardRepository.getInstance().getName(),
+              _preferences.setString("name", name),
+              setState(() {
+                _personInfo = new PersonInfo(id, pwd, name);
+              }),
+              Navigator.of(context).pop(),
+            },
+        onError: (_) => {
+              progressDialog.dismiss(),
+              Fluttertoast.showToast(msg: "登录失败，请检查用户名和密码是否正确！")
+            });
   }
 
   Future<void> _loadSharedPreference({bool forceLogin = false}) async {
@@ -233,6 +231,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<String> _loadCard() async {
+    Fluttertoast.showToast(msg: "Testtest!");
     await CardRepository.getInstance().login(_personInfo);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(7);
     return _cardInfo.cash;
