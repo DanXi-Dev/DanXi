@@ -20,12 +20,7 @@ class UISLoginTool {
     data["password"] = info.password;
     res = await dio.post(serviceUrl,
         data: data.entries.map((p) => '${p.key}=${p.value}').join('&'),
-        options: Options(
-            contentType: Headers.formUrlEncodedContentType,
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 400;
-            }));
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     return await DioUtils.processRedirect(dio, res);
   }
 }

@@ -24,9 +24,8 @@ class QRCodeRepository {
 
   factory QRCodeRepository.getInstance() => _instance;
 
-  Future<String> getQRCode(PersonInfo info, {int retryTimes = 5}) async {
-    return Retryer.runAsyncWithRetry(() => _getQRCode(info),
-        retryTimes: retryTimes);
+  Future<String> getQRCode(PersonInfo info) async {
+    return Retryer.runAsyncWithRetry(() => _getQRCode(info), retryTimes: 5);
   }
 
   Future<String> _getQRCode(PersonInfo info) async {

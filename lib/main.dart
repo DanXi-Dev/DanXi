@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
@@ -82,6 +82,30 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void _showQRCode() {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+              title: Text("复活码"),
+              content: Container(
+                  width: double.maxFinite,
+                  child: Center(
+                      child: FutureBuilder<String>(
+                          future: QRCodeRepository.getInstance()
+                              .getQRCode(_personInfo),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<String> snapshot) {
+                            if (snapshot.hasData) {
+                              return QrImage(data: snapshot.data, size: 200.0);
+                            } else {
+                              return Text("加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)");
+                            }
+                          }))));
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -98,32 +122,34 @@ class _HomePageState extends State<HomePage> {
     quickActions.initialize((shortcutType) {
       if (shortcutType == 'action_qr_code') {
         if (_personInfo != null) {
-          showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (BuildContext context) {
-                return new AlertDialog(
-                    title: Text("复活码"),
-                    content: Container(
-                        width: double.maxFinite,
-                        child: Center(
-                            child: FutureBuilder<String>(
-                                future: QRCodeRepository.getInstance()
-                                    .getQRCode(_personInfo),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String> snapshot) {
-                                  if (snapshot.hasData) {
-                                    return QrImage(
-                                        data: snapshot.data, size: 200.0);
-                                  } else {
-                                    return Text(
-                                        "加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)");
-                                  }
-                                }))));
-              });
+          _showQRCode();
         }
       }
     });
+  }
+
+  Future<void> _tryLogin(String name, String pwd) async {
+    var progressDialog =
+        showProgressDialog(loadingText: "尝试登录中...", context: context);
+    var name = "";
+    await CardRepository.getInstance()
+        .login(new PersonInfo(name, pwd, ""))
+        .then(
+            (_) async => {
+                  progressDialog.dismiss(),
+                  _preferences.setString("id", name),
+                  _preferences.setString("password", pwd),
+                  name = await CardRepository.getInstance().getName(),
+                  _preferences.setString("name", name),
+                  setState(() {
+                    _personInfo = new PersonInfo(name, pwd, name);
+                  }),
+                  Navigator.of(context).pop(),
+                },
+            onError: (_) => {
+                  progressDialog.dismiss(),
+                  Fluttertoast.showToast(msg: "登录失败，请检查用户名和密码是否正确！")
+                });
   }
 
   Future<void> _loadSharedPreference({bool forceLogin = false}) async {
@@ -170,35 +196,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () async {
                     if (nameController.text.length * pwdController.text.length >
                         0) {
-                      var progressDialog = showProgressDialog(
-                          loadingText: "尝试登录中...", context: context);
-                      var name = "";
-                      await CardRepository.getInstance()
-                          .login(new PersonInfo(
-                              nameController.text, pwdController.text, ""))
-                          .then(
-                              (_) async => {
-                                    progressDialog.dismiss(),
-                                    _preferences.setString(
-                                        "id", nameController.text),
-                                    _preferences.setString(
-                                        "password", pwdController.text),
-                                    name = await CardRepository.getInstance()
-                                        .getName(),
-                                    _preferences.setString("name", name),
-                                    setState(() {
-                                      _personInfo = new PersonInfo(
-                                          nameController.text,
-                                          pwdController.text,
-                                          name);
-                                    }),
-                                    Navigator.of(context).pop(),
-                                  },
-                              onError: (_) => {
-                                    progressDialog.dismiss(),
-                                    Fluttertoast.showToast(
-                                        msg: "登录失败，请检查用户名和密码是否正确！")
-                                  });
+                      _tryLogin(nameController.text, pwdController.text);
                     }
                   },
                 )
@@ -224,7 +222,7 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {
         _connectionStatus = result == null || result['name'] == null
-            ? "获取WiFi名称失败"
+            ? "获取WiFi名称失败，检查位置服务开启情况"
             : FDUWiFiConverter.recognizeWiFi(result['name']);
       });
     } else {
@@ -311,13 +309,11 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(Icons.stacked_line_chart),
                       title: Text("食堂排队消费状况"),
                       onTap: () {
-                        if (_cardInfo != null) {
-                          Navigator.of(context).pushNamed("/card/crowdData",
-                              arguments: {
-                                "cardInfo": _cardInfo,
-                                "personInfo": _personInfo
-                              });
-                        }
+                        Navigator.of(context).pushNamed("/card/crowdData",
+                            arguments: {
+                              "cardInfo": _cardInfo,
+                              "personInfo": _personInfo
+                            });
                       },
                     )
                   ],

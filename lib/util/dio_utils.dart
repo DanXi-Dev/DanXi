@@ -1,6 +1,15 @@
 import 'package:dio/dio.dart';
 
 class DioUtils {
+  static get NON_REDIRECT_OPTION_WITH_FORM_TYPE {
+    return Options(
+        contentType: Headers.formUrlEncodedContentType,
+        followRedirects: false,
+        validateStatus: (status) {
+          return status < 400;
+        });
+  }
+
   static Future<Response> processRedirect(Dio dio, Response response) async {
     //Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&

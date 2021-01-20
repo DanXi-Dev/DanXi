@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
@@ -27,19 +26,34 @@ class DiningHallCrowdednessRepository {
       PersonInfo info, int areaCode) async {
     var result = Map<String, TrafficInfo>();
     await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, info);
-    var re = await _dio.get(DETAIL_URL);
-    var dataString =
-        re.data.toString().between("}", "</script>", headGreedy: false);
-    var jsonExtraction = new RegExp(r'\[.+\]').allMatches(dataString);
-    List names = jsonDecode(jsonExtraction.elementAt(areaCode * 3).group(0));
-    List cur = jsonDecode(jsonExtraction.elementAt(areaCode * 3 + 1).group(0));
-    List max = jsonDecode(jsonExtraction.elementAt(areaCode * 3 + 2).group(0));
-    for (int i = 0; i < names.length; i++) {
-      result[names[i]] = TrafficInfo(cur[i], max[i]);
+    var response = await _dio.get(DETAIL_URL);
+
+    //If it's not time for a meal
+    if (response.data.toString().contains("仅")) {
+      throw UnsuitableTimeException();
     }
+    var dataString =
+        response.data.toString().between("}", "</script>", headGreedy: false);
+    var jsonExtraction = new RegExp(r'\[.+\]').allMatches(dataString);
+    List names = jsonDecode(
+        jsonExtraction.elementAt(areaCode * 3).group(0).replaceAll("\'", "\""));
+    List cur = jsonDecode(jsonExtraction
+        .elementAt(areaCode * 3 + 1)
+        .group(0)
+        .replaceAll("\'", "\""));
+    List max = jsonDecode(jsonExtraction
+        .elementAt(areaCode * 3 + 2)
+        .group(0)
+        .replaceAll("\'", "\""));
+    for (int i = 0; i < names.length; i++) {
+      result[names[i]] = TrafficInfo(int.parse(cur[i]), int.parse(max[i]));
+    }
+
     return result;
   }
 }
+
+class UnsuitableTimeException implements Exception {}
 
 class TrafficInfo {
   int current;

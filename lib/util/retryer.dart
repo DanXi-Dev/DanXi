@@ -1,3 +1,4 @@
+//Retry when errors occur. Useful with unstable net connection
 class Retryer {
   static E runWithRetry<E>(E function(), {int retryTimes = 3}) {
     Exception error;

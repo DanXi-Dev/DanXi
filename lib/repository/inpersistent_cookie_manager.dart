@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:cookie_jar/src/cookie_jar.dart';
 import 'package:cookie_jar/src/serializable_cookie.dart';
 
+//A copy of [DefaultCookieJar], but with an independent cookie storage.
+
 class NonpersistentCookieJar implements CookieJar {
   /// [ignoreExpires]: save/load even cookies that have expired.
   NonpersistentCookieJar({this.ignoreExpires = false});
@@ -115,7 +117,6 @@ class NonpersistentCookieJar implements CookieJar {
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
   void delete(Uri uri, [bool withDomainSharedCookie = false]) {
-    print("call delete $uri");
     final String host = uri.host;
     domains[1].remove(host);
     if (withDomainSharedCookie) {
@@ -127,7 +128,6 @@ class NonpersistentCookieJar implements CookieJar {
 
   /// Delete all cookies in RAM
   void deleteAll() {
-    print("call delete all");
     domains[0].clear();
     domains[1].clear();
   }

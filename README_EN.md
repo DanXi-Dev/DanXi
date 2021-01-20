@@ -8,9 +8,14 @@ Maybe the best all-rounded service app for Fudan University students!
 **Only support Chinese (Simplified) language at the moment. Come on to help us! **   
 
 - Campus card balance and consumption records
-- ~~Dining hall traffic~~
+- Dining hall traffic
 - Shortcut for Fudan Daily
 - Shortcut for Fudan QR Code
+
+# TODO List
+- [ ] Course selection 
+- [ ] Fudan BBS integration
+
 
 (Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
 This application is still at the very initial development stage, welcome to join the development ~

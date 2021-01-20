@@ -1,5 +1,4 @@
 import 'package:beautifulsoup/beautifulsoup.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
@@ -46,8 +45,6 @@ class CardRepository {
   factory CardRepository.getInstance() => _instance;
 
   bool _testLoginSuccess() {
-    print(
-        "Now login:${_cookieJar.loadForRequest(Uri.parse("http://ecard.fudan.edu.cn/")).any((element) => element.name == "iPlanetDirectoryPro")}");
     return _cookieJar
         .loadForRequest(Uri.parse("http://ecard.fudan.edu.cn/"))
         .any((element) => element.name == "iPlanetDirectoryPro");
@@ -56,13 +53,9 @@ class CardRepository {
   Future<void> login(PersonInfo info) async {
     _info = info;
     await Retryer.runAsyncWithRetry(() async {
-      print("Trying login in Card!");
-      var result =
-          await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
+      await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
       if (!_testLoginSuccess()) {
         throw new LoginException();
-      } else {
-        print("Login successful in Card!");
       }
       return null;
     });
@@ -173,9 +166,6 @@ class CardRecord {
   String type;
   String location;
   String payment;
-
-  // String moneyBefore;
-  // String moneyAfter;
 
   CardRecord(this.time, this.type, this.location, this.payment);
 }

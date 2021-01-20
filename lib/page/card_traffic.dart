@@ -17,7 +17,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   CardInfo _cardInfo;
   PersonInfo _personInfo;
   Map<String, TrafficInfo> _trafficInfos;
-  String _selectItem = "请选择食堂~";
+  String _selectItem = "请选择校区~";
 
   @override
   void initState() {
@@ -39,7 +39,8 @@ class _CardCrowdDataState extends State<CardCrowdData> {
               setState(() => {_selectItem = e, _trafficInfos = null});
               _trafficInfos =
                   await DiningHallCrowdednessRepository.getInstance()
-                      .getCrowdednessInfo(_personInfo, 0);
+                      .getCrowdednessInfo(_personInfo,
+                          Constant.campusArea.indexOf(_selectItem));
               setState(() {});
             },
           ),
@@ -53,7 +54,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   }
 
   List<DropdownMenuItem> _getItems() {
-    return Constant.diningHallNameForECard
+    return Constant.campusArea
         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
         .toList(growable: false);
   }
@@ -68,14 +69,6 @@ class _CardCrowdDataState extends State<CardCrowdData> {
         subtitle: Text(key),
       ));
     });
-    // _trafficInfo.record.forEach((element) {
-    //   widgets.add(ListTile(
-    //     leading: Icon(Icons.monetization_on),
-    //     title: Text(element.payment),
-    //     isThreeLine: true,
-    //     subtitle: Text("${element.location}\n${element.time.toString()}"),
-    //   ));
-    // });
 
     return widgets;
   }
