@@ -23,7 +23,7 @@ class CardRepository {
   static const String CONSUME_DETAIL_CSRF_URL =
       "http://ecard.fudan.edu.cn/epay/consume/index";
 
-  static var _CONSUME_DETAIL_HEADER = {
+  static var _consumeDetailHeader = {
     "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
     "Accept": "text/xml",
@@ -71,7 +71,7 @@ class CardRepository {
     requestData['pageNo'] = pageNum.toString();
     var detailResponse = await _dio.post(CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
-        options: Options(headers: _CONSUME_DETAIL_HEADER));
+        options: Options(headers: _consumeDetailHeader));
     var soup = Beautifulsoup(
         detailResponse.data.toString().between("<![CDATA[", "]]>"));
     var elements = soup.find(id: "tbody").querySelectorAll("tr");
@@ -122,7 +122,7 @@ class CardRepository {
 
     var detailResponse = await _dio.post(CONSUME_DETAIL_URL,
         data: data.encodeMap(),
-        options: Options(headers: _CONSUME_DETAIL_HEADER));
+        options: Options(headers: _consumeDetailHeader));
 
     var totalPages =
         int.parse(detailResponse.data.toString().between('</b>/', "页"));

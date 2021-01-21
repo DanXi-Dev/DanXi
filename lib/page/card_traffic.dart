@@ -1,6 +1,5 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +13,6 @@ class CardCrowdData extends StatefulWidget {
 }
 
 class _CardCrowdDataState extends State<CardCrowdData> {
-  CardInfo _cardInfo;
   PersonInfo _personInfo;
   Map<String, TrafficInfo> _trafficInfos;
   String _selectItem = "请选择校区~";
@@ -22,7 +20,6 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   @override
   void initState() {
     super.initState();
-    _cardInfo = widget.arguments['cardInfo'];
     _personInfo = widget.arguments['personInfo'];
   }
 
@@ -39,8 +36,14 @@ class _CardCrowdDataState extends State<CardCrowdData> {
               setState(() => {_selectItem = e, _trafficInfos = null});
               _trafficInfos =
                   await DiningHallCrowdednessRepository.getInstance()
-                      .getCrowdednessInfo(_personInfo,
-                          Constant.campusArea.indexOf(_selectItem));
+                      .getCrowdednessInfo(
+                          _personInfo, Constant.campusArea.indexOf(_selectItem))
+                      .catchError((e) {
+                if (e is UnsuitableTimeException) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text("现在不是食堂用餐时间哦~")));
+                }
+              });
               setState(() {});
             },
           ),

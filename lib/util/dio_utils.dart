@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 class DioUtils {
+  // ignore: non_constant_identifier_names
   static get NON_REDIRECT_OPTION_WITH_FORM_TYPE {
     return Options(
         contentType: Headers.formUrlEncodedContentType,
