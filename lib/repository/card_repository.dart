@@ -63,7 +63,7 @@ class CardRepository {
 
   Future<String> getName() async {
     if (_info != null && _info.name.length > 0) return _info.name;
-    return (await loadCardInfo(0)).name;
+    return (await loadCardInfo(-1)).name;
   }
 
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(

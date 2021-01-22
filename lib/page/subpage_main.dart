@@ -3,7 +3,6 @@ import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class HomeSubpage extends StatefulWidget {
@@ -109,12 +108,14 @@ class _HomeSubpageState extends State<HomeSubpage> {
               if (_fudanDailyTicked) return;
               var progressDialog =
                   showProgressDialog(loadingText: "打卡中...", context: context);
-              await FudanDailyRepository.getInstance().tick(info).then(
-                  (value) => {progressDialog.dismiss(), setState(() {})},
-                  onError: (_) => {
-                        progressDialog.dismiss(),
-                        Fluttertoast.showToast(msg: "打卡失败，请检查网络连接~")
-                      });
+              await FudanDailyRepository.getInstance()
+                  .tick(info)
+                  .then((value) => {progressDialog.dismiss(), setState(() {})},
+                      onError: (_) => {
+                            progressDialog.dismiss(),
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("打卡失败，请检查网络连接~")))
+                          });
             },
           ),
         )

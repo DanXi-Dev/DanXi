@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/card_detail.dart';
@@ -13,17 +14,30 @@ import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'generated/l10n.dart';
+
 final QuickActions quickActions = QuickActions();
 
 void main() {
-  runApp(DanxiApp());
+  CatcherOptions debugOptions = CatcherOptions(PageReportMode(), [
+    ConsoleHandler()
+  ], localizationOptions: [
+    LocalizationOptions.buildDefaultEnglishOptions(),
+    LocalizationOptions.buildDefaultChineseOptions(),
+  ]);
+  Catcher(
+      rootWidget: DanxiApp(),
+      debugConfig: debugOptions,
+      releaseConfig: debugOptions);
+  //runApp(DanxiApp());
 }
 
 class DanxiApp extends StatelessWidget {
@@ -37,12 +51,19 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Intl.defaultLocale = "en";
     return MaterialApp(
-      title: "旦兮",
+      title: "DanXi",
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: HomePage(title: "旦兮"),
+      localizationsDelegates: [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
+      supportedLocales: S.delegate.supportedLocales,
+      home: HomePage(),
       onGenerateRoute: (settings) {
         final String name = settings.name;
         final Function pageContentBuilder = this.routes[name];
@@ -54,14 +75,14 @@ class DanxiApp extends StatelessWidget {
         }
         return null;
       },
+      //Catcher integration
+      navigatorKey: Catcher.navigatorKey,
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  HomePage({Key key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -144,10 +165,7 @@ class _HomePageState extends State<HomePage> {
               }),
               Navigator.of(context).pop(),
             },
-        onError: (_) => {
-              progressDialog.dismiss(),
-              Fluttertoast.showToast(msg: "登录失败，请检查用户名和密码是否正确！")
-            });
+        onError: (e) => {progressDialog.dismiss(), throw e});
   }
 
   void _showLoginDialog({bool forceLogin = false}) {
@@ -192,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   if (nameController.text.length * pwdController.text.length >
                       0) {
-                    _tryLogin(nameController.text, pwdController.text);
+                    await _tryLogin(nameController.text, pwdController.text);
                   }
                 },
               )
@@ -237,16 +255,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print("Start run");
-
     return _personInfo == null
         ? Scaffold(
             appBar: AppBar(
-            title: Text(widget.title),
+              title: Text(S.of(context).app_name),
           ))
         : Scaffold(
       appBar: AppBar(
               title: Text(
-                widget.title,
+                S.of(context).app_name,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
