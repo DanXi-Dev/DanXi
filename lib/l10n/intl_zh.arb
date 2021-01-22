@@ -1,4 +1,14 @@
 {
-    "app_name":"旦兮 α"
+    "app_name":"旦兮 α",
+    "fudan_qr_code":"复活码",
+    "welcome":"欢迎你，{name}!",
+    "current_connection":"当前连接",
+    "ecard_balance":"饭卡余额",
+    "dining_hall_crowdedness":"食堂排队消费状况",
+    "fudan_daily":"平安复旦",
+    "fudan_daily_ticked":"你今天已经上报过了哦！",
+    "fudan_daily_tick":"点击上报",
+    "loading":"获取中...",
+    "current_connection_failed":"获取WiFi名称失败，检查位置服务开启情况"
 
 }

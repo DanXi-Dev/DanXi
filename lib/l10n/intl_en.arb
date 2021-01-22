@@ -1,0 +1,13 @@
+{
+    "app_name":"DanXi",
+    "fudan_qr_code":"ECard Code",
+    "welcome":"Welcome, {name}!",
+    "current_connection":"Connectivity",
+    "ecard_balance":"Ecard balance",
+    "dining_hall_crowdedness":"Dining hall crowdedness",
+    "fudan_daily":"Fudan daily",
+    "fudan_daily_ticked":"You have reported today!",
+    "fudan_daily_tick":"Click to report",
+    "loading":"Loading...",
+    "current_connection_failed":"Failed to obtain WiFi information"
+}

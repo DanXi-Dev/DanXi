@@ -1,3 +1,4 @@
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
@@ -48,20 +49,20 @@ class _HomeSubpageState extends State<HomeSubpage> {
       children: <Widget>[
         Card(
             child: Column(
-          children: [
-            ListTile(
-              title: Text("欢迎你,${info?.name}"),
+              children: [
+                ListTile(
+                  title: Text(S.of(context).welcome(info?.name)),
               subtitle: Text(_helloQuote),
             ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.wifi),
-              title: Text("当前连接"),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.wifi),
+              title: Text(S.of(context).current_connection),
               subtitle: Text(connectStatus),
             ),
-            ListTile(
-              leading: Icon(Icons.account_balance_wallet),
-              title: Text("饭卡余额"),
+                ListTile(
+                  leading: Icon(Icons.account_balance_wallet),
+              title: Text(S.of(context).ecard_balance),
               subtitle: FutureBuilder(
                   future: _loadCard(info),
                   builder:
@@ -70,52 +71,54 @@ class _HomeSubpageState extends State<HomeSubpage> {
                       String response = snapshot.data;
                       return Text(response);
                     } else {
-                      return Text("获取中...");
+                      return Text(S.of(context).loading);
                     }
                   }),
-              onTap: () {
-                if (_cardInfo != null) {
-                  Navigator.of(context).pushNamed("/card/detail",
-                      arguments: {"cardInfo": _cardInfo, "personInfo": info});
-                }
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.stacked_line_chart),
-              title: Text("食堂排队消费状况"),
+                  onTap: () {
+                    if (_cardInfo != null) {
+                      Navigator.of(context).pushNamed("/card/detail",
+                          arguments: {"cardInfo": _cardInfo, "personInfo": info});
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.stacked_line_chart),
+              title: Text(S.of(context).dining_hall_crowdedness),
               onTap: () {
                 Navigator.of(context).pushNamed("/card/crowdData",
                     arguments: {"cardInfo": _cardInfo, "personInfo": info});
               },
             )
-          ],
-        )),
+              ],
+            )),
         Card(
           child: ListTile(
-            title: Text("平安复旦"),
+            title: Text(S.of(context).fudan_daily),
             leading: Icon(Icons.cloud_upload),
             subtitle: FutureBuilder(
                 future: FudanDailyRepository.getInstance().hasTick(info),
                 builder: (_, AsyncSnapshot<bool> snapshot) {
                   if (snapshot.hasData) {
                     _fudanDailyTicked = snapshot.data;
-                    return Text(_fudanDailyTicked ? "你今天已经上报过了哦！" : "点击上报");
+                    return Text(_fudanDailyTicked
+                        ? S.of(context).fudan_daily_ticked
+                        : S.of(context).fudan_daily_tick);
                   } else {
-                    return Text("获取中...");
+                    return Text(S.of(context).loading);
                   }
                 }),
             onTap: () async {
               if (_fudanDailyTicked) return;
               var progressDialog =
-                  showProgressDialog(loadingText: "打卡中...", context: context);
+              showProgressDialog(loadingText: "打卡中...", context: context);
               await FudanDailyRepository.getInstance()
                   .tick(info)
                   .then((value) => {progressDialog.dismiss(), setState(() {})},
-                      onError: (_) => {
-                            progressDialog.dismiss(),
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("打卡失败，请检查网络连接~")))
-                          });
+                  onError: (_) => {
+                    progressDialog.dismiss(),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("打卡失败，请检查网络连接~")))
+                  });
             },
           ),
         )

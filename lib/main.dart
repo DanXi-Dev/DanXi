@@ -51,7 +51,6 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Intl.defaultLocale = "en";
     return MaterialApp(
       title: "DanXi",
       theme: ThemeData(
@@ -109,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         barrierDismissible: true,
         builder: (BuildContext context) {
           return new AlertDialog(
-              title: Text("复活码"),
+              title: Text(S.of(context).fudan_qr_code),
               content: Container(
                   width: double.maxFinite,
                   child: Center(
@@ -136,8 +135,10 @@ class _HomePageState extends State<HomePage> {
     _loadSharedPreference();
     _loadNetworkState();
     quickActions.setShortcutItems(<ShortcutItem>[
-      const ShortcutItem(
-          type: 'action_qr_code', localizedTitle: '复活码', icon: 'ic_launcher'),
+      ShortcutItem(
+          type: 'action_qr_code',
+          localizedTitle: S.current.fudan_qr_code,
+          icon: 'ic_launcher'),
     ]);
 
     quickActions.initialize((shortcutType) {
@@ -242,7 +243,7 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {
         _connectStatus.value = result == null || result['name'] == null
-            ? "获取WiFi名称失败，检查位置服务开启情况"
+            ? S.current.current_connection_failed
             : FDUWiFiConverter.recognizeWiFi(result['name']);
       });
     } else {
