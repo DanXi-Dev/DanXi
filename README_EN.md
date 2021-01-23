@@ -6,7 +6,7 @@
   
 Maybe the best all-rounded service app for Fudan University students!    
  
-**Only support Chinese (Simplified) language at the moment. Come on to help us!**    
+**Only support Chinese (Simplified) and English language at the moment. Come on to help us!**    
 
 - Campus card balance and consumption records
 - Dining hall traffic

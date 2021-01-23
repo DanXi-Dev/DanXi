@@ -1,3 +1,4 @@
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
@@ -17,6 +18,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
   String _helloQuote = "";
   CardInfo _cardInfo;
   bool _fudanDailyTicked = true;
+  ConnectionStatus _fudanDailyStatus = ConnectionStatus.NONE;
 
   @override
   void initState() {
@@ -49,19 +51,19 @@ class _HomeSubpageState extends State<HomeSubpage> {
       children: <Widget>[
         Card(
             child: Column(
-              children: [
-                ListTile(
-                  title: Text(S.of(context).welcome(info?.name)),
+          children: [
+            ListTile(
+              title: Text(S.of(context).welcome(info?.name)),
               subtitle: Text(_helloQuote),
             ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.wifi),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.wifi),
               title: Text(S.of(context).current_connection),
               subtitle: Text(connectStatus),
             ),
-                ListTile(
-                  leading: Icon(Icons.account_balance_wallet),
+            ListTile(
+              leading: Icon(Icons.account_balance_wallet),
               title: Text(S.of(context).ecard_balance),
               subtitle: FutureBuilder(
                   future: _loadCard(info),
@@ -74,23 +76,23 @@ class _HomeSubpageState extends State<HomeSubpage> {
                       return Text(S.of(context).loading);
                     }
                   }),
-                  onTap: () {
-                    if (_cardInfo != null) {
-                      Navigator.of(context).pushNamed("/card/detail",
-                          arguments: {"cardInfo": _cardInfo, "personInfo": info});
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.stacked_line_chart),
+              onTap: () {
+                if (_cardInfo != null) {
+                  Navigator.of(context).pushNamed("/card/detail",
+                      arguments: {"cardInfo": _cardInfo, "personInfo": info});
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.stacked_line_chart),
               title: Text(S.of(context).dining_hall_crowdedness),
               onTap: () {
                 Navigator.of(context).pushNamed("/card/crowdData",
                     arguments: {"cardInfo": _cardInfo, "personInfo": info});
               },
             )
-              ],
-            )),
+          ],
+        )),
         Card(
           child: ListTile(
             title: Text(S.of(context).fudan_daily),
@@ -99,26 +101,43 @@ class _HomeSubpageState extends State<HomeSubpage> {
                 future: FudanDailyRepository.getInstance().hasTick(info),
                 builder: (_, AsyncSnapshot<bool> snapshot) {
                   if (snapshot.hasData) {
+                    _fudanDailyStatus = ConnectionStatus.DONE;
                     _fudanDailyTicked = snapshot.data;
                     return Text(_fudanDailyTicked
                         ? S.of(context).fudan_daily_ticked
                         : S.of(context).fudan_daily_tick);
+                  } else if (snapshot.hasError) {
+                    _fudanDailyStatus = ConnectionStatus.FAILED;
+                    return Text(S.of(context).failed);
                   } else {
+                    _fudanDailyStatus = ConnectionStatus.CONNECTING;
                     return Text(S.of(context).loading);
                   }
                 }),
             onTap: () async {
-              if (_fudanDailyTicked) return;
-              var progressDialog =
-              showProgressDialog(loadingText: "打卡中...", context: context);
-              await FudanDailyRepository.getInstance()
-                  .tick(info)
-                  .then((value) => {progressDialog.dismiss(), setState(() {})},
-                  onError: (_) => {
-                    progressDialog.dismiss(),
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("打卡失败，请检查网络连接~")))
-                  });
+              switch (_fudanDailyStatus) {
+                case ConnectionStatus.DONE:
+                  if (!_fudanDailyTicked) {
+                    var progressDialog = showProgressDialog(
+                        loadingText: S.of(context).ticking, context: context);
+                    await FudanDailyRepository.getInstance().tick(info).then(
+                        (value) => {progressDialog.dismiss(), setState(() {})},
+                        onError: (_) => {
+                              progressDialog.dismiss(),
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(S.of(context).tick_failed)))
+                            });
+                  }
+                  break;
+                case ConnectionStatus.FAILED:
+                  setState(() {});
+                  break;
+                case ConnectionStatus.FATAL_ERROR:
+                case ConnectionStatus.CONNECTING:
+                case ConnectionStatus.NONE:
+                  break;
+              }
             },
           ),
         )

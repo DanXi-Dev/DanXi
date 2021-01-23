@@ -86,11 +86,41 @@ class S {
     );
   }
 
+  /// `Ecard balance detail`
+  String get ecard_balance_log {
+    return Intl.message(
+      'Ecard balance detail',
+      name: 'ecard_balance_log',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Dining hall crowdedness`
   String get dining_hall_crowdedness {
     return Intl.message(
       'Dining hall crowdedness',
       name: 'dining_hall_crowdedness',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose your location`
+  String get choose_area {
+    return Intl.message(
+      'Choose your location',
+      name: 'choose_area',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `It's not time for a meal at the moment!`
+  String get out_of_dining_time {
+    return Intl.message(
+      'It\'s not time for a meal at the moment!',
+      name: 'out_of_dining_time',
       desc: '',
       args: [],
     );
@@ -136,11 +166,121 @@ class S {
     );
   }
 
+  /// `Load failed, click to retry`
+  String get failed {
+    return Intl.message(
+      'Load failed, click to retry',
+      name: 'failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reporting...`
+  String get ticking {
+    return Intl.message(
+      'Reporting...',
+      name: 'ticking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Report failed. Check your connection.`
+  String get tick_failed {
+    return Intl.message(
+      'Report failed. Check your connection.',
+      name: 'tick_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Failed to obtain WiFi information`
   String get current_connection_failed {
     return Intl.message(
       'Failed to obtain WiFi information',
       name: 'current_connection_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not connect to any WiFi`
+  String get current_connection_no_wifi {
+    return Intl.message(
+      'Not connect to any WiFi',
+      name: 'current_connection_no_wifi',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login Fudan UIS`
+  String get login_uis {
+    return Intl.message(
+      'Login Fudan UIS',
+      name: 'login_uis',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UIS ID`
+  String get login_uis_uid {
+    return Intl.message(
+      'UIS ID',
+      name: 'login_uis_uid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UIS Password`
+  String get login_uis_pwd {
+    return Intl.message(
+      'UIS Password',
+      name: 'login_uis_pwd',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login`
+  String get login {
+    return Intl.message(
+      'Login',
+      name: 'login',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Logging in...`
+  String get logining {
+    return Intl.message(
+      'Logging in...',
+      name: 'logining',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change account`
+  String get change_account {
+    return Intl.message(
+      'Change account',
+      name: 'change_account',
       desc: '',
       args: [],
     );
@@ -159,10 +299,8 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
 
   @override
   bool isSupported(Locale locale) => _isSupported(locale);
-
   @override
   Future<S> load(Locale locale) => S.load(locale);
-
   @override
   bool shouldReload(AppLocalizationDelegate old) => false;
 

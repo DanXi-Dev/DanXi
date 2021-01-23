@@ -196,9 +196,11 @@ packages:
   flutter_progress_dialog:
     dependency: "direct main"
     description:
-      name: flutter_progress_dialog
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "48eb2ee396c6a6f3bec70909d80e40f547765119"
+      url: "git://github.com/w568w/flutter_progress_dialog.git"
+    source: git
     version: "0.1.0"
   flutter_test:
     dependency: "direct dev"
@@ -539,4 +541,4 @@ packages:
     version: "0.1.2"
 sdks:
   dart: ">=2.12.0-0.0 <3.0.0"
-  flutter: ">=1.20.0 <2.0.0"
+  flutter: ">=1.20.0"

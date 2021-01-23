@@ -1,3 +1,4 @@
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("饭卡消费记录")),
+      appBar: AppBar(title: Text(S.of(context).ecard_balance_log)),
       body: ListView(
         children: _getListWidgets(),
       ),

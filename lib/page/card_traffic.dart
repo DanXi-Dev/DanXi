@@ -1,4 +1,5 @@
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ class CardCrowdData extends StatefulWidget {
 class _CardCrowdDataState extends State<CardCrowdData> {
   PersonInfo _personInfo;
   Map<String, TrafficInfo> _trafficInfos;
-  String _selectItem = "请选择校区~";
+  String _selectItem = S.current.choose_area;
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("食堂排队消费状况")),
+      appBar: AppBar(title: Text(S.of(context).dining_hall_crowdedness)),
       body: Column(
         children: [
           DropdownButton(
@@ -40,8 +41,8 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                           _personInfo, Constant.campusArea.indexOf(_selectItem))
                       .catchError((e) {
                 if (e is UnsuitableTimeException) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("现在不是食堂用餐时间哦~")));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(S.of(context).out_of_dining_time)));
                 }
               });
               setState(() {});

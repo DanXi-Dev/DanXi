@@ -4,11 +4,25 @@
     "welcome":"欢迎你，{name}!",
     "current_connection":"当前连接",
     "ecard_balance":"饭卡余额",
+    "ecard_balance_log":"饭卡消费记录",
     "dining_hall_crowdedness":"食堂排队消费状况",
+    "choose_area":"请选择校区~",
+    "out_of_dining_time":"现在不是食堂用餐时间哦~",
     "fudan_daily":"平安复旦",
     "fudan_daily_ticked":"你今天已经上报过了哦！",
     "fudan_daily_tick":"点击上报",
     "loading":"获取中...",
-    "current_connection_failed":"获取WiFi名称失败，检查位置服务开启情况"
+    "failed":"获取失败，点击重试",
+    "ticking":"打卡中...",
+    "tick_failed":"打卡失败，请检查网络连接~",
+    "current_connection_failed":"获取 WiFi 名称失败，检查位置服务开启情况",
+    "current_connection_no_wifi":"没有链接到 WiFi",
+    "login_uis":"登录 Fudan UIS",
+    "login_uis_uid":"UIS 账号",
+    "login_uis_pwd":"UIS 密码",
+    "cancel":"取消",
+    "login":"登录",
+    "logining":"尝试登录中...",
+    "change_account":"切换账号"
 
 }

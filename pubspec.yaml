@@ -34,7 +34,10 @@ dependencies:
   http: ^0.12.2
   intl: ^0.17.0-nullsafety.2
   shared_preferences: ^0.5.12+4
-  flutter_progress_dialog: ^0.1.0
+  flutter_progress_dialog:
+    git:
+      url: git://github.com/w568w/flutter_progress_dialog.git
+      ref: master
   beautifulsoup: ^0.0.1
   fl_chart: ^0.12.2
   quick_actions: ^0.4.0+10

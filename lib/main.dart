@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -151,8 +150,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _tryLogin(String id, String pwd) async {
-    var progressDialog =
-        showProgressDialog(loadingText: "尝试登录中...", context: context);
+    var progressDialog = showProgressDialog(
+        loadingText: S.of(context).logining, context: context);
     var name = "";
     await CardRepository.getInstance().login(new PersonInfo(id, pwd, "")).then(
         (_) async => {
@@ -177,7 +176,7 @@ class _HomePageState extends State<HomePage> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return new AlertDialog(
-            title: Text("登录Fudan UIS"),
+            title: Text(S.of(context).login_uis),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -185,20 +184,22 @@ class _HomePageState extends State<HomePage> {
                   controller: nameController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      labelText: "UIS账号", icon: Icon(Icons.perm_identity)),
+                      labelText: S.of(context).login_uis_uid,
+                      icon: Icon(Icons.perm_identity)),
                   autofocus: true,
                 ),
                 TextField(
                   controller: pwdController,
                   decoration: InputDecoration(
-                      labelText: "UIS密码", icon: Icon(Icons.lock_outline)),
+                      labelText: S.of(context).login_uis_pwd,
+                      icon: Icon(Icons.lock_outline)),
                   obscureText: true,
                 )
               ],
             ),
             actions: [
               FlatButton(
-                child: Text("取消"),
+                child: Text(S.of(context).cancel),
                 onPressed: () {
                   if (forceLogin)
                     Navigator.of(context).pop();
@@ -207,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               FlatButton(
-                child: Text("登录"),
+                child: Text(S.of(context).login),
                 onPressed: () async {
                   if (nameController.text.length * pwdController.text.length >
                       0) {
@@ -248,7 +249,7 @@ class _HomePageState extends State<HomePage> {
       });
     } else {
       setState(() {
-        _connectStatus.value = "没有链接到WiFi";
+        _connectStatus.value = S.of(context).current_connection_no_wifi;
       });
     }
   }
@@ -307,7 +308,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 await _loadSharedPreference(forceLogin: true);
               },
-              tooltip: '切换账号',
+              tooltip: S.of(context).change_account,
               child: Icon(Icons.login),
             ),
           );

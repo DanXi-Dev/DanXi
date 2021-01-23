@@ -25,13 +25,24 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static _notInlinedMessages(_) => <String, Function>{
         "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "change_account":
+            MessageLookupByLibrary.simpleMessage("Change account"),
+        "choose_area":
+            MessageLookupByLibrary.simpleMessage("Choose your location"),
         "current_connection":
             MessageLookupByLibrary.simpleMessage("Connectivity"),
         "current_connection_failed": MessageLookupByLibrary.simpleMessage(
             "Failed to obtain WiFi information"),
+        "current_connection_no_wifi":
+            MessageLookupByLibrary.simpleMessage("Not connect to any WiFi"),
         "dining_hall_crowdedness":
             MessageLookupByLibrary.simpleMessage("Dining hall crowdedness"),
         "ecard_balance": MessageLookupByLibrary.simpleMessage("Ecard balance"),
+        "ecard_balance_log":
+            MessageLookupByLibrary.simpleMessage("Ecard balance detail"),
+        "failed":
+            MessageLookupByLibrary.simpleMessage("Load failed, click to retry"),
         "fudan_daily": MessageLookupByLibrary.simpleMessage("Fudan daily"),
         "fudan_daily_tick":
             MessageLookupByLibrary.simpleMessage("Click to report"),
@@ -39,6 +50,16 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("You have reported today!"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("ECard Code"),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
+        "login": MessageLookupByLibrary.simpleMessage("Login"),
+        "login_uis": MessageLookupByLibrary.simpleMessage("Login Fudan UIS"),
+        "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS Password"),
+        "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS ID"),
+        "logining": MessageLookupByLibrary.simpleMessage("Logging in..."),
+        "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
+            "It\'s not time for a meal at the moment!"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage(
+            "Report failed. Check your connection."),
+        "ticking": MessageLookupByLibrary.simpleMessage("Reporting..."),
         "welcome": m0
       };
 }

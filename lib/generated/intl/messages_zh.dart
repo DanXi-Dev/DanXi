@@ -25,18 +25,34 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static _notInlinedMessages(_) => <String, Function>{
         "app_name": MessageLookupByLibrary.simpleMessage("旦兮 α"),
+        "cancel": MessageLookupByLibrary.simpleMessage("取消"),
+        "change_account": MessageLookupByLibrary.simpleMessage("切换账号"),
+        "choose_area": MessageLookupByLibrary.simpleMessage("请选择校区~"),
         "current_connection": MessageLookupByLibrary.simpleMessage("当前连接"),
         "current_connection_failed":
-            MessageLookupByLibrary.simpleMessage("获取WiFi名称失败，检查位置服务开启情况"),
+            MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，检查位置服务开启情况"),
+        "current_connection_no_wifi":
+            MessageLookupByLibrary.simpleMessage("没有链接到 WiFi"),
         "dining_hall_crowdedness":
             MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
         "ecard_balance": MessageLookupByLibrary.simpleMessage("饭卡余额"),
+        "ecard_balance_log": MessageLookupByLibrary.simpleMessage("饭卡消费记录"),
+        "failed": MessageLookupByLibrary.simpleMessage("获取失败，点击重试"),
         "fudan_daily": MessageLookupByLibrary.simpleMessage("平安复旦"),
         "fudan_daily_tick": MessageLookupByLibrary.simpleMessage("点击上报"),
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("你今天已经上报过了哦！"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("复活码"),
         "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
+        "login": MessageLookupByLibrary.simpleMessage("登录"),
+        "login_uis": MessageLookupByLibrary.simpleMessage("登录 Fudan UIS"),
+        "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS 密码"),
+        "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS 账号"),
+        "logining": MessageLookupByLibrary.simpleMessage("尝试登录中..."),
+        "out_of_dining_time":
+            MessageLookupByLibrary.simpleMessage("现在不是食堂用餐时间哦~"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接~"),
+        "ticking": MessageLookupByLibrary.simpleMessage("打卡中..."),
         "welcome": m0
       };
 }
