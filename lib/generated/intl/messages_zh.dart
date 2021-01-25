@@ -38,11 +38,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "ecard_balance": MessageLookupByLibrary.simpleMessage("饭卡余额"),
         "ecard_balance_log": MessageLookupByLibrary.simpleMessage("饭卡消费记录"),
         "failed": MessageLookupByLibrary.simpleMessage("获取失败，点击重试"),
+        "fatal_error": MessageLookupByLibrary.simpleMessage("错误"),
         "fudan_daily": MessageLookupByLibrary.simpleMessage("平安复旦"),
         "fudan_daily_tick": MessageLookupByLibrary.simpleMessage("点击上报"),
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("你今天已经上报过了哦！"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("复活码"),
+        "i_see": MessageLookupByLibrary.simpleMessage("我知道了"),
         "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
         "login": MessageLookupByLibrary.simpleMessage("登录"),
         "login_uis": MessageLookupByLibrary.simpleMessage("登录 Fudan UIS"),
@@ -52,6 +54,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "out_of_dining_time":
             MessageLookupByLibrary.simpleMessage("现在不是食堂用餐时间哦~"),
         "tick_failed": MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接~"),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "打卡失败，旦兮无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
         "ticking": MessageLookupByLibrary.simpleMessage("打卡中..."),
         "welcome": m0
       };

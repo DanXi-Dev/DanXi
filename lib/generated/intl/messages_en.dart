@@ -43,12 +43,14 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Ecard balance detail"),
         "failed":
             MessageLookupByLibrary.simpleMessage("Load failed, click to retry"),
+        "fatal_error": MessageLookupByLibrary.simpleMessage("ERROR"),
         "fudan_daily": MessageLookupByLibrary.simpleMessage("Fudan daily"),
         "fudan_daily_tick":
             MessageLookupByLibrary.simpleMessage("Click to report"),
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("You have reported today!"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("ECard Code"),
+        "i_see": MessageLookupByLibrary.simpleMessage("I know"),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "login_uis": MessageLookupByLibrary.simpleMessage("Login Fudan UIS"),
@@ -59,6 +61,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "It\'s not time for a meal at the moment!"),
         "tick_failed": MessageLookupByLibrary.simpleMessage(
             "Report failed. Check your connection."),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Report failed. Danxi can\'t get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day."),
         "ticking": MessageLookupByLibrary.simpleMessage("Reporting..."),
         "welcome": m0
       };

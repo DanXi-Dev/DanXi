@@ -176,6 +176,36 @@ class S {
     );
   }
 
+  /// `ERROR`
+  String get fatal_error {
+    return Intl.message(
+      'ERROR',
+      name: 'fatal_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Report failed. Danxi can't get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day.`
+  String get tick_issue_1 {
+    return Intl.message(
+      'Report failed. Danxi can\'t get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day.',
+      name: 'tick_issue_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `I know`
+  String get i_see {
+    return Intl.message(
+      'I know',
+      name: 'i_see',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Reporting...`
   String get ticking {
     return Intl.message(

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -10,6 +9,7 @@ import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -198,16 +198,16 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 child: Text(S.of(context).cancel),
                 onPressed: () {
                   if (forceLogin)
                     Navigator.of(context).pop();
                   else
-                    exit(0);
+                    FlutterApp.exitApp();
                 },
               ),
-              FlatButton(
+              TextButton(
                 child: Text(S.of(context).login),
                 onPressed: () async {
                   if (nameController.text.length * pwdController.text.length >
@@ -239,9 +239,7 @@ class _HomePageState extends State<HomePage> {
       var result;
       try {
         result = await WiFiUtils.getWiFiInfo(connectivity);
-      } catch (e) {
-        print(e);
-      }
+      } catch (ignored) {}
       setState(() {
         _connectStatus.value = result == null || result['name'] == null
             ? S.current.current_connection_failed
@@ -257,13 +255,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print("Start run");
-    return _personInfo == null
+    return _personInfo.value == null
         ? Scaffold(
             appBar: AppBar(
-              title: Text(S.of(context).app_name),
+            title: Text(S.of(context).app_name),
           ))
         : Scaffold(
-      appBar: AppBar(
+            appBar: AppBar(
               title: Text(
                 S.of(context).app_name,
                 style: TextStyle(fontWeight: FontWeight.bold),

@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'inpersistent_cookie_manager.dart';
 
@@ -18,6 +22,7 @@ class FudanDailyRepository {
       "https://zlapp.fudan.edu.cn/ncov/wap/fudan/save";
   static const String GET_INFO_URL =
       "https://zlapp.fudan.edu.cn/ncov/wap/fudan/get-info";
+  static const String _KEY_PREF = "daily_payload_cache";
   PersonInfo _info;
 
   FudanDailyRepository._() {
@@ -42,22 +47,12 @@ class FudanDailyRepository {
 
   Future<bool> hasTick(PersonInfo info) async {
     _historyData = await Retryer.runAsyncWithRetry(() => _getHistoryInfo(info));
-    print("Last Tick Date:${_historyData['info']['date']}");
-    return _historyData['info']['date'] ==
-        new DateFormat('yyyyMMdd').format(DateTime.now());
+    return _historyData['info'] is! Map ||
+        _historyData['info']['date'] ==
+            new DateFormat('yyyyMMdd').format(DateTime.now());
   }
 
-  Future<void> tick(PersonInfo info) async {
-    if (_historyData == null) {
-      _historyData =
-          await Retryer.runAsyncWithRetry(() => _getHistoryInfo(info));
-    }
-    var headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
-      "Origin": "https://zlapp.fudan.edu.cn",
-      "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
-    };
+  Map _buildPayloadFromHistory() {
     Map payload = _historyData['info'];
     payload['ismoved'] = 0;
     payload['number'] = _historyData['uinfo']['role']['number'];
@@ -76,15 +71,38 @@ class FudanDailyRepository {
     payload['jcjgqr'] = 0;
     payload['sfwztl'] = 0;
     payload['sftztl'] = 0;
+    return payload;
+  }
+
+  Future<void> tick(PersonInfo info) async {
+    if (_historyData == null) {
+      _historyData =
+          await Retryer.runAsyncWithRetry(() => _getHistoryInfo(info));
+    }
+    var headers = {
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
+      "Origin": "https://zlapp.fudan.edu.cn",
+      "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
+    };
+    Map payload;
+    var pref = await SharedPreferences.getInstance();
+    if (_historyData == null || _historyData['oldInfo'] is! Map) {
+      if (pref.containsKey(_KEY_PREF)) {
+        payload = jsonDecode(pref.getString(_KEY_PREF));
+      } else {
+        throw NotTickYesterdayException();
+      }
+    } else {
+      payload = _buildPayloadFromHistory();
+      await pref.setString(_KEY_PREF, jsonEncode(payload));
+    }
 
     await _dio.post(SAVE_URL,
         data: payload.encodeMap(),
-        options: Options(
-            headers: headers,
-            contentType: Headers.formUrlEncodedContentType,
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 400;
-            }));
+        options:
+            DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));
   }
 }
+
+class NotTickYesterdayException implements Exception {}

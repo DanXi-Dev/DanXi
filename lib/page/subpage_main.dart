@@ -31,6 +31,20 @@ class _HomeSubpageState extends State<HomeSubpage> {
     return _cardInfo.cash;
   }
 
+  void _processForgetTickIssue() {
+    showDialog(
+        context: context,
+        builder: (cxt) => AlertDialog(
+              title: Text(S.of(context).fatal_error),
+              content: Text(S.of(context).tick_issue_1),
+              actions: [
+                TextButton(
+                    child: Text(S.of(context).i_see),
+                    onPressed: () => Navigator.of(context).pop())
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     int time = DateTime.now().hour;
@@ -122,16 +136,20 @@ class _HomeSubpageState extends State<HomeSubpage> {
                         loadingText: S.of(context).ticking, context: context);
                     await FudanDailyRepository.getInstance().tick(info).then(
                         (value) => {progressDialog.dismiss(), setState(() {})},
-                        onError: (_) => {
-                              progressDialog.dismiss(),
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(S.of(context).tick_failed)))
-                            });
+                        onError: (e) {
+                      progressDialog.dismiss();
+                      if (e is NotTickYesterdayException) {
+                        _processForgetTickIssue();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(S.of(context).tick_failed)));
+                      }
+                    });
                   }
                   break;
                 case ConnectionStatus.FAILED:
-                  setState(() {});
+                  setState(
+                      () => _fudanDailyStatus = ConnectionStatus.CONNECTING);
                   break;
                 case ConnectionStatus.FATAL_ERROR:
                 case ConnectionStatus.CONNECTING:
