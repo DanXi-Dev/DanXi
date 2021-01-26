@@ -26,5 +26,8 @@
     "cancel":"Cancel",
     "login":"Login",
     "logining":"Logging in...",
-    "change_account":"Change account"
+    "change_account":"Change account",
+    "loading_qr_code":"Loading ECard Code...\nIt may take more than 5 seconds.",
+
+    "dashboard":"Dashboard"
 }

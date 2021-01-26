@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return new AlertDialog(
+          return AlertDialog(
               title: Text(S.of(context).fudan_qr_code),
               content: Container(
                   width: double.maxFinite,
@@ -116,11 +116,9 @@ class _HomePageState extends State<HomePage> {
                               .getQRCode(_personInfo.value),
                           builder: (BuildContext context,
                               AsyncSnapshot<String> snapshot) {
-                            if (snapshot.hasData) {
-                              return QrImage(data: snapshot.data, size: 200.0);
-                            } else {
-                              return Text("加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)");
-                            }
+                            return snapshot.hasData
+                                ? QrImage(data: snapshot.data, size: 200.0)
+                                : Text(S.of(context).loading_qr_code);
                           }))));
         });
   }
@@ -278,14 +276,14 @@ class _HomePageState extends State<HomePage> {
               items: [
                 BottomNavigationBarItem(
                   backgroundColor: Colors.purple,
-                  icon: Icon(Icons.home),
-                  label: "首页",
+                  icon: Icon(Icons.dashboard),
+                  label: S.of(context).dashboard,
                 ),
-                BottomNavigationBarItem(
-                  backgroundColor: Colors.indigo,
-                  icon: Icon(Icons.forum),
-                  label: "论坛",
-                ),
+                // BottomNavigationBarItem(
+                //   backgroundColor: Colors.indigo,
+                //   icon: Icon(Icons.forum),
+                //   label: "论坛",
+                // ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.blue,
                   icon: Icon(Icons.person),

@@ -36,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Failed to obtain WiFi information"),
         "current_connection_no_wifi":
             MessageLookupByLibrary.simpleMessage("Not connect to any WiFi"),
+        "dashboard": MessageLookupByLibrary.simpleMessage("Dashboard"),
         "dining_hall_crowdedness":
             MessageLookupByLibrary.simpleMessage("Dining hall crowdedness"),
         "ecard_balance": MessageLookupByLibrary.simpleMessage("Ecard balance"),
@@ -52,6 +53,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("ECard Code"),
         "i_see": MessageLookupByLibrary.simpleMessage("I know"),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
+        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
+            "Loading ECard Code...\nIt may take more than 5 seconds."),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "login_uis": MessageLookupByLibrary.simpleMessage("Login Fudan UIS"),
         "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS Password"),

@@ -26,6 +26,8 @@
     "cancel":"取消",
     "login":"登录",
     "logining":"尝试登录中...",
-    "change_account":"切换账号"
+    "change_account":"切换账号",
+    "loading_qr_code":"加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)",
 
+    "dashboard":"仪表盘"
 }

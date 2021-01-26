@@ -38,7 +38,7 @@ class FudanDailyRepository {
     await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
     var res = await _dio.get(GET_INFO_URL);
     try {
-      return res.data['d'];
+      return jsonDecode(res.data.toString())['d'];
     } catch (e) {
       print(e);
     }

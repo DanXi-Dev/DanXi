@@ -315,6 +315,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Loading ECard Code...\nIt may take more than 5 seconds.`
+  String get loading_qr_code {
+    return Intl.message(
+      'Loading ECard Code...\nIt may take more than 5 seconds.',
+      name: 'loading_qr_code',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dashboard`
+  String get dashboard {
+    return Intl.message(
+      'Dashboard',
+      name: 'dashboard',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

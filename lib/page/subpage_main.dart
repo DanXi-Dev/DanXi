@@ -34,7 +34,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
   void _processForgetTickIssue() {
     showDialog(
         context: context,
-        builder: (cxt) => AlertDialog(
+        builder: (_) => AlertDialog(
               title: Text(S.of(context).fatal_error),
               content: Text(S.of(context).tick_issue_1),
               actions: [

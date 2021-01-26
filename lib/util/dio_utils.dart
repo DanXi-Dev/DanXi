@@ -11,6 +11,7 @@ class DioUtils {
         });
   }
 
+  // ignore: non_constant_identifier_names
   static NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(
           Map<String, dynamic> header) =>
       Options(

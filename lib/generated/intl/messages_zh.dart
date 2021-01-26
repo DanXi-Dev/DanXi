@@ -33,6 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，检查位置服务开启情况"),
         "current_connection_no_wifi":
             MessageLookupByLibrary.simpleMessage("没有链接到 WiFi"),
+        "dashboard": MessageLookupByLibrary.simpleMessage("仪表盘"),
         "dining_hall_crowdedness":
             MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
         "ecard_balance": MessageLookupByLibrary.simpleMessage("饭卡余额"),
@@ -46,6 +47,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("复活码"),
         "i_see": MessageLookupByLibrary.simpleMessage("我知道了"),
         "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
+        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
+            "加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)"),
         "login": MessageLookupByLibrary.simpleMessage("登录"),
         "login_uis": MessageLookupByLibrary.simpleMessage("登录 Fudan UIS"),
         "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS 密码"),
