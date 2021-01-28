@@ -159,6 +159,12 @@ class CardInfo {
   String cash;
   String name;
   List<CardRecord> records;
+
+  Future<List<CardRecord>> loadRecords(int logDays) async {
+    this.records = await Retryer.runAsyncWithRetry(
+        () => CardRepository.getInstance().loadCardRecord(logDays));
+    return this.records;
+  }
 }
 
 class CardRecord {

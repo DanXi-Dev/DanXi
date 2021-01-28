@@ -29,5 +29,8 @@
     "change_account":"切换账号",
     "loading_qr_code":"加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)",
 
+    "last_7_days":"过去 7 天",
+    "last_15_days":"过去 15 天",
+    "last_30_days":"过去 30 天",
     "dashboard":"仪表盘"
 }

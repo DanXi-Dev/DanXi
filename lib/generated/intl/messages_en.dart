@@ -52,6 +52,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("You have reported today!"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("ECard Code"),
         "i_see": MessageLookupByLibrary.simpleMessage("I know"),
+        "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
+        "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
         "loading_qr_code": MessageLookupByLibrary.simpleMessage(
             "Loading ECard Code...\nIt may take more than 5 seconds."),

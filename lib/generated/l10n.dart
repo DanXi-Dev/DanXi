@@ -326,6 +326,36 @@ class S {
     );
   }
 
+  /// `Last 7 days`
+  String get last_7_days {
+    return Intl.message(
+      'Last 7 days',
+      name: 'last_7_days',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last 15 days`
+  String get last_15_days {
+    return Intl.message(
+      'Last 15 days',
+      name: 'last_15_days',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last 30 days`
+  String get last_30_days {
+    return Intl.message(
+      'Last 30 days',
+      name: 'last_30_days',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Dashboard`
   String get dashboard {
     return Intl.message(

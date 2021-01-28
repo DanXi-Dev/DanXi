@@ -29,5 +29,8 @@
     "change_account":"Change account",
     "loading_qr_code":"Loading ECard Code...\nIt may take more than 5 seconds.",
 
+    "last_7_days":"Last 7 days",
+    "last_15_days":"Last 15 days",
+    "last_30_days":"Last 30 days",
     "dashboard":"Dashboard"
 }

@@ -1,6 +1,8 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/widget/tag_selector/selector.dart';
+import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
 
 class CardDetailPage extends StatefulWidget {
@@ -15,21 +17,46 @@ class CardDetailPage extends StatefulWidget {
 class _CardDetailPageState extends State<CardDetailPage> {
   CardInfo _cardInfo;
   PersonInfo _personInfo;
+  List<Tag> _tags;
+  List<int> _tagDays;
 
   @override
   void initState() {
     super.initState();
     _cardInfo = widget.arguments['cardInfo'];
     _personInfo = widget.arguments['personInfo'];
+    _tags = [
+      Tag(S.current.last_7_days, Icons.timelapse),
+      Tag(S.current.last_15_days, Icons.timelapse),
+      Tag(S.current.last_30_days, Icons.timelapse),
+    ];
+    _tagDays = [7, 15, 30];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(S.of(context).ecard_balance_log)),
-      body: ListView(
-        children: _getListWidgets(),
-      ),
+      body: Column(children: [
+        TagContainer(
+            fillRandomColor: false,
+            fixedColor: Colors.purple,
+            fontSize: 16,
+            singleChoice: true,
+            onChoice: (Tag tag, list) async {
+              int index = _tags.indexOf(tag);
+              if (index >= 0) {
+                setState(() => tag.checkedIcon = Icons.pending);
+                await _cardInfo.loadRecords(_tagDays[index]);
+                setState(() => tag.checkedIcon = Icons.check);
+              }
+            },
+            tagList: _tags),
+        Expanded(
+            child: ListView(
+          children: _getListWidgets(),
+        )),
+      ]),
     );
   }
 

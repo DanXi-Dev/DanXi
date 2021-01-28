@@ -46,6 +46,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("你今天已经上报过了哦！"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("复活码"),
         "i_see": MessageLookupByLibrary.simpleMessage("我知道了"),
+        "last_15_days": MessageLookupByLibrary.simpleMessage("过去 15 天"),
+        "last_30_days": MessageLookupByLibrary.simpleMessage("过去 30 天"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("过去 7 天"),
         "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
         "loading_qr_code": MessageLookupByLibrary.simpleMessage(
             "加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)"),
