@@ -16,7 +16,7 @@
 
 # 计划 
 - [ ] 选课功能
-- [ ] 论坛功能
+- [ ] 论坛功能 (开发中)
 
 # 构建
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  

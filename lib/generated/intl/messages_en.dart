@@ -45,6 +45,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "failed":
             MessageLookupByLibrary.simpleMessage("Load failed, click to retry"),
         "fatal_error": MessageLookupByLibrary.simpleMessage("ERROR"),
+        "forum": MessageLookupByLibrary.simpleMessage("FD Forum"),
         "fudan_daily": MessageLookupByLibrary.simpleMessage("Fudan daily"),
         "fudan_daily_tick":
             MessageLookupByLibrary.simpleMessage("Click to report"),

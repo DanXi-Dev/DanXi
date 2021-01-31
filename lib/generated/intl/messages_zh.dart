@@ -40,6 +40,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "ecard_balance_log": MessageLookupByLibrary.simpleMessage("饭卡消费记录"),
         "failed": MessageLookupByLibrary.simpleMessage("获取失败，点击重试"),
         "fatal_error": MessageLookupByLibrary.simpleMessage("错误"),
+        "forum": MessageLookupByLibrary.simpleMessage("旦唧"),
         "fudan_daily": MessageLookupByLibrary.simpleMessage("平安复旦"),
         "fudan_daily_tick": MessageLookupByLibrary.simpleMessage("点击上报"),
         "fudan_daily_ticked":

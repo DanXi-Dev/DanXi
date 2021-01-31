@@ -365,6 +365,16 @@ class S {
       args: [],
     );
   }
+
+  /// `FD Forum`
+  String get forum {
+    return Intl.message(
+      'FD Forum',
+      name: 'forum',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

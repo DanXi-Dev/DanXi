@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
+import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
@@ -32,11 +33,11 @@ void main() {
     LocalizationOptions.buildDefaultEnglishOptions(),
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
+  //Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
       releaseConfig: debugOptions);
-  //runApp(DanxiApp());
 }
 
 class DanxiApp extends StatelessWidget {
@@ -93,7 +94,10 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   int _pageindex = 0;
 
-  final List<Function> _subpageBuilders = [() => HomeSubpage()];
+  final List<Function> _subpageBuilders = [
+    () => HomeSubpage(),
+    () => BBSSubpage()
+  ];
 
   @override
   void dispose() {
@@ -270,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                 ChangeNotifierProvider.value(value: _connectStatus),
                 ChangeNotifierProvider.value(value: _personInfo),
               ],
-              child: _subpageBuilders[0](),
+              child: _subpageBuilders[_pageindex](),
             ),
             bottomNavigationBar: BottomNavigationBar(
               items: [
@@ -279,16 +283,16 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.dashboard),
                   label: S.of(context).dashboard,
                 ),
-                // BottomNavigationBarItem(
-                //   backgroundColor: Colors.indigo,
-                //   icon: Icon(Icons.forum),
-                //   label: "论坛",
-                // ),
                 BottomNavigationBarItem(
-                  backgroundColor: Colors.blue,
-                  icon: Icon(Icons.person),
-                  label: "我",
+                  backgroundColor: Colors.indigo,
+                  icon: Icon(Icons.forum),
+                  label: S.of(context).forum,
                 ),
+                // BottomNavigationBarItem(
+                //   backgroundColor: Colors.blue,
+                //   icon: Icon(Icons.person),
+                //   label: "我",
+                // ),
               ],
               currentIndex: _pageindex,
               type: BottomNavigationBarType.shifting,

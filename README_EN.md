@@ -15,7 +15,7 @@ Maybe the best all-rounded service app for Fudan University students!
 
 # TODO List
 - [ ] Course selection 
-- [ ] Fudan BBS integration
+- [ ] Fudan BBS integration (Working in progress)
 
 
 (Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
