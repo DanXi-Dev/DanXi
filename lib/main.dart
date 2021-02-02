@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/bbs_editor.dart';
+import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
@@ -45,7 +48,11 @@ class DanxiApp extends StatelessWidget {
     '/card/detail': (context, {arguments}) =>
         CardDetailPage(arguments: arguments),
     '/card/crowdData': (context, {arguments}) =>
-        CardCrowdData(arguments: arguments)
+        CardCrowdData(arguments: arguments),
+    '/bbs/postDetail': (context, {arguments}) =>
+        BBSPostDetail(arguments: arguments),
+    '/bbs/newPost': (context, {arguments}) =>
+        BBSEditorPage(arguments: arguments),
   };
 
   // This widget is the root of your application.
@@ -306,7 +313,14 @@ class _HomePageState extends State<HomePage> {
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () async {
-                await _loadSharedPreference(forceLogin: true);
+                switch (_pageindex) {
+                  case 0:
+                    await _loadSharedPreference(forceLogin: true);
+                    break;
+                  case 1:
+                    NewPostEvent().fire();
+                    break;
+                }
               },
               tooltip: S.of(context).change_account,
               child: Icon(Icons.login),

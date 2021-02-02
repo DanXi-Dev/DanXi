@@ -1,3 +1,5 @@
+import 'package:dan_xi/common/constant.dart';
+
 extension StringEx on String {
   String between(String a, String b, {bool headGreedy = true}) {
     if (indexOf(a) < 0) return null;
@@ -10,6 +12,12 @@ extension StringEx on String {
       return substring(
           lastIndexOf(a) + a.length, indexOf(b, lastIndexOf(a) + a.length));
     }
+  }
+}
+
+extension ObjectEx on dynamic {
+  void fire() {
+    Constant.eventBus.fire(this);
   }
 }
 
