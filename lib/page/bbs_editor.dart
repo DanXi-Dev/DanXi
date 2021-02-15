@@ -1,3 +1,4 @@
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:flutter/material.dart';
 
@@ -31,20 +32,35 @@ class BBSEditorPageState extends State<BBSEditorPage> {
           ],
         ),
         body: Padding(
-          padding: EdgeInsets.all(4),
-          child: TextField(
-            style: TextStyle(fontSize: 18),
-            expands: true,
-            controller: _controller,
-            maxLines: null,
-            autofocus: true,
-          ),
-        ));
+            padding: EdgeInsets.all(4),
+            child: Column(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: _post.replyTo == "0"
+                            ? null
+                            : S.of(context).reply_to(_post.author)),
+                    style: TextStyle(fontSize: 18),
+                    expands: true,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.top,
+                    controller: _controller,
+                    maxLines: null,
+                    autofocus: true,
+                  ),
+                )
+              ],
+            )));
   }
 
   Future<void> _sendDocument() async {
-    _post.content = _controller.text;
-    await _post.save();
-    Navigator.pop(context);
+    if (_controller.text.trim().isEmpty) {
+    } else {
+      _post.content = _controller.text;
+      await _post.save();
+      Navigator.pop(context);
+    }
   }
 }

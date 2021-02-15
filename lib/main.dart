@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
@@ -15,6 +16,7 @@ import 'package:dan_xi/repository/qr_code_repository.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
+import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +38,7 @@ void main() {
     LocalizationOptions.buildDefaultEnglishOptions(),
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
-  //Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+  Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
@@ -104,6 +106,10 @@ class _HomePageState extends State<HomePage> {
   final List<Function> _subpageBuilders = [
     () => HomeSubpage(),
     () => BBSSubpage()
+  ];
+  final List<Function> _subpageActionButtonBuilders = [
+    () => Icons.login,
+    () => Icons.add
   ];
 
   @override
@@ -305,26 +311,27 @@ class _HomePageState extends State<HomePage> {
               type: BottomNavigationBarType.shifting,
               onTap: (index) {
                 if (index != _pageindex) {
-                  setState(() {
-                    _pageindex = index;
-                  });
+                  setState(() => _pageindex = index);
                 }
               },
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () async {
-                switch (_pageindex) {
-                  case 0:
-                    await _loadSharedPreference(forceLogin: true);
-                    break;
-                  case 1:
-                    NewPostEvent().fire();
-                    break;
-                }
-              },
-              tooltip: S.of(context).change_account,
-              child: Icon(Icons.login),
-            ),
+            floatingActionButton:
+                _subpageActionButtonBuilders[_pageindex]() != null
+                    ? FloatingActionButton(
+                        onPressed: () async {
+                          switch (_pageindex) {
+                            case 0:
+                              await _loadSharedPreference(forceLogin: true);
+                              break;
+                            case 1:
+                              NewPostEvent().fire();
+                              break;
+                          }
+                        },
+                        tooltip: S.of(context).change_account,
+                        child: Icon(_subpageActionButtonBuilders[_pageindex]()),
+                      )
+                    : null,
           );
   }
 }

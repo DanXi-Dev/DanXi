@@ -65,7 +65,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ? Column()
                 : Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("回复 ${int.parse(e.replyTo, radix: 36)}",
+                    child: Text(
+                        S.of(context).reply_to(int.parse(e.replyTo, radix: 36)),
                         style: TextStyle(fontSize: 10, color: Colors.green)),
                   ),
             Align(

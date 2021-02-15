@@ -375,6 +375,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Sign in the forum as:`
+  String get login_with_uis {
+    return Intl.message(
+      'Sign in the forum as:',
+      name: 'login_with_uis',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reply {name}`
+  String reply_to(Object name) {
+    return Intl.message(
+      'Reply $name',
+      name: 'reply_to',
+      desc: '',
+      args: [name],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

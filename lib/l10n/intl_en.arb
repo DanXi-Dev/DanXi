@@ -33,5 +33,8 @@
     "last_15_days":"Last 15 days",
     "last_30_days":"Last 30 days",
     "dashboard":"Dashboard",
-    "forum":"FD Forum"
+    "forum":"FD Forum",
+    "login_with_uis":"Sign in the forum as:",
+    "reply_to":"Reply {name}"
+
 }

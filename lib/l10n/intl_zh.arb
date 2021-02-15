@@ -33,5 +33,8 @@
     "last_15_days":"过去 15 天",
     "last_30_days":"过去 30 天",
     "dashboard":"仪表盘",
-    "forum":"旦唧"
+    "forum":"旦唧",
+    "login_with_uis":"将使用以下信息匿名登录旦唧",
+    "reply_to":"回复 {name}"
+
 }

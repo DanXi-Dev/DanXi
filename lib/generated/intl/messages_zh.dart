@@ -19,7 +19,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
-  static m0(name) => "欢迎你，${name}!";
+  static m0(name) => "回复 ${name}";
+
+  static m1(name) => "欢迎你，${name}!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
 
@@ -57,13 +59,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "login_uis": MessageLookupByLibrary.simpleMessage("登录 Fudan UIS"),
         "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS 密码"),
         "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS 账号"),
+        "login_with_uis": MessageLookupByLibrary.simpleMessage("将使用以下信息匿名登录旦唧"),
         "logining": MessageLookupByLibrary.simpleMessage("尝试登录中..."),
         "out_of_dining_time":
             MessageLookupByLibrary.simpleMessage("现在不是食堂用餐时间哦~"),
+        "reply_to": m0,
         "tick_failed": MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接~"),
         "tick_issue_1": MessageLookupByLibrary.simpleMessage(
             "打卡失败，旦兮无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
         "ticking": MessageLookupByLibrary.simpleMessage("打卡中..."),
-        "welcome": m0
+        "welcome": m1
       };
 }

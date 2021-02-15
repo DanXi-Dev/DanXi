@@ -45,7 +45,7 @@ class _BBSSubpageState extends State<BBSSubpage> {
       barrierDismissible: false,
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("将使用以下信息匿名注册旦唧"),
+        title: Text(S.of(context).login_with_uis),
         content: ListTile(
           leading: Icon(Icons.account_circle),
           title: Text(info.name),
@@ -58,7 +58,7 @@ class _BBSSubpageState extends State<BBSSubpage> {
                     await PostRepository.getInstance().register(info);
                 Navigator.pop(context, registered);
               },
-              child: Text("注册")),
+              child: Text(S.of(context).login)),
           TextButton(
               onPressed: () async {
                 Navigator.pop(context, null);
