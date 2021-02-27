@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:data_plugin/bmob/bmob.dart';
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/model/person.dart';
@@ -9,6 +10,7 @@ import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
@@ -36,7 +38,7 @@ void main() {
     LocalizationOptions.buildDefaultEnglishOptions(),
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
-  //Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+  Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,

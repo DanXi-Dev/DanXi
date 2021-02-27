@@ -53,7 +53,11 @@ class CardRepository {
   Future<void> login(PersonInfo info) async {
     _info = info;
     await Retryer.runAsyncWithRetry(() async {
+      try{
       await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
+      }catch(e){
+        print(e);
+      }
       if (!_testLoginSuccess()) {
         throw new LoginException();
       }
