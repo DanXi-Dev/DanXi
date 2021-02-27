@@ -35,6 +35,13 @@
     "dashboard":"Dashboard",
     "forum":"FD Forum",
     "login_with_uis":"Sign in the forum as:",
-    "reply_to":"Reply {name}"
+    "reply_to":"Reply {name}",
+
+    "good_morning":"Every dawn is a new sunrise.",
+    "good_noon":"Middy receives a full of light.",
+    "good_afternoon":"It's when lights show up from the city.",
+    "good_night":"So night comes, leaving a frail moonlight.",
+    "late_night":"With the night oil burning, I'm with you here."
+
 
 }

@@ -48,10 +48,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("你今天已经上报过了哦！"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("复活码"),
+        "good_afternoon": MessageLookupByLibrary.simpleMessage("下午的悠闲时光~"),
+        "good_morning": MessageLookupByLibrary.simpleMessage("一日之计在于晨"),
+        "good_night": MessageLookupByLibrary.simpleMessage("晚上好~"),
+        "good_noon": MessageLookupByLibrary.simpleMessage("快到中午啦"),
         "i_see": MessageLookupByLibrary.simpleMessage("我知道了"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("过去 15 天"),
         "last_30_days": MessageLookupByLibrary.simpleMessage("过去 30 天"),
         "last_7_days": MessageLookupByLibrary.simpleMessage("过去 7 天"),
+        "late_night": MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
         "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
         "loading_qr_code": MessageLookupByLibrary.simpleMessage(
             "加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)"),

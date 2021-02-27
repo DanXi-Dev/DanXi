@@ -35,6 +35,12 @@
     "dashboard":"仪表盘",
     "forum":"旦唧",
     "login_with_uis":"将使用以下信息匿名登录旦唧",
-    "reply_to":"回复 {name}"
+    "reply_to":"回复 {name}",
+
+    "good_morning":"一日之计在于晨",
+    "good_noon":"快到中午啦",
+    "good_afternoon":"下午的悠闲时光~",
+    "good_night":"晚上好~",
+    "late_night":"披星戴月，不负韶华"
 
 }

@@ -54,10 +54,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("You have reported today!"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("ECard Code"),
+        "good_afternoon": MessageLookupByLibrary.simpleMessage(
+            "It\'s when lights show up from the city."),
+        "good_morning": MessageLookupByLibrary.simpleMessage(
+            "Every dawn is a new sunrise."),
+        "good_night": MessageLookupByLibrary.simpleMessage(
+            "So night comes, leaving a frail moonlight."),
+        "good_noon": MessageLookupByLibrary.simpleMessage(
+            "Middy receives a full of light."),
         "i_see": MessageLookupByLibrary.simpleMessage("I know"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
         "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
         "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
+        "late_night": MessageLookupByLibrary.simpleMessage(
+            "With the night oil burning, I\'m with you here."),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
         "loading_qr_code": MessageLookupByLibrary.simpleMessage(
             "Loading ECard Code...\nIt may take more than 5 seconds."),
