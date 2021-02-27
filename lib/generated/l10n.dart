@@ -375,6 +375,76 @@ class S {
       args: [],
     );
   }
+
+  /// `Sign in the forum as:`
+  String get login_with_uis {
+    return Intl.message(
+      'Sign in the forum as:',
+      name: 'login_with_uis',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reply {name}`
+  String reply_to(Object name) {
+    return Intl.message(
+      'Reply $name',
+      name: 'reply_to',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Every dawn is a new sunrise.`
+  String get good_morning {
+    return Intl.message(
+      'Every dawn is a new sunrise.',
+      name: 'good_morning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Middy receives a full of light.`
+  String get good_noon {
+    return Intl.message(
+      'Middy receives a full of light.',
+      name: 'good_noon',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `It's when lights show up from the city.`
+  String get good_afternoon {
+    return Intl.message(
+      'It\'s when lights show up from the city.',
+      name: 'good_afternoon',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `So night comes, leaving a frail moonlight.`
+  String get good_night {
+    return Intl.message(
+      'So night comes, leaving a frail moonlight.',
+      name: 'good_night',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `With the night oil burning, I'm with you here.`
+  String get late_night {
+    return Intl.message(
+      'With the night oil burning, I\'m with you here.',
+      name: 'late_night',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -19,7 +19,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static m0(name) => "Welcome, ${name}!";
+  static m0(name) => "Reply ${name}";
+
+  static m1(name) => "Welcome, ${name}!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
 
@@ -52,10 +54,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("You have reported today!"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("ECard Code"),
+        "good_afternoon": MessageLookupByLibrary.simpleMessage(
+            "It\'s when lights show up from the city."),
+        "good_morning": MessageLookupByLibrary.simpleMessage(
+            "Every dawn is a new sunrise."),
+        "good_night": MessageLookupByLibrary.simpleMessage(
+            "So night comes, leaving a frail moonlight."),
+        "good_noon": MessageLookupByLibrary.simpleMessage(
+            "Middy receives a full of light."),
         "i_see": MessageLookupByLibrary.simpleMessage("I know"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
         "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
         "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
+        "late_night": MessageLookupByLibrary.simpleMessage(
+            "With the night oil burning, I\'m with you here."),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
         "loading_qr_code": MessageLookupByLibrary.simpleMessage(
             "Loading ECard Code...\nIt may take more than 5 seconds."),
@@ -63,14 +75,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "login_uis": MessageLookupByLibrary.simpleMessage("Login Fudan UIS"),
         "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS Password"),
         "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS ID"),
+        "login_with_uis":
+            MessageLookupByLibrary.simpleMessage("Sign in the forum as:"),
         "logining": MessageLookupByLibrary.simpleMessage("Logging in..."),
         "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
             "It\'s not time for a meal at the moment!"),
+        "reply_to": m0,
         "tick_failed": MessageLookupByLibrary.simpleMessage(
             "Report failed. Check your connection."),
         "tick_issue_1": MessageLookupByLibrary.simpleMessage(
             "Report failed. Danxi can\'t get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day."),
         "ticking": MessageLookupByLibrary.simpleMessage("Reporting..."),
-        "welcome": m0
+        "welcome": m1
       };
 }

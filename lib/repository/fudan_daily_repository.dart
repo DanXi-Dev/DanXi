@@ -38,7 +38,9 @@ class FudanDailyRepository {
     await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
     var res = await _dio.get(GET_INFO_URL);
     try {
-      return jsonDecode(res.data.toString())['d'];
+      return res.data is Map
+          ? res.data['d']
+          : jsonDecode(res.data.toString())['d'];
     } catch (e) {
       print(e);
     }
@@ -47,9 +49,11 @@ class FudanDailyRepository {
 
   Future<bool> hasTick(PersonInfo info) async {
     _historyData = await Retryer.runAsyncWithRetry(() => _getHistoryInfo(info));
-    return _historyData['info'] is! Map ||
-        _historyData['info']['date'] ==
-            new DateFormat('yyyyMMdd').format(DateTime.now());
+    if (_historyData['info'] is! Map) {
+      return false;
+    }
+    return _historyData['info']['date'] ==
+        new DateFormat('yyyyMMdd').format(DateTime.now());
   }
 
   Map _buildPayloadFromHistory() {

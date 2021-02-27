@@ -49,15 +49,15 @@ class _HomeSubpageState extends State<HomeSubpage> {
   Widget build(BuildContext context) {
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
-      _helloQuote = "披星戴月，不负韶华";
+      _helloQuote = S.of(context).late_night;
     } else if (time >= 5 && time <= 8) {
-      _helloQuote = "一日之计在于晨";
+      _helloQuote = S.of(context).good_morning;
     } else if (time >= 9 && time <= 11) {
-      _helloQuote = "快到中午啦";
+      _helloQuote = S.of(context).good_noon;
     } else if (time >= 12 && time <= 16) {
-      _helloQuote = "下午的悠闲时光~";
+      _helloQuote = S.of(context).good_afternoon;
     } else if (time >= 17 && time <= 22) {
-      _helloQuote = "晚上好~";
+      _helloQuote = S.of(context).good_night;
     }
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     String connectStatus = Provider.of<ValueNotifier<String>>(context)?.value;

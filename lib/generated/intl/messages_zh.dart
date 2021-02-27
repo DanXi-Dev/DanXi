@@ -19,7 +19,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
-  static m0(name) => "欢迎你，${name}!";
+  static m0(name) => "回复 ${name}";
+
+  static m1(name) => "欢迎你，${name}!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
 
@@ -46,10 +48,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "fudan_daily_ticked":
             MessageLookupByLibrary.simpleMessage("你今天已经上报过了哦！"),
         "fudan_qr_code": MessageLookupByLibrary.simpleMessage("复活码"),
+        "good_afternoon": MessageLookupByLibrary.simpleMessage("下午的悠闲时光~"),
+        "good_morning": MessageLookupByLibrary.simpleMessage("一日之计在于晨"),
+        "good_night": MessageLookupByLibrary.simpleMessage("晚上好~"),
+        "good_noon": MessageLookupByLibrary.simpleMessage("快到中午啦"),
         "i_see": MessageLookupByLibrary.simpleMessage("我知道了"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("过去 15 天"),
         "last_30_days": MessageLookupByLibrary.simpleMessage("过去 30 天"),
         "last_7_days": MessageLookupByLibrary.simpleMessage("过去 7 天"),
+        "late_night": MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
         "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
         "loading_qr_code": MessageLookupByLibrary.simpleMessage(
             "加载复活码中...\n(由于复旦校园服务器较差，可能需要5~10秒)"),
@@ -57,13 +64,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "login_uis": MessageLookupByLibrary.simpleMessage("登录 Fudan UIS"),
         "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS 密码"),
         "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS 账号"),
+        "login_with_uis": MessageLookupByLibrary.simpleMessage("将使用以下信息匿名登录旦唧"),
         "logining": MessageLookupByLibrary.simpleMessage("尝试登录中..."),
         "out_of_dining_time":
             MessageLookupByLibrary.simpleMessage("现在不是食堂用餐时间哦~"),
+        "reply_to": m0,
         "tick_failed": MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接~"),
         "tick_issue_1": MessageLookupByLibrary.simpleMessage(
             "打卡失败，旦兮无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
         "ticking": MessageLookupByLibrary.simpleMessage("打卡中..."),
-        "welcome": m0
+        "welcome": m1
       };
 }
