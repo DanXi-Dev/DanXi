@@ -1,9 +1,14 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+//TODO iOSify RefreshIndicator & Divider
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
@@ -19,12 +24,23 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(S.of(context).forum)),
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        title: Text(S.of(context).forum),
+        cupertino: (_, __) => CupertinoNavigationBarData(
+            trailing: PlatformIconButton(
+          icon: Icon(CupertinoIcons.reply),
+          onPressed: () {
+            Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
+              "post": BBSPost.newReply(_user.objectId, _post.objectId)
+            });
+          },
+        )),
+      ),
       body: RefreshIndicator(
           color: Colors.deepPurple,
           onRefresh: () async {
-            setState(() {});
+            refreshSelf();
           },
           child: FutureBuilder(
               builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
@@ -41,18 +57,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 return Container();
               },
               future: PostRepository.getInstance().loadReplies(_post))),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add_comment),
-        onPressed: () {
-          Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-            "post": BBSPost.newReply(_user.objectId, _post.objectId)
-          });
-        },
+      material: (_, __) => MaterialScaffoldData(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add_comment),
+          onPressed: () {
+            Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
+              "post": BBSPost.newReply(_user.objectId, _post.objectId)
+            });
+          },
+        ),
       ),
     );
   }
 
-  Widget _getListItem(BBSPost e, int index) => ListTile(
+  Widget _getListItem(BBSPost e, int index) => Material(
+          child: ListTile(
         dense: false,
         title: Column(
           children: [
@@ -105,7 +124,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 replyTo: index > 0 ? e.objectId : "0")
           });
         },
-      );
+      ));
 
   @override
   void initState() {

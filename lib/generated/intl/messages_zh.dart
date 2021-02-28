@@ -66,6 +66,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS 账号"),
         "login_with_uis": MessageLookupByLibrary.simpleMessage("将使用以下信息匿名登录旦唧"),
         "logining": MessageLookupByLibrary.simpleMessage("尝试登录中..."),
+        "new_post": MessageLookupByLibrary.simpleMessage("发布新帖子"),
         "out_of_dining_time":
             MessageLookupByLibrary.simpleMessage("现在不是食堂用餐时间哦~"),
         "reply_to": m0,

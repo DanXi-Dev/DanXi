@@ -376,6 +376,16 @@ class S {
     );
   }
 
+  /// `New Post`
+  String get new_post {
+    return Intl.message(
+      'New Post',
+      name: 'new_post',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sign in the forum as:`
   String get login_with_uis {
     return Intl.message(

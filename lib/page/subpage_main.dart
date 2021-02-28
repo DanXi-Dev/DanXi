@@ -4,9 +4,12 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 
+//TODO iOSify Card & ListTile
 class HomeSubpage extends StatefulWidget {
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
@@ -32,13 +35,13 @@ class _HomeSubpageState extends State<HomeSubpage> {
   }
 
   void _processForgetTickIssue() {
-    showDialog(
+    showPlatformDialog(
         context: context,
-        builder: (_) => AlertDialog(
+        builder: (_) => PlatformAlertDialog(
               title: Text(S.of(context).fatal_error),
               content: Text(S.of(context).tick_issue_1),
               actions: [
-                TextButton(
+                PlatformButton(
                     child: Text(S.of(context).i_see),
                     onPressed: () => Navigator.of(context).pop())
               ],

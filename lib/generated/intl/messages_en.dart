@@ -78,6 +78,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "login_with_uis":
             MessageLookupByLibrary.simpleMessage("Sign in the forum as:"),
         "logining": MessageLookupByLibrary.simpleMessage("Logging in..."),
+        "new_post": MessageLookupByLibrary.simpleMessage("New Post"),
         "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
             "It\'s not time for a meal at the moment!"),
         "reply_to": m0,

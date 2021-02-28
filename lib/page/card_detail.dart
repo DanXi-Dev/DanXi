@@ -4,6 +4,8 @@ import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class CardDetailPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -35,8 +37,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(S.of(context).ecard_balance_log)),
+    return PlatformScaffold(
+      appBar: PlatformAppBar(title: Text(S.of(context).ecard_balance_log)),
       body: Column(children: [
         TagContainer(
             fillRandomColor: false,
@@ -63,12 +65,13 @@ class _CardDetailPageState extends State<CardDetailPage> {
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
     _cardInfo.records.forEach((element) {
-      widgets.add(ListTile(
+      widgets.add(Material(
+          child: ListTile(
         leading: Icon(Icons.monetization_on),
         title: Text(element.payment),
         isThreeLine: true,
         subtitle: Text("${element.location}\n${element.time.toString()}"),
-      ));
+      )));
     });
 
     return widgets;

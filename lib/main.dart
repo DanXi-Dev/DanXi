@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:data_plugin/bmob/bmob.dart';
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/common/Secret.dart';
@@ -11,7 +10,6 @@ import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
-import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
@@ -19,10 +17,13 @@ import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:data_plugin/bmob/bmob.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -62,15 +63,18 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return PlatformApp(
       title: "DanXi",
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+      material: (_, __) => MaterialAppData(
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+        ),
       ),
       localizationsDelegates: [
         S.delegate,
         GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
       ],
       supportedLocales: S.delegate.supportedLocales,
       home: HomePage(),
@@ -78,7 +82,8 @@ class DanxiApp extends StatelessWidget {
         final String name = settings.name;
         final Function pageContentBuilder = this.routes[name];
         if (pageContentBuilder != null) {
-          final Route route = MaterialPageRoute(
+          final Route route = platformPageRoute(
+              context: context,
               builder: (context) =>
                   pageContentBuilder(context, arguments: settings.arguments));
           return route;
@@ -110,8 +115,12 @@ class _HomePageState extends State<HomePage> {
     () => BBSSubpage()
   ];
   final List<Function> _subpageActionButtonBuilders = [
-    () => Icons.login,
-    () => Icons.add
+    (cxt) => Icons.login,
+    (cxt) => PlatformIcons(cxt).add
+  ];
+  final List<Function> _subpageActionButtonTextBuilders = [
+    (cxt) => S.of(cxt).change_account,
+    (cxt) => S.of(cxt).new_post
   ];
 
   @override
@@ -121,11 +130,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showQRCode() {
-    showDialog(
+    showPlatformDialog(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return AlertDialog(
+          return PlatformAlertDialog(
               title: Text(S.of(context).fudan_qr_code),
               content: Container(
                   width: double.maxFinite,
@@ -188,34 +197,41 @@ class _HomePageState extends State<HomePage> {
   void _showLoginDialog({bool forceLogin = false}) {
     var nameController = new TextEditingController();
     var pwdController = new TextEditingController();
-    showDialog<Null>(
+    showPlatformDialog<Null>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return new AlertDialog(
+          return new PlatformAlertDialog(
             title: Text(S.of(context).login_uis),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
+                PlatformTextField(
                   controller: nameController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                      labelText: S.of(context).login_uis_uid,
-                      icon: Icon(Icons.perm_identity)),
+                  material: (_, __) => MaterialTextFieldData(
+                      decoration: InputDecoration(
+                          labelText: S.of(context).login_uis_uid,
+                          icon: Icon(Icons.perm_identity))),
+                  cupertino: (_, __) => CupertinoTextFieldData(
+                      placeholder: S.of(context).login_uis_uid),
                   autofocus: true,
                 ),
-                TextField(
+                PlatformTextField(
                   controller: pwdController,
-                  decoration: InputDecoration(
-                      labelText: S.of(context).login_uis_pwd,
-                      icon: Icon(Icons.lock_outline)),
+                  material: (_, __) => MaterialTextFieldData(
+                    decoration: InputDecoration(
+                        labelText: S.of(context).login_uis_pwd,
+                        icon: Icon(Icons.lock_outline)),
+                  ),
+                  cupertino: (_, __) => CupertinoTextFieldData(
+                      placeholder: S.of(context).login_uis_pwd),
                   obscureText: true,
                 )
               ],
             ),
             actions: [
-              TextButton(
+              PlatformButton(
                 child: Text(S.of(context).cancel),
                 onPressed: () {
                   if (forceLogin)
@@ -224,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                     FlutterApp.exitApp();
                 },
               ),
-              TextButton(
+              PlatformButton(
                 child: Text(S.of(context).login),
                 onPressed: () async {
                   if (nameController.text.length * pwdController.text.length >
@@ -269,16 +285,35 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _onPressActionButton() async {
+    switch (_pageindex) {
+      case 0:
+        await _loadSharedPreference(forceLogin: true);
+        break;
+      case 1:
+        NewPostEvent().fire();
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print("Start run");
     return _personInfo.value == null
-        ? Scaffold(
-            appBar: AppBar(
+        ? PlatformScaffold(
+            appBar: PlatformAppBar(
             title: Text(S.of(context).app_name),
+            cupertino: (_, __) => CupertinoNavigationBarData(
+                trailing: _subpageActionButtonBuilders[_pageindex](context) !=
+                        null
+                    ? PlatformIconButton(
+                        icon: _subpageActionButtonBuilders[_pageindex](context),
+                        onPressed: _onPressActionButton,
+                      )
+                    : null),
           ))
-        : Scaffold(
-            appBar: AppBar(
+        : PlatformScaffold(
+            appBar: PlatformAppBar(
               title: Text(
                 S.of(context).app_name,
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -291,7 +326,7 @@ class _HomePageState extends State<HomePage> {
               ],
               child: _subpageBuilders[_pageindex](),
             ),
-            bottomNavigationBar: BottomNavigationBar(
+      bottomNavBar: PlatformNavBar(
               items: [
                 BottomNavigationBarItem(
                   backgroundColor: Colors.purple,
@@ -310,30 +345,29 @@ class _HomePageState extends State<HomePage> {
                 // ),
               ],
               currentIndex: _pageindex,
-              type: BottomNavigationBarType.shifting,
-              onTap: (index) {
+              material: (_, __) => MaterialNavBarData(
+                type: BottomNavigationBarType.shifting,
+              ),
+              itemChanged: (index) {
                 if (index != _pageindex) {
                   setState(() => _pageindex = index);
                 }
               },
             ),
-            floatingActionButton:
-                _subpageActionButtonBuilders[_pageindex]() != null
-                    ? FloatingActionButton(
-                        onPressed: () async {
-                          switch (_pageindex) {
-                            case 0:
-                              await _loadSharedPreference(forceLogin: true);
-                              break;
-                            case 1:
-                              NewPostEvent().fire();
-                              break;
-                          }
-                        },
-                        tooltip: S.of(context).change_account,
-                        child: Icon(_subpageActionButtonBuilders[_pageindex]()),
-                      )
-                    : null,
+            material: (_, __) => MaterialScaffoldData(
+              floatingActionButton: _subpageActionButtonBuilders[_pageindex](
+                          context) !=
+                      null
+                  ? FloatingActionButton(
+                      onPressed: _onPressActionButton,
+                      tooltip:
+                          _subpageActionButtonTextBuilders[_pageindex](context),
+                      child: Icon(
+                          _subpageActionButtonBuilders[_pageindex](context)),
+                    )
+                  : null,
+            ),
+            cupertino: (_, __) => CupertinoPageScaffoldData(),
           );
   }
 }

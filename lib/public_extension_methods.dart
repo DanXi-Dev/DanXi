@@ -1,4 +1,5 @@
 import 'package:dan_xi/common/constant.dart';
+import 'package:flutter/widgets.dart';
 
 extension StringEx on String {
   String between(String a, String b, {bool headGreedy = true}) {
@@ -18,6 +19,13 @@ extension StringEx on String {
 extension ObjectEx on dynamic {
   void fire() {
     Constant.eventBus.fire(this);
+  }
+}
+
+extension StateEx on State {
+  void refreshSelf() {
+    // ignore: invalid_use_of_protected_member
+    setState(() {});
   }
 }
 
