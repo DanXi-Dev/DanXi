@@ -60,7 +60,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                     hint: Text(_selectItem),
                     onChanged: (String e) => _onSelectedItemChanged(e),
                   ),
-              cupertino: (_, __) => CupertinoSegmentedControl<int>(
+              cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
                     onValueChanged: (int value) =>
                         _onSelectedItemChanged(Constant.campusArea[value]),
                     children: _getCupertinoItems(),

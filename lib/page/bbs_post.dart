@@ -27,15 +27,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(S.of(context).forum),
-        cupertino: (_, __) => CupertinoNavigationBarData(
-            trailing: PlatformIconButton(
-          icon: Icon(CupertinoIcons.reply),
-          onPressed: () {
-            Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-              "post": BBSPost.newReply(_user.objectId, _post.objectId)
-            });
-          },
-        )),
+        trailingActions: [
+          PlatformIconButton(
+            icon: Icon(CupertinoIcons.reply),
+            onPressed: () {
+              Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
+                "post": BBSPost.newReply(_user.objectId, _post.objectId)
+              });
+            },
+          )
+        ],
       ),
       body: RefreshIndicator(
           color: Colors.deepPurple,
@@ -57,16 +58,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 return Container();
               },
               future: PostRepository.getInstance().loadReplies(_post))),
-      material: (_, __) => MaterialScaffoldData(
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add_comment),
-          onPressed: () {
-            Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-              "post": BBSPost.newReply(_user.objectId, _post.objectId)
-            });
-          },
-        ),
-      ),
+      // material: (_, __) => MaterialScaffoldData(
+      //   floatingActionButton: FloatingActionButton(
+      //     child: Icon(Icons.add_comment),
+      //     onPressed: () {
+      //       Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
+      //         "post": BBSPost.newReply(_user.objectId, _post.objectId)
+      //       });
+      //     },
+      //   ),
+      // ),
     );
   }
 

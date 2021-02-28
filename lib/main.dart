@@ -302,22 +302,27 @@ class _HomePageState extends State<HomePage> {
     return _personInfo.value == null
         ? PlatformScaffold(
             appBar: PlatformAppBar(
-            title: Text(S.of(context).app_name),
-            cupertino: (_, __) => CupertinoNavigationBarData(
-                trailing: _subpageActionButtonBuilders[_pageindex](context) !=
-                        null
-                    ? PlatformIconButton(
-                        icon: _subpageActionButtonBuilders[_pageindex](context),
-                        onPressed: _onPressActionButton,
-                      )
-                    : null),
-          ))
+              title: Text(S.of(context).app_name),
+              trailingActions: [
+                PlatformIconButton(
+                  icon: Icon(_subpageActionButtonBuilders[_pageindex](context)),
+                  onPressed: _onPressActionButton,
+                )
+              ],
+            ),
+          )
         : PlatformScaffold(
             appBar: PlatformAppBar(
               title: Text(
                 S.of(context).app_name,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
+              trailingActions: [
+                PlatformIconButton(
+                  icon: Icon(_subpageActionButtonBuilders[_pageindex](context)),
+                  onPressed: _onPressActionButton,
+                )
+              ],
             ),
             body: MultiProvider(
               providers: [
@@ -354,20 +359,20 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
-            material: (_, __) => MaterialScaffoldData(
-              floatingActionButton: _subpageActionButtonBuilders[_pageindex](
-                          context) !=
-                      null
-                  ? FloatingActionButton(
-                      onPressed: _onPressActionButton,
-                      tooltip:
-                          _subpageActionButtonTextBuilders[_pageindex](context),
-                      child: Icon(
-                          _subpageActionButtonBuilders[_pageindex](context)),
-                    )
-                  : null,
-            ),
-            cupertino: (_, __) => CupertinoPageScaffoldData(),
+            // material: (_, __) => MaterialScaffoldData(
+            //   floatingActionButton: _subpageActionButtonBuilders[_pageindex](
+            //               context) !=
+            //           null
+            //       ? FloatingActionButton(
+            //           onPressed: _onPressActionButton,
+            //           tooltip:
+            //               _subpageActionButtonTextBuilders[_pageindex](context),
+            //           child: Icon(
+            //               _subpageActionButtonBuilders[_pageindex](context)),
+            //         )
+            //       : null,
+            // ),
+            // cupertino: (_, __) => CupertinoPageScaffoldData(),
           );
   }
 }
