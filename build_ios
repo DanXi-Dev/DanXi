@@ -3,11 +3,10 @@
 # iOS DanXi 自动打包
 # KYLN24
 
-if [ $# -eq 1 -a $1=="pre" ]
-then
-    release="pre-release"
+if [ $# -eq 1 ] && [ "$1" == "pre" ]; then
+  release="pre-release"
 else
-    release="release"
+  release="release"
 fi
 
 echo Building..
@@ -15,14 +14,14 @@ flutter build ios --no-codesign
 echo Build Done.
 
 echo Archieving..
-cd build/ios/iphoneos
+cd build/ios/iphoneos || return
 version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Runner.app/Info.plist)
 name="DanXi-"${version}"-"${release}".ios.ipa"
 mkdir Payload
 cp -rf Runner.app Payload/DanXi.app
-ditto -c -k --sequesterRsrc --keepParent Payload ${name}
-md5sum ${name} > ${name}".md5sum"
-echo Made IPA package at build/ios/iphoneos/${name}
+ditto -c -k --sequesterRsrc --keepParent Payload "${name}"
+md5sum "${name}" >"${name}"".md5sum"
+echo Made IPA package at build/ios/iphoneos/"${name}"
 rm -rf Payload
 echo Archieve Done.
 

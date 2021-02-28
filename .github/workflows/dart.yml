@@ -18,10 +18,9 @@ jobs:
       with:
         flutter-version: '1.26.0-12.0.pre'
         channel: 'dev'
-        
-        
     - run: flutter pub get
       #Testing is still useless at the moment.
       #- run: flutter test
-    - run: flutter build apk
     - run: ./build_ios
+    - run: flutter build apk
+
