@@ -2,6 +2,8 @@
 # DanXi
 ![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)    
   
+> ** CAUTION ** The English version of README may not be as updated as [the Chinese one](README.md).
+
 日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
   
 Maybe the best all-rounded service app for Fudan University students!    
