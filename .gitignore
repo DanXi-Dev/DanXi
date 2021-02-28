@@ -48,7 +48,10 @@ app.*.map.json
 #Key related
 lib/common/Secret.dart
 
+# VSCode
+.history
+.vscode
+
 # macOS
 .DS_Store
-.history
 ios/build
