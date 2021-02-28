@@ -21,4 +21,4 @@ jobs:
       #Testing is still useless at the moment.
       #- run: flutter test
     - run: flutter build apk
-    - run: flutter build ios --release --no-codesign
+    - run: ./build_ios
