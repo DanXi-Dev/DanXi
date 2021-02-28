@@ -2,7 +2,8 @@
 # DanXi
 ![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)    
   
-> ** CAUTION ** The English version of README may not be as updated as [the Chinese one](README.md).
+> **CAUTION**   
+> The English version of README may not be synchronized with [the Chinese one](README.md).
 
 日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
   
@@ -15,13 +16,32 @@ Maybe the best all-rounded service app for Fudan University students!
 - Shortcut for Fudan Daily
 - Shortcut for Fudan QR Code
 
-# TODO List
-- [ ] Course selection 
-- [ ] Fudan BBS integration (Working in progress)
-
-
 (Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
-This application is still at the very initial development stage, welcome to join the development ~
+This application is still at the very initial development stage, welcome to join the development and donation~
+
+# Install
+Note: This application is still in early development and may have unpredictable bugs.   
+If you meet abnormal behavior in this application，Please [create an issue](https://github.com/w568w/DanXi/issues/new/choose) or [create a new pull request](https://github.com/w568w/DanXi/compare).
+## Android
+Go to [release page](https://github.com/w568w/DanXi/releases), just download the apk file and install it.   
+(Depending on the device, you may need to allow "Install apps from unknown sources" in the settings.)  
+
+## iOS/iPadOS (Via [AltStore](https://altstore.io) )
+  
+Due to the development team's inability to support the expensive Apple Developer Program fees, it's difficult to publish this app on the AppStore or to adapt other easier ways to install it.
+  
+We provide a special method here, requiring a computer on the same LAN (macOS/Windows):
+  
+1. Install [AltServer](https://altstore.io) on your PC.
+2. Use AltServer to install AltStore on the device.
+3. Browse [release page](https://github.com/w568w/DanXi/releases) by Safari on your device and download the ipa file.
+4. Open the AltStore you installed on your device, select My Apps at the bottom, then click "+" in the upper left corner and select the ipa file you downloaded.
+5. The certificates needs to be refreshed every 7 days (the Expire time shown in the app), otherwise both of the AltStore and the app will NOT work.
+  
+[FAQ](https://altstore.io/faq/)   
+AltStore [Project homepage](https://github.com/rileytestut/AltStore)(英文)。
+  
+Thanks for understanding and your support! :)
 
 # Compile
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  

@@ -15,30 +15,28 @@
 目前这款应用仍处于最初的开发阶段,欢迎各位大佬加入开发~
 
 # 安装
-注意：本应用仍处于早期开发阶段！也许会有不可预料的 BUG 发生！如果您遇到了本应用中不符合预期的行为，欢迎提交 issue 或 pr！
+注意：本应用仍处于早期开发阶段，也许会有不可预料的 Bug 发生。  
+如果您遇到了本应用中不符合预期的行为，欢迎[新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或[发起 Pull request](https://github.com/w568w/DanXi/compare)。
 ## Android
-前往 [release 页面](https://github.com/w568w/DanXi/releases)下载的 apk 安装包然后安装即可（注意在设置中允许安装来自未知来源的应用）
+打开 [release 页面](https://github.com/w568w/DanXi/releases)下载 apk 安装包，安装即可。  
+（依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
 
-## iOS / iPadOS（使用 [AltStore](https://altstore.io) 安装）
+## iOS/iPadOS（使用 [AltStore](https://altstore.io) 安装）
   
 由于开发团队没有能力支持高额的 Apple 开发者计划费用（疯狂暗示.jpg），本应用难以上架 AppStore 或使用其他简便的方式供用户安装。
   
-此处提供一种特殊的安装方法，需要准备同一局域网下的一台电脑（macOS/Windows）
+此处提供一种特殊的使用方法，需要准备同一局域网下的一台电脑（ macOS/Windows ）
   
 1. 在电脑上安装 [AltServer](https://altstore.io)
 2. 使用 AltServer 在设备上安装 AltStore。
-3. 在设备上使用 Safari 浏览器前往 [release 页面](https://github.com/w568w/DanXi/releases)下载的 ipa 安装包。
-4. 在设备上打开于第二步中安装好的 AltStore，选择底部的 My Apps 标签页，再点击左上角的加号，在弹出的文件窗口中选择下载好的 ipa 安装包进行安装。
+3. 在设备上使用 Safari 浏览器前往 [release 页面](https://github.com/w568w/DanXi/releases)下载 ipa 安装包。
+4. 在设备上打开于第二步中安装好的 AltStore，选择底部的 My Apps 标签页，再点击左上角的”+“号，在弹出的文件窗口中选择您下载好的 ipa 安装包进行安装。
 5. 每 7 天（应用旁显示的 Expire 时间）内需要在 AltStore 中刷新一次，否则 AltStore 与本应用均无法运行。
   
-有关 AltStore 的常见问题你可以在[这里](https://altstore.io/faq/)得到解答。
-有关 AltStore 的技术细节参见其[项目首页](https://github.com/rileytestut/AltStore)
+有关 AltStore 的常见问题你可以在[这里](https://altstore.io/faq/)(英文)得到解答。  
+有关 AltStore 的技术细节参见其[项目首页](https://github.com/rileytestut/AltStore)(英文)。
   
 感谢理解与支持！
-
-# 计划 
-- [ ] 选课功能
-- [ ] 论坛功能 (开发中)
 
 # 构建
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
