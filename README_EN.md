@@ -47,6 +47,7 @@ Thanks for understanding and your support! :)
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  
   
 To build this app, you need to [download Flutter SDK](https://flutter.dev/docs/get-started/install) and install it.    
-(If you are building for `Android`, you should also [install and configure](https://developer.android.com/studio)`Android Command Line Tools`.)   
 
+If you are building for `Android`, you should also [install and configure](https://developer.android.com/studio)`Android Command Line Tools`.   
+If you are building for `iOS/iPadOS`, you should also install and configure [`Xcode`](https://apps.apple.com/cn/app/xcode/id497799835)  
 Run the command `flutter run [ios/android]` to start the app.
