@@ -157,7 +157,13 @@ class _HomePageState extends State<HomePage> {
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
         .listen((_) => {_loadNetworkState()});
-    _loadSharedPreference();
+    _loadSharedPreference().then((_) => quickActions.initialize((shortcutType) {
+          if (shortcutType == 'action_qr_code') {
+            if (_personInfo != null) {
+              _showQRCode();
+            }
+          }
+        }));
     _loadNetworkState();
     quickActions.setShortcutItems(<ShortcutItem>[
       ShortcutItem(
@@ -165,14 +171,6 @@ class _HomePageState extends State<HomePage> {
           localizedTitle: S.current.fudan_qr_code,
           icon: 'ic_launcher'),
     ]);
-
-    quickActions.initialize((shortcutType) {
-      if (shortcutType == 'action_qr_code') {
-        if (_personInfo != null) {
-          _showQRCode();
-        }
-      }
-    });
   }
 
   Future<void> _tryLogin(String id, String pwd) async {
