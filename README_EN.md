@@ -28,7 +28,7 @@ Go to [release page](https://github.com/w568w/DanXi/releases), just download the
 
 ## iOS/iPadOS (Via [AltStore](https://altstore.io) )
   
-Due to the development team's inability to support the expensive Apple Developer Program fees, it's difficult to publish this app on the AppStore or to adapt other easier ways to install it.
+Due to the development team's inability to support the expensive Apple Developer Program fees, it's difficult to publish this app on the AppStore or to use other easier ways to install it.
   
 We provide a special method here, requiring a computer on the same LAN (macOS/Windows):
   
@@ -36,12 +36,13 @@ We provide a special method here, requiring a computer on the same LAN (macOS/Wi
 2. Use AltServer to install AltStore on the device.
 3. Browse [release page](https://github.com/w568w/DanXi/releases) by Safari on your device and download the ipa file.
 4. Open the AltStore you installed on your device, select My Apps at the bottom, then click "+" in the upper left corner and select the ipa file you downloaded.
-5. The certificates needs to be refreshed every 7 days (the Expire time shown in the app), otherwise both of the AltStore and the app will NOT work.
+5. The certificates needs to be refreshed **every 7 days** (the Expire time shown in the app), otherwise both of the AltStore and **the app will NOT work**.
+   
+### Useful links
+[FAQ](https://altstore.io/faq/)    
+AltStore [Project homepage](https://github.com/rileytestut/AltStore)  
   
-[FAQ](https://altstore.io/faq/)   
-AltStore [Project homepage](https://github.com/rileytestut/AltStore)(英文)。
-  
-Thanks for understanding and your support! :)
+Thanks for your understanding and support! :)
 
 # Compile
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  
