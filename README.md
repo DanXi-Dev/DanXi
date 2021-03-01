@@ -16,9 +16,9 @@
 
 # 安装
 注意：本应用仍处于早期开发阶段，也许会有不可预料的 Bug 发生。  
-如果您遇到了本应用中不符合预期的行为，欢迎[新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或[发起 Pull request](https://github.com/w568w/DanXi/compare)。
+如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/w568w/DanXi/compare)。
 ## Android
-打开 [release 页面](https://github.com/w568w/DanXi/releases)下载 apk 安装包，安装即可。  
+打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 apk 安装包，安装即可。  
 （依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
 
 ## iOS/iPadOS（使用 [AltStore](https://altstore.io) 安装）
@@ -29,7 +29,7 @@
   
 1. 在电脑上安装 [AltServer](https://altstore.io)
 2. 使用 AltServer 在设备上安装 AltStore。
-3. 在设备上使用 Safari 浏览器前往 [release 页面](https://github.com/w568w/DanXi/releases)下载 ipa 安装包。
+3. 在设备上使用 Safari 浏览器前往 [release 页面](https://github.com/w568w/DanXi/releases) 下载 ipa 安装包。
 4. 在设备上打开于第二步中安装好的 AltStore，选择底部的 My Apps 标签页，再点击左上角的”+“号，在弹出的文件窗口中选择您下载好的 ipa 安装包进行安装。
 5. 每 7 天（应用旁显示的 Expire 时间）内需要在 AltStore 中刷新一次，否则 AltStore 与本应用均无法运行。
   
@@ -45,6 +45,6 @@
   
 如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。
   
-如果你正在为`iOS/iPadOS`平台构建，您还需要安装 [`Xcode`](https://apps.apple.com/cn/app/xcode/id497799835)
+如果你正在为`iOS/iPadOS`平台构建，您还需要[安装并配置](https://apps.apple.com/cn/app/xcode/id497799835)`Xcode`。
   
 确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。
