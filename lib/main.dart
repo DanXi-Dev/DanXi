@@ -310,6 +310,7 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
+            body: Container(),
           )
         : PlatformScaffold(
             appBar: PlatformAppBar(

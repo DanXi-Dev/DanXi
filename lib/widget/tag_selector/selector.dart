@@ -97,6 +97,8 @@ class _TagContainerState extends State<TagContainer> {
           borderRadius: BorderRadius.circular(50),
         ),
         child: Material(
+          borderRadius: BorderRadius.circular(50),
+          color: data.tagColor,
           child: InkWell(
             onTap: () {
               if (data.isSelected && widget.singleChoice) return;
