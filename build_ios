@@ -3,7 +3,7 @@
 # iOS DanXi 自动打包
 # KYLN24
 
-if [ $# -eq 1 ] && [ "$1" == "pre" ]; then
+if [ $# -eq 1 ] && [ "$1" = "pre" ]; then
   release="pre-release"
 else
   release="release"

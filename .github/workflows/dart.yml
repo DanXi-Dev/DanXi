@@ -21,6 +21,6 @@ jobs:
     - run: flutter pub get
       #Testing is still useless at the moment.
       #- run: flutter test
-    - run: ./build_ios
+    - run: ./build_ios pre
     - run: flutter build apk
 
