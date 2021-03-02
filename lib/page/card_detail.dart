@@ -57,9 +57,12 @@ class _CardDetailPageState extends State<CardDetailPage> {
             },
             tagList: _tags),
         Expanded(
-            child: ListView(
-              children: _getListWidgets(),
-            )),
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: ListView(
+                  children: _getListWidgets(),
+                ))),
       ]),
     );
   }
@@ -68,12 +71,13 @@ class _CardDetailPageState extends State<CardDetailPage> {
     List<Widget> widgets = [];
     _cardInfo.records.forEach((element) {
       widgets.add(Material(
+          color: isCupertino(context) ? Colors.white : null,
           child: ListTile(
-        leading: Icon(Icons.monetization_on),
-        title: Text(element.payment),
-        isThreeLine: true,
-        subtitle: Text("${element.location}\n${element.time.toString()}"),
-      )));
+            leading: Icon(Icons.monetization_on),
+            title: Text(element.payment),
+            isThreeLine: true,
+            subtitle: Text("${element.location}\n${element.time.toString()}"),
+          )));
     });
 
     return widgets;

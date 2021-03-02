@@ -61,11 +61,12 @@ class _BBSSubpageState extends State<BBSSubpage>
       builder: (_) => PlatformAlertDialog(
         title: Text(S.of(context).login_with_uis),
         content: Material(
+            color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
-          leading: Icon(Icons.account_circle),
-          title: Text(info.name),
-          subtitle: Text(info.id),
-        )),
+              leading: Icon(Icons.account_circle),
+              title: Text(info.name),
+              subtitle: Text(info.id),
+            )),
         actions: [
           PlatformButton(
               onPressed: () async {
@@ -125,28 +126,29 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _getListItem(BBSPost e) {
     return Material(
+        color: isCupertino(context) ? Colors.white : null,
         child: ListTile(
-      dense: false,
-      title: Text(e.content,
-          maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            e.author,
-            style: TextStyle(color: Colors.deepPurple),
+          dense: false,
+          title: Text(e.content,
+              maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                e.author,
+                style: TextStyle(color: Colors.deepPurple),
+              ),
+              Text(
+                e.createdAt,
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
           ),
-          Text(
-            e.createdAt,
-            style: TextStyle(fontSize: 12),
-          ),
-        ],
-      ),
-      onTap: () {
-        Navigator.of(context).pushNamed("/bbs/postDetail",
-            arguments: {"post": e, "user": _loginUser});
-      },
-    ));
+          onTap: () {
+            Navigator.of(context).pushNamed("/bbs/postDetail",
+                arguments: {"post": e, "user": _loginUser});
+          },
+        ));
   }
 
   @override

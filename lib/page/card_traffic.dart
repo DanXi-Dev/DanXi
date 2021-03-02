@@ -72,9 +72,12 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                     children: _getCupertinoItems(),
                   )),
           Expanded(
-              child: ListView(
-                children: _getListWidgets(),
-              ))
+              child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: ListView(
+                    children: _getListWidgets(),
+                  )))
         ],
       ),
     );
@@ -92,11 +95,12 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     if (_trafficInfos == null) return widgets;
     _trafficInfos.forEach((key, value) {
       widgets.add(Material(
+          color: isCupertino(context) ? Colors.white : null,
           child: ListTile(
-        leading: Icon(Icons.timelapse),
-        title: Text(value.current.toString()),
-        subtitle: Text(key),
-      )));
+            leading: Icon(Icons.timelapse),
+            title: Text(value.current.toString()),
+            subtitle: Text(key),
+          )));
     });
 
     return widgets;

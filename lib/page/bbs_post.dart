@@ -53,8 +53,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       itemBuilder: (context, index) =>
                           _getListItem(l[index], index),
                       separatorBuilder: (_, __) => Divider(
-                        color: Colors.grey,
-                      ),
+                            color: Colors.grey,
+                          ),
                       itemCount: l.length);
                 }
                 return Container();
@@ -74,7 +74,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _getListItem(BBSPost e, int index) => Material(
-          child: ListTile(
+      color: isCupertino(context) ? Colors.white : null,
+      child: ListTile(
         dense: false,
         title: Column(
           children: [
