@@ -64,7 +64,7 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        //initialPlatform: TargetPlatform.iOS,
+        initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
               title: "DanXi",
               material: (_, __) => MaterialAppData(
@@ -137,6 +137,7 @@ class _HomePageState extends State<HomePage> {
               title: Text(S.of(context).fudan_qr_code),
               content: Container(
                   width: double.maxFinite,
+                  height: 200.0,
                   child: Center(
                       child: FutureBuilder<String>(
                           future: QRCodeRepository.getInstance()
@@ -312,7 +313,7 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
-      body: Container(),
+            body: Container(),
           )
         : PlatformScaffold(
             iosContentBottomPadding: true,
@@ -330,16 +331,16 @@ class _HomePageState extends State<HomePage> {
                   onPressed: _onPressActionButton,
                 )
               ],
-      ),
-      body: MultiProvider(
-        providers: [
+            ),
+            body: MultiProvider(
+              providers: [
                 ChangeNotifierProvider.value(value: _pageIndex),
                 ChangeNotifierProvider.value(value: _connectStatus),
                 ChangeNotifierProvider.value(value: _personInfo),
               ],
               child: IndexedStack(index: _pageIndex.value, children: _subpage),
             ),
-      bottomNavBar: PlatformNavBar(
+            bottomNavBar: PlatformNavBar(
               items: [
                 BottomNavigationBarItem(
                   backgroundColor: Colors.purple,
