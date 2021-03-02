@@ -25,11 +25,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      iosContentBottomPadding: true,
       appBar: PlatformAppBar(
         title: Text(S.of(context).forum),
         trailingActions: [
           PlatformIconButton(
-            icon: Icon(CupertinoIcons.reply),
+            padding: EdgeInsets.zero,
+            icon: Icon(Icons.reply),
             onPressed: () {
               Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
                 "post": BBSPost.newReply(_user.objectId, _post.objectId)
@@ -51,8 +53,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       itemBuilder: (context, index) =>
                           _getListItem(l[index], index),
                       separatorBuilder: (_, __) => Divider(
-                            color: Colors.grey,
-                          ),
+                        color: Colors.grey,
+                      ),
                       itemCount: l.length);
                 }
                 return Container();

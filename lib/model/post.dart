@@ -6,6 +6,7 @@ part 'post.g.dart';
 
 @JsonSerializable()
 class BBSPost extends BmobObject {
+  // ignore: unused_field
   String __type = "BBSPost";
 
   //replyPost = "0" when it's the first floor of a post

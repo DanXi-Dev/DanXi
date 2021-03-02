@@ -102,9 +102,11 @@ packages:
   catcher:
     dependency: "direct main"
     description:
-      name: catcher
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "2420ff441e442663482545dc6d046edbf0e7f45d"
+      url: "https://github.com/w568w/catcher"
+    source: git
     version: "0.4.0"
   characters:
     dependency: transitive
@@ -814,4 +816,4 @@ packages:
     version: "2.2.1"
 sdks:
   dart: ">=2.12.0-0.0 <3.0.0"
-  flutter: ">=1.20.4 <2.0.0"
+  flutter: ">=1.20.4"

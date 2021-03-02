@@ -22,6 +22,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   PersonInfo _personInfo;
   Map<String, TrafficInfo> _trafficInfos;
   String _selectItem = S.current.choose_area;
+  int _sliding;
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
             _personInfo, Constant.campusArea.indexOf(_selectItem))
         .catchError((e) {
       if (e is UnsuitableTimeException) {
-        if (Platform.isAndroid) {
+        if (Platform.isAndroid && isMaterial(context)) {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(S.of(context).out_of_dining_time)));
         } else if (Platform.isIOS) {
@@ -50,6 +51,8 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
       appBar:
           PlatformAppBar(title: Text(S.of(context).dining_hall_crowdedness)),
       body: Column(
@@ -61,14 +64,17 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                     onChanged: (String e) => _onSelectedItemChanged(e),
                   ),
               cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                    onValueChanged: (int value) =>
-                        _onSelectedItemChanged(Constant.campusArea[value]),
+                    onValueChanged: (int value) {
+                      _sliding = value;
+                      _onSelectedItemChanged(Constant.campusArea[value]);
+                    },
+                    groupValue: _sliding,
                     children: _getCupertinoItems(),
                   )),
           Expanded(
               child: ListView(
-            children: _getListWidgets(),
-          ))
+                children: _getListWidgets(),
+              ))
         ],
       ),
     );

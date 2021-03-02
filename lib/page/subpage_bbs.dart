@@ -25,17 +25,21 @@ class NewPostEvent {}
 
 class RetrieveNewPostEvent {}
 
-class _BBSSubpageState extends State<BBSSubpage> {
+class _BBSSubpageState extends State<BBSSubpage>
+    with AutomaticKeepAliveClientMixin {
   BmobUser _loginUser;
-  StreamSubscription _postSubscription;
-  StreamSubscription _refreshSubscription;
+  static StreamSubscription _postSubscription;
+  static StreamSubscription _refreshSubscription;
 
   @override
   void initState() {
     super.initState();
-    _postSubscription = Constant.eventBus.on<NewPostEvent>().listen((_) =>
+    if (_postSubscription == null) {
+      _postSubscription = Constant.eventBus.on<NewPostEvent>().listen((_) {
         Navigator.of(context).pushNamed("/bbs/newPost",
-            arguments: {"post": BBSPost.newPost(_loginUser.objectId)}));
+            arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
+      });
+    }
     _refreshSubscription = Constant.eventBus
         .on<RetrieveNewPostEvent>()
         .listen((_) => refreshSelf());
@@ -46,6 +50,8 @@ class _BBSSubpageState extends State<BBSSubpage> {
     super.dispose();
     _postSubscription.cancel();
     _refreshSubscription.cancel();
+    _postSubscription = null;
+    _refreshSubscription = null;
   }
 
   Future<BmobUser> register(PersonInfo info) async {
@@ -100,6 +106,7 @@ class _BBSSubpageState extends State<BBSSubpage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     return RefreshIndicator(
         color: Colors.deepPurple,
@@ -111,8 +118,8 @@ class _BBSSubpageState extends State<BBSSubpage> {
                 snapshot.hasData
                     ? ListView(
                         children:
-                            snapshot.data.map((e) => _getListItem(e)).toList())
-                    : Container(),
+                snapshot.data.map((e) => _getListItem(e)).toList())
+                : Container(),
             future: loginAndLoadPost(info)));
   }
 
@@ -141,4 +148,7 @@ class _BBSSubpageState extends State<BBSSubpage> {
       },
     ));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -38,6 +38,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
       appBar: PlatformAppBar(title: Text(S.of(context).ecard_balance_log)),
       body: Column(children: [
         TagContainer(
@@ -56,8 +58,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
             tagList: _tags),
         Expanded(
             child: ListView(
-          children: _getListWidgets(),
-        )),
+              children: _getListWidgets(),
+            )),
       ]),
     );
   }

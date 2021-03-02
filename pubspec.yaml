@@ -43,7 +43,10 @@ dependencies:
   quick_actions: ^0.4.0+10
   qr_flutter: ^3.2.0
   provider: ^4.3.3
-  catcher: ^0.4.0
+  catcher:
+    git:
+      url: https://github.com/w568w/catcher
+      ref: master
   data_plugin: ^0.0.18
   json_serializable: ^3.5.1
   #zefyr: ^0.12.0

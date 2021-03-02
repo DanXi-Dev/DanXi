@@ -29,10 +29,15 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+        iosContentBottomPadding: true,
+        iosContentPadding: true,
         appBar: PlatformAppBar(
           title: Text("写点什么"),
           trailingActions: [
-            PlatformIconButton(icon: Icon(Icons.send), onPressed: _sendDocument)
+            PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.send),
+                onPressed: _sendDocument)
           ],
         ),
         body: Padding(

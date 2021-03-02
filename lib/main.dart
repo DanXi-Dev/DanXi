@@ -63,36 +63,36 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return PlatformApp(
-      title: "DanXi",
-      material: (_, __) => MaterialAppData(
-        theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
-        ),
-      ),
-      localizationsDelegates: [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate
-      ],
-      supportedLocales: S.delegate.supportedLocales,
-      home: HomePage(),
-      onGenerateRoute: (settings) {
-        final String name = settings.name;
-        final Function pageContentBuilder = this.routes[name];
-        if (pageContentBuilder != null) {
-          final Route route = platformPageRoute(
-              context: context,
-              builder: (context) =>
-                  pageContentBuilder(context, arguments: settings.arguments));
-          return route;
-        }
-        return null;
-      },
-      //Catcher integration
-      navigatorKey: Catcher.navigatorKey,
-    );
+    return PlatformProvider(
+        //initialPlatform: TargetPlatform.iOS,
+        builder: (BuildContext context) => PlatformApp(
+              title: "DanXi",
+              material: (_, __) => MaterialAppData(
+                theme: ThemeData(
+                  primarySwatch: Colors.deepPurple,
+                ),
+              ),
+              localizationsDelegates: [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              home: HomePage(),
+              onGenerateRoute: (settings) {
+                final Function pageContentBuilder = this.routes[settings.name];
+                if (pageContentBuilder != null) {
+                  final Route route = platformPageRoute(
+                      context: context,
+                      builder: (context) => pageContentBuilder(context,
+                          arguments: settings.arguments));
+                  return route;
+                }
+                return null;
+              },
+              navigatorKey: Catcher.navigatorKey,
+            ));
   }
 }
 
@@ -108,16 +108,15 @@ class _HomePageState extends State<HomePage> {
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
   ValueNotifier<String> _connectStatus = ValueNotifier("");
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  int _pageindex = 0;
+  ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
-  final List<Function> _subpageBuilders = [
-    () => HomeSubpage(),
-    () => BBSSubpage()
-  ];
-  final List<Function> _subpageActionButtonBuilders = [
+  final List<Widget> _subpage = [HomeSubpage(), BBSSubpage()];
+  final List<Function> _subpageActionButtonIconBuilders = [
     (cxt) => Icons.login,
     (cxt) => PlatformIcons(cxt).add
   ];
+
+  // ignore: unused_field
   final List<Function> _subpageActionButtonTextBuilders = [
     (cxt) => S.of(cxt).change_account,
     (cxt) => S.of(cxt).new_post
@@ -284,11 +283,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onPressActionButton() async {
-    switch (_pageindex) {
+    switch (_pageIndex.value) {
       case 0:
         await _loadSharedPreference(forceLogin: true);
         break;
       case 1:
+        print("click 1");
         NewPostEvent().fire();
         break;
     }
@@ -299,18 +299,24 @@ class _HomePageState extends State<HomePage> {
     print("Start run");
     return _personInfo.value == null
         ? PlatformScaffold(
+            iosContentBottomPadding: true,
+            iosContentPadding: true,
             appBar: PlatformAppBar(
               title: Text(S.of(context).app_name),
               trailingActions: [
                 PlatformIconButton(
-                  icon: Icon(_subpageActionButtonBuilders[_pageindex](context)),
+                  padding: EdgeInsets.zero,
+                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                      context)),
                   onPressed: _onPressActionButton,
                 )
               ],
             ),
-            body: Container(),
+      body: Container(),
           )
         : PlatformScaffold(
+            iosContentBottomPadding: true,
+            iosContentPadding: _pageIndex.value == 1 ? false : true,
             appBar: PlatformAppBar(
               title: Text(
                 S.of(context).app_name,
@@ -318,17 +324,20 @@ class _HomePageState extends State<HomePage> {
               ),
               trailingActions: [
                 PlatformIconButton(
-                  icon: Icon(_subpageActionButtonBuilders[_pageindex](context)),
+                  padding: EdgeInsets.zero,
+                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                      context)),
                   onPressed: _onPressActionButton,
                 )
               ],
-            ),
-            body: MultiProvider(
-              providers: [
+      ),
+      body: MultiProvider(
+        providers: [
+                ChangeNotifierProvider.value(value: _pageIndex),
                 ChangeNotifierProvider.value(value: _connectStatus),
                 ChangeNotifierProvider.value(value: _personInfo),
               ],
-              child: _subpageBuilders[_pageindex](),
+              child: IndexedStack(index: _pageIndex.value, children: _subpage),
             ),
       bottomNavBar: PlatformNavBar(
               items: [
@@ -348,13 +357,13 @@ class _HomePageState extends State<HomePage> {
                 //   label: "我",
                 // ),
               ],
-              currentIndex: _pageindex,
+              currentIndex: _pageIndex.value,
               material: (_, __) => MaterialNavBarData(
                 type: BottomNavigationBarType.shifting,
               ),
               itemChanged: (index) {
-                if (index != _pageindex) {
-                  setState(() => _pageindex = index);
+                if (index != _pageIndex.value) {
+                  setState(() => _pageIndex.value = index);
                 }
               },
             ),
