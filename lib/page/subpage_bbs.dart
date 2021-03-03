@@ -40,9 +40,11 @@ class _BBSSubpageState extends State<BBSSubpage>
             arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
       });
     }
-    _refreshSubscription = Constant.eventBus
-        .on<RetrieveNewPostEvent>()
-        .listen((_) => refreshSelf());
+    if (_refreshSubscription == null) {
+      _refreshSubscription = Constant.eventBus
+          .on<RetrieveNewPostEvent>()
+          .listen((_) => refreshSelf());
+    }
   }
 
   @override
@@ -112,15 +114,15 @@ class _BBSSubpageState extends State<BBSSubpage>
     return RefreshIndicator(
         color: Colors.deepPurple,
         onRefresh: () async {
-          setState(() {});
+          refreshSelf();
         },
         child: FutureBuilder(
             builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) =>
                 snapshot.hasData
                     ? ListView(
                         children:
-                snapshot.data.map((e) => _getListItem(e)).toList())
-                : Container(),
+                            snapshot.data.map((e) => _getListItem(e)).toList())
+                    : Container(),
             future: loginAndLoadPost(info)));
   }
 

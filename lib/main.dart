@@ -64,14 +64,22 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        //initialPlatform: TargetPlatform.iOS,
+        // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
-              title: "DanXi",
+          title: "DanXi",
               material: (_, __) => MaterialAppData(
-                theme: ThemeData(
-                  primarySwatch: Colors.deepPurple,
-                ),
-              ),
+                  theme: ThemeData(
+                    brightness: Brightness.light,
+                    primarySwatch: Colors.deepPurple,
+                  ),
+                  darkTheme: ThemeData(
+                      brightness: Brightness.dark,
+                      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                          selectedIconTheme: IconThemeData(color: Colors.white),
+                          unselectedIconTheme:
+                              IconThemeData(color: Colors.white),
+                          selectedItemColor: Colors.white,
+                          unselectedItemColor: Colors.white))),
               localizationsDelegates: [
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
@@ -125,6 +133,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+    _connectivitySubscription = null;
     super.dispose();
   }
 
@@ -156,12 +165,10 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
-        .listen((_) => {_loadNetworkState()});
+        .listen((_) => _loadNetworkState());
     _loadSharedPreference().then((_) => quickActions.initialize((shortcutType) {
-          if (shortcutType == 'action_qr_code') {
-            if (_personInfo != null) {
-              _showQRCode();
-            }
+          if (shortcutType == 'action_qr_code' && _personInfo != null) {
+            _showQRCode();
           }
         }));
     _loadNetworkState();
@@ -173,23 +180,17 @@ class _HomePageState extends State<HomePage> {
     ]);
   }
 
-  Future<void> _tryLogin(String id, String pwd) async {
+  Future<void> _tryLogin(String id, String password) async {
     var progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
-    var name = "";
-    await CardRepository.getInstance().login(new PersonInfo(id, pwd, "")).then(
-        (_) async => {
-              progressDialog.dismiss(),
-              _preferences.setString("id", id),
-              _preferences.setString("password", pwd),
-              name = await CardRepository.getInstance().getName(),
-              _preferences.setString("name", name),
-              setState(() {
-                _personInfo.value = new PersonInfo(id, pwd, name);
-              }),
-              Navigator.of(context).pop(),
-            },
-        onError: (e) => {progressDialog.dismiss(), throw e});
+    var newInfo = PersonInfo.createNewInfo(id, password);
+    await CardRepository.getInstance().login(newInfo).then((_) async {
+      newInfo.name = await CardRepository.getInstance().getName();
+      await newInfo.saveAsSharedPreferences(_preferences);
+      setState(() => _personInfo.value = newInfo);
+      progressDialog.dismiss();
+      Navigator.of(context).pop();
+    }, onError: (e) => {progressDialog.dismiss(), throw e});
   }
 
   void _showLoginDialog({bool forceLogin = false}) {
@@ -254,13 +255,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadSharedPreference({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
-    if (!_preferences.containsKey("id") || forceLogin) {
+    if (forceLogin || !_preferences.containsKey("id")) {
       _showLoginDialog(forceLogin: forceLogin);
     } else {
-      setState(() {
-        _personInfo.value = new PersonInfo(_preferences.getString("id"),
-            _preferences.getString("password"), _preferences.getString("name"));
-      });
+      setState(() =>
+          _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));
     }
   }
 
@@ -289,7 +288,6 @@ class _HomePageState extends State<HomePage> {
         await _loadSharedPreference(forceLogin: true);
         break;
       case 1:
-        print("click 1");
         NewPostEvent().fire();
         break;
     }
@@ -297,7 +295,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print("Start run");
     return _personInfo.value == null
         ? PlatformScaffold(
             iosContentBottomPadding: true,
@@ -361,6 +358,10 @@ class _HomePageState extends State<HomePage> {
               currentIndex: _pageIndex.value,
               material: (_, __) => MaterialNavBarData(
                 type: BottomNavigationBarType.shifting,
+                selectedIconTheme:
+                    BottomNavigationBarTheme.of(context).selectedIconTheme,
+                unselectedIconTheme:
+                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
               ),
               itemChanged: (index) {
                 if (index != _pageIndex.value) {

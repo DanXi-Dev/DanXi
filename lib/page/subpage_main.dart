@@ -17,11 +17,15 @@ class HomeSubpage extends StatefulWidget {
   HomeSubpage({Key key});
 }
 
-class _HomeSubpageState extends State<HomeSubpage> {
+class _HomeSubpageState extends State<HomeSubpage>
+    with AutomaticKeepAliveClientMixin {
   String _helloQuote = "";
   CardInfo _cardInfo;
   bool _fudanDailyTicked = true;
   ConnectionStatus _fudanDailyStatus = ConnectionStatus.NONE;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -50,6 +54,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
       _helloQuote = S.of(context).late_night;
@@ -68,48 +73,48 @@ class _HomeSubpageState extends State<HomeSubpage> {
       children: <Widget>[
         Card(
             child: Column(
-          children: [
-            ListTile(
-              title: Text(S.of(context).welcome(info?.name)),
-              subtitle: Text(_helloQuote),
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.wifi),
-              title: Text(S.of(context).current_connection),
-              subtitle: Text(connectStatus),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_balance_wallet),
-              title: Text(S.of(context).ecard_balance),
-              subtitle: FutureBuilder(
-                  future: _loadCard(info),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    if (snapshot.hasData) {
-                      String response = snapshot.data;
-                      return Text(response);
-                    } else {
-                      return Text(S.of(context).loading);
+              children: [
+                ListTile(
+                  title: Text(S.of(context).welcome(info?.name)),
+                  subtitle: Text(_helloQuote),
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.wifi),
+                  title: Text(S.of(context).current_connection),
+                  subtitle: Text(connectStatus),
+                ),
+                ListTile(
+                  leading: Icon(Icons.account_balance_wallet),
+                  title: Text(S.of(context).ecard_balance),
+                  subtitle: FutureBuilder(
+                      future: _loadCard(info),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<String> snapshot) {
+                        if (snapshot.hasData) {
+                          String response = snapshot.data;
+                          return Text(response);
+                        } else {
+                          return Text(S.of(context).loading);
+                        }
+                      }),
+                  onTap: () {
+                    if (_cardInfo != null) {
+                      Navigator.of(context).pushNamed("/card/detail",
+                          arguments: {"cardInfo": _cardInfo, "personInfo": info});
                     }
-                  }),
-              onTap: () {
-                if (_cardInfo != null) {
-                  Navigator.of(context).pushNamed("/card/detail",
-                      arguments: {"cardInfo": _cardInfo, "personInfo": info});
-                }
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.stacked_line_chart),
-              title: Text(S.of(context).dining_hall_crowdedness),
-              onTap: () {
-                Navigator.of(context).pushNamed("/card/crowdData",
-                    arguments: {"cardInfo": _cardInfo, "personInfo": info});
-              },
-            )
-          ],
-        )),
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.stacked_line_chart),
+                  title: Text(S.of(context).dining_hall_crowdedness),
+                  onTap: () {
+                    Navigator.of(context).pushNamed("/card/crowdData",
+                        arguments: {"cardInfo": _cardInfo, "personInfo": info});
+                  },
+                )
+              ],
+            )),
         Card(
           child: ListTile(
             title: Text(S.of(context).fudan_daily),
@@ -138,21 +143,21 @@ class _HomeSubpageState extends State<HomeSubpage> {
                     var progressDialog = showProgressDialog(
                         loadingText: S.of(context).ticking, context: context);
                     await FudanDailyRepository.getInstance().tick(info).then(
-                        (value) => {progressDialog.dismiss(), setState(() {})},
+                            (value) => {progressDialog.dismiss(), setState(() {})},
                         onError: (e) {
-                      progressDialog.dismiss();
-                      if (e is NotTickYesterdayException) {
-                        _processForgetTickIssue();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(S.of(context).tick_failed)));
-                      }
-                    });
+                          progressDialog.dismiss();
+                          if (e is NotTickYesterdayException) {
+                            _processForgetTickIssue();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(S.of(context).tick_failed)));
+                          }
+                        });
                   }
                   break;
                 case ConnectionStatus.FAILED:
                   setState(
-                      () => _fudanDailyStatus = ConnectionStatus.CONNECTING);
+                          () => _fudanDailyStatus = ConnectionStatus.CONNECTING);
                   break;
                 case ConnectionStatus.FATAL_ERROR:
                 case ConnectionStatus.CONNECTING:
