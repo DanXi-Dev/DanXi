@@ -1,21 +1,35 @@
+/*
+ *     Copyright (C) 2021  w568w
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'dart:convert';
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'inpersistent_cookie_manager.dart';
 
-class FudanDailyRepository {
-  Dio _dio = Dio();
+class FudanDailyRepository extends BaseRepositoryWithDio {
   dynamic _historyData;
-  NonpersistentCookieJar _cookieJar = NonpersistentCookieJar();
+
   static const String LOGIN_URL =
       "http://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Fsite%252Fncov%252FfudanDaily%253Ffrom%253Dhistory%26from%3Dwap";
   static const String SAVE_URL =
@@ -26,7 +40,7 @@ class FudanDailyRepository {
   PersonInfo _info;
 
   FudanDailyRepository._() {
-    _dio.interceptors.add(CookieManager(_cookieJar));
+    initRepository();
   }
 
   static final _instance = FudanDailyRepository._();
@@ -35,8 +49,8 @@ class FudanDailyRepository {
 
   Future<dynamic> _getHistoryInfo(PersonInfo info) async {
     _info = info;
-    await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
-    var res = await _dio.get(GET_INFO_URL);
+    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info);
+    var res = await dio.get(GET_INFO_URL);
     try {
       return res.data is Map
           ? res.data['d']
@@ -48,7 +62,7 @@ class FudanDailyRepository {
   }
 
   Future<bool> hasTick(PersonInfo info) async {
-    _historyData = await Retryer.runAsyncWithRetry(() => _getHistoryInfo(info));
+    _historyData = await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
     if (_historyData['info'] is! Map) {
       return false;
     }
@@ -81,7 +95,7 @@ class FudanDailyRepository {
   Future<void> tick(PersonInfo info) async {
     if (_historyData == null) {
       _historyData =
-          await Retryer.runAsyncWithRetry(() => _getHistoryInfo(info));
+          await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
     }
     var headers = {
       "User-Agent":
@@ -102,7 +116,7 @@ class FudanDailyRepository {
       await pref.setString(_KEY_PREF, jsonEncode(payload));
     }
 
-    await _dio.post(SAVE_URL,
+    await dio.post(SAVE_URL,
         data: payload.encodeMap(),
         options:
             DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));

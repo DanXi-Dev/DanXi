@@ -1,3 +1,20 @@
+/*
+ *     Copyright (C) 2021  w568w
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'dart:async';
 
 import 'package:catcher/catcher.dart';
@@ -8,6 +25,7 @@ import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
+import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -64,12 +82,12 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        // initialPlatform: TargetPlatform.iOS,
+      // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
           title: "DanXi",
-              material: (_, __) => MaterialAppData(
-                  theme: ThemeData(
-                    brightness: Brightness.light,
+          material: (_, __) => MaterialAppData(
+              theme: ThemeData(
+                brightness: Brightness.light,
                     primarySwatch: Colors.deepPurple,
                   ),
                   darkTheme: ThemeData(
@@ -91,11 +109,10 @@ class DanxiApp extends StatelessWidget {
               onGenerateRoute: (settings) {
                 final Function pageContentBuilder = this.routes[settings.name];
                 if (pageContentBuilder != null) {
-                  final Route route = platformPageRoute(
+                  return platformPageRoute(
                       context: context,
                       builder: (context) => pageContentBuilder(context,
                           arguments: settings.arguments));
-                  return route;
                 }
                 return null;
               },
@@ -113,18 +130,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   SharedPreferences _preferences;
+
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
   ValueNotifier<String> _connectStatus = ValueNotifier("");
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
-  final List<Widget> _subpage = [HomeSubpage(), BBSSubpage()];
+  final List<PlatformSubpage> _subpage = [HomeSubpage(), BBSSubpage()];
   final List<Function> _subpageActionButtonIconBuilders = [
     (cxt) => Icons.login,
     (cxt) => PlatformIcons(cxt).add
   ];
-
-  // ignore: unused_field
   final List<Function> _subpageActionButtonTextBuilders = [
     (cxt) => S.of(cxt).change_account,
     (cxt) => S.of(cxt).new_post
@@ -166,11 +182,12 @@ class _HomePageState extends State<HomePage> {
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
         .listen((_) => _loadNetworkState());
-    _loadSharedPreference().then((_) => quickActions.initialize((shortcutType) {
-          if (shortcutType == 'action_qr_code' && _personInfo != null) {
-            _showQRCode();
-          }
-        }));
+    _loadOrInitSharedPreference()
+        .then((_) => quickActions.initialize((shortcutType) {
+              if (shortcutType == 'action_qr_code' && _personInfo != null) {
+                _showQRCode();
+              }
+            }));
     _loadNetworkState();
     quickActions.setShortcutItems(<ShortcutItem>[
       ShortcutItem(
@@ -183,7 +200,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _tryLogin(String id, String password) async {
     var progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
-    var newInfo = PersonInfo.createNewInfo(id, password);
+    PersonInfo newInfo = PersonInfo.createNewInfo(id, password);
     await CardRepository.getInstance().login(newInfo).then((_) async {
       newInfo.name = await CardRepository.getInstance().getName();
       await newInfo.saveAsSharedPreferences(_preferences);
@@ -194,13 +211,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showLoginDialog({bool forceLogin = false}) {
-    var nameController = new TextEditingController();
-    var pwdController = new TextEditingController();
-    showPlatformDialog<Null>(
+    TextEditingController nameController = new TextEditingController();
+    TextEditingController pwdController = new TextEditingController();
+    showPlatformDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return new PlatformAlertDialog(
+          return PlatformAlertDialog(
             title: Text(S.of(context).login_uis),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -253,20 +270,21 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Future<void> _loadSharedPreference({bool forceLogin = false}) async {
+  Future<void> _loadOrInitSharedPreference({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
-    if (forceLogin || !_preferences.containsKey("id")) {
-      _showLoginDialog(forceLogin: forceLogin);
-    } else {
+    if (!forceLogin && _preferences.containsKey("id")) {
       setState(() =>
           _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));
+    } else {
+      _showLoginDialog(forceLogin: forceLogin);
     }
   }
 
   Future<void> _loadNetworkState() async {
-    var connectivity = await WiFiUtils.getConnectivity().checkConnectivity();
+    ConnectivityResult connectivity =
+        await WiFiUtils.getConnectivity().checkConnectivity();
     if (connectivity == ConnectivityResult.wifi) {
-      var result;
+      Map result;
       try {
         result = await WiFiUtils.getWiFiInfo(connectivity);
       } catch (ignored) {}
@@ -285,10 +303,10 @@ class _HomePageState extends State<HomePage> {
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        await _loadSharedPreference(forceLogin: true);
+        await _loadOrInitSharedPreference(forceLogin: true);
         break;
       case 1:
-        NewPostEvent().fire();
+        AddNewPostEvent().fire();
         break;
     }
   }
@@ -314,14 +332,18 @@ class _HomePageState extends State<HomePage> {
           )
         : PlatformScaffold(
             iosContentBottomPadding: true,
-            iosContentPadding: _pageIndex.value == 1 ? false : true,
+            iosContentPadding: _subpage[_pageIndex.value].needPadding,
             appBar: PlatformAppBar(
               title: Text(
                 S.of(context).app_name,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               trailingActions: [
                 PlatformIconButton(
+                  material: (_, __) => MaterialIconButtonData(
+                      tooltip:
+                          _subpageActionButtonTextBuilders[_pageIndex.value](
+                              context)),
                   padding: EdgeInsets.zero,
                   icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
                       context)),
@@ -369,20 +391,6 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
-            // material: (_, __) => MaterialScaffoldData(
-            //   floatingActionButton: _subpageActionButtonBuilders[_pageindex](
-            //               context) !=
-            //           null
-            //       ? FloatingActionButton(
-            //           onPressed: _onPressActionButton,
-            //           tooltip:
-            //               _subpageActionButtonTextBuilders[_pageindex](context),
-            //           child: Icon(
-            //               _subpageActionButtonBuilders[_pageindex](context)),
-            //         )
-            //       : null,
-            // ),
-            // cupertino: (_, __) => CupertinoPageScaffoldData(),
           );
   }
 }

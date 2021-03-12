@@ -1,19 +1,31 @@
+/*
+ *     Copyright (C) 2021  w568w
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:intl/intl.dart';
 
-import 'inpersistent_cookie_manager.dart';
-
-class CardRepository {
+class CardRepository extends BaseRepositoryWithDio {
   PersonInfo _info;
-  Dio _dio = Dio();
-  NonpersistentCookieJar _cookieJar =
-      NonpersistentCookieJar(ignoreExpires: true);
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fecard.fudan.edu.cn%2Fepay%2Fj_spring_cas_security_check";
   static const String USER_DETAIL_URL =
@@ -37,7 +49,7 @@ class CardRepository {
   };
 
   CardRepository._() {
-    _dio.interceptors.add(CookieManager(_cookieJar));
+    initRepository();
   }
 
   static final _instance = CardRepository._();
@@ -45,17 +57,17 @@ class CardRepository {
   factory CardRepository.getInstance() => _instance;
 
   bool _testLoginSuccess() {
-    return _cookieJar
+    return cookieJar
         .loadForRequest(Uri.parse("http://ecard.fudan.edu.cn/"))
         .any((element) => element.name == "iPlanetDirectoryPro");
   }
 
   Future<void> login(PersonInfo info) async {
     _info = info;
-    await Retryer.runAsyncWithRetry(() async {
-      try{
-      await UISLoginTool.loginUIS(_dio, LOGIN_URL, _cookieJar, _info);
-      }catch(e){
+    await Retrier.runAsyncWithRetry(() async {
+      try {
+        await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info);
+      } catch (e) {
         print(e);
       }
       if (!_testLoginSuccess()) {
@@ -73,7 +85,7 @@ class CardRepository {
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String> requestData, int pageNum) async {
     requestData['pageNo'] = pageNum.toString();
-    var detailResponse = await _dio.post(CONSUME_DETAIL_URL,
+    var detailResponse = await dio.post(CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
         options: Options(headers: _consumeDetailHeader));
     var soup = Beautifulsoup(
@@ -95,7 +107,7 @@ class CardRepository {
     print("Start load record.");
     if (logDays < 0) return null;
     //Get csrf id.
-    var consumeCsrfPageResponse = await _dio.get(CONSUME_DETAIL_CSRF_URL);
+    var consumeCsrfPageResponse = await dio.get(CONSUME_DETAIL_CSRF_URL);
     var consumeCsrfPageSoup =
         Beautifulsoup(consumeCsrfPageResponse.data.toString());
     var metas = consumeCsrfPageSoup.find_all("meta");
@@ -124,7 +136,7 @@ class CardRepository {
 
     //Get the number of pages.
 
-    var detailResponse = await _dio.post(CONSUME_DETAIL_URL,
+    var detailResponse = await dio.post(CONSUME_DETAIL_URL,
         data: data.encodeMap(),
         options: Options(headers: _consumeDetailHeader));
 
@@ -147,13 +159,13 @@ class CardRepository {
     var cardInfo = CardInfo();
 
     //获取用户页面信息
-    var userPageResponse = await _dio.get(USER_DETAIL_URL);
+    var userPageResponse = await dio.get(USER_DETAIL_URL);
     cardInfo.cash =
         userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
     cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");
 
     List<CardRecord> records =
-        await Retryer.runAsyncWithRetry(() => loadCardRecord(logDays));
+        await Retrier.runAsyncWithRetry(() => loadCardRecord(logDays));
     cardInfo.records = records;
     return cardInfo;
   }
@@ -165,7 +177,7 @@ class CardInfo {
   List<CardRecord> records;
 
   Future<List<CardRecord>> loadRecords(int logDays) async {
-    this.records = await Retryer.runAsyncWithRetry(
+    this.records = await Retrier.runAsyncWithRetry(
         () => CardRepository.getInstance().loadCardRecord(logDays));
     return this.records;
   }

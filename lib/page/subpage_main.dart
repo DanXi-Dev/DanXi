@@ -1,6 +1,24 @@
+/*
+ *     Copyright (C) 2021  w568w
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +27,10 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 
-//TODO iOSify Card & ListTile
-class HomeSubpage extends StatefulWidget {
+class HomeSubpage extends PlatformSubpage {
+  @override
+  bool get needPadding => true;
+
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
@@ -73,52 +93,52 @@ class _HomeSubpageState extends State<HomeSubpage>
       children: <Widget>[
         Card(
             child: Column(
-              children: [
-                ListTile(
-                  title: Text(S.of(context).welcome(info?.name)),
-                  subtitle: Text(_helloQuote),
-                ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.wifi),
-                  title: Text(S.of(context).current_connection),
-                  subtitle: Text(connectStatus),
-                ),
-                ListTile(
-                  leading: Icon(Icons.account_balance_wallet),
-                  title: Text(S.of(context).ecard_balance),
-                  subtitle: FutureBuilder(
-                      future: _loadCard(info),
-                      builder:
-                          (BuildContext context, AsyncSnapshot<String> snapshot) {
-                        if (snapshot.hasData) {
-                          String response = snapshot.data;
-                          return Text(response);
-                        } else {
-                          return Text(S.of(context).loading);
-                        }
-                      }),
-                  onTap: () {
-                    if (_cardInfo != null) {
-                      Navigator.of(context).pushNamed("/card/detail",
-                          arguments: {"cardInfo": _cardInfo, "personInfo": info});
+          children: [
+            ListTile(
+              title: Text(S.of(context).welcome(info?.name)),
+              subtitle: Text(_helloQuote),
+            ),
+            Divider(),
+            ListTile(
+              leading: const Icon(Icons.wifi),
+              title: Text(S.of(context).current_connection),
+              subtitle: Text(connectStatus),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet),
+              title: Text(S.of(context).ecard_balance),
+              subtitle: FutureBuilder(
+                  future: _loadCard(info),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    if (snapshot.hasData) {
+                      String response = snapshot.data;
+                      return Text(response);
+                    } else {
+                      return Text(S.of(context).loading);
                     }
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.stacked_line_chart),
-                  title: Text(S.of(context).dining_hall_crowdedness),
-                  onTap: () {
-                    Navigator.of(context).pushNamed("/card/crowdData",
-                        arguments: {"cardInfo": _cardInfo, "personInfo": info});
-                  },
-                )
-              ],
-            )),
+                  }),
+              onTap: () {
+                if (_cardInfo != null) {
+                  Navigator.of(context).pushNamed("/card/detail",
+                      arguments: {"cardInfo": _cardInfo, "personInfo": info});
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.stacked_line_chart),
+              title: Text(S.of(context).dining_hall_crowdedness),
+              onTap: () {
+                Navigator.of(context).pushNamed("/card/crowdData",
+                    arguments: {"cardInfo": _cardInfo, "personInfo": info});
+              },
+            )
+          ],
+        )),
         Card(
           child: ListTile(
             title: Text(S.of(context).fudan_daily),
-            leading: Icon(Icons.cloud_upload),
+            leading: const Icon(Icons.cloud_upload),
             subtitle: FutureBuilder(
                 future: FudanDailyRepository.getInstance().hasTick(info),
                 builder: (_, AsyncSnapshot<bool> snapshot) {
@@ -143,21 +163,21 @@ class _HomeSubpageState extends State<HomeSubpage>
                     var progressDialog = showProgressDialog(
                         loadingText: S.of(context).ticking, context: context);
                     await FudanDailyRepository.getInstance().tick(info).then(
-                            (value) => {progressDialog.dismiss(), setState(() {})},
+                        (value) => {progressDialog.dismiss(), setState(() {})},
                         onError: (e) {
-                          progressDialog.dismiss();
-                          if (e is NotTickYesterdayException) {
-                            _processForgetTickIssue();
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(S.of(context).tick_failed)));
-                          }
-                        });
+                      progressDialog.dismiss();
+                      if (e is NotTickYesterdayException) {
+                        _processForgetTickIssue();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(S.of(context).tick_failed)));
+                      }
+                    });
                   }
                   break;
                 case ConnectionStatus.FAILED:
                   setState(
-                          () => _fudanDailyStatus = ConnectionStatus.CONNECTING);
+                      () => _fudanDailyStatus = ConnectionStatus.CONNECTING);
                   break;
                 case ConnectionStatus.FATAL_ERROR:
                 case ConnectionStatus.CONNECTING:

@@ -1,9 +1,27 @@
+/*
+ *     Copyright (C) 2021  w568w
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'dart:async';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
@@ -14,14 +32,17 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-class BBSSubpage extends StatefulWidget {
+class BBSSubpage extends PlatformSubpage {
+  @override
+  bool get needPadding => false;
+
   @override
   _BBSSubpageState createState() => _BBSSubpageState();
 
   BBSSubpage({Key key});
 }
 
-class NewPostEvent {}
+class AddNewPostEvent {}
 
 class RetrieveNewPostEvent {}
 
@@ -35,7 +56,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   void initState() {
     super.initState();
     if (_postSubscription == null) {
-      _postSubscription = Constant.eventBus.on<NewPostEvent>().listen((_) {
+      _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         Navigator.of(context).pushNamed("/bbs/newPost",
             arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
       });
