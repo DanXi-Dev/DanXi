@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -84,10 +85,10 @@ class DanxiApp extends StatelessWidget {
     return PlatformProvider(
       // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
-          title: "DanXi",
-          material: (_, __) => MaterialAppData(
-              theme: ThemeData(
-                brightness: Brightness.light,
+              title: "DanXi",
+              material: (_, __) => MaterialAppData(
+                  theme: ThemeData(
+                    brightness: Brightness.light,
                     primarySwatch: Colors.deepPurple,
                   ),
                   darkTheme: ThemeData(
@@ -182,19 +183,22 @@ class _HomePageState extends State<HomePage> {
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
         .listen((_) => _loadNetworkState());
-    _loadOrInitSharedPreference()
-        .then((_) => quickActions.initialize((shortcutType) {
-              if (shortcutType == 'action_qr_code' && _personInfo != null) {
-                _showQRCode();
-              }
-            }));
+    _loadOrInitSharedPreference().then((_) {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+        quickActions.initialize((shortcutType) {
+          if (shortcutType == 'action_qr_code' && _personInfo != null) {
+            _showQRCode();
+          }
+        });
+    });
     _loadNetworkState();
-    quickActions.setShortcutItems(<ShortcutItem>[
-      ShortcutItem(
-          type: 'action_qr_code',
-          localizedTitle: S.current.fudan_qr_code,
-          icon: 'ic_launcher'),
-    ]);
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+      quickActions.setShortcutItems(<ShortcutItem>[
+        ShortcutItem(
+            type: 'action_qr_code',
+            localizedTitle: S.current.fudan_qr_code,
+            icon: 'ic_launcher'),
+      ]);
   }
 
   Future<void> _tryLogin(String id, String password) async {

@@ -20,8 +20,10 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 class WiFiUtils {
+  static NetworkInfo _networkInfo = NetworkInfo();
   static Connectivity _connectivity = Connectivity();
 
   static Connectivity getConnectivity() {
@@ -37,20 +39,19 @@ class WiFiUtils {
         try {
           if (!kIsWeb && Platform.isIOS) {
             LocationAuthorizationStatus status =
-                await _connectivity.getLocationServiceAuthorization();
+                await _networkInfo.getLocationServiceAuthorization();
             if (status == LocationAuthorizationStatus.notDetermined) {
-              status =
-                  await _connectivity.requestLocationServiceAuthorization();
+              status = await _networkInfo.requestLocationServiceAuthorization();
             }
             if (status == LocationAuthorizationStatus.authorizedAlways ||
                 status == LocationAuthorizationStatus.authorizedWhenInUse) {
-              wifiName = await _connectivity.getWifiName();
+              wifiName = await _networkInfo.getWifiName();
             } else {
-              await _connectivity.requestLocationServiceAuthorization();
-              wifiName = await _connectivity.getWifiName();
+              await _networkInfo.requestLocationServiceAuthorization();
+              wifiName = await _networkInfo.getWifiName();
             }
           } else {
-            wifiName = await _connectivity.getWifiName().catchError((_, stack) {
+            wifiName = await _networkInfo.getWifiName().catchError((_, stack) {
               return null;
             });
           }
@@ -60,7 +61,7 @@ class WiFiUtils {
         result['name'] = wifiName;
 
         try {
-          wifiIP = await _connectivity.getWifiIP();
+          wifiIP = await _networkInfo.getWifiIP();
         } on PlatformException {
           wifiIP = null;
         }

@@ -21,6 +21,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/repository/table_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -54,6 +55,8 @@ class _HomeSubpageState extends State<HomeSubpage>
 
   Future<String> _loadCard(PersonInfo info) async {
     await CardRepository.getInstance().login(info);
+    TimeTable table =
+        await TimeTableRepository.getInstance().loadTimeTableRemote(info);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(7);
     return _cardInfo.cash;
   }
