@@ -34,7 +34,9 @@
     "last_30_days":"Last 30 days",
     "dashboard":"Dashboard",
     "forum":"FD Forum",
+    "timetable":"Timetable",
     "new_post":"New Post",
+    "share":"Share",
     "login_with_uis":"Sign in the forum as:",
     "reply_to":"Reply {name}",
 

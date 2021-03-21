@@ -376,11 +376,31 @@ class S {
     );
   }
 
+  /// `Timetable`
+  String get timetable {
+    return Intl.message(
+      'Timetable',
+      name: 'timetable',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `New Post`
   String get new_post {
     return Intl.message(
       'New Post',
       name: 'new_post',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share`
+  String get share {
+    return Intl.message(
+      'Share',
+      name: 'share',
       desc: '',
       args: [],
     );

@@ -29,6 +29,7 @@ import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
@@ -137,14 +138,20 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
-  final List<PlatformSubpage> _subpage = [HomeSubpage(), BBSSubpage()];
+  final List<PlatformSubpage> _subpage = [
+    HomeSubpage(),
+    BBSSubpage(),
+    TimetableSubPage()
+  ];
   final List<Function> _subpageActionButtonIconBuilders = [
     (cxt) => Icons.login,
-    (cxt) => PlatformIcons(cxt).add
+    (cxt) => PlatformIcons(cxt).add,
+    (cxt) => Icons.share
   ];
   final List<Function> _subpageActionButtonTextBuilders = [
     (cxt) => S.of(cxt).change_account,
-    (cxt) => S.of(cxt).new_post
+    (cxt) => S.of(cxt).new_post,
+    (cxt) => S.of(cxt).share,
   ];
 
   @override
@@ -375,11 +382,11 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.forum),
                   label: S.of(context).forum,
                 ),
-                // BottomNavigationBarItem(
-                //   backgroundColor: Colors.blue,
-                //   icon: Icon(Icons.person),
-                //   label: "我",
-                // ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.blue,
+                  icon: Icon(Icons.calendar_today),
+                  label: S.of(context).timetable,
+                ),
               ],
               currentIndex: _pageIndex.value,
               material: (_, __) => MaterialNavBarData(

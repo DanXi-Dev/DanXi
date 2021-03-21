@@ -82,11 +82,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
             "It\'s not time for a meal at the moment!"),
         "reply_to": m0,
+        "share": MessageLookupByLibrary.simpleMessage("Share"),
         "tick_failed": MessageLookupByLibrary.simpleMessage(
             "Report failed. Check your connection."),
         "tick_issue_1": MessageLookupByLibrary.simpleMessage(
             "Report failed. Danxi can\'t get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day."),
         "ticking": MessageLookupByLibrary.simpleMessage("Reporting..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("Timetable"),
         "welcome": m1
       };
 }
