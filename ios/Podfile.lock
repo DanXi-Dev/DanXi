@@ -16,6 +16,8 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
+  - network_info_plus (0.0.1):
+    - Flutter
   - package_info (0.0.1):
     - Flutter
   - quick_actions (0.0.1):
@@ -34,6 +36,7 @@ DEPENDENCIES:
   - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - quick_actions (from `.symlinks/plugins/quick_actions/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
@@ -60,6 +63,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_mailer/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  network_info_plus:
+    :path: ".symlinks/plugins/network_info_plus/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
   quick_actions:
@@ -76,6 +81,7 @@ SPEC CHECKSUMS:
   flutter_inappwebview: 69dfbac46157b336ffbec19ca6dfd4638c7bf189
   flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
+  network_info_plus: b78876159360f5580608c2cea620d6ceffabd0ad
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   quick_actions: 6cb2390c4dab0e737c94573c27e18d9666710720
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
