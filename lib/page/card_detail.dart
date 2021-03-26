@@ -64,6 +64,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
             fixedColor: Colors.purple,
             fontSize: 16,
             singleChoice: true,
+            defaultChoice: -1,
             onChoice: (Tag tag, list) async {
               int index = _tags.indexOf(tag);
               if (index >= 0) {
@@ -86,16 +87,17 @@ class _CardDetailPageState extends State<CardDetailPage> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    _cardInfo.records.forEach((element) {
-      widgets.add(Material(
-          color: isCupertino(context) ? Colors.white : null,
-          child: ListTile(
-            leading: Icon(Icons.monetization_on),
-            title: Text(element.payment),
-            isThreeLine: true,
-            subtitle: Text("${element.location}\n${element.time.toString()}"),
-          )));
-    });
+    if (_cardInfo.records != null)
+      _cardInfo.records.forEach((element) {
+        widgets.add(Material(
+            color: isCupertino(context) ? Colors.white : null,
+            child: ListTile(
+              leading: Icon(Icons.monetization_on),
+              title: Text(element.payment),
+              isThreeLine: true,
+              subtitle: Text("${element.location}\n${element.time.toString()}"),
+            )));
+      });
 
     return widgets;
   }

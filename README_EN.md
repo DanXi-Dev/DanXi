@@ -29,8 +29,7 @@ Go to [release page](https://github.com/w568w/DanXi/releases), just download the
 
 ## iOS/iPadOS (Via [AltStore](https://altstore.io) )
   
-Due to the development team's inability to support the expensive Apple Developer Program fees, it's difficult to publish this app on the AppStore or to use other easier ways to install it.
-  
+Due to the development team's inability to support the expensive Apple Developer Program fees, it's difficult to publish this app on the AppStore or to use other easier ways to install
 We provide a special method here, requiring a computer on the same LAN (macOS/Windows):
   
 1. Install [AltServer](https://altstore.io) on your PC.

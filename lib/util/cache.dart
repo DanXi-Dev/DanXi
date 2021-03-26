@@ -21,12 +21,12 @@ class Cache {
   static Future<T> get<T>(String key, Future<T> fetch(),
       T decode(String cachedValue), String encode(T object),
       {bool validate(String cachedValue)}) async {
-    print("loading");
     SharedPreferences preferences = await SharedPreferences.getInstance();
     if (validate == null) {
       validate = (v) => v != null;
     }
     if (!preferences.containsKey(key)) {
+      //Reload the cache
       T newValue = await fetch();
       preferences.setString(key, encode(newValue));
       return newValue;

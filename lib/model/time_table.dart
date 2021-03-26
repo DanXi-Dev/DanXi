@@ -84,12 +84,13 @@ class TimeTable {
                   .addMin(MINUTES_OF_COURSE)));
         }));
     for (int i = 0; i < 7; i++) {
-      result.add(LaneEvents(
-          lane: Lane(
-              width: style.laneWidth,
-              height: style.laneHeight,
-              name: DateFormat.EEEE().format(MONDAY.add(Duration(days: i)))),
-          events: table[i]));
+      if (table[i].isNotEmpty)
+        result.add(LaneEvents(
+            lane: Lane(
+                width: style.laneWidth,
+                height: style.laneHeight,
+                name: DateFormat.EEEE().format(MONDAY.add(Duration(days: i)))),
+            events: table[i]));
     }
     return result;
   }
@@ -118,13 +119,19 @@ class Course {
     return availableWeeks;
   }
 
-  static List<CourseTime> _parseTimeFromStrings(Iterable<RegExpMatch> times) {
+  static List<CourseTime> _parseSlotFromStrings(Iterable<RegExpMatch> times) {
     List<CourseTime> courseTimes = [];
     courseTimes.addAll(times.map((RegExpMatch e) {
       List<String> daySlot = e.group(0).trim().split("*unitCount+");
       return CourseTime(int.parse(daySlot[0]), int.parse(daySlot[1]));
     }));
     return courseTimes;
+  }
+
+  static _trimCourseName(String name) {
+    name = name.trim();
+    int idPos = name.lastIndexOf(RegExp(r'\(\w{4}\d{6}\.\d{2}\)'));
+    return idPos >= 0 ? name.replaceRange(idPos, name.length, "") : name;
   }
 
   factory Course.fromHtmlPart(String htmlPart) {
@@ -138,11 +145,11 @@ class Course {
       ..teacherIds = infoVarList[0].split(",")
       ..teacherNames = infoVarList[1].split(",")
       ..courseId = infoVarList[2]
-      ..courseName = infoVarList[3]
+      ..courseName = _trimCourseName(infoVarList[3])
       ..roomId = infoVarList[4]
       ..roomName = infoVarList[5]
       ..availableWeeks = _parseWeeksFromString(infoVarList[6])
-      ..times = _parseTimeFromStrings(timeMatcher.allMatches(htmlPart));
+      ..times = _parseSlotFromStrings(timeMatcher.allMatches(htmlPart));
   }
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);

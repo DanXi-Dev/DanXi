@@ -20,6 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
@@ -58,7 +59,7 @@ class _HomeSubpageState extends State<HomeSubpage>
     await CardRepository.getInstance().login(info);
     TimeTable table =
         await TimeTableRepository.getInstance().loadTimeTableRemotely(info);
-    _cardInfo = await CardRepository.getInstance().loadCardInfo(7);
+    _cardInfo = await CardRepository.getInstance().loadCardInfo(-1);
     return _cardInfo.cash;
   }
 
@@ -93,18 +94,20 @@ class _HomeSubpageState extends State<HomeSubpage>
     }
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     String connectStatus = Provider.of<ValueNotifier<String>>(context)?.value;
-    return Column(
-      children: <Widget>[
-        Card(
-            child: Column(
-          children: [
-            ListTile(
-              title: Text(S.of(context).welcome(info?.name)),
-              subtitle: Text(_helloQuote),
-            ),
-            Divider(),
-            ListTile(
-              leading: const Icon(Icons.wifi),
+    return RefreshIndicator(
+        onRefresh: () async => refreshSelf(),
+        child: ListView(
+          children: <Widget>[
+            Card(
+                child: Column(
+              children: [
+                ListTile(
+                  title: Text(S.of(context).welcome(info?.name)),
+                  subtitle: Text(_helloQuote),
+                ),
+                Divider(),
+                ListTile(
+                  leading: const Icon(Icons.wifi),
               title: Text(S.of(context).current_connection),
               subtitle: Text(connectStatus),
             ),
@@ -182,16 +185,16 @@ class _HomeSubpageState extends State<HomeSubpage>
                 case ConnectionStatus.FAILED:
                   setState(
                       () => _fudanDailyStatus = ConnectionStatus.CONNECTING);
-                  break;
-                case ConnectionStatus.FATAL_ERROR:
-                case ConnectionStatus.CONNECTING:
-                case ConnectionStatus.NONE:
-                  break;
-              }
-            },
-          ),
-        )
-      ],
-    );
+                      break;
+                    case ConnectionStatus.FATAL_ERROR:
+                    case ConnectionStatus.CONNECTING:
+                    case ConnectionStatus.NONE:
+                      break;
+                  }
+                },
+              ),
+            )
+          ],
+        ));
   }
 }

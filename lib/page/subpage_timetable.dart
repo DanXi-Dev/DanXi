@@ -42,7 +42,7 @@ class _TimetableSubPageState extends State<TimetableSubPage> {
                     laneHeight: 30,
                     laneWidth: 80,
                     timeItemWidth: 50,
-                    timeItemHeight: 200),
+                    timeItemHeight: 160),
               )
             : Container(),
         future: TimeTableRepository.getInstance().loadTimeTableLocally(info));
