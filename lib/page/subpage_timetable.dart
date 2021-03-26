@@ -15,11 +15,15 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:provider/provider.dart';
 
@@ -28,9 +32,41 @@ class TimetableSubPage extends PlatformSubpage {
   _TimetableSubPageState createState() => _TimetableSubPageState();
 }
 
-class _TimetableSubPageState extends State<TimetableSubPage> {
+class ShareTimetableEvent {}
+
+class _TimetableSubPageState extends State<TimetableSubPage>
+    with AutomaticKeepAliveClientMixin {
+  static StreamSubscription _shareSubscription;
+
+  List<Widget> _buildShareList() {
+    return [];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (_shareSubscription == null) {
+      _shareSubscription = Constant.eventBus
+          .on<ShareTimetableEvent>()
+          .listen((_) => showPlatformModalSheet(
+              context: context,
+              builder: (_) => Container(
+                    height: 200,
+                    child: Column(children: _buildShareList()),
+                  )));
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _shareSubscription.cancel();
+    _shareSubscription = null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     return FutureBuilder(
         builder: (_, AsyncSnapshot<TimeTable> snapshot) => snapshot.hasData
@@ -47,4 +83,7 @@ class _TimetableSubPageState extends State<TimetableSubPage> {
             : Container(),
         future: TimeTableRepository.getInstance().loadTimeTableLocally(info));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

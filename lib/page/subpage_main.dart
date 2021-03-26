@@ -80,6 +80,7 @@ class _HomeSubpageState extends State<HomeSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
       _helloQuote = S.of(context).late_night;

@@ -319,6 +319,9 @@ class _HomePageState extends State<HomePage> {
       case 1:
         AddNewPostEvent().fire();
         break;
+      case 2:
+        ShareTimetableEvent().fire();
+        break;
     }
   }
 
