@@ -16,16 +16,23 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/table_repository.dart';
+import 'package:dan_xi/util/timetable_converter_impl.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 class TimetableSubPage extends PlatformSubpage {
   @override
@@ -37,23 +44,59 @@ class ShareTimetableEvent {}
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   static StreamSubscription _shareSubscription;
+  Map<String, TimetableConverter> converters;
+  TimeTable _table;
+
+  void _closeDialogAndStartShare(TimetableConverter converter) async {
+    Navigator.of(context).pop();
+
+    String converted = converter.convertTo(_table);
+    Directory documentDir = await getApplicationDocumentsDirectory();
+    File outputFile = File(
+        "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
+    outputFile.createSync(recursive: true);
+    await outputFile.writeAsString(converted, flush: true);
+
+    Share.shareFiles([outputFile.absolute.path],
+        mimeTypes: [converter.mimeType]);
+  }
 
   List<Widget> _buildShareList() {
-    return [];
+    return converters.entries
+        .map<Widget>((MapEntry<String, TimetableConverter> e) {
+      return PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () => _closeDialogAndStartShare(e.value),
+          child: Text(e.key),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(e.key),
+          onTap: () => _closeDialogAndStartShare(e.value),
+        ),
+      );
+    }).toList();
   }
 
   @override
   void initState() {
     super.initState();
+    converters = {S.current.share_as_ics: ICSConverter()};
     if (_shareSubscription == null) {
-      _shareSubscription = Constant.eventBus
-          .on<ShareTimetableEvent>()
-          .listen((_) => showPlatformModalSheet(
-              context: context,
-              builder: (_) => Container(
+      _shareSubscription =
+          Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
+        if (_table == null) return;
+        showPlatformModalSheet(
+            context: context,
+            builder: (_) => PlatformWidget(
+                  cupertino: (_, __) => CupertinoActionSheet(
+                    actions: _buildShareList(),
+                  ),
+                  material: (_, __) => Container(
                     height: 200,
                     child: Column(children: _buildShareList()),
-                  )));
+                  ),
+                ));
+      });
     }
   }
 
@@ -69,19 +112,25 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     super.build(context);
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     return FutureBuilder(
-        builder: (_, AsyncSnapshot<TimeTable> snapshot) => snapshot.hasData
-            ? TimetableView(
-                laneEventsList: snapshot.data.toLaneEvents(
-                    1, TimetableStyle(laneHeight: 30, laneWidth: 80)),
-                timetableStyle: TimetableStyle(
-                    startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
-                    laneHeight: 30,
-                    laneWidth: 80,
-                    timeItemWidth: 50,
-                    timeItemHeight: 160),
-              )
-            : Container(),
-        future: TimeTableRepository.getInstance().loadTimeTableLocally(info));
+        builder: (_, AsyncSnapshot<TimeTable> snapshot) {
+          if (snapshot.hasData) {
+            _table = snapshot.data;
+            return TimetableView(
+              laneEventsList: _table.toLaneEvents(
+                  1, TimetableStyle(laneHeight: 30, laneWidth: 80)),
+              timetableStyle: TimetableStyle(
+                  startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
+                  laneHeight: 30,
+                  laneWidth: 80,
+                  timeItemWidth: 50,
+                  timeItemHeight: 160),
+            );
+          } else {
+            return Container();
+          }
+        },
+        future: TimeTableRepository.getInstance()
+            .loadTimeTableLocally(info, startTime: DateTime(2021, 3, 1)));
   }
 
   @override

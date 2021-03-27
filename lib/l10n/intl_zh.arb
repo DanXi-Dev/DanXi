@@ -44,6 +44,8 @@
     "good_noon":"快到中午啦",
     "good_afternoon":"下午的悠闲时光~",
     "good_night":"晚上好~",
-    "late_night":"披星戴月，不负韶华"
+    "late_night":"披星戴月，不负韶华",
+
+    "share_as_ics":"以 ICS 格式分享"
 
 }

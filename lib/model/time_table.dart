@@ -27,6 +27,21 @@ extension TableEventTimeEx on TableEventTime {
   }
 }
 
+abstract class TimetableConverter {
+  String get fileName;
+
+  String get mimeType;
+
+  String convertTo(TimeTable table);
+}
+
+class Event {
+  Course course;
+  CourseTime time;
+
+  Event(this.course, this.time);
+}
+
 @JsonSerializable()
 class TimeTable {
   static final DateTime MONDAY = DateTime.utc(2021, 3, 22);
@@ -70,25 +85,42 @@ class TimeTable {
 
   Map<String, dynamic> toJson() => _$TimeTableToJson(this);
 
-  List<LaneEvents> toLaneEvents(int week, TimetableStyle style) {
+  Map<int, List<Event>> toWeekCourses(int week) {
+    Map<int, List<Event>> table = Map();
+    for (int i = 0; i < 7; i++) table[i] = [];
+
+    courses.forEach((course) {
+      if (course.availableWeeks.contains(week)) {
+        course.times.forEach((courseTime) =>
+            table[courseTime.weekDay].add(Event(course, courseTime)));
+      }
+    });
+    return table;
+  }
+
+  List<LaneEvents> toLaneEvents(int week, TimetableStyle style,
+      {bool compact = true}) {
     Map<int, List<TableEvent>> table = Map();
     List<LaneEvents> result = [];
     for (int i = 0; i < 7; i++) {
       table[i] = [];
     }
-    courses.forEach((course) => course.times.forEach((courseTime) {
-          table[courseTime.weekDay].add(TableEvent(
-              title: course.courseName,
-              start: COURSE_SLOT_START_TIME[courseTime.slot],
-              end: COURSE_SLOT_START_TIME[courseTime.slot]
-                  .addMin(MINUTES_OF_COURSE)));
-        }));
+    courses.forEach((course) {
+      if (course.availableWeeks.contains(week)) {
+        course.times.forEach((courseTime) => table[courseTime.weekDay].add(
+            TableEvent(
+                title: course.courseName,
+                start: COURSE_SLOT_START_TIME[courseTime.slot],
+                end: COURSE_SLOT_START_TIME[courseTime.slot]
+                    .addMin(MINUTES_OF_COURSE))));
+      }
+    });
     for (int i = 0; i < 7; i++) {
-      if (table[i].isNotEmpty)
+      if (!compact || table[i].isNotEmpty)
         result.add(LaneEvents(
             lane: Lane(
-                width: style.laneWidth,
-                height: style.laneHeight,
+                width: style?.laneWidth,
+                height: style?.laneHeight,
                 name: DateFormat.EEEE().format(MONDAY.add(Duration(days: i)))),
             events: table[i]));
     }

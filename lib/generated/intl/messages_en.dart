@@ -83,6 +83,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "It\'s not time for a meal at the moment!"),
         "reply_to": m0,
         "share": MessageLookupByLibrary.simpleMessage("Share"),
+        "share_as_ics": MessageLookupByLibrary.simpleMessage("Share as .ics"),
         "tick_failed": MessageLookupByLibrary.simpleMessage(
             "Report failed. Check your connection."),
         "tick_issue_1": MessageLookupByLibrary.simpleMessage(

@@ -57,8 +57,6 @@ class _HomeSubpageState extends State<HomeSubpage>
 
   Future<String> _loadCard(PersonInfo info) async {
     await CardRepository.getInstance().login(info);
-    TimeTable table =
-        await TimeTableRepository.getInstance().loadTimeTableRemotely(info);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(-1);
     return _cardInfo.cash;
   }

@@ -475,6 +475,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Share as .ics`
+  String get share_as_ics {
+    return Intl.message(
+      'Share as .ics',
+      name: 'share_as_ics',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
