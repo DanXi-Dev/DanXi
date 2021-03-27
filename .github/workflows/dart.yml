@@ -16,7 +16,7 @@ jobs:
         java-version: '12.x'
     - uses: subosito/flutter-action@v1
       with:
-        flutter-version: '1.26.0-12.0.pre'
+        flutter-version: '2.1.0-12.1.pre'
         channel: 'dev'
     - run: flutter pub get
       #Testing is still useless at the moment.
