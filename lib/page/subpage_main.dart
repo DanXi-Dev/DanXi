@@ -68,7 +68,7 @@ class _HomeSubpageState extends State<HomeSubpage>
               title: Text(S.of(context).fatal_error),
               content: Text(S.of(context).tick_issue_1),
               actions: [
-                PlatformButton(
+                PlatformDialogAction(
                     child: Text(S.of(context).i_see),
                     onPressed: () => Navigator.of(context).pop())
               ],

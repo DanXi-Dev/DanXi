@@ -33,13 +33,13 @@ class ICSConverter extends TimetableConverter {
               location: event.course.roomName,
               summary: event.course.courseName,
               start: table.startTime.add(Duration(
-                  days: 7 * (weekNum - 1),
+                  days: 7 * (weekNum - 1) + day,
                   hours: TimeTable.COURSE_SLOT_START_TIME[event.time.slot].hour,
                   minutes: TimeTable
                       .COURSE_SLOT_START_TIME[event.time.slot].minute)),
               end: table.startTime
                   .add(Duration(
-                      days: 7 * (weekNum - 1),
+                  days: 7 * (weekNum - 1) + day,
                       hours: TimeTable
                           .COURSE_SLOT_START_TIME[event.time.slot].hour,
                       minutes: TimeTable

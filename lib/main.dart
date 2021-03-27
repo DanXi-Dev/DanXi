@@ -258,7 +258,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             actions: [
-              PlatformButton(
+              PlatformDialogAction(
                 child: Text(S.of(context).cancel),
                 onPressed: () {
                   if (forceLogin)
@@ -267,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                     FlutterApp.exitApp();
                 },
               ),
-              PlatformButton(
+              PlatformDialogAction(
                 child: Text(S.of(context).login),
                 onPressed: () async {
                   if (nameController.text.length * pwdController.text.length >
