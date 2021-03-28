@@ -84,7 +84,7 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
+        // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
               title: "DanXi",
               material: (_, __) => MaterialAppData(
@@ -209,6 +209,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _tryLogin(String id, String password) async {
+    if (id.length * password.length == 0) {
+      return;
+    }
     var progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
     PersonInfo newInfo = PersonInfo.createNewInfo(id, password);
@@ -254,6 +257,8 @@ class _HomePageState extends State<HomePage> {
                   cupertino: (_, __) => CupertinoTextFieldData(
                       placeholder: S.of(context).login_uis_pwd),
                   obscureText: true,
+                  onSubmitted: (_) =>
+                      _tryLogin(nameController.text, pwdController.text),
                 )
               ],
             ),
@@ -261,20 +266,17 @@ class _HomePageState extends State<HomePage> {
               PlatformDialogAction(
                 child: Text(S.of(context).cancel),
                 onPressed: () {
-                  if (forceLogin)
+                  if (forceLogin) {
                     Navigator.of(context).pop();
-                  else
+                  } else {
                     FlutterApp.exitApp();
+                  }
                 },
               ),
               PlatformDialogAction(
                 child: Text(S.of(context).login),
-                onPressed: () async {
-                  if (nameController.text.length * pwdController.text.length >
-                      0) {
-                    await _tryLogin(nameController.text, pwdController.text);
-                  }
-                },
+                onPressed: () =>
+                    _tryLogin(nameController.text, pwdController.text),
               )
             ],
           );

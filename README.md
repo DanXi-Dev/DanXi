@@ -18,6 +18,9 @@
 # 安装
 注意：本应用仍处于早期开发阶段，也许会有不可预料的 Bug 发生。  
 如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/w568w/DanXi/compare)。
+## Windows
+打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 zip 压缩包，解压运行即可。  
+
 ## Android
 打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 apk 安装包，安装即可。  
 （依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
@@ -43,6 +46,8 @@
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
   
 为了构建本应用，您需要按照`Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装`Flutter SDK`。    
+  
+如果您正在为`Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/)`Visual Studio`。  
   
 如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。
   

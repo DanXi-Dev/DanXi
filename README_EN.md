@@ -23,6 +23,9 @@ This application is still at the very initial development stage, welcome to join
 # Install
 Note: This application is still in early development and may have unpredictable bugs.   
 If you meet abnormal behavior in this application，Please [create an issue](https://github.com/w568w/DanXi/issues/new/choose) or [create a new pull request](https://github.com/w568w/DanXi/compare).
+## Windows
+Go to [release page](https://github.com/w568w/DanXi/releases), just download the zip file and unzip it.   
+
 ## Android
 Go to [release page](https://github.com/w568w/DanXi/releases), just download the apk file and install it.   
 (Depending on the device, you may need to allow "Install apps from unknown sources" in the settings.)  
@@ -48,7 +51,10 @@ Thanks for your understanding and support! :)
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  
   
 To build this app, you need to [download Flutter SDK](https://flutter.dev/docs/get-started/install) and install it.    
-
+  
+If you are building for `Windows`, you should also install and configure [`Visual Studio`](https://visualstudio.microsoft.com/downloads/).    
+  
 If you are building for `Android`, you should also [install and configure](https://developer.android.com/studio)`Android Command Line Tools`.   
+
 If you are building for `iOS/iPadOS`, you should also install and configure [`Xcode`](https://apps.apple.com/cn/app/xcode/id497799835)  
 Run the command `flutter run [ios/android]` to start the app.
