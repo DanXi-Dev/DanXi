@@ -84,7 +84,7 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        // initialPlatform: TargetPlatform.iOS,
+        initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
               title: "DanXi",
               material: (_, __) => MaterialAppData(

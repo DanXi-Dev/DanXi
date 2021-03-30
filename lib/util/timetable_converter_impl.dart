@@ -55,6 +55,5 @@ class ICSConverter extends TimetableConverter {
   String get fileName => "timetable.ics";
 
   @override
-  // TODO: implement mineType
   String get mimeType => "text/calendar";
 }
