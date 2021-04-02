@@ -45,10 +45,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:screen/screen.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:screen/screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'generated/l10n.dart';
@@ -132,14 +132,16 @@ class HomePage extends StatefulWidget {
 }
 
 class QR {
-  static void showQRCode(BuildContext context, PersonInfo personInfo, double brightness) {
+  static void showQRCode(
+      BuildContext context, PersonInfo personInfo, double brightness) {
     //Set screen brightness for displaying QR Code
     Screen.keepOn(true);
     Screen.setBrightness(1.0);
     double savedBrightness = brightness;
 
     //Get current theme (light/dark)
-    bool darkModeOn = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    bool darkModeOn =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     showPlatformDialog(
         context: context,
@@ -157,17 +159,22 @@ class QR {
                         builder: (BuildContext context,
                             AsyncSnapshot<String> snapshot) {
                           return snapshot.hasData
-                              ? QrImage(data: snapshot.data, size: 200.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(0xFF000000))
+                              ? QrImage(
+                                  data: snapshot.data,
+                                  size: 200.0,
+                                  foregroundColor:
+                                      darkModeOn ? Colors.white : Colors.black)
                               : Text(S.of(context).loading_qr_code);
                         }))),
-            actions: <Widget> [PlatformDialogAction(
-                child: PlatformText('OK'),
-                onPressed: () {
-                  Screen.setBrightness(savedBrightness);
-                  Screen.keepOn(false);
-                  Navigator.pop(context);
-                }
-            ),],
+            actions: <Widget>[
+              PlatformDialogAction(
+                  child: PlatformText(S.of(context).i_see),
+                  onPressed: () {
+                    Screen.setBrightness(savedBrightness);
+                    Screen.keepOn(false);
+                    Navigator.pop(context);
+                  }),
+            ],
           );
         });
   }
@@ -209,29 +216,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _showQRCode() {
-    showPlatformDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return PlatformAlertDialog(
-              title: Text(S.of(context).fudan_qr_code),
-              content: Container(
-                  width: double.maxFinite,
-                  height: 200.0,
-                  child: Center(
-                      child: FutureBuilder<String>(
-                          future: QRCodeRepository.getInstance()
-                              .getQRCode(_personInfo.value),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<String> snapshot) {
-                            return snapshot.hasData
-                                ? QrImage(data: snapshot.data, size: 200.0)
-                                : Text(S.of(context).loading_qr_code);
-                          }))));
-        });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -245,7 +229,7 @@ class _HomePageState extends State<HomePage> {
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo != null) {
-            QR.showQRCode(context,_personInfo.value,_brightness);
+            QR.showQRCode(context, _personInfo.value, _brightness);
           }
         });
     });
@@ -263,11 +247,9 @@ class _HomePageState extends State<HomePage> {
 
   //Get current brightness with _brightness
   double _brightness = 1.0;
+
   initPlatformState() async {
-    double brightness = await Screen.brightness;
-    setState((){
-      _brightness = brightness;
-    });
+    _brightness = await Screen.brightness;
   }
 
   Future<void> _tryLogin(String id, String password) async {
@@ -355,6 +337,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Load network ssid
   Future<void> _loadNetworkState() async {
     ConnectivityResult connectivity =
         await WiFiUtils.getConnectivity().checkConnectivity();
@@ -375,6 +358,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// When user clicks the action button on appbar
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
       case 0:
@@ -392,6 +376,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return _personInfo.value == null
+    // Empty container if no person info is set
         ? PlatformScaffold(
             iosContentBottomPadding: true,
             iosContentPadding: true,
