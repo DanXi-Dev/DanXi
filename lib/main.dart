@@ -45,6 +45,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:screen/screen.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -162,6 +163,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showQRCode() {
+    //Set screen brightness for displaying QR Code
+    Screen.keepOn(true);
+    Screen.setBrightness(1.0);
+
+    //Get current theme (light/dark)
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool darkModeOn = brightness == Brightness.dark;
+
     showPlatformDialog(
         context: context,
         barrierDismissible: true,
@@ -170,7 +179,7 @@ class _HomePageState extends State<HomePage> {
               title: Text(S.of(context).fudan_qr_code),
               content: Container(
                   width: double.maxFinite,
-                  height: 200.0,
+                  height: 250.0,
                   child: Center(
                       child: FutureBuilder<String>(
                           future: QRCodeRepository.getInstance()
@@ -178,9 +187,17 @@ class _HomePageState extends State<HomePage> {
                           builder: (BuildContext context,
                               AsyncSnapshot<String> snapshot) {
                             return snapshot.hasData
-                                ? QrImage(data: snapshot.data, size: 200.0)
+                                ? QrImage(data: snapshot.data, size: 250.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(4278190080), backgroundColor: darkModeOn ? Color(4278190080) : Color(0xFFFFFFFF))
                                 : Text(S.of(context).loading_qr_code);
-                          }))));
+                          }))),
+              actions: <Widget> [PlatformDialogAction(
+                child: PlatformText('OK'),
+                onPressed: () {
+                //TODO: Restore brightness to default (or previous state)?
+                Navigator.pop(context);
+                }
+              ),],
+          );
         });
   }
 
