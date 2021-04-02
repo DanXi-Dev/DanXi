@@ -15,7 +15,7 @@ Maybe the best all-rounded service app for Fudan University students!
 - Dining hall traffic
 - Shortcut for Fudan Daily
 - Shortcut for Fudan QR Code
-- Timetable (in development)
+- Timetable and export as .ics file
 
 (Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
 This application is still at the very initial development stage, welcome to join the development and donation~
