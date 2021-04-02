@@ -55,3 +55,6 @@ lib/common/Secret.dart
 # macOS
 .DS_Store
 ios/build
+
+#Private Key
+lib/common/Secret.dart
