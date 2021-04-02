@@ -166,20 +166,20 @@ class _HomePageState extends State<HomePage> {
     //Set screen brightness for displaying QR Code
     Screen.keepOn(true);
     Screen.setBrightness(1.0);
+    double savedBrightness = _brightness;
 
     //Get current theme (light/dark)
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool darkModeOn = brightness == Brightness.dark;
+    bool darkModeOn = MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     showPlatformDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return PlatformAlertDialog(
               title: Text(S.of(context).fudan_qr_code),
               content: Container(
                   width: double.maxFinite,
-                  height: 250.0,
+                  height: 200.0,
                   child: Center(
                       child: FutureBuilder<String>(
                           future: QRCodeRepository.getInstance()
@@ -187,13 +187,14 @@ class _HomePageState extends State<HomePage> {
                           builder: (BuildContext context,
                               AsyncSnapshot<String> snapshot) {
                             return snapshot.hasData
-                                ? QrImage(data: snapshot.data, size: 250.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(4278190080), backgroundColor: darkModeOn ? Color(4278190080) : Color(0xFFFFFFFF))
+                                ? QrImage(data: snapshot.data, size: 200.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(0xFF000000))
                                 : Text(S.of(context).loading_qr_code);
                           }))),
               actions: <Widget> [PlatformDialogAction(
                 child: PlatformText('OK'),
                 onPressed: () {
-                //TODO: Restore brightness to default (or previous state)?
+                Screen.setBrightness(savedBrightness);
+                Screen.keepOn(false);
                 Navigator.pop(context);
                 }
               ),],
@@ -223,6 +224,16 @@ class _HomePageState extends State<HomePage> {
             localizedTitle: S.current.fudan_qr_code,
             icon: 'ic_launcher'),
       ]);
+    initPlatformState(); //Init brightness control
+  }
+
+  //Get current brightness with _brightness
+  double _brightness = 1.0;
+  initPlatformState() async {
+    double brightness = await Screen.brightness;
+    setState((){
+      _brightness = brightness;
+    });
   }
 
   Future<void> _tryLogin(String id, String password) async {
