@@ -43,6 +43,15 @@
 感谢理解与支持！
 
 # 构建
+## 我们当前使用的 Flutter 编译版本
+```shell script
+$ flutter --version
+Flutter 2.1.0-12.1.pre • channel dev • https://github.com/flutter/flutter.git
+Framework • revision 8264cb3e8a (3 weeks ago) • 2021-03-10 12:37:57 -0800
+Engine • revision 711ab3fda0
+Tools • Dart 2.13.0 (build 2.13.0-116.0.dev)
+```
+## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
   
 为了构建本应用，您需要按照`Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装`Flutter SDK`。    

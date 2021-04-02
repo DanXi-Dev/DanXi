@@ -48,6 +48,15 @@ AltStore [Project homepage](https://github.com/rileytestut/AltStore)
 Thanks for your understanding and support! :)
 
 # Compile
+## Flutter version that we're using
+```shell script
+$ flutter --version
+Flutter 2.1.0-12.1.pre • channel dev • https://github.com/flutter/flutter.git
+Framework • revision 8264cb3e8a (3 weeks ago) • 2021-03-10 12:37:57 -0800
+Engine • revision 711ab3fda0
+Tools • Dart 2.13.0 (build 2.13.0-116.0.dev)
+```
+## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  
   
 To build this app, you need to [download Flutter SDK](https://flutter.dev/docs/get-started/install) and install it.    
