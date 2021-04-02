@@ -54,7 +54,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
             _personInfo, Constant.campusArea.indexOf(_selectItem))
         .catchError((e) {
       if (e is UnsuitableTimeException) {
-        if (Platform.isAndroid && isMaterial(context)) {
+        if (isMaterial(context)) {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(S.of(context).out_of_dining_time)));
         } else if (Platform.isIOS) {

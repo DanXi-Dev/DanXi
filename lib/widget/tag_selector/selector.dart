@@ -56,6 +56,7 @@ class TagContainer extends StatefulWidget {
   final double iconSize;
   final double fontSize;
   final Function onChoice;
+  final bool enabled;
 
   TagContainer(
       {Key key,
@@ -67,7 +68,8 @@ class TagContainer extends StatefulWidget {
       this.fixedColor,
       this.iconColor,
       this.iconSize,
-      this.fontSize})
+      this.fontSize,
+      this.enabled = true})
       : assert(
             fillRandomColor || (fillRandomColor == false && fixedColor != null),
             "fixedColor can't be empty.");
@@ -139,6 +141,7 @@ class _TagContainerState extends State<TagContainer> {
           color: data.tagColor,
           child: InkWell(
             onTap: () {
+              if (!widget.enabled) return;
               if (data.isSelected && widget.singleChoice) return;
               setState(() {
                 data.isSelected = !data.isSelected;

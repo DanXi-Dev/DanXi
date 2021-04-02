@@ -26,6 +26,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -56,9 +57,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(converted, flush: true);
-
-    Share.shareFiles([outputFile.absolute.path],
-        mimeTypes: [converter.mimeType]);
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+      Share.shareFiles([outputFile.absolute.path],
+          mimeTypes: [converter.mimeType]);
+    else if (isMaterial(context)) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(outputFile.absolute.path)));
+    }
   }
 
   List<Widget> _buildShareList() {

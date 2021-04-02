@@ -283,6 +283,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
+  disk_space:
+    dependency: transitive
+    description:
+      name: disk_space
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.3"
   event_bus:
     dependency: "direct main"
     description:
@@ -311,6 +318,27 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.1.0"
+  file_chooser:
+    dependency: transitive
+    description:
+      name: file_chooser
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.6"
+  file_picker:
+    dependency: transitive
+    description:
+      name: file_picker
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.7"
+  file_picker_cross:
+    dependency: "direct main"
+    description:
+      name: file_picker_cross
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.3.0"
   fixnum:
     dependency: transitive
     description:
@@ -349,6 +377,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.0"
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.11"
   flutter_progress_dialog:
     dependency: "direct main"
     description:
@@ -712,7 +747,7 @@ packages:
     source: hosted
     version: "4.0.6"
   share:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       name: share
       url: "https://pub.flutter-io.cn"
