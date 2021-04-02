@@ -11,6 +11,11 @@ PODS:
   - Flutter (1.0.0)
   - flutter_inappwebview (0.0.1):
     - Flutter
+    - flutter_inappwebview/Core (= 0.0.1)
+    - OrderedSet (~> 5.0)
+  - flutter_inappwebview/Core (0.0.1):
+    - Flutter
+    - OrderedSet (~> 5.0)
   - flutter_mailer (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
@@ -18,11 +23,18 @@ PODS:
     - Toast
   - network_info_plus (0.0.1):
     - Flutter
+  - OrderedSet (5.0.0)
   - package_info (0.0.1):
+    - Flutter
+  - path_provider (0.0.1):
     - Flutter
   - quick_actions (0.0.1):
     - Flutter
   - Reachability (3.2)
+  - screen (0.0.1):
+    - Flutter
+  - share (0.0.1):
+    - Flutter
   - shared_preferences (0.0.1):
     - Flutter
   - Toast (4.0.0)
@@ -38,11 +50,15 @@ DEPENDENCIES:
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - quick_actions (from `.symlinks/plugins/quick_actions/ios`)
+  - screen (from `.symlinks/plugins/screen/ios`)
+  - share (from `.symlinks/plugins/share/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
 
 SPEC REPOS:
   trunk:
+    - OrderedSet
     - Reachability
     - Toast
 
@@ -67,8 +83,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/network_info_plus/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
   quick_actions:
     :path: ".symlinks/plugins/quick_actions/ios"
+  screen:
+    :path: ".symlinks/plugins/screen/ios"
+  share:
+    :path: ".symlinks/plugins/share/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
 
@@ -78,13 +100,17 @@ SPEC CHECKSUMS:
   data_plugin: 718d6550a02b30410748b3b7711ee393933070e6
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_inappwebview: 69dfbac46157b336ffbec19ca6dfd4638c7bf189
+  flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
   flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   network_info_plus: b78876159360f5580608c2cea620d6ceffabd0ad
+  OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   quick_actions: 6cb2390c4dab0e737c94573c27e18d9666710720
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  screen: abd91ca7bf3426e1cc3646d27e9b2358d6bf07b0
+  share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
 
