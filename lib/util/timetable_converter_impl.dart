@@ -19,6 +19,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:ical/serializer.dart';
 
 class ICSConverter extends TimetableConverter {
+  /// Convert [table] to .ics format string
   @override
   String convertTo(TimeTable table) {
     ICalendar calendar = ICalendar(company: 'DanXi', lang: "CN");

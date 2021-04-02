@@ -138,16 +138,21 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
+  /// List of all of the subpages. They will display as tab pages.
   final List<PlatformSubpage> _subpage = [
     HomeSubpage(),
     BBSSubpage(),
     TimetableSubPage()
   ];
+
+  /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonIconBuilders = [
     (cxt) => Icons.login,
     (cxt) => PlatformIcons(cxt).add,
     (cxt) => Icons.share
   ];
+
+  /// List of all of the subpages' action button description. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonTextBuilders = [
     (cxt) => S.of(cxt).change_account,
     (cxt) => S.of(cxt).new_post,
@@ -161,6 +166,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  /// Pop up a dialog displaying the qr code.
   void _showQRCode() {
     showPlatformDialog(
         context: context,
@@ -187,10 +193,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // Listening to the network state.
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
         .listen((_) => _loadNetworkState());
+
     _loadOrInitSharedPreference().then((_) {
+      // Configure shortcut listeners on Android & iOS.
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo != null) {
@@ -199,6 +208,7 @@ class _HomePageState extends State<HomePage> {
         });
     });
     _loadNetworkState();
+    // Add shortcuts on Android & iOS.
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
       quickActions.setShortcutItems(<ShortcutItem>[
         ShortcutItem(

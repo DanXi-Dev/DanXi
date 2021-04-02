@@ -59,7 +59,7 @@ Tools • Dart 2.13.0 (build 2.13.0-116.0.dev)
 如果您正在为`Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/)`Visual Studio`。  
   
 如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。
-  
+   
 如果你正在为`iOS/iPadOS`平台构建，您还需要[安装并配置](https://apps.apple.com/cn/app/xcode/id497799835)`Xcode`。
   
 确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。

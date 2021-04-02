@@ -15,8 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-//Retry when errors occur. Useful with unstable net connection
+/// Helper class to retry when errors occur.
+///
+/// Useful when net connection is unstable.
 class Retrier {
+  /// Try to run [function] for [retryTimes] times synchronously.
+  /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
   static E runWithRetry<E>(E function(), {int retryTimes = 3}) {
     Exception error;
     for (int i = 0; i < retryTimes; i++) {
@@ -29,6 +33,8 @@ class Retrier {
     throw error;
   }
 
+  /// Try to run [function] for [retryTimes] times asynchronously.
+  /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
   static Future<E> runAsyncWithRetry<E>(Future<E> function(),
       {int retryTimes = 3}) async {
     Function errorCatcher;
