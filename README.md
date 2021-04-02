@@ -42,6 +42,9 @@
   
 感谢理解与支持！
 
+## macOS
+打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 dmg 磁盘映像，挂载后将旦兮拖入 Applications 文件夹即可。  
+
 # 构建
 ## 我们当前使用的 Flutter 编译版本
 ```shell script
@@ -60,6 +63,6 @@ Tools • Dart 2.13.0 (build 2.13.0-116.0.dev)
   
 如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。
    
-如果你正在为`iOS/iPadOS`平台构建，您还需要[安装并配置](https://apps.apple.com/cn/app/xcode/id497799835)`Xcode`。
+如果你正在为`iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/cn/app/xcode/id497799835)`Xcode`。
   
 确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。
