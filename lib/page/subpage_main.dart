@@ -27,6 +27,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:dan_xi/main.dart' as main_qr;
+import 'package:screen/screen.dart';
 
 class HomeSubpage extends PlatformSubpage {
   @override
@@ -51,6 +53,16 @@ class _HomeSubpageState extends State<HomeSubpage>
   @override
   void initState() {
     super.initState();
+    initPlatformState();
+  }
+
+  //Get current brightness with _brightness
+  double _brightness = 1.0;
+  initPlatformState() async {
+    double brightness = await Screen.brightness;
+    setState((){
+      _brightness = brightness;
+    });
   }
 
   Future<String> _loadCard(PersonInfo info) async {
@@ -206,6 +218,16 @@ class _HomeSubpageState extends State<HomeSubpage>
                           break;
                       }
                     },
+                  ),
+                ),
+                Card(
+                  child: ListTile(
+                    title: Text(S.of(context).fudan_qr_code),
+                    leading: const Icon(Icons.qr_code),
+                    subtitle: Text(S.of(context).tap_to_view),
+                    onTap: ()  {
+                      main_qr.QR.showQRCode(context, info, _brightness);
+                      },
                   ),
                 )
               ],

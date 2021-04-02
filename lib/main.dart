@@ -45,6 +45,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:screen/screen.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -130,6 +131,48 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+class QR {
+  static void showQRCode(BuildContext context, PersonInfo personInfo, double brightness) {
+    //Set screen brightness for displaying QR Code
+    Screen.keepOn(true);
+    Screen.setBrightness(1.0);
+    double savedBrightness = brightness;
+
+    //Get current theme (light/dark)
+    bool darkModeOn = MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    showPlatformDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return PlatformAlertDialog(
+            title: Text(S.of(context).fudan_qr_code),
+            content: Container(
+                width: double.maxFinite,
+                height: 200.0,
+                child: Center(
+                    child: FutureBuilder<String>(
+                        future: QRCodeRepository.getInstance()
+                            .getQRCode(personInfo),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> snapshot) {
+                          return snapshot.hasData
+                              ? QrImage(data: snapshot.data, size: 200.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(0xFF000000))
+                              : Text(S.of(context).loading_qr_code);
+                        }))),
+            actions: <Widget> [PlatformDialogAction(
+                child: PlatformText('OK'),
+                onPressed: () {
+                  Screen.setBrightness(savedBrightness);
+                  Screen.keepOn(false);
+                  Navigator.pop(context);
+                }
+            ),],
+          );
+        });
+  }
+}
+
 class _HomePageState extends State<HomePage> {
   SharedPreferences _preferences;
 
@@ -166,7 +209,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  /// Pop up a dialog displaying the qr code.
   void _showQRCode() {
     showPlatformDialog(
         context: context,
@@ -203,7 +245,7 @@ class _HomePageState extends State<HomePage> {
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo != null) {
-            _showQRCode();
+            QR.showQRCode(context,_personInfo.value,_brightness);
           }
         });
     });
@@ -216,6 +258,16 @@ class _HomePageState extends State<HomePage> {
             localizedTitle: S.current.fudan_qr_code,
             icon: 'ic_launcher'),
       ]);
+    initPlatformState(); //Init brightness control
+  }
+
+  //Get current brightness with _brightness
+  double _brightness = 1.0;
+  initPlatformState() async {
+    double brightness = await Screen.brightness;
+    setState((){
+      _brightness = brightness;
+    });
   }
 
   Future<void> _tryLogin(String id, String password) async {
