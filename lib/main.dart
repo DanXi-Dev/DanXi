@@ -131,6 +131,48 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+class QR {
+  static void showQRCode(BuildContext context, PersonInfo personInfo, double brightness) {
+    //Set screen brightness for displaying QR Code
+    Screen.keepOn(true);
+    Screen.setBrightness(1.0);
+    double savedBrightness = brightness;
+
+    //Get current theme (light/dark)
+    bool darkModeOn = MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    showPlatformDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return PlatformAlertDialog(
+            title: Text(S.of(context).fudan_qr_code),
+            content: Container(
+                width: double.maxFinite,
+                height: 200.0,
+                child: Center(
+                    child: FutureBuilder<String>(
+                        future: QRCodeRepository.getInstance()
+                            .getQRCode(personInfo),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> snapshot) {
+                          return snapshot.hasData
+                              ? QrImage(data: snapshot.data, size: 200.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(0xFF000000))
+                              : Text(S.of(context).loading_qr_code);
+                        }))),
+            actions: <Widget> [PlatformDialogAction(
+                child: PlatformText('OK'),
+                onPressed: () {
+                  Screen.setBrightness(savedBrightness);
+                  Screen.keepOn(false);
+                  Navigator.pop(context);
+                }
+            ),],
+          );
+        });
+  }
+}
+
 class _HomePageState extends State<HomePage> {
   SharedPreferences _preferences;
 
@@ -162,45 +204,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _showQRCode() {
-    //Set screen brightness for displaying QR Code
-    Screen.keepOn(true);
-    Screen.setBrightness(1.0);
-    double savedBrightness = _brightness;
 
-    //Get current theme (light/dark)
-    bool darkModeOn = MediaQuery.of(context).platformBrightness == Brightness.dark;
-
-    showPlatformDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return PlatformAlertDialog(
-              title: Text(S.of(context).fudan_qr_code),
-              content: Container(
-                  width: double.maxFinite,
-                  height: 200.0,
-                  child: Center(
-                      child: FutureBuilder<String>(
-                          future: QRCodeRepository.getInstance()
-                              .getQRCode(_personInfo.value),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<String> snapshot) {
-                            return snapshot.hasData
-                                ? QrImage(data: snapshot.data, size: 200.0, foregroundColor: darkModeOn ? Color(0xFFFFFFFF) : Color(0xFF000000))
-                                : Text(S.of(context).loading_qr_code);
-                          }))),
-              actions: <Widget> [PlatformDialogAction(
-                child: PlatformText('OK'),
-                onPressed: () {
-                Screen.setBrightness(savedBrightness);
-                Screen.keepOn(false);
-                Navigator.pop(context);
-                }
-              ),],
-          );
-        });
-  }
 
   @override
   void initState() {
@@ -212,7 +216,7 @@ class _HomePageState extends State<HomePage> {
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo != null) {
-            _showQRCode();
+            QR.showQRCode(context,_personInfo.value,_brightness);
           }
         });
     });
