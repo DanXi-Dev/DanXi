@@ -38,6 +38,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
   PersonInfo _personInfo; // ignore: unused_field
   List<Tag> _tags;
   List<int> _tagDays;
+  bool _selectable = true;
 
   @override
   void initState() {
@@ -63,14 +64,21 @@ class _CardDetailPageState extends State<CardDetailPage> {
             fillRandomColor: false,
             fixedColor: Colors.purple,
             fontSize: 16,
+            enabled: _selectable,
             singleChoice: true,
             defaultChoice: -1,
             onChoice: (Tag tag, list) async {
               int index = _tags.indexOf(tag);
               if (index >= 0) {
-                setState(() => tag.checkedIcon = Icons.pending);
+                setState(() {
+                  tag.checkedIcon = Icons.pending;
+                  _selectable = false;
+                });
                 await _cardInfo.loadRecords(_tagDays[index]);
-                setState(() => tag.checkedIcon = Icons.check);
+                setState(() {
+                  tag.checkedIcon = Icons.check;
+                  _selectable = true;
+                });
               }
             },
             tagList: _tags),
