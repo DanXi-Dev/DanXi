@@ -58,3 +58,4 @@ ios/build
 
 #Private Key
 lib/common/Secret.dart
+macos/Podfile.lock
