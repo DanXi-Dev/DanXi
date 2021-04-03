@@ -45,7 +45,8 @@ abstract class Feature {
   void onTap() {}
 }
 
-/// FeatureContainer is a container to render the feature as a list item. Usually is a class of [State<StatefulWidget>]
+/// FeatureContainer is a container to render the feature as a list item.
+/// Usually is a class of [State<StatefulWidget>]
 mixin FeatureContainer {
   void doUpdate();
 }

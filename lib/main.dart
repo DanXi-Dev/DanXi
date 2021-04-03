@@ -33,6 +33,7 @@ import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
+import 'package:dan_xi/util/ScreenProxy.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
@@ -48,7 +49,6 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
-import 'package:screen/screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'generated/l10n.dart';
@@ -85,7 +85,7 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        initialPlatform: TargetPlatform.iOS,
+      // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
               title: "DanXi",
               material: (_, __) => MaterialAppData(
@@ -135,8 +135,8 @@ class QR {
   static void showQRCode(
       BuildContext context, PersonInfo personInfo, double brightness) {
     //Set screen brightness for displaying QR Code
-    Screen.keepOn(true);
-    Screen.setBrightness(1.0);
+    ScreenProxy.keepOn(true);
+    ScreenProxy.setBrightness(1.0);
     double savedBrightness = brightness;
 
     //Get current theme (light/dark)
@@ -170,8 +170,8 @@ class QR {
               PlatformDialogAction(
                   child: PlatformText(S.of(context).i_see),
                   onPressed: () {
-                    Screen.setBrightness(savedBrightness);
-                    Screen.keepOn(false);
+                    ScreenProxy.setBrightness(savedBrightness);
+                    ScreenProxy.keepOn(false);
                     Navigator.pop(context);
                   }),
             ],
@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> {
 
   /// get current brightness so that we can restore it after showing QR code.
   initPlatformState() async {
-    _brightness = await Screen.brightness;
+    _brightness = await ScreenProxy.brightness;
   }
 
   /// Attempt to log in for verification.
