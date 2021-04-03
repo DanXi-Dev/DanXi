@@ -47,6 +47,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     _personInfo = widget.arguments['personInfo'];
   }
 
+  /// Load dining hall data
   Future<void> _onSelectedItemChanged(String e) async {
     setState(() => {_selectItem = e, _trafficInfos = null});
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()

@@ -77,6 +77,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _refreshSubscription = null;
   }
 
+  /// Pop up a dialog to request for signing up and complete registration
   Future<BmobUser> register(PersonInfo info) async {
     var result = await showPlatformDialog<BmobRegistered>(
       barrierDismissible: false,

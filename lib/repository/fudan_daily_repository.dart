@@ -21,11 +21,10 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/cache.dart';
 import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 class FudanDailyRepository extends BaseRepositoryWithDio {
   dynamic _historyData;
@@ -71,6 +70,9 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
   }
 
   Map _buildPayloadFromHistory() {
+    if (_historyData == null || _historyData['oldInfo'] is! Map) {
+      return null;
+    }
     Map payload = _historyData['info'];
     payload['ismoved'] = 0;
     payload['number'] = _historyData['uinfo']['role']['number'];
@@ -97,25 +99,20 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
       _historyData =
           await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
     }
-    var headers = {
+    Map<String, String> headers = {
       "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };
-    Map payload;
-    var pref = await SharedPreferences.getInstance();
-    if (_historyData == null || _historyData['oldInfo'] is! Map) {
-      if (pref.containsKey(_KEY_PREF)) {
-        payload = jsonDecode(pref.getString(_KEY_PREF));
-      } else {
-        throw NotTickYesterdayException();
-      }
-    } else {
-      payload = _buildPayloadFromHistory();
-      await pref.setString(_KEY_PREF, jsonEncode(payload));
+    Map payload = await Cache.get<Map>(
+        _KEY_PREF,
+        () async => _buildPayloadFromHistory(),
+        (cachedValue) => jsonDecode(cachedValue),
+        (object) => jsonEncode(object));
+    if (payload == null) {
+      throw NotTickYesterdayException();
     }
-
     await dio.post(SAVE_URL,
         data: payload.encodeMap(),
         options:

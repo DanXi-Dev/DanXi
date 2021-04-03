@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
-  /// List of all of the subpages. They will display as tab pages.
+  /// List of all of the subpages. They will be displayed as tab pages.
   final List<PlatformSubpage> _subpage = [
     HomeSubpage(),
     BBSSubpage(),
@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
     (cxt) => Icons.share
   ];
 
-  /// List of all of the subpages' action button description. They will show on the appbar of each tab page.
+  /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonTextBuilders = [
     (cxt) => S.of(cxt).change_account,
     (cxt) => S.of(cxt).new_post,
@@ -245,13 +245,15 @@ class _HomePageState extends State<HomePage> {
     initPlatformState(); //Init brightness control
   }
 
-  //Get current brightness with _brightness
+  /// Current brightness
   double _brightness = 1.0;
 
+  /// get current brightness so that we can restore it after showing QR code.
   initPlatformState() async {
     _brightness = await Screen.brightness;
   }
 
+  /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {
     if (id.length * password.length == 0) {
       return;
@@ -268,6 +270,7 @@ class _HomePageState extends State<HomePage> {
     }, onError: (e) => {progressDialog.dismiss(), throw e});
   }
 
+  /// Pop up a dialog where user can give his name & password.
   void _showLoginDialog({bool forceLogin = false}) {
     TextEditingController nameController = new TextEditingController();
     TextEditingController pwdController = new TextEditingController();
@@ -327,6 +330,9 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
+  /// Load persistent data (e.g. user name, password, etc.) from the local storage.
+  ///
+  /// If user hasn't logged in before, request him to do so.
   Future<void> _loadOrInitSharedPreference({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
     if (!forceLogin && _preferences.containsKey("id")) {

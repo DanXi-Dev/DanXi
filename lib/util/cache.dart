@@ -17,7 +17,15 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A helper class to cache data locally and load it remotely if necessary.
 class Cache {
+  /// Get cached data.
+  ///
+  /// Look for data with [key] and [decode] it to the specific type,
+  /// if [key] is not found, or the data is null, or we don't [validate] it,
+  /// [fetch] it from remote (usually from network), [encode] it and save it locally.
+  ///
+  /// Finally return the cached data.
   static Future<T> get<T>(String key, Future<T> fetch(),
       T decode(String cachedValue), String encode(T object),
       {bool validate(String cachedValue)}) async {
@@ -26,9 +34,10 @@ class Cache {
       validate = (v) => v != null;
     }
     if (!preferences.containsKey(key)) {
-      //Reload the cache
+      // Reload the cache
       T newValue = await fetch();
-      preferences.setString(key, encode(newValue));
+      if (validate(encode(newValue)))
+        preferences.setString(key, encode(newValue));
       return newValue;
     }
     String result = preferences.getString(key);

@@ -70,6 +70,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
             onChoice: (Tag tag, list) async {
               int index = _tags.indexOf(tag);
               if (index >= 0) {
+                // Make the tags not clickable when data's being retrieved
                 setState(() {
                   tag.checkedIcon = Icons.pending;
                   _selectable = false;
