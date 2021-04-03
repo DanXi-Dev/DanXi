@@ -39,14 +39,16 @@ class _FeatureListItemState extends State<FeatureListItem>
       ..container = this
       ..buildFeature();
 
+    List<String> summary = [];
+    summary.add(widget.feature.subTitle ?? "");
+    if (widget.feature.tertiaryTitle != null)
+      summary.add(widget.feature.tertiaryTitle);
+
     return ListTile(
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
       title: Text(widget.feature.mainTitle),
-      subtitle: Text(widget.feature.subTitle == null
-          ? null
-          : '${widget.feature.subTitle}'
-              '${widget.feature.tertiaryTitle == null ? "" : "\n${widget.feature.tertiaryTitle}"}'),
+      subtitle: Text(summary.join("\n")),
       onTap: widget.feature.clickable ? widget.feature.onTap : null,
     );
   }
