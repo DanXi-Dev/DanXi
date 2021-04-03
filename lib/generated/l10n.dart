@@ -45,10 +45,10 @@ class S {
     );
   }
 
-  /// `ECard Code`
+  /// `Fudan QR Code`
   String get fudan_qr_code {
     return Intl.message(
-      'ECard Code',
+      'Fudan QR Code',
       name: 'fudan_qr_code',
       desc: '',
       args: [],
@@ -65,90 +65,90 @@ class S {
     );
   }
 
-  /// `Connectivity`
+  /// `Current Connection`
   String get current_connection {
     return Intl.message(
-      'Connectivity',
+      'Current Connection',
       name: 'current_connection',
       desc: '',
       args: [],
     );
   }
 
-  /// `Ecard balance`
+  /// `Card Balance`
   String get ecard_balance {
     return Intl.message(
-      'Ecard balance',
+      'Card Balance',
       name: 'ecard_balance',
       desc: '',
       args: [],
     );
   }
 
-  /// `Ecard balance detail`
+  /// `Transactions`
   String get ecard_balance_log {
     return Intl.message(
-      'Ecard balance detail',
+      'Transactions',
       name: 'ecard_balance_log',
       desc: '',
       args: [],
     );
   }
 
-  /// `Dining hall crowdedness`
+  /// `Canteen Popularity`
   String get dining_hall_crowdedness {
     return Intl.message(
-      'Dining hall crowdedness',
+      'Canteen Popularity',
       name: 'dining_hall_crowdedness',
       desc: '',
       args: [],
     );
   }
 
-  /// `Choose your location`
+  /// `Select Campus`
   String get choose_area {
     return Intl.message(
-      'Choose your location',
+      'Select Campus',
       name: 'choose_area',
       desc: '',
       args: [],
     );
   }
 
-  /// `It's not time for a meal at the moment!`
+  /// `It's not dining time right now.`
   String get out_of_dining_time {
     return Intl.message(
-      'It\'s not time for a meal at the moment!',
+      'It\'s not dining time right now.',
       name: 'out_of_dining_time',
       desc: '',
       args: [],
     );
   }
 
-  /// `Fudan daily`
+  /// `COVID-19 Safety Check-In`
   String get fudan_daily {
     return Intl.message(
-      'Fudan daily',
+      'COVID-19 Safety Check-In',
       name: 'fudan_daily',
       desc: '',
       args: [],
     );
   }
 
-  /// `You have reported today!`
+  /// `Already done.`
   String get fudan_daily_ticked {
     return Intl.message(
-      'You have reported today!',
+      'Already done.',
       name: 'fudan_daily_ticked',
       desc: '',
       args: [],
     );
   }
 
-  /// `Click to report`
+  /// `Tap to check in.`
   String get fudan_daily_tick {
     return Intl.message(
-      'Click to report',
+      'Tap to check in.',
       name: 'fudan_daily_tick',
       desc: '',
       args: [],
@@ -165,30 +165,30 @@ class S {
     );
   }
 
-  /// `Load failed, click to retry`
+  /// `Unable to load content, tap to retry`
   String get failed {
     return Intl.message(
-      'Load failed, click to retry',
+      'Unable to load content, tap to retry',
       name: 'failed',
       desc: '',
       args: [],
     );
   }
 
-  /// `ERROR`
+  /// `Fatal Error`
   String get fatal_error {
     return Intl.message(
-      'ERROR',
+      'Fatal Error',
       name: 'fatal_error',
       desc: '',
       args: [],
     );
   }
 
-  /// `Report failed. Danxi can't get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day.`
+  /// `Failed to check in. Unable to acquire the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.`
   String get tick_issue_1 {
     return Intl.message(
-      'Report failed. Danxi can\'t get the last report record.\nThis error is most likely due to the fact that it is your first time to use Danxi and you forgot to report yesterday.\nYou need complete the first report via Wechat manually, and Danxi will be able to handle the same situation properly from the next day.',
+      'Failed to check in. Unable to acquire the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.',
       name: 'tick_issue_1',
       desc: '',
       args: [],
@@ -205,70 +205,70 @@ class S {
     );
   }
 
-  /// `Reporting...`
+  /// `Checking in...`
   String get ticking {
     return Intl.message(
-      'Reporting...',
+      'Checking in...',
       name: 'ticking',
       desc: '',
       args: [],
     );
   }
 
-  /// `Report failed. Check your connection.`
+  /// `Failed to check in. Check your internet connection.`
   String get tick_failed {
     return Intl.message(
-      'Report failed. Check your connection.',
+      'Failed to check in. Check your internet connection.',
       name: 'tick_failed',
       desc: '',
       args: [],
     );
   }
 
-  /// `Failed to obtain WiFi information`
+  /// `Failed to obtain WLAN information`
   String get current_connection_failed {
     return Intl.message(
-      'Failed to obtain WiFi information',
+      'Failed to obtain WLAN information',
       name: 'current_connection_failed',
       desc: '',
       args: [],
     );
   }
 
-  /// `Not connect to any WiFi`
+  /// `Not connected to WLAN`
   String get current_connection_no_wifi {
     return Intl.message(
-      'Not connect to any WiFi',
+      'Not connected to WLAN',
       name: 'current_connection_no_wifi',
       desc: '',
       args: [],
     );
   }
 
-  /// `Login Fudan UIS`
+  /// `Fudan UIS Login`
   String get login_uis {
     return Intl.message(
-      'Login Fudan UIS',
+      'Fudan UIS Login',
       name: 'login_uis',
       desc: '',
       args: [],
     );
   }
 
-  /// `UIS ID`
+  /// `ID`
   String get login_uis_uid {
     return Intl.message(
-      'UIS ID',
+      'ID',
       name: 'login_uis_uid',
       desc: '',
       args: [],
     );
   }
 
-  /// `UIS Password`
+  /// `Password`
   String get login_uis_pwd {
     return Intl.message(
-      'UIS Password',
+      'Password',
       name: 'login_uis_pwd',
       desc: '',
       args: [],
@@ -305,20 +305,20 @@ class S {
     );
   }
 
-  /// `Change account`
+  /// `Switch Account`
   String get change_account {
     return Intl.message(
-      'Change account',
+      'Switch Account',
       name: 'change_account',
       desc: '',
       args: [],
     );
   }
 
-  /// `Loading ECard Code...\nIt may take more than 5 seconds.`
+  /// `Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers.`
   String get loading_qr_code {
     return Intl.message(
-      'Loading ECard Code...\nIt may take more than 5 seconds.',
+      'Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers.',
       name: 'loading_qr_code',
       desc: '',
       args: [],
@@ -375,20 +375,20 @@ class S {
     );
   }
 
-  /// `FD Forum`
+  /// `Forum`
   String get forum {
     return Intl.message(
-      'FD Forum',
+      'Forum',
       name: 'forum',
       desc: '',
       args: [],
     );
   }
 
-  /// `Timetable`
+  /// `Agenda`
   String get timetable {
     return Intl.message(
-      'Timetable',
+      'Agenda',
       name: 'timetable',
       desc: '',
       args: [],
@@ -415,10 +415,10 @@ class S {
     );
   }
 
-  /// `Sign in the forum as:`
+  /// `Sign in as:`
   String get login_with_uis {
     return Intl.message(
-      'Sign in the forum as:',
+      'Sign in as:',
       name: 'login_with_uis',
       desc: '',
       args: [],
@@ -485,10 +485,10 @@ class S {
     );
   }
 
-  /// `Share as .ics`
+  /// `Export as ICS`
   String get share_as_ics {
     return Intl.message(
-      'Share as .ics',
+      'Export as ICS',
       name: 'share_as_ics',
       desc: '',
       args: [],
