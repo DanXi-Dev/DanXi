@@ -17,6 +17,7 @@
 
 import 'package:dio/dio.dart';
 
+/// Useful utils when processing network requests by dio.
 class DioUtils {
   // ignore: non_constant_identifier_names
   static get NON_REDIRECT_OPTION_WITH_FORM_TYPE {
