@@ -15,7 +15,7 @@
     "failed":"Unable to load content, tap to retry",
     "fatal_error":"Fatal Error",
     "tick_issue_1":"Failed to check in. Unable to acquire the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.",
-    "i_see":"I know",
+    "i_see":"OK",
     "ticking":"Checking in...",
     "tick_failed":"Failed to check in. Check your internet connection.",
     "current_connection_failed":"Failed to obtain WLAN information",
@@ -42,10 +42,10 @@
     "reply_to":"Reply {name}",
 
     "good_morning":"Every dawn is a new sunrise.",
-    "good_noon":"Middy receives a full of light.",
-    "good_afternoon":"It's when lights show up from the city.",
-    "good_night":"So night comes, leaving a frail moonlight.",
-    "late_night":"With the night oil burning, I'm with you here.",
+    "good_noon":"Rise and shine.",
+    "good_afternoon":"The afternoon knows what the morning never suspected.",
+    "good_night":"Goodnight stars, goodnight air, goodnight noises everywhere.",
+    "late_night":"The dead of midnight is the noon of thought.",
 
     "share_as_ics":"Export as ICS"
 }

@@ -195,10 +195,10 @@ class S {
     );
   }
 
-  /// `I know`
+  /// `OK`
   String get i_see {
     return Intl.message(
-      'I know',
+      'OK',
       name: 'i_see',
       desc: '',
       args: [],
@@ -445,40 +445,40 @@ class S {
     );
   }
 
-  /// `Middy receives a full of light.`
+  /// `Rise and shine.`
   String get good_noon {
     return Intl.message(
-      'Middy receives a full of light.',
+      'Rise and shine.',
       name: 'good_noon',
       desc: '',
       args: [],
     );
   }
 
-  /// `It's when lights show up from the city.`
+  /// `The afternoon knows what the morning never suspected.`
   String get good_afternoon {
     return Intl.message(
-      'It\'s when lights show up from the city.',
+      'The afternoon knows what the morning never suspected.',
       name: 'good_afternoon',
       desc: '',
       args: [],
     );
   }
 
-  /// `So night comes, leaving a frail moonlight.`
+  /// `Goodnight stars, goodnight air, goodnight noises everywhere.`
   String get good_night {
     return Intl.message(
-      'So night comes, leaving a frail moonlight.',
+      'Goodnight stars, goodnight air, goodnight noises everywhere.',
       name: 'good_night',
       desc: '',
       args: [],
     );
   }
 
-  /// `With the night oil burning, I'm with you here.`
+  /// `The dead of midnight is the noon of thought.`
   String get late_night {
     return Intl.message(
-      'With the night oil burning, I\'m with you here.',
+      'The dead of midnight is the noon of thought.',
       name: 'late_night',
       desc: '',
       args: [],
