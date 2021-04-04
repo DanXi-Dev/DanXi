@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "Reply ${name}";
 
-  static m1(name) => "Welcome, ${name}!";
+  static m1(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -30,7 +30,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
-    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information"),
+    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
     "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
@@ -40,8 +40,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
     "forum" : MessageLookupByLibrary.simpleMessage("Forum"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("COVID-19 Safety Check-In"),
-    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("Tap to check in."),
-    "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done."),
+    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("Tap to check in"),
+    "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
     "good_afternoon" : MessageLookupByLibrary.simpleMessage("The afternoon knows what the morning never suspected."),
     "good_morning" : MessageLookupByLibrary.simpleMessage("Every dawn is a new sunrise."),
@@ -65,9 +65,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "reply_to" : m0,
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to View"),
+    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
     "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to acquire the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
     "welcome" : m1

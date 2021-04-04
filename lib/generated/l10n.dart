@@ -55,10 +55,10 @@ class S {
     );
   }
 
-  /// `Welcome, {name}!`
+  /// `Welcome, {name}`
   String welcome(Object name) {
     return Intl.message(
-      'Welcome, $name!',
+      'Welcome, $name',
       name: 'welcome',
       desc: '',
       args: [name],
@@ -135,20 +135,20 @@ class S {
     );
   }
 
-  /// `Already done.`
+  /// `Already done`
   String get fudan_daily_ticked {
     return Intl.message(
-      'Already done.',
+      'Already done',
       name: 'fudan_daily_ticked',
       desc: '',
       args: [],
     );
   }
 
-  /// `Tap to check in.`
+  /// `Tap to check in`
   String get fudan_daily_tick {
     return Intl.message(
-      'Tap to check in.',
+      'Tap to check in',
       name: 'fudan_daily_tick',
       desc: '',
       args: [],
@@ -185,10 +185,10 @@ class S {
     );
   }
 
-  /// `Failed to check in. Unable to acquire the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.`
+  /// `Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.`
   String get tick_issue_1 {
     return Intl.message(
-      'Failed to check in. Unable to acquire the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.',
+      'Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.',
       name: 'tick_issue_1',
       desc: '',
       args: [],
@@ -225,10 +225,10 @@ class S {
     );
   }
 
-  /// `Failed to obtain WLAN information`
+  /// `Failed to obtain WLAN information, Precise Location permission required`
   String get current_connection_failed {
     return Intl.message(
-      'Failed to obtain WLAN information',
+      'Failed to obtain WLAN information, Precise Location permission required',
       name: 'current_connection_failed',
       desc: '',
       args: [],
@@ -325,10 +325,10 @@ class S {
     );
   }
 
-  /// `Tap to View`
+  /// `Tap to view`
   String get tap_to_view {
     return Intl.message(
-      'Tap to View',
+      'Tap to view',
       name: 'tap_to_view',
       desc: '',
       args: [],
