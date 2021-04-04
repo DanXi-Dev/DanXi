@@ -34,6 +34,7 @@ class FudanDailyFeature extends Feature {
 
   void _loadTickStatus() {
     _status = ConnectionStatus.CONNECTING;
+
     FudanDailyRepository.getInstance().hasTick(_info).then((bool value) {
       _status = ConnectionStatus.DONE;
       _subTitle = value

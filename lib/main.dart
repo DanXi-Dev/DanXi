@@ -354,6 +354,7 @@ class _HomePageState extends State<HomePage> {
   /// If user hasn't logged in before, request him to do so.
   Future<void> _loadOrInitSharedPreference({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
+
     if (!forceLogin && _preferences.containsKey("id")) {
       setState(() =>
           _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));

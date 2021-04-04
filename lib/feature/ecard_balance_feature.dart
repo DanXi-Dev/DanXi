@@ -20,6 +20,8 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +36,7 @@ class EcardBalanceFeature extends Feature {
     await CardRepository.getInstance().login(info);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(1);
     _balance = _cardInfo.cash;
+
     if (_cardInfo.records.isNotEmpty)
       _lastTransaction = _cardInfo.records.first;
     notifyUpdate();
