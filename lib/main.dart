@@ -46,6 +46,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -84,6 +85,7 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return PlatformProvider(
       // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
@@ -92,6 +94,10 @@ class DanxiApp extends StatelessWidget {
                   theme: ThemeData(
                     brightness: Brightness.light,
                     primarySwatch: Colors.deepPurple,
+                    cardTheme: CardTheme(
+                      color: Colors.grey, //TODO: Delete
+                      elevation: 5,
+                    ),
                   ),
                   darkTheme: ThemeData(
                       brightness: Brightness.dark,
@@ -100,7 +106,17 @@ class DanxiApp extends StatelessWidget {
                           unselectedIconTheme:
                               IconThemeData(color: Colors.white),
                           selectedItemColor: Colors.white,
-                          unselectedItemColor: Colors.white))),
+                          unselectedItemColor: Colors.white),
+                      cardTheme: CardTheme(
+                          elevation: 5,
+                          color: Colors.grey,
+                      ),
+                      textTheme: new TextTheme(
+                           bodyText2: new TextStyle(color: Colors.red),
+                           headline1: new TextStyle(fontSize: 78),
+                           button: new TextStyle(color: Colors.green),
+                      ),
+                  )),
               localizationsDelegates: [
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
