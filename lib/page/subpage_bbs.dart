@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -27,6 +28,8 @@ import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:data_plugin/bmob/response/bmob_registered.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -51,6 +54,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   BmobUser _loginUser;
   static StreamSubscription _postSubscription;
   static StreamSubscription _refreshSubscription;
+  ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -139,12 +143,26 @@ class _BBSSubpageState extends State<BBSSubpage>
           refreshSelf();
         },
         child: FutureBuilder(
-            builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) =>
-                snapshot.hasData
-                    ? ListView(
-                        children:
-                            snapshot.data.map((e) => _getListItem(e)).toList())
-                    : Container(),
+            builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) => snapshot
+                    .hasData
+                ? PlatformWidget(
+                    material: (_, __) => Scrollbar(
+                        controller: _controller,
+                        interactive:
+                            !kIsWeb && !(Platform.isAndroid || Platform.isIOS),
+                        child: ListView(
+                            controller: _controller,
+                            children: snapshot.data
+                                .map((e) => _getListItem(e))
+                                .toList())),
+                    cupertino: (_, __) => CupertinoScrollbar(
+                        controller: _controller,
+                        child: ListView(
+                            controller: _controller,
+                            children: snapshot.data
+                                .map((e) => _getListItem(e))
+                                .toList())))
+                : Container(),
             future: loginAndLoadPost(info)));
   }
 
