@@ -45,6 +45,7 @@ class _FeatureListItemState extends State<FeatureListItem>
       summary.add(widget.feature.tertiaryTitle);
 
     return ListTile(
+      trailing: widget.feature.trailing,
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
       title: Text(widget.feature.mainTitle),

@@ -46,7 +46,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -71,6 +70,7 @@ void main() {
 }
 
 class DanxiApp extends StatelessWidget {
+  /// Routes to every pages.
   final Map<String, Function> routes = {
     '/card/detail': (context, {arguments}) =>
         CardDetailPage(arguments: arguments),
@@ -85,7 +85,6 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return PlatformProvider(
       // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
@@ -94,28 +93,27 @@ class DanxiApp extends StatelessWidget {
                   theme: ThemeData(
                     brightness: Brightness.light,
                     primarySwatch: Colors.deepPurple,
-                    cardTheme: CardTheme(
-                      color: Colors.grey, //TODO: Delete
-                      elevation: 5,
-                    ),
+                    // cardTheme: CardTheme(
+                    //   color: Colors.grey, //TODO: Delete
+                    //   elevation: 5,
+                    // ),
                   ),
                   darkTheme: ThemeData(
-                      brightness: Brightness.dark,
-                      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                          selectedIconTheme: IconThemeData(color: Colors.white),
-                          unselectedIconTheme:
-                              IconThemeData(color: Colors.white),
-                          selectedItemColor: Colors.white,
-                          unselectedItemColor: Colors.white),
-                      cardTheme: CardTheme(
-                          elevation: 5,
-                          color: Colors.grey,
-                      ),
-                      textTheme: new TextTheme(
-                           bodyText2: new TextStyle(color: Colors.red),
-                           headline1: new TextStyle(fontSize: 78),
-                           button: new TextStyle(color: Colors.green),
-                      ),
+                    brightness: Brightness.dark,
+                    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                        selectedIconTheme: IconThemeData(color: Colors.white),
+                        unselectedIconTheme: IconThemeData(color: Colors.white),
+                        selectedItemColor: Colors.white,
+                        unselectedItemColor: Colors.white),
+                    cardTheme: CardTheme(
+                      elevation: 5,
+                      color: Colors.grey,
+                    ),
+                    textTheme: new TextTheme(
+                      bodyText2: new TextStyle(color: Colors.red),
+                      headline1: new TextStyle(fontSize: 78),
+                      button: new TextStyle(color: Colors.green),
+                    ),
                   )),
               localizationsDelegates: [
                 S.delegate,
@@ -200,8 +198,13 @@ class _HomePageState extends State<HomePage> {
   SharedPreferences _preferences;
 
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
+
+  /// A description for current connection status.
   ValueNotifier<String> _connectStatus = ValueNotifier("");
+
+  /// Listener to connectivity changes.
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.

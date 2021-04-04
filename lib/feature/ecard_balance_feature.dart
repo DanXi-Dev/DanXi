@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
@@ -27,11 +28,14 @@ class EcardBalanceFeature extends Feature {
   PersonInfo _info;
   String _balance;
   CardInfo _cardInfo;
+  CardRecord _lastTransaction;
 
   void _loadCard(PersonInfo info) async {
     await CardRepository.getInstance().login(info);
-    _cardInfo = await CardRepository.getInstance().loadCardInfo(-1);
+    _cardInfo = await CardRepository.getInstance().loadCardInfo(1);
     _balance = _cardInfo.cash;
+    if (_cardInfo.records.isNotEmpty)
+      _lastTransaction = _cardInfo.records.first;
     notifyUpdate();
   }
 
@@ -43,7 +47,7 @@ class EcardBalanceFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_cardInfo == null) {
-      _balance = S.of(context).loading;
+      _balance = "";
       _loadCard(_info);
     }
   }
@@ -52,7 +56,18 @@ class EcardBalanceFeature extends Feature {
   String get mainTitle => S.of(context).ecard_balance;
 
   @override
-  String get subTitle => _balance;
+  String get subTitle => _balance.isEmpty
+      ? S.of(context).loading
+      : Constant.yuanSymbol(_lastTransaction?.payment);
+
+  @override
+  String get tertiaryTitle => _lastTransaction?.location;
+
+  @override
+  Widget get trailing => Text(
+        Constant.yuanSymbol(_balance),
+        textScaleFactor: 1.2,
+      );
 
   @override
   Widget get icon => const Icon(Icons.account_balance_wallet);

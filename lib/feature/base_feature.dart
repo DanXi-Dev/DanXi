@@ -32,6 +32,7 @@ abstract class Feature {
 
   String get tertiaryTitle => null;
 
+  Widget get trailing => null;
   FeatureContainer container;
 
   BuildContext context;
