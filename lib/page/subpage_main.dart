@@ -99,6 +99,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                     subtitle: Text(S.of(context).tap_to_view),
                     onTap: () {
                       main_qr.QR.showQRCode(context, info, _brightness);
+                      main_qr.QR.sendQRtoWatch(info);
                     },
                   ),
                 )

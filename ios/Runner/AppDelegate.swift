@@ -24,8 +24,7 @@ import WatchConnectivity
             let session = WCSession.default;
             if(session.isPaired && session.isReachable){
              DispatchQueue.main.async {
-                    print("Sending counter...")
-                    session.sendMessage(["counter": text], replyHandler: nil)
+                    session.sendMessage(["qr_text": text], replyHandler: nil)
                 }
             }else{
                 print("Watch not reachable...")

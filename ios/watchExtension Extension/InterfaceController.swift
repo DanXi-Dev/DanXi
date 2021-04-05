@@ -19,7 +19,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
          session.activate();
         }
         
-        label.setText("")
+        label.setText("Loading...") //TODO: Internationalization?
     }
     
     override func willActivate() {
@@ -33,7 +33,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        self.label.setText(message["counter"] as! String)
+        self.label.setText(message["qr_text"] as! String)
     }
 
 }

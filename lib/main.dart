@@ -191,21 +191,17 @@ class QR {
           );
         });
   }
+  //watchOS Support
+  static const channel = const MethodChannel('myWatchChannel');
+  static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
+    String qr = await QRCodeRepository.getInstance()
+        .getQRCode(personInfo);
+
+    channel.invokeMethod("sendStringToNative", qr.toString());
+  }
 }
 
 class _HomePageState extends State<HomePage> {
-  //watchOS Support
-  static const channel = const MethodChannel('myWatchChannel');
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-
-    channel.invokeMethod("sendStringToNative", _counter.toString());
-  }
-
   SharedPreferences _preferences;
 
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
