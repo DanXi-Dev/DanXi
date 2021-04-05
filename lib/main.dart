@@ -179,8 +179,8 @@ class QR {
                               ? QrImage(
                                   data: snapshot.data,
                                   size: 200.0,
-                                  foregroundColor:
-                                      darkModeOn ? Colors.white : Colors.black)
+                                  foregroundColor: Colors.black,
+                                  backgroundColor: Colors.white,)
                               : Text(S.of(context).loading_qr_code);
                         }))),
             actions: <Widget>[
@@ -196,7 +196,7 @@ class QR {
         });
   }
   //watchOS Support
-  static const channel = const MethodChannel('myWatchChannel');
+  static const channel = const MethodChannel('watchQRValue');
   static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
     String qr = await QRCodeRepository.getInstance()
         .getQRCode(personInfo);
@@ -273,6 +273,15 @@ class _HomePageState extends State<HomePage> {
             icon: 'ic_launcher'),
       ]);
     initPlatformState(); //Init brightness control
+
+    //Init watchOS support
+    const channel_a = const MethodChannel('watchAppActivated');
+    channel_a.setMethodCallHandler((MethodCall call) async {
+      print("received method call\n\n");
+      if(call.method == 'watchActivated') {
+        QR.sendQRtoWatch(_personInfo.value);
+      }
+    });
   }
 
   /// Current brightness

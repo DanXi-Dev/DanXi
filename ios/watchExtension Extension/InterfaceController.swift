@@ -6,21 +6,45 @@ import WatchConnectivity
 class InterfaceController: WKInterfaceController, WCSessionDelegate {
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        
+        QRImage.setHidden(true)
+        label.setText("Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone.")
+        sendString(text: "refresh")
+    }
+    
+    func sendString(text: String){
+        let session = WCSession.default;
+        if(session.isReachable){
+         DispatchQueue.main.async {
+                session.sendMessage(["qr_text": text], replyHandler: nil)
+            }
+        }else{
+            label.setText("iPhone Unreachable.") //TODO: Internationalization?
+        }
     }
     
     @IBOutlet var label: WKInterfaceLabel!
     @IBOutlet weak var QRImage: WKInterfaceImage!
+    @IBAction func tapRecognizer(_ sender: Any) {
+        label.setHidden(false)
+        QRImage.setHidden(true)
+        label.setText("Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone.")
+        sendString(text: "refresh")
+    }
+    @IBAction func tapRecognizerLabel(_ sender: Any) {
+        tapRecognizer(sender)
+    }
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-        
+    
         if(WCSession.isSupported()){
          let session = WCSession.default;
          session.delegate = self;
          session.activate();
         }
         
-        label.setText("Loading...") //TODO: Internationalization?
+        label.setText("Connecting") //TODO: Internationalization?
     }
     
     override func willActivate() {
@@ -37,9 +61,11 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         //self.label.setText(message["qr_text"] as! String)
         if let image = EFQRCode.generate(content: message["qr_text"] as! String) {
             QRImage.setImage(UIImage(cgImage: image))
+            label.setHidden(true)
+            QRImage.setHidden(false)
         }
         else {
-            fatalError("Failed to generate QR")
+            label.setText("Failed to generate QR. Please file bug report.")
         }
     }
 

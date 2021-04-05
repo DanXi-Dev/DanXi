@@ -6,30 +6,40 @@ import WatchConnectivity
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, WCSessionDelegate {
+        
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-         
-        }
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "watchAppActivated",
+                binaryMessenger: controller.binaryMessenger)
+        channel.invokeMethod("watchActivated",arguments: nil)
+    }
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "watchAppActivated",
+                binaryMessenger: controller.binaryMessenger)
+        channel.invokeMethod("watchActivated",arguments: nil)
+    }
         
-        func sessionDidBecomeInactive(_ session: WCSession) {
+    func sessionDidBecomeInactive(_ session: WCSession) {
+    
+    }
+    
+    func sessionDidDeactivate(_ session: WCSession) {
         
-        }
+    }
         
-        func sessionDidDeactivate(_ session: WCSession) {
-         
-        }
-        
-        func sendString(text: String){
-            print(text)
-            let session = WCSession.default;
-            if(session.isPaired && session.isReachable){
-             DispatchQueue.main.async {
-                    session.sendMessage(["qr_text": text], replyHandler: nil)
-                }
-            }else{
-                print("Watch not reachable...")
+    func sendString(text: String){
+        let session = WCSession.default;
+        if(session.isPaired && session.isReachable){
+            DispatchQueue.main.async {
+                session.sendMessage(["qr_text": text], replyHandler: nil)
             }
+        }else{
+            print("Watch not reachable...")
         }
+    }
     
   override func application(
     _ application: UIApplication,
@@ -44,8 +54,7 @@ import WatchConnectivity
     }
     
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-    
-    let channel = FlutterMethodChannel(name: "myWatchChannel",
+    let channel = FlutterMethodChannel(name: "watchQRValue",
               binaryMessenger: controller.binaryMessenger)
 
     channel.setMethodCallHandler({

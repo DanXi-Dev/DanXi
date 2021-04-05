@@ -11,8 +11,24 @@
             <objects>
                 <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="watchExtension" customModuleProvider="target">
                     <items>
-                        <label alignment="left" text="Label" numberOfLines="5" id="4Td-to-NdO"/>
-                        <imageView alignment="left" id="O9A-EY-Iho"/>
+                        <imageView alignment="left" id="O9A-EY-Iho">
+                            <gestureRecognizers>
+                                <tapGestureRecognizer id="afh-Yt-jfj">
+                                    <connections>
+                                        <action selector="tapRecognizer:" destination="AgC-eL-Hgc" id="3lF-hh-U57"/>
+                                    </connections>
+                                </tapGestureRecognizer>
+                            </gestureRecognizers>
+                        </imageView>
+                        <label alignment="left" text="Label" numberOfLines="9" id="4Td-to-NdO">
+                            <gestureRecognizers>
+                                <tapGestureRecognizer id="1QZ-fR-tBG">
+                                    <connections>
+                                        <action selector="tapRecognizerLabel:" destination="AgC-eL-Hgc" id="cQs-WB-e3L"/>
+                                    </connections>
+                                </tapGestureRecognizer>
+                            </gestureRecognizers>
+                        </label>
                     </items>
                     <connections>
                         <outlet property="QRImage" destination="O9A-EY-Iho" id="Sxk-8Y-iFU"/>
