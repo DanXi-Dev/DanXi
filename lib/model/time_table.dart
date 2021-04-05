@@ -98,6 +98,9 @@ class TimeTable {
     return table;
   }
 
+  /// Convert the specific [week]'s timetable to [LaneEvents] with [style], usually for a [TimetableView].
+  ///
+  /// If [compact], it will not add the days to the result when no course is taken.
   List<LaneEvents> toLaneEvents(int week, TimetableStyle style,
       {bool compact = true}) {
     Map<int, List<TableEvent>> table = Map();

@@ -27,7 +27,8 @@ class WiFiUtils {
     return _connectivity;
   }
 
-  static Future<Map> getWiFiInfo(ConnectivityResult connectivityResult) async {
+  static Future<Map<String, String>> getWiFiInfo(
+      ConnectivityResult connectivityResult) async {
     Map<String, String> result = {};
     switch (connectivityResult) {
       case ConnectivityResult.wifi:
@@ -51,7 +52,6 @@ class WiFiUtils {
         }
 
         result['name'] = wifiName;
-
         wifiIP = await _networkInfo.getWifiIP().catchError((_) => null);
         result['ip'] = wifiIP;
         break;

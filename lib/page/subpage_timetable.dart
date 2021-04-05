@@ -49,7 +49,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Map<String, TimetableConverter> converters;
   TimeTable _table;
 
-  void _closeDialogAndStartShare(TimetableConverter converter) async {
+  void _startShare(TimetableConverter converter) async {
+    // Close the dialog
     Navigator.of(context).pop();
 
     String converted = converter.convertTo(_table);
@@ -72,12 +73,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         .map<Widget>((MapEntry<String, TimetableConverter> e) {
       return PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () => _closeDialogAndStartShare(e.value),
+          onPressed: () => _startShare(e.value),
           child: Text(e.key),
         ),
         material: (_, __) => ListTile(
           title: Text(e.key),
-          onTap: () => _closeDialogAndStartShare(e.value),
+          onTap: () => _startShare(e.value),
         ),
       );
     }).toList();
@@ -117,19 +118,19 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Widget build(BuildContext context) {
     super.build(context);
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
+    TimetableStyle style = TimetableStyle(
+        startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
+        laneHeight: 30,
+        laneWidth: 80,
+        timeItemWidth: 50,
+        timeItemHeight: 160);
     return FutureBuilder(
         builder: (_, AsyncSnapshot<TimeTable> snapshot) {
           if (snapshot.hasData) {
             _table = snapshot.data;
             return TimetableView(
-              laneEventsList: _table.toLaneEvents(
-                  1, TimetableStyle(laneHeight: 30, laneWidth: 80)),
-              timetableStyle: TimetableStyle(
-                  startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
-                  laneHeight: 30,
-                  laneWidth: 80,
-                  timeItemWidth: 50,
-                  timeItemHeight: 160),
+              laneEventsList: _table.toLaneEvents(1, style),
+              timetableStyle: style,
             );
           } else {
             return Container();

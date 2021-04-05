@@ -16,12 +16,12 @@
  */
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
@@ -81,6 +81,8 @@ class DanxiApp extends StatelessWidget {
         BBSPostDetail(arguments: arguments),
     '/bbs/newPost': (context, {arguments}) =>
         BBSEditorPage(arguments: arguments),
+    '/notice/aao/list': (context, {arguments}) =>
+        AAONoticesList(arguments: arguments),
   };
 
   // This widget is the root of your application.
@@ -369,20 +371,15 @@ class _HomePageState extends State<HomePage> {
     ConnectivityResult connectivity =
         await WiFiUtils.getConnectivity().checkConnectivity();
     if (connectivity == ConnectivityResult.wifi) {
-      Map result;
-      try {
-        result =
-            await WiFiUtils.getWiFiInfo(connectivity).catchError((_) => null);
-      } catch (ignored) {}
-      setState(() {
-        _connectStatus.value = result == null || result['name'] == null
-            ? S.current.current_connection_failed
-            : FDUWiFiConverter.recognizeWiFi(result['name']);
-      });
+      Map<String, String> result =
+          await WiFiUtils.getWiFiInfo(connectivity).catchError((_) => null);
+      setState(() => _connectStatus.value =
+          result == null || result['name'] == null
+              ? S.current.current_connection_failed
+              : FDUWiFiConverter.recognizeWiFi(result['name']));
     } else {
-      setState(() {
-        _connectStatus.value = S.of(context).current_connection_no_wifi;
-      });
+      setState(() =>
+          _connectStatus.value = S.of(context).current_connection_no_wifi);
     }
   }
 
