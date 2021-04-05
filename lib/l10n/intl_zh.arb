@@ -11,6 +11,7 @@
     "fudan_daily":"平安复旦",
     "fudan_daily_ticked":"今日已打卡",
     "fudan_daily_tick":"点击打卡",
+    "fudan_aao_notices":"教务处通知",
     "loading":"获取中...",
     "failed":"获取失败，点击重试",
     "fatal_error":"错误",

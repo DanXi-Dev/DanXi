@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
@@ -42,7 +43,6 @@ class HomeSubpage extends PlatformSubpage {
 
 class _HomeSubpageState extends State<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
-
   @override
   bool get wantKeepAlive => true;
 
@@ -57,9 +57,7 @@ class _HomeSubpageState extends State<HomeSubpage>
 
   initPlatformState() async {
     double brightness = await ScreenProxy.brightness;
-    setState(() {
-      _brightness = brightness;
-    });
+    setState(() => _brightness = brightness);
   }
 
   @override
@@ -88,7 +86,8 @@ class _HomeSubpageState extends State<HomeSubpage>
                         Navigator.of(context).pushNamed("/card/crowdData",
                             arguments: {"personInfo": info});
                       },
-                    )
+                    ),
+                    FeatureListItem(feature: FudanAAONoticesFeature())
                   ],
                 )),
                 Card(child: FeatureListItem(feature: FudanDailyFeature())),

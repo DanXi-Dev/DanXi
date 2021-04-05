@@ -17,6 +17,7 @@
 
 import 'dart:io';
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -25,26 +26,25 @@ class ScreenProxy {
       const MethodChannel('github.com/clovisnicolas/flutter_screen');
 
   static Future<double> get brightness async {
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+    if (PlatformX.isMobile)
       return (await _channel.invokeMethod('brightness')) as double;
     else
       return 1.0;
   }
 
   static setBrightness(double brightness) {
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+    if (PlatformX.isMobile)
       _channel.invokeMethod('setBrightness', {"brightness": brightness});
   }
 
   static Future<bool> get isKeptOn async {
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+    if (PlatformX.isMobile)
       return (await _channel.invokeMethod('isKeptOn')) as bool;
     else
       return true;
   }
 
   static keepOn(bool on) {
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
-      _channel.invokeMethod('keepOn', {"on": on});
+    if (PlatformX.isMobile) _channel.invokeMethod('keepOn', {"on": on});
   }
 }

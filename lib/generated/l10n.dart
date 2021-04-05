@@ -155,6 +155,16 @@ class S {
     );
   }
 
+  /// `AAO Notices`
+  String get fudan_aao_notices {
+    return Intl.message(
+      'AAO Notices',
+      name: 'fudan_aao_notices',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Loading...`
   String get loading {
     return Intl.message(

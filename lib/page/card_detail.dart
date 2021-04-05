@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
@@ -93,8 +94,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                 removeTop: true,
                 child: PlatformWidget(
                     material: (_, __) => Scrollbar(
-                        interactive:
-                            !kIsWeb && !(Platform.isAndroid || Platform.isIOS),
+                        interactive: PlatformX.isDesktop,
                         child: ListView(
                           children: _getListWidgets(),
                         )),

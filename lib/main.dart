@@ -16,12 +16,12 @@
  */
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
@@ -36,6 +36,7 @@ import 'package:dan_xi/repository/qr_code_repository.dart';
 import 'package:dan_xi/util/ScreenProxy.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/cupertino.dart';
@@ -80,6 +81,8 @@ class DanxiApp extends StatelessWidget {
         BBSPostDetail(arguments: arguments),
     '/bbs/newPost': (context, {arguments}) =>
         BBSEditorPage(arguments: arguments),
+    '/notice/aao/list': (context, {arguments}) =>
+        AAONoticesList(arguments: arguments),
   };
 
   // This widget is the root of your application.
@@ -252,7 +255,7 @@ class _HomePageState extends State<HomePage> {
 
     _loadOrInitSharedPreference().then((_) {
       // Configure shortcut listeners on Android & iOS.
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+      if (PlatformX.isMobile)
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo != null) {
             QR.showQRCode(context, _personInfo.value, _brightness);
@@ -261,7 +264,7 @@ class _HomePageState extends State<HomePage> {
     });
     _loadNetworkState();
     // Add shortcuts on Android & iOS.
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+    if (PlatformX.isMobile)
       quickActions.setShortcutItems(<ShortcutItem>[
         ShortcutItem(
             type: 'action_qr_code',
@@ -375,19 +378,15 @@ class _HomePageState extends State<HomePage> {
     ConnectivityResult connectivity =
         await WiFiUtils.getConnectivity().checkConnectivity();
     if (connectivity == ConnectivityResult.wifi) {
-      Map result;
-      try {
-        result = await WiFiUtils.getWiFiInfo(connectivity);
-      } catch (ignored) {}
-      setState(() {
-        _connectStatus.value = result == null || result['name'] == null
-            ? S.current.current_connection_failed
-            : FDUWiFiConverter.recognizeWiFi(result['name']);
-      });
+      Map<String, String> result =
+          await WiFiUtils.getWiFiInfo(connectivity).catchError((_) => null);
+      setState(() => _connectStatus.value =
+          result == null || result['name'] == null
+              ? S.current.current_connection_failed
+              : FDUWiFiConverter.recognizeWiFi(result['name']));
     } else {
-      setState(() {
-        _connectStatus.value = S.of(context).current_connection_no_wifi;
-      });
+      setState(() =>
+          _connectStatus.value = S.of(context).current_connection_no_wifi);
     }
   }
 

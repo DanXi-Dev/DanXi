@@ -11,6 +11,7 @@
     "fudan_daily":"COVID-19 Safety Check-In",
     "fudan_daily_ticked":"Already done",
     "fudan_daily_tick":"Tap to check in",
+    "fudan_aao_notices":"AAO Notices",
     "loading":"Loading...",
     "failed":"Unable to load content, tap to retry",
     "fatal_error":"Fatal Error",

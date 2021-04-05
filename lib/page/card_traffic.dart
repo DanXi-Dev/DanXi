@@ -21,6 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -55,10 +56,10 @@ class _CardCrowdDataState extends State<CardCrowdData> {
             _personInfo, Constant.campusArea.indexOf(_selectItem))
         .catchError((e) {
       if (e is UnsuitableTimeException) {
-        if (isMaterial(context)) {
+        if (PlatformX.isMaterial(context)) {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(S.of(context).out_of_dining_time)));
-        } else if (Platform.isIOS) {
+        } else if (PlatformX.isIOS) {
           //TODO
         }
       }
