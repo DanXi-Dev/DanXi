@@ -96,10 +96,6 @@ class DanxiApp extends StatelessWidget {
                   theme: ThemeData(
                     brightness: Brightness.light,
                     primarySwatch: Colors.deepPurple,
-                    // cardTheme: CardTheme(
-                    //   color: Colors.grey, //TODO: Delete
-                    //   elevation: 5,
-                    // ),
                   ),
                   darkTheme: ThemeData(
                     brightness: Brightness.dark,
@@ -108,10 +104,6 @@ class DanxiApp extends StatelessWidget {
                         unselectedIconTheme: IconThemeData(color: Colors.white),
                         selectedItemColor: Colors.white,
                         unselectedItemColor: Colors.white),
-                    cardTheme: CardTheme(
-                      elevation: 5,
-                      color: Colors.grey,
-                    ),
                     textTheme: new TextTheme(
                       bodyText2: new TextStyle(color: Colors.red),
                       headline1: new TextStyle(fontSize: 78),

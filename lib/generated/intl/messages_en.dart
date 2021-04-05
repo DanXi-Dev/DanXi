@@ -24,11 +24,12 @@ class MessageLookup extends MessageLookupByLibrary {
   static m1(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function> {
-    "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
-    "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
-    "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
-    "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
+  static _notInlinedMessages(_) => <String, Function>{
+        "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "change_account":
+            MessageLookupByLibrary.simpleMessage("Switch Account"),
+        "choose_area": MessageLookupByLibrary.simpleMessage("Select Campus"),
         "current_connection":
             MessageLookupByLibrary.simpleMessage("Current Connection"),
         "current_connection_failed": MessageLookupByLibrary.simpleMessage(
@@ -63,18 +64,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "good_noon": MessageLookupByLibrary.simpleMessage("Rise and shine."),
         "i_see": MessageLookupByLibrary.simpleMessage("OK"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
-        "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
-    "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
-    "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
-    "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
-    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
-    "login" : MessageLookupByLibrary.simpleMessage("Login"),
-    "login_uis" : MessageLookupByLibrary.simpleMessage("Fudan UIS Login"),
-    "login_uis_pwd" : MessageLookupByLibrary.simpleMessage("Password"),
-    "login_uis_uid" : MessageLookupByLibrary.simpleMessage("ID"),
-    "login_with_uis" : MessageLookupByLibrary.simpleMessage("Sign in as:"),
-    "logining" : MessageLookupByLibrary.simpleMessage("Logging in..."),
-    "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
+        "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
+        "late_night": MessageLookupByLibrary.simpleMessage(
+            "The dead of midnight is the noon of thought."),
+        "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
+        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
+            "Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
+        "login": MessageLookupByLibrary.simpleMessage("Login"),
+        "login_uis": MessageLookupByLibrary.simpleMessage("Fudan UIS Login"),
+        "login_uis_pwd": MessageLookupByLibrary.simpleMessage("Password"),
+        "login_uis_uid": MessageLookupByLibrary.simpleMessage("ID"),
+        "login_with_uis": MessageLookupByLibrary.simpleMessage("Sign in as:"),
+        "logining": MessageLookupByLibrary.simpleMessage("Logging in..."),
+        "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "reply_to" : m0,
     "share" : MessageLookupByLibrary.simpleMessage("Share"),

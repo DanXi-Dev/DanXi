@@ -24,11 +24,11 @@ class MessageLookup extends MessageLookupByLibrary {
   static m1(name) => "欢迎你，${name}!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function> {
-    "app_name" : MessageLookupByLibrary.simpleMessage("旦兮 α"),
-    "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
-    "change_account" : MessageLookupByLibrary.simpleMessage("切换账号"),
-    "choose_area" : MessageLookupByLibrary.simpleMessage("选择校区"),
+  static _notInlinedMessages(_) => <String, Function>{
+        "app_name": MessageLookupByLibrary.simpleMessage("旦兮 α"),
+        "cancel": MessageLookupByLibrary.simpleMessage("取消"),
+        "change_account": MessageLookupByLibrary.simpleMessage("切换账号"),
+        "choose_area": MessageLookupByLibrary.simpleMessage("选择校区"),
         "current_connection": MessageLookupByLibrary.simpleMessage("当前连接"),
         "current_connection_failed":
             MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
@@ -53,18 +53,19 @@ class MessageLookup extends MessageLookupByLibrary {
         "good_noon": MessageLookupByLibrary.simpleMessage("快到中午啦"),
         "i_see": MessageLookupByLibrary.simpleMessage("好"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("过去 15 天"),
-        "last_30_days" : MessageLookupByLibrary.simpleMessage("过去 30 天"),
-    "last_7_days" : MessageLookupByLibrary.simpleMessage("过去 7 天"),
-    "late_night" : MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
-    "loading" : MessageLookupByLibrary.simpleMessage("获取中..."),
-    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("加载复活码中...\n可能需要5~10秒，取决于复旦服务器。"),
-    "login" : MessageLookupByLibrary.simpleMessage("登录"),
-    "login_uis" : MessageLookupByLibrary.simpleMessage("登录复旦UIS"),
-    "login_uis_pwd" : MessageLookupByLibrary.simpleMessage("UIS密码"),
-    "login_uis_uid" : MessageLookupByLibrary.simpleMessage("UIS账号"),
-    "login_with_uis" : MessageLookupByLibrary.simpleMessage("将使用以下信息匿名登录旦唧"),
-    "logining" : MessageLookupByLibrary.simpleMessage("正在登录..."),
-    "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
+        "last_30_days": MessageLookupByLibrary.simpleMessage("过去 30 天"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("过去 7 天"),
+        "late_night": MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
+        "loading": MessageLookupByLibrary.simpleMessage("获取中..."),
+        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
+            "加载复活码中...\n可能需要5~10秒，取决于复旦服务器。"),
+        "login": MessageLookupByLibrary.simpleMessage("登录"),
+        "login_uis": MessageLookupByLibrary.simpleMessage("登录复旦UIS"),
+        "login_uis_pwd": MessageLookupByLibrary.simpleMessage("UIS密码"),
+        "login_uis_uid": MessageLookupByLibrary.simpleMessage("UIS账号"),
+        "login_with_uis": MessageLookupByLibrary.simpleMessage("将使用以下信息匿名登录旦唧"),
+        "logining": MessageLookupByLibrary.simpleMessage("正在登录..."),
+        "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是食堂用餐时间"),
     "reply_to" : m0,
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
