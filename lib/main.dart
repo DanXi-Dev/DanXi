@@ -117,6 +117,7 @@ class DanxiApp extends StatelessWidget {
                       headline1: new TextStyle(fontSize: 78),
                       button: new TextStyle(color: Colors.green),
                     ),
+                    
                   )),
               localizationsDelegates: [
                 S.delegate,

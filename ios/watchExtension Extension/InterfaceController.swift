@@ -9,6 +9,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     }
     
     @IBOutlet var label: WKInterfaceLabel!
+    @IBOutlet weak var QRImage: WKInterfaceImage!
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
@@ -33,7 +34,13 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        self.label.setText(message["qr_text"] as! String)
+        //self.label.setText(message["qr_text"] as! String)
+        if let image = EFQRCode.generate(content: message["qr_text"] as! String) {
+            QRImage.setImage(UIImage(cgImage: image))
+        }
+        else {
+            fatalError("Failed to generate QR")
+        }
     }
 
 }
