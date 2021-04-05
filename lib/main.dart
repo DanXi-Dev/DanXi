@@ -154,7 +154,6 @@ class QR {
     //Set screen brightness for displaying QR Code
     ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
-    double savedBrightness = brightness;
 
     //Get current theme (light/dark)
     bool darkModeOn =
@@ -187,7 +186,7 @@ class QR {
               PlatformDialogAction(
                   child: PlatformText(S.of(context).i_see),
                   onPressed: () {
-                    ScreenProxy.setBrightness(savedBrightness);
+                    ScreenProxy.setBrightness(brightness);
                     ScreenProxy.keepOn(false);
                     Navigator.pop(context);
                   }),
@@ -198,6 +197,18 @@ class QR {
 }
 
 class _HomePageState extends State<HomePage> {
+  //watchOS Support
+  static const channel = const MethodChannel('myWatchChannel');
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+
+    channel.invokeMethod("sendStringToNative", _counter.toString());
+  }
+
   SharedPreferences _preferences;
 
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
