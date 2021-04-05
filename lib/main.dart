@@ -36,6 +36,7 @@ import 'package:dan_xi/repository/qr_code_repository.dart';
 import 'package:dan_xi/util/ScreenProxy.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/cupertino.dart';
@@ -245,7 +246,7 @@ class _HomePageState extends State<HomePage> {
 
     _loadOrInitSharedPreference().then((_) {
       // Configure shortcut listeners on Android & iOS.
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+      if (PlatformX.isMobile)
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo != null) {
             QR.showQRCode(context, _personInfo.value, _brightness);
@@ -254,7 +255,7 @@ class _HomePageState extends State<HomePage> {
     });
     _loadNetworkState();
     // Add shortcuts on Android & iOS.
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+    if (PlatformX.isMobile)
       quickActions.setShortcutItems(<ShortcutItem>[
         ShortcutItem(
             type: 'action_qr_code',
@@ -370,7 +371,8 @@ class _HomePageState extends State<HomePage> {
     if (connectivity == ConnectivityResult.wifi) {
       Map result;
       try {
-        result = await WiFiUtils.getWiFiInfo(connectivity);
+        result =
+            await WiFiUtils.getWiFiInfo(connectivity).catchError((_) => null);
       } catch (ignored) {}
       setState(() {
         _connectStatus.value = result == null || result['name'] == null

@@ -15,11 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
 class WiFiUtils {
@@ -31,40 +28,31 @@ class WiFiUtils {
   }
 
   static Future<Map> getWiFiInfo(ConnectivityResult connectivityResult) async {
-    Map result = {};
+    Map<String, String> result = {};
     switch (connectivityResult) {
       case ConnectivityResult.wifi:
         String wifiName, wifiIP;
-
-        try {
-          if (!kIsWeb && Platform.isIOS) {
-            LocationAuthorizationStatus status =
-                await _networkInfo.getLocationServiceAuthorization();
-            if (status == LocationAuthorizationStatus.notDetermined) {
-              status = await _networkInfo.requestLocationServiceAuthorization();
-            }
-            if (status == LocationAuthorizationStatus.authorizedAlways ||
-                status == LocationAuthorizationStatus.authorizedWhenInUse) {
-              wifiName = await _networkInfo.getWifiName();
-            } else {
-              await _networkInfo.requestLocationServiceAuthorization();
-              wifiName = await _networkInfo.getWifiName();
-            }
-          } else {
-            wifiName = await _networkInfo.getWifiName().catchError((_, stack) {
-              return null;
-            });
+        if (PlatformX.isIOS) {
+          // Decide the status of location authorization
+          LocationAuthorizationStatus status =
+              await _networkInfo.getLocationServiceAuthorization();
+          if (status == LocationAuthorizationStatus.notDetermined) {
+            // Ask user to authorize
+            status = await _networkInfo.requestLocationServiceAuthorization();
           }
-        } on PlatformException {
-          wifiName = null;
+          // Recheck again
+          if (status == LocationAuthorizationStatus.authorizedAlways ||
+              status == LocationAuthorizationStatus.authorizedWhenInUse) {
+            wifiName = await _networkInfo.getWifiName();
+          }
+        } else {
+          // On other devices, just try to obtain the wifi name
+          wifiName = await _networkInfo.getWifiName();
         }
+
         result['name'] = wifiName;
 
-        try {
-          wifiIP = await _networkInfo.getWifiIP();
-        } on PlatformException {
-          wifiIP = null;
-        }
+        wifiIP = await _networkInfo.getWifiIP().catchError((_) => null);
         result['ip'] = wifiIP;
         break;
       default:
