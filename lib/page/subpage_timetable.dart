@@ -25,6 +25,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -136,11 +137,16 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               timetableStyle: style,
             );
           } else {
-            return Container();
+            return Container(
+              child: Center(
+                child: Text(S.of(context).loading),
+              ),
+            );
           }
         },
-        future: TimeTableRepository.getInstance()
-            .loadTimeTableLocally(info, startTime: START_TIME));
+        future: Retrier.runAsyncWithRetry(() =>
+            TimeTableRepository.getInstance()
+                .loadTimeTableLocally(info, startTime: START_TIME)));
   }
 
   @override
