@@ -49,7 +49,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,
-            icon: PlatformX.isAndroid ? const Icon(Icons.reply) : const Icon(SFSymbols.arrowshape_turn_up_left_fill),
+            icon: PlatformX.isAndroid
+                ? const Icon(Icons.reply)
+                : const Icon(SFSymbols.arrowshape_turn_up_left_fill),
             onPressed: () {
               Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
                 "post": BBSPost.newReply(_user.objectId, _post.objectId)
@@ -133,7 +135,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         onTap: () {
           Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
             "post": BBSPost.newReply(_user.objectId, _post.objectId,
-                replyTo: index > 0 ? e.objectId : "0")
+                replyTo: index > 0 ? e.objectId : "0"),
+            "replyTo": _post.author
           });
         },
       ));

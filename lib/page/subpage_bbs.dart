@@ -92,7 +92,9 @@ class _BBSSubpageState extends State<BBSSubpage>
         content: Material(
             color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
-              leading: PlatformX.isAndroid ? Icon(Icons.account_circle) : Icon(SFSymbols.person_crop_circle_fill),
+              leading: PlatformX.isAndroid
+                  ? Icon(Icons.account_circle)
+                  : Icon(SFSymbols.person_crop_circle_fill),
               title: Text(info.name),
               subtitle: Text(info.id),
             )),
@@ -126,7 +128,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
-    if (_loginUser == null) {
+    if (_loginUser == null || _loginUser.email != info.id) {
       _loginUser = await PostRepository.getInstance()
           .login(info)
           .catchError((e, _) => register(info));

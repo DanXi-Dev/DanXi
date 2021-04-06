@@ -36,6 +36,7 @@ class BBSEditorPage extends StatefulWidget {
 
 class BBSEditorPageState extends State<BBSEditorPage> {
   BBSPost _post;
+  String _replyTo;
 
   TextEditingController _controller = TextEditingController();
 
@@ -43,6 +44,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   void initState() {
     super.initState();
     _post = widget.arguments['post'];
+    _replyTo = widget.arguments['replyTo'];
   }
 
   @override
@@ -70,12 +72,12 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                           border: OutlineInputBorder(),
                           hintText: _post.replyTo == "0"
                               ? null
-                              : S.of(context).reply_to(_post.author)),
+                              : S.of(context).reply_to(_replyTo)),
                     ),
                     cupertino: (_, __) => CupertinoTextFieldData(
                         placeholder: _post.replyTo == "0"
                             ? null
-                            : S.of(context).reply_to(_post.author)),
+                            : S.of(context).reply_to(_replyTo)),
                     style: TextStyle(fontSize: 18),
                     expands: true,
                     textAlign: TextAlign.start,
