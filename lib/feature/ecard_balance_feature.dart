@@ -20,9 +20,11 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
 class EcardBalanceFeature extends Feature {
@@ -90,7 +92,7 @@ class EcardBalanceFeature extends Feature {
       );
 
   @override
-  Widget get icon => const Icon(Icons.account_balance_wallet);
+  Widget get icon => PlatformX.isAndroid ? const Icon(Icons.account_balance_wallet) : const Icon(SFSymbols.creditcard);
 
   void refreshData() {
     _status = ConnectionStatus.NONE;

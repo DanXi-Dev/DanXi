@@ -19,9 +19,11 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class BBSEditorPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -49,11 +51,11 @@ class BBSEditorPageState extends State<BBSEditorPage> {
         iosContentBottomPadding: true,
         iosContentPadding: true,
         appBar: PlatformAppBar(
-          title: Text("写点什么"),
+          title: Text(S.of(context).forum_post_enter_content),
           trailingActions: [
             PlatformIconButton(
                 padding: EdgeInsets.zero,
-                icon: Icon(Icons.send),
+                icon: PlatformX.isAndroid ? const Icon(Icons.send): const Icon(SFSymbols.paperplane),
                 onPressed: _sendDocument)
           ],
         ),

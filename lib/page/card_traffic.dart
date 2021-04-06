@@ -26,6 +26,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -116,7 +117,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
       widgets.add(Material(
           color: isCupertino(context) ? Colors.white : null,
           child: ListTile(
-            leading: Icon(Icons.timelapse),
+            leading: PlatformX.isAndroid ? const Icon(Icons.timelapse) : const Icon(SFSymbols.clock),
             title: Text(value.current.toString()),
             subtitle: Text(key),
           )));

@@ -19,11 +19,13 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -47,7 +49,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,
-            icon: Icon(Icons.reply),
+            icon: PlatformX.isAndroid ? const Icon(Icons.reply) : const Icon(SFSymbols.arrowshape_turn_up_left_fill),
             onPressed: () {
               Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
                 "post": BBSPost.newReply(_user.objectId, _post.objectId)

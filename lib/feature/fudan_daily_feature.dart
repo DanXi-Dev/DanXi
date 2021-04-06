@@ -20,10 +20,12 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
 class FudanDailyFeature extends Feature {
@@ -69,7 +71,7 @@ class FudanDailyFeature extends Feature {
   String get subTitle => _subTitle;
 
   @override
-  Widget get icon => const Icon(Icons.cloud_upload);
+  Widget get icon => PlatformX.isAndroid ? const Icon(Icons.cloud_upload) : const Icon(SFSymbols.arrow_up_doc);
 
   void _processForgetTickIssue() {
     showPlatformDialog(

@@ -20,10 +20,12 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginDialog extends StatefulWidget {
@@ -85,7 +87,7 @@ class _LoginDialogState extends State<LoginDialog> {
             material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
-                    icon: Icon(Icons.perm_identity))),
+                    icon: PlatformX.isAndroid ? Icon(Icons.perm_identity) : Icon(SFSymbols.person_crop_circle))),
             cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_uid),
             autofocus: true,
@@ -95,8 +97,8 @@ class _LoginDialogState extends State<LoginDialog> {
             material: (_, __) => MaterialTextFieldData(
               decoration: InputDecoration(
                   labelText: S.of(context).login_uis_pwd,
-                  icon: Icon(Icons.lock_outline)),
-            ),
+                  icon: PlatformX.isAndroid ? Icon(Icons.lock_outline) : Icon(SFSymbols.lock_circle),
+            )),
             cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_pwd),
             obscureText: true,
