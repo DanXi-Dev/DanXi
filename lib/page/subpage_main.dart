@@ -79,7 +79,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                   children: [
                     FeatureListItem(feature: WelcomeFeature()),
                     Divider(),
-                    FeatureListItem(feature: WlanFeature()),
+                    //FeatureListItem(feature: WlanFeature()),
                     FeatureListItem(feature: EcardBalanceFeature()),
                     ListTile(
                       leading: PlatformX.isAndroid ? const Icon(Icons.stacked_line_chart) : const Icon(SFSymbols.person_3_fill),

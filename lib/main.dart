@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonIconBuilders = [
-    (cxt) => PlatformX.isAndroid ? Icons.login : SFSymbols.person_crop_circle_badge_minus,
+    (cxt) => PlatformX.isAndroid ? Icons.login : SFSymbols.person_crop_circle,
     (cxt) => PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up
   ];

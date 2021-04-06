@@ -51,7 +51,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             padding: EdgeInsets.zero,
             icon: PlatformX.isAndroid
                 ? const Icon(Icons.reply)
-                : const Icon(SFSymbols.arrowshape_turn_up_left_fill),
+                : const Icon(SFSymbols.arrowshape_turn_up_left),
             onPressed: () {
               Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
                 "post": BBSPost.newReply(_user.objectId, _post.objectId)
