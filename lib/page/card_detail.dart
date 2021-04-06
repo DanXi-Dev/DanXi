@@ -83,7 +83,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                 });
                 await _cardInfo.loadRecords(_tagDays[index]);
                 setState(() {
-                  tag.checkedIcon = PlatformX.isAndroid ? (Icons.check) : const Icon(SFSymbols.checkmark);
+                  tag.checkedIcon = PlatformX.isAndroid ? Icons.check : SFSymbols.checkmark;
                   _selectable = true;
                 });
               }
