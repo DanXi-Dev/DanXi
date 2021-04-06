@@ -23,6 +23,8 @@ import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dio/dio.dart';
 
 class UISLoginTool {
+  static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
+
   static Future<Response> loginUIS(Dio dio, String serviceUrl,
       NonpersistentCookieJar jar, PersonInfo info) async {
     jar.deleteAll();
@@ -38,6 +40,12 @@ class UISLoginTool {
     res = await dio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    return await DioUtils.processRedirect(dio, res);
+    Response response = await DioUtils.processRedirect(dio, res);
+    if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
+      CaptchaNeededException().fire();
+    }
+    return response;
   }
 }
+
+class CaptchaNeededException implements Exception {}

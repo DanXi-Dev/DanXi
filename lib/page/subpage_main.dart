@@ -25,7 +25,7 @@ import 'package:dan_xi/main.dart' as main_qr;
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/util/ScreenProxy.dart';
+import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

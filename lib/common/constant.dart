@@ -20,6 +20,7 @@ import 'package:event_bus/event_bus.dart';
 class Constant {
   static const campusArea = ['邯郸校区', '枫林校区', '江湾校区', '张江校区'];
   static EventBus eventBus = EventBus();
+  static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
 
   static String yuanSymbol(String num) {
     if (num == null || num.trim().isEmpty) return "";

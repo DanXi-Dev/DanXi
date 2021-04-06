@@ -32,7 +32,10 @@ class LoginDialog extends StatefulWidget {
   final bool forceLogin;
 
   const LoginDialog(
-      {Key key, this.sharedPreferences, this.personInfo, this.forceLogin})
+      {Key key,
+      @required this.sharedPreferences,
+      @required this.personInfo,
+      @required this.forceLogin})
       : super(key: key);
 
   @override

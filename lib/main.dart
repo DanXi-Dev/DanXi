@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/common/Secret.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
@@ -32,9 +33,10 @@ import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
-import 'package:dan_xi/util/ScreenProxy.dart';
+import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:data_plugin/bmob/bmob.dart';
@@ -49,6 +51,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'generated/l10n.dart';
 
@@ -85,52 +88,50 @@ class DanxiApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return PlatformProvider(
-        // initialPlatform: TargetPlatform.iOS,
-        builder: (BuildContext context) => PlatformApp(
-          title: "DanXi",
-              cupertino: (_, __) => CupertinoAppData(
-                  theme: CupertinoThemeData(brightness: Brightness.light)),
-              material: (_, __) => MaterialAppData(
-                  theme: ThemeData(
-                    brightness: Brightness.light,
-                    primarySwatch: Colors.deepPurple,
+  Widget build(BuildContext context) => PlatformProvider(
+      // initialPlatform: TargetPlatform.iOS,
+      builder: (BuildContext context) => PlatformApp(
+            title: "DanXi",
+            cupertino: (_, __) => CupertinoAppData(
+                theme: CupertinoThemeData(brightness: Brightness.light)),
+            material: (_, __) => MaterialAppData(
+                theme: ThemeData(
+                  brightness: Brightness.light,
+                  primarySwatch: Colors.deepPurple,
+                ),
+                darkTheme: ThemeData(
+                  brightness: Brightness.dark,
+                  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                      selectedIconTheme: IconThemeData(color: Colors.white),
+                      unselectedIconTheme: IconThemeData(color: Colors.white),
+                      selectedItemColor: Colors.white,
+                      unselectedItemColor: Colors.white),
+                  textTheme: new TextTheme(
+                    bodyText2: new TextStyle(color: Colors.red),
+                    headline1: new TextStyle(fontSize: 78),
+                    button: new TextStyle(color: Colors.green),
                   ),
-                  darkTheme: ThemeData(
-                    brightness: Brightness.dark,
-                    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                        selectedIconTheme: IconThemeData(color: Colors.white),
-                        unselectedIconTheme: IconThemeData(color: Colors.white),
-                        selectedItemColor: Colors.white,
-                        unselectedItemColor: Colors.white),
-                    textTheme: new TextTheme(
-                      bodyText2: new TextStyle(color: Colors.red),
-                      headline1: new TextStyle(fontSize: 78),
-                      button: new TextStyle(color: Colors.green),
-                    ),
-                  )),
-              localizationsDelegates: [
-                S.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate
-              ],
-              supportedLocales: S.delegate.supportedLocales,
-              home: HomePage(),
-              onGenerateRoute: (settings) {
-                final Function pageContentBuilder = this.routes[settings.name];
-                if (pageContentBuilder != null) {
-                  return platformPageRoute(
-                      context: context,
-                      builder: (context) => pageContentBuilder(context,
-                          arguments: settings.arguments));
-                }
-                return null;
-              },
-              navigatorKey: Catcher.navigatorKey,
-            ));
-  }
+                )),
+            localizationsDelegates: [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            home: HomePage(),
+            onGenerateRoute: (settings) {
+              final Function pageContentBuilder = this.routes[settings.name];
+              if (pageContentBuilder != null) {
+                return platformPageRoute(
+                    context: context,
+                    builder: (context) => pageContentBuilder(context,
+                        arguments: settings.arguments));
+              }
+              return null;
+            },
+            navigatorKey: Catcher.navigatorKey,
+          ));
 }
 
 class HomePage extends StatefulWidget {
@@ -154,38 +155,35 @@ class QR {
     showPlatformDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) {
-          return PlatformAlertDialog(
-            title: Text(S.of(context).fudan_qr_code),
-            content: Container(
-                width: double.maxFinite,
-                height: 200.0,
-                child: Center(
-                    child: FutureBuilder<String>(
-                        future: QRCodeRepository.getInstance()
-                            .getQRCode(personInfo),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<String> snapshot) {
-                          return snapshot.hasData
-                              ? QrImage(
-                                  data: snapshot.data,
-                                  size: 200.0,
-                                  foregroundColor: Colors.black,
-                                  backgroundColor: Colors.white,
-                                )
-                              : Text(S.of(context).loading_qr_code);
-                        }))),
-            actions: <Widget>[
-              PlatformDialogAction(
-                  child: PlatformText(S.of(context).i_see),
-                  onPressed: () {
-                    ScreenProxy.setBrightness(brightness);
-                    ScreenProxy.keepOn(false);
-                    Navigator.pop(context);
-                  }),
-            ],
-          );
-        });
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: Text(S.of(context).fudan_qr_code),
+              content: Container(
+                  width: double.maxFinite,
+                  height: 200.0,
+                  child: Center(
+                      child: FutureBuilder<String>(
+                          future: QRCodeRepository.getInstance()
+                              .getQRCode(personInfo),
+                          builder: (BuildContext context,
+                                  AsyncSnapshot<String> snapshot) =>
+                              snapshot.hasData
+                                  ? QrImage(
+                                      data: snapshot.data,
+                                      size: 200.0,
+                                      foregroundColor: Colors.black,
+                                      backgroundColor: Colors.white,
+                                    )
+                                  : Text(S.of(context).loading_qr_code)))),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).i_see),
+                    onPressed: () {
+                      ScreenProxy.setBrightness(brightness);
+                      ScreenProxy.keepOn(false);
+                      Navigator.pop(context);
+                    }),
+              ],
+            ));
   }
 
   //watchOS Support
@@ -208,6 +206,12 @@ class _HomePageState extends State<HomePage> {
 
   /// Listener to connectivity changes.
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  /// Listener to the failure of logging in caused by necessary captcha.
+  ///
+  /// Request user to log in manually in the browser.
+  StreamSubscription<CaptchaNeededException> _captchaSubscription;
+  bool _isDialogShown = false;
 
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
@@ -246,7 +250,37 @@ class _HomePageState extends State<HomePage> {
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
         .listen((_) => _loadNetworkState());
-
+    _captchaSubscription =
+        Constant.eventBus.on<CaptchaNeededException>().listen((_) {
+      // Deal with login issue at [CaptchaNeededException].
+      if (!_isDialogShown) {
+        _isDialogShown = true;
+        showPlatformDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (_) => PlatformAlertDialog(
+                  title: Text(S.of(context).fatal_error),
+                  content: Text(S.of(context).login_issue_1),
+                  actions: [
+                    PlatformDialogAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () {
+                        _isDialogShown = false;
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    PlatformDialogAction(
+                      child: Text(S.of(context).login_issue_1_action),
+                      onPressed: () {
+                        _isDialogShown = false;
+                        Navigator.of(context).pop();
+                        launch(Constant.UIS_URL);
+                      },
+                    ),
+                  ],
+                ));
+      }
+    });
     _loadOrInitSharedPreference().then((_) {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)

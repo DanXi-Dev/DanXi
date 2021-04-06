@@ -205,6 +205,26 @@ class S {
     );
   }
 
+  /// `Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually.`
+  String get login_issue_1 {
+    return Intl.message(
+      'Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually.',
+      name: 'login_issue_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Goto UIS`
+  String get login_issue_1_action {
+    return Intl.message(
+      'Goto UIS',
+      name: 'login_issue_1_action',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `OK`
   String get i_see {
     return Intl.message(

@@ -15,10 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
 
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class ScreenProxy {
