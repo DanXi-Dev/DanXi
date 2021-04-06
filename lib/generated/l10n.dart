@@ -345,6 +345,16 @@ class S {
     );
   }
 
+  /// `Post`
+  String get forum_post_enter_content {
+    return Intl.message(
+      'Post',
+      name: 'forum_post_enter_content',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Last 7 days`
   String get last_7_days {
     return Intl.message(

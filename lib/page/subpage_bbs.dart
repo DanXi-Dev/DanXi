@@ -33,6 +33,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
 class BBSSubpage extends PlatformSubpage {
@@ -91,7 +92,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         content: Material(
             color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: PlatformX.isAndroid ? Icon(Icons.account_circle) : Icon(SFSymbols.person_crop_circle_fill),
               title: Text(info.name),
               subtitle: Text(info.id),
             )),

@@ -30,6 +30,7 @@
     "change_account":"Switch Account",
     "loading_qr_code":"Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers.",
     "tap_to_view": "Tap to view",
+    "forum_post_enter_content": "Post",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",

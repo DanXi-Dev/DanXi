@@ -45,6 +45,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -220,9 +221,9 @@ class _HomePageState extends State<HomePage> {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonIconBuilders = [
-    (cxt) => Icons.login,
-    (cxt) => PlatformIcons(cxt).add,
-    (cxt) => Icons.share
+    (cxt) => PlatformX.isAndroid ? Icons.login : SFSymbols.person_crop_circle_badge_minus,
+    (cxt) => PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
+    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
@@ -393,17 +394,17 @@ class _HomePageState extends State<HomePage> {
               items: [
                 BottomNavigationBarItem(
                   backgroundColor: Colors.purple,
-                  icon: Icon(Icons.dashboard),
+                  icon: PlatformX.isAndroid ? Icon(Icons.dashboard) : Icon(SFSymbols.square_stack_3d_up_fill),
                   label: S.of(context).dashboard,
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.indigo,
-                  icon: Icon(Icons.forum),
+                  icon: PlatformX.isAndroid ? Icon(Icons.forum) : Icon(SFSymbols.text_bubble),
                   label: S.of(context).forum,
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.blue,
-                  icon: Icon(Icons.calendar_today),
+                  icon: PlatformX.isAndroid ? Icon(Icons.calendar_today) : Icon(SFSymbols.calendar),
                   label: S.of(context).timetable,
                 ),
               ],

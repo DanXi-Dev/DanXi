@@ -23,6 +23,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AAONoticesList extends StatefulWidget {
@@ -95,7 +96,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
       widgets.add(Material(
           color: isCupertino(context) ? Colors.white : null,
           child: ListTile(
-            leading: Icon(Icons.info),
+            leading: PlatformX.isAndroid ? Icon(Icons.info) : Icon(SFSymbols.info_circle_fill),
             title: Text(value.title),
             subtitle: Text(value.time),
             onTap: () => launch(value.url),

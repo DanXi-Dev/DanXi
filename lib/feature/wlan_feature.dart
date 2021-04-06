@@ -17,8 +17,10 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
 class WlanFeature extends Feature {
@@ -36,5 +38,5 @@ class WlanFeature extends Feature {
   String get subTitle => _connectStatus;
 
   @override
-  Widget get icon => const Icon(Icons.wifi);
+  Widget get icon => PlatformX.isAndroid ? const Icon(Icons.wifi) : const Icon(SFSymbols.wifi);
 }

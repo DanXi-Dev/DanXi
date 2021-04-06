@@ -21,10 +21,12 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
 class FudanAAONoticesFeature extends Feature {
@@ -55,7 +57,7 @@ class FudanAAONoticesFeature extends Feature {
       _initialData == null ? S.of(context).loading : _initialData.first.title;
 
   @override
-  Widget get icon => const Icon(Icons.developer_board);
+  Widget get icon => PlatformX.isAndroid ? Icon(Icons.developer_board) : Icon(SFSymbols.info_circle);
 
   @override
   void onTap() {

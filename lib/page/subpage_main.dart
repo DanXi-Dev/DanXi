@@ -26,10 +26,12 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/ScreenProxy.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class HomeSubpage extends PlatformSubpage {
   @override
@@ -80,7 +82,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                     FeatureListItem(feature: WlanFeature()),
                     FeatureListItem(feature: EcardBalanceFeature()),
                     ListTile(
-                      leading: Icon(Icons.stacked_line_chart),
+                      leading: PlatformX.isAndroid ? const Icon(Icons.stacked_line_chart) : const Icon(SFSymbols.person_3_fill),
                       title: Text(S.of(context).dining_hall_crowdedness),
                       onTap: () {
                         Navigator.of(context).pushNamed("/card/crowdData",
@@ -94,7 +96,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                 Card(
                   child: ListTile(
                     title: Text(S.of(context).fudan_qr_code),
-                    leading: const Icon(Icons.qr_code),
+                    leading: PlatformX.isAndroid ? const Icon(Icons.qr_code) : const Icon(SFSymbols.qrcode),
                     subtitle: Text(S.of(context).tap_to_view),
                     onTap: () {
                       main_qr.QR.showQRCode(context, info, _brightness);
