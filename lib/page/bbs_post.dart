@@ -136,7 +136,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
             "post": BBSPost.newReply(_user.objectId, _post.objectId,
                 replyTo: index > 0 ? e.objectId : "0"),
-            "replyTo": _post.author
+            "replyTo": e.author
           });
         },
       ));
