@@ -20,6 +20,11 @@ version: 0.1.0+1
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
+fonts:
+  - family: sficonsets
+    fonts:
+      - asset: packages/flutter_sfsymbols/fonts/sficonsets.ttf
+
 dependencies:
   flutter:
     sdk: flutter
@@ -57,6 +62,7 @@ dependencies:
   share: ^2.0.1
   path_provider: ^1.6.28
   screen: ^0.0.5
+  flutter_sfsymbols: ^1.0.0
 
   #TODO: ical breaks the dependency relation
   ical: ^0.1.3
