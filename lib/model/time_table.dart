@@ -85,6 +85,11 @@ class TimeTable {
 
   Map<String, dynamic> toJson() => _$TimeTableToJson(this);
 
+  TimeNow now() {
+    var diff = DateTime.now().difference(startTime);
+    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7);
+  }
+
   Map<int, List<Event>> toWeekCourses(int week) {
     Map<int, List<Event>> table = Map();
     for (int i = 0; i < 7; i++) table[i] = [];
@@ -203,4 +208,11 @@ class CourseTime {
       _$CourseTimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseTimeToJson(this);
+}
+
+class TimeNow {
+  //First week is 1, Monday is 0
+  int week, weekday;
+
+  TimeNow(this.week, this.weekday);
 }

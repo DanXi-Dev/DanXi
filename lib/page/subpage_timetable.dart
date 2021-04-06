@@ -25,6 +25,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -48,6 +49,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   static StreamSubscription _shareSubscription;
   Map<String, TimetableConverter> converters;
   TimeTable _table;
+  TimeNow _showingTime;
+  static final START_TIME = DateTime(2021, 3, 1);
 
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
@@ -128,16 +131,22 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         builder: (_, AsyncSnapshot<TimeTable> snapshot) {
           if (snapshot.hasData) {
             _table = snapshot.data;
+            _showingTime = _table.now();
             return TimetableView(
-              laneEventsList: _table.toLaneEvents(1, style),
+              laneEventsList: _table.toLaneEvents(_showingTime.week, style),
               timetableStyle: style,
             );
           } else {
-            return Container();
+            return Container(
+              child: Center(
+                child: Text(S.of(context).loading),
+              ),
+            );
           }
         },
-        future: TimeTableRepository.getInstance()
-            .loadTimeTableLocally(info, startTime: DateTime(2021, 3, 1)));
+        future: Retrier.runAsyncWithRetry(() =>
+            TimeTableRepository.getInstance()
+                .loadTimeTableLocally(info, startTime: START_TIME)));
   }
 
   @override

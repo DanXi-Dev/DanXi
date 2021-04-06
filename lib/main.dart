@@ -89,9 +89,11 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
+        // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => PlatformApp(
-              title: "DanXi",
+          title: "DanXi",
+              cupertino: (_, __) => CupertinoAppData(
+                  theme: CupertinoThemeData(brightness: Brightness.light)),
               material: (_, __) => MaterialAppData(
                   theme: ThemeData(
                     brightness: Brightness.light,
@@ -109,7 +111,6 @@ class DanxiApp extends StatelessWidget {
                       headline1: new TextStyle(fontSize: 78),
                       button: new TextStyle(color: Colors.green),
                     ),
-                    
                   )),
               localizationsDelegates: [
                 S.delegate,
@@ -172,7 +173,8 @@ class QR {
                                   data: snapshot.data,
                                   size: 200.0,
                                   foregroundColor: Colors.black,
-                                  backgroundColor: Colors.white,)
+                                  backgroundColor: Colors.white,
+                                )
                               : Text(S.of(context).loading_qr_code);
                         }))),
             actions: <Widget>[
@@ -187,11 +189,12 @@ class QR {
           );
         });
   }
+
   //watchOS Support
   static const channel = const MethodChannel('watchQRValue');
+
   static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
-    String qr = await QRCodeRepository.getInstance()
-        .getQRCode(personInfo);
+    String qr = await QRCodeRepository.getInstance().getQRCode(personInfo);
 
     channel.invokeMethod("sendStringToNative", qr.toString());
   }
@@ -270,7 +273,7 @@ class _HomePageState extends State<HomePage> {
     const channel_a = const MethodChannel('watchAppActivated');
     channel_a.setMethodCallHandler((MethodCall call) async {
       print("received method call\n\n");
-      if(call.method == 'watchActivated') {
+      if (call.method == 'watchActivated') {
         QR.sendQRtoWatch(_personInfo.value);
       }
     });
