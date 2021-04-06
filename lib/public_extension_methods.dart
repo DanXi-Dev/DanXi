@@ -19,6 +19,15 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:flutter/widgets.dart';
 
 extension StringEx on String {
+  /// Get the sub string between [a] and [b].
+  ///
+  /// e.g.
+  /// "I love flutter".between("l","t") == "ove flu"
+  ///
+  /// If [headGreedy] is false, it will return the longest matched part.
+  ///
+  /// e.g.
+  /// "I love flutter".between("l","t",headGreedy = false) == "ove flut"
   String between(String a, String b, {bool headGreedy = true}) {
     if (indexOf(a) < 0) return null;
     if (headGreedy) {
@@ -34,12 +43,14 @@ extension StringEx on String {
 }
 
 extension ObjectEx on dynamic {
+  /// Send the object itself as an event to [Constant.eventBus].
   void fire() {
     Constant.eventBus.fire(this);
   }
 }
 
 extension StateEx on State {
+  /// Call [setState] to perform a global redrawing of the widget.
   void refreshSelf() {
     // ignore: invalid_use_of_protected_member
     setState(() {});
@@ -47,6 +58,7 @@ extension StateEx on State {
 }
 
 extension MapEx on Map {
+  /// Encode a map as a url query string.
   String encodeMap() {
     return keys.map((key) {
       var k = key.toString();

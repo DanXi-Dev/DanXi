@@ -48,6 +48,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   static StreamSubscription _shareSubscription;
   Map<String, TimetableConverter> converters;
   TimeTable _table;
+  TimeNow _showingTime;
+  static final START_TIME = DateTime(2021, 3, 1);
 
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
@@ -128,8 +130,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         builder: (_, AsyncSnapshot<TimeTable> snapshot) {
           if (snapshot.hasData) {
             _table = snapshot.data;
+            _showingTime = _table.now();
             return TimetableView(
-              laneEventsList: _table.toLaneEvents(1, style),
+              laneEventsList: _table.toLaneEvents(_showingTime.week, style),
               timetableStyle: style,
             );
           } else {
@@ -137,7 +140,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           }
         },
         future: TimeTableRepository.getInstance()
-            .loadTimeTableLocally(info, startTime: DateTime(2021, 3, 1)));
+            .loadTimeTableLocally(info, startTime: START_TIME));
   }
 
   @override
