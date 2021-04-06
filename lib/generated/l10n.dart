@@ -155,10 +155,10 @@ class S {
     );
   }
 
-  /// `AAO Notices`
+  /// `Academic Announcements`
   String get fudan_aao_notices {
     return Intl.message(
-      'AAO Notices',
+      'Academic Announcements',
       name: 'fudan_aao_notices',
       desc: '',
       args: [],
