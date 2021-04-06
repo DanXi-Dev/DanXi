@@ -32,19 +32,15 @@ class FudanDailyFeature extends Feature {
   String _subTitle;
   bool _hasTicked;
 
-  void _loadTickStatus() {
+  Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
 
-    FudanDailyRepository.getInstance().hasTick(_info).then((bool value) {
+    await FudanDailyRepository.getInstance().hasTick(_info).then((bool value) {
       _status = ConnectionStatus.DONE;
       _subTitle = value
           ? S.of(context).fudan_daily_ticked
           : S.of(context).fudan_daily_tick;
       _hasTicked = value;
-      notifyUpdate();
-    }, onError: (error) {
-      _status = ConnectionStatus.FAILED;
-      _subTitle = S.of(context).failed;
       notifyUpdate();
     });
   }
@@ -58,7 +54,11 @@ class FudanDailyFeature extends Feature {
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
       _subTitle = S.of(context).loading;
-      _loadTickStatus();
+      _loadTickStatus().catchError((error) {
+        _status = ConnectionStatus.FAILED;
+        _subTitle = S.of(context).failed;
+        notifyUpdate();
+      });
     }
   }
 

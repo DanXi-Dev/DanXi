@@ -31,13 +31,12 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/qr_code_repository.dart';
 import 'package:dan_xi/util/ScreenProxy.dart';
 import 'package:dan_xi/util/fdu_wifi_detection.dart';
-import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
+import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -46,7 +45,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -287,82 +285,14 @@ class _HomePageState extends State<HomePage> {
     _brightness = await ScreenProxy.brightness;
   }
 
-  /// Attempt to log in for verification.
-  Future<void> _tryLogin(String id, String password) async {
-    if (id.length * password.length == 0) {
-      return;
-    }
-    var progressDialog = showProgressDialog(
-        loadingText: S.of(context).logining, context: context);
-    PersonInfo newInfo = PersonInfo.createNewInfo(id, password);
-    await CardRepository.getInstance().login(newInfo).then((_) async {
-      newInfo.name = await CardRepository.getInstance().getName();
-      await newInfo.saveAsSharedPreferences(_preferences);
-      setState(() => _personInfo.value = newInfo);
-      progressDialog.dismiss();
-      Navigator.of(context).pop();
-    }, onError: (e) => {progressDialog.dismiss(), throw e});
-  }
-
   /// Pop up a dialog where user can give his name & password.
-  void _showLoginDialog({bool forceLogin = false}) {
-    TextEditingController nameController = new TextEditingController();
-    TextEditingController pwdController = new TextEditingController();
-    showPlatformDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return PlatformAlertDialog(
-            title: Text(S.of(context).login_uis),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PlatformTextField(
-                  controller: nameController,
-                  keyboardType: TextInputType.number,
-                  material: (_, __) => MaterialTextFieldData(
-                      decoration: InputDecoration(
-                          labelText: S.of(context).login_uis_uid,
-                          icon: Icon(Icons.perm_identity))),
-                  cupertino: (_, __) => CupertinoTextFieldData(
-                      placeholder: S.of(context).login_uis_uid),
-                  autofocus: true,
-                ),
-                PlatformTextField(
-                  controller: pwdController,
-                  material: (_, __) => MaterialTextFieldData(
-                    decoration: InputDecoration(
-                        labelText: S.of(context).login_uis_pwd,
-                        icon: Icon(Icons.lock_outline)),
-                  ),
-                  cupertino: (_, __) => CupertinoTextFieldData(
-                      placeholder: S.of(context).login_uis_pwd),
-                  obscureText: true,
-                  onSubmitted: (_) =>
-                      _tryLogin(nameController.text, pwdController.text),
-                )
-              ],
-            ),
-            actions: [
-              PlatformDialogAction(
-                child: Text(S.of(context).cancel),
-                onPressed: () {
-                  if (forceLogin) {
-                    Navigator.of(context).pop();
-                  } else {
-                    FlutterApp.exitApp();
-                  }
-                },
-              ),
-              PlatformDialogAction(
-                child: Text(S.of(context).login),
-                onPressed: () =>
-                    _tryLogin(nameController.text, pwdController.text),
-              )
-            ],
-          );
-        });
-  }
+  void _showLoginDialog({bool forceLogin = false}) => showPlatformDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => LoginDialog(
+          sharedPreferences: _preferences,
+          personInfo: _personInfo,
+          forceLogin: forceLogin));
 
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
   ///

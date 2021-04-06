@@ -504,6 +504,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Login failed. Check your ID and/or password.`
+  String get login_failed {
+    return Intl.message(
+      'Login failed. Check your ID and/or password.',
+      name: 'login_failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

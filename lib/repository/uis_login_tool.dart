@@ -16,9 +16,10 @@
  */
 
 import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/dio_utils.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dio/dio.dart';
 
 class UISLoginTool {
@@ -35,7 +36,7 @@ class UISLoginTool {
     data['username'] = info.id;
     data["password"] = info.password;
     res = await dio.post(serviceUrl,
-        data: data.entries.map((p) => '${p.key}=${p.value}').join('&'),
+        data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     return await DioUtils.processRedirect(dio, res);
   }

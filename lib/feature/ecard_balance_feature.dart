@@ -20,7 +20,6 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
-import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -32,13 +31,18 @@ class EcardBalanceFeature extends Feature {
   CardInfo _cardInfo;
   CardRecord _lastTransaction;
 
-  void _loadCard(PersonInfo info) async {
+  /// Status of the request.
+  ConnectionStatus _status = ConnectionStatus.NONE;
+
+  Future<void> _loadCard(PersonInfo info) async {
+    _status = ConnectionStatus.CONNECTING;
     await CardRepository.getInstance().login(info);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(1);
     _balance = _cardInfo.cash;
 
     if (_cardInfo.records.isNotEmpty)
       _lastTransaction = _cardInfo.records.first;
+    _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
 
@@ -49,9 +53,12 @@ class EcardBalanceFeature extends Feature {
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_cardInfo == null) {
+    if (_status == ConnectionStatus.NONE) {
       _balance = "";
-      _loadCard(_info);
+      _loadCard(_info).catchError((error) {
+        _status = ConnectionStatus.FAILED;
+        notifyUpdate();
+      });
     }
   }
 
@@ -59,9 +66,19 @@ class EcardBalanceFeature extends Feature {
   String get mainTitle => S.of(context).ecard_balance;
 
   @override
-  String get subTitle => _balance.isEmpty
-      ? S.of(context).loading
-      : Constant.yuanSymbol(_lastTransaction?.payment);
+  String get subTitle {
+    switch (_status) {
+      case ConnectionStatus.NONE:
+      case ConnectionStatus.CONNECTING:
+        return S.of(context).loading;
+      case ConnectionStatus.DONE:
+        return Constant.yuanSymbol(_lastTransaction?.payment);
+      case ConnectionStatus.FAILED:
+      case ConnectionStatus.FATAL_ERROR:
+        return S.of(context).failed;
+    }
+    return '';
+  }
 
   @override
   String get tertiaryTitle => _lastTransaction?.location;
@@ -75,11 +92,18 @@ class EcardBalanceFeature extends Feature {
   @override
   Widget get icon => const Icon(Icons.account_balance_wallet);
 
+  void refreshData() {
+    _status = ConnectionStatus.NONE;
+    notifyUpdate();
+  }
+
   @override
   void onTap() {
     if (_cardInfo != null) {
       Navigator.of(context).pushNamed("/card/detail",
           arguments: {"cardInfo": _cardInfo, "personInfo": _info});
+    } else {
+      refreshData();
     }
   }
 

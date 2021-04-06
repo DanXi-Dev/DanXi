@@ -22,7 +22,7 @@ class Constant {
   static EventBus eventBus = EventBus();
 
   static String yuanSymbol(String num) {
-    if (num == null || num.trim().isEmpty) return num;
+    if (num == null || num.trim().isEmpty) return "";
     return '\u00A5' + num;
   }
 }

@@ -68,6 +68,7 @@ class CardRepository extends BaseRepositoryWithDio {
       try {
         await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info);
       } catch (e) {
+        // Ignore the error. Any error will be rethrown as [LoginException] below.
         print(e);
       }
       if (!_testLoginSuccess()) {

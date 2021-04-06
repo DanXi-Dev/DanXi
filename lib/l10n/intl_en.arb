@@ -48,5 +48,7 @@
     "good_night":"Goodnight stars, goodnight air, goodnight noises everywhere.",
     "late_night":"The dead of midnight is the noon of thought.",
 
-    "share_as_ics":"Export as ICS"
+    "share_as_ics":"Export as ICS",
+
+    "login_failed":"Login failed. Check your ID and/or password."
 }
