@@ -31,6 +31,7 @@
     "loading_qr_code":"加载复活码中...\n可能需要5~10秒，取决于复旦服务器。",
     "tap_to_view":"点击以查看",
     "forum_post_enter_content": "发布",
+    "last_transaction": "上次交易：",
 
     "last_7_days":"过去 7 天",
     "last_15_days":"过去 15 天",

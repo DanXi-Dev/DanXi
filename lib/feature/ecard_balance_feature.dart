@@ -74,7 +74,7 @@ class EcardBalanceFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
       case ConnectionStatus.DONE:
-        return Constant.yuanSymbol(_lastTransaction?.payment);
+        return S.of(context).last_transaction + Constant.yuanSymbol(_lastTransaction?.payment) + " " + _lastTransaction?.location;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context).failed;
@@ -82,8 +82,8 @@ class EcardBalanceFeature extends Feature {
     return '';
   }
 
-  @override
-  String get tertiaryTitle => _lastTransaction?.location;
+  //@override
+  //String get tertiaryTitle => _lastTransaction?.location;
 
   @override
   Widget get trailing => Text(

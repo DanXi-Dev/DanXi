@@ -355,6 +355,16 @@ class S {
     );
   }
 
+  /// `Last Transaction: `
+  String get last_transaction {
+    return Intl.message(
+      'Last Transaction: ',
+      name: 'last_transaction',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Last 7 days`
   String get last_7_days {
     return Intl.message(

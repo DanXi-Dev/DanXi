@@ -53,6 +53,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_15_days" : MessageLookupByLibrary.simpleMessage("Last 15 days"),
     "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
     "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
+    "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction: "),
     "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
     "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
