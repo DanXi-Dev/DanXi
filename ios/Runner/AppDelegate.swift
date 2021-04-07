@@ -9,6 +9,7 @@ import WatchConnectivity
         
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "watchAppActivated",
                 binaryMessenger: controller.binaryMessenger)
