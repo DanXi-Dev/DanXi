@@ -45,33 +45,32 @@ class DiningHallCrowdednessFeature extends Feature {
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;
-        //TODO: Show the message?
       }
     });
 
     //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
-      var crowdednessSum = List<int>.filled(3, 0);
+      var crowdedness_sum = List<int>.filled(5, 0);
       _trafficInfos.forEach((key, value) {
-        if (value.current != 0) {
-          //Ignore zero entries
-          key = key.split('\n')[0]; //TODO: Is this needed?
-          switch (key) {
+        if(value.current != 0) { //Ignore zero entries
+          key = key.split('\n')[0];
+          switch(key) {
             case '北区':
-              crowdednessSum[0] += value.current;
+              crowdedness_sum[0] += value.current;
               break;
             case '南区':
-              crowdednessSum[1] += value.current;
+              crowdedness_sum[1] += value.current;
+              //TODO: Seperate 南苑
               break;
             case '旦苑':
-              crowdednessSum[2] += value.current;
+              crowdedness_sum[2] += value.current;
               break;
           }
         }
       });
-      var crowdedness_min =
-          min(crowdednessSum[0], min(crowdednessSum[1], crowdednessSum[2]));
-      switch (crowdednessSum.indexOf(crowdedness_min)) {
+      var crowdedness_min = min(crowdedness_sum[0], min(crowdedness_sum[1], crowdedness_sum[2]));
+      //TODO: Display crowdedness_max
+      switch(crowdedness_sum.indexOf(crowdedness_min)) {
         case 0:
           _leastCrowdedCanteen = '北区';
           break;
