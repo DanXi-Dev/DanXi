@@ -125,10 +125,10 @@ class S {
     );
   }
 
-  /// `The least crowded canteen is `
+  /// `Currently, the least crowded canteen is `
   String get least_crowded_canteen_is {
     return Intl.message(
-      'The least crowded canteen is ',
+      'Currently, the least crowded canteen is ',
       name: 'least_crowded_canteen_is',
       desc: '',
       args: [],
@@ -235,10 +235,10 @@ class S {
     );
   }
 
-  /// `Goto UIS`
+  /// `Open UIS Login Page`
   String get login_issue_1_action {
     return Intl.message(
-      'Goto UIS',
+      'Open UIS Login Page',
       name: 'login_issue_1_action',
       desc: '',
       args: [],
@@ -445,10 +445,10 @@ class S {
     );
   }
 
-  /// `Forum`
+  /// `The "Hole"`
   String get forum {
     return Intl.message(
-      'Forum',
+      'The "Hole"',
       name: 'forum',
       desc: '',
       args: [],
@@ -485,10 +485,10 @@ class S {
     );
   }
 
-  /// `Sign in as:`
+  /// `Sign in anonymously as:`
   String get login_with_uis {
     return Intl.message(
-      'Sign in as:',
+      'Sign in anonymously as:',
       name: 'login_with_uis',
       desc: '',
       args: [],
