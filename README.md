@@ -17,6 +17,11 @@
 (复旦于2021年元旦前后大批量修改了API接口，导致某些功能失效，正在逐个修复中)  
 目前这款应用仍处于最初的开发阶段,欢迎各位大佬加入开发~
 
+## 我们需要赞助！
+由于开发团队没有能力支持高额的 Apple Developer Program 费用（发布应用至App Store和TestFlight所必需），我们正在寻找赞助。
+
+有意者可联系zhaoxingjian@outlook.com
+
 # 安装
 注意：本应用仍处于早期开发阶段，也许会有不可预料的 Bug 发生。  
 如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/w568w/DanXi/compare)。
