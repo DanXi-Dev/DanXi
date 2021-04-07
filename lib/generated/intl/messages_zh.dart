@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "app_name" : MessageLookupByLibrary.simpleMessage("旦兮 α"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
+    "canteen" : MessageLookupByLibrary.simpleMessage("餐厅"),
     "change_account" : MessageLookupByLibrary.simpleMessage("切换账号"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("当前连接"),
@@ -55,6 +56,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_7_days" : MessageLookupByLibrary.simpleMessage("过去 7 天"),
     "last_transaction" : MessageLookupByLibrary.simpleMessage("上次交易："),
     "late_night" : MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
+    "least_crowded_canteen_is" : MessageLookupByLibrary.simpleMessage("人最少的餐厅是"),
     "loading" : MessageLookupByLibrary.simpleMessage("获取中..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("加载复活码中...\n可能需要5~10秒，取决于复旦服务器。"),
     "login" : MessageLookupByLibrary.simpleMessage("登录"),

@@ -125,6 +125,26 @@ class S {
     );
   }
 
+  /// `The least crowded canteen is `
+  String get least_crowded_canteen_is {
+    return Intl.message(
+      'The least crowded canteen is ',
+      name: 'least_crowded_canteen_is',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `食堂`
+  String get canteen {
+    return Intl.message(
+      '食堂',
+      name: 'canteen',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `COVID-19 Safety Check-In`
   String get fudan_daily {
     return Intl.message(

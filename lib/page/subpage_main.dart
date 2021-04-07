@@ -16,10 +16,11 @@
  */
 
 import 'package:dan_xi/feature/aao_notice_feature.dart';
+import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
-import 'package:dan_xi/feature/wlan_feature.dart';
+//import 'package:dan_xi/feature/wlan_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/main.dart' as main_qr;
 import 'package:dan_xi/model/person.dart';
@@ -81,14 +82,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                     Divider(),
                     //FeatureListItem(feature: WlanFeature()),
                     FeatureListItem(feature: EcardBalanceFeature()),
-                    ListTile(
-                      leading: PlatformX.isAndroid ? const Icon(Icons.stacked_line_chart) : const Icon(SFSymbols.person_3_fill),
-                      title: Text(S.of(context).dining_hall_crowdedness),
-                      onTap: () {
-                        Navigator.of(context).pushNamed("/card/crowdData",
-                            arguments: {"personInfo": info});
-                      },
-                    ),
+                    FeatureListItem(feature: DiningHallCrowdednessFeature()),
                     FeatureListItem(feature: FudanAAONoticesFeature())
                   ],
                 )),

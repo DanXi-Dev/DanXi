@@ -61,7 +61,20 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(S.of(context).out_of_dining_time)));
         } else if (PlatformX.isIOS) {
-          //TODO
+          showPlatformDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => PlatformAlertDialog(
+                content: Text(S.of(context).out_of_dining_time),
+                actions: <Widget>[
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).i_see),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        //TODO: Return to previous level menu?
+                      }),
+                ],
+              ));
         }
       }
     });

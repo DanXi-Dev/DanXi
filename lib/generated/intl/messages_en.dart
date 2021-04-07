@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
+    "canteen" : MessageLookupByLibrary.simpleMessage("食堂"),
     "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
@@ -55,6 +56,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
     "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction: "),
     "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
+    "least_crowded_canteen_is" : MessageLookupByLibrary.simpleMessage("The least crowded canteen is "),
     "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
     "login" : MessageLookupByLibrary.simpleMessage("Login"),
