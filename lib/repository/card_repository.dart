@@ -126,7 +126,8 @@ class CardRepository extends BaseRepositoryWithDio {
     CodeTimer.tick(info: "csrfId got.");
     //Build the request body.
     var end = new DateTime.now();
-    var start = end.add(Duration(days: -logDays));
+    int backDays = logDays == 0 ? 30 : logDays;
+    var start = end.add(Duration(days: -backDays));
     var formatter = new DateFormat('yyyy-MM-dd');
     var data = {
       "aaxmlrequest": "true",
