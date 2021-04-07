@@ -70,8 +70,8 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                   PlatformDialogAction(
                       child: PlatformText(S.of(context).i_see),
                       onPressed: () {
-                        Navigator.pop(context);
-                        //TODO: Return to previous level menu?
+                        Navigator.pop(context); //Close Dialog
+                        Navigator.pop(context); //Return to previous level
                       }),
                 ],
               ));

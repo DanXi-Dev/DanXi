@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "回复 ${name}";
 
-  static m1(name) => "欢迎你，${name}!";
+  static m1(name) => "欢迎你，${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -58,7 +58,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "late_night" : MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
     "least_crowded_canteen_is" : MessageLookupByLibrary.simpleMessage("当前用餐人数最少的餐厅是"),
     "loading" : MessageLookupByLibrary.simpleMessage("获取中..."),
-    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("加载复活码中...\n可能需要5~10秒，取决于复旦服务器。"),
+    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("正在加载复活码...\n可能需要5~10秒，取决于复旦服务器。"),
     "login" : MessageLookupByLibrary.simpleMessage("登录"),
     "login_failed" : MessageLookupByLibrary.simpleMessage("登陆失败，请检查账号和密码"),
     "login_issue_1" : MessageLookupByLibrary.simpleMessage("登录失败，旦兮无法完成 UIS 登录。\n出现此错误，很可能是由于您连续多次登录失败所致。\n您需要使用浏览器手动完成一次登录，从下一次登录开始，旦兮 即可妥善处理此情况。"),
@@ -75,8 +75,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("导出为ICS"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),
     "tick_failed" : MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接"),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，旦兮无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
-    "ticking" : MessageLookupByLibrary.simpleMessage("打卡中..."),
+    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
+    "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
     "welcome" : m1
   };
