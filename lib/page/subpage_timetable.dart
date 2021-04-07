@@ -50,7 +50,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Map<String, TimetableConverter> converters;
   TimeTable _table;
   TimeNow _showingTime;
-  static final START_TIME = DateTime(2021, 3, 1);
+  static final START_TIME = DateTime(2021, 3, 1); //TODO: Make this thing dynamic
 
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
@@ -124,9 +124,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     TimetableStyle style = TimetableStyle(
         startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
         laneHeight: 30,
-        laneWidth: 80,
-        timeItemWidth: 50,
-        timeItemHeight: 160);
+        laneWidth: 70,
+        timeItemWidth: 40,
+        timeItemHeight: 120);
     return FutureBuilder(
         builder: (_, AsyncSnapshot<TimeTable> snapshot) {
           if (snapshot.hasData) {
