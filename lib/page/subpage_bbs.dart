@@ -142,9 +142,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     return RefreshIndicator(
         color: Colors.deepPurple,
-        onRefresh: () async {
-          refreshSelf();
-        },
+        onRefresh: () async => refreshSelf(),
         child: FutureBuilder(
             builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) =>
                 snapshot.hasData
@@ -153,6 +151,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             controller: _controller,
                             interactive: PlatformX.isDesktop,
                             child: ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
                                 controller: _controller,
                                 children: snapshot.data
                                     .map((e) => _getListItem(e))
@@ -160,6 +159,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         cupertino: (_, __) => CupertinoScrollbar(
                             controller: _controller,
                             child: ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
                                 controller: _controller,
                                 children: snapshot.data
                                     .map((e) => _getListItem(e))

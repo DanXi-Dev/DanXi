@@ -51,25 +51,27 @@ class DiningHallCrowdednessFeature extends Feature {
 
     //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
-      var crowdedness_sum = List<int>.filled(3, 0);
+      var crowdednessSum = List<int>.filled(3, 0);
       _trafficInfos.forEach((key, value) {
-        if(value.current != 0) { //Ignore zero entries
+        if (value.current != 0) {
+          //Ignore zero entries
           key = key.split('\n')[0]; //TODO: Is this needed?
-          switch(key) {
+          switch (key) {
             case '北区':
-              crowdedness_sum[0] += value.current;
+              crowdednessSum[0] += value.current;
               break;
             case '南区':
-              crowdedness_sum[1] += value.current;
+              crowdednessSum[1] += value.current;
               break;
             case '旦苑':
-              crowdedness_sum[2] += value.current;
+              crowdednessSum[2] += value.current;
               break;
           }
         }
       });
-      var crowdedness_min = min(crowdedness_sum[0], min(crowdedness_sum[1], crowdedness_sum[2]));
-      switch(crowdedness_sum.indexOf(crowdedness_min)) {
+      var crowdedness_min =
+          min(crowdednessSum[0], min(crowdednessSum[1], crowdednessSum[2]));
+      switch (crowdednessSum.indexOf(crowdedness_min)) {
         case 0:
           _leastCrowdedCanteen = '北区';
           break;

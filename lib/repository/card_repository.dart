@@ -20,6 +20,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/code_timer.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
@@ -29,13 +30,13 @@ class CardRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fecard.fudan.edu.cn%2Fepay%2Fj_spring_cas_security_check";
   static const String USER_DETAIL_URL =
-      "http://ecard.fudan.edu.cn/epay/myepay/index";
+      "https://ecard.fudan.edu.cn/epay/myepay/index";
   static const String CONSUME_DETAIL_URL =
-      "http://ecard.fudan.edu.cn/epay/consume/query";
+      "https://ecard.fudan.edu.cn/epay/consume/query";
   static const String CONSUME_DETAIL_CSRF_URL =
-      "http://ecard.fudan.edu.cn/epay/consume/index";
+      "https://ecard.fudan.edu.cn/epay/consume/index";
 
-  static var _consumeDetailHeader = {
+  static const Map<String, String> _CONSUME_DETAIL_HEADER = {
     "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
     "Accept": "text/xml",
@@ -76,6 +77,7 @@ class CardRepository extends BaseRepositoryWithDio {
       }
       return null;
     });
+    CodeTimer.tick(info: "Logged in");
   }
 
   Future<String> getName() async {
@@ -88,7 +90,7 @@ class CardRepository extends BaseRepositoryWithDio {
     requestData['pageNo'] = pageNum.toString();
     var detailResponse = await dio.post(CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
-        options: Options(headers: _consumeDetailHeader));
+        options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
     var soup = Beautifulsoup(
         detailResponse.data.toString().between("<![CDATA[", "]]>"));
     var elements = soup.find(id: "tbody").querySelectorAll("tr");
@@ -104,6 +106,11 @@ class CardRepository extends BaseRepositoryWithDio {
     return records;
   }
 
+  /// Load the card record.
+  ///
+  /// If [logDays] > 0, it will return records of recent [logDays] days;
+  /// If [logDays] = 0, it will return the latest records;
+  /// If [logDays] < 0, it will return null.
   Future<List<CardRecord>> loadCardRecord(int logDays) async {
     print("Start load record.");
     if (logDays < 0) return null;
@@ -115,9 +122,8 @@ class CardRepository extends BaseRepositoryWithDio {
     var element = metas.firstWhere(
         (element) => element.attributes["name"] == "_csrf",
         orElse: () => null);
-    print("Csrf is $element");
     var csrfId = element.attributes["content"];
-
+    CodeTimer.tick(info: "csrfId got.");
     //Build the request body.
     var end = new DateTime.now();
     var start = end.add(Duration(days: -logDays));
@@ -135,21 +141,23 @@ class CardRepository extends BaseRepositoryWithDio {
       "_csrf": csrfId,
     };
 
-    //Get the number of pages.
+    //Get the number of pages, only when logDays > 0.
+    var totalPages = 1;
+    if (logDays > 0) {
+      var detailResponse = await dio.post(CONSUME_DETAIL_URL,
+          data: data.encodeMap(),
+          options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
 
-    var detailResponse = await dio.post(CONSUME_DETAIL_URL,
-        data: data.encodeMap(),
-        options: Options(headers: _consumeDetailHeader));
-
-    var totalPages =
-        int.parse(detailResponse.data.toString().between('</b>/', "页"));
-
+      totalPages =
+          int.parse(detailResponse.data.toString().between('</b>/', '页'));
+    }
+    CodeTimer.tick(info: "totalPages got.");
     //Get pages.
     List<CardRecord> list = [];
     for (int pageIndex = 1; pageIndex <= totalPages; pageIndex++) {
       list.addAll(await _loadOnePageCardRecord(data, pageIndex));
     }
-
+    CodeTimer.tick(info: "CardRecord got.");
     return list;
   }
 
@@ -164,7 +172,7 @@ class CardRepository extends BaseRepositoryWithDio {
     cardInfo.cash =
         userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
     cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");
-
+    CodeTimer.tick(info: "Info got.");
     List<CardRecord> records =
         await Retrier.runAsyncWithRetry(() => loadCardRecord(logDays));
     cardInfo.records = records;

@@ -20,6 +20,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/util/code_timer.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +39,10 @@ class EcardBalanceFeature extends Feature {
 
   Future<void> _loadCard(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
+    CodeTimer.start();
     await CardRepository.getInstance().login(info);
-    _cardInfo = await CardRepository.getInstance().loadCardInfo(1);
+    _cardInfo = await CardRepository.getInstance().loadCardInfo(0);
+
     _balance = _cardInfo.cash;
 
     if (_cardInfo.records.isNotEmpty)

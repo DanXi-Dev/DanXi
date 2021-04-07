@@ -20,19 +20,20 @@ import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
+
 //import 'package:dan_xi/feature/wlan_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/main.dart' as main_qr;
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:provider/provider.dart';
 
 class HomeSubpage extends PlatformSubpage {
   @override
@@ -74,6 +75,7 @@ class _HomeSubpageState extends State<HomeSubpage>
             context: context,
             removeTop: true,
             child: ListView(
+              padding: EdgeInsets.all(4),
               children: <Widget>[
                 Card(
                     child: Column(
@@ -84,13 +86,15 @@ class _HomeSubpageState extends State<HomeSubpage>
                     FeatureListItem(feature: EcardBalanceFeature()),
                     FeatureListItem(feature: DiningHallCrowdednessFeature()),
                     FeatureListItem(feature: FudanAAONoticesFeature())
-                  ],
-                )),
+                      ],
+                    )),
                 Card(child: FeatureListItem(feature: FudanDailyFeature())),
                 Card(
                   child: ListTile(
                     title: Text(S.of(context).fudan_qr_code),
-                    leading: PlatformX.isAndroid ? const Icon(Icons.qr_code) : const Icon(SFSymbols.qrcode),
+                    leading: PlatformX.isAndroid
+                        ? const Icon(Icons.qr_code)
+                        : const Icon(SFSymbols.qrcode),
                     subtitle: Text(S.of(context).tap_to_view),
                     onTap: () {
                       main_qr.QR.showQRCode(context, info, _brightness);
