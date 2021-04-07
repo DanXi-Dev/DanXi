@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -40,8 +41,8 @@ class DiningHallCrowdednessFeature extends Feature {
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
-        .getCrowdednessInfo(
-        info, Constant.campusArea.indexOf("邯郸校区")) //TODO: Support more campus
+        .getCrowdednessInfo(info,
+            Constant.campusArea.indexOf("邯郸校区")) //TODO: Support more campus
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;
@@ -52,9 +53,10 @@ class DiningHallCrowdednessFeature extends Feature {
     if (_trafficInfos != null) {
       var crowdedness_sum = List<int>.filled(5, 0);
       _trafficInfos.forEach((key, value) {
-        if(value.current != 0) { //Ignore zero entries
+        if (value.current != 0) {
+          //Ignore zero entries
           key = key.split('\n')[0];
-          switch(key) {
+          switch (key) {
             case '北区':
               crowdedness_sum[0] += value.current;
               break;
@@ -68,9 +70,10 @@ class DiningHallCrowdednessFeature extends Feature {
           }
         }
       });
-      var crowdedness_min = min(crowdedness_sum[0], min(crowdedness_sum[1], crowdedness_sum[2]));
+      var crowdedness_min =
+          min(crowdedness_sum[0], min(crowdedness_sum[1], crowdedness_sum[2]));
       //TODO: Display crowdedness_max
-      switch(crowdedness_sum.indexOf(crowdedness_min)) {
+      switch (crowdedness_sum.indexOf(crowdedness_min)) {
         case 0:
           _leastCrowdedCanteen = '北区';
           break;
@@ -95,7 +98,8 @@ class DiningHallCrowdednessFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _trafficInfos = null; //TODO: Initialize? I'm not sure about the data structure here.
+      _trafficInfos =
+          null; //TODO: Initialize? I'm not sure about the data structure here.
       _leastCrowdedCanteen = '';
       _loadCrowdednessSummary(_info).catchError((error) {
         _status = ConnectionStatus.FAILED;
@@ -114,7 +118,9 @@ class DiningHallCrowdednessFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
       case ConnectionStatus.DONE:
-        return S.of(context).least_crowded_canteen_is + _leastCrowdedCanteen + S.of(context).canteen;
+        return S.of(context).least_crowded_canteen_is +
+            _leastCrowdedCanteen +
+            S.of(context).canteen;
       case ConnectionStatus.FAILED:
         return S.of(context).failed;
       case ConnectionStatus.FATAL_ERROR:
@@ -124,7 +130,20 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isAndroid ? const Icon(Icons.stacked_line_chart) : const Icon(SFSymbols.person_3_fill);
+  Widget get icon => PlatformX.isAndroid
+      ? const Icon(Icons.stacked_line_chart)
+      : const Icon(SFSymbols.person_3_fill);
+
+  @override
+  Widget get trailing {
+    if (_status == ConnectionStatus.CONNECTING) {
+      return ScaleTransform(
+        scale: 0.5,
+        child: CircularProgressIndicator(),
+      );
+    }
+    return null;
+  }
 
   void refreshData() {
     _status = ConnectionStatus.NONE;
@@ -134,8 +153,8 @@ class DiningHallCrowdednessFeature extends Feature {
   @override
   void onTap() {
     if (_trafficInfos != null) {
-      Navigator.of(context).pushNamed("/card/crowdData",
-          arguments: {"personInfo": _info});
+      Navigator.of(context)
+          .pushNamed("/card/crowdData", arguments: {"personInfo": _info});
     } else {
       refreshData();
     }

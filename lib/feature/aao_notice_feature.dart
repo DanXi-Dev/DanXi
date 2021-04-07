@@ -23,6 +23,7 @@ import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -57,7 +58,9 @@ class FudanAAONoticesFeature extends Feature {
       _initialData == null ? S.of(context).loading : _initialData.first.title;
 
   @override
-  Widget get icon => PlatformX.isAndroid ? Icon(Icons.developer_board) : Icon(SFSymbols.info_circle);
+  Widget get icon => PlatformX.isAndroid
+      ? Icon(Icons.developer_board)
+      : Icon(SFSymbols.info_circle);
 
   @override
   void onTap() {
@@ -65,6 +68,17 @@ class FudanAAONoticesFeature extends Feature {
       Navigator.of(context).pushNamed("/notice/aao/list",
           arguments: {"initialData": _initialData});
     }
+  }
+
+  @override
+  Widget get trailing {
+    if (_initialData == null) {
+      return ScaleTransform(
+        scale: 0.5,
+        child: CircularProgressIndicator(),
+      );
+    }
+    return null;
   }
 
   @override

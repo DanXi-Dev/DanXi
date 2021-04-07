@@ -21,6 +21,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -122,6 +123,17 @@ class FudanDailyFeature extends Feature {
       case ConnectionStatus.NONE:
         break;
     }
+  }
+
+  @override
+  Widget get trailing {
+    if (_status == ConnectionStatus.CONNECTING) {
+      return ScaleTransform(
+        scale: 0.5,
+        child: CircularProgressIndicator(),
+      );
+    }
+    return null;
   }
 
   @override

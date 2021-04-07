@@ -22,6 +22,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/code_timer.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -77,7 +78,10 @@ class EcardBalanceFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
       case ConnectionStatus.DONE:
-        return S.of(context).last_transaction + Constant.yuanSymbol(_lastTransaction?.payment) + " " + _lastTransaction?.location;
+        return S.of(context).last_transaction +
+            Constant.yuanSymbol(_lastTransaction?.payment) +
+            " " +
+            _lastTransaction?.location;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context).failed;
@@ -89,13 +93,24 @@ class EcardBalanceFeature extends Feature {
   //String get tertiaryTitle => _lastTransaction?.location;
 
   @override
-  Widget get trailing => Text(
+  Widget get trailing {
+    if (_status == ConnectionStatus.CONNECTING) {
+      return ScaleTransform(
+        scale: 0.5,
+        child: CircularProgressIndicator(),
+      );
+    } else if (_status == ConnectionStatus.DONE)
+      return Text(
         Constant.yuanSymbol(_balance),
         textScaleFactor: 1.2,
       );
+    return null;
+  }
 
   @override
-  Widget get icon => PlatformX.isAndroid ? const Icon(Icons.account_balance_wallet) : const Icon(SFSymbols.creditcard);
+  Widget get icon => PlatformX.isAndroid
+      ? const Icon(Icons.account_balance_wallet)
+      : const Icon(SFSymbols.creditcard);
 
   void refreshData() {
     _status = ConnectionStatus.NONE;
