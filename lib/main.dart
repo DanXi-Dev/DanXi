@@ -29,6 +29,7 @@ import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
+import 'package:dan_xi/page/subpage_empty_classroom.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -168,7 +169,8 @@ class _HomePageState extends State<HomePage> {
   final List<PlatformSubpage> _subpage = [
     HomeSubpage(),
     BBSSubpage(),
-    TimetableSubPage()
+    TimetableSubPage(),
+    EmptyClassroomSubpage()
   ];
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
@@ -176,7 +178,8 @@ class _HomePageState extends State<HomePage> {
     (cxt) => PlatformX.isAndroid ? Icons.login : SFSymbols.person_crop_circle,
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
-    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up
+    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
+    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up //TODO: is a stub
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
@@ -184,6 +187,7 @@ class _HomePageState extends State<HomePage> {
     (cxt) => S.of(cxt).change_account,
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
+    (cxt) => S.of(cxt).share, //TODO: is a stub
   ];
 
   @override
@@ -196,10 +200,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Listening to the network state.
+    /* Listening to the network state.
     _connectivitySubscription = WiFiUtils.getConnectivity()
         .onConnectivityChanged
         .listen((_) => _loadNetworkState());
+     */
     _captchaSubscription =
         Constant.eventBus.on<CaptchaNeededException>().listen((_) {
       // Deal with login issue at [CaptchaNeededException].
@@ -240,7 +245,7 @@ class _HomePageState extends State<HomePage> {
           }
         });
     });
-    _loadNetworkState();
+    //_loadNetworkState();
     // Add shortcuts on Android & iOS.
     if (PlatformX.isMobile)
       quickActions.setShortcutItems(<ShortcutItem>[
@@ -292,7 +297,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  /// Load network ssid
+  /* Load network ssid
   Future<void> _loadNetworkState() async {
     ConnectivityResult connectivity =
         await WiFiUtils.getConnectivity().checkConnectivity();
@@ -308,6 +313,7 @@ class _HomePageState extends State<HomePage> {
           _connectStatus.value = S.of(context).current_connection_no_wifi);
     }
   }
+  */
 
   /// When user clicks the action button on appbar
   void _onPressActionButton() async {
@@ -319,6 +325,9 @@ class _HomePageState extends State<HomePage> {
         AddNewPostEvent().fire();
         break;
       case 2:
+        ShareTimetableEvent().fire();
+        break;
+      case 3: //TODO: is a stub
         ShareTimetableEvent().fire();
         break;
     }
@@ -395,6 +404,13 @@ class _HomePageState extends State<HomePage> {
                       ? Icon(Icons.calendar_today)
                       : Icon(SFSymbols.calendar),
                   label: S.of(context).timetable,
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.blue, //TODO: Change Color
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.room)
+                      : Icon(SFSymbols.book), //TODO: Change Icon
+                  label: S.of(context).empty_classrooms,
                 ),
               ],
               currentIndex: _pageIndex.value,

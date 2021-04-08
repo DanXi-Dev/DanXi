@@ -255,6 +255,16 @@ class S {
     );
   }
 
+  /// `Empty Classrooms`
+  String get empty_classrooms {
+    return Intl.message(
+      'Empty Classrooms',
+      name: 'empty_classrooms',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `OK`
   String get i_see {
     return Intl.message(

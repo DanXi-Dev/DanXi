@@ -24,6 +24,8 @@
     "login_issue_1":"登录失败，旦兮无法完成 UIS 登录。\n出现此错误，很可能是由于您连续多次登录失败所致。\n您需要使用浏览器手动完成一次登录，从下一次登录开始，旦兮 即可妥善处理此情况。",
     "login_issue_1_action":"打开UIS登录页面",
 
+    "empty_classrooms": "空教室",
+
     "i_see":"好",
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",
     "current_connection_no_wifi":"没有连接到WLAN",

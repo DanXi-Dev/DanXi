@@ -38,6 +38,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("校园卡余额"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("消费记录"),
+    "empty_classrooms" : MessageLookupByLibrary.simpleMessage("空教室"),
     "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("错误"),
     "forum" : MessageLookupByLibrary.simpleMessage("树洞"),

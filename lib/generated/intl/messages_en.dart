@@ -38,6 +38,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
+    "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
     "forum" : MessageLookupByLibrary.simpleMessage("The \"Hole\""),

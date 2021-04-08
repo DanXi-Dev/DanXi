@@ -22,6 +22,8 @@
     "login_issue_1":"Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually.",
     "login_issue_1_action":"Open UIS Login Page",
 
+    "empty_classrooms": "Empty Classrooms",
+
     "i_see":"OK",
     "ticking":"Checking in...",
     "tick_failed":"Failed to check in. Check your internet connection.",
