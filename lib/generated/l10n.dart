@@ -125,11 +125,21 @@ class S {
     );
   }
 
-  /// `Currently, the least crowded canteen is `
-  String get least_crowded_canteen_is {
+  /// `, the least crowded canteen is`
+  String get comma_least_crowded_canteen_is {
     return Intl.message(
-      'Currently, the least crowded canteen is ',
-      name: 'least_crowded_canteen_is',
+      ', the least crowded canteen is',
+      name: 'comma_least_crowded_canteen_is',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Currently, the most crowded canteen is`
+  String get most_crowded_canteen_currently_is {
+    return Intl.message(
+      'Currently, the most crowded canteen is',
+      name: 'most_crowded_canteen_currently_is',
       desc: '',
       args: [],
     );

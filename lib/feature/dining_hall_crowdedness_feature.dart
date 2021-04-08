@@ -34,6 +34,7 @@ class DiningHallCrowdednessFeature extends Feature {
   PersonInfo _info;
   Map<String, TrafficInfo> _trafficInfos;
   String _leastCrowdedCanteen;
+  String _mostCrowdedCanteen;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -51,29 +52,48 @@ class DiningHallCrowdednessFeature extends Feature {
 
     //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
-      var crowdedness_sum = List<int>.filled(5, 0);
-      _trafficInfos.forEach((key, value) {
+      var crowdednessSum = List<num>.filled(5, 0);
+      /* About crowdedness List
+         Index 0：北区
+         Index 1：南区
+         Index 2：旦苑
+         Index 3：南苑
+         Index 4：南区教工
+       */
+      _trafficInfos.forEach((keyUnprocessed, value) {
         if (value.current != 0) {
           //Ignore zero entries
-          key = key.split('\n')[0];
+          var key = keyUnprocessed.split('\n')[0];
+          var keySubtitle = '';
+          if(keyUnprocessed.length > 1) keySubtitle = keyUnprocessed.split('\n')[1];
           switch (key) {
             case '北区':
-              crowdedness_sum[0] += value.current;
+              crowdednessSum[0] += value.current;
               break;
             case '南区':
-              crowdedness_sum[1] += value.current;
-              //TODO: Seperate 南苑
+              if(keySubtitle == '') {
+                crowdednessSum[1] += value.current;
+              }
+              else {
+                switch(keySubtitle){
+                  case '南苑餐厅':
+                    crowdednessSum[3] += value.current;
+                    break;
+                  case '教工快餐':
+                    crowdednessSum[4] += value.current;
+                    break;
+                  default:
+                    crowdednessSum[1] += value.current;
+                }
+              }
               break;
             case '旦苑':
-              crowdedness_sum[2] += value.current;
+              crowdednessSum[2] += value.current;
               break;
           }
         }
       });
-      var crowdedness_min =
-          min(crowdedness_sum[0], min(crowdedness_sum[1], crowdedness_sum[2]));
-      //TODO: Display crowdedness_max
-      switch (crowdedness_sum.indexOf(crowdedness_min)) {
+      switch (crowdednessSum.indexOf(crowdednessSum.reduce(min))) {
         case 0:
           _leastCrowdedCanteen = '北区';
           break;
@@ -83,10 +103,36 @@ class DiningHallCrowdednessFeature extends Feature {
         case 2:
           _leastCrowdedCanteen = '旦苑';
           break;
+        case 3:
+          _leastCrowdedCanteen = '南苑';
+          break;
+        case 4:
+          _leastCrowdedCanteen = '南区教工';
+          break;
+        default:
+          _leastCrowdedCanteen = 'NULL';
+      }
+      switch (crowdednessSum.indexOf(crowdednessSum.reduce(max))) {
+        case 0:
+          _mostCrowdedCanteen = '北区';
+          break;
+        case 1:
+          _mostCrowdedCanteen = '南区';
+          break;
+        case 2:
+          _mostCrowdedCanteen = '旦苑';
+          break;
+        case 3:
+          _mostCrowdedCanteen = '南苑';
+          break;
+        case 4:
+          _mostCrowdedCanteen = '南区教工';
+          break;
+        default:
+          _mostCrowdedCanteen = 'NULL';
       }
       _status = ConnectionStatus.DONE;
     }
-
     notifyUpdate();
   }
 
@@ -101,6 +147,7 @@ class DiningHallCrowdednessFeature extends Feature {
       _trafficInfos =
           null; //TODO: Initialize? I'm not sure about the data structure here.
       _leastCrowdedCanteen = '';
+      _mostCrowdedCanteen = '';
       _loadCrowdednessSummary(_info).catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
@@ -118,7 +165,10 @@ class DiningHallCrowdednessFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
       case ConnectionStatus.DONE:
-        return S.of(context).least_crowded_canteen_is +
+        return S.of(context).most_crowded_canteen_currently_is +
+            _mostCrowdedCanteen +
+            S.of(context).canteen +
+            S.of(context).comma_least_crowded_canteen_is +
             _leastCrowdedCanteen +
             S.of(context).canteen;
       case ConnectionStatus.FAILED:
