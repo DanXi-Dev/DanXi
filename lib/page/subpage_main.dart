@@ -21,15 +21,14 @@ import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 
-//import 'package:dan_xi/feature/wlan_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/main.dart' as main_qr;
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
+import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -97,7 +96,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                         : const Icon(SFSymbols.qrcode),
                     subtitle: Text(S.of(context).tap_to_view),
                     onTap: () {
-                      main_qr.QR.showQRCode(context, info, _brightness);
+                      QR.showQRCode(context, info, _brightness);
                     },
                   ),
                 )

@@ -39,6 +39,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
+import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -142,60 +143,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class QR {
-  static void showQRCode(
-      BuildContext context, PersonInfo personInfo, double brightness) {
-    //Set screen brightness for displaying QR Code
-    ScreenProxy.keepOn(true);
-    ScreenProxy.setBrightness(1.0);
 
-    //Get current theme (light/dark)
-    bool darkModeOn =
-        MediaQuery.of(context).platformBrightness == Brightness.dark;
-
-    showPlatformDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => PlatformAlertDialog(
-              title: Text(S.of(context).fudan_qr_code),
-              content: Container(
-                  width: double.maxFinite,
-                  height: 200.0,
-                  child: Center(
-                      child: FutureBuilder<String>(
-                          future: QRCodeRepository.getInstance()
-                              .getQRCode(personInfo),
-                          builder: (BuildContext context,
-                                  AsyncSnapshot<String> snapshot) =>
-                              snapshot.hasData
-                                  ? QrImage(
-                                      data: snapshot.data,
-                                      size: 200.0,
-                                      foregroundColor: Colors.black,
-                                      backgroundColor: Colors.white,
-                                    )
-                                  : Text(S.of(context).loading_qr_code)))),
-              actions: <Widget>[
-                PlatformDialogAction(
-                    child: PlatformText(S.of(context).i_see),
-                    onPressed: () {
-                      ScreenProxy.setBrightness(brightness);
-                      ScreenProxy.keepOn(false);
-                      Navigator.pop(context);
-                    }),
-              ],
-            ));
-  }
-
-  //watchOS Support
-  static const channel = const MethodChannel('watchQRValue');
-
-  static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
-    String qr = await QRCodeRepository.getInstance().getQRCode(personInfo);
-
-    channel.invokeMethod("sendStringToNative", qr.toString());
-  }
-}
 
 class _HomePageState extends State<HomePage> {
   SharedPreferences _preferences;
@@ -226,7 +174,8 @@ class _HomePageState extends State<HomePage> {
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonIconBuilders = [
     (cxt) => PlatformX.isAndroid ? Icons.login : SFSymbols.person_crop_circle,
-    (cxt) => PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
+    (cxt) =>
+        PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up
   ];
 
@@ -428,17 +377,23 @@ class _HomePageState extends State<HomePage> {
               items: [
                 BottomNavigationBarItem(
                   backgroundColor: Colors.purple,
-                  icon: PlatformX.isAndroid ? Icon(Icons.dashboard) : Icon(SFSymbols.square_stack_3d_up_fill),
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.dashboard)
+                      : Icon(SFSymbols.square_stack_3d_up_fill),
                   label: S.of(context).dashboard,
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.indigo,
-                  icon: PlatformX.isAndroid ? Icon(Icons.forum) : Icon(SFSymbols.text_bubble),
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.forum)
+                      : Icon(SFSymbols.text_bubble),
                   label: S.of(context).forum,
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.blue,
-                  icon: PlatformX.isAndroid ? Icon(Icons.calendar_today) : Icon(SFSymbols.calendar),
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.calendar_today)
+                      : Icon(SFSymbols.calendar),
                   label: S.of(context).timetable,
                 ),
               ],
