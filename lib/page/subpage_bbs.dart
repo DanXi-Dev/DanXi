@@ -127,6 +127,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
+  /// Login in and load all of the posts.
+  ///
+  /// TODO: Load posts by page, instead of loading all of them at once
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
     if (_loginUser == null || _loginUser.email != info.id) {
       _loginUser = await PostRepository.getInstance()
@@ -146,6 +149,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) =>
                 snapshot.hasData
                     ? PlatformWidget(
+                  // Add a scrollbar on desktop platform
                         material: (_, __) => Scrollbar(
                             controller: _controller,
                             interactive: PlatformX.isDesktop,

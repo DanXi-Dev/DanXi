@@ -34,7 +34,6 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       'https://jwfw.fudan.edu.cn/eams/courseTableForStd!courseTable.action';
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
-
   TimeTableRepository._() {
     initRepository();
   }
@@ -69,10 +68,12 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   Future<TimeTable> loadTimeTableLocally(PersonInfo info,
-          {DateTime startTime}) =>
-      Cache.get(
-          KEY_TIMETABLE_CACHE,
-          () => loadTimeTableRemotely(info, startTime: startTime),
-          (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue)),
-          (object) => jsonEncode(object.toJson()));
+      {DateTime startTime}) async {
+    print("load person info:${info.id}");
+    return await Cache.get(
+        KEY_TIMETABLE_CACHE,
+        () => loadTimeTableRemotely(info, startTime: startTime),
+        (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue)),
+        (object) => jsonEncode(object.toJson()));
+  }
 }

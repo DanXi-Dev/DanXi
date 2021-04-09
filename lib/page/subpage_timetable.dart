@@ -20,23 +20,20 @@ import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 
 class TimetableSubPage extends PlatformSubpage {
   @override
@@ -51,7 +48,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Map<String, TimetableConverter> converters;
   TimeTable _table;
   TimeNow _showingTime;
-  static final START_TIME = DateTime(2021, 3, 1); //TODO: Make this thing dynamic
+  static final START_TIME = DateTime(2021, 3, 1); //TODO: Make this dynamic
+  ConnectionStatus _status = ConnectionStatus.NONE;
 
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
@@ -121,22 +119,25 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    TimetableStyle style = TimetableStyle(
-        startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
-        laneHeight: 30,
-        laneWidth: 70,
-        timeItemWidth: 40,
-        timeItemHeight: 120);
+
     return FutureBuilder(
         builder: (_, AsyncSnapshot<TimeTable> snapshot) {
           if (snapshot.hasData) {
-            _table = snapshot.data;
-            _showingTime = _table.now();
-            return TimetableView(
-              laneEventsList: _table.toLaneEvents(_showingTime.week, style),
-              timetableStyle: style,
+            return _buildPage(snapshot.data);
+          } else if (snapshot.hasError &&
+              _status == ConnectionStatus.CONNECTING) {
+            _status = ConnectionStatus.FAILED;
+            return GestureDetector(
+              onTap: () {
+                _status = ConnectionStatus.NONE;
+                refreshSelf();
+              },
+              child: Center(
+                child: Text(S.of(context).failed),
+              ),
             );
           } else {
+            _status = ConnectionStatus.CONNECTING;
             return Container(
               child: Center(
                 child: Text(S.of(context).loading),
@@ -148,6 +149,22 @@ class _TimetableSubPageState extends State<TimetableSubPage>
             TimeTableRepository.getInstance().loadTimeTableLocally(
                 context.personInfo,
                 startTime: START_TIME)));
+  }
+
+  Widget _buildPage(TimeTable table) {
+    TimetableStyle style = TimetableStyle(
+        startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
+        laneHeight: 30,
+        laneWidth: 70,
+        timeItemWidth: 40,
+        timeItemHeight: 120);
+    _table = table;
+    _showingTime = _table.now();
+    _status = ConnectionStatus.DONE;
+    return TimetableView(
+      laneEventsList: _table.toLaneEvents(_showingTime.week, style),
+      timetableStyle: style,
+    );
   }
 
   @override

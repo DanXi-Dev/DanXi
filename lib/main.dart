@@ -34,10 +34,8 @@ import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
-import 'package:dan_xi/util/fdu_wifi_detection.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
-import 'package:dan_xi/util/wifi_utils.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:data_plugin/bmob/bmob.dart';
@@ -142,8 +140,6 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-
-
 class _HomePageState extends State<HomePage> {
   SharedPreferences _preferences;
 
@@ -164,12 +160,22 @@ class _HomePageState extends State<HomePage> {
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.
-  final List<PlatformSubpage> _subpage = [
+  List<PlatformSubpage> _subpage = [
     HomeSubpage(),
     BBSSubpage(),
     TimetableSubPage(),
     EmptyClassroomSubpage()
   ];
+
+  /// Force app to refresh pages.
+  void _rebuildPage() {
+    _subpage = [
+      HomeSubpage(),
+      BBSSubpage(),
+      TimetableSubPage(),
+      EmptyClassroomSubpage()
+    ];
+  }
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonIconBuilders = [
@@ -177,7 +183,8 @@ class _HomePageState extends State<HomePage> {
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
-    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up //TODO: is a stub
+    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up
+    //TODO: is a stub
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
@@ -203,9 +210,15 @@ class _HomePageState extends State<HomePage> {
         .onConnectivityChanged
         .listen((_) => _loadNetworkState());
      */
+
+    // Refresh the page when account changes.
+    _personInfo.addListener(() {
+      _rebuildPage();
+      refreshSelf();
+    });
     _captchaSubscription =
         Constant.eventBus.on<CaptchaNeededException>().listen((_) {
-      // Deal with login issue at [CaptchaNeededException].
+      // Deal with login issue described at [CaptchaNeededException].
       if (!_isDialogShown) {
         _isDialogShown = true;
         showPlatformDialog(
@@ -333,8 +346,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("rebuild!");
     return _personInfo.value == null
-    // Empty container if no person info is set
+        // Empty container if no person info is set
         ? PlatformScaffold(
             iosContentBottomPadding: true,
             iosContentPadding: true,
@@ -344,87 +358,87 @@ class _HomePageState extends State<HomePage> {
                 PlatformIconButton(
                   padding: EdgeInsets.zero,
                   icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-                  onPressed: _onPressActionButton,
-                )
-              ],
-            ),
-            body: Container(),
+                context)),
+            onPressed: _onPressActionButton,
           )
+        ],
+      ),
+      body: Container(),
+    )
         : PlatformScaffold(
-            iosContentBottomPadding: true,
-            iosContentPadding: _subpage[_pageIndex.value].needPadding,
-            appBar: PlatformAppBar(
-              title: Text(
-                S.of(context).app_name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              trailingActions: [
-                PlatformIconButton(
-                  material: (_, __) => MaterialIconButtonData(
-                      tooltip:
-                          _subpageActionButtonTextBuilders[_pageIndex.value](
-                              context)),
-                  padding: EdgeInsets.zero,
-                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-                  onPressed: _onPressActionButton,
-                )
-              ],
-            ),
-            body: MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: _pageIndex),
-                ChangeNotifierProvider.value(value: _connectStatus),
-                ChangeNotifierProvider.value(value: _personInfo),
-              ],
-              child: IndexedStack(index: _pageIndex.value, children: _subpage),
-            ),
-            bottomNavBar: PlatformNavBar(
-              items: [
-                BottomNavigationBarItem(
-                  backgroundColor: Colors.purple,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.dashboard)
-                      : Icon(SFSymbols.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
-                ),
-                BottomNavigationBarItem(
-                  backgroundColor: Colors.indigo,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.forum)
-                      : Icon(SFSymbols.text_bubble),
-                  label: S.of(context).forum,
-                ),
-                BottomNavigationBarItem(
-                  backgroundColor: Colors.blue,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.calendar_today)
-                      : Icon(SFSymbols.calendar),
-                  label: S.of(context).timetable,
-                ),
-                BottomNavigationBarItem(
-                  backgroundColor: Colors.blue, //TODO: Change Color
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.room)
-                      : Icon(SFSymbols.book), //TODO: Change Icon
-                  label: S.of(context).empty_classrooms,
-                ),
-              ],
-              currentIndex: _pageIndex.value,
-              material: (_, __) => MaterialNavBarData(
-                type: BottomNavigationBarType.shifting,
-                selectedIconTheme:
-                    BottomNavigationBarTheme.of(context).selectedIconTheme,
-                unselectedIconTheme:
-                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
-              ),
-              itemChanged: (index) {
-                if (index != _pageIndex.value) {
-                  setState(() => _pageIndex.value = index);
-                }
-              },
-            ),
-          );
+      iosContentBottomPadding: true,
+      iosContentPadding: _subpage[_pageIndex.value].needPadding,
+      appBar: PlatformAppBar(
+        title: Text(
+          S.of(context).app_name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        trailingActions: [
+          PlatformIconButton(
+            material: (_, __) => MaterialIconButtonData(
+                tooltip:
+                _subpageActionButtonTextBuilders[_pageIndex.value](
+                    context)),
+            padding: EdgeInsets.zero,
+            icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                context)),
+            onPressed: _onPressActionButton,
+          )
+        ],
+      ),
+      body: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: _pageIndex),
+          ChangeNotifierProvider.value(value: _connectStatus),
+          ChangeNotifierProvider.value(value: _personInfo),
+        ],
+        child: IndexedStack(index: _pageIndex.value, children: _subpage),
+      ),
+      bottomNavBar: PlatformNavBar(
+        items: [
+          BottomNavigationBarItem(
+            backgroundColor: Colors.purple,
+            icon: PlatformX.isAndroid
+                ? Icon(Icons.dashboard)
+                : Icon(SFSymbols.square_stack_3d_up_fill),
+            label: S.of(context).dashboard,
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: Colors.indigo,
+            icon: PlatformX.isAndroid
+                ? Icon(Icons.forum)
+                : Icon(SFSymbols.text_bubble),
+            label: S.of(context).forum,
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: Colors.blue,
+            icon: PlatformX.isAndroid
+                ? Icon(Icons.calendar_today)
+                : Icon(SFSymbols.calendar),
+            label: S.of(context).timetable,
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: Colors.blue, //TODO: Change Color
+            icon: PlatformX.isAndroid
+                ? Icon(Icons.room)
+                : Icon(SFSymbols.book), //TODO: Change Icon
+            label: S.of(context).empty_classrooms,
+          ),
+        ],
+        currentIndex: _pageIndex.value,
+        material: (_, __) => MaterialNavBarData(
+          type: BottomNavigationBarType.shifting,
+          selectedIconTheme:
+          BottomNavigationBarTheme.of(context).selectedIconTheme,
+          unselectedIconTheme:
+          BottomNavigationBarTheme.of(context).unselectedIconTheme,
+        ),
+        itemChanged: (index) {
+          if (index != _pageIndex.value) {
+            setState(() => _pageIndex.value = index);
+          }
+        },
+      ),
+    );
   }
 }

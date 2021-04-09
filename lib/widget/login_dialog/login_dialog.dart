@@ -49,6 +49,8 @@ class _LoginDialogState extends State<LoginDialog> {
   TextEditingController _pwdController = new TextEditingController();
   String _errorText = "";
 
+  Future<bool> _deleteAllData() async => await widget.sharedPreferences.clear();
+
   /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {
     if (id.length * password.length == 0) {
@@ -59,8 +61,9 @@ class _LoginDialogState extends State<LoginDialog> {
     PersonInfo newInfo = PersonInfo.createNewInfo(id, password);
     await CardRepository.getInstance().login(newInfo).then((_) async {
       newInfo.name = await CardRepository.getInstance().getName();
+      _deleteAllData();
       await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
-      setState(() => widget.personInfo.value = newInfo);
+      widget.personInfo.value = newInfo;
       progressDialog.dismiss();
       Navigator.of(context).pop();
     }, onError: (e) {
@@ -87,7 +90,9 @@ class _LoginDialogState extends State<LoginDialog> {
             material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
-                    icon: PlatformX.isAndroid ? Icon(Icons.perm_identity) : Icon(SFSymbols.person_crop_circle))),
+                    icon: PlatformX.isAndroid
+                        ? Icon(Icons.perm_identity)
+                        : Icon(SFSymbols.person_crop_circle))),
             cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_uid),
             autofocus: true,
@@ -95,9 +100,11 @@ class _LoginDialogState extends State<LoginDialog> {
           PlatformTextField(
             controller: _pwdController,
             material: (_, __) => MaterialTextFieldData(
-              decoration: InputDecoration(
-                  labelText: S.of(context).login_uis_pwd,
-                  icon: PlatformX.isAndroid ? Icon(Icons.lock_outline) : Icon(SFSymbols.lock_circle),
+                decoration: InputDecoration(
+              labelText: S.of(context).login_uis_pwd,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.lock_outline)
+                  : Icon(SFSymbols.lock_circle),
             )),
             cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_pwd),
