@@ -25,6 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "about" : MessageLookupByLibrary.simpleMessage("关于"),
     "app_name" : MessageLookupByLibrary.simpleMessage("旦兮 α"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
     "canteen" : MessageLookupByLibrary.simpleMessage("餐厅"),
@@ -35,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("没有连接到WLAN"),
     "dashboard" : MessageLookupByLibrary.simpleMessage("首页"),
+    "default_campus" : MessageLookupByLibrary.simpleMessage("默认校区"),
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("校园卡余额"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("消费记录"),
@@ -73,6 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),
     "reply_to" : m0,
+    "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("导出为ICS"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),

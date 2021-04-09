@@ -29,7 +29,7 @@ import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
-import 'package:dan_xi/page/subpage_empty_classroom.dart';
+import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -164,7 +164,7 @@ class _HomePageState extends State<HomePage> {
     HomeSubpage(),
     BBSSubpage(),
     TimetableSubPage(),
-    EmptyClassroomSubpage()
+    SettingsSubpage()
   ];
 
   /// Force app to refresh pages.
@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
       HomeSubpage(),
       BBSSubpage(),
       TimetableSubPage(),
-      EmptyClassroomSubpage()
+      SettingsSubpage()
     ];
   }
 
@@ -420,9 +420,9 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             backgroundColor: Colors.blue, //TODO: Change Color
             icon: PlatformX.isAndroid
-                ? Icon(Icons.room)
-                : Icon(SFSymbols.book), //TODO: Change Icon
-            label: S.of(context).empty_classrooms,
+                ? Icon(Icons.settings)
+                : Icon(SFSymbols.gear_alt), //TODO: Change Icon
+            label: S.of(context).settings,
           ),
         ],
         currentIndex: _pageIndex.value,

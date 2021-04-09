@@ -23,6 +23,9 @@
     "login_issue_1_action":"Open UIS Login Page",
 
     "empty_classrooms": "Empty Classrooms",
+    "settings": "Settings",
+    "default_campus": "Default Campus",
+    "about": "About",
 
     "i_see":"OK",
     "ticking":"Checking in...",

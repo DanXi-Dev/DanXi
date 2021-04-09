@@ -26,20 +26,17 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
-class EmptyClassroomSubpage extends PlatformSubpage {
+class SettingsSubpage extends PlatformSubpage {
   @override
   bool get needPadding => true;
 
   @override
-  _EmptyClassroomSubpageState createState() => _EmptyClassroomSubpageState();
+  _SettingsSubpageState createState() => _SettingsSubpageState();
 
-  EmptyClassroomSubpage({Key key});
+  SettingsSubpage({Key key});
 }
 
-class _EmptyClassroomSubpageState extends State<EmptyClassroomSubpage>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
+class _SettingsSubpageState extends State<SettingsSubpage> {
 
   @override
   void initState() {
@@ -48,9 +45,6 @@ class _EmptyClassroomSubpageState extends State<EmptyClassroomSubpage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
-
     //WebView
     InAppBrowserClassOptions options = InAppBrowserClassOptions(
         crossPlatform: InAppBrowserOptions(hideUrlBar: false),
@@ -68,18 +62,32 @@ class _EmptyClassroomSubpageState extends State<EmptyClassroomSubpage>
               children: <Widget>[
                 Card(
                   child: ListTile(
-                    title: Text(S.of(context).empty_classrooms),
+                    title: Text(S.of(context).default_campus),
                     leading: PlatformX.isAndroid
-                        ? const Icon(Icons.book)
-                        : const Icon(SFSymbols.book),
-                    subtitle: Text(S.of(context).tap_to_view),
+                        ? const Icon(Icons.location_city)
+                        : const Icon(SFSymbols.location),
+                    subtitle: Text("TODO: is a stub"),
                     onTap: () {
                       browser.openUrlRequest(
                           urlRequest: URLRequest(url: Uri.parse("http://map.fudan.edu.cn/src/paike/index.php")),
                           options: options);
                     },
                   ),
-                )
+                ),
+                Card(
+                  child: ListTile(
+                    title: Text(S.of(context).about),
+                    leading: PlatformX.isAndroid
+                        ? const Icon(Icons.info)
+                        : const Icon(SFSymbols.info_circle),
+                    subtitle: Text("TODO: This ought to be a very long card with a lot of contents (texts, images, avatars,...)."),
+                    onTap: () {
+                      browser.openUrlRequest(
+                          urlRequest: URLRequest(url: Uri.parse("http://map.fudan.edu.cn/src/paike/index.php")),
+                          options: options);
+                    },
+                  ),
+                ),
               ],
             )));
   }

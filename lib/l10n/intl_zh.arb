@@ -25,6 +25,9 @@
     "login_issue_1_action":"打开UIS登录页面",
 
     "empty_classrooms": "空教室",
+    "settings": "设置",
+    "default_campus": "默认校区",
+    "about": "关于",
 
     "i_see":"好",
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",

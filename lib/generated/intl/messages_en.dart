@@ -25,6 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "about" : MessageLookupByLibrary.simpleMessage("About"),
     "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
     "canteen" : MessageLookupByLibrary.simpleMessage("食堂"),
@@ -35,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
     "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
+    "default_campus" : MessageLookupByLibrary.simpleMessage("Default Campus"),
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
@@ -73,6 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "reply_to" : m0,
+    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),

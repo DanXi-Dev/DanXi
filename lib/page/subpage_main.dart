@@ -18,6 +18,7 @@
 import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
+import 'package:dan_xi/feature/empty_classroom_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -80,7 +81,8 @@ class _HomeSubpageState extends State<HomeSubpage>
                     //FeatureListItem(feature: WlanFeature()),
                     FeatureListItem(feature: EcardBalanceFeature()),
                     FeatureListItem(feature: DiningHallCrowdednessFeature()),
-                    FeatureListItem(feature: FudanAAONoticesFeature())
+                    FeatureListItem(feature: FudanAAONoticesFeature()),
+                    FeatureListItem(feature: EmptyClassroomFeature()),
                   ],
                 )),
                 Card(child: FeatureListItem(feature: FudanDailyFeature())),
