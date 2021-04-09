@@ -36,6 +36,7 @@ import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 class TimetableSubPage extends PlatformSubpage {
   @override
@@ -120,7 +121,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     TimetableStyle style = TimetableStyle(
         startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
         laneHeight: 30,
@@ -145,8 +145,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           }
         },
         future: Retrier.runAsyncWithRetry(() =>
-            TimeTableRepository.getInstance()
-                .loadTimeTableLocally(info, startTime: START_TIME)));
+            TimeTableRepository.getInstance().loadTimeTableLocally(
+                context.personInfo,
+                startTime: START_TIME)));
   }
 
   @override

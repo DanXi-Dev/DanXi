@@ -16,7 +16,9 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 extension StringEx on String {
   /// Get the sub string between [a] and [b].
@@ -66,4 +68,9 @@ extension MapEx on Map {
       return '$k=$v';
     }).join('&');
   }
+}
+
+extension BuildContextEx on BuildContext {
+  PersonInfo get personInfo =>
+      Provider.of<ValueNotifier<PersonInfo>>(this, listen: false)?.value;
 }

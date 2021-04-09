@@ -27,6 +27,10 @@ class UISLoginTool {
 
   static Future<Response> loginUIS(Dio dio, String serviceUrl,
       NonpersistentCookieJar jar, PersonInfo info) async {
+    ArgumentError.checkNotNull(info);
+    ArgumentError.checkNotNull(jar);
+    ArgumentError.checkNotNull(dio);
+    ArgumentError.checkNotNull(serviceUrl);
     jar.deleteAll();
     var data = {};
     var res = await dio.get(serviceUrl);

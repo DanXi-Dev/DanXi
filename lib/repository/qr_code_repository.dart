@@ -20,6 +20,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dio/src/response.dart';
 
 class QRCodeRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
@@ -40,8 +41,8 @@ class QRCodeRepository extends BaseRepositoryWithDio {
 
   Future<String> _getQRCode(PersonInfo info) async {
     await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
-    var res = await dio.get(QR_URL);
-    var soup = Beautifulsoup(res.data.toString());
+    Response res = await dio.get(QR_URL);
+    Beautifulsoup soup = Beautifulsoup(res.data.toString());
     return soup.find(id: "#myText").attributes['value'];
   }
 }

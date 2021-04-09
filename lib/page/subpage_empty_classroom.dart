@@ -50,10 +50,9 @@ class _EmptyClassroomSubpageState extends State<EmptyClassroomSubpage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
 
     //WebView
-    var options = InAppBrowserClassOptions(
+    InAppBrowserClassOptions options = InAppBrowserClassOptions(
         crossPlatform: InAppBrowserOptions(hideUrlBar: false),
         inAppWebViewGroupOptions: InAppWebViewGroupOptions(
             crossPlatform: InAppWebViewOptions(javaScriptEnabled: true)));

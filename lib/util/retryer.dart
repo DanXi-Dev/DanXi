@@ -48,4 +48,12 @@ class Retrier {
     };
     return await function().catchError(errorCatcher);
   }
+
+  /// Try to run [function] asynchronously, and forever.
+  /// Return the results of [function] if it executes successfully. Otherwise, it will be stuck in an infinite loop.
+  static Future<E> runAsyncWithRetryForever<E>(Future<E> function()) async {
+    Function errorCatcher;
+    errorCatcher = (e) async => await function().catchError(errorCatcher);
+    return await function().catchError(errorCatcher);
+  }
 }

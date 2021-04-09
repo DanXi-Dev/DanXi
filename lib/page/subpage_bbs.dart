@@ -139,7 +139,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     return RefreshIndicator(
         color: Colors.deepPurple,
         onRefresh: () async => refreshSelf(),
@@ -165,7 +164,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                                     .map((e) => _getListItem(e))
                                     .toList())))
                     : Container(),
-            future: loginAndLoadPost(info)));
+            future: loginAndLoadPost(context.personInfo)));
   }
 
   Widget _getListItem(BBSPost e) {

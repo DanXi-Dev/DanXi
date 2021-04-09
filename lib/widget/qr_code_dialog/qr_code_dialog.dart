@@ -74,54 +74,49 @@ class _QRDialogState extends State<QRDialog> {
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   @override
-  Widget build(BuildContext context) {
-    return PlatformAlertDialog(
-      title: Text(S.of(context).fudan_qr_code),
-      content: GestureDetector(
-          onTap: () {
-            if (_status == ConnectionStatus.FAILED) {
-              _status = ConnectionStatus.NONE;
-              print("refreshing...");
-              refreshSelf();
-            }
-          },
-          child: Container(
-              width: double.maxFinite,
-              height: 200.0,
-              child: Center(
-                  child: FutureBuilder<String>(
-                      future: QRCodeRepository.getInstance()
-                          .getQRCode(widget.personInfo),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<String> snapshot) {
-                        print(
-                            "building... ${snapshot.hasData},${snapshot.hasError},${_status}");
-                        if (snapshot.hasData) {
-                          _status = ConnectionStatus.DONE;
-                          return QrImage(
-                            data: snapshot.data,
-                            size: 200.0,
-                            foregroundColor: Colors.black,
-                            backgroundColor: Colors.white,
-                          );
-                        } else if (snapshot.hasError &&
-                            _status == ConnectionStatus.CONNECTING) {
-                          _status = ConnectionStatus.FAILED;
-                          return Text(S.of(context).failed);
-                        } else {
-                          _status = ConnectionStatus.CONNECTING;
-                          return Text(S.of(context).loading_qr_code);
-                        }
-                      })))),
-      actions: <Widget>[
-        PlatformDialogAction(
-            child: PlatformText(S.of(context).i_see),
-            onPressed: () {
-              ScreenProxy.setBrightness(widget.originBrightness);
-              ScreenProxy.keepOn(false);
-              Navigator.pop(context);
-            }),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => PlatformAlertDialog(
+        title: Text(S.of(context).fudan_qr_code),
+        content: GestureDetector(
+            onTap: () {
+              if (_status == ConnectionStatus.FAILED) {
+                _status = ConnectionStatus.NONE;
+                refreshSelf();
+              }
+            },
+            child: Container(
+                width: double.maxFinite,
+                height: 200.0,
+                child: Center(
+                    child: FutureBuilder<String>(
+                        future: QRCodeRepository.getInstance()
+                            .getQRCode(widget.personInfo),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> snapshot) {
+                          if (snapshot.hasData) {
+                            _status = ConnectionStatus.DONE;
+                            return QrImage(
+                              data: snapshot.data,
+                              size: 200.0,
+                              foregroundColor: Colors.black,
+                              backgroundColor: Colors.white,
+                            );
+                          } else if (snapshot.hasError &&
+                              _status == ConnectionStatus.CONNECTING) {
+                            _status = ConnectionStatus.FAILED;
+                            return Text(S.of(context).failed);
+                          } else {
+                            _status = ConnectionStatus.CONNECTING;
+                            return Text(S.of(context).loading_qr_code);
+                          }
+                        })))),
+        actions: <Widget>[
+          PlatformDialogAction(
+              child: PlatformText(S.of(context).i_see),
+              onPressed: () {
+                ScreenProxy.setBrightness(widget.originBrightness);
+                ScreenProxy.keepOn(false);
+                Navigator.pop(context);
+              }),
+        ],
+      );
 }

@@ -124,70 +124,38 @@ class _TagContainerState extends State<TagContainer> {
       margin: const EdgeInsets.only(top: 16),
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       child: Wrap(
+        spacing: 8,
         children: tagList.map((e) => _buildTag(e)).toList(),
       ),
     );
   }
 
-  Container _buildTag(Tag data) {
-    return Container(
-        margin: const EdgeInsets.only(right: 8.0, bottom: 15.0),
-        decoration: BoxDecoration(
-          color: data.tagColor,
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Material(
-          borderRadius: BorderRadius.circular(50),
-          color: data.tagColor,
-          child: InkWell(
-            onTap: () {
-              if (!widget.enabled) return;
-              if (data.isSelected && widget.singleChoice) return;
-              setState(() {
-                data.isSelected = !data.isSelected;
-                if (data.isSelected && widget.singleChoice) {
-                  selectedCategories.clear();
-                  tagList.forEach((element) => element.isSelected = false);
-                  data.isSelected = true;
+  Widget _buildTag(Tag data) {
+    return ChoiceChip(
+        label: Text(data.tagTitle),
+        selected: data.isSelected,
+        avatar: Icon(data.icon),
+        // When [widget.enabled] is false, set [onSelected] to null so that this chip will act as disabled.
+        onSelected: widget.enabled
+            ? (bool newValue) {
+                if (!widget.enabled) return;
+                if (data.isSelected && widget.singleChoice) return;
+                setState(() {
+                  data.isSelected = !data.isSelected;
+                  if (data.isSelected && widget.singleChoice) {
+                    selectedCategories.clear();
+                    tagList.forEach((element) => element.isSelected = false);
+                    data.isSelected = true;
+                  }
+                  data.isSelected
+                      ? selectedCategories.add(data.tagTitle)
+                      : selectedCategories.remove(data.tagTitle);
+                });
+                if (data.isSelected && widget.onChoice != null) {
+                  widget.onChoice(data, selectedCategories);
                 }
-                data.isSelected
-                    ? selectedCategories.add(data.tagTitle)
-                    : selectedCategories.remove(data.tagTitle);
-              });
-              if (data.isSelected && widget.onChoice != null) {
-                widget.onChoice(data, selectedCategories);
               }
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedContainer(
-                  padding: const EdgeInsets.all(4.0),
-                  duration: Duration(milliseconds: 100),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: Colors.white60,
-                  ),
-                  child: new Icon(
-                    data.icon,
-                    color: iconColor,
-                    size: iconSize,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5.0, right: 10.0),
-                  child: Text(
-                    data.tagTitle,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: fontSize),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ));
+            : null);
   }
 
   int generateRandom(int old) {

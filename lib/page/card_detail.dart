@@ -15,12 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:intl/intl.dart';
 
 class CardDetailPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -52,9 +53,12 @@ class _CardDetailPageState extends State<CardDetailPage> {
     _cardInfo = widget.arguments['cardInfo'];
     _personInfo = widget.arguments['personInfo'];
     _tags = [
-      Tag(S.current.last_7_days, PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
-      Tag(S.current.last_15_days, PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
-      Tag(S.current.last_30_days, PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
+      Tag(S.current.last_7_days,
+          PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
+      Tag(S.current.last_15_days,
+          PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
+      Tag(S.current.last_30_days,
+          PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
     ];
     _tagDays = [7, 15, 30];
   }
@@ -78,12 +82,16 @@ class _CardDetailPageState extends State<CardDetailPage> {
               if (index >= 0) {
                 // Make the tags not clickable when data's being retrieved
                 setState(() {
-                  tag.checkedIcon = PlatformX.isAndroid ? Icons.pending : SFSymbols.hourglass;
+                  tag.checkedIcon =
+                      PlatformX.isAndroid ? Icons.pending : SFSymbols.hourglass;
                   _selectable = false;
                 });
-                await _cardInfo.loadRecords(_tagDays[index]);
+                _cardInfo.records = await Retrier.runAsyncWithRetryForever(() =>
+                    CardRepository.getInstance()
+                        .loadCardRecord(_tagDays[index]));
                 setState(() {
-                  tag.checkedIcon = PlatformX.isAndroid ? Icons.check : SFSymbols.checkmark;
+                  tag.checkedIcon =
+                      PlatformX.isAndroid ? Icons.check : SFSymbols.checkmark;
                   _selectable = true;
                 });
               }
@@ -114,10 +122,13 @@ class _CardDetailPageState extends State<CardDetailPage> {
         widgets.add(Material(
             color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
-              leading: PlatformX.isAndroid ? Icon(Icons.monetization_on) : Icon(SFSymbols.money_dollar_circle_fill),
-              title: Text(element.payment),
-              isThreeLine: true,
-              subtitle: Text("${element.location}\n${element.time.toString()}"),
+              // leading: PlatformX.isAndroid
+              //     ? Icon(Icons.monetization_on)
+              //     : Icon(SFSymbols.money_dollar_circle_fill),
+              title: Text(element.location),
+              trailing: Text(Constant.yuanSymbol(element.payment)),
+              subtitle:
+                  Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
             )));
       });
 

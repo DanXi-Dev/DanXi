@@ -20,9 +20,7 @@ import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
-
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -32,7 +30,6 @@ import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
 
 class HomeSubpage extends PlatformSubpage {
   @override
@@ -67,7 +64,6 @@ class _HomeSubpageState extends State<HomeSubpage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    PersonInfo info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     return RefreshIndicator(
         onRefresh: () async => refreshSelf(),
         child: MediaQuery.removePadding(
@@ -85,8 +81,8 @@ class _HomeSubpageState extends State<HomeSubpage>
                     FeatureListItem(feature: EcardBalanceFeature()),
                     FeatureListItem(feature: DiningHallCrowdednessFeature()),
                     FeatureListItem(feature: FudanAAONoticesFeature())
-                      ],
-                    )),
+                  ],
+                )),
                 Card(child: FeatureListItem(feature: FudanDailyFeature())),
                 Card(
                   child: ListTile(
@@ -96,7 +92,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                         : const Icon(SFSymbols.qrcode),
                     subtitle: Text(S.of(context).tap_to_view),
                     onTap: () {
-                      QR.showQRCode(context, info, _brightness);
+                      QR.showQRCode(context, context.personInfo, _brightness);
                     },
                   ),
                 )
