@@ -26,8 +26,16 @@
 
     "empty_classrooms": "空教室",
     "settings": "设置",
-    "default_campus": "默认校区",
-    "about": "关于",
+    "default_campus": "当前校区",
+    "about": "关于本应用",
+    "open_source_software_licenses": "开源软件许可协议",
+    "project_page": "项目页面",
+    "authors": "作者：",
+    "app_description_title": "简介：",
+    "app_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "account": "账户",
+
+    "handan_campus": "邯郸校区",
 
     "i_see":"好",
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",
@@ -64,5 +72,4 @@
     "share_as_ics":"导出为ICS",
 
     "login_failed":"登陆失败，请检查账号和密码"
-
 }

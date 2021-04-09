@@ -24,8 +24,16 @@
 
     "empty_classrooms": "Empty Classrooms",
     "settings": "Settings",
-    "default_campus": "Default Campus",
-    "about": "About",
+    "default_campus": "Current Campus",
+    "about": "About This App",
+    "open_source_software_licenses": "Open Source Software Licenses",
+    "project_page": "Project Page",
+    "authors": "Authors",
+    "app_description_title": "Description",
+    "app_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "account": "Account",
+
+    "handan_campus": "Handan Campus",
 
     "i_see":"OK",
     "ticking":"Checking in...",
@@ -63,5 +71,18 @@
 
     "share_as_ics":"Export as ICS",
 
-    "login_failed":"Login failed. Check your ID and/or password."
+    "login_failed":"Login failed. Check your ID and/or password.",
+
+    "project_url": "https:\/\/github.com\/w568w\/DanXi",
+    "dev_name_1": "w568w",
+    "dev_name_2": "kavinzhao",
+    "dev_name_3": "KYLN24",
+    "dev_page_1": "https:\/\/github.com\/w568w",
+    "dev_page_2": "https:\/\/github.com\/kavinzhao",
+    "dev_page_3": "https:\/\/github.com\/KYLN24",
+    "dev_image_url_1": "https:\/\/avatars.githubusercontent.com\/u\/8389787?v=4",
+    "dev_image_url_2": "https:\/\/avatars.githubusercontent.com\/u\/12184989?v=4",
+    "dev_image_url_3": "https:\/\/avatars.githubusercontent.com\/u\/54014142?v=4",
+
+    "LICENSES": "DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 }

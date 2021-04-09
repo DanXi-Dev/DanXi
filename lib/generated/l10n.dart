@@ -275,21 +275,91 @@ class S {
     );
   }
 
-  /// `Default Campus`
+  /// `Current Campus`
   String get default_campus {
     return Intl.message(
-      'Default Campus',
+      'Current Campus',
       name: 'default_campus',
       desc: '',
       args: [],
     );
   }
 
-  /// `About`
+  /// `About This App`
   String get about {
     return Intl.message(
-      'About',
+      'About This App',
       name: 'about',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open Source Software Licenses`
+  String get open_source_software_licenses {
+    return Intl.message(
+      'Open Source Software Licenses',
+      name: 'open_source_software_licenses',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Project Page`
+  String get project_page {
+    return Intl.message(
+      'Project Page',
+      name: 'project_page',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Authors`
+  String get authors {
+    return Intl.message(
+      'Authors',
+      name: 'authors',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Description`
+  String get app_description_title {
+    return Intl.message(
+      'Description',
+      name: 'app_description_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+  String get app_description {
+    return Intl.message(
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      name: 'app_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account`
+  String get account {
+    return Intl.message(
+      'Account',
+      name: 'account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Handan Campus`
+  String get handan_campus {
+    return Intl.message(
+      'Handan Campus',
+      name: 'handan_campus',
       desc: '',
       args: [],
     );
@@ -620,6 +690,116 @@ class S {
     return Intl.message(
       'Login failed. Check your ID and/or password.',
       name: 'login_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://github.com/w568w/DanXi`
+  String get project_url {
+    return Intl.message(
+      'https://github.com/w568w/DanXi',
+      name: 'project_url',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `w568w`
+  String get dev_name_1 {
+    return Intl.message(
+      'w568w',
+      name: 'dev_name_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `kavinzhao`
+  String get dev_name_2 {
+    return Intl.message(
+      'kavinzhao',
+      name: 'dev_name_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `KYLN24`
+  String get dev_name_3 {
+    return Intl.message(
+      'KYLN24',
+      name: 'dev_name_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://github.com/w568w`
+  String get dev_page_1 {
+    return Intl.message(
+      'https://github.com/w568w',
+      name: 'dev_page_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://github.com/kavinzhao`
+  String get dev_page_2 {
+    return Intl.message(
+      'https://github.com/kavinzhao',
+      name: 'dev_page_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://github.com/KYLN24`
+  String get dev_page_3 {
+    return Intl.message(
+      'https://github.com/KYLN24',
+      name: 'dev_page_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://avatars.githubusercontent.com/u/8389787?v=4`
+  String get dev_image_url_1 {
+    return Intl.message(
+      'https://avatars.githubusercontent.com/u/8389787?v=4',
+      name: 'dev_image_url_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://avatars.githubusercontent.com/u/12184989?v=4`
+  String get dev_image_url_2 {
+    return Intl.message(
+      'https://avatars.githubusercontent.com/u/12184989?v=4',
+      name: 'dev_image_url_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://avatars.githubusercontent.com/u/54014142?v=4`
+  String get dev_image_url_3 {
+    return Intl.message(
+      'https://avatars.githubusercontent.com/u/54014142?v=4',
+      name: 'dev_image_url_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+  String get LICENSES {
+    return Intl.message(
+      'DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      name: 'LICENSES',
       desc: '',
       args: [],
     );
