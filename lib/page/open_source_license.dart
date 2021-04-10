@@ -96,6 +96,8 @@ class License {
 }
 
 const License LICENSE_APACHE_2_0 = License("Apache Licence 2.0");
+const License LICENSE_BSD = License("BSD Licence");
+const License LICENSE_BSD_3_0_CLAUSE = License("BSD 3-Clause License");
 const License LICENSE_LGPL_3_0 =
     License("GNU Lesser General Public License v3.0");
 const License LICENSE_GPL_3_0 = License("GNU General Public License v3.0");
