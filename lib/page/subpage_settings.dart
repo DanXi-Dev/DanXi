@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -23,6 +24,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -134,7 +136,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               ),
                               Divider(),
                               Text(S.of(context).app_description),
-                              const SizedBox(height: 10,),
+                              const SizedBox(height: 15,),
                               Text(S.of(context).authors,textScaleFactor: 1.1,),
                               Divider(),
                               Row(
@@ -219,100 +221,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                             ]
                         ),
                       ),
-                            ]),
-                      ),
-                      //Divider(),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
-                        child: new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                S.of(context).authors,
-                                textScaleFactor: 1.1,
-                              ),
-                            ]),
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                child: Container(
-                                    width: _avatarSize,
-                                    height: _avatarSize,
-                                    decoration: new BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: new NetworkImage(S
-                                                .of(context)
-                                                .dev_image_url_1)))),
-                                onTap: () {
-                                  launch(S.of(context).dev_page_1);
-                                },
-                              ),
-                              const SizedBox(height: _avatarNameSpacing),
-                              Text(S.of(context).dev_name_1),
-                            ],
-                          ),
-                          const SizedBox(width: _avatarSpacing),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                child: Container(
-                                    width: _avatarSize,
-                                    height: _avatarSize,
-                                    decoration: new BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: new NetworkImage(S
-                                                .of(context)
-                                                .dev_image_url_2)))),
-                                onTap: () {
-                                  launch(S.of(context).dev_page_2);
-                                },
-                              ),
-                              const SizedBox(height: _avatarNameSpacing),
-                              Text(S.of(context).dev_name_2),
-                            ],
-                          ),
-                          const SizedBox(width: _avatarSpacing),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                child: Container(
-                                    width: _avatarSize,
-                                    height: _avatarSize,
-                                    decoration: new BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: new NetworkImage(S
-                                                .of(context)
-                                                .dev_image_url_3)))),
-                                onTap: () {
-                                  launch(S.of(context).dev_page_3);
-                                },
-                              ),
-                              const SizedBox(height: _avatarNameSpacing),
-                              Text(S.of(context).dev_name_3),
-                            ],
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -339,7 +247,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     ],
                   ),
                 ),
-              ],
-            )));
+            ]),)
+    );
   }
 }
