@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
@@ -107,6 +109,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   @override
   void initState() {
     super.initState();
+    initCampus();
     _personInfo.addListener(() {
       _rebuildPage();
       refreshSelf();
@@ -153,7 +156,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   }
 
   String getCampusFriendlyName() {
-    initCampus();
     switch(_campus){
       case 'handan_campus':
         return S.of(context).handan_campus;
@@ -234,7 +236,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                             ? const Icon(Icons.info)
                             : const Icon(SFSymbols.info_circle),
                         title: Text(S.of(context).about),
-                        //subtitle: Text("TODO: is a stub"),
                       ),
                       Container(
                         padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
@@ -328,6 +329,12 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                     ],
                                   ),
                                 ],
+                              ),
+                              const SizedBox(height: 10),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget> [Text(S.of(context).author_descriptor,textScaleFactor: 0.75, textAlign: TextAlign.right, style: TextStyle(fontStyle: FontStyle.italic)),],
                               ),
                             ]
                         ),

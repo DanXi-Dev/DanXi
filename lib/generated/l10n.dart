@@ -325,6 +325,16 @@ class S {
     );
   }
 
+  /// `Passionate developers\nfrom Engineering @ Fudan University`
+  String get author_descriptor {
+    return Intl.message(
+      'Passionate developers\nfrom Engineering @ Fudan University',
+      name: 'author_descriptor',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Description`
   String get app_description_title {
     return Intl.message(
