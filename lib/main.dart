@@ -27,6 +27,7 @@ import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
+import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
@@ -83,6 +84,8 @@ class DanxiApp extends StatelessWidget {
         BBSEditorPage(arguments: arguments),
     '/notice/aao/list': (context, {arguments}) =>
         AAONoticesList(arguments: arguments),
+    '/about/openLicense': (context, {arguments}) =>
+        OpenSourceLicenseList(arguments: arguments),
   };
 
   // This widget is the root of your application.

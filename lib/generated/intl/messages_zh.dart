@@ -24,24 +24,28 @@ class MessageLookup extends MessageLookupByLibrary {
   static m1(name) => "欢迎你，${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function> {
-    "about" : MessageLookupByLibrary.simpleMessage("关于本应用"),
-    "account" : MessageLookupByLibrary.simpleMessage("账户"),
-    "app_description" : MessageLookupByLibrary.simpleMessage("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
-    "app_description_title" : MessageLookupByLibrary.simpleMessage("简介："),
-    "app_name" : MessageLookupByLibrary.simpleMessage("旦兮 α"),
-    "authors" : MessageLookupByLibrary.simpleMessage("作者："),
-    "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
-    "canteen" : MessageLookupByLibrary.simpleMessage("餐厅"),
-    "change_account" : MessageLookupByLibrary.simpleMessage("切换账号"),
-    "choose_area" : MessageLookupByLibrary.simpleMessage("选择校区"),
-    "comma_least_crowded_canteen_is" : MessageLookupByLibrary.simpleMessage("，最不拥挤的餐厅是"),
-    "current_connection" : MessageLookupByLibrary.simpleMessage("当前连接"),
-    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
-    "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("没有连接到WLAN"),
-    "dashboard" : MessageLookupByLibrary.simpleMessage("首页"),
-    "default_campus" : MessageLookupByLibrary.simpleMessage("当前校区"),
-    "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
+  static _notInlinedMessages(_) => <String, Function>{
+        "about": MessageLookupByLibrary.simpleMessage("关于本应用"),
+        "account": MessageLookupByLibrary.simpleMessage("账户"),
+        "app_description": MessageLookupByLibrary.simpleMessage(
+            "由几位复旦本科学生用爱发电打造的微型复旦综合服务 APP，希望能为你的生活提供便利~"),
+        "app_description_title": MessageLookupByLibrary.simpleMessage("简介"),
+        "app_name": MessageLookupByLibrary.simpleMessage("旦兮 α"),
+        "authors": MessageLookupByLibrary.simpleMessage("作者"),
+        "cancel": MessageLookupByLibrary.simpleMessage("取消"),
+        "canteen": MessageLookupByLibrary.simpleMessage("餐厅"),
+        "change_account": MessageLookupByLibrary.simpleMessage("切换账号"),
+        "choose_area": MessageLookupByLibrary.simpleMessage("选择校区"),
+        "comma_least_crowded_canteen_is":
+            MessageLookupByLibrary.simpleMessage("，最不拥挤的餐厅是"),
+        "current_connection": MessageLookupByLibrary.simpleMessage("当前连接"),
+        "current_connection_failed":
+            MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
+        "current_connection_no_wifi":
+            MessageLookupByLibrary.simpleMessage("没有连接到WLAN"),
+        "dashboard": MessageLookupByLibrary.simpleMessage("首页"),
+        "default_campus": MessageLookupByLibrary.simpleMessage("当前校区"),
+        "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("校园卡余额"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("消费记录"),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("空教室"),

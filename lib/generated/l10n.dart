@@ -145,10 +145,10 @@ class S {
     );
   }
 
-  /// `食堂`
+  /// `Canteen`
   String get canteen {
     return Intl.message(
-      '食堂',
+      'Canteen',
       name: 'canteen',
       desc: '',
       args: [],
@@ -335,10 +335,10 @@ class S {
     );
   }
 
-  /// `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+  /// `A miniature Fudan Integrated Service APP, created by several Fudan undergraduate students with love. We hope it can facilitate your life~`
   String get app_description {
     return Intl.message(
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'A miniature Fudan Integrated Service APP, created by several Fudan undergraduate students with love. We hope it can facilitate your life~',
       name: 'app_description',
       desc: '',
       args: [],
