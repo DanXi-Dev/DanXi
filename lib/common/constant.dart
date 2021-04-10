@@ -22,6 +22,15 @@ class Constant {
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
 
+  /* SharedPrefs Campus
+   * Key: campus
+   * Has 4 values: handan_campus, fenglin_campus, jiangwan_campus, zhangjiang_campus
+   */
+  static const String HANDAN_CAMPUS = 'handan_campus';
+  static const String FENGLIN_CAMPUS = 'fenglin_campus';
+  static const String JIANGWAN_CAMPUS = 'jiangwan_campus';
+  static const String ZHANGJIANG_CAMPUS = 'zhangjiang_campus';
+
   static String yuanSymbol(String num) {
     if (num == null || num.trim().isEmpty) return "";
     return '\u00A5' + num;

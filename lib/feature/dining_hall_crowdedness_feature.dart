@@ -43,7 +43,7 @@ class DiningHallCrowdednessFeature extends Feature {
     _status = ConnectionStatus.CONNECTING;
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
         .getCrowdednessInfo(info,
-            Constant.campusArea.indexOf("邯郸校区")) //TODO: Support more campus
+            Constant.campusArea.indexOf("邯郸校区")) //TODO: Support sharedPrefs
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;

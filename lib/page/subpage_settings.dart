@@ -17,6 +17,7 @@
 
 import 'dart:ui';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
@@ -24,6 +25,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -115,35 +117,27 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     _showLoginDialog(forceLogin: forceLogin);
   }
 
-  /* SharedPrefs Campus
-   * Key: campus
-   * Has 4 values: handan_campus, fenglin_campus, jiangwan_campus, zhangjiang_campus
-   */
-  static const String HANDAN_CAMPUS = 'handan_campus';
-  static const String FENGLIN_CAMPUS = 'fenglin_campus';
-  static const String JIANGWAN_CAMPUS = 'jiangwan_campus';
-  static const String ZHANGJIANG_CAMPUS = 'zhangjiang_campus';
-
   void changeCampus(String newCampus) {
     _preferences.setString('campus', newCampus);
+    refreshSelf();
   }
 
   String setDefaultCampus() {
-    changeCampus(HANDAN_CAMPUS);
-    return HANDAN_CAMPUS;
+    changeCampus(Constant.HANDAN_CAMPUS);
+    return Constant.HANDAN_CAMPUS;
   }
 
   Future<String> getCampusFriendlyName() async {
     _preferences = await SharedPreferences.getInstance();
     _campus = _preferences.getString('campus') ?? setDefaultCampus();
     switch (_campus) {
-      case HANDAN_CAMPUS:
+      case Constant.HANDAN_CAMPUS:
         return S.of(context).handan_campus;
-      case FENGLIN_CAMPUS:
+      case Constant.FENGLIN_CAMPUS:
         return S.of(context).fenglin_campus;
-      case JIANGWAN_CAMPUS:
+      case Constant.JIANGWAN_CAMPUS:
         return S.of(context).jiangwan_campus;
-      case ZHANGJIANG_CAMPUS:
+      case Constant.ZHANGJIANG_CAMPUS:
         return S.of(context).zhangjiang_campus;
       default:
         return '[Corrupted Data] (' + _campus + ')';
@@ -209,8 +203,104 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     }
                   }),
                 onTap: () {
-                  //TODO: Present a selector
-                  //Set campus with changeCampus(String);
+                  if(_preferences!=null) {
+                    showPlatformModalSheet(
+                        context: context,
+                        builder: (_) =>
+                            PlatformWidget(
+                              cupertino: (_, __) =>
+                                  CupertinoActionSheet(
+                                    title: Text(S
+                                        .of(context)
+                                        .select_campus),
+                                    //message: const Text('Your options are '),
+                                    actions: <Widget>[
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .handan_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.HANDAN_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .fenglin_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.FENGLIN_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .jiangwan_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.JIANGWAN_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .zhangjiang_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.ZHANGJIANG_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                              material: (_, __) =>
+                                //TODO: Add material controls
+                                  CupertinoActionSheet(
+                                    title: Text(S
+                                        .of(context)
+                                        .select_campus),
+                                    //message: const Text('Your options are '),
+                                    actions: <Widget>[
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .handan_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.HANDAN_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .fenglin_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.FENGLIN_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .jiangwan_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.JIANGWAN_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: Text(S
+                                            .of(context)
+                                            .zhangjiang_campus),
+                                        onPressed: () {
+                                          changeCampus(Constant.ZHANGJIANG_CAMPUS);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                            ));
+                  }
                 },
               ),
             ),
@@ -320,12 +410,12 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 15),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               Text(S.of(context).author_descriptor,
-                                  textScaleFactor: 0.8,
+                                  textScaleFactor: 0.7,
                                   textAlign: TextAlign.right,
                                   //style: TextStyle(fontStyle: FontStyle.italic)),
                               )],

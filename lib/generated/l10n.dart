@@ -285,6 +285,16 @@ class S {
     );
   }
 
+  /// `Select Campus`
+  String get select_campus {
+    return Intl.message(
+      'Select Campus',
+      name: 'select_campus',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `About This App`
   String get about {
     return Intl.message(

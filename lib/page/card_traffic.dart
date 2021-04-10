@@ -24,6 +24,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -38,12 +39,13 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   PersonInfo _personInfo;
   Map<String, TrafficInfo> _trafficInfos;
   String _selectItem = S.current.choose_area;
-  int _sliding;
+  //int _sliding;
 
   @override
   void initState() {
     super.initState();
     _personInfo = widget.arguments['personInfo'];
+    getDefaultCampus().then((value) => _onSelectedItemChanged(value));
   }
 
   /// Load dining hall data
@@ -78,6 +80,12 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     setState(() {});
   }
 
+  SharedPreferences _preferences;
+  Future<String> getDefaultCampus() async {
+    _preferences = await SharedPreferences.getInstance();
+    return _preferences.getString('campus');
+  }
+
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
@@ -87,7 +95,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           PlatformAppBar(title: Text(S.of(context).dining_hall_crowdedness)),
       body: Column(
         children: [
-          PlatformWidget(
+          /*PlatformWidget(
               material: (_, __) => DropdownButton<String>(
                     items: _getItems(),
                     hint: Text(_selectItem),
@@ -100,7 +108,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                     },
                     groupValue: _sliding,
                     children: _getCupertinoItems(),
-                  )),
+                  )),*/
           Expanded(
               child: MediaQuery.removePadding(
                   context: context,

@@ -93,7 +93,7 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) => PlatformProvider(
       // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => PlatformApp(
-            title: "DanXi",
+            title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
                 theme: CupertinoThemeData(brightness: Brightness.light)),
             material: (_, __) => MaterialAppData(

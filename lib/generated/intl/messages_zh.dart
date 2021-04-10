@@ -85,6 +85,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目页面"),
     "reply_to" : m0,
+    "select_campus" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("导出为ICS"),
