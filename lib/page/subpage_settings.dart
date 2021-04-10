@@ -163,7 +163,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Widget build(BuildContext context) {
     double _avatarSize = (MediaQuery.of(context).size.width - 180) / 3;
     const double _avatarSpacing = 56;
-    const double _avatarNameSpacing = 5;
+    const double _avatarNameSpacing = 4;
     //TODO: WARNING Hardcoded avatarSize Modifiers!
 
     return RefreshIndicator(
@@ -183,13 +183,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     ' (' +
                     context.personInfo.id +
                     ')'),
-                onTap: () async {
-                  await initLogin(forceLogin: true);
-                  //TODO: Reload after account switch
-                },
+                onTap: () => initLogin(forceLogin: true),
               ),
             ),
-
             //Campus Selection
             Card(
               child: ListTile(
@@ -229,7 +225,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                           Divider(),
                           Text(S.of(context).app_description),
                           const SizedBox(
-                            height: 15,
+                            height: 16,
                           ),
                           Text(
                             S.of(context).authors,
@@ -254,9 +250,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                 image: new NetworkImage(S
                                                     .of(context)
                                                     .dev_image_url_1)))),
-                                    onTap: () {
-                                      launch(S.of(context).dev_page_1);
-                                    },
+                                    onTap: () =>
+                                        launch(S.of(context).dev_page_1),
                                   ),
                                   const SizedBox(height: _avatarNameSpacing),
                                   Text(S.of(context).dev_name_1),
@@ -278,9 +273,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                 image: new NetworkImage(S
                                                     .of(context)
                                                     .dev_image_url_2)))),
-                                    onTap: () {
-                                      launch(S.of(context).dev_page_2);
-                                    },
+                                    onTap: () =>
+                                        launch(S.of(context).dev_page_2),
                                   ),
                                   const SizedBox(height: _avatarNameSpacing),
                                   Text(S.of(context).dev_name_2),
@@ -312,10 +306,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10),
-                          Column(
+                          const SizedBox(height: 8),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: <Widget>[
                               Text(S.of(context).author_descriptor,
                                   textScaleFactor: 0.75,
@@ -326,7 +319,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                           ),
                         ]),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
