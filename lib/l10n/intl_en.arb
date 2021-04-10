@@ -30,7 +30,7 @@
     "open_source_software_licenses": "Open Source Software Licenses",
     "project_page": "Project Page",
     "authors": "Developers",
-    "author_descriptor": "Passionate developers\nfrom Engineering @ Fudan University",
+    "author_descriptor": "Passionate developers from\nEngineering @ Fudan University",
     "app_description_title": "Description",
     "app_description": "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~",
     "account": "Account",
@@ -79,15 +79,13 @@
     "login_failed":"Login failed. Check your ID and/or password.",
 
     "project_url": "https:\/\/github.com\/w568w\/DanXi",
-    "dev_name_1": "许冬[w568w]",
-    "dev_name_2": "赵行健[kavinzhao]",
-    "dev_name_3": "郭虹麟[KYLN24]",
+    "dev_name_1": "许冬\nw568w",
+    "dev_name_2": "赵行健\nkavinzhao",
+    "dev_name_3": "郭虹麟\nKYLN24",
     "dev_page_1": "https:\/\/github.com\/w568w",
     "dev_page_2": "https:\/\/github.com\/kavinzhao",
     "dev_page_3": "https:\/\/github.com\/KYLN24",
     "dev_image_url_1": "https:\/\/avatars.githubusercontent.com\/u\/8389787?v=4",
     "dev_image_url_2": "https:\/\/avatars.githubusercontent.com\/u\/12184989?v=4",
-    "dev_image_url_3": "https:\/\/avatars.githubusercontent.com\/u\/54014142?v=4",
-
-    "LICENSES": "DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    "dev_image_url_3": "https:\/\/avatars.githubusercontent.com\/u\/54014142?v=4"
 }

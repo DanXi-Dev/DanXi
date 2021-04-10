@@ -25,13 +25,12 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
-    "LICENSES" : MessageLookupByLibrary.simpleMessage("DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
     "about" : MessageLookupByLibrary.simpleMessage("About This App"),
     "account" : MessageLookupByLibrary.simpleMessage("Account"),
     "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
     "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
     "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
-    "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering @ Fudan University"),
+    "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
     "canteen" : MessageLookupByLibrary.simpleMessage("Canteen"),
@@ -46,9 +45,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "dev_image_url_1" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/8389787?v=4"),
     "dev_image_url_2" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/12184989?v=4"),
     "dev_image_url_3" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/54014142?v=4"),
-    "dev_name_1" : MessageLookupByLibrary.simpleMessage("许冬[w568w]"),
-    "dev_name_2" : MessageLookupByLibrary.simpleMessage("赵行健[kavinzhao]"),
-    "dev_name_3" : MessageLookupByLibrary.simpleMessage("郭虹麟[KYLN24]"),
+    "dev_name_1" : MessageLookupByLibrary.simpleMessage("许冬\nw568w"),
+    "dev_name_2" : MessageLookupByLibrary.simpleMessage("赵行健\nkavinzhao"),
+    "dev_name_3" : MessageLookupByLibrary.simpleMessage("郭虹麟\nKYLN24"),
     "dev_page_1" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w"),
     "dev_page_2" : MessageLookupByLibrary.simpleMessage("https://github.com/kavinzhao"),
     "dev_page_3" : MessageLookupByLibrary.simpleMessage("https://github.com/KYLN24"),

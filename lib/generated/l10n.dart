@@ -335,10 +335,10 @@ class S {
     );
   }
 
-  /// `Passionate developers\nfrom Engineering @ Fudan University`
+  /// `Passionate developers from\nEngineering @ Fudan University`
   String get author_descriptor {
     return Intl.message(
-      'Passionate developers\nfrom Engineering @ Fudan University',
+      'Passionate developers from\nEngineering @ Fudan University',
       name: 'author_descriptor',
       desc: '',
       args: [],
@@ -755,30 +755,30 @@ class S {
     );
   }
 
-  /// `许冬[w568w]`
+  /// `许冬\nw568w`
   String get dev_name_1 {
     return Intl.message(
-      '许冬[w568w]',
+      '许冬\nw568w',
       name: 'dev_name_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `赵行健[kavinzhao]`
+  /// `赵行健\nkavinzhao`
   String get dev_name_2 {
     return Intl.message(
-      '赵行健[kavinzhao]',
+      '赵行健\nkavinzhao',
       name: 'dev_name_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `郭虹麟[KYLN24]`
+  /// `郭虹麟\nKYLN24`
   String get dev_name_3 {
     return Intl.message(
-      '郭虹麟[KYLN24]',
+      '郭虹麟\nKYLN24',
       name: 'dev_name_3',
       desc: '',
       args: [],
@@ -840,16 +840,6 @@ class S {
     return Intl.message(
       'https://avatars.githubusercontent.com/u/54014142?v=4',
       name: 'dev_image_url_3',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
-  String get LICENSES {
-    return Intl.message(
-      'DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      name: 'LICENSES',
       desc: '',
       args: [],
     );
