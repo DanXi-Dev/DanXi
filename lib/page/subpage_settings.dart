@@ -127,8 +127,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     return Constant.HANDAN_CAMPUS;
   }
 
-  Future<String> getCampusFriendlyName() async {
-    _preferences = await SharedPreferences.getInstance();
+  String getCampusFriendlyName() {
     _campus = _preferences.getString('campus') ?? setDefaultCampus();
     switch (_campus) {
       case Constant.HANDAN_CAMPUS:
@@ -157,8 +156,38 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
             forceLogin: forceLogin));
   }
 
+  List<Widget> _buildCampusAreaList() {
+    Map<String, String> areaMap = {
+      S.of(context).handan_campus: Constant.HANDAN_CAMPUS,
+      S.of(context).fenglin_campus: Constant.FENGLIN_CAMPUS,
+      S.of(context).zhangjiang_campus: Constant.ZHANGJIANG_CAMPUS,
+      S.of(context).jiangwan_campus: Constant.JIANGWAN_CAMPUS
+    };
+    List<Widget> list = [];
+    areaMap.forEach((key, value) {
+      list.add(PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () {
+            changeCampus(value);
+            Navigator.of(context).pop();
+          },
+          child: Text(key),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(key),
+          onTap: () {
+            changeCampus(value);
+            Navigator.of(context).pop();
+          },
+        ),
+      ));
+    });
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
+    _preferences = Provider.of<SharedPreferences>(context);
     double _avatarSize = (MediaQuery.of(context).size.width - 180) / 3;
     const double _avatarSpacing = 56;
     const double _avatarNameSpacing = 4;
@@ -191,114 +220,20 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                 leading: PlatformX.isAndroid
                     ? const Icon(Icons.location_city)
                     : const Icon(SFSymbols.location),
-                subtitle: FutureBuilder<String>(
-                  future: getCampusFriendlyName(),
-                  builder: (BuildContext context,
-                  AsyncSnapshot<String> snapshot) {
-                    if (snapshot.hasData) {
-                      return Text(snapshot.data);
-                    }
-                    else {
-                      return Text(S.of(context).loading);
-                    }
-                  }),
+                subtitle: Text(getCampusFriendlyName()),
                 onTap: () {
-                  if(_preferences!=null) {
+                  if (_preferences != null) {
                     showPlatformModalSheet(
                         context: context,
-                        builder: (_) =>
-                            PlatformWidget(
-                              cupertino: (_, __) =>
-                                  CupertinoActionSheet(
-                                    title: Text(S
-                                        .of(context)
-                                        .select_campus),
-                                    //message: const Text('Your options are '),
-                                    actions: <Widget>[
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .handan_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.HANDAN_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .fenglin_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.FENGLIN_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .jiangwan_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.JIANGWAN_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .zhangjiang_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.ZHANGJIANG_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                              material: (_, __) =>
-                                //TODO: Add material controls
-                                  CupertinoActionSheet(
-                                    title: Text(S
-                                        .of(context)
-                                        .select_campus),
-                                    //message: const Text('Your options are '),
-                                    actions: <Widget>[
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .handan_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.HANDAN_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .fenglin_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.FENGLIN_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .jiangwan_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.JIANGWAN_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      CupertinoActionSheetAction(
-                                        child: Text(S
-                                            .of(context)
-                                            .zhangjiang_campus),
-                                        onPressed: () {
-                                          changeCampus(Constant.ZHANGJIANG_CAMPUS);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                        builder: (_) => PlatformWidget(
+                              cupertino: (_, __) => CupertinoActionSheet(
+                                title: Text(S.of(context).select_campus),
+                                actions: _buildCampusAreaList(),
+                              ),
+                              material: (_, __) => Container(
+                                height: 300,
+                                child: Column(children: _buildCampusAreaList()),
+                              ),
                             ));
                   }
                 },
@@ -414,11 +349,13 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
-                              Text(S.of(context).author_descriptor,
-                                  textScaleFactor: 0.7,
-                                  textAlign: TextAlign.right,
-                                  //style: TextStyle(fontStyle: FontStyle.italic)),
-                              )],
+                              Text(
+                                S.of(context).author_descriptor,
+                                textScaleFactor: 0.7,
+                                textAlign: TextAlign.right,
+                                //style: TextStyle(fontStyle: FontStyle.italic)),
+                              )
+                            ],
                           ),
                         ]),
                   ),
@@ -428,7 +365,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     children: <Widget>[
                       TextButton(
                         child:
-                            Text(S.of(context).open_source_software_licenses),
+                        Text(S.of(context).open_source_software_licenses),
                         onPressed: () {
                           Navigator.of(context).pushNamed("/about/openLicense",
                               arguments: {"items": _LICENSE_ITEMS});

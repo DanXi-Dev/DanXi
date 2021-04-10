@@ -405,6 +405,7 @@ class _HomePageState extends State<HomePage> {
                 ChangeNotifierProvider.value(value: _pageIndex),
                 ChangeNotifierProvider.value(value: _connectStatus),
                 ChangeNotifierProvider.value(value: _personInfo),
+                Provider.value(value: _preferences)
               ],
               child: IndexedStack(index: _pageIndex.value, children: _subpage),
             ),
