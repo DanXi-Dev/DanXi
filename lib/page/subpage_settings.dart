@@ -46,7 +46,60 @@ class SettingsSubpage extends PlatformSubpage {
 class _SettingsSubpageState extends State<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
-    LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio/")
+    LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
+    LicenseItem("beautifulsoup", LICENSE_APACHE_2_0,
+        "https://github.com/Sach97/beautifulsoup.dart"),
+    LicenseItem("build_runner", LICENSE_BSD,
+        "https://github.com/dart-lang/build/tree/master/build_runner"),
+    LicenseItem(
+        "catcher", LICENSE_APACHE_2_0, "https://github.com/jhomlala/catcher"),
+    LicenseItem("connectivity_plus", LICENSE_BSD,
+        "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/"),
+    LicenseItem("cupertino_icons", LICENSE_MIT,
+        "https://github.com/flutter/cupertino_icons"),
+    LicenseItem("data_plugin", LICENSE_NO, "https://github.com/chaozhouzhang"),
+    LicenseItem("dio_cookie_manager", LICENSE_MIT,
+        "https://github.com/flutterchina/dio"),
+    LicenseItem("event_bus", LICENSE_MIT,
+        "https://github.com/marcojakob/dart-event-bus"),
+    LicenseItem("flutter", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/flutter/flutter"),
+    LicenseItem("flutter_inappwebview", LICENSE_APACHE_2_0,
+        "https://github.com/pichillilorenzo/flutter_inappwebview"),
+    //TODO items below need recheck
+    LicenseItem("flutter_localizations", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem("flutter_platform_widgets", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem("flutter_progress_dialog", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem("flutter_sfsymbols", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem(
+        "flutter_test", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("flutter_timetable_view", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem("http", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("ical", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("intl", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("json_serializable", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem("network_info_plus", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem(
+        "path_provider", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem(
+        "provider", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem(
+        "qr_flutter", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem(
+        "quick_actions", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("screen", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("share", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+    LicenseItem("shared_preferences", LICENSE_MIT,
+        "https://github.com/flutterchina/dio/"),
+    LicenseItem(
+        "url_launcher", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
   ];
 
   String _campus;
