@@ -24,6 +24,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CardCrowdData extends StatefulWidget {
@@ -177,13 +178,15 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           children: [
             Row(
               children: [
-                Icon(
+                PlatformX.isAndroid ? Icon(
                   Icons.location_on_outlined,
                   color: Colors.deepPurple,
+                ) : Icon(
+                  SFSymbols.location_circle,
                 ),
                 Text(
                   zoneName,
-                  style: TextStyle(fontSize: 18, color: Colors.deepPurple),
+                  style: PlatformX.isAndroid ? TextStyle(fontSize: 18, color: Colors.deepPurple) : TextStyle(fontSize: 18),
                 ),
               ],
             ),

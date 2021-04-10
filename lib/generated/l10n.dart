@@ -755,30 +755,30 @@ class S {
     );
   }
 
-  /// `w568w`
+  /// `许冬[w568w]`
   String get dev_name_1 {
     return Intl.message(
-      'w568w',
+      '许冬[w568w]',
       name: 'dev_name_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `kavinzhao`
+  /// `赵行健[kavinzhao]`
   String get dev_name_2 {
     return Intl.message(
-      'kavinzhao',
+      '赵行健[kavinzhao]',
       name: 'dev_name_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `KYLN24`
+  /// `郭虹麟[KYLN24]`
   String get dev_name_3 {
     return Intl.message(
-      'KYLN24',
+      '郭虹麟[KYLN24]',
       name: 'dev_name_3',
       desc: '',
       args: [],
