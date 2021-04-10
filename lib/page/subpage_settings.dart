@@ -20,12 +20,14 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsSubpage extends PlatformSubpage {
@@ -46,6 +48,22 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   void initState() {
     super.initState();
   }
+
+  SharedPreferences _preferences;
+  ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
+  Future<void> initSharedPreference({bool forceLogin = false}) async {
+    _preferences = await SharedPreferences.getInstance();
+    _showLoginDialog(forceLogin: forceLogin);
+  }
+
+  /// Pop up a dialog where user can give his name & password.
+  void _showLoginDialog({bool forceLogin = false}) => showPlatformDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => LoginDialog(
+          sharedPreferences: _preferences,
+          personInfo: _personInfo,
+          forceLogin: forceLogin));
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +89,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     leading: PlatformX.isAndroid
                         ? const Icon(Icons.account_circle)
                         : const Icon(SFSymbols.person_circle),
-                    subtitle: Text("Current Account"), //TODO: is a stub
-                    onTap: () {
-                      //TODO
+                    subtitle: Text(context.personInfo.name + ' (' + context.personInfo.id + ')'),
+                    onTap: () async {
+                      await initSharedPreference(forceLogin: true);
+                      //TODO: Reload after account switch
                     },
                   ),
                 ),
@@ -113,99 +132,90 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               Text(S.of(context).app_description_title,textScaleFactor: 1.1,),
                               Divider(),
                               Text(S.of(context).app_description),
+                              const SizedBox(height: 10,),
+                              Text(S.of(context).authors,textScaleFactor: 1.1,),
+                              Divider(),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new NetworkImage(
+                                                        S.of(context).dev_image_url_1)
+                                                )
+                                            )),
+                                        onTap: () {
+                                          launch(S.of(context).dev_page_1);
+                                        },
+                                      ),
+                                      const SizedBox(height: _avatarNameSpacing),
+                                      Text(S.of(context).dev_name_1),
+                                    ],
+                                  ),
+                                  const SizedBox(width: _avatarSpacing),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new NetworkImage(
+                                                        S.of(context).dev_image_url_2)
+                                                )
+                                            )),
+                                        onTap: () {
+                                          launch(S.of(context).dev_page_2);
+                                        },
+                                      ),
+                                      const SizedBox(height: _avatarNameSpacing),
+                                      Text(S.of(context).dev_name_2),
+                                    ],
+                                  ),
+                                  const SizedBox(width: _avatarSpacing),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new NetworkImage(
+                                                        S.of(context).dev_image_url_3)
+                                                )
+                                            )),
+                                        onTap: () {
+                                          launch(S.of(context).dev_page_3);
+                                        },
+                                      ),
+                                      const SizedBox(height: _avatarNameSpacing),
+                                      Text(S.of(context).dev_name_3),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ]
                         ),
-                      ),
-                      //Divider(),
-                      const SizedBox(height: 10,),
-                      Container(
-                        padding: new EdgeInsets.fromLTRB(25,5,25,0),
-                        child: new Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget> [
-                            Text(S.of(context).authors,textScaleFactor: 1.1,),
-                          ]
-                        ),
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                child: Container(
-                                    width: _avatarSize,
-                                    height: _avatarSize,
-                                    decoration: new BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: new NetworkImage(
-                                                S.of(context).dev_image_url_1)
-                                        )
-                                    )),
-                                onTap: () {
-                                  launch(S.of(context).dev_page_1);
-                                },
-                              ),
-                              const SizedBox(height: _avatarNameSpacing),
-                              Text(S.of(context).dev_name_1),
-                            ],
-                          ),
-                          const SizedBox(width: _avatarSpacing),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                            InkWell(
-                              child: Container(
-                                  width: _avatarSize,
-                                  height: _avatarSize,
-                                  decoration: new BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: new DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image: new NetworkImage(
-                                              S.of(context).dev_image_url_2)
-                                      )
-                                  )),
-                              onTap: () {
-                                  launch(S.of(context).dev_page_2);
-                                },
-                              ),
-                              const SizedBox(height: _avatarNameSpacing),
-                              Text(S.of(context).dev_name_2),
-                            ],
-                          ),
-                          const SizedBox(width: _avatarSpacing),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                child: Container(
-                                    width: _avatarSize,
-                                    height: _avatarSize,
-                                    decoration: new BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: new NetworkImage(
-                                                S.of(context).dev_image_url_3)
-                                        )
-                                    )),
-                                onTap: () {
-                                  launch(S.of(context).dev_page_3);
-                                },
-                              ),
-                              const SizedBox(height: _avatarNameSpacing),
-                              Text(S.of(context).dev_name_3),
-                            ],
-                          ),
-                        ],
                       ),
                       const SizedBox(height: 10),
                       Row(

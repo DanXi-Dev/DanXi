@@ -179,20 +179,19 @@ class _HomePageState extends State<HomePage> {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonIconBuilders = [
-    (cxt) => PlatformX.isAndroid ? Icons.login : SFSymbols.person_crop_circle,
+    (cxt) => null,
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
-    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up
-    //TODO: is a stub
+    (cxt) => null  //TODO: is a stub
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
   final List<Function> _subpageActionButtonTextBuilders = [
-    (cxt) => S.of(cxt).change_account,
+    (cxt) => null,
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
-    (cxt) => S.of(cxt).share, //TODO: is a stub
+    (cxt) => null, //TODO: is a stub
   ];
 
   @override
@@ -330,7 +329,7 @@ class _HomePageState extends State<HomePage> {
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        await _loadOrInitSharedPreference(forceLogin: true);
+        //await loadOrInitSharedPreference(forceLogin: true);
         break;
       case 1:
         AddNewPostEvent().fire();
@@ -339,7 +338,7 @@ class _HomePageState extends State<HomePage> {
         ShareTimetableEvent().fire();
         break;
       case 3: //TODO: is a stub
-        ShareTimetableEvent().fire();
+        //ShareTimetableEvent().fire();
         break;
     }
   }

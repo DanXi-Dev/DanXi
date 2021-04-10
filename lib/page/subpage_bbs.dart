@@ -90,7 +90,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       builder: (_) => PlatformAlertDialog(
         title: Text(S.of(context).login_with_uis),
         content: Material(
-            color: isCupertino(context) ? Colors.white : null,
+            //color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
               leading: PlatformX.isAndroid
                   ? Icon(Icons.account_circle)
