@@ -6,7 +6,10 @@ import WatchConnectivity
 class InterfaceController: WKInterfaceController, WCSessionDelegate {
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        
+    }
+    
+    func refreshQR() {
+        label.setHidden(false)
         QRImage.setHidden(true)
         label.setText("Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone.")
         sendString(text: "refresh")
@@ -26,10 +29,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     @IBOutlet var label: WKInterfaceLabel!
     @IBOutlet weak var QRImage: WKInterfaceImage!
     @IBAction func tapRecognizer(_ sender: Any) {
-        label.setHidden(false)
-        QRImage.setHidden(true)
-        label.setText("Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone.")
-        sendString(text: "refresh")
+        refreshQR()
     }
     @IBAction func tapRecognizerLabel(_ sender: Any) {
         tapRecognizer(sender)
@@ -37,7 +37,6 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-    
         if(WCSession.isSupported()){
          let session = WCSession.default;
          session.delegate = self;
@@ -50,6 +49,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
+        refreshQR()
     }
     
     override func didDeactivate() {
