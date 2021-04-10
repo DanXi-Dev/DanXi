@@ -107,13 +107,12 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   @override
   void initState() {
     super.initState();
-    initCampus();
+    initSharedPrefs();
   }
 
   SharedPreferences _preferences;
 
-  Future<void> initLogin({bool forceLogin = false}) async {
-    _preferences = await SharedPreferences.getInstance();
+  void initLogin({bool forceLogin = false}) {
     _showLoginDialog(forceLogin: forceLogin);
   }
 
@@ -121,28 +120,37 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
    * Key: campus
    * Has 4 values: handan_campus, fenglin_campus, jiangwan_campus, zhangjiang_campus
    */
-  Future<void> initCampus() async {
+  static const String HANDAN_CAMPUS = 'handan_campus';
+  static const String FENGLIN_CAMPUS = 'fenglin_campus';
+  static const String JIANGWAN_CAMPUS = 'jiangwan_campus';
+  static const String ZHANGJIANG_CAMPUS = 'zhangjiang_campus';
+
+  Future<void> initSharedPrefs() async {
     _preferences = await SharedPreferences.getInstance();
-    _campus = _preferences.getString('campus') ?? 'handan_campus';
   }
 
-  Future<void> changeCampus(String newCampus) async {
-    _preferences = await SharedPreferences.getInstance();
+  void changeCampus(String newCampus) {
     _preferences.setString('campus', newCampus);
   }
 
+  String setDefaultCampus() {
+    changeCampus(HANDAN_CAMPUS);
+    return HANDAN_CAMPUS;
+  }
+
   String getCampusFriendlyName() {
+    _campus = _preferences.getString('campus') ?? setDefaultCampus();
     switch (_campus) {
-      case 'handan_campus':
+      case HANDAN_CAMPUS:
         return S.of(context).handan_campus;
-      case 'fenglin_campus':
+      case FENGLIN_CAMPUS:
         return S.of(context).fenglin_campus;
-      case 'jiangwan_campus':
+      case JIANGWAN_CAMPUS:
         return S.of(context).jiangwan_campus;
-      case 'zhangjiang_campus':
+      case ZHANGJIANG_CAMPUS:
         return S.of(context).zhangjiang_campus;
       default:
-        return '[Corrupted Data]';
+        return '[Corrupted Data] (' + _campus + ')';
     }
   }
 
@@ -311,10 +319,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               Text(S.of(context).author_descriptor,
-                                  textScaleFactor: 0.75,
+                                  textScaleFactor: 0.8,
                                   textAlign: TextAlign.right,
-                                  style:
-                                      TextStyle(fontStyle: FontStyle.italic)),
+                                  //style: TextStyle(fontStyle: FontStyle.italic)),
                             ],
                           ),
                         ]),
