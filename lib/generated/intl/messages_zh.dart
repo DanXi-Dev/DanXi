@@ -47,6 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("空教室"),
     "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("错误"),
+    "fenglin_campus" : MessageLookupByLibrary.simpleMessage("枫林校区"),
     "forum" : MessageLookupByLibrary.simpleMessage("树洞"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("发布"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("教务处通知"),
@@ -60,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_noon" : MessageLookupByLibrary.simpleMessage("快到中午啦"),
     "handan_campus" : MessageLookupByLibrary.simpleMessage("邯郸校区"),
     "i_see" : MessageLookupByLibrary.simpleMessage("好"),
+    "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("江湾校区"),
     "last_15_days" : MessageLookupByLibrary.simpleMessage("过去 15 天"),
     "last_30_days" : MessageLookupByLibrary.simpleMessage("过去 30 天"),
     "last_7_days" : MessageLookupByLibrary.simpleMessage("过去 7 天"),
@@ -90,6 +92,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
     "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
-    "welcome" : m1
+    "welcome" : m1,
+    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }

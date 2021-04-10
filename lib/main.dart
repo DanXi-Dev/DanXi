@@ -194,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     (cxt) => null,
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
-    (cxt) => null, //TODO: is a stub
+    (cxt) => null,
   ];
 
   @override
@@ -272,7 +272,6 @@ class _HomePageState extends State<HomePage> {
     //Init watchOS support
     const channel_a = const MethodChannel('watchAppActivated');
     channel_a.setMethodCallHandler((MethodCall call) async {
-      print("received method call\n\n");
       if (call.method == 'watchActivated') {
         QR.sendQRtoWatch(_personInfo.value);
       }
@@ -340,7 +339,7 @@ class _HomePageState extends State<HomePage> {
       case 2:
         ShareTimetableEvent().fire();
         break;
-      case 3: //TODO: is a stub
+      case 3:
         //ShareTimetableEvent().fire();
         break;
     }

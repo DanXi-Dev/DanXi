@@ -19,6 +19,9 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/page/subpage_bbs.dart';
+import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
@@ -46,16 +49,70 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio/")
   ];
 
+  String _campus;
+
   @override
   void initState() {
     super.initState();
+    _personInfo.addListener(() {
+      _rebuildPage();
+      refreshSelf();
+    });
+  }
+
+  /// List of all of the subpages. They will be displayed as tab pages.
+  List<PlatformSubpage> _subpage = [
+    HomeSubpage(),
+    BBSSubpage(),
+    TimetableSubPage(),
+    SettingsSubpage()
+  ];
+
+  /// Force app to refresh pages.
+  void _rebuildPage() {
+    _subpage = [
+      HomeSubpage(),
+      BBSSubpage(),
+      TimetableSubPage(),
+      SettingsSubpage()
+    ];
   }
 
   SharedPreferences _preferences;
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
-  Future<void> initSharedPreference({bool forceLogin = false}) async {
+  Future<void> initLogin({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
     _showLoginDialog(forceLogin: forceLogin);
+  }
+
+  /* SharedPrefs Campus
+   * Key: campus
+   * Has 4 values: handan_campus, fenglin_campus, jiangwan_campus, zhangjiang_campus
+   */
+  Future<void> initCampus() async {
+    _preferences = await SharedPreferences.getInstance();
+    _campus = _preferences.getString('campus') ?? 'handan_campus';
+  }
+
+  Future<void> changeCampus(String newCampus) async {
+    _preferences = await SharedPreferences.getInstance();
+    _preferences.setString('campus',newCampus);
+  }
+
+  String getCampusFriendlyName() {
+    initCampus();
+    switch(_campus){
+      case 'handan_campus':
+        return S.of(context).handan_campus;
+      case 'fenglin_campus':
+        return S.of(context).fenglin_campus;
+      case 'jiangwan_campus':
+        return S.of(context).jiangwan_campus;
+      case 'zhangjiang_campus':
+        return S.of(context).zhangjiang_campus;
+      default:
+        return '[Corrupted Data]';
+    }
   }
 
   /// Pop up a dialog where user can give his name & password.
@@ -91,7 +148,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                         : const Icon(SFSymbols.person_circle),
                     subtitle: Text(context.personInfo.name + ' (' + context.personInfo.id + ')'),
                     onTap: () async {
-                      await initSharedPreference(forceLogin: true);
+                      await initLogin(forceLogin: true);
                       //TODO: Reload after account switch
                     },
                   ),
@@ -105,9 +162,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                         ? const Icon(Icons.location_city)
                         : const Icon(SFSymbols.location),
                     subtitle:
-                        Text(S.of(context).handan_campus), //TODO: is a stub
+                        Text(getCampusFriendlyName()),
                     onTap: () {
-                      //TODO
+                      //TODO: Present a selector
+                      //Set campus with changeCampus(String);
                     },
                   ),
                 ),

@@ -57,6 +57,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
+    "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin Campus"),
     "forum" : MessageLookupByLibrary.simpleMessage("The \"Hole\""),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
@@ -70,6 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_noon" : MessageLookupByLibrary.simpleMessage("Rise and shine."),
     "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan Campus"),
     "i_see" : MessageLookupByLibrary.simpleMessage("OK"),
+    "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("Jiangwan Campus"),
     "last_15_days" : MessageLookupByLibrary.simpleMessage("Last 15 days"),
     "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
     "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
@@ -101,6 +103,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "welcome" : m1
+    "welcome" : m1,
+    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang Campus")
   };
 }

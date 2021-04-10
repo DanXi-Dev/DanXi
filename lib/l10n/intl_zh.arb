@@ -36,6 +36,9 @@
     "account": "账户",
 
     "handan_campus": "邯郸校区",
+    "fenglin_campus": "枫林校区",
+    "jiangwan_campus": "江湾校区",
+    "zhangjiang_campus": "张江校区",
 
     "i_see":"好",
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",

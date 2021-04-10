@@ -34,6 +34,9 @@
     "account": "Account",
 
     "handan_campus": "Handan Campus",
+    "fenglin_campus": "Fenglin Campus",
+    "jiangwan_campus": "Jiangwan Campus",
+    "zhangjiang_campus": "Zhangjiang Campus",
 
     "i_see":"OK",
     "ticking":"Checking in...",

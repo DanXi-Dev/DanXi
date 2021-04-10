@@ -365,6 +365,36 @@ class S {
     );
   }
 
+  /// `Fenglin Campus`
+  String get fenglin_campus {
+    return Intl.message(
+      'Fenglin Campus',
+      name: 'fenglin_campus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Jiangwan Campus`
+  String get jiangwan_campus {
+    return Intl.message(
+      'Jiangwan Campus',
+      name: 'jiangwan_campus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Zhangjiang Campus`
+  String get zhangjiang_campus {
+    return Intl.message(
+      'Zhangjiang Campus',
+      name: 'zhangjiang_campus',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `OK`
   String get i_see {
     return Intl.message(
