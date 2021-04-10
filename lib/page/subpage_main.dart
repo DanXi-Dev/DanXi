@@ -94,7 +94,8 @@ class _HomeSubpageState extends State<HomeSubpage>
                         : const Icon(SFSymbols.qrcode),
                     subtitle: Text(S.of(context).tap_to_view),
                     onTap: () {
-                      QR.showQRCode(context, context.personInfo, _brightness);
+                      QRHelper.showQRCode(
+                          context, context.personInfo, _brightness);
                     },
                   ),
                 )

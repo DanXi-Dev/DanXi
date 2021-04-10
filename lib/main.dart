@@ -30,8 +30,8 @@ import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
-import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
@@ -158,6 +158,12 @@ class _HomePageState extends State<HomePage> {
   ///
   /// Request user to log in manually in the browser.
   StreamSubscription<CaptchaNeededException> _captchaSubscription;
+
+  /// If we need to send the qr code to iWatch now.
+  ///
+  /// When notified [watchActivated], we should send it after [_personInfo] is loaded.
+  bool _needSendToWatch = false;
+
   bool _isDialogShown = false;
 
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
@@ -171,6 +177,8 @@ class _HomePageState extends State<HomePage> {
   ];
 
   /// Force app to refresh pages.
+  ///
+  /// It's usually called when user changes his account.
   void _rebuildPage() {
     _subpage = [
       HomeSubpage(),
@@ -186,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
-    (cxt) => null  //TODO: is a stub
+    (cxt) => null //TODO: is a stub
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
@@ -207,12 +215,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    /* Listening to the network state.
-    _connectivitySubscription = WiFiUtils.getConnectivity()
-        .onConnectivityChanged
-        .listen((_) => _loadNetworkState());
-     */
-
     // Refresh the page when account changes.
     _personInfo.addListener(() {
       _rebuildPage();
@@ -253,27 +255,39 @@ class _HomePageState extends State<HomePage> {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)
         quickActions.initialize((shortcutType) {
-          if (shortcutType == 'action_qr_code' && _personInfo != null) {
-            QR.showQRCode(context, _personInfo.value, _brightness);
+          if (shortcutType == 'action_qr_code' && _personInfo.value != null) {
+            QRHelper.showQRCode(context, _personInfo.value, _brightness);
           }
         });
+      // Configure watch listeners on iOS.
+      if (_needSendToWatch && _personInfo.value != null) {
+        QRHelper.sendQRtoWatch(_personInfo.value);
+        // Only send once.
+        _needSendToWatch = false;
+      }
     });
-    //_loadNetworkState();
     // Add shortcuts on Android & iOS.
-    if (PlatformX.isMobile)
+    if (PlatformX.isMobile) {
       quickActions.setShortcutItems(<ShortcutItem>[
         ShortcutItem(
             type: 'action_qr_code',
             localizedTitle: S.current.fudan_qr_code,
             icon: 'ic_launcher'),
       ]);
+    }
     initPlatformState(); //Init brightness control
 
-    //Init watchOS support
+    // Init watchOS support
     const channel_a = const MethodChannel('watchAppActivated');
     channel_a.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'watchActivated') {
-        QR.sendQRtoWatch(_personInfo.value);
+        // If we haven't loaded [_personInfo]
+        if (_personInfo.value == null) {
+          // Notify that we should send the qr code to watch later
+          _needSendToWatch = true;
+        } else {
+          QRHelper.sendQRtoWatch(_personInfo.value);
+        }
       }
     });
   }
@@ -331,7 +345,6 @@ class _HomePageState extends State<HomePage> {
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        //await loadOrInitSharedPreference(forceLogin: true);
         break;
       case 1:
         AddNewPostEvent().fire();
@@ -349,7 +362,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     print("rebuild!");
     return _personInfo.value == null
-        // Empty container if no person info is set
+    // Show an empty container if no person info is set
         ? PlatformScaffold(
             iosContentBottomPadding: true,
             iosContentPadding: true,
@@ -359,87 +372,87 @@ class _HomePageState extends State<HomePage> {
                 PlatformIconButton(
                   padding: EdgeInsets.zero,
                   icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
-                context)),
-            onPressed: _onPressActionButton,
+                      context)),
+                  onPressed: _onPressActionButton,
+                )
+              ],
+            ),
+            body: Container(),
           )
-        ],
-      ),
-      body: Container(),
-    )
         : PlatformScaffold(
-      iosContentBottomPadding: true,
-      iosContentPadding: _subpage[_pageIndex.value].needPadding,
-      appBar: PlatformAppBar(
-        title: Text(
-          S.of(context).app_name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        trailingActions: [
-          PlatformIconButton(
-            material: (_, __) => MaterialIconButtonData(
-                tooltip:
-                _subpageActionButtonTextBuilders[_pageIndex.value](
-                    context)),
-            padding: EdgeInsets.zero,
-            icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
-                context)),
-            onPressed: _onPressActionButton,
-          )
-        ],
-      ),
-      body: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: _pageIndex),
-          ChangeNotifierProvider.value(value: _connectStatus),
-          ChangeNotifierProvider.value(value: _personInfo),
-        ],
-        child: IndexedStack(index: _pageIndex.value, children: _subpage),
-      ),
-      bottomNavBar: PlatformNavBar(
-        items: [
-          BottomNavigationBarItem(
-            backgroundColor: Colors.purple,
-            icon: PlatformX.isAndroid
-                ? Icon(Icons.dashboard)
-                : Icon(SFSymbols.square_stack_3d_up_fill),
-            label: S.of(context).dashboard,
-          ),
-          BottomNavigationBarItem(
-            backgroundColor: Colors.indigo,
-            icon: PlatformX.isAndroid
-                ? Icon(Icons.forum)
-                : Icon(SFSymbols.text_bubble),
-            label: S.of(context).forum,
-          ),
-          BottomNavigationBarItem(
-            backgroundColor: Colors.blue,
-            icon: PlatformX.isAndroid
-                ? Icon(Icons.calendar_today)
-                : Icon(SFSymbols.calendar),
-            label: S.of(context).timetable,
-          ),
-          BottomNavigationBarItem(
-            backgroundColor: Colors.blue, //TODO: Change Color
-            icon: PlatformX.isAndroid
-                ? Icon(Icons.settings)
-                : Icon(SFSymbols.gear_alt), //TODO: Change Icon
-            label: S.of(context).settings,
-          ),
-        ],
-        currentIndex: _pageIndex.value,
-        material: (_, __) => MaterialNavBarData(
-          type: BottomNavigationBarType.shifting,
-          selectedIconTheme:
-          BottomNavigationBarTheme.of(context).selectedIconTheme,
-          unselectedIconTheme:
-          BottomNavigationBarTheme.of(context).unselectedIconTheme,
-        ),
-        itemChanged: (index) {
-          if (index != _pageIndex.value) {
-            setState(() => _pageIndex.value = index);
-          }
-        },
-      ),
-    );
+            iosContentBottomPadding: true,
+            iosContentPadding: _subpage[_pageIndex.value].needPadding,
+            appBar: PlatformAppBar(
+              title: Text(
+                S.of(context).app_name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              trailingActions: [
+                PlatformIconButton(
+                  material: (_, __) => MaterialIconButtonData(
+                      tooltip:
+                          _subpageActionButtonTextBuilders[_pageIndex.value](
+                              context)),
+                  padding: EdgeInsets.zero,
+                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+                  onPressed: _onPressActionButton,
+                )
+              ],
+            ),
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(value: _pageIndex),
+                ChangeNotifierProvider.value(value: _connectStatus),
+                ChangeNotifierProvider.value(value: _personInfo),
+              ],
+              child: IndexedStack(index: _pageIndex.value, children: _subpage),
+            ),
+            bottomNavBar: PlatformNavBar(
+              items: [
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.purple,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.dashboard)
+                      : Icon(SFSymbols.square_stack_3d_up_fill),
+                  label: S.of(context).dashboard,
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.indigo,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.forum)
+                      : Icon(SFSymbols.text_bubble),
+                  label: S.of(context).forum,
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.blue,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.calendar_today)
+                      : Icon(SFSymbols.calendar),
+                  label: S.of(context).timetable,
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.blue, //TODO: Change Color
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.settings)
+                      : Icon(SFSymbols.gear_alt), //TODO: Change Icon
+                  label: S.of(context).settings,
+                ),
+              ],
+              currentIndex: _pageIndex.value,
+              material: (_, __) => MaterialNavBarData(
+                type: BottomNavigationBarType.shifting,
+                selectedIconTheme:
+                    BottomNavigationBarTheme.of(context).selectedIconTheme,
+                unselectedIconTheme:
+                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
+              ),
+              itemChanged: (index) {
+                if (index != _pageIndex.value) {
+                  setState(() => _pageIndex.value = index);
+                }
+              },
+            ),
+          );
   }
 }

@@ -29,7 +29,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class QR {
+class QRHelper {
   static void showQRCode(
       BuildContext context, PersonInfo personInfo, double brightness) {
     //Set screen brightness for displaying QR Code

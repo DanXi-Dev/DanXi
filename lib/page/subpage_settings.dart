@@ -21,9 +21,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/page/subpage_bbs.dart';
-import 'package:dan_xi/page/subpage_main.dart';
-import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
@@ -69,39 +66,40 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     LicenseItem("flutter_inappwebview", LICENSE_APACHE_2_0,
         "https://github.com/pichillilorenzo/flutter_inappwebview"),
     //TODO items below need recheck
-    LicenseItem("flutter_localizations", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
+    LicenseItem("flutter_localizations", LICENSE_BSD_3_0_CLAUSE,
+        "https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html"),
     LicenseItem("flutter_platform_widgets", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
-    LicenseItem("flutter_progress_dialog", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
-    LicenseItem("flutter_sfsymbols", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
-    LicenseItem(
-        "flutter_test", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+        "https://github.com/stryder-dev/flutter_platform_widgets"),
+    LicenseItem("flutter_progress_dialog", LICENSE_APACHE_2_0,
+        "https://github.com/wuzhendev/flutter_progress_dialog"),
+    LicenseItem("flutter_sfsymbols", LICENSE_APACHE_2_0,
+        "https://github.com/virskor/flutter_sfsymbols"),
+    LicenseItem("flutter_test", LICENSE_BSD_3_0_CLAUSE,
+        "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html"),
     LicenseItem("flutter_timetable_view", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
-    LicenseItem("http", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
-    LicenseItem("ical", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
-    LicenseItem("intl", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
-    LicenseItem("json_serializable", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
-    LicenseItem("network_info_plus", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
+        "https://github.com/yamarkz/flutter_timetable_view"),
+    LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
+    LicenseItem("ical", LICENSE_BSD, "https://github.com/dartclub/ical"),
+    LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
+    LicenseItem("json_serializable", LICENSE_BSD,
+        "https://github.com/google/json_serializable.dart/tree/master/json_serializable"),
+    LicenseItem("network_info_plus", LICENSE_BSD,
+        "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/"),
     LicenseItem(
-        "path_provider", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+        "path_provider", LICENSE_BSD, "https://github.com/flutter/plugins"),
     LicenseItem(
-        "provider", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+        "provider", LICENSE_MIT, "https://github.com/rrousselGit/provider"),
     LicenseItem(
-        "qr_flutter", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+        "qr_flutter", LICENSE_BSD, "https://github.com/theyakka/qr.flutter"),
     LicenseItem(
-        "quick_actions", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
-    LicenseItem("screen", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
-    LicenseItem("share", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
-    LicenseItem("shared_preferences", LICENSE_MIT,
-        "https://github.com/flutterchina/dio/"),
+        "quick_actions", LICENSE_BSD, "https://github.com/flutter/plugins"),
+    LicenseItem("screen", LICENSE_MIT,
+        "https://github.com/clovisnicolas/flutter_screen"),
+    LicenseItem("share", LICENSE_BSD, "https://github.com/flutter/plugins"),
+    LicenseItem("shared_preferences", LICENSE_BSD,
+        "https://github.com/flutter/plugins"),
     LicenseItem(
-        "url_launcher", LICENSE_MIT, "https://github.com/flutterchina/dio/"),
+        "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
   ];
 
   String _campus;
@@ -110,32 +108,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   void initState() {
     super.initState();
     initCampus();
-    _personInfo.addListener(() {
-      _rebuildPage();
-      refreshSelf();
-    });
-  }
-
-  /// List of all of the subpages. They will be displayed as tab pages.
-  List<PlatformSubpage> _subpage = [
-    HomeSubpage(),
-    BBSSubpage(),
-    TimetableSubPage(),
-    SettingsSubpage()
-  ];
-
-  /// Force app to refresh pages.
-  void _rebuildPage() {
-    _subpage = [
-      HomeSubpage(),
-      BBSSubpage(),
-      TimetableSubPage(),
-      SettingsSubpage()
-    ];
   }
 
   SharedPreferences _preferences;
-  ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
+
   Future<void> initLogin({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
     _showLoginDialog(forceLogin: forceLogin);
@@ -152,11 +128,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
 
   Future<void> changeCampus(String newCampus) async {
     _preferences = await SharedPreferences.getInstance();
-    _preferences.setString('campus',newCampus);
+    _preferences.setString('campus', newCampus);
   }
 
   String getCampusFriendlyName() {
-    switch(_campus){
+    switch (_campus) {
       case 'handan_campus':
         return S.of(context).handan_campus;
       case 'fenglin_campus':
@@ -176,7 +152,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
       barrierDismissible: false,
       builder: (BuildContext context) => LoginDialog(
           sharedPreferences: _preferences,
-          personInfo: _personInfo,
+          personInfo:
+              Provider.of<ValueNotifier<PersonInfo>>(context, listen: false),
           forceLogin: forceLogin));
 
   @override
@@ -189,183 +166,189 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     return RefreshIndicator(
         onRefresh: () async => refreshSelf(),
         child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: ListView(
-              padding: EdgeInsets.all(4),
-              children: <Widget>[
-                //Account Selection
-                Card(
-                  child: ListTile(
-                    title: Text(S.of(context).account),
-                    leading: PlatformX.isAndroid
-                        ? const Icon(Icons.account_circle)
-                        : const Icon(SFSymbols.person_circle),
-                    subtitle: Text(context.personInfo.name + ' (' + context.personInfo.id + ')'),
-                    onTap: () async {
-                      await initLogin(forceLogin: true);
-                      //TODO: Reload after account switch
-                    },
-                  ),
-                ),
+          context: context,
+          removeTop: true,
+          child: ListView(padding: EdgeInsets.all(4), children: <Widget>[
+            //Account Selection
+            Card(
+              child: ListTile(
+                title: Text(S.of(context).account),
+                leading: PlatformX.isAndroid
+                    ? const Icon(Icons.account_circle)
+                    : const Icon(SFSymbols.person_circle),
+                subtitle: Text(context.personInfo.name +
+                    ' (' +
+                    context.personInfo.id +
+                    ')'),
+                onTap: () async {
+                  await initLogin(forceLogin: true);
+                  //TODO: Reload after account switch
+                },
+              ),
+            ),
 
-                //Campus Selection
-                Card(
-                  child: ListTile(
-                    title: Text(S.of(context).default_campus),
-                    leading: PlatformX.isAndroid
-                        ? const Icon(Icons.location_city)
-                        : const Icon(SFSymbols.location),
-                    subtitle:
-                        Text(getCampusFriendlyName()),
-                    onTap: () {
-                      //TODO: Present a selector
-                      //Set campus with changeCampus(String);
-                    },
-                  ),
-                ),
+            //Campus Selection
+            Card(
+              child: ListTile(
+                title: Text(S.of(context).default_campus),
+                leading: PlatformX.isAndroid
+                    ? const Icon(Icons.location_city)
+                    : const Icon(SFSymbols.location),
+                subtitle: Text(getCampusFriendlyName()),
+                onTap: () {
+                  //TODO: Present a selector
+                  //Set campus with changeCampus(String);
+                },
+              ),
+            ),
 
-                //About Page
-                Card(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ListTile(
-                        leading: PlatformX.isAndroid
-                            ? const Icon(Icons.info)
-                            : const Icon(SFSymbols.info_circle),
-                        title: Text(S.of(context).about),
-                      ),
-                      Container(
-                        padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
-                        child: new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            //About Page
+            Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ListTile(
+                    leading: PlatformX.isAndroid
+                        ? const Icon(Icons.info)
+                        : const Icon(SFSymbols.info_circle),
+                    title: Text(S.of(context).about),
+                  ),
+                  Container(
+                    padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
+                    child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            S.of(context).app_description_title,
+                            textScaleFactor: 1.1,
+                          ),
+                          Divider(),
+                          Text(S.of(context).app_description),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Text(
+                            S.of(context).authors,
+                            textScaleFactor: 1.1,
+                          ),
+                          Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text(
-                                S.of(context).app_description_title,
-                                textScaleFactor: 1.1,
-                              ),
-                              Divider(),
-                              Text(S.of(context).app_description),
-                              const SizedBox(height: 15,),
-                              Text(S.of(context).authors,textScaleFactor: 1.1,),
-                              Divider(),
-                              Row(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new NetworkImage(
-                                                        S.of(context).dev_image_url_1)
-                                                )
-                                            )),
-                                        onTap: () {
-                                          launch(S.of(context).dev_page_1);
-                                        },
-                                      ),
-                                      const SizedBox(height: _avatarNameSpacing),
-                                      Text(S.of(context).dev_name_1),
-                                    ],
+                                  InkWell(
+                                    child: Container(
+                                        width: _avatarSize,
+                                        height: _avatarSize,
+                                        decoration: new BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: new DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: new NetworkImage(S
+                                                    .of(context)
+                                                    .dev_image_url_1)))),
+                                    onTap: () {
+                                      launch(S.of(context).dev_page_1);
+                                    },
                                   ),
-                                  const SizedBox(width: _avatarSpacing),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new NetworkImage(
-                                                        S.of(context).dev_image_url_2)
-                                                )
-                                            )),
-                                        onTap: () {
-                                          launch(S.of(context).dev_page_2);
-                                        },
-                                      ),
-                                      const SizedBox(height: _avatarNameSpacing),
-                                      Text(S.of(context).dev_name_2),
-                                    ],
-                                  ),
-                                  const SizedBox(width: _avatarSpacing),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new NetworkImage(
-                                                        S.of(context).dev_image_url_3)
-                                                )
-                                            )),
-                                        onTap: () {
-                                          launch(S.of(context).dev_page_3);
-                                        },
-                                      ),
-                                      const SizedBox(height: _avatarNameSpacing),
-                                      Text(S.of(context).dev_name_3),
-                                    ],
-                                  ),
+                                  const SizedBox(height: _avatarNameSpacing),
+                                  Text(S.of(context).dev_name_1),
                                 ],
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(width: _avatarSpacing),
                               Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget> [Text(S.of(context).author_descriptor,textScaleFactor: 0.75, textAlign: TextAlign.right, style: TextStyle(fontStyle: FontStyle.italic)),],
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  InkWell(
+                                    child: Container(
+                                        width: _avatarSize,
+                                        height: _avatarSize,
+                                        decoration: new BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: new DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: new NetworkImage(S
+                                                    .of(context)
+                                                    .dev_image_url_2)))),
+                                    onTap: () {
+                                      launch(S.of(context).dev_page_2);
+                                    },
+                                  ),
+                                  const SizedBox(height: _avatarNameSpacing),
+                                  Text(S.of(context).dev_name_2),
+                                ],
                               ),
-                            ]
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          TextButton(
-                            child: Text(
-                                S.of(context).open_source_software_licenses),
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(
-                                  "/about/openLicense",
-                                  arguments: {"items": _LICENSE_ITEMS});
-                            },
+                              const SizedBox(width: _avatarSpacing),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  InkWell(
+                                    child: Container(
+                                        width: _avatarSize,
+                                        height: _avatarSize,
+                                        decoration: new BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: new DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: new NetworkImage(S
+                                                    .of(context)
+                                                    .dev_image_url_3)))),
+                                    onTap: () {
+                                      launch(S.of(context).dev_page_3);
+                                    },
+                                  ),
+                                  const SizedBox(height: _avatarNameSpacing),
+                                  Text(S.of(context).dev_name_3),
+                                ],
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          TextButton(
-                            child: Text(S.of(context).project_page),
-                            onPressed: () {
-                              launch(S.of(context).project_url);
-                            },
+                          const SizedBox(height: 10),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              Text(S.of(context).author_descriptor,
+                                  textScaleFactor: 0.75,
+                                  textAlign: TextAlign.right,
+                                  style:
+                                      TextStyle(fontStyle: FontStyle.italic)),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                        ],
+                        ]),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      TextButton(
+                        child:
+                            Text(S.of(context).open_source_software_licenses),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed("/about/openLicense",
+                              arguments: {"items": _LICENSE_ITEMS});
+                        },
                       ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        child: Text(S.of(context).project_page),
+                        onPressed: () {
+                          launch(S.of(context).project_url);
+                        },
+                      ),
+                      const SizedBox(width: 8),
                     ],
                   ),
-                ),
-            ]),)
-    );
+                ],
+              ),
+            ),
+          ]),
+        ));
   }
 }
