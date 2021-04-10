@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
@@ -26,7 +24,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -65,16 +62,16 @@ class _CardCrowdDataState extends State<CardCrowdData> {
               context: context,
               barrierDismissible: false,
               builder: (BuildContext context) => PlatformAlertDialog(
-                content: Text(S.of(context).out_of_dining_time),
-                actions: <Widget>[
-                  PlatformDialogAction(
-                      child: PlatformText(S.of(context).i_see),
-                      onPressed: () {
-                        Navigator.pop(context); //Close Dialog
-                        Navigator.pop(context); //Return to previous level
-                      }),
-                ],
-              ));
+                    content: Text(S.of(context).out_of_dining_time),
+                    actions: <Widget>[
+                      PlatformDialogAction(
+                          child: PlatformText(S.of(context).i_see),
+                          onPressed: () {
+                            Navigator.pop(context); //Close Dialog
+                            Navigator.pop(context); //Return to previous level
+                          }),
+                    ],
+                  ));
         }
       }
     });
@@ -125,17 +122,69 @@ class _CardCrowdDataState extends State<CardCrowdData> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
+    Map<String, Map<String, TrafficInfo>> zoneTraffic = {};
     if (_trafficInfos == null) return widgets;
-    _trafficInfos.forEach((key, value) {
-      widgets.add(Material(
-          color: isCupertino(context) ? Colors.white : null,
-          child: ListTile(
-            leading: PlatformX.isAndroid ? const Icon(Icons.timelapse) : const Icon(SFSymbols.clock),
-            title: Text(value.current.toString()),
-            subtitle: Text(key),
-          )));
-    });
 
+    DiningHallCrowdednessRepository.getInstance()
+        .toZoneList(_selectItem, _trafficInfos)
+        .forEach((key, value) {
+      widgets.add(_buildZoneCard(key, value));
+    });
     return widgets;
+  }
+
+  Card _buildZoneCard(String zoneName, Map<String, TrafficInfo> infoList) {
+    List<Widget> infoIndicators = [];
+    infoList.forEach((key, value) {
+      infoIndicators.add(Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(key),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text("${value.current} / ${value.max}"),
+                ),
+              ],
+            ),
+            LinearProgressIndicator(
+              value: value.max == 0 ? 0 : value.current / value.max,
+            )
+          ],
+        ),
+      ));
+    });
+    return Card(
+      margin: EdgeInsets.all(8),
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Column(
+          // Make the title align to left
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  color: Colors.deepPurple,
+                ),
+                Text(
+                  zoneName,
+                  style: TextStyle(fontSize: 18, color: Colors.deepPurple),
+                ),
+              ],
+            ),
+            Column(
+              children: infoIndicators,
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

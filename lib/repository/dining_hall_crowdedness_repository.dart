@@ -35,6 +35,33 @@ class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
 
   factory DiningHallCrowdednessRepository.getInstance() => _instance;
 
+  /// Divide canteens into different zones.
+  /// e.g. 光华，南区，南苑，枫林，张江（枫林和张江无明显划分）
+  Map<String, Map<String, TrafficInfo>> toZoneList(
+      String areaName, Map<String, TrafficInfo> trafficInfo) {
+    Map<String, Map<String, TrafficInfo>> zoneTraffic = {};
+    if (trafficInfo == null) return zoneTraffic;
+
+    // Divide canteens into different zones.
+    // e.g. 光华，南区，南苑，枫林，张江（枫林和张江无明显划分）
+    trafficInfo.forEach((key, value) {
+      List<String> locations = key.split("\n");
+      String zone, canteenName;
+      if (locations.length == 1) {
+        zone = areaName;
+      } else {
+        zone = locations[0];
+        locations.removeAt(0);
+      }
+      canteenName = locations.join(' ');
+      if (!zoneTraffic.containsKey(zone)) {
+        zoneTraffic[zone] = {};
+      }
+      zoneTraffic[zone][canteenName] = value;
+    });
+    return zoneTraffic;
+  }
+
   Future<Map<String, TrafficInfo>> getCrowdednessInfo(
       PersonInfo info, int areaCode) async {
     var result = Map<String, TrafficInfo>();
