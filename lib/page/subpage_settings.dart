@@ -147,14 +147,17 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   }
 
   /// Pop up a dialog where user can give his name & password.
-  void _showLoginDialog({bool forceLogin = false}) => showPlatformDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => LoginDialog(
-          sharedPreferences: _preferences,
-          personInfo:
-              Provider.of<ValueNotifier<PersonInfo>>(context, listen: false),
-          forceLogin: forceLogin));
+  void _showLoginDialog({bool forceLogin = false}) {
+    ValueNotifier<PersonInfo> _infoNotifier =
+        Provider.of<ValueNotifier<PersonInfo>>(context, listen: false);
+    showPlatformDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => LoginDialog(
+            sharedPreferences: _preferences,
+            personInfo: _infoNotifier,
+            forceLogin: forceLogin));
+  }
 
   @override
   Widget build(BuildContext context) {
