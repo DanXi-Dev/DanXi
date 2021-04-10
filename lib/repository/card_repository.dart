@@ -77,7 +77,6 @@ class CardRepository extends BaseRepositoryWithDio {
       }
       return null;
     });
-    CodeTimer.tick(info: "Logged in");
   }
 
   Future<String> getName() async {
@@ -123,7 +122,6 @@ class CardRepository extends BaseRepositoryWithDio {
         (element) => element.attributes["name"] == "_csrf",
         orElse: () => null);
     var csrfId = element.attributes["content"];
-    CodeTimer.tick(info: "csrfId got.");
     //Build the request body.
     var end = new DateTime.now();
     int backDays = logDays == 0 ? 30 : logDays;
@@ -152,13 +150,11 @@ class CardRepository extends BaseRepositoryWithDio {
       totalPages =
           int.parse(detailResponse.data.toString().between('</b>/', '页'));
     }
-    CodeTimer.tick(info: "totalPages got.");
     //Get pages.
     List<CardRecord> list = [];
     for (int pageIndex = 1; pageIndex <= totalPages; pageIndex++) {
       list.addAll(await _loadOnePageCardRecord(data, pageIndex));
     }
-    CodeTimer.tick(info: "CardRecord got.");
     return list;
   }
 
@@ -173,7 +169,6 @@ class CardRepository extends BaseRepositoryWithDio {
     cardInfo.cash =
         userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
     cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");
-    CodeTimer.tick(info: "Info got.");
     List<CardRecord> records =
         await Retrier.runAsyncWithRetry(() => loadCardRecord(logDays));
     cardInfo.records = records;

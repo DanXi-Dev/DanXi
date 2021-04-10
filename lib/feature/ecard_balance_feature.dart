@@ -40,7 +40,6 @@ class EcardBalanceFeature extends Feature {
 
   Future<void> _loadCard(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
-    CodeTimer.start();
     await CardRepository.getInstance().login(info);
     _cardInfo = await CardRepository.getInstance().loadCardInfo(0);
 
