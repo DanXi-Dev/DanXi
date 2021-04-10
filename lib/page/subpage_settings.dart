@@ -322,7 +322,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                   textScaleFactor: 0.8,
                                   textAlign: TextAlign.right,
                                   //style: TextStyle(fontStyle: FontStyle.italic)),
-                            ],
+                              )],
                           ),
                         ]),
                   ),
