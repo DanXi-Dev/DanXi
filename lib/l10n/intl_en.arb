@@ -10,7 +10,7 @@
     "out_of_dining_time":"It's not dining time right now.",
     "comma_least_crowded_canteen_is": ", the least crowded canteen is",
     "most_crowded_canteen_currently_is": "Currently, the most crowded canteen is",
-    "canteen": "食堂",
+    "canteen": "Canteen",
     "fudan_daily":"COVID-19 Safety Check-In",
     "fudan_daily_ticked":"Already done",
     "fudan_daily_tick":"Tap to check in",
@@ -30,7 +30,7 @@
     "project_page": "Project Page",
     "authors": "Authors",
     "app_description_title": "Description",
-    "app_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "app_description": "A miniature Fudan Integrated Service APP, created by several Fudan undergraduate students with love. We hope it can facilitate your life~",
     "account": "Account",
 
     "handan_campus": "Handan Campus",

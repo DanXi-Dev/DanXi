@@ -32,8 +32,8 @@ class UISLoginTool {
     ArgumentError.checkNotNull(dio);
     ArgumentError.checkNotNull(serviceUrl);
     jar.deleteAll();
-    var data = {};
-    var res = await dio.get(serviceUrl);
+    Map<String, String> data = {};
+    Response res = await dio.get(serviceUrl);
     Beautifulsoup(res.data.toString()).find_all("input").forEach((element) {
       if (element.attributes['type'] != "button") {
         data[element.attributes['name']] = element.attributes['value'];

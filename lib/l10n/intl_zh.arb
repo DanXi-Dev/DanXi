@@ -30,9 +30,9 @@
     "about": "关于本应用",
     "open_source_software_licenses": "开源软件许可协议",
     "project_page": "项目页面",
-    "authors": "作者：",
-    "app_description_title": "简介：",
-    "app_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "authors": "作者",
+    "app_description_title": "简介",
+    "app_description": "由几位复旦本科学生用爱发电打造的微型复旦综合服务 APP，希望能为你的生活提供便利~",
     "account": "账户",
 
     "handan_campus": "邯郸校区",
