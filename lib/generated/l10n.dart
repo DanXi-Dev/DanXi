@@ -315,10 +315,10 @@ class S {
     );
   }
 
-  /// `Authors`
+  /// `Developers`
   String get authors {
     return Intl.message(
-      'Authors',
+      'Developers',
       name: 'authors',
       desc: '',
       args: [],

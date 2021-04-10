@@ -24,38 +24,27 @@ class MessageLookup extends MessageLookupByLibrary {
   static m1(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function>{
-        "LICENSES": MessageLookupByLibrary.simpleMessage(
-            "DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
-        "about": MessageLookupByLibrary.simpleMessage("About This App"),
-        "account": MessageLookupByLibrary.simpleMessage("Account"),
-        "app_description": MessageLookupByLibrary.simpleMessage(
-            "A miniature Fudan Integrated Service APP, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
-        "app_description_title":
-            MessageLookupByLibrary.simpleMessage("Description"),
-        "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
-        "authors": MessageLookupByLibrary.simpleMessage("Authors"),
-        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
-        "canteen": MessageLookupByLibrary.simpleMessage("Canteen"),
-        "change_account":
-            MessageLookupByLibrary.simpleMessage("Switch Account"),
-        "choose_area": MessageLookupByLibrary.simpleMessage("Select Campus"),
-        "comma_least_crowded_canteen_is": MessageLookupByLibrary.simpleMessage(
-            ", the least crowded canteen is"),
-        "current_connection":
-            MessageLookupByLibrary.simpleMessage("Current Connection"),
-        "current_connection_failed": MessageLookupByLibrary.simpleMessage(
-            "Failed to obtain WLAN information, Precise Location permission required"),
-        "current_connection_no_wifi":
-            MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
-        "dashboard": MessageLookupByLibrary.simpleMessage("Dashboard"),
-        "default_campus":
-            MessageLookupByLibrary.simpleMessage("Current Campus"),
-        "dev_image_url_1": MessageLookupByLibrary.simpleMessage(
-            "https://avatars.githubusercontent.com/u/8389787?v=4"),
-        "dev_image_url_2": MessageLookupByLibrary.simpleMessage(
-            "https://avatars.githubusercontent.com/u/12184989?v=4"),
-        "dev_image_url_3" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/54014142?v=4"),
+  static _notInlinedMessages(_) => <String, Function> {
+    "LICENSES" : MessageLookupByLibrary.simpleMessage("DEMO LICENSE FILE\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
+    "about" : MessageLookupByLibrary.simpleMessage("About This App"),
+    "account" : MessageLookupByLibrary.simpleMessage("Account"),
+    "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service APP, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
+    "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
+    "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
+    "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
+    "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
+    "canteen" : MessageLookupByLibrary.simpleMessage("Canteen"),
+    "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
+    "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
+    "comma_least_crowded_canteen_is" : MessageLookupByLibrary.simpleMessage(", the least crowded canteen is"),
+    "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
+    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
+    "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
+    "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
+    "default_campus" : MessageLookupByLibrary.simpleMessage("Current Campus"),
+    "dev_image_url_1" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/8389787?v=4"),
+    "dev_image_url_2" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/12184989?v=4"),
+    "dev_image_url_3" : MessageLookupByLibrary.simpleMessage("https://avatars.githubusercontent.com/u/54014142?v=4"),
     "dev_name_1" : MessageLookupByLibrary.simpleMessage("w568w"),
     "dev_name_2" : MessageLookupByLibrary.simpleMessage("kavinzhao"),
     "dev_name_3" : MessageLookupByLibrary.simpleMessage("KYLN24"),
