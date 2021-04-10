@@ -107,7 +107,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   @override
   void initState() {
     super.initState();
-    initSharedPrefs();
   }
 
   SharedPreferences _preferences;
@@ -125,10 +124,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   static const String JIANGWAN_CAMPUS = 'jiangwan_campus';
   static const String ZHANGJIANG_CAMPUS = 'zhangjiang_campus';
 
-  Future<void> initSharedPrefs() async {
-    _preferences = await SharedPreferences.getInstance();
-  }
-
   void changeCampus(String newCampus) {
     _preferences.setString('campus', newCampus);
   }
@@ -138,7 +133,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     return HANDAN_CAMPUS;
   }
 
-  String getCampusFriendlyName() {
+  Future<String> getCampusFriendlyName() async {
+    _preferences = await SharedPreferences.getInstance();
     _campus = _preferences.getString('campus') ?? setDefaultCampus();
     switch (_campus) {
       case HANDAN_CAMPUS:
@@ -201,7 +197,17 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                 leading: PlatformX.isAndroid
                     ? const Icon(Icons.location_city)
                     : const Icon(SFSymbols.location),
-                subtitle: Text(getCampusFriendlyName()),
+                subtitle: FutureBuilder<String>(
+                  future: getCampusFriendlyName(),
+                  builder: (BuildContext context,
+                  AsyncSnapshot<String> snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(snapshot.data);
+                    }
+                    else {
+                      return Text(S.of(context).loading);
+                    }
+                  }),
                 onTap: () {
                   //TODO: Present a selector
                   //Set campus with changeCampus(String);
