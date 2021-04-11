@@ -139,6 +139,11 @@ class DiningHallCrowdednessFeature extends Feature {
             _mostCrowdedCanteen = 'NULL';
         }
       }
+      else {
+        _mostCrowdedCanteen = '(unimplemented)';
+        _leastCrowdedCanteen = '(unimplemented)';
+      }
+
       _status = ConnectionStatus.DONE;
     }
     notifyUpdate();

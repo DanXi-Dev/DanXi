@@ -88,6 +88,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           PlatformAppBar(title: Text(S.of(context).dining_hall_crowdedness)),
       body: Column(
         children: [
+          SizedBox(height: PlatformX.isMaterial(context) ? 0 : 10,),
           PlatformWidget(
               material: (_, __) => DropdownButton<Campus>(
                     items: _getItems(),

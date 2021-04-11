@@ -22,6 +22,7 @@ class SettingsProvider {
   SharedPreferences _preferences;
 
   static const String KEY_PREFERRED_CAMPUS = "campus";
+  static const String KEY_AUTOTICK_LAST_CANCEL_DATE = "autotick_last_cancel_date";
 
   SettingsProvider._(this._preferences);
 
@@ -44,5 +45,17 @@ class SettingsProvider {
 
   set campus(Campus campus) {
     _preferences.setString(KEY_PREFERRED_CAMPUS, campus.toString());
+  }
+
+  //FudanDaily AutoTick
+  String get autoTickCancelDate {
+    if (_preferences.containsKey(KEY_AUTOTICK_LAST_CANCEL_DATE)) {
+      return _preferences.getString(KEY_AUTOTICK_LAST_CANCEL_DATE);
+    }
+    return null;
+  }
+
+  set autoTickCancelDate(String datetime) {
+    _preferences.setString(KEY_AUTOTICK_LAST_CANCEL_DATE, datetime.toString());
   }
 }

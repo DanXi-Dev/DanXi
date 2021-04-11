@@ -21,6 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
@@ -29,12 +30,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FudanDailyFeature extends Feature {
   PersonInfo _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
   String _subTitle;
   bool _hasTicked;
+  SharedPreferences _preferences;
 
   int countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
   Timer timer;
@@ -44,11 +47,17 @@ class FudanDailyFeature extends Feature {
 
     await FudanDailyRepository.getInstance().hasTick(_info).then((bool value) {
       _status = ConnectionStatus.DONE;
+
+      DateTime now = new DateTime.now();
+      DateTime todayDate = new DateTime(now.year, now.month, now.day);
       if (value) {
         _subTitle = S.of(context).fudan_daily_ticked;
       }
-      else {
+      else if (SettingsProvider.of(_preferences).autoTickCancelDate != todayDate.toString()){
         timer = startTimeout();
+      }
+      else {
+        _subTitle = S.of(context).fudan_daily_tick;
       }
       _hasTicked = value;
       notifyUpdate();
@@ -89,7 +98,7 @@ class FudanDailyFeature extends Feature {
   @override
   void buildFeature() {
     _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
-
+    _preferences = Provider.of<SharedPreferences>(context);
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -140,6 +149,11 @@ class FudanDailyFeature extends Feature {
           timer.cancel();
           _subTitle = S.of(context).fudan_daily_tick;
           timer = null; countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
+
+          //Don't try to tick again today
+          DateTime now = new DateTime.now();
+          DateTime todayDate = new DateTime(now.year, now.month, now.day);
+          SettingsProvider.of(_preferences).autoTickCancelDate = todayDate.toString();
         }
         else {
           tickFudanDaily();
