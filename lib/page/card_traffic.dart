@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,13 +44,15 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   Campus _selectItem = Campus.NONE;
   int _sliding;
 
-  SharedPreferences _preferences;
-
   @override
   void initState() {
     super.initState();
     _personInfo = widget.arguments['personInfo'];
-    _sliding = SettingsProvider.of(_preferences).campus.index;
+    SharedPreferences.getInstance().then((preferences) {
+      _selectItem = SettingsProvider.of(preferences).campus;
+      _sliding = _selectItem.index;
+      _onSelectedItemChanged(_selectItem);
+    });
   }
 
   /// Load dining hall data
@@ -81,7 +84,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
         }
       }
     });
-    setState(() {});
+    refreshSelf();
   }
 
   @override
@@ -93,10 +96,14 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           PlatformAppBar(title: Text(S.of(context).dining_hall_crowdedness)),
       body: Column(
         children: [
-          SizedBox(height: PlatformX.isMaterial(context) ? 0 : 10,),
+          SizedBox(
+            height: PlatformX.isMaterial(context) ? 0 : 10,
+          ),
           PlatformWidget(
               material: (_, __) => DropdownButton<Campus>(
                     items: _getItems(),
+                    // Don't select anything if _selectItem == Campus.NONE
+                    value: _selectItem == Campus.NONE ? null : _selectItem,
                     hint: Text(_selectItem.displayTitle(context)),
                     onChanged: (Campus e) => _onSelectedItemChanged(e),
                   ),

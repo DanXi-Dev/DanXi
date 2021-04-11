@@ -154,8 +154,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   @override
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
-    double _avatarSize = (MediaQuery.of(context).size.width - 180) / 3;
+
     const double _avatarSpacing = 56;
+    double _avatarSize =
+        (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
     //TODO: WARNING Hardcoded avatarSize Modifiers!
 

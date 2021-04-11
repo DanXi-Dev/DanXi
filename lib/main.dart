@@ -108,11 +108,11 @@ class DanxiApp extends StatelessWidget {
                       unselectedIconTheme: IconThemeData(color: Colors.white),
                       selectedItemColor: Colors.white,
                       unselectedItemColor: Colors.white),
-                  textTheme: new TextTheme(
-                    bodyText2: new TextStyle(color: Colors.red),
-                    headline1: new TextStyle(fontSize: 78),
-                    button: new TextStyle(color: Colors.green),
-                  ),
+                  // textTheme: new TextTheme(
+                  //   bodyText2: new TextStyle(color: Colors.red),
+                  //   headline1: new TextStyle(fontSize: 78),
+                  //   button: new TextStyle(color: Colors.green),
+                  // ),
                 )),
             localizationsDelegates: [
               S.delegate,

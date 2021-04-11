@@ -39,34 +39,30 @@ class FudanDailyFeature extends Feature {
   bool _hasTicked;
   SharedPreferences _preferences;
 
-  int countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
-  Timer timer;
+  int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
+  Timer _timer;
 
   Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
-
-    await FudanDailyRepository.getInstance().hasTick(_info).then((bool value) {
+    // Get the status of reporting
+    await FudanDailyRepository.getInstance().hasTick(_info).then((bool ticked) {
       _status = ConnectionStatus.DONE;
 
-      DateTime now = new DateTime.now();
-      DateTime todayDate = new DateTime(now.year, now.month, now.day);
-      if (value) {
+      if (ticked) {
         _subTitle = S.of(context).fudan_daily_ticked;
-      }
-      else if (SettingsProvider.of(_preferences).autoTickCancelDate != todayDate.toString()){
-        timer = startTimeout();
-      }
-      else {
+      } else if (shouldAutomaticallyTickToday) {
+        _timer = startCountdown();
+      } else {
         _subTitle = S.of(context).fudan_daily_tick;
       }
-      _hasTicked = value;
+      _hasTicked = ticked;
       notifyUpdate();
     });
   }
 
   Future<void> tickFudanDaily() async {
     if (!_hasTicked) {
-      await FudanDailyRepository.getInstance().tick(_info).then((value) {
+      await FudanDailyRepository.getInstance().tick(_info).then((_) {
         refreshData();
       }, onError: (e) {
         if (e is NotTickYesterdayException) {
@@ -74,27 +70,27 @@ class FudanDailyFeature extends Feature {
         } else {
           _subTitle = S.of(context).tick_failed;
           notifyUpdate();
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context).tick_failed)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(S.of(context).tick_failed)));
         }
       });
     }
   }
 
-  Timer startTimeout() {
-    _subTitle = S.of(context).fudan_daily_tick_countdown_1 + countdownRemainingTime.toString() + S.of(context).fudan_daily_tick_countdown_2;
-    notifyUpdate();
-    return Timer(Duration(seconds: 1), handleTimeout);
-  }
-
-  void handleTimeout() {  // callback function
-    countdownRemainingTime--;
-    if (countdownRemainingTime < 0) {
-      tickFudanDaily();
-    }
-    else {
-      timer = startTimeout();
-    }
+  Timer startCountdown() {
+    _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
+    return Timer.periodic(Duration(seconds: 1), (timer) {
+      _countdownRemainingTime--;
+      if (_countdownRemainingTime < 0) {
+        timer.cancel();
+        tickFudanDaily();
+      } else {
+        _subTitle = S.of(context).fudan_daily_tick_countdown_1 +
+            _countdownRemainingTime.toString() +
+            S.of(context).fudan_daily_tick_countdown_2;
+        notifyUpdate();
+      }
+    });
   }
 
   @override
@@ -102,7 +98,7 @@ class FudanDailyFeature extends Feature {
     _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     _preferences = Provider.of<SharedPreferences>(context);
 
-    if (timer != null) timer.cancel();
+    if (_timer != null) _timer.cancel();
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -123,7 +119,9 @@ class FudanDailyFeature extends Feature {
   String get subTitle => _subTitle;
 
   @override
-  Widget get icon => PlatformX.isAndroid ? const Icon(Icons.cloud_upload) : const Icon(SFSymbols.arrow_up_doc);
+  Widget get icon => PlatformX.isAndroid
+      ? const Icon(Icons.cloud_upload)
+      : const Icon(SFSymbols.arrow_up_doc);
 
   void _processForgetTickIssue() {
     showPlatformDialog(
@@ -139,6 +137,25 @@ class FudanDailyFeature extends Feature {
             ));
   }
 
+  bool get shouldAutomaticallyTickToday {
+    DateTime now = new DateTime.now();
+    DateTime todayDate = new DateTime(now.year, now.month, now.day);
+    return SettingsProvider.of(_preferences).autoTickCancelDate !=
+        todayDate.toString();
+  }
+
+  set shouldAutomaticallyTickToday(bool value) {
+    DateTime now = new DateTime.now();
+    DateTime todayDate = new DateTime(now.year, now.month, now.day);
+    if (value) {
+      SettingsProvider.of(_preferences).autoTickCancelDate = "";
+    } else {
+      SettingsProvider.of(_preferences).autoTickCancelDate =
+          todayDate.toString();
+    }
+  }
+
+  /// Restart the loading process
   void refreshData() {
     _status = ConnectionStatus.NONE;
     _subTitle = S.of(context).loading;
@@ -149,18 +166,15 @@ class FudanDailyFeature extends Feature {
   void onTap() async {
     switch (_status) {
       case ConnectionStatus.DONE:
-        if (timer != null && countdownRemainingTime >= 0) {
-          timer.cancel();
+        // If it's counting down, we'll cancel it
+        if (_timer != null && _countdownRemainingTime >= 0) {
+          _timer.cancel();
           _subTitle = S.of(context).fudan_daily_tick;
-          timer = null; countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
-
+          _timer = null;
           //Don't try to tick again today
-          DateTime now = new DateTime.now();
-          DateTime todayDate = new DateTime(now.year, now.month, now.day);
-          SettingsProvider.of(_preferences).autoTickCancelDate = todayDate.toString();
+          shouldAutomaticallyTickToday = false;
           notifyUpdate();
-        }
-        else {
+        } else {
           tickFudanDaily();
         }
         break;
