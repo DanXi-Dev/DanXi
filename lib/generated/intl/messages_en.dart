@@ -19,9 +19,11 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static m0(name) => "Reply ${name}";
+  static m0(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
-  static m1(name) => "Welcome, ${name}";
+  static m1(name) => "Reply ${name}";
+
+  static m2(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -63,8 +65,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("COVID-19 Safety Check-In"),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("Tap to check in"),
-    "fudan_daily_tick_countdown_1" : MessageLookupByLibrary.simpleMessage("Automatic check-in in "),
-    "fudan_daily_tick_countdown_2" : MessageLookupByLibrary.simpleMessage(" seconds. Tap to cancel."),
+    "fudan_daily_tick_countdown" : m0,
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
     "good_afternoon" : MessageLookupByLibrary.simpleMessage("The afternoon knows what the morning never suspected."),
@@ -96,7 +97,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
     "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reply_to" : m0,
+    "reply_to" : m1,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
@@ -106,7 +107,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "welcome" : m1,
+    "welcome" : m2,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

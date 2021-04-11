@@ -19,9 +19,11 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
-  static m0(name) => "回复 ${name}";
+  static m0(time) => "将在${time}秒后自动打卡，点击以取消";
 
-  static m1(name) => "欢迎你，${name}";
+  static m1(name) => "回复 ${name}";
+
+  static m2(name) => "欢迎你，${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -54,8 +56,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("教务处通知"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("平安复旦"),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("点击打卡"),
-    "fudan_daily_tick_countdown_1" : MessageLookupByLibrary.simpleMessage("将在"),
-    "fudan_daily_tick_countdown_2" : MessageLookupByLibrary.simpleMessage("秒内自动打卡，点击以取消"),
+    "fudan_daily_tick_countdown" : m0,
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("今日已打卡"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("复活码"),
     "good_afternoon" : MessageLookupByLibrary.simpleMessage("下午的悠闲时光~"),
@@ -86,7 +87,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("开源软件许可协议"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目页面"),
-    "reply_to" : m0,
+    "reply_to" : m1,
     "select_campus" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
@@ -96,7 +97,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
     "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
-    "welcome" : m1,
+    "welcome" : m2,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }

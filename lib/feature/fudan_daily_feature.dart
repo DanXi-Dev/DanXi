@@ -50,9 +50,7 @@ class FudanDailyFeature extends Feature {
       if (ticked) {
         _subTitle = S.of(context).fudan_daily_ticked;
       } else if (shouldAutomaticallyTickToday) {
-        _subTitle = S.of(context).fudan_daily_tick_countdown_1 +
-            _countdownRemainingTime.toString() +
-            S.of(context).fudan_daily_tick_countdown_2;
+        _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
         notifyUpdate();
         startCountdown();
       } else {
@@ -81,15 +79,15 @@ class FudanDailyFeature extends Feature {
   }
 
   void startCountdown() {
-    _subTitle = S.of(context).fudan_daily_tick_countdown_1 + _countdownRemainingTime.toString() + S.of(context).fudan_daily_tick_countdown_2;
+    _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
     notifyUpdate();
     Timer(Duration(seconds: 1), handleTimeout);
   }
 
   void handleTimeout() {  // callback function
-    if (_countdownRemainingTime == -1) {
+    if (_countdownRemainingTime == 0) {
       tickFudanDaily();
-      _countdownRemainingTime--;
+      _countdownRemainingTime = -2;
     }
     else if (_countdownRemainingTime != -2) {
       _countdownRemainingTime--;

@@ -185,23 +185,13 @@ class S {
     );
   }
 
-  /// `Automatic check-in in `
-  String get fudan_daily_tick_countdown_1 {
+  /// `Automatic check-in in {time} seconds. Tap to cancel.`
+  String fudan_daily_tick_countdown(Object time) {
     return Intl.message(
-      'Automatic check-in in ',
-      name: 'fudan_daily_tick_countdown_1',
+      'Automatic check-in in $time seconds. Tap to cancel.',
+      name: 'fudan_daily_tick_countdown',
       desc: '',
-      args: [],
-    );
-  }
-
-  /// ` seconds. Tap to cancel.`
-  String get fudan_daily_tick_countdown_2 {
-    return Intl.message(
-      ' seconds. Tap to cancel.',
-      name: 'fudan_daily_tick_countdown_2',
-      desc: '',
-      args: [],
+      args: [time],
     );
   }
 
