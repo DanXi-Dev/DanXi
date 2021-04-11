@@ -177,7 +177,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           children: [
             Row(
               children: [
-                PlatformX.isAndroid
+                PlatformX.isMaterial(context)
                     ? Icon(
                         Icons.location_on_outlined,
                         color: Colors.deepPurple,
@@ -187,7 +187,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                       ),
                 Text(
                   zoneName,
-                  style: PlatformX.isAndroid
+                  style: PlatformX.isMaterial(context)
                       ? TextStyle(fontSize: 18, color: Colors.deepPurple)
                       : TextStyle(fontSize: 18),
                 ),

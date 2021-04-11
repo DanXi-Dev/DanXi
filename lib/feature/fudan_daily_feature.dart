@@ -89,7 +89,7 @@ class FudanDailyFeature extends Feature {
 
   void handleTimeout() {  // callback function
     countdownRemainingTime--;
-    if (countdownRemainingTime <= 0) {
+    if (countdownRemainingTime < 0) {
       tickFudanDaily();
     }
     else {
@@ -101,6 +101,8 @@ class FudanDailyFeature extends Feature {
   void buildFeature() {
     _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     _preferences = Provider.of<SharedPreferences>(context);
+
+    if (timer != null) timer.cancel();
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
