@@ -131,23 +131,20 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
 
   List<Widget> _buildCampusAreaList() {
     List<Widget> list = [];
+    Function onTapListener = (Campus campus) {
+      SettingsProvider.of(_preferences).campus = campus;
+      Navigator.of(context).pop();
+      refreshSelf();
+    };
     Constant.CAMPUS_VALUES.forEach((value) {
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            SettingsProvider.of(_preferences).campus = value;
-            Navigator.of(context).pop();
-            refreshSelf();
-          },
+          onPressed: () => onTapListener(value),
           child: Text(value.displayTitle(context)),
         ),
         material: (_, __) => ListTile(
           title: Text(value.displayTitle(context)),
-          onTap: () {
-            SettingsProvider.of(_preferences).campus = value;
-            Navigator.of(context).pop();
-            refreshSelf();
-          },
+          onTap: () => onTapListener(value),
         ),
       ));
     });

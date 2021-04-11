@@ -53,6 +53,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
         .getCrowdednessInfo(_personInfo, _selectItem.index)
         .catchError((e) {
+      // If it's not time for a meal
       if (e is UnsuitableTimeException) {
         if (PlatformX.isMaterial(context)) {
           ScaffoldMessenger.of(context).showSnackBar(

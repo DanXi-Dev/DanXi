@@ -44,9 +44,9 @@ class DiningHallCrowdednessFeature extends Feature {
 
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
+    Campus preferredCampus = SettingsProvider.of(_preferences).campus;
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
-        .getCrowdednessInfo(
-            info, SettingsProvider.of(_preferences).campus.index)
+        .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;
@@ -55,84 +55,89 @@ class DiningHallCrowdednessFeature extends Feature {
 
     //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
-      var crowdednessSum = List<num>.filled(5, 0);
-      /* About crowdedness List
+      if (preferredCampus == Campus.HANDAN_CAMPUS) {
+        var crowdednessSum = List<num>.filled(5, 0);
+        /* About crowdedness List
          Index 0：北区
          Index 1：南区
          Index 2：旦苑
          Index 3：南苑
          Index 4：南区教工
        */
-      _trafficInfos.forEach((keyUnprocessed, value) {
-        if (value.current != 0) {
-          //Ignore zero entries
-          var key = keyUnprocessed.split('\n')[0];
-          var keySubtitle = '';
-          if (keyUnprocessed.length > 1)
-            keySubtitle = keyUnprocessed.split('\n')[1];
-          switch (key) {
-            case '北区':
-              crowdednessSum[0] += value.current;
-              break;
-            case '南区':
-              if (keySubtitle == '') {
-                crowdednessSum[1] += value.current;
-              } else {
-                switch (keySubtitle) {
-                  case '南苑餐厅':
-                    crowdednessSum[3] += value.current;
-                    break;
-                  case '教工快餐':
-                    crowdednessSum[4] += value.current;
-                    break;
-                  default:
-                    crowdednessSum[1] += value.current;
+        // Map<String, Map<String, TrafficInfo>> zoneList =
+        //     DiningHallCrowdednessRepository.getInstance()
+        //         .toZoneList(preferredCampus.displayTitle(context), _trafficInfos);
+        _trafficInfos.forEach((keyUnprocessed, value) {
+          if (value.current != 0) {
+            //Ignore zero entries
+            var key = keyUnprocessed.split('\n')[0];
+            var keySubtitle = '';
+            if (keyUnprocessed.length > 1)
+              keySubtitle = keyUnprocessed.split('\n')[1];
+            switch (key) {
+              case '北区':
+                crowdednessSum[0] += value.current;
+                break;
+              case '南区':
+                if (keySubtitle == '') {
+                  crowdednessSum[1] += value.current;
+                } else {
+                  switch (keySubtitle) {
+                    case '南苑餐厅':
+                      crowdednessSum[3] += value.current;
+                      break;
+                    case '教工快餐':
+                      crowdednessSum[4] += value.current;
+                      break;
+                    default:
+                      crowdednessSum[1] += value.current;
+                  }
                 }
-              }
-              break;
-            case '旦苑':
-              crowdednessSum[2] += value.current;
-              break;
+                break;
+              case '旦苑':
+                crowdednessSum[2] += value.current;
+                break;
+            }
           }
+        });
+        switch (crowdednessSum.indexOf(crowdednessSum.reduce(min))) {
+          case 0:
+            _leastCrowdedCanteen = '北区';
+            break;
+          case 1:
+            _leastCrowdedCanteen = '南区';
+            break;
+          case 2:
+            _leastCrowdedCanteen = '旦苑';
+            break;
+          case 3:
+            _leastCrowdedCanteen = '南苑';
+            break;
+          case 4:
+            _leastCrowdedCanteen = '南区教工';
+            break;
+          default:
+            _leastCrowdedCanteen = 'NULL';
         }
-      });
-      switch (crowdednessSum.indexOf(crowdednessSum.reduce(min))) {
-        case 0:
-          _leastCrowdedCanteen = '北区';
-          break;
-        case 1:
-          _leastCrowdedCanteen = '南区';
-          break;
-        case 2:
-          _leastCrowdedCanteen = '旦苑';
-          break;
-        case 3:
-          _leastCrowdedCanteen = '南苑';
-          break;
-        case 4:
-          _leastCrowdedCanteen = '南区教工';
-          break;
-        default:
-          _leastCrowdedCanteen = 'NULL';
-      }
-      switch (crowdednessSum.indexOf(crowdednessSum.reduce(max))) {
-        case 0:
-          _mostCrowdedCanteen = '北区';
-          break;
-        case 1:
-          _mostCrowdedCanteen = '南区';
-          break;
-        case 2:
-          _mostCrowdedCanteen = '旦苑';
-          break;
-        case 3:
-          _mostCrowdedCanteen = '南苑';
-          break;
-        case 4:
-          _mostCrowdedCanteen = '南区教工';
-          break;
-        default:
-          _mostCrowdedCanteen = 'NULL';
+        switch (crowdednessSum.indexOf(crowdednessSum.reduce(max))) {
+          case 0:
+            _mostCrowdedCanteen = '北区';
+            break;
+          case 1:
+            _mostCrowdedCanteen = '南区';
+            break;
+          case 2:
+            _mostCrowdedCanteen = '旦苑';
+            break;
+          case 3:
+            _mostCrowdedCanteen = '南苑';
+            break;
+          case 4:
+            _mostCrowdedCanteen = '南区教工';
+            break;
+          default:
+            _mostCrowdedCanteen = 'NULL';
+        }
       }
       _status = ConnectionStatus.DONE;
     }
@@ -147,10 +152,6 @@ class DiningHallCrowdednessFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _trafficInfos =
-          null; //TODO: Initialize? I'm not sure about the data structure here.
-      _leastCrowdedCanteen = '';
-      _mostCrowdedCanteen = '';
       _loadCrowdednessSummary(_info).catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
@@ -168,12 +169,14 @@ class DiningHallCrowdednessFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
       case ConnectionStatus.DONE:
-        return S.of(context).most_crowded_canteen_currently_is +
-            _mostCrowdedCanteen +
-            S.of(context).canteen +
-            S.of(context).comma_least_crowded_canteen_is +
-            _leastCrowdedCanteen +
-            S.of(context).canteen;
+        if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null)
+          return S.of(context).most_crowded_canteen_currently_is +
+              _mostCrowdedCanteen +
+              S.of(context).canteen +
+              S.of(context).comma_least_crowded_canteen_is +
+              _leastCrowdedCanteen +
+              S.of(context).canteen;
+        return '';
       case ConnectionStatus.FAILED:
         return S.of(context).failed;
       case ConnectionStatus.FATAL_ERROR:
