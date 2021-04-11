@@ -57,7 +57,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
-    "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin Campus"),
+    "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
     "forum" : MessageLookupByLibrary.simpleMessage("The \"Hole\""),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
@@ -71,9 +71,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_morning" : MessageLookupByLibrary.simpleMessage("Every dawn is a new sunrise."),
     "good_night" : MessageLookupByLibrary.simpleMessage("Goodnight stars, goodnight air, goodnight noises everywhere."),
     "good_noon" : MessageLookupByLibrary.simpleMessage("Rise and shine."),
-    "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan Campus"),
+    "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan"),
     "i_see" : MessageLookupByLibrary.simpleMessage("OK"),
-    "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("Jiangwan Campus"),
+    "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("Jiangwan"),
     "last_15_days" : MessageLookupByLibrary.simpleMessage("Last 15 days"),
     "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
     "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
@@ -107,6 +107,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
     "welcome" : m1,
-    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang Campus")
+    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

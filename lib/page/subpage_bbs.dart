@@ -174,27 +174,31 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _getListItem(BBSPost e) {
     return Material(
         color: PlatformX.isCupertino(context) ? Colors.white : null,
-        child: ListTile(
-          dense: false,
-          title: Text(e.content,
-              maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                e.author,
-                style: TextStyle(color: Colors.deepPurple),
-              ),
-              Text(
-                e.createdAt,
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-          onTap: () {
-            Navigator.of(context).pushNamed("/bbs/postDetail",
-                arguments: {"post": e, "user": _loginUser});
-          },
+        child: Card(
+          child: ListTile(
+            leading: Icon(SFSymbols.quote_bubble_fill),
+            visualDensity: VisualDensity(vertical: 2),
+            dense: false,
+            title: Text(e.content,
+                maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis),
+            subtitle:
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      e.author,
+                      style: TextStyle(color: Colors.deepPurple),
+                    ),
+                    Text(
+                      e.createdAt,
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+            onTap: () {
+              Navigator.of(context).pushNamed("/bbs/postDetail",
+                  arguments: {"post": e, "user": _loginUser});
+            }),
         ));
   }
 

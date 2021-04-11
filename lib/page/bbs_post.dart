@@ -69,12 +69,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
                 if (snapshot.hasData) {
                   var l = snapshot.data;
-                  return ListView.separated(
+                  return ListView.builder(
                       itemBuilder: (context, index) =>
                           _getListItem(l[index], index),
-                      separatorBuilder: (_, __) => Divider(
-                            color: Colors.grey,
-                          ),
+                      //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
                       itemCount: l.length);
                 }
                 return Container();
@@ -85,7 +83,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Widget _getListItem(BBSPost e, int index) => Material(
       color: isCupertino(context) ? Colors.white : null,
-      child: ListTile(
+      child: Card(
+          child: ListTile(
+        leading: Icon(SFSymbols.quote_bubble_fill),
+        //visualDensity: VisualDensity(vertical: 2),
         dense: false,
         title: Column(
           children: [
@@ -94,6 +95,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               child: Text("No. ${int.parse(e.objectId, radix: 36)}",
                   style: TextStyle(fontSize: 10, color: Colors.blueGrey)),
             ),
+            const SizedBox(height: 2),
             e.replyTo == "0"
                 ? Column()
                 : Align(
@@ -103,7 +105,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         style: TextStyle(fontSize: 10, color: Colors.green)),
                   ),
             Align(
-              alignment: Alignment.bottomLeft,
+              alignment: Alignment.topLeft,
               child: Text(e.content, style: TextStyle(fontSize: 15)),
             )
           ],
@@ -111,10 +113,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         subtitle: Stack(
           children: [
             Align(
-              alignment: Alignment.topLeft,
+              alignment: Alignment.topRight,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  const SizedBox(height: 2),
+                  Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
                   Text(
                     e.author,
                     style: TextStyle(color: Colors.deepPurple, fontSize: 12),
@@ -126,10 +130,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
-            )
           ],
         ),
         onTap: () {
@@ -139,7 +139,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             "replyTo": e.author
           });
         },
-      ));
+      )));
 
   @override
   void initState() {

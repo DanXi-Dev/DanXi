@@ -154,10 +154,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Widget _buildPage(TimeTable table) {
     TimetableStyle style = TimetableStyle(
         startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
-        laneHeight: 30,
-        laneWidth: 70,
-        timeItemWidth: 40,
-        timeItemHeight: 120);
+        laneHeight: 25,
+        laneWidth: (MediaQuery.of(context).size.width - 50) / 5,
+        timeItemWidth: 50,
+        timeItemHeight: 160);
     _table = table;
     _showingTime = _table.now();
     _status = ConnectionStatus.DONE;

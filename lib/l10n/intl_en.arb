@@ -37,10 +37,10 @@
     "app_description": "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~",
     "account": "Account",
 
-    "handan_campus": "Handan Campus",
-    "fenglin_campus": "Fenglin Campus",
-    "jiangwan_campus": "Jiangwan Campus",
-    "zhangjiang_campus": "Zhangjiang Campus",
+    "handan_campus": "Handan",
+    "fenglin_campus": "Fenglin",
+    "jiangwan_campus": "Jiangwan",
+    "zhangjiang_campus": "Zhangjiang",
 
     "i_see":"OK",
     "ticking":"Checking in...",

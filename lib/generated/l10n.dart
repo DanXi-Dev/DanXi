@@ -395,40 +395,40 @@ class S {
     );
   }
 
-  /// `Handan Campus`
+  /// `Handan`
   String get handan_campus {
     return Intl.message(
-      'Handan Campus',
+      'Handan',
       name: 'handan_campus',
       desc: '',
       args: [],
     );
   }
 
-  /// `Fenglin Campus`
+  /// `Fenglin`
   String get fenglin_campus {
     return Intl.message(
-      'Fenglin Campus',
+      'Fenglin',
       name: 'fenglin_campus',
       desc: '',
       args: [],
     );
   }
 
-  /// `Jiangwan Campus`
+  /// `Jiangwan`
   String get jiangwan_campus {
     return Intl.message(
-      'Jiangwan Campus',
+      'Jiangwan',
       name: 'jiangwan_campus',
       desc: '',
       args: [],
     );
   }
 
-  /// `Zhangjiang Campus`
+  /// `Zhangjiang`
   String get zhangjiang_campus {
     return Intl.message(
-      'Zhangjiang Campus',
+      'Zhangjiang',
       name: 'zhangjiang_campus',
       desc: '',
       args: [],
