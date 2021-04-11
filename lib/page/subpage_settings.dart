@@ -254,7 +254,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                             shape: BoxShape.circle,
                                             image: new DecorationImage(
                                                 fit: BoxFit.fill,
-                                                image: new NetworkImage(S
+                                                image: new AssetImage(S
                                                     .of(context)
                                                     .dev_image_url_1)))),
                                     onTap: () =>
@@ -280,7 +280,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                             shape: BoxShape.circle,
                                             image: new DecorationImage(
                                                 fit: BoxFit.fill,
-                                                image: new NetworkImage(S
+                                                image: new AssetImage(S
                                                     .of(context)
                                                     .dev_image_url_2)))),
                                     onTap: () =>
@@ -306,7 +306,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                             shape: BoxShape.circle,
                                             image: new DecorationImage(
                                                 fit: BoxFit.fill,
-                                                image: new NetworkImage(S
+                                                image: new AssetImage(S
                                                     .of(context)
                                                     .dev_image_url_3)))),
                                     onTap: () {

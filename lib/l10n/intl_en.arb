@@ -81,13 +81,13 @@
     "login_failed":"Login failed. Check your ID and/or password.",
 
     "project_url": "https:\/\/github.com\/w568w\/DanXi",
-    "dev_name_1": "许冬\nw568w",
-    "dev_name_2": "赵行健\nkavinzhao",
-    "dev_name_3": "郭虹麟\nKYLN24",
+    "dev_name_1": "许冬\n[w568w]",
+    "dev_name_2": "赵行健\n[kavinzhao]",
+    "dev_name_3": "郭虹麟\n[KYLN24]",
     "dev_page_1": "https:\/\/github.com\/w568w",
     "dev_page_2": "https:\/\/github.com\/kavinzhao",
     "dev_page_3": "https:\/\/github.com\/KYLN24",
-    "dev_image_url_1": "https:\/\/avatars.githubusercontent.com\/u\/8389787?v=4",
-    "dev_image_url_2": "https:\/\/avatars.githubusercontent.com\/u\/12184989?v=4",
-    "dev_image_url_3": "https:\/\/avatars.githubusercontent.com\/u\/54014142?v=4"
+    "dev_image_url_1": "assets/graphics/w568w.jpeg",
+    "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
+    "dev_image_url_3": "assets/graphics/kyln24.jpeg"
 }

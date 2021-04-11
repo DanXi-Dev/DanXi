@@ -73,6 +73,7 @@ class FudanDailyFeature extends Feature {
           _processForgetTickIssue();
         } else {
           _subTitle = S.of(context).tick_failed;
+          notifyUpdate();
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(S.of(context).tick_failed)));
         }
@@ -82,6 +83,7 @@ class FudanDailyFeature extends Feature {
 
   Timer startTimeout() {
     _subTitle = S.of(context).fudan_daily_tick_countdown_1 + countdownRemainingTime.toString() + S.of(context).fudan_daily_tick_countdown_2;
+    notifyUpdate();
     return Timer(Duration(seconds: 1), handleTimeout);
   }
 
@@ -154,6 +156,7 @@ class FudanDailyFeature extends Feature {
           DateTime now = new DateTime.now();
           DateTime todayDate = new DateTime(now.year, now.month, now.day);
           SettingsProvider.of(_preferences).autoTickCancelDate = todayDate.toString();
+          notifyUpdate();
         }
         else {
           tickFudanDaily();

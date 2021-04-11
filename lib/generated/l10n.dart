@@ -775,30 +775,30 @@ class S {
     );
   }
 
-  /// `许冬\nw568w`
+  /// `许冬\n[w568w]`
   String get dev_name_1 {
     return Intl.message(
-      '许冬\nw568w',
+      '许冬\n[w568w]',
       name: 'dev_name_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `赵行健\nkavinzhao`
+  /// `赵行健\n[kavinzhao]`
   String get dev_name_2 {
     return Intl.message(
-      '赵行健\nkavinzhao',
+      '赵行健\n[kavinzhao]',
       name: 'dev_name_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `郭虹麟\nKYLN24`
+  /// `郭虹麟\n[KYLN24]`
   String get dev_name_3 {
     return Intl.message(
-      '郭虹麟\nKYLN24',
+      '郭虹麟\n[KYLN24]',
       name: 'dev_name_3',
       desc: '',
       args: [],
@@ -835,30 +835,30 @@ class S {
     );
   }
 
-  /// `https://avatars.githubusercontent.com/u/8389787?v=4`
+  /// `assets/graphics/w568w.jpeg`
   String get dev_image_url_1 {
     return Intl.message(
-      'https://avatars.githubusercontent.com/u/8389787?v=4',
+      'assets/graphics/w568w.jpeg',
       name: 'dev_image_url_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `https://avatars.githubusercontent.com/u/12184989?v=4`
+  /// `assets/graphics/kavinzhao.jpeg`
   String get dev_image_url_2 {
     return Intl.message(
-      'https://avatars.githubusercontent.com/u/12184989?v=4',
+      'assets/graphics/kavinzhao.jpeg',
       name: 'dev_image_url_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `https://avatars.githubusercontent.com/u/54014142?v=4`
+  /// `assets/graphics/kyln24.jpeg`
   String get dev_image_url_3 {
     return Intl.message(
-      'https://avatars.githubusercontent.com/u/54014142?v=4',
+      'assets/graphics/kyln24.jpeg',
       name: 'dev_image_url_3',
       desc: '',
       args: [],
