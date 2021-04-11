@@ -76,7 +76,6 @@ class _HomeSubpageState extends State<HomeSubpage>
                 Card(
                     child: Column(
                   children: [
-                    const SizedBox(height: 10),
                     FeatureListItem(feature: WelcomeFeature()),
                     Divider(),
                     //FeatureListItem(feature: WlanFeature()),
