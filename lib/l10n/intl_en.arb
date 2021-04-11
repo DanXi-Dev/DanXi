@@ -14,6 +14,8 @@
     "fudan_daily":"COVID-19 Safety Check-In",
     "fudan_daily_ticked":"Already done",
     "fudan_daily_tick":"Tap to check in",
+    "fudan_daily_tick_countdown_1":"Automatic check-in in ",
+    "fudan_daily_tick_countdown_2":" seconds. Tap to cancel.",
     "fudan_aao_notices":"Academic Announcements",
     "loading":"Loading...",
     "failed":"Unable to load content, tap to retry",

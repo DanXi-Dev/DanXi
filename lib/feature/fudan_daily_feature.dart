@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -25,7 +27,6 @@ import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 
@@ -35,17 +36,54 @@ class FudanDailyFeature extends Feature {
   String _subTitle;
   bool _hasTicked;
 
+  int countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
+  Timer timer;
+
   Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
 
     await FudanDailyRepository.getInstance().hasTick(_info).then((bool value) {
       _status = ConnectionStatus.DONE;
-      _subTitle = value
-          ? S.of(context).fudan_daily_ticked
-          : S.of(context).fudan_daily_tick;
+      if (value) {
+        _subTitle = S.of(context).fudan_daily_ticked;
+      }
+      else {
+        timer = startTimeout();
+      }
       _hasTicked = value;
       notifyUpdate();
     });
+  }
+
+  Future<void> tickFudanDaily() async {
+    if (!_hasTicked) {
+      await FudanDailyRepository.getInstance().tick(_info).then((value) {
+        refreshData();
+      }, onError: (e) {
+        if (e is NotTickYesterdayException) {
+          _processForgetTickIssue();
+        } else {
+          _subTitle = S.of(context).tick_failed;
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(S.of(context).tick_failed)));
+        }
+      });
+    }
+  }
+
+  Timer startTimeout() {
+    _subTitle = S.of(context).fudan_daily_tick_countdown_1 + countdownRemainingTime.toString() + S.of(context).fudan_daily_tick_countdown_2;
+    return Timer(Duration(seconds: 1), handleTimeout);
+  }
+
+  void handleTimeout() {  // callback function
+    countdownRemainingTime--;
+    if (countdownRemainingTime <= 0) {
+      tickFudanDaily();
+    }
+    else {
+      timer = startTimeout();
+    }
   }
 
   @override
@@ -98,21 +136,13 @@ class FudanDailyFeature extends Feature {
   void onTap() async {
     switch (_status) {
       case ConnectionStatus.DONE:
-        if (!_hasTicked) {
-          var progressDialog = showProgressDialog(
-              loadingText: S.of(context).ticking, context: context);
-          await FudanDailyRepository.getInstance().tick(_info).then((value) {
-            progressDialog.dismiss();
-            refreshData();
-          }, onError: (e) {
-            progressDialog.dismiss();
-            if (e is NotTickYesterdayException) {
-              _processForgetTickIssue();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context).tick_failed)));
-            }
-          });
+        if (timer != null && countdownRemainingTime >= 0) {
+          timer.cancel();
+          _subTitle = S.of(context).fudan_daily_tick;
+          timer = null; countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS;
+        }
+        else {
+          tickFudanDaily();
         }
         break;
       case ConnectionStatus.FAILED:

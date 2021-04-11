@@ -63,6 +63,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("COVID-19 Safety Check-In"),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("Tap to check in"),
+    "fudan_daily_tick_countdown_1" : MessageLookupByLibrary.simpleMessage("Automatic check-in in "),
+    "fudan_daily_tick_countdown_2" : MessageLookupByLibrary.simpleMessage(" seconds. Tap to cancel."),
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
     "good_afternoon" : MessageLookupByLibrary.simpleMessage("The afternoon knows what the morning never suspected."),

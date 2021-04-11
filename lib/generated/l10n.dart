@@ -185,6 +185,26 @@ class S {
     );
   }
 
+  /// `Automatic check-in in `
+  String get fudan_daily_tick_countdown_1 {
+    return Intl.message(
+      'Automatic check-in in ',
+      name: 'fudan_daily_tick_countdown_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ` seconds. Tap to cancel.`
+  String get fudan_daily_tick_countdown_2 {
+    return Intl.message(
+      ' seconds. Tap to cancel.',
+      name: 'fudan_daily_tick_countdown_2',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Academic Announcements`
   String get fudan_aao_notices {
     return Intl.message(

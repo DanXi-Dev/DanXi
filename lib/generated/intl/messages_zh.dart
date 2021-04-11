@@ -54,6 +54,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("教务处通知"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("平安复旦"),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("点击打卡"),
+    "fudan_daily_tick_countdown_1" : MessageLookupByLibrary.simpleMessage("将在"),
+    "fudan_daily_tick_countdown_2" : MessageLookupByLibrary.simpleMessage("秒内自动打卡，点击以取消"),
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("今日已打卡"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("复活码"),
     "good_afternoon" : MessageLookupByLibrary.simpleMessage("下午的悠闲时光~"),
