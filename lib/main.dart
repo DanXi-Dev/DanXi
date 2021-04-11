@@ -194,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
-    (cxt) => null //TODO: is a stub
+    (cxt) => null
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
@@ -433,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                   label: S.of(context).timetable,
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Colors.blue, //TODO: Change Color
+                  backgroundColor: Colors.blueGrey,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.settings)
                       : Icon(SFSymbols.gear_alt), //TODO: Change Icon
