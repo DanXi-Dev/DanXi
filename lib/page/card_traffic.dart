@@ -25,7 +25,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -39,22 +38,20 @@ class CardCrowdData extends StatefulWidget {
 class _CardCrowdDataState extends State<CardCrowdData> {
   PersonInfo _personInfo;
   Map<String, TrafficInfo> _trafficInfos;
-  String _selectItem = S.current.choose_area;
-  //int _sliding;
+  Campus _selectItem = Campus.NONE;
+  int _sliding;
 
   @override
   void initState() {
     super.initState();
     _personInfo = widget.arguments['personInfo'];
-    getDefaultCampus().then((value) => _onSelectedItemChanged(value));
   }
 
   /// Load dining hall data
-  Future<void> _onSelectedItemChanged(String e) async {
+  Future<void> _onSelectedItemChanged(Campus e) async {
     setState(() => {_selectItem = e, _trafficInfos = null});
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
-        .getCrowdednessInfo(
-            _personInfo, Constant.campusArea.indexOf(_selectItem))
+        .getCrowdednessInfo(_personInfo, _selectItem.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         if (PlatformX.isMaterial(context)) {
@@ -81,12 +78,6 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     setState(() {});
   }
 
-  SharedPreferences _preferences;
-  Future<String> getDefaultCampus() async {
-    _preferences = await SharedPreferences.getInstance();
-    return _preferences.getString('campus');
-  }
-
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
@@ -96,20 +87,20 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           PlatformAppBar(title: Text(S.of(context).dining_hall_crowdedness)),
       body: Column(
         children: [
-          /*PlatformWidget(
-              material: (_, __) => DropdownButton<String>(
+          PlatformWidget(
+              material: (_, __) => DropdownButton<Campus>(
                     items: _getItems(),
-                    hint: Text(_selectItem),
-                    onChanged: (String e) => _onSelectedItemChanged(e),
+                    hint: Text(_selectItem.displayTitle(context)),
+                    onChanged: (Campus e) => _onSelectedItemChanged(e),
                   ),
               cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
                     onValueChanged: (int value) {
                       _sliding = value;
-                      _onSelectedItemChanged(Constant.campusArea[value]);
+                      _onSelectedItemChanged(Campus.values[_sliding]);
                     },
                     groupValue: _sliding,
                     children: _getCupertinoItems(),
-                  )),*/
+                  )),
           Expanded(
               child: MediaQuery.removePadding(
                   context: context,
@@ -122,20 +113,21 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     );
   }
 
-  List<DropdownMenuItem> _getItems() => Constant.campusArea
-      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-      .toList(growable: false);
+  List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
+        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
+      }).toList(growable: false);
 
-  Map<int, Text> _getCupertinoItems() =>
-      Constant.campusArea.map((e) => Text(e)).toList(growable: false).asMap();
+  Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
+      .map((e) => Text(e.displayTitle(context)))
+      .toList(growable: false)
+      .asMap();
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    Map<String, Map<String, TrafficInfo>> zoneTraffic = {};
     if (_trafficInfos == null) return widgets;
 
     DiningHallCrowdednessRepository.getInstance()
-        .toZoneList(_selectItem, _trafficInfos)
+        .toZoneList(_selectItem.displayTitle(context), _trafficInfos)
         .forEach((key, value) {
       widgets.add(_buildZoneCard(key, value));
     });
@@ -178,15 +170,19 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           children: [
             Row(
               children: [
-                PlatformX.isAndroid ? Icon(
-                  Icons.location_on_outlined,
-                  color: Colors.deepPurple,
-                ) : Icon(
-                  SFSymbols.location_circle,
-                ),
+                PlatformX.isAndroid
+                    ? Icon(
+                        Icons.location_on_outlined,
+                        color: Colors.deepPurple,
+                      )
+                    : Icon(
+                        SFSymbols.location_circle,
+                      ),
                 Text(
                   zoneName,
-                  style: PlatformX.isAndroid ? TextStyle(fontSize: 18, color: Colors.deepPurple) : TextStyle(fontSize: 18),
+                  style: PlatformX.isAndroid
+                      ? TextStyle(fontSize: 18, color: Colors.deepPurple)
+                      : TextStyle(fontSize: 18),
                 ),
               ],
             ),

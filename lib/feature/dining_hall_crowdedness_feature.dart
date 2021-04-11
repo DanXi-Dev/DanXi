@@ -21,20 +21,23 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
   PersonInfo _info;
   Map<String, TrafficInfo> _trafficInfos;
   String _leastCrowdedCanteen;
   String _mostCrowdedCanteen;
+  SharedPreferences _preferences;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -42,8 +45,8 @@ class DiningHallCrowdednessFeature extends Feature {
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
     _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
-        .getCrowdednessInfo(info,
-            Constant.campusArea.indexOf("邯郸校区")) //TODO: Support sharedPrefs
+        .getCrowdednessInfo(
+            info, SettingsProvider.of(_preferences).campus.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;
@@ -65,17 +68,17 @@ class DiningHallCrowdednessFeature extends Feature {
           //Ignore zero entries
           var key = keyUnprocessed.split('\n')[0];
           var keySubtitle = '';
-          if(keyUnprocessed.length > 1) keySubtitle = keyUnprocessed.split('\n')[1];
+          if (keyUnprocessed.length > 1)
+            keySubtitle = keyUnprocessed.split('\n')[1];
           switch (key) {
             case '北区':
               crowdednessSum[0] += value.current;
               break;
             case '南区':
-              if(keySubtitle == '') {
+              if (keySubtitle == '') {
                 crowdednessSum[1] += value.current;
-              }
-              else {
-                switch(keySubtitle){
+              } else {
+                switch (keySubtitle) {
                   case '南苑餐厅':
                     crowdednessSum[3] += value.current;
                     break;
@@ -138,8 +141,8 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   void buildFeature() {
-    _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
-
+    _info = context.personInfo;
+    _preferences = Provider.of<SharedPreferences>(context);
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.

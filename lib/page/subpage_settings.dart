@@ -22,6 +22,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
@@ -104,8 +105,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
   ];
 
-  String _campus;
-
   @override
   void initState() {
     super.initState();
@@ -115,32 +114,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
 
   void initLogin({bool forceLogin = false}) {
     _showLoginDialog(forceLogin: forceLogin);
-  }
-
-  void changeCampus(String newCampus) {
-    _preferences.setString('campus', newCampus);
-    refreshSelf();
-  }
-
-  String setDefaultCampus() {
-    changeCampus(Constant.HANDAN_CAMPUS);
-    return Constant.HANDAN_CAMPUS;
-  }
-
-  String getCampusFriendlyName() {
-    _campus = _preferences.getString('campus') ?? setDefaultCampus();
-    switch (_campus) {
-      case Constant.HANDAN_CAMPUS:
-        return S.of(context).handan_campus;
-      case Constant.FENGLIN_CAMPUS:
-        return S.of(context).fenglin_campus;
-      case Constant.JIANGWAN_CAMPUS:
-        return S.of(context).jiangwan_campus;
-      case Constant.ZHANGJIANG_CAMPUS:
-        return S.of(context).zhangjiang_campus;
-      default:
-        return '[Corrupted Data] (' + _campus + ')';
-    }
   }
 
   /// Pop up a dialog where user can give his name & password.
@@ -157,27 +130,23 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   }
 
   List<Widget> _buildCampusAreaList() {
-    Map<String, String> areaMap = {
-      S.of(context).handan_campus: Constant.HANDAN_CAMPUS,
-      S.of(context).fenglin_campus: Constant.FENGLIN_CAMPUS,
-      S.of(context).zhangjiang_campus: Constant.ZHANGJIANG_CAMPUS,
-      S.of(context).jiangwan_campus: Constant.JIANGWAN_CAMPUS
-    };
     List<Widget> list = [];
-    areaMap.forEach((key, value) {
+    Constant.CAMPUS_VALUES.forEach((value) {
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () {
-            changeCampus(value);
+            SettingsProvider.of(_preferences).campus = value;
             Navigator.of(context).pop();
+            refreshSelf();
           },
-          child: Text(key),
+          child: Text(value.displayTitle(context)),
         ),
         material: (_, __) => ListTile(
-          title: Text(key),
+          title: Text(value.displayTitle(context)),
           onTap: () {
-            changeCampus(value);
+            SettingsProvider.of(_preferences).campus = value;
             Navigator.of(context).pop();
+            refreshSelf();
           },
         ),
       ));
@@ -220,7 +189,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                 leading: PlatformX.isAndroid
                     ? const Icon(Icons.location_city)
                     : const Icon(SFSymbols.location),
-                subtitle: Text(getCampusFriendlyName()),
+                subtitle: Text(SettingsProvider.of(_preferences)
+                    .campus
+                    .displayTitle(context)),
                 onTap: () {
                   if (_preferences != null) {
                     showPlatformModalSheet(
@@ -293,7 +264,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                         launch(S.of(context).dev_page_1),
                                   ),
                                   const SizedBox(height: _avatarNameSpacing),
-                                  Text(S.of(context).dev_name_1, textAlign: TextAlign.center,),
+                                  Text(
+                                    S.of(context).dev_name_1,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                               const SizedBox(width: _avatarSpacing),
@@ -316,7 +290,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                         launch(S.of(context).dev_page_2),
                                   ),
                                   const SizedBox(height: _avatarNameSpacing),
-                                  Text(S.of(context).dev_name_2, textAlign: TextAlign.center,),
+                                  Text(
+                                    S.of(context).dev_name_2,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                               const SizedBox(width: _avatarSpacing),
@@ -340,7 +317,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                     },
                                   ),
                                   const SizedBox(height: _avatarNameSpacing),
-                                  Text(S.of(context).dev_name_3, textAlign: TextAlign.center,),
+                                  Text(
+                                    S.of(context).dev_name_3,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                             ],
@@ -365,7 +345,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     children: <Widget>[
                       TextButton(
                         child:
-                        Text(S.of(context).open_source_software_licenses),
+                            Text(S.of(context).open_source_software_licenses),
                         onPressed: () {
                           Navigator.of(context).pushNamed("/about/openLicense",
                               arguments: {"items": _LICENSE_ITEMS});
