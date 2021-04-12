@@ -28,7 +28,7 @@ class PostRepository {
   PostRepository._();
 
   Future<BmobUser> login(PersonInfo personInfo) async {
-    var user = BmobUser();
+    BmobUser user = BmobUser();
     user.username = personInfo.name;
     user.email = personInfo.id;
     user.password = personInfo.password;

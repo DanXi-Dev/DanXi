@@ -54,8 +54,10 @@ extension ObjectEx on dynamic {
 extension StateEx on State {
   /// Call [setState] to perform a global redrawing of the widget.
   void refreshSelf() {
-    // ignore: invalid_use_of_protected_member
-    setState(() {});
+    if (mounted) {
+      // ignore: invalid_use_of_protected_member
+      setState(() {});
+    }
   }
 }
 

@@ -322,25 +322,6 @@ class _HomePageState extends State<HomePage> {
       _showLoginDialog(forceLogin: forceLogin);
     }
   }
-
-  /* Load network ssid
-  Future<void> _loadNetworkState() async {
-    ConnectivityResult connectivity =
-        await WiFiUtils.getConnectivity().checkConnectivity();
-    if (connectivity == ConnectivityResult.wifi) {
-      Map<String, String> result =
-          await WiFiUtils.getWiFiInfo(connectivity).catchError((_) => null);
-      setState(() => _connectStatus.value =
-          result == null || result['name'] == null
-              ? S.current.current_connection_failed
-              : FDUWiFiConverter.recognizeWiFi(result['name']));
-    } else {
-      setState(() =>
-          _connectStatus.value = S.of(context).current_connection_no_wifi);
-    }
-  }
-  */
-
   /// When user clicks the action button on appbar
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
@@ -360,7 +341,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print("rebuild!");
     return _personInfo.value == null
     // Show an empty container if no person info is set
         ? PlatformScaffold(

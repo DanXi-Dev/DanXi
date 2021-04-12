@@ -120,14 +120,15 @@ class _TagContainerState extends State<TagContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Material(
+        child: Container(
       margin: const EdgeInsets.only(top: 16),
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       child: Wrap(
         spacing: 8,
         children: tagList.map((e) => _buildTag(e)).toList(),
       ),
-    );
+    ));
   }
 
   Widget _buildTag(Tag data) {
