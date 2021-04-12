@@ -168,13 +168,6 @@ class _HomePageState extends State<HomePage> {
 
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
-  PageController _pageController = PageController(initialPage: 0);
-
-  /// Whether the [PageView] is animating to another page.
-  ///
-  /// Call the [BottomAppBar] not to show its animation.
-  bool _animating = false;
-
   /// List of all of the subpages. They will be displayed as tab pages.
   List<PlatformSubpage> _subpage = [
     HomeSubpage(),
@@ -329,7 +322,6 @@ class _HomePageState extends State<HomePage> {
       _showLoginDialog(forceLogin: forceLogin);
     }
   }
-
   /// When user clicks the action button on appbar
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
@@ -395,15 +387,7 @@ class _HomePageState extends State<HomePage> {
                 ChangeNotifierProvider.value(value: _personInfo),
                 Provider.value(value: _preferences)
               ],
-              child: PageView(
-                controller: _pageController,
-                children: _subpage,
-                onPageChanged: (index) {
-                  if (index != _pageIndex.value && !_animating) {
-                    setState(() => _pageIndex.value = index);
-                  }
-                },
-              ),
+              child: IndexedStack(index: _pageIndex.value, children: _subpage),
             ),
             bottomNavBar: PlatformNavBar(
               items: [
@@ -446,15 +430,7 @@ class _HomePageState extends State<HomePage> {
               ),
               itemChanged: (index) {
                 if (index != _pageIndex.value) {
-                  setState(() {
-                    _animating = true;
-                    _pageController
-                        .animateToPage(index,
-                            curve: Curves.easeInOut,
-                            duration: Duration(milliseconds: 300))
-                        .then((_) => _animating = false);
-                    _pageIndex.value = index;
-                  });
+                  setState(() => _pageIndex.value = index);
                 }
               },
             ),
