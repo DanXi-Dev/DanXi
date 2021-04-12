@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
@@ -25,11 +24,11 @@ import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -112,14 +111,29 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     super.initState();
   }
 
-  static const channel = const MethodChannel('appControl');
-
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     await _preferences.clear().then((value) =>
     {
-      SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
-      channel.invokeMethod('exit'), //TODO: WARNING This might not pass App Store Review
+      showPlatformDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => PlatformAlertDialog(
+          title: Text(S.of(context).logout_question_prompt_title),
+          content: Text(S.of(context).logout_question_prompt),
+          actions: [
+            PlatformDialogAction(
+              child: Text(S.of(context).cancel),
+              onPressed: (){
+                Navigator.of(context).pop();
+          },),
+            PlatformDialogAction(
+              child: Text(S.of(context).i_see),
+              onPressed: (){
+                FlutterApp.exitApp();
+                },),],
+        ),
+      ),
       showPlatformDialog(
           context: context,
           barrierDismissible: false,

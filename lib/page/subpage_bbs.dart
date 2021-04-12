@@ -248,7 +248,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 children: [
                   Text(
                     e.author,
-                    style: TextStyle(color: Colors.deepPurple),
+                    style: TextStyle(color: Colors.deepPurple, fontSize: 12),
                   ),
                   Text(
                     e.createdAt,

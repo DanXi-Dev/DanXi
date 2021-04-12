@@ -22,9 +22,14 @@ import 'package:flutter/services.dart';
 
 class FlutterApp {
   static void exitApp() {
-    if (PlatformX.isMobile) {
+    if (PlatformX.isAndroid) {
       SystemNavigator.pop(animated: true);
-    } else {
+    }
+    else if (PlatformX.isIOS) {
+      const channel = const MethodChannel('appControl');
+      channel.invokeMethod('exit'); //TODO: WARNING This might not pass App Store Review
+    }
+    else {
       exit(0);
     }
   }

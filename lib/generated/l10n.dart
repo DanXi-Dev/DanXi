@@ -405,6 +405,26 @@ class S {
     );
   }
 
+  /// `Are you sure?`
+  String get logout_question_prompt_title {
+    return Intl.message(
+      'Are you sure?',
+      name: 'logout_question_prompt_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This app will exit after deleting all data.`
+  String get logout_question_prompt {
+    return Intl.message(
+      'This app will exit after deleting all data.',
+      name: 'logout_question_prompt',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `You need to restart this app for changes to take effect.`
   String get logout_prompt {
     return Intl.message(
@@ -715,10 +735,10 @@ class S {
     );
   }
 
-  /// `Reply {name}`
+  /// `Reply No.{name}`
   String reply_to(Object name) {
     return Intl.message(
-      'Reply $name',
+      'Reply No.$name',
       name: 'reply_to',
       desc: '',
       args: [name],

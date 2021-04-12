@@ -37,6 +37,8 @@
     "account": "Account",
     "logout": "Logout",
     "logout_subtitle": "And delete all data from this device",
+    "logout_question_prompt_title": "Are you sure?",
+    "logout_question_prompt": "This app will exit after deleting all data.",
     "logout_prompt": "You need to restart this app for changes to take effect.",
 
     "handan_campus": "Handan",
@@ -71,7 +73,7 @@
     "new_post":"New Post",
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
-    "reply_to":"Reply {name}",
+    "reply_to":"Reply No.{name}",
 
     "good_morning":"Every dawn is a new sunrise.",
     "good_noon":"Rise and shine.",

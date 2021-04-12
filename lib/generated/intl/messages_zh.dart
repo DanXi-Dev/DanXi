@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(time) => "将在${time}秒后自动打卡，点击以取消";
 
-  static m1(name) => "回复 ${name}";
+  static m1(name) => "回复 No.${name}";
 
   static m2(name) => "欢迎你，${name}";
 
@@ -85,6 +85,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "logining" : MessageLookupByLibrary.simpleMessage("正在登录..."),
     "logout" : MessageLookupByLibrary.simpleMessage("退出登录"),
     "logout_prompt" : MessageLookupByLibrary.simpleMessage("重新启动app以删除数据"),
+    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("删除数据后，此app将会退出。"),
+    "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("确定要退出登录吗？"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("并删除此设备上的所有数据"),
     "most_crowded_canteen_currently_is" : MessageLookupByLibrary.simpleMessage("当前排队人数最多的餐厅是"),
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
