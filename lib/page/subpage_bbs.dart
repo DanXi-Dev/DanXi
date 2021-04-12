@@ -242,7 +242,8 @@ class _BBSSubpageState extends State<BBSSubpage>
               title: Text(e.content,
                   maxLines: 1,
                   softWrap: false,
-                  overflow: TextOverflow.ellipsis),
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 16),), //TODO: Support Dynamic Font
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [

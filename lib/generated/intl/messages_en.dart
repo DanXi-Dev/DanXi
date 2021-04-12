@@ -94,7 +94,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "logining" : MessageLookupByLibrary.simpleMessage("Logging in..."),
     "logout" : MessageLookupByLibrary.simpleMessage("Logout"),
     "logout_prompt" : MessageLookupByLibrary.simpleMessage("You need to restart this app for changes to take effect."),
-    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("This app will exit after deleting all data."),
+    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("This app will exit after deleting all data"),
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
     "most_crowded_canteen_currently_is" : MessageLookupByLibrary.simpleMessage("Currently, the most crowded canteen is"),

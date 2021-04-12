@@ -115,32 +115,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     await _preferences.clear().then((value) =>
     {
-      showPlatformDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => PlatformAlertDialog(
-          title: Text(S.of(context).logout_question_prompt_title),
-          content: Text(S.of(context).logout_question_prompt),
-          actions: [
-            PlatformDialogAction(
-              child: Text(S.of(context).cancel),
-              onPressed: (){
-                Navigator.of(context).pop();
-          },),
-            PlatformDialogAction(
-              child: Text(S.of(context).i_see),
-              onPressed: (){
-                FlutterApp.exitApp();
-                },),],
-        ),
-      ),
-      showPlatformDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) => PlatformAlertDialog(
-            content: Text(S.of(context).logout_prompt),
-        ),
-      )
+      FlutterApp.exitApp(),
     }
     );
   }
@@ -224,7 +199,25 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                       : const Icon(SFSymbols.trash),
                   subtitle: Text(S.of(context).logout_subtitle),
                   onTap: () {
-                    _deleteAllDataAndExit();
+                    showPlatformDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) => PlatformAlertDialog(
+                        title: Text(S.of(context).logout_question_prompt_title),
+                        content: Text(S.of(context).logout_question_prompt),
+                        actions: [
+                          PlatformDialogAction(
+                            child: Text(S.of(context).cancel),
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                            },),
+                          PlatformDialogAction(
+                            child: Text(S.of(context).i_see),
+                            onPressed: (){
+                              _deleteAllDataAndExit();
+                            },),],
+                      ),
+                    );
                   },
                 ),
               ]),

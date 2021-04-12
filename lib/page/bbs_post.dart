@@ -90,25 +90,27 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         dense: false,
         title: Column(
           children: [
-            Row(children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: Text("No. ${int.parse(e.objectId, radix: 36)}",
-                    style: TextStyle(fontSize: 10, color: Colors.blueGrey)),
-              ),
-              e.replyTo == "0"
-                  ? Column()
-                  : Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                    S.of(context).reply_to(int.parse(e.replyTo, radix: 36)),
-                    style: TextStyle(fontSize: 10, color: Colors.grey)),
-              ),
-            ],),
             const SizedBox(height: 2),
             Align(
               alignment: Alignment.topLeft,
-              child: Text(e.content),
+              child:  Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                  e.replyTo == "0"
+                      ? Column()
+                      : Text(
+                        S.of(context).reply_to(int.parse(e.replyTo, radix: 36)),
+                        style: TextStyle(fontSize: 10, color: Colors.black)),
+                    Text("No. ${int.parse(e.objectId, radix: 36)}",
+                        style: TextStyle(fontSize: 10, color: Colors.grey)),
+                  ],
+                ),
+            ),
+            const SizedBox(height: 2),
+            Align(
+              alignment: Alignment.topLeft,
+              child: Text(e.content,
+                          style: TextStyle(fontSize: 16),),
             )
           ],
         ),

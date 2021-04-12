@@ -415,10 +415,10 @@ class S {
     );
   }
 
-  /// `This app will exit after deleting all data.`
+  /// `This app will exit after deleting all data`
   String get logout_question_prompt {
     return Intl.message(
-      'This app will exit after deleting all data.',
+      'This app will exit after deleting all data',
       name: 'logout_question_prompt',
       desc: '',
       args: [],

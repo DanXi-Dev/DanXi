@@ -85,7 +85,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "logining" : MessageLookupByLibrary.simpleMessage("正在登录..."),
     "logout" : MessageLookupByLibrary.simpleMessage("退出登录"),
     "logout_prompt" : MessageLookupByLibrary.simpleMessage("重新启动app以删除数据"),
-    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("删除数据后，此app将会退出。"),
+    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("删除数据后，此app将会退出"),
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("确定要退出登录吗？"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("并删除此设备上的所有数据"),
     "most_crowded_canteen_currently_is" : MessageLookupByLibrary.simpleMessage("当前排队人数最多的餐厅是"),

@@ -38,7 +38,7 @@
     "logout": "Logout",
     "logout_subtitle": "And delete all data from this device",
     "logout_question_prompt_title": "Are you sure?",
-    "logout_question_prompt": "This app will exit after deleting all data.",
+    "logout_question_prompt": "This app will exit after deleting all data",
     "logout_prompt": "You need to restart this app for changes to take effect.",
 
     "handan_campus": "Handan",
