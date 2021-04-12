@@ -112,11 +112,14 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     super.initState();
   }
 
+  static const channel = const MethodChannel('appControl');
+
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     await _preferences.clear().then((value) =>
     {
       SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+      channel.invokeMethod('exit'), //TODO: WARNING This might not pass App Store Review
       showPlatformDialog(
           context: context,
           barrierDismissible: false,
