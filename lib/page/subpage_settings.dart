@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
@@ -28,6 +29,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -110,6 +112,22 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     super.initState();
   }
 
+  Future<void> _deleteAllDataAndExit() async {
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    await _preferences.clear().then((value) =>
+    {
+      SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+      showPlatformDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) => PlatformAlertDialog(
+            content: Text(S.of(context).logout_prompt),
+        ),
+      )
+    }
+    );
+  }
+
   SharedPreferences _preferences;
 
   void initLogin({bool forceLogin = false}) {
@@ -169,23 +187,37 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
           child: ListView(padding: EdgeInsets.all(4), children: <Widget>[
             //Account Selection
             Card(
-              child: ListTile(
-                title: Text(S.of(context).account),
-                leading: PlatformX.isAndroid
-                    ? const Icon(Icons.account_circle)
-                    : const Icon(SFSymbols.person_circle),
-                subtitle: Text(context.personInfo.name +
-                    ' (' +
-                    context.personInfo.id +
-                    ')'),
-                onTap: () => initLogin(forceLogin: true),
-              ),
+              child: Column(
+              children: <Widget>[
+                ListTile(
+                  title: Text(S.of(context).account),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.account_circle)
+                      : const Icon(SFSymbols.person_circle),
+                  subtitle: Text(context.personInfo.name +
+                      ' (' +
+                      context.personInfo.id +
+                      ')'),
+                  onTap: () => initLogin(forceLogin: true),
+                ),
+                ListTile(
+                  title: Text(S.of(context).logout),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.delete_forever)
+                      : const Icon(SFSymbols.trash),
+                  subtitle: Text(S.of(context).logout_subtitle),
+                  onTap: () {
+                    _deleteAllDataAndExit();
+                  },
+                ),
+              ]),
             ),
+
             //Campus Selection
             Card(
               child: ListTile(
                 title: Text(S.of(context).default_campus),
-                leading: PlatformX.isAndroid
+                leading: PlatformX.isMaterial(context)
                     ? const Icon(Icons.location_city)
                     : const Icon(SFSymbols.location),
                 subtitle: Text(SettingsProvider.of(_preferences)
@@ -217,8 +249,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   ListTile(
-                    leading: PlatformX.isAndroid
-                        ? const Icon(Icons.info)
+                    leading: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.info)
                         : const Icon(SFSymbols.info_circle),
                     title: Text(S.of(context).about),
                   ),

@@ -35,6 +35,9 @@
     "app_description_title": "Description",
     "app_description": "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~",
     "account": "Account",
+    "logout": "Logout",
+    "logout_subtitle": "And delete all data from this device",
+    "logout_prompt": "You need to restart this app for changes to take effect.",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -47,6 +50,7 @@
     "current_connection_failed":"Failed to obtain WLAN information, Precise Location permission required",
     "current_connection_no_wifi":"Not connected to WLAN",
     "login_uis":"Fudan UIS Login",
+    "login_uis_description":"Your login information is only sent to Fudan servers via secure connection.",
     "login_uis_uid":"ID",
     "login_uis_pwd":"Password",
     "cancel":"Cancel",

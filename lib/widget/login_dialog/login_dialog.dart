@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -22,6 +24,7 @@ import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
@@ -79,6 +82,7 @@ class _LoginDialogState extends State<LoginDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(S.of(context).login_uis_description),
           Text(
             _errorText,
             textAlign: TextAlign.start,
@@ -97,6 +101,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 placeholder: S.of(context).login_uis_uid),
             autofocus: true,
           ),
+          if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
           PlatformTextField(
             controller: _pwdController,
             material: (_, __) => MaterialTextFieldData(
@@ -121,15 +126,13 @@ class _LoginDialogState extends State<LoginDialog> {
         ],
       ),
       actions: [
-        PlatformDialogAction(
-          child: Text(S.of(context).cancel),
+        if (widget.forceLogin) PlatformDialogAction(
+          child: Text(S
+              .of(context)
+              .cancel),
           onPressed: () {
-            if (widget.forceLogin) {
               Navigator.of(context).pop();
-            } else {
-              FlutterApp.exitApp();
             }
-          },
         ),
         PlatformDialogAction(
           child: Text(S.of(context).login),

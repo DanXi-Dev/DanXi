@@ -385,6 +385,36 @@ class S {
     );
   }
 
+  /// `Logout`
+  String get logout {
+    return Intl.message(
+      'Logout',
+      name: 'logout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `And delete all data from this device`
+  String get logout_subtitle {
+    return Intl.message(
+      'And delete all data from this device',
+      name: 'logout_subtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You need to restart this app for changes to take effect.`
+  String get logout_prompt {
+    return Intl.message(
+      'You need to restart this app for changes to take effect.',
+      name: 'logout_prompt',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(
@@ -480,6 +510,16 @@ class S {
     return Intl.message(
       'Fudan UIS Login',
       name: 'login_uis',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your login information is only sent to Fudan servers via secure connection.`
+  String get login_uis_description {
+    return Intl.message(
+      'Your login information is only sent to Fudan servers via secure connection.',
+      name: 'login_uis_description',
       desc: '',
       args: [],
     );

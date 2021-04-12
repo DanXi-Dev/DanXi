@@ -37,6 +37,9 @@
     "app_description_title": "简介",
     "app_description": "由几位复旦本科学生用爱发电打造的微型复旦综合服务App，希望能为你的生活提供便利~",
     "account": "账户",
+    "logout": "退出登录",
+    "logout_subtitle": "并删除此设备上的所有数据",
+    "logout_prompt": "重新启动app以删除数据",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",
@@ -47,6 +50,7 @@
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",
     "current_connection_no_wifi":"没有连接到WLAN",
     "login_uis":"登录复旦UIS",
+    "login_uis_description":"您的用户名和密码仅会被用于登录复旦UIS",
     "login_uis_uid":"UIS账号",
     "login_uis_pwd":"UIS密码",
     "cancel":"取消",
