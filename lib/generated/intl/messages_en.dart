@@ -91,40 +91,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "login_uis_pwd" : MessageLookupByLibrary.simpleMessage("Password"),
     "login_uis_uid" : MessageLookupByLibrary.simpleMessage("ID"),
     "login_with_uis" : MessageLookupByLibrary.simpleMessage("Sign in anonymously as:"),
-        "logining": MessageLookupByLibrary.simpleMessage("Logging in..."),
-        "logout": MessageLookupByLibrary.simpleMessage("Logout"),
-        "logout_prompt": MessageLookupByLibrary.simpleMessage(
-            "You need to restart this app for changes to take effect."),
-        "logout_question_prompt": MessageLookupByLibrary.simpleMessage(
-            "This app will exit after deleting all data"),
-        "logout_question_prompt_title":
-            MessageLookupByLibrary.simpleMessage("Are you sure?"),
-        "logout_subtitle": MessageLookupByLibrary.simpleMessage(
-            "And delete all data from this device"),
-        "most_crowded_canteen_currently_is":
-            MessageLookupByLibrary.simpleMessage(
-                "Currently, the most crowded canteen is"),
-        "new_post": MessageLookupByLibrary.simpleMessage("New Post"),
-        "open_source_software_licenses": MessageLookupByLibrary.simpleMessage(
-            "Open Source Software Licenses"),
-        "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
-            "It\'s not dining time right now."),
-        "post_failed":
-            MessageLookupByLibrary.simpleMessage("Network error, post failed."),
-        "project_page": MessageLookupByLibrary.simpleMessage("Project Page"),
-        "project_url": MessageLookupByLibrary.simpleMessage(
-            "https://github.com/w568w/DanXi"),
-        "reply_to": m1,
-        "select_campus": MessageLookupByLibrary.simpleMessage("Select Campus"),
-        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
-        "share": MessageLookupByLibrary.simpleMessage("Share"),
-        "share_as_ics": MessageLookupByLibrary.simpleMessage("Export as ICS"),
-        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
-        "tick_failed": MessageLookupByLibrary.simpleMessage(
-            "Failed to check in. Check your internet connection."),
-        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
-            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-        "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
+    "logining" : MessageLookupByLibrary.simpleMessage("Logging in..."),
+    "logout" : MessageLookupByLibrary.simpleMessage("Logout"),
+    "logout_prompt" : MessageLookupByLibrary.simpleMessage("You need to restart this app for changes to take effect."),
+    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("This app will exit after deleting all data"),
+    "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
+    "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
+    "most_crowded_canteen_currently_is" : MessageLookupByLibrary.simpleMessage("Currently, the most crowded canteen is"),
+    "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
+    "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
+    "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
+    "post_failed" : MessageLookupByLibrary.simpleMessage("Network error, post failed."),
+    "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
+    "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
+    "reply_to" : m1,
+    "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
+    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
+    "share" : MessageLookupByLibrary.simpleMessage("Share"),
+    "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
+    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
+    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
+    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
     "welcome" : m2,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")

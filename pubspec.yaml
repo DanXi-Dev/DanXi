@@ -69,8 +69,14 @@ dependency_overrides:
   cupertino_icons: ^1.0.2
 dev_dependencies:
   build_runner: ^1.11.0
+  flutter_launcher_icons: ^0.8.0
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/graphics/icon.png"
 
 flutter_intl:
   enabled: true
