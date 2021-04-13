@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +72,7 @@ class FudanDailyFeature extends Feature {
         } else {
           _subTitle = S.of(context).tick_failed;
           notifyUpdate();
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(S.of(context).tick_failed)));
+          Noticing.showNotice(context, S.of(context).tick_failed);
         }
       });
     }

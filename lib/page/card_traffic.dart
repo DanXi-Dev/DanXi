@@ -21,6 +21,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -63,25 +64,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
         .catchError((e) {
       // If it's not time for a meal
       if (e is UnsuitableTimeException) {
-        if (PlatformX.isMaterial(context)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context).out_of_dining_time)));
-        } else if (PlatformX.isIOS) {
-          showPlatformDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) => PlatformAlertDialog(
-                    content: Text(S.of(context).out_of_dining_time),
-                    actions: <Widget>[
-                      PlatformDialogAction(
-                          child: PlatformText(S.of(context).i_see),
-                          onPressed: () {
-                            Navigator.pop(context); //Close Dialog
-                            Navigator.pop(context); //Return to previous level
-                          }),
-                    ],
-                  ));
-        }
+        Noticing.showNotice(context, S.of(context).out_of_dining_time);
       }
     });
     refreshSelf();

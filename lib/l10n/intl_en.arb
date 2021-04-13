@@ -71,6 +71,7 @@
     "forum":"The \"Hole\"",
     "timetable":"Agenda",
     "new_post":"New Post",
+    "post_failed":"Network error, post failed.",
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
     "reply_to":"Reply No.{name}",

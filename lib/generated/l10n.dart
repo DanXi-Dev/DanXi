@@ -715,6 +715,16 @@ class S {
     );
   }
 
+  /// `Network error, post failed.`
+  String get post_failed {
+    return Intl.message(
+      'Network error, post failed.',
+      name: 'post_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Share`
   String get share {
     return Intl.message(

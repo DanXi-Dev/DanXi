@@ -71,6 +71,7 @@
     "forum":"树洞",
     "timetable":"日程",
     "new_post":"发布新帖子",
+    "post_failed":"网络错误，帖子发布失败",
     "share":"分享",
     "login_with_uis":"将使用以下信息匿名登录树洞",
     "reply_to":"回复 No.{name}",

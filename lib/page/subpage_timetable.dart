@@ -24,6 +24,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/table_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
@@ -64,9 +65,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     if (PlatformX.isMobile)
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: [converter.mimeType]);
-    else if (PlatformX.isMaterial(context)) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(outputFile.absolute.path)));
+    else {
+      Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
 

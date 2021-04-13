@@ -19,7 +19,9 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:data_plugin/bmob/response/bmob_saved.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -36,8 +38,12 @@ class BBSEditorPage extends StatefulWidget {
 
 class BBSEditorPageState extends State<BBSEditorPage> {
   BBSPost _post;
+
+  /// The user id of the post we reply to
   String _replyTo;
 
+  /// Whether the send button is enabled
+  bool _canSend = true;
   TextEditingController _controller = TextEditingController();
 
   @override
@@ -57,8 +63,10 @@ class BBSEditorPageState extends State<BBSEditorPage> {
           trailingActions: [
             PlatformIconButton(
                 padding: EdgeInsets.zero,
-                icon: PlatformX.isAndroid ? const Icon(Icons.send): const Icon(SFSymbols.paperplane),
-                onPressed: _sendDocument)
+                icon: PlatformX.isAndroid
+                    ? const Icon(Icons.send)
+                    : const Icon(SFSymbols.paperplane),
+                onPressed: _canSend ? _sendDocument : null)
           ],
         ),
         body: Padding(
@@ -91,13 +99,20 @@ class BBSEditorPageState extends State<BBSEditorPage> {
             )));
   }
 
-  Future<void> _sendDocument() async {
+  Future<void> _sendDocument() {
     if (_controller.text.trim().isEmpty) {
     } else {
       _post.content = _controller.text;
-      await _post.save();
-      Navigator.pop(context);
-      RetrieveNewPostEvent().fire();
+      _canSend = false;
+      refreshSelf();
+      _post.save().then((BmobSaved value) {
+        Navigator.pop(context);
+        RetrieveNewPostEvent().fire();
+      }, onError: (_) {
+        _canSend = true;
+        refreshSelf();
+        Noticing.showNotice(context, S.of(context).post_failed);
+      });
     }
   }
 }
