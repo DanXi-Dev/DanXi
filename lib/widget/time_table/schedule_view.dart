@@ -85,7 +85,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     for (int day = 0; day < widget.laneEventsList.length; day++) {
       int deltaDay = day - widget.today.weekday;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
-      TextStyle highlightStyle = TextStyle(color: Theme.of(context).primaryColor);
+      TextStyle highlightStyle = TextStyle(color: Theme.of(context).accentColor);
       result[1 + day] = SizedBox(
         width: widget.timetableStyle.laneWidth,
         height: widget.timetableStyle.laneHeight,
@@ -120,11 +120,11 @@ class _ScheduleViewState extends State<ScheduleView> {
             margin: EdgeInsets.all(2),
             padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
                 borderRadius: BorderRadius.circular(4)),
             child: Text(
               event.course.courseName,
-              style: Theme.of(context).primaryTextTheme.bodyText2.copyWith(fontSize: 14),
+              style: Theme.of(context).textTheme.overline.copyWith(fontSize: 14, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),
             ),
           ),
         );

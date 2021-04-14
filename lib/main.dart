@@ -102,7 +102,7 @@ class DanxiApp extends StatelessWidget {
               brightness: Brightness.light,
             )),
             material: (_, __) => MaterialAppData(
-                // themeMode: ThemeMode.dark,
+                //themeMode: ThemeMode.light,
                 theme: ThemeData(
                   brightness: Brightness.light,
                   primarySwatch: Colors.blue,
