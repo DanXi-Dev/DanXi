@@ -37,12 +37,14 @@ class BBSPostDetail extends StatefulWidget {
 }
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
+
   BBSPost _post;
   BmobUser _user;
 
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      iosContentPadding: true,
       iosContentBottomPadding: true,
       appBar: PlatformAppBar(
         title: Text(S.of(context).forum),
@@ -65,19 +67,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           onRefresh: () async {
             refreshSelf();
           },
-          child: FutureBuilder(
-              builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-                if (snapshot.hasData) {
-                  var l = snapshot.data;
-                  return ListView.builder(
-                      itemBuilder: (context, index) =>
-                          _getListItem(l[index], index),
-                      //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
-                      itemCount: l.length);
-                }
-                return Container();
-              },
-              future: PostRepository.getInstance().loadReplies(_post))),
+          child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: FutureBuilder(
+                builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
+                  if (snapshot.hasData) {
+                    var l = snapshot.data;
+                    return ListView.builder(
+                        itemBuilder: (context, index) =>
+                            _getListItem(l[index], index),
+                        //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
+                        itemCount: l.length);
+                  }
+                  return Container();
+                },
+                future: PostRepository.getInstance().loadReplies(_post)))),
     );
   }
 

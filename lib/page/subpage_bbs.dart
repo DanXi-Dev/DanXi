@@ -38,7 +38,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class BBSSubpage extends PlatformSubpage {
   @override
-  bool get needPadding => false;
+  bool get needPadding => true;
 
   @override
   _BBSSubpageState createState() => _BBSSubpageState();
@@ -177,22 +177,27 @@ class _BBSSubpageState extends State<BBSSubpage>
     return RefreshIndicator(
         color: Theme.of(context).accentColor,
         onRefresh: () async => refreshSelf(),
-        child: FutureBuilder(
-            builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-              if (snapshot.hasData) {
-                // If login failed
-                if (snapshot.data == null) {
-                  return _buildErrorPage();
+        child: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: FutureBuilder(
+              builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
+                if (snapshot.hasData) {
+                  // If login failed
+                  if (snapshot.data == null) {
+                    return _buildErrorPage();
+                  } else {
+                    return _buildPage(snapshot.data);
+                  }
+                } else if (snapshot.hasError) {
+                  return _buildErrorPage(error: snapshot.error);
                 } else {
-                  return _buildPage(snapshot.data);
+                  return _buildLoadingPage();
                 }
-              } else if (snapshot.hasError) {
-                return _buildErrorPage(error: snapshot.error);
-              } else {
-                return _buildLoadingPage();
-              }
-            },
-            future: loginAndLoadPost(context.personInfo)));
+              },
+              future: loginAndLoadPost(context.personInfo))
+        )
+    );
   }
 
   Widget _buildLoadingPage() {
