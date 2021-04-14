@@ -14,6 +14,8 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:dan_xi/widget/time_table/day_events.dart';
+import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -103,33 +105,25 @@ class TimeTable {
     return table;
   }
 
-  /// Convert the specific [week]'s timetable to [LaneEvents] with [style], usually for a [TimetableView].
+  /// Convert the specific [week]'s timetable to [DayEvents], usually for a [ScheduleView].
   ///
-  /// If [compact], it will not add the days to the result when no course is taken.
-  List<LaneEvents> toLaneEvents(int week, TimetableStyle style,
-      {bool compact = true}) {
-    Map<int, List<TableEvent>> table = Map();
-    List<LaneEvents> result = [];
+  /// If [compact], it will not add the days to [result] when no course is taken.
+  List<DayEvents> toDayEvents(int week, {bool compact = true}) {
+    Map<int, List<Event>> table = Map();
+    List<DayEvents> result = [];
     for (int i = 0; i < 7; i++) {
       table[i] = [];
     }
     courses.forEach((course) {
       if (course.availableWeeks.contains(week)) {
-        course.times.forEach((courseTime) => table[courseTime.weekDay].add(
-            TableEvent(
-                title: course.courseName,
-                start: COURSE_SLOT_START_TIME[courseTime.slot],
-                end: COURSE_SLOT_START_TIME[courseTime.slot]
-                    .addMin(MINUTES_OF_COURSE))));
+        course.times.forEach((courseTime) =>
+            table[courseTime.weekDay].add(Event(course, courseTime)));
       }
     });
     for (int i = 0; i < 7; i++) {
       if (!compact || table[i].isNotEmpty)
-        result.add(LaneEvents(
-            lane: Lane(
-                width: style?.laneWidth,
-                height: style?.laneHeight,
-                name: DateFormat.EEEE().format(MONDAY.add(Duration(days: i)))),
+        result.add(DayEvents(
+            day: DateFormat.EEEE().format(MONDAY.add(Duration(days: i))),
             events: table[i]));
     }
     return result;

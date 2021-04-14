@@ -28,6 +28,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
+import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -154,17 +155,15 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Widget _buildPage(TimeTable table) {
     TimetableStyle style = TimetableStyle(
         startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
-        laneHeight: 25,
+        laneHeight: 16,
         laneWidth: (MediaQuery.of(context).size.width - 50) / 5,
-        timeItemWidth: 50,
-        timeItemHeight: 160);
+        timeItemWidth: 16,
+        timeItemHeight: 140);
     _table = table;
     _showingTime = _table.now();
     _status = ConnectionStatus.DONE;
-    return TimetableView(
-      laneEventsList: _table.toLaneEvents(_showingTime.week, style),
-      timetableStyle: style,
-    );
+    return ScheduleView(
+        _table.toDayEvents(_showingTime.week), style, _showingTime);
   }
 
   @override

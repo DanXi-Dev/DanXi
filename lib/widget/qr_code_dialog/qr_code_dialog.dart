@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -35,10 +34,6 @@ class QRHelper {
     //Set screen brightness for displaying QR Code
     ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
-
-    //Get current theme (light/dark)
-    bool darkModeOn =
-        MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     showPlatformDialog(
         context: context,

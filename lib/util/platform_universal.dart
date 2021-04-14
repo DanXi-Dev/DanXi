@@ -46,4 +46,7 @@ class PlatformX {
 
   static bool isCupertino(BuildContext context) =>
       platformImpl.isCupertino(context);
+
+  static bool isDarkMode(BuildContext context) =>
+      MediaQuery.of(context).platformBrightness == Brightness.dark;
 }
