@@ -279,12 +279,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                   PlatformX.isMaterial(context)
                       ? PlatformProvider.of(context).changeToCupertinoPlatform()
                       : PlatformProvider.of(context).changeToMaterialPlatform();
-                  refreshSelf();
                   if (SettingsProvider.of(_preferences).theme == null) {
-                    SettingsProvider.of(_preferences).theme = Theme.of(context).platform == TargetPlatform.android ? 1 : 0;
+                    SettingsProvider.of(_preferences).theme = (Theme.of(context).platform == TargetPlatform.android) ? 1 : 0;
                   }
                   else {
-                    SettingsProvider.of(_preferences).theme = SettingsProvider.of(_preferences).theme == 0 ? 1 : 0;
+                    SettingsProvider.of(_preferences).theme = (SettingsProvider.of(_preferences).theme == 0) ? 1 : 0;
                   }
                 },
               ),

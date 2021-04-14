@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "contact_us" : MessageLookupByLibrary.simpleMessage("Contact Us"),
-    "cupertino" : MessageLookupByLibrary.simpleMessage("iOS Native"),
+    "cupertino" : MessageLookupByLibrary.simpleMessage("Cupertino"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),

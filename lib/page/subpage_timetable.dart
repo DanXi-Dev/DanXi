@@ -123,7 +123,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   void dispose() {
     super.dispose();
-    _shareSubscription.cancel();
+    if(_shareSubscription != null) _shareSubscription.cancel();
     _shareSubscription = null;
   }
 

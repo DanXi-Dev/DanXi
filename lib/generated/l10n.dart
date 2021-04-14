@@ -515,10 +515,10 @@ class S {
     );
   }
 
-  /// `iOS Native`
+  /// `Cupertino`
   String get cupertino {
     return Intl.message(
-      'iOS Native',
+      'Cupertino',
       name: 'cupertino',
       desc: '',
       args: [],
