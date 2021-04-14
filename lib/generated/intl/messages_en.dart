@@ -21,24 +21,26 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
-  static m1(name) => "Reply No.${name}";
+  static m1(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m2(name) => "Welcome, ${name}";
+  static m2(name) => "Reply No.${name}";
+
+  static m3(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About This App"),
     "account" : MessageLookupByLibrary.simpleMessage("Account"),
+    "and" : MessageLookupByLibrary.simpleMessage(" and "),
     "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
     "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
     "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
     "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
-    "canteen" : MessageLookupByLibrary.simpleMessage("Canteen"),
     "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "comma_least_crowded_canteen_is" : MessageLookupByLibrary.simpleMessage(", the least crowded canteen is"),
+    "contact_us" : MessageLookupByLibrary.simpleMessage("Contact Us"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
@@ -97,24 +99,32 @@ class MessageLookup extends MessageLookupByLibrary {
     "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("This app will exit after deleting all data"),
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
-    "most_crowded_canteen_currently_is" : MessageLookupByLibrary.simpleMessage("Currently, the most crowded canteen is"),
+    "most_least_crowded_canteen" : m1,
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "post_failed" : MessageLookupByLibrary.simpleMessage("Network error, post failed."),
+    "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+    "privacy_policy_url" : MessageLookupByLibrary.simpleMessage(""),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
     "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reply_to" : m1,
+    "reply_to" : m2,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
+    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
+    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". "),
+    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
+    "terms_and_conditions_url" : MessageLookupByLibrary.simpleMessage(""),
     "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "welcome" : m2,
+    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
+    "welcome" : m3,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

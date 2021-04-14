@@ -175,12 +175,7 @@ class DiningHallCrowdednessFeature extends Feature {
         return S.of(context).loading;
       case ConnectionStatus.DONE:
         if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null)
-          return S.of(context).most_crowded_canteen_currently_is +
-              _mostCrowdedCanteen +
-              S.of(context).canteen +
-              S.of(context).comma_least_crowded_canteen_is +
-              _leastCrowdedCanteen +
-              S.of(context).canteen;
+          return S.of(context).most_least_crowded_canteen(_mostCrowdedCanteen, _leastCrowdedCanteen);
         return '';
       case ConnectionStatus.FAILED:
         return S.of(context).failed;

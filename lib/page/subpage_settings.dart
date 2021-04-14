@@ -28,6 +28,7 @@ import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -169,6 +170,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     double _avatarSize =
         (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
+    const defaultText = TextStyle(color: Colors.black); //TODO: Dark Mode support
+    const linkText = TextStyle(color: Colors.blue);
+    //const linkText = TextStyle(color: Color(0xFF0000FF));
     //TODO: WARNING Hardcoded avatarSize Modifiers!
 
     return RefreshIndicator(
@@ -241,6 +245,12 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               cupertino: (_, __) => CupertinoActionSheet(
                                 title: Text(S.of(context).select_campus),
                                 actions: _buildCampusAreaList(),
+                                cancelButton: CupertinoActionSheetAction(
+                                  child: Text(S.of(context).cancel),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
                               ),
                               material: (_, __) => Container(
                                 height: 300,
@@ -275,6 +285,61 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                           ),
                           Divider(),
                           Text(S.of(context).app_description),
+                          const SizedBox(
+                            height: 16,
+                          ),
+
+                          //Terms and Conditions
+                          Text(
+                            S.of(context).terms_and_conditions_title,
+                            textScaleFactor: 1.1,
+                          ),
+                          Divider(),
+                          RichText(
+                              text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                        style: defaultText,
+                                        text: S.of(context).terms_and_conditions_content,
+                                    ),
+                                    TextSpan(
+                                        style: linkText,
+                                        text: S.of(context).terms_and_conditions,
+                                        recognizer: TapGestureRecognizer()..onTap =  () async{
+                                            await launch(S.of(context).terms_and_conditions_url);
+                                            //TODO: Add Links
+                                        }
+                                    ),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S.of(context).and,
+                                    ),
+                                    TextSpan(
+                                        style: linkText,
+                                        text: S.of(context).privacy_policy,
+                                        recognizer: TapGestureRecognizer()..onTap =  () async{
+                                          await launch(S.of(context).privacy_policy_url);
+                                        }
+                                    ),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S.of(context).terms_and_conditions_content_end,
+                                    ),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S.of(context).view_ossl,
+                                    ),
+                                    TextSpan(
+                                        style: linkText,
+                                        text: S.of(context).open_source_software_licenses,
+                                        recognizer: TapGestureRecognizer()..onTap =  () {
+                                          Navigator.of(context).pushNamed("/about/openLicense",
+                                              arguments: {"items": _LICENSE_ITEMS});
+                                        }
+                                    ),
+                                  ]
+                              )),
+
                           const SizedBox(
                             height: 16,
                           ),
@@ -386,10 +451,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     children: <Widget>[
                       TextButton(
                         child:
-                            Text(S.of(context).open_source_software_licenses),
+                            Text(S.of(context).contact_us),
                         onPressed: () {
-                          Navigator.of(context).pushNamed("/about/openLicense",
-                              arguments: {"items": _LICENSE_ITEMS});
+                            //TODO: Launch Email Client?
                         },
                       ),
                       const SizedBox(width: 8),

@@ -125,33 +125,13 @@ class S {
     );
   }
 
-  /// `, the least crowded canteen is`
-  String get comma_least_crowded_canteen_is {
+  /// `[Most Crowded]{mostCrowded}餐厅 [Least Crowded]{leastCrowded}餐厅`
+  String most_least_crowded_canteen(Object mostCrowded, Object leastCrowded) {
     return Intl.message(
-      ', the least crowded canteen is',
-      name: 'comma_least_crowded_canteen_is',
+      '[Most Crowded]$mostCrowded餐厅 [Least Crowded]$leastCrowded餐厅',
+      name: 'most_least_crowded_canteen',
       desc: '',
-      args: [],
-    );
-  }
-
-  /// `Currently, the most crowded canteen is`
-  String get most_crowded_canteen_currently_is {
-    return Intl.message(
-      'Currently, the most crowded canteen is',
-      name: 'most_crowded_canteen_currently_is',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Canteen`
-  String get canteen {
-    return Intl.message(
-      'Canteen',
-      name: 'canteen',
-      desc: '',
-      args: [],
+      args: [mostCrowded, leastCrowded],
     );
   }
 
@@ -430,6 +410,86 @@ class S {
     return Intl.message(
       'You need to restart this app for changes to take effect.',
       name: 'logout_prompt',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Legal`
+  String get terms_and_conditions_title {
+    return Intl.message(
+      'Legal',
+      name: 'terms_and_conditions_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your use of this application is governed under `
+  String get terms_and_conditions_content {
+    return Intl.message(
+      'Your use of this application is governed under ',
+      name: 'terms_and_conditions_content',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Terms and Conditions`
+  String get terms_and_conditions {
+    return Intl.message(
+      'Terms and Conditions',
+      name: 'terms_and_conditions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ` and `
+  String get and {
+    return Intl.message(
+      ' and ',
+      name: 'and',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This app is made possible thanks to various open-source software. View `
+  String get view_ossl {
+    return Intl.message(
+      'This app is made possible thanks to various open-source software. View ',
+      name: 'view_ossl',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Privacy Policy`
+  String get privacy_policy {
+    return Intl.message(
+      'Privacy Policy',
+      name: 'privacy_policy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `. `
+  String get terms_and_conditions_content_end {
+    return Intl.message(
+      '. ',
+      name: 'terms_and_conditions_content_end',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Contact Us`
+  String get contact_us {
+    return Intl.message(
+      'Contact Us',
+      name: 'contact_us',
       desc: '',
       args: [],
     );
@@ -920,6 +980,26 @@ class S {
     return Intl.message(
       'assets/graphics/kyln24.jpeg',
       name: 'dev_image_url_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ``
+  String get terms_and_conditions_url {
+    return Intl.message(
+      '',
+      name: 'terms_and_conditions_url',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ``
+  String get privacy_policy_url {
+    return Intl.message(
+      '',
+      name: 'privacy_policy_url',
       desc: '',
       args: [],
     );

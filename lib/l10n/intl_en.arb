@@ -8,9 +8,7 @@
     "dining_hall_crowdedness":"Canteen Popularity",
     "choose_area":"Select Campus",
     "out_of_dining_time":"It's not dining time right now.",
-    "comma_least_crowded_canteen_is": ", the least crowded canteen is",
-    "most_crowded_canteen_currently_is": "Currently, the most crowded canteen is",
-    "canteen": "Canteen",
+    "most_least_crowded_canteen": "[Most Crowded]{mostCrowded}餐厅 [Least Crowded]{leastCrowded}餐厅",
     "fudan_daily":"COVID-19 Safety Check-In",
     "fudan_daily_ticked":"Already done",
     "fudan_daily_tick":"Tap to check in",
@@ -40,6 +38,14 @@
     "logout_question_prompt_title": "Are you sure?",
     "logout_question_prompt": "This app will exit after deleting all data",
     "logout_prompt": "You need to restart this app for changes to take effect.",
+    "terms_and_conditions_title": "Legal",
+    "terms_and_conditions_content": "Your use of this application is governed under ",
+    "terms_and_conditions": "Terms and Conditions",
+    "and": " and ",
+    "view_ossl": "This app is made possible thanks to various open-source software. View ",
+    "privacy_policy": "Privacy Policy",
+    "terms_and_conditions_content_end": ". ",
+    "contact_us": "Contact Us",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -95,5 +101,8 @@
     "dev_page_3": "https:\/\/github.com\/KYLN24",
     "dev_image_url_1": "assets/graphics/w568w.jpeg",
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
-    "dev_image_url_3": "assets/graphics/kyln24.jpeg"
+    "dev_image_url_3": "assets/graphics/kyln24.jpeg",
+
+    "terms_and_conditions_url" : "",
+    "privacy_policy_url" : ""
 }
