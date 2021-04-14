@@ -23,6 +23,7 @@ class SettingsProvider {
 
   static const String KEY_PREFERRED_CAMPUS = "campus";
   static const String KEY_AUTOTICK_LAST_CANCEL_DATE = "autotick_last_cancel_date";
+  static const String KEY_PREFERRED_THEME = "theme";
 
   SettingsProvider._(this._preferences);
 
@@ -57,5 +58,18 @@ class SettingsProvider {
 
   set autoTickCancelDate(String datetime) {
     _preferences.setString(KEY_AUTOTICK_LAST_CANCEL_DATE, datetime.toString());
+  }
+
+  //Theme
+  //int: 0 for Material, 1 for Cupertino
+  int get theme {
+    if (_preferences.containsKey(KEY_PREFERRED_THEME)) {
+      return _preferences.getInt(KEY_PREFERRED_THEME);
+    }
+    return null;
+  }
+
+  set theme(int theme) {
+    _preferences.setInt(KEY_PREFERRED_THEME, theme);
   }
 }

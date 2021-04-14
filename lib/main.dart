@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -33,6 +34,7 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -91,10 +93,6 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) => PlatformProvider(
-      /*settings: PlatformSettingsData(
-        iosUsesMaterialWidgets: true,
-      ),*/
-      //initialPlatform: TargetPlatform.android,
       builder: (BuildContext context) => PlatformApp(
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
@@ -335,6 +333,14 @@ class _HomePageState extends State<HomePage> {
     } else {
       _showLoginDialog(forceLogin: forceLogin);
     }
+
+    if (_preferences.containsKey(SettingsProvider.KEY_PREFERRED_THEME)) {
+      if(SettingsProvider.of(_preferences).theme == (PlatformX.isMaterial(context))) {
+        PlatformX.isMaterial(context)
+            ? PlatformProvider.of(context).changeToCupertinoPlatform()
+            : PlatformProvider.of(context).changeToMaterialPlatform();
+      }
+    }
   }
 
   /// When user clicks the action button on appbar
@@ -356,7 +362,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return _personInfo.value == null
+    return PlatformProvider(
+        builder: (BuildContext context) =>
+        _personInfo.value == null
     // Show an empty container if no person info is set
         ? PlatformScaffold(
             iosContentBottomPadding: true,
@@ -449,6 +457,6 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
-          );
+          ));
   }
 }

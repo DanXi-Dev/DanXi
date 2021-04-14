@@ -505,6 +505,26 @@ class S {
     );
   }
 
+  /// `Material`
+  String get material {
+    return Intl.message(
+      'Material',
+      name: 'material',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `iOS Native`
+  String get cupertino {
+    return Intl.message(
+      'iOS Native',
+      name: 'cupertino',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(

@@ -77,8 +77,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void dispose() {
     super.dispose();
-    _postSubscription.cancel();
-    _refreshSubscription.cancel();
+    if (_postSubscription != null) _postSubscription.cancel();
+    if (_refreshSubscription != null) _refreshSubscription.cancel();
     _postSubscription = null;
     _refreshSubscription = null;
   }
