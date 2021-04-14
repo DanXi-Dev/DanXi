@@ -114,11 +114,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
 
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    await _preferences.clear().then((value) =>
-    {
-      FlutterApp.exitApp(),
-    }
-    );
+    await _preferences.clear().then((value) => {
+          FlutterApp.exitApp(),
+        });
   }
 
   SharedPreferences _preferences;
@@ -170,9 +168,13 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     double _avatarSize =
         (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
-    var defaultText = Theme.of(context).textTheme.bodyText2; //TODO: Dark Mode support
+    var defaultText =
+        Theme.of(context).textTheme.bodyText2; //TODO: Dark Mode support
     //const linkText = TextStyle(color: Colors.blue);
-    var linkText = Theme.of(context).textTheme.bodyText2.copyWith(color: Theme.of(context).accentColor);
+    var linkText = Theme.of(context)
+        .textTheme
+        .bodyText2
+        .copyWith(color: Theme.of(context).accentColor);
     //TODO: WARNING Hardcoded avatarSize Modifiers!
 
     return RefreshIndicator(
@@ -183,8 +185,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
           child: ListView(padding: EdgeInsets.all(4), children: <Widget>[
             //Account Selection
             Card(
-              child: Column(
-              children: <Widget>[
+              child: Column(children: <Widget>[
                 ListTile(
                   title: Text(S.of(context).account),
                   leading: PlatformX.isMaterial(context)
@@ -212,14 +213,15 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                         actions: [
                           PlatformDialogAction(
                             child: Text(S.of(context).cancel),
-                            onPressed: (){
+                            onPressed: () {
                               Navigator.of(context).pop();
-                            },),
+                            },
+                          ),
                           PlatformDialogAction(
                             child: Text(S.of(context).i_see),
-                            onPressed: (){
-                              _deleteAllDataAndExit();
-                            },),],
+                            onPressed: () => _deleteAllDataAndExit(),
+                          )
+                        ],
                       ),
                     );
                   },
@@ -255,9 +257,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               material: (_, __) => Container(
                                 height: 300,
                                 child: Column(
-                                    children:
-                                      _buildCampusAreaList(),
-                                      //TODO: Cancel button on Android
+                                  children: _buildCampusAreaList(),
+                                  //TODO: Cancel button on Android
                                 ),
                               ),
                             ));
@@ -275,8 +276,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     : const Icon(SFSymbols.color_filter),
                 subtitle: Text("WARNING: Experimental Feature."),
                 onTap: () {
-                    PlatformX.isMaterial(context) ? PlatformProvider.of(context).changeToCupertinoPlatform() : PlatformProvider.of(context).changeToMaterialPlatform();
-                  },
+                  PlatformX.isMaterial(context)
+                      ? PlatformProvider.of(context).changeToCupertinoPlatform()
+                      : PlatformProvider.of(context).changeToMaterialPlatform();
+                },
               ),
             ),
 
@@ -288,7 +291,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                 children: <Widget>[
                   ListTile(
                     leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.info)
+                        ? const Icon(Icons.info)
                         : const Icon(SFSymbols.info_circle),
                     title: Text(S.of(context).about),
                   ),
@@ -314,49 +317,53 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                           ),
                           Divider(),
                           RichText(
-                              text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                        style: defaultText,
-                                        text: S.of(context).terms_and_conditions_content,
-                                    ),
-                                    TextSpan(
-                                        style: linkText,
-                                        text: S.of(context).terms_and_conditions,
-                                        recognizer: TapGestureRecognizer()..onTap =  () async{
-                                            await launch(S.of(context).terms_and_conditions_url);
-                                            //TODO: Add Links
-                                        }
-                                    ),
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S.of(context).and,
-                                    ),
-                                    TextSpan(
-                                        style: linkText,
-                                        text: S.of(context).privacy_policy,
-                                        recognizer: TapGestureRecognizer()..onTap =  () async{
-                                          await launch(S.of(context).privacy_policy_url);
-                                        }
-                                    ),
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S.of(context).terms_and_conditions_content_end,
-                                    ),
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S.of(context).view_ossl,
-                                    ),
-                                    TextSpan(
-                                        style: linkText,
-                                        text: S.of(context).open_source_software_licenses,
-                                        recognizer: TapGestureRecognizer()..onTap =  () {
-                                          Navigator.of(context).pushNamed("/about/openLicense",
-                                              arguments: {"items": _LICENSE_ITEMS});
-                                        }
-                                    ),
-                                  ]
-                              )),
+                              text: TextSpan(children: [
+                            TextSpan(
+                              style: defaultText,
+                              text: S.of(context).terms_and_conditions_content,
+                            ),
+                            TextSpan(
+                                style: linkText,
+                                text: S.of(context).terms_and_conditions,
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () async {
+                                    await launch(
+                                        S.of(context).terms_and_conditions_url);
+                                    //TODO: Add Links
+                                  }),
+                            TextSpan(
+                              style: defaultText,
+                              text: S.of(context).and,
+                            ),
+                            TextSpan(
+                                style: linkText,
+                                text: S.of(context).privacy_policy,
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () async {
+                                    await launch(
+                                        S.of(context).privacy_policy_url);
+                                  }),
+                            TextSpan(
+                              style: defaultText,
+                              text: S
+                                  .of(context)
+                                  .terms_and_conditions_content_end,
+                            ),
+                            TextSpan(
+                              style: defaultText,
+                              text: S.of(context).view_ossl,
+                            ),
+                            TextSpan(
+                                style: linkText,
+                                text:
+                                    S.of(context).open_source_software_licenses,
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.of(context).pushNamed(
+                                        "/about/openLicense",
+                                        arguments: {"items": _LICENSE_ITEMS});
+                                  }),
+                          ])),
 
                           const SizedBox(
                             height: 16,
@@ -468,10 +475,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       TextButton(
-                        child:
-                            Text(S.of(context).contact_us),
+                        child: Text(S.of(context).contact_us),
                         onPressed: () {
-                            //TODO: Launch Email Client?
+                          //TODO: Launch Email Client?
                         },
                       ),
                       const SizedBox(width: 8),

@@ -99,11 +99,10 @@ class DanxiApp extends StatelessWidget {
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
                 theme: CupertinoThemeData(
-                    brightness: Brightness.light,
-                )
-                ),
+              brightness: Brightness.light,
+            )),
             material: (_, __) => MaterialAppData(
-                themeMode: ThemeMode.dark,
+                // themeMode: ThemeMode.dark,
                 theme: ThemeData(
                   brightness: Brightness.light,
                   primarySwatch: Colors.blue,
@@ -220,8 +219,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
-    _connectivitySubscription = null;
+    if (_connectivitySubscription != null) {
+      _connectivitySubscription.cancel();
+      _connectivitySubscription = null;
+    }
     super.dispose();
   }
 
@@ -335,6 +336,7 @@ class _HomePageState extends State<HomePage> {
       _showLoginDialog(forceLogin: forceLogin);
     }
   }
+
   /// When user clicks the action button on appbar
   void _onPressActionButton() async {
     switch (_pageIndex.value) {
@@ -439,7 +441,7 @@ class _HomePageState extends State<HomePage> {
                 selectedIconTheme:
                     BottomNavigationBarTheme.of(context).selectedIconTheme,
                 unselectedIconTheme:
-                   BottomNavigationBarTheme.of(context).unselectedIconTheme,
+                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
               ),
               itemChanged: (index) {
                 if (index != _pageIndex.value) {

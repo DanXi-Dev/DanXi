@@ -39,6 +39,9 @@ import 'package:share/share.dart';
 
 class TimetableSubPage extends PlatformSubpage {
   @override
+  bool get needPadding => false;
+
+  @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 }
 
