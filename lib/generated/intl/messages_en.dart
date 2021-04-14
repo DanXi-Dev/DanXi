@@ -119,6 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". "),
     "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
     "terms_and_conditions_url" : MessageLookupByLibrary.simpleMessage(""),
+    "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
     "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),

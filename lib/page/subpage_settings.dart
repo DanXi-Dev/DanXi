@@ -170,9 +170,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     double _avatarSize =
         (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
-    const defaultText = TextStyle(color: Colors.black); //TODO: Dark Mode support
-    const linkText = TextStyle(color: Colors.blue);
-    //const linkText = TextStyle(color: Color(0xFF0000FF));
+    var defaultText = Theme.of(context).textTheme.bodyText2; //TODO: Dark Mode support
+    //const linkText = TextStyle(color: Colors.blue);
+    var linkText = Theme.of(context).textTheme.bodyText2.copyWith(color: Theme.of(context).accentColor);
     //TODO: WARNING Hardcoded avatarSize Modifiers!
 
     return RefreshIndicator(
@@ -199,7 +199,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                 ListTile(
                   title: Text(S.of(context).logout),
                   leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.delete_forever)
+                      ? const Icon(Icons.logout)
                       : const Icon(SFSymbols.trash),
                   subtitle: Text(S.of(context).logout_subtitle),
                   onTap: () {
@@ -232,7 +232,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
               child: ListTile(
                 title: Text(S.of(context).default_campus),
                 leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.location_city)
+                    ? const Icon(Icons.location_on)
                     : const Icon(SFSymbols.location),
                 subtitle: Text(SettingsProvider.of(_preferences)
                     .campus
@@ -263,6 +263,20 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                             ));
                   }
                 },
+              ),
+            ),
+
+            //Theme Selection
+            Card(
+              child: ListTile(
+                title: Text(S.of(context).theme),
+                leading: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.color_lens)
+                    : const Icon(SFSymbols.color_filter),
+                subtitle: Text("WARNING: Experimental Feature."),
+                onTap: () {
+                    PlatformX.isMaterial(context) ? PlatformProvider.of(context).changeToCupertinoPlatform() : PlatformProvider.of(context).changeToMaterialPlatform();
+                  },
               ),
             ),
 
