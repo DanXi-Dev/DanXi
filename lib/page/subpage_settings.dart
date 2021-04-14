@@ -254,7 +254,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               ),
                               material: (_, __) => Container(
                                 height: 300,
-                                child: Column(children: _buildCampusAreaList()),
+                                child: Column(
+                                    children:
+                                      _buildCampusAreaList(),
+                                      //TODO: Cancel button on Android
+                                ),
                               ),
                             ));
                   }

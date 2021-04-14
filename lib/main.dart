@@ -91,7 +91,7 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) => PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
+      //initialPlatform: TargetPlatform.android,
       builder: (BuildContext context) => PlatformApp(
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(

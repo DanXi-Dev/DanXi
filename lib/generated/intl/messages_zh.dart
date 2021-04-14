@@ -111,7 +111,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
     "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("此app的诞生离不开诸多开源软件。查看"),
+    "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
     "welcome" : m3,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
