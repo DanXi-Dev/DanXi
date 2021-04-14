@@ -122,10 +122,13 @@ class _ScheduleViewState extends State<ScheduleView> {
             decoration: BoxDecoration(
                 color: Theme.of(context).accentColor,
                 borderRadius: BorderRadius.circular(4)),
-            child: Text(
-              event.course.courseName,
-              style: Theme.of(context).textTheme.overline.copyWith(fontSize: 14, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),
-            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(event.course.courseName, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 11, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
+                Text(event.course.roomName, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 10, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
+                //Text(event.course.roomId, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 10, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
+            ]),
           ),
         );
       });
