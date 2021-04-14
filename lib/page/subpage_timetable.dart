@@ -33,6 +33,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
@@ -103,6 +104,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
             builder: (_) => PlatformWidget(
                   cupertino: (_, __) => CupertinoActionSheet(
                     actions: _buildShareList(),
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
                   ),
                   material: (_, __) => Container(
                     height: 200,
@@ -165,8 +172,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     _table = table;
     _showingTime = _table.now();
     _status = ConnectionStatus.DONE;
+
+
+
     return ScheduleView(
-        _table.toDayEvents(_showingTime.week), style, _showingTime);
+          _table.toDayEvents(_showingTime.week), style, _showingTime);
+
   }
 
   @override

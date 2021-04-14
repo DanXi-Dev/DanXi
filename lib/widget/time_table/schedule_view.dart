@@ -58,9 +58,8 @@ class _ScheduleViewState extends State<ScheduleView> {
             margin: EdgeInsets.all(2),
             padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
-                color: PlatformX.isDarkMode(context)
-                    ? Colors.black12
-                    : Colors.white,
+                //color: PlatformX.isDarkMode(context) ? Colors.black12 : Colors.white,
+                color: Theme.of(context).hoverColor,
                 borderRadius: BorderRadius.circular(4)),
           ),
         ));
@@ -86,7 +85,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     for (int day = 0; day < widget.laneEventsList.length; day++) {
       int deltaDay = day - widget.today.weekday;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
-      TextStyle highlightStyle = TextStyle(color: Colors.lightBlue);
+      TextStyle highlightStyle = TextStyle(color: Theme.of(context).primaryColor);
       result[1 + day] = SizedBox(
         width: widget.timetableStyle.laneWidth,
         height: widget.timetableStyle.laneHeight,
@@ -121,11 +120,11 @@ class _ScheduleViewState extends State<ScheduleView> {
             margin: EdgeInsets.all(2),
             padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
-                color: Colors.lightBlue,
+                color: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(4)),
             child: Text(
               event.course.courseName,
-              style: TextStyle(color: Colors.white),
+              style: Theme.of(context).primaryTextTheme.bodyText2.copyWith(fontSize: 14),
             ),
           ),
         );
