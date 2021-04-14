@@ -50,6 +50,7 @@ class FudanDailyFeature extends Feature {
 
       if (ticked) {
         _subTitle = S.of(context).fudan_daily_ticked;
+        _countdownRemainingTime = -2;
       } else if (shouldAutomaticallyTickToday) {
         _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
         notifyUpdate();
