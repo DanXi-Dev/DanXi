@@ -107,6 +107,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("您对本应用的使用受"),
     "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage("的约束。"),
     "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("法律"),
+    "theme" : MessageLookupByLibrary.simpleMessage("主题"),
     "tick_failed" : MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接"),
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
     "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),

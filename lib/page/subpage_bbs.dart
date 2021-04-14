@@ -175,7 +175,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
-        color: Colors.deepPurple,
+        color: Theme.of(context).accentColor,
         onRefresh: () async => refreshSelf(),
         child: FutureBuilder(
             builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
@@ -249,7 +249,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 children: [
                   Text(
                     e.author,
-                    style: TextStyle(color: Colors.deepPurple, fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).accentColor, fontSize: 12),
                   ),
                   Text(
                     e.createdAt,

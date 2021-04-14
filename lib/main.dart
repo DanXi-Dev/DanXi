@@ -91,23 +91,33 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) => PlatformProvider(
+      settings: PlatformSettingsData(
+        iosUsesMaterialWidgets: true,
+      ),
       //initialPlatform: TargetPlatform.android,
       builder: (BuildContext context) => PlatformApp(
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
                 theme: CupertinoThemeData(brightness: Brightness.light)),
             material: (_, __) => MaterialAppData(
+                themeMode: ThemeMode.dark,
                 theme: ThemeData(
                   brightness: Brightness.light,
-                  primarySwatch: Colors.deepPurple,
+                  primarySwatch: Colors.blue,
+                  /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                      selectedIconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+                      unselectedIconTheme: IconThemeData(color: Colors.black),
+                      selectedItemColor: Colors.black,
+                      unselectedItemColor: Colors.black),*/
                 ),
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
-                  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                  //primarySwatch: Colors.teal,
+                  /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
                       selectedIconTheme: IconThemeData(color: Colors.white),
                       unselectedIconTheme: IconThemeData(color: Colors.white),
                       selectedItemColor: Colors.white,
-                      unselectedItemColor: Colors.white),
+                      unselectedItemColor: Colors.white),*/
                   // textTheme: new TextTheme(
                   //   bodyText2: new TextStyle(color: Colors.red),
                   //   headline1: new TextStyle(fontSize: 78),
@@ -385,35 +395,35 @@ class _HomePageState extends State<HomePage> {
                 ChangeNotifierProvider.value(value: _pageIndex),
                 ChangeNotifierProvider.value(value: _connectStatus),
                 ChangeNotifierProvider.value(value: _personInfo),
-                Provider.value(value: _preferences)
+                Provider.value(value: _preferences),
               ],
               child: IndexedStack(index: _pageIndex.value, children: _subpage),
             ),
             bottomNavBar: PlatformNavBar(
               items: [
                 BottomNavigationBarItem(
-                  backgroundColor: Colors.purple,
+                  //backgroundColor: Colors.purple,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.dashboard)
                       : Icon(SFSymbols.square_stack_3d_up_fill),
                   label: S.of(context).dashboard,
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Colors.indigo,
+                  //backgroundColor: Colors.indigo,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.forum)
                       : Icon(SFSymbols.text_bubble),
                   label: S.of(context).forum,
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Colors.blue,
+                  //backgroundColor: Colors.blue,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.calendar_today)
                       : Icon(SFSymbols.calendar),
                   label: S.of(context).timetable,
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Colors.blueGrey,
+                  //backgroundColor: Theme.of(context).primaryColor,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.settings)
                       : Icon(SFSymbols.gear_alt), //TODO: Change Icon
@@ -422,11 +432,11 @@ class _HomePageState extends State<HomePage> {
               ],
               currentIndex: _pageIndex.value,
               material: (_, __) => MaterialNavBarData(
-                type: BottomNavigationBarType.shifting,
+                type: BottomNavigationBarType.fixed,
                 selectedIconTheme:
                     BottomNavigationBarTheme.of(context).selectedIconTheme,
                 unselectedIconTheme:
-                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
+                   BottomNavigationBarTheme.of(context).unselectedIconTheme,
               ),
               itemChanged: (index) {
                 if (index != _pageIndex.value) {

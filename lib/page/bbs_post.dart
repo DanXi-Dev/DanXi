@@ -61,7 +61,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       ),
       body: RefreshIndicator(
-          color: Colors.deepPurple,
+          color: Theme.of(context).accentColor,
           onRefresh: () async {
             refreshSelf();
           },
@@ -100,9 +100,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ? Column()
                       : Text(
                         S.of(context).reply_to(int.parse(e.replyTo, radix: 36)),
-                        style: TextStyle(fontSize: 10, color: Colors.black)),
+                        style: TextStyle(fontSize: 10, color: Theme.of(context).accentColor)),
                     Text("No. ${int.parse(e.objectId, radix: 36)}",
-                        style: TextStyle(fontSize: 10, color: Colors.grey)),
+                        style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor)),
                   ],
                 ),
             ),
@@ -125,7 +125,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
                   Text(
                     e.author,
-                    style: TextStyle(color: Colors.deepPurple, fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).accentColor, fontSize: 12),
                   ),
                   Text(
                     e.createdAt,
