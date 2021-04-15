@@ -16,10 +16,13 @@ BBSPost _$BBSPostFromJson(Map<String, dynamic> json) {
     ..createdAt = json['createdAt'] as String
     ..updatedAt = json['updatedAt'] as String
     ..objectId = json['objectId'] as String
-    ..ACL = json['ACL'] as Map<String, dynamic>;
+    ..ACL = json['ACL'] as Map<String, dynamic>
+    ..upvote = json['upvote'] as int
+    ..report = json['report'] as int;
 }
 
-Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
+Map<String, dynamic> _$BBSPostToJson(BBSPost instance) =>
+    <String, dynamic>{
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
       'objectId': instance.objectId,
@@ -28,4 +31,6 @@ Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
       'content': instance.content,
       'replyPost': instance.replyPost,
       'replyTo': instance.replyTo,
+      'upvote': instance.upvote,
+      'report': instance.report,
     };

@@ -30,6 +30,8 @@ class BBSPost extends BmobObject {
   //replyTo = "0" when it's a reply to nobody
   String author, content, replyPost = "0", replyTo = "0";
 
+  int upvote = 0, report = 0;
+
   factory BBSPost.fromJson(Map<String, dynamic> json) =>
       _$BBSPostFromJson(json);
 
@@ -57,6 +59,8 @@ class BBSPost extends BmobObject {
         "author": author,
         "content": content,
         "replyPost": replyPost,
-        "replyTo": replyTo
+        "replyTo": replyTo,
+        "upvote": upvote,
+        "report": report
       });
 }
