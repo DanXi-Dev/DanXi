@@ -495,10 +495,10 @@ class S {
     );
   }
 
-  /// `By logging in, you indicate that you have read and consent to these policies. `
+  /// `. By logging in, you indicate that you have read and consent to these policies. `
   String get terms_and_conditions_content_end {
     return Intl.message(
-      'By logging in, you indicate that you have read and consent to these policies. ',
+      '. By logging in, you indicate that you have read and consent to these policies. ',
       name: 'terms_and_conditions_content_end',
       desc: '',
       args: [],

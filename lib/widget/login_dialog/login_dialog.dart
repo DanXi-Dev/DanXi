@@ -87,11 +87,11 @@ class _LoginDialogState extends State<LoginDialog> {
   @override
   Widget build(BuildContext context) {
     var defaultText =
-        Theme.of(context).textTheme.bodyText2.copyWith(fontSize: 14);
+        Theme.of(context).textTheme.bodyText2.copyWith(fontSize: 12);
     var linkText = Theme.of(context)
         .textTheme
         .bodyText2
-        .copyWith(color: Theme.of(context).accentColor, fontSize: 14);
+        .copyWith(color: Theme.of(context).accentColor, fontSize: 12);
 
     //Tackle #25
     if (!widget.forceLogin) {
