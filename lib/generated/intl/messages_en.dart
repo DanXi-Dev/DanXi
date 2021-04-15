@@ -122,7 +122,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
     "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
     "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". "),
+    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage("By logging in, you indicate that you have read and consent to these policies. "),
     "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
     "terms_and_conditions_url" : MessageLookupByLibrary.simpleMessage(""),
     "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
