@@ -9,6 +9,8 @@
     "choose_area":"选择校区",
     "out_of_dining_time":"现在不是用餐时间",
     "most_least_crowded_canteen": "[排队最多]{mostCrowded}餐厅 [排队最少]{leastCrowded}餐厅",
+    "tag_most_crowded": "最拥挤",
+    "tag_least_crowded": "最空闲",
     "fudan_daily":"平安复旦",
     "fudan_daily_ticked":"今日已打卡",
     "fudan_daily_tick":"点击打卡",

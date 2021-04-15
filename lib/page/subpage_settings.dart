@@ -169,7 +169,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
     var defaultText =
-        Theme.of(context).textTheme.bodyText2; //TODO: Dark Mode support
+        Theme.of(context).textTheme.bodyText2;
     //const linkText = TextStyle(color: Colors.blue);
     var linkText = Theme.of(context)
         .textTheme

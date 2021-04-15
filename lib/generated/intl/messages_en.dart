@@ -115,6 +115,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
+    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
+    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
     "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
     "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),

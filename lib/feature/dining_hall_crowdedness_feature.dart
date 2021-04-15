@@ -186,6 +186,35 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
+  Row get customSubtitle {
+    if (_status == ConnectionStatus.DONE) {
+      return Row(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+                color: Theme.of(context).hintColor,
+                borderRadius: BorderRadius.all(Radius.circular(5.0))),
+            child: Text(S.of(context).tag_most_crowded, style: TextStyle(color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),),
+          ),
+          const SizedBox(width: 7,),
+          Text(_mostCrowdedCanteen),
+          const SizedBox(width: 7,),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+                color: Theme.of(context).hintColor,
+                borderRadius: BorderRadius.all(Radius.circular(5.0))),
+            child: Text(S.of(context).tag_least_crowded, style: TextStyle(color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),),
+          ),
+          const SizedBox(width: 7,),
+          Text(_leastCrowdedCanteen),
+      ],);
+    }
+    return null;
+  }
+
+  @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.stacked_line_chart)
       : const Icon(SFSymbols.person_3_fill);

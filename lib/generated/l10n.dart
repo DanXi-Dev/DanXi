@@ -135,6 +135,26 @@ class S {
     );
   }
 
+  /// `Most Crowded`
+  String get tag_most_crowded {
+    return Intl.message(
+      'Most Crowded',
+      name: 'tag_most_crowded',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Least Crowded`
+  String get tag_least_crowded {
+    return Intl.message(
+      'Least Crowded',
+      name: 'tag_least_crowded',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `COVID-19 Safety Check-In`
   String get fudan_daily {
     return Intl.message(

@@ -102,6 +102,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("导出为ICS"),
+    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("最空闲"),
+    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("最拥挤"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),
     "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("使用条款"),
     "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("您对本应用的使用受"),

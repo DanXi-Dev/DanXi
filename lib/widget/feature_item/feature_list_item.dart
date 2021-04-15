@@ -49,7 +49,7 @@ class _FeatureListItemState extends State<FeatureListItem>
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
       title: Text(widget.feature.mainTitle),
-      subtitle: Text(summary.join("\n")),
+      subtitle: widget.feature.customSubtitle == null ? Text(summary.join("\n")) : widget.feature.customSubtitle,
       onTap: widget.feature.clickable ? widget.feature.onTap : null,
     );
   }
