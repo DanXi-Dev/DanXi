@@ -1045,6 +1045,16 @@ class S {
     );
   }
 
+  /// `Week {week}`
+  String week(Object week) {
+    return Intl.message(
+      'Week $week',
+      name: 'week',
+      desc: '',
+      args: [week],
+    );
+  }
+
   /// ``
   String get feedback_email {
     return Intl.message(

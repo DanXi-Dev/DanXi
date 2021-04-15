@@ -48,6 +48,7 @@ class Event {
 class TimeTable {
   static final DateTime MONDAY = DateTime.utc(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
+  static const int MAX_WEEK = 18;
   static final List<TableEventTime> COURSE_SLOT_START_TIME = [
     TableEventTime(hour: 8, minute: 0),
     TableEventTime(hour: 8, minute: 55),

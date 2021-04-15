@@ -20,7 +20,6 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
-import 'package:dan_xi/util/code_timer.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/foundation.dart';
@@ -105,13 +104,32 @@ class EcardBalanceFeature extends Feature {
               decoration: BoxDecoration(
                   color: Theme.of(context).hintColor,
                   borderRadius: BorderRadius.all(Radius.circular(4.0))),
-              child: Text(S.of(context).last_transaction, style: TextStyle(color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),),
+              child: Text(
+                S.of(context).last_transaction,
+                style: TextStyle(
+                    color: Theme.of(context).accentColorBrightness ==
+                            Brightness.light
+                        ? Colors.black
+                        : Colors.white),
+              ),
             ),
-            const SizedBox(width: 7,),
+            const SizedBox(
+              width: 4,
+            ),
             Text(Constant.yuanSymbol(_lastTransaction?.payment)),
-            const SizedBox(width: 4,),
-            Text(_lastTransaction?.location),
-          ],);
+            const SizedBox(
+              width: 4,
+            ),
+            Expanded(
+              child: Text(
+                _lastTransaction?.location,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                maxLines: 1,
+              ),
+            )
+          ],
+        );
     }
     return null;
   }

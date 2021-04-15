@@ -92,6 +92,7 @@
     "good_night":"晚上好~",
     "late_night":"披星戴月，不负韶华",
 
+    "week":"第 {week} 周",
     "share_as_ics":"导出为ICS",
 
     "login_failed":"登陆失败，请检查账号和密码"

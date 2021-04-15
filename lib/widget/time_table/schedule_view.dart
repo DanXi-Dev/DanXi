@@ -28,8 +28,10 @@ class ScheduleView extends StatefulWidget {
   final List<DayEvents> laneEventsList;
   final TimetableStyle timetableStyle;
   final TimeNow today;
+  final int showingWeek;
 
-  ScheduleView(this.laneEventsList, this.timetableStyle, this.today);
+  ScheduleView(
+      this.laneEventsList, this.timetableStyle, this.today, this.showingWeek);
 
   @override
   _ScheduleViewState createState() => _ScheduleViewState();
@@ -82,9 +84,12 @@ class _ScheduleViewState extends State<ScheduleView> {
 
     // Build day indicator & courses
     for (int day = 0; day < widget.laneEventsList.length; day++) {
-      int deltaDay = day - widget.today.weekday;
+      int deltaDay = day -
+          widget.today.weekday +
+          (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
-      TextStyle highlightStyle = TextStyle(color: Theme.of(context).accentColor);
+      TextStyle highlightStyle =
+          TextStyle(color: Theme.of(context).accentColor);
       result[1 + day] = SizedBox(
         width: widget.timetableStyle.laneWidth,
         height: widget.timetableStyle.laneHeight,
@@ -121,12 +126,23 @@ class _ScheduleViewState extends State<ScheduleView> {
             decoration: BoxDecoration(
                 color: Theme.of(context).accentColor,
                 borderRadius: BorderRadius.circular(4)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(event.course.courseName, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 11, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
-                Text(event.course.roomName, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 10, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
-                //Text(event.course.roomId, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 10, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(event.course.courseName,
+                  style: Theme.of(context).textTheme.overline.copyWith(
+                      fontSize: 11,
+                      color: Theme.of(context).accentColorBrightness ==
+                              Brightness.light
+                          ? Colors.black
+                          : Colors.white)),
+              Text(event.course.roomName,
+                  style: Theme.of(context).textTheme.overline.copyWith(
+                      fontSize: 10,
+                      color: Theme.of(context).accentColorBrightness ==
+                              Brightness.light
+                          ? Colors.black
+                          : Colors.white)),
+              //Text(event.course.roomId, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 10, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
             ]),
           ),
         );

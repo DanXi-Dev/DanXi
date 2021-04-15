@@ -33,7 +33,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
@@ -123,7 +122,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   void dispose() {
     super.dispose();
-    if(_shareSubscription != null) _shareSubscription.cancel();
+    if (_shareSubscription != null) _shareSubscription.cancel();
     _shareSubscription = null;
   }
 
@@ -162,6 +161,16 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                 startTime: START_TIME)));
   }
 
+  goToPrev() {
+    _showingTime.week--;
+    refreshSelf();
+  }
+
+  goToNext() {
+    _showingTime.week++;
+    refreshSelf();
+  }
+
   Widget _buildPage(TimeTable table) {
     TimetableStyle style = TimetableStyle(
         startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
@@ -170,14 +179,29 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemWidth: 16,
         timeItemHeight: 140);
     _table = table;
-    _showingTime = _table.now();
+    if (_showingTime == null) _showingTime = _table.now();
     _status = ConnectionStatus.DONE;
 
-
-
-    return ScheduleView(
-          _table.toDayEvents(_showingTime.week), style, _showingTime);
-
+    return Column(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          PlatformIconButton(
+            icon: Icon(Icons.chevron_left),
+            onPressed: _showingTime.week >= 0 ? goToPrev : null,
+          ),
+          Text(S.of(context).week(_showingTime.week)),
+          PlatformIconButton(
+            icon: Icon(Icons.chevron_right),
+            onPressed:
+                _showingTime.week <= TimeTable.MAX_WEEK ? goToNext : null,
+          )
+        ],
+      ),
+      Expanded(
+          child: ScheduleView(_table.toDayEvents(_showingTime.week), style,
+              _table.now(), _showingTime.week))
+    ]);
   }
 
   @override

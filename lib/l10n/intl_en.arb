@@ -109,6 +109,7 @@
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
 
+    "week":"Week {week}",
     "feedback_email": "",
     "terms_and_conditions_url" : "",
     "privacy_policy_url" : ""
