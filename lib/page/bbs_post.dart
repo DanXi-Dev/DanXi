@@ -87,7 +87,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                   //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
                                   itemCount: l.length);
                             }
-                            return Container();
+                            return GestureDetector(
+                              child: Center(child: CircularProgressIndicator()),
+                            );
                           },
                           future: PostRepository.getInstance()
                               .loadReplies(_post)))),
