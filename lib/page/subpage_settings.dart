@@ -171,12 +171,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     const double _avatarNameSpacing = 4;
     var defaultText =
         Theme.of(context).textTheme.bodyText2;
-    //const linkText = TextStyle(color: Colors.blue);
     var linkText = Theme.of(context)
         .textTheme
         .bodyText2
         .copyWith(color: Theme.of(context).accentColor);
-    //TODO: WARNING Hardcoded avatarSize Modifiers!
 
     return RefreshIndicator(
         onRefresh: () async => refreshSelf(),
