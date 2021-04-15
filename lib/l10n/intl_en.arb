@@ -9,7 +9,9 @@
     "choose_area":"Select Campus",
     "out_of_dining_time":"It's not dining time right now.",
     "most_least_crowded_canteen": "[Most Crowded]{mostCrowded}餐厅 [Least Crowded]{leastCrowded}餐厅",
-    "fudan_daily":"COVID-19 Safety Check-In",
+    "tag_most_crowded": "Most Crowded",
+    "tag_least_crowded": "Least Crowded",
+    "fudan_daily":"Automatic COVID-19 Safety Check-In",
     "fudan_daily_ticked":"Already done",
     "fudan_daily_tick":"Tap to check in",
     "fudan_daily_tick_countdown":"Automatic check-in in {time} seconds. Tap to cancel.",
@@ -36,7 +38,7 @@
     "logout": "Logout",
     "logout_subtitle": "And delete all data from this device",
     "logout_question_prompt_title": "Are you sure?",
-    "logout_question_prompt": "This app will exit after deleting all data",
+    "logout_question_prompt": "Restart the app for changes to take effect",
     "logout_prompt": "You need to restart this app for changes to take effect.",
     "terms_and_conditions_title": "Legal",
     "terms_and_conditions_content": "Your use of this application is governed under ",
@@ -48,7 +50,8 @@
     "contact_us": "Contact Us",
     "theme": "Theme",
     "material": "Material",
-    "cupertino": "iOS Native",
+    "cupertino": "Cupertino",
+    "app_feedback": " App Feedback",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -71,7 +74,7 @@
     "loading_qr_code":"Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers.",
     "tap_to_view": "Tap to view",
     "forum_post_enter_content": "Post",
-    "last_transaction": "Last Transaction: ",
+    "last_transaction": "Last Transaction",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
@@ -106,6 +109,7 @@
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
 
+    "feedback_email": "",
     "terms_and_conditions_url" : "",
     "privacy_policy_url" : ""
 }

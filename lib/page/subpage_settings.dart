@@ -36,6 +36,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class SettingsSubpage extends PlatformSubpage {
   @override
@@ -169,7 +170,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
     var defaultText =
-        Theme.of(context).textTheme.bodyText2; //TODO: Dark Mode support
+        Theme.of(context).textTheme.bodyText2;
     //const linkText = TextStyle(color: Colors.blue);
     var linkText = Theme.of(context)
         .textTheme
@@ -267,28 +268,47 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
               ),
             ),
 
-            //Theme Selection
-            Card(
-              child: ListTile(
-                title: Text(S.of(context).theme),
-                leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.color_lens)
-                    : const Icon(SFSymbols.color_filter),
-                subtitle: Text(PlatformX.isMaterial(context) ? S.of(context).material : S.of(context).cupertino),
-                onTap: () {
-                  PlatformX.isMaterial(context)
-                      ? PlatformProvider.of(context).changeToCupertinoPlatform()
-                      : PlatformProvider.of(context).changeToMaterialPlatform();
-                  refreshSelf();
-                  if (SettingsProvider.of(_preferences).theme == null) {
-                    SettingsProvider.of(_preferences).theme = Theme.of(context).platform == TargetPlatform.android ? 1 : 0;
-                  }
-                  else {
-                    SettingsProvider.of(_preferences).theme = SettingsProvider.of(_preferences).theme == 0 ? 1 : 0;
-                  }
-                },
+            if (!Constant.IS_PRODUCTION_ENVIRONMENT)
+              //Theme Selection
+              Card(
+                child: ListTile(
+                  title: Text(S
+                      .of(context)
+                      .theme),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.color_lens)
+                      : const Icon(SFSymbols.color_filter),
+                  subtitle: Text(PlatformX.isMaterial(context) ? S
+                      .of(context)
+                      .material : S
+                      .of(context)
+                      .cupertino),
+                  onTap: () {
+                    PlatformX.isMaterial(context)
+                        ? PlatformProvider.of(context)
+                        .changeToCupertinoPlatform()
+                        : PlatformProvider.of(context)
+                        .changeToMaterialPlatform();
+                    if (SettingsProvider
+                        .of(_preferences)
+                        .theme == null) {
+                      SettingsProvider
+                          .of(_preferences)
+                          .theme = (Theme
+                          .of(context)
+                          .platform == TargetPlatform.android) ? 1 : 0;
+                    }
+                    else {
+                      SettingsProvider
+                          .of(_preferences)
+                          .theme = (SettingsProvider
+                          .of(_preferences)
+                          .theme == 0) ? 1 : 0;
+                    }
+                  },
+                ),
               ),
-            ),
+
 
             //About Page
             Card(
@@ -483,8 +503,15 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     children: <Widget>[
                       TextButton(
                         child: Text(S.of(context).contact_us),
-                        onPressed: () {
-                          //TODO: Launch Email Client?
+                        onPressed: () async {
+                          final Email email = Email(
+                            body: '',
+                            subject: S.of(context).app_name + S.of(context).app_feedback,
+                            recipients: [S.of(context).feedback_email],
+                            isHTML: false,
+                          );
+
+                          await FlutterEmailSender.send(email);
                         },
                       ),
                       const SizedBox(width: 8),

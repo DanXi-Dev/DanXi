@@ -57,6 +57,7 @@ dependencies:
   path_provider: ^1.6.28
   screen: ^0.0.5
   flutter_sfsymbols: ^2.0.0
+  flutter_email_sender: ^5.0.0
 
   #TODO: ical breaks the dependency relation
   ical: ^0.1.3

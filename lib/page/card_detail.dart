@@ -65,7 +65,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return PlatformProvider(
+        builder: (BuildContext context) => PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBar(title: Text(S.of(context).ecard_balance_log)),
@@ -112,7 +113,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                           children: _getListWidgets(),
                         ))))),
       ]),
-    );
+    ));
   }
 
   List<Widget> _getListWidgets() {

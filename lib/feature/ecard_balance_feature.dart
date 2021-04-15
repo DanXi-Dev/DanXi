@@ -92,6 +92,30 @@ class EcardBalanceFeature extends Feature {
     return '';
   }
 
+  @override
+  Row get customSubtitle {
+    if (_status == ConnectionStatus.DONE) {
+      if (_lastTransaction == null)
+        return null;
+      else
+        return Row(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).hintColor,
+                  borderRadius: BorderRadius.all(Radius.circular(4.0))),
+              child: Text(S.of(context).last_transaction, style: TextStyle(color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),),
+            ),
+            const SizedBox(width: 7,),
+            Text(Constant.yuanSymbol(_lastTransaction?.payment)),
+            const SizedBox(width: 4,),
+            Text(_lastTransaction?.location),
+          ],);
+    }
+    return null;
+  }
+
   //@override
   //String get tertiaryTitle => _lastTransaction?.location;
 

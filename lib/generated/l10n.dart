@@ -135,10 +135,30 @@ class S {
     );
   }
 
-  /// `COVID-19 Safety Check-In`
+  /// `Most Crowded`
+  String get tag_most_crowded {
+    return Intl.message(
+      'Most Crowded',
+      name: 'tag_most_crowded',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Least Crowded`
+  String get tag_least_crowded {
+    return Intl.message(
+      'Least Crowded',
+      name: 'tag_least_crowded',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Automatic COVID-19 Safety Check-In`
   String get fudan_daily {
     return Intl.message(
-      'COVID-19 Safety Check-In',
+      'Automatic COVID-19 Safety Check-In',
       name: 'fudan_daily',
       desc: '',
       args: [],
@@ -395,10 +415,10 @@ class S {
     );
   }
 
-  /// `This app will exit after deleting all data`
+  /// `Restart the app for changes to take effect`
   String get logout_question_prompt {
     return Intl.message(
-      'This app will exit after deleting all data',
+      'Restart the app for changes to take effect',
       name: 'logout_question_prompt',
       desc: '',
       args: [],
@@ -515,11 +535,21 @@ class S {
     );
   }
 
-  /// `iOS Native`
+  /// `Cupertino`
   String get cupertino {
     return Intl.message(
-      'iOS Native',
+      'Cupertino',
       name: 'cupertino',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ` App Feedback`
+  String get app_feedback {
+    return Intl.message(
+      ' App Feedback',
+      name: 'app_feedback',
       desc: '',
       args: [],
     );
@@ -725,10 +755,10 @@ class S {
     );
   }
 
-  /// `Last Transaction: `
+  /// `Last Transaction`
   String get last_transaction {
     return Intl.message(
-      'Last Transaction: ',
+      'Last Transaction',
       name: 'last_transaction',
       desc: '',
       args: [],
@@ -1010,6 +1040,16 @@ class S {
     return Intl.message(
       'assets/graphics/kyln24.jpeg',
       name: 'dev_image_url_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ``
+  String get feedback_email {
+    return Intl.message(
+      '',
+      name: 'feedback_email',
       desc: '',
       args: [],
     );

@@ -72,7 +72,8 @@ class _CardCrowdDataState extends State<CardCrowdData> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return PlatformProvider(
+        builder: (BuildContext context) => PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar:
@@ -107,7 +108,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                   )))
         ],
       ),
-    );
+    ));
   }
 
   List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
