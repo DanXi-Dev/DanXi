@@ -20,10 +20,12 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/widgets.dart';
 
 class Constant {
+  static const bool IS_PRODUCTION_ENVIRONMENT = bool.fromEnvironment('dart.vm.product');
+
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
 
-  static const FUDAN_DAILY_COUNTDOWN_SECONDS = 4;
+  static const FUDAN_DAILY_COUNTDOWN_SECONDS = 5;
 
   static String yuanSymbol(String num) {
     if (num == null || num.trim().isEmpty) return "";

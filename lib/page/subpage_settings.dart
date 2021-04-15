@@ -267,27 +267,47 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
               ),
             ),
 
-            //Theme Selection
-            Card(
-              child: ListTile(
-                title: Text(S.of(context).theme),
-                leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.color_lens)
-                    : const Icon(SFSymbols.color_filter),
-                subtitle: Text(PlatformX.isMaterial(context) ? S.of(context).material : S.of(context).cupertino),
-                onTap: () {
-                  PlatformX.isMaterial(context)
-                      ? PlatformProvider.of(context).changeToCupertinoPlatform()
-                      : PlatformProvider.of(context).changeToMaterialPlatform();
-                  if (SettingsProvider.of(_preferences).theme == null) {
-                    SettingsProvider.of(_preferences).theme = (Theme.of(context).platform == TargetPlatform.android) ? 1 : 0;
-                  }
-                  else {
-                    SettingsProvider.of(_preferences).theme = (SettingsProvider.of(_preferences).theme == 0) ? 1 : 0;
-                  }
-                },
+            if (!Constant.IS_PRODUCTION_ENVIRONMENT)
+              //Theme Selection
+              Card(
+                child: ListTile(
+                  title: Text(S
+                      .of(context)
+                      .theme),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.color_lens)
+                      : const Icon(SFSymbols.color_filter),
+                  subtitle: Text(PlatformX.isMaterial(context) ? S
+                      .of(context)
+                      .material : S
+                      .of(context)
+                      .cupertino),
+                  onTap: () {
+                    PlatformX.isMaterial(context)
+                        ? PlatformProvider.of(context)
+                        .changeToCupertinoPlatform()
+                        : PlatformProvider.of(context)
+                        .changeToMaterialPlatform();
+                    if (SettingsProvider
+                        .of(_preferences)
+                        .theme == null) {
+                      SettingsProvider
+                          .of(_preferences)
+                          .theme = (Theme
+                          .of(context)
+                          .platform == TargetPlatform.android) ? 1 : 0;
+                    }
+                    else {
+                      SettingsProvider
+                          .of(_preferences)
+                          .theme = (SettingsProvider
+                          .of(_preferences)
+                          .theme == 0) ? 1 : 0;
+                    }
+                  },
+                ),
               ),
-            ),
+
 
             //About Page
             Card(
