@@ -42,10 +42,13 @@ class _ScheduleViewState extends State<ScheduleView> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: widget.laneEventsList.length + 1,
-      children: _buildTable(),
-    );
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: GridView.count(
+          crossAxisCount: widget.laneEventsList.length + 1,
+          children: _buildTable(),
+        ));
   }
 
   List<Widget> _buildTable() {

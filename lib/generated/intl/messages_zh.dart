@@ -21,22 +21,27 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(time) => "将在${time}秒后自动打卡，点击以取消";
 
-  static m1(mostCrowded, leastCrowded) => "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
+  static m1(mostCrowded, leastCrowded) =>
+      "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
 
   static m2(name) => "回复 No.${name}";
 
-  static m3(name) => "欢迎你，${name}";
+  static m3(week) => "第 ${week} 周";
+
+  static m4(name) => "欢迎你，${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function> {
-    "about" : MessageLookupByLibrary.simpleMessage("关于本应用"),
-    "account" : MessageLookupByLibrary.simpleMessage("账户"),
-    "and" : MessageLookupByLibrary.simpleMessage("和"),
-    "app_description" : MessageLookupByLibrary.simpleMessage("由几位复旦本科学生用爱发电打造的微型复旦综合服务App，希望能为你的生活提供便利~"),
-    "app_description_title" : MessageLookupByLibrary.simpleMessage("简介"),
-    "app_feedback" : MessageLookupByLibrary.simpleMessage("App反馈"),
-    "app_name" : MessageLookupByLibrary.simpleMessage("旦兮 α"),
-    "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering @ Fudan University"),
+
+  static _notInlinedMessages(_) => <String, Function>{
+        "about": MessageLookupByLibrary.simpleMessage("关于本应用"),
+        "account": MessageLookupByLibrary.simpleMessage("账户"),
+        "and": MessageLookupByLibrary.simpleMessage("和"),
+        "app_description": MessageLookupByLibrary.simpleMessage(
+            "由几位复旦本科学生用爱发电打造的微型复旦综合服务App，希望能为你的生活提供便利~"),
+        "app_description_title": MessageLookupByLibrary.simpleMessage("简介"),
+        "app_feedback": MessageLookupByLibrary.simpleMessage("App反馈"),
+        "app_name": MessageLookupByLibrary.simpleMessage("旦兮 α"),
+        "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering @ Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("开发者"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
     "change_account" : MessageLookupByLibrary.simpleMessage("切换账号"),
@@ -106,17 +111,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("最空闲"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("最拥挤"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("使用条款"),
-    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("登录即表示您已阅读并同意"),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage("。"),
-    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("法律"),
-    "theme" : MessageLookupByLibrary.simpleMessage("主题"),
-    "tick_failed" : MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接"),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
-    "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
-    "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
-    "welcome" : m3,
-    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
-  };
+        "terms_and_conditions": MessageLookupByLibrary.simpleMessage("使用条款"),
+        "terms_and_conditions_content":
+            MessageLookupByLibrary.simpleMessage("登录即表示您已阅读并同意"),
+        "terms_and_conditions_content_end":
+            MessageLookupByLibrary.simpleMessage("。"),
+        "terms_and_conditions_title":
+            MessageLookupByLibrary.simpleMessage("法律"),
+        "theme": MessageLookupByLibrary.simpleMessage("主题"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接"),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
+        "ticking": MessageLookupByLibrary.simpleMessage("正在打卡..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("日程"),
+        "view_ossl": MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
+        "week": m3,
+        "welcome": m4,
+        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("张江校区")
+      };
 }
