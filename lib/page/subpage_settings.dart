@@ -504,7 +504,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                         onPressed: () async {
                           final Email email = Email(
                             body: '',
-                            subject: S.of(context).app_name + S.of(context).app_feedback,
+                            subject: S.of(context).app_feedback,
                             recipients: [S.of(context).feedback_email],
                             isHTML: false,
                           );

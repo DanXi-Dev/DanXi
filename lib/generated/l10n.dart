@@ -545,10 +545,10 @@ class S {
     );
   }
 
-  /// ` App Feedback`
+  /// `[Feedback]`
   String get app_feedback {
     return Intl.message(
-      ' App Feedback',
+      '[Feedback]',
       name: 'app_feedback',
       desc: '',
       args: [],
@@ -965,30 +965,30 @@ class S {
     );
   }
 
-  /// `许冬\n[w568w]`
+  /// `Xu Dong\n[w568w]`
   String get dev_name_1 {
     return Intl.message(
-      '许冬\n[w568w]',
+      'Xu Dong\n[w568w]',
       name: 'dev_name_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `赵行健\n[kavinzhao]`
+  /// `Zhao Xingjian\n[kavinzhao]`
   String get dev_name_2 {
     return Intl.message(
-      '赵行健\n[kavinzhao]',
+      'Zhao Xingjian\n[kavinzhao]',
       name: 'dev_name_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `郭虹麟\n[KYLN24]`
+  /// `Guo Honglin\n[KYLN24]`
   String get dev_name_3 {
     return Intl.message(
-      '郭虹麟\n[KYLN24]',
+      'Guo Honglin\n[KYLN24]',
       name: 'dev_name_3',
       desc: '',
       args: [],

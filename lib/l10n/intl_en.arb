@@ -51,7 +51,7 @@
     "theme": "Theme",
     "material": "Material",
     "cupertino": "Cupertino",
-    "app_feedback": " App Feedback",
+    "app_feedback": "[Feedback]",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -100,9 +100,9 @@
     "login_failed":"Login failed. Check your ID and/or password.",
 
     "project_url": "https:\/\/github.com\/w568w\/DanXi",
-    "dev_name_1": "许冬\n[w568w]",
-    "dev_name_2": "赵行健\n[kavinzhao]",
-    "dev_name_3": "郭虹麟\n[KYLN24]",
+    "dev_name_1": "Xu Dong\n[w568w]",
+    "dev_name_2": "Zhao Xingjian\n[kavinzhao]",
+    "dev_name_3": "Guo Honglin\n[KYLN24]",
     "dev_page_1": "https:\/\/github.com\/w568w",
     "dev_page_2": "https:\/\/github.com\/kavinzhao",
     "dev_page_3": "https:\/\/github.com\/KYLN24",
