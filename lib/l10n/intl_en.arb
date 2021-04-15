@@ -82,6 +82,7 @@
     "dashboard":"Dashboard",
     "forum":"The \"Hole\"",
     "timetable":"Agenda",
+    "week":"Week {week}",
     "new_post":"New Post",
     "post_failed":"Network error, post failed.",
     "share":"Share",
@@ -109,8 +110,7 @@
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
 
-    "week":"Week {week}",
-    "feedback_email": "",
+    "feedback_email": "danxi_dev@protonmail.com",
     "terms_and_conditions_url" : "",
     "privacy_policy_url" : ""
 }

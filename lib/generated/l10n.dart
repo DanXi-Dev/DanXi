@@ -825,6 +825,16 @@ class S {
     );
   }
 
+  /// `Week {week}`
+  String week(Object week) {
+    return Intl.message(
+      'Week $week',
+      name: 'week',
+      desc: '',
+      args: [week],
+    );
+  }
+
   /// `New Post`
   String get new_post {
     return Intl.message(
@@ -1045,20 +1055,10 @@ class S {
     );
   }
 
-  /// `Week {week}`
-  String week(Object week) {
-    return Intl.message(
-      'Week $week',
-      name: 'week',
-      desc: '',
-      args: [week],
-    );
-  }
-
-  /// ``
+  /// `danxi_dev@protonmail.com`
   String get feedback_email {
     return Intl.message(
-      '',
+      'danxi_dev@protonmail.com',
       name: 'feedback_email',
       desc: '',
       args: [],

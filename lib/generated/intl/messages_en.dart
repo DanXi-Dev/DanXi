@@ -21,8 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
-  static m1(mostCrowded, leastCrowded) =>
-      "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
+  static m1(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
   static m2(name) => "Reply No.${name}";
 
@@ -31,18 +30,15 @@ class MessageLookup extends MessageLookupByLibrary {
   static m4(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-
-  static _notInlinedMessages(_) => <String, Function>{
-        "about": MessageLookupByLibrary.simpleMessage("About This App"),
-        "account": MessageLookupByLibrary.simpleMessage("Account"),
-        "and": MessageLookupByLibrary.simpleMessage(" and "),
-        "app_description": MessageLookupByLibrary.simpleMessage(
-            "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
-        "app_description_title":
-            MessageLookupByLibrary.simpleMessage("Description"),
-        "app_feedback": MessageLookupByLibrary.simpleMessage(" App Feedback"),
-        "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
-        "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
+  static _notInlinedMessages(_) => <String, Function> {
+    "about" : MessageLookupByLibrary.simpleMessage("About This App"),
+    "account" : MessageLookupByLibrary.simpleMessage("Account"),
+    "and" : MessageLookupByLibrary.simpleMessage(" and "),
+    "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
+    "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
+    "app_feedback" : MessageLookupByLibrary.simpleMessage(" App Feedback"),
+    "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
+    "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
     "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
@@ -69,7 +65,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
-    "feedback_email" : MessageLookupByLibrary.simpleMessage(""),
+    "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
     "forum" : MessageLookupByLibrary.simpleMessage("The \"Hole\""),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
@@ -127,24 +123,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
     "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
-        "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
-            "Your use of this application is governed under "),
-        "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(
-            "By logging in, you indicate that you have read and consent to these policies. "),
-        "terms_and_conditions_title":
-            MessageLookupByLibrary.simpleMessage("Legal"),
-        "terms_and_conditions_url": MessageLookupByLibrary.simpleMessage(""),
-        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
-        "tick_failed": MessageLookupByLibrary.simpleMessage(
-            "Failed to check in. Check your internet connection."),
-        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
-            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-        "ticking": MessageLookupByLibrary.simpleMessage("Checking in..."),
-        "timetable": MessageLookupByLibrary.simpleMessage("Agenda"),
-        "view_ossl": MessageLookupByLibrary.simpleMessage(
-            "This app is made possible thanks to various open-source software. View "),
-        "week": m3,
-        "welcome": m4,
-        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("Zhangjiang")
-      };
+    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
+    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage("By logging in, you indicate that you have read and consent to these policies. "),
+    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
+    "terms_and_conditions_url" : MessageLookupByLibrary.simpleMessage(""),
+    "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
+    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
+    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
+    "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
+    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
+    "week" : m3,
+    "welcome" : m4,
+    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
+  };
 }

@@ -100,17 +100,18 @@ class EcardBalanceFeature extends Feature {
         return Row(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
-                  color: Theme.of(context).hintColor,
+                  color: Theme.of(context).hintColor.withOpacity(0.3),
                   borderRadius: BorderRadius.all(Radius.circular(4.0))),
               child: Text(
                 S.of(context).last_transaction,
                 style: TextStyle(
-                    color: Theme.of(context).accentColorBrightness ==
-                            Brightness.light
+                    color: Theme.of(context).hintColor.computeLuminance() >=
+                            0.5
                         ? Colors.black
-                        : Colors.white),
+                        : Colors.white,
+                        fontSize: 11),
               ),
             ),
             const SizedBox(

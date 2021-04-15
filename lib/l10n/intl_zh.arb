@@ -51,7 +51,7 @@
     "terms_and_conditions_content_end": "。",
     "contact_us": "联系我们",
     "theme": "主题",
-    "app_feedback": "App反馈",
+    "app_feedback": " App反馈",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",
@@ -80,6 +80,7 @@
     "dashboard":"首页",
     "forum":"树洞",
     "timetable":"日程",
+    "week":"第 {week} 周",
     "new_post":"发布新帖子",
     "post_failed":"网络错误，帖子发布失败",
     "share":"分享",
@@ -92,7 +93,6 @@
     "good_night":"晚上好~",
     "late_night":"披星戴月，不负韶华",
 
-    "week":"第 {week} 周",
     "share_as_ics":"导出为ICS",
 
     "login_failed":"登陆失败，请检查账号和密码"
