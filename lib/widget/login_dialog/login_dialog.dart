@@ -15,13 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -76,6 +75,15 @@ class _LoginDialogState extends State<LoginDialog> {
     });
   }
 
+  void testInternetAccess() async {
+    try {
+      await Dio().get('http://captive.apple.com');
+      //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
+    } catch (e) {
+      //TODO: No internet Access
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var defaultText =
@@ -84,6 +92,11 @@ class _LoginDialogState extends State<LoginDialog> {
         .textTheme
         .bodyText2
         .copyWith(color: Theme.of(context).accentColor, fontSize: 14);
+
+    //Tackle #25
+    if (!widget.forceLogin) {
+      testInternetAccess();
+    }
 
     return PlatformAlertDialog(
       title: Text(S.of(context).login_uis),
