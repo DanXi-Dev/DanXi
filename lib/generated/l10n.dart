@@ -1065,20 +1065,20 @@ class S {
     );
   }
 
-  /// ``
+  /// `https://danxi-dev.github.io/terms-and-condition`
   String get terms_and_conditions_url {
     return Intl.message(
-      '',
+      'https://danxi-dev.github.io/terms-and-condition',
       name: 'terms_and_conditions_url',
       desc: '',
       args: [],
     );
   }
 
-  /// ``
+  /// `https://danxi-dev.github.io/privacy`
   String get privacy_policy_url {
     return Intl.message(
-      '',
+      'https://danxi-dev.github.io/privacy',
       name: 'privacy_policy_url',
       desc: '',
       args: [],
