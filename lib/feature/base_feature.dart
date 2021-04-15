@@ -32,7 +32,7 @@ abstract class Feature {
 
   String get tertiaryTitle => null;
 
-  Row get customSubtitle => null;
+  Widget get customSubtitle => null;
 
   Widget get trailing => null;
   FeatureContainer container;

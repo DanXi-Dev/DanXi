@@ -745,10 +745,10 @@ class S {
     );
   }
 
-  /// `Last Transaction: `
+  /// `Last Transaction`
   String get last_transaction {
     return Intl.message(
-      'Last Transaction: ',
+      'Last Transaction',
       name: 'last_transaction',
       desc: '',
       args: [],

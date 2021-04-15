@@ -194,7 +194,7 @@ class DiningHallCrowdednessFeature extends Feature {
             padding: EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
                 color: Theme.of(context).hintColor,
-                borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                borderRadius: BorderRadius.all(Radius.circular(4.0))),
             child: Text(S.of(context).tag_most_crowded, style: TextStyle(color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),),
           ),
           const SizedBox(width: 7,),
@@ -204,7 +204,7 @@ class DiningHallCrowdednessFeature extends Feature {
             padding: EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
                 color: Theme.of(context).hintColor,
-                borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                borderRadius: BorderRadius.all(Radius.circular(4.0))),
             child: Text(S.of(context).tag_least_crowded, style: TextStyle(color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white),),
           ),
           const SizedBox(width: 7,),

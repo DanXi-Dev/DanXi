@@ -71,7 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_15_days" : MessageLookupByLibrary.simpleMessage("过去 15 天"),
     "last_30_days" : MessageLookupByLibrary.simpleMessage("过去 30 天"),
     "last_7_days" : MessageLookupByLibrary.simpleMessage("过去 7 天"),
-    "last_transaction" : MessageLookupByLibrary.simpleMessage("上次交易："),
+    "last_transaction" : MessageLookupByLibrary.simpleMessage("上次交易"),
     "late_night" : MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
     "loading" : MessageLookupByLibrary.simpleMessage("加载中..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("正在加载复活码...\n可能需要5~10秒，取决于复旦服务器。"),
