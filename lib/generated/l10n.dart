@@ -155,10 +155,10 @@ class S {
     );
   }
 
-  /// `COVID-19 Safety Check-In`
+  /// `Automatic COVID-19 Safety Check-In`
   String get fudan_daily {
     return Intl.message(
-      'COVID-19 Safety Check-In',
+      'Automatic COVID-19 Safety Check-In',
       name: 'fudan_daily',
       desc: '',
       args: [],
@@ -415,10 +415,10 @@ class S {
     );
   }
 
-  /// `This app will exit after deleting all data`
+  /// `Restart the app for changes to take effect`
   String get logout_question_prompt {
     return Intl.message(
-      'This app will exit after deleting all data',
+      'Restart the app for changes to take effect',
       name: 'logout_question_prompt',
       desc: '',
       args: [],
