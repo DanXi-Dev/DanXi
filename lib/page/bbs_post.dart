@@ -43,7 +43,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return PlatformProvider(
+        builder: (BuildContext context) => PlatformScaffold(
       iosContentPadding: true,
       iosContentBottomPadding: true,
       appBar: PlatformAppBar(
@@ -83,7 +84,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   return Container();
                 },
                 future: PostRepository.getInstance().loadReplies(_post)))),
-    );
+    ));
   }
 
   Widget _getListItem(BBSPost e, int index) => Material(

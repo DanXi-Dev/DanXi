@@ -40,7 +40,8 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return PlatformProvider(
+        builder: (BuildContext context) => PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBar(
@@ -61,7 +62,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
                           children: _getListWidgets(),
                         ))))),
       ]),
-    );
+    ));
   }
 
   List<Widget> _getListWidgets() {

@@ -67,7 +67,8 @@ class _AAONoticesListState extends State<AAONoticesList> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return PlatformProvider(
+        builder: (BuildContext context) =>PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBar(title: Text(S.of(context).fudan_aao_notices)),
@@ -86,7 +87,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
                       ))))
         ],
       ),
-    );
+    ));
   }
 
   List<Widget> _getListWidgets() {

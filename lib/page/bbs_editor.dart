@@ -55,7 +55,8 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
+    return PlatformProvider(
+        builder: (BuildContext context) => PlatformScaffold(
         iosContentBottomPadding: true,
         iosContentPadding: true,
         appBar: PlatformAppBar(
@@ -96,7 +97,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                   ),
                 )
               ],
-            )));
+            ))));
   }
 
   Future<void> _sendDocument() {
