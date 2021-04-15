@@ -123,7 +123,7 @@ class TimeTable {
     for (int i = 0; i < 7; i++) {
       if (!compact || table[i].isNotEmpty)
         result.add(DayEvents(
-            day: DateFormat.EEEE().format(MONDAY.add(Duration(days: i))),
+            day: DateFormat.E().format(MONDAY.add(Duration(days: i))),
             events: table[i]));
     }
     return result;
@@ -164,7 +164,7 @@ class Course {
 
   static _trimCourseName(String name) {
     name = name.trim();
-    int idPos = name.lastIndexOf(RegExp(r'\(\w{4}\d{6}\.\d{2}\)'));
+    int idPos = name.lastIndexOf(RegExp(r'\(\w{4}\d{6}.?\.\d{2}\)'));
     return idPos >= 0 ? name.replaceRange(idPos, name.length, "") : name;
   }
 

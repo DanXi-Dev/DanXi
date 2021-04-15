@@ -18,7 +18,6 @@
 import 'dart:math';
 
 import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
