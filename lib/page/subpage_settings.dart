@@ -36,6 +36,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class SettingsSubpage extends PlatformSubpage {
   @override
@@ -502,8 +503,15 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     children: <Widget>[
                       TextButton(
                         child: Text(S.of(context).contact_us),
-                        onPressed: () {
-                          //TODO: Launch Email Client?
+                        onPressed: () async {
+                          final Email email = Email(
+                            body: '',
+                            subject: S.of(context).app_name + S.of(context).app_feedback,
+                            recipients: [S.of(context).feedback_email],
+                            isHTML: false,
+                          );
+
+                          await FlutterEmailSender.send(email);
                         },
                       ),
                       const SizedBox(width: 8),

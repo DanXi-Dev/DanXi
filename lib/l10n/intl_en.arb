@@ -51,6 +51,7 @@
     "theme": "Theme",
     "material": "Material",
     "cupertino": "Cupertino",
+    "app_feedback": " App Feedback",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -108,6 +109,7 @@
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
 
+    "feedback_email": "",
     "terms_and_conditions_url" : "",
     "privacy_policy_url" : ""
 }

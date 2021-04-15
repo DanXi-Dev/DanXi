@@ -545,6 +545,16 @@ class S {
     );
   }
 
+  /// ` App Feedback`
+  String get app_feedback {
+    return Intl.message(
+      ' App Feedback',
+      name: 'app_feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(
@@ -1030,6 +1040,16 @@ class S {
     return Intl.message(
       'assets/graphics/kyln24.jpeg',
       name: 'dev_image_url_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ``
+  String get feedback_email {
+    return Intl.message(
+      '',
+      name: 'feedback_email',
       desc: '',
       args: [],
     );
