@@ -65,10 +65,15 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     LicenseItem("data_plugin", LICENSE_NO, "https://github.com/chaozhouzhang"),
     LicenseItem("dio_cookie_manager", LICENSE_MIT,
         "https://github.com/flutterchina/dio"),
+    LicenseItem(
+        "EFQRCode", LICENSE_MIT, "https://github.com/EFPrefix/EFQRCode"),
     LicenseItem("event_bus", LICENSE_MIT,
         "https://github.com/marcojakob/dart-event-bus"),
     LicenseItem("flutter", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/flutter/flutter"),
+    LicenseItem(
+        "flutter_email_sender", LICENSE_APACHE_2_0,
+        "https://github.com/sidlatau/flutter_email_sender"),
     LicenseItem("flutter_inappwebview", LICENSE_APACHE_2_0,
         "https://github.com/pichillilorenzo/flutter_inappwebview"),
     //TODO items below need recheck
