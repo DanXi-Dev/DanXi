@@ -67,7 +67,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
     "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
-    "forum" : MessageLookupByLibrary.simpleMessage("The \"Hole\""),
+    "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("Automatic COVID-19 Safety Check-In"),

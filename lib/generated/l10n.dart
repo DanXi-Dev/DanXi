@@ -805,10 +805,10 @@ class S {
     );
   }
 
-  /// `The "Hole"`
+  /// `Tree Hole`
   String get forum {
     return Intl.message(
-      'The "Hole"',
+      'Tree Hole',
       name: 'forum',
       desc: '',
       args: [],
