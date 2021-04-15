@@ -16,7 +16,6 @@
  */
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -41,6 +40,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -335,7 +335,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (_preferences.containsKey(SettingsProvider.KEY_PREFERRED_THEME)) {
-      if(SettingsProvider.of(_preferences).theme == (PlatformX.isMaterial(context))) {
+      if (SettingsProvider.of(_preferences).theme ==
+          (PlatformX.isMaterial(context))) {
         PlatformX.isMaterial(context)
             ? PlatformProvider.of(context).changeToCupertinoPlatform()
             : PlatformProvider.of(context).changeToMaterialPlatform();
@@ -355,7 +356,6 @@ class _HomePageState extends State<HomePage> {
         ShareTimetableEvent().fire();
         break;
       case 3:
-        //ShareTimetableEvent().fire();
         break;
     }
   }
@@ -363,100 +363,104 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        builder: (BuildContext context) =>
-        _personInfo.value == null
-    // Show an empty container if no person info is set
-        ? PlatformScaffold(
-            iosContentBottomPadding: true,
-            iosContentPadding: true,
-            appBar: PlatformAppBar(
-              title: Text(S.of(context).app_name),
-              trailingActions: [
-                PlatformIconButton(
-                  padding: EdgeInsets.zero,
-                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-                  onPressed: _onPressActionButton,
-                )
-              ],
-            ),
-            body: Container(),
-          )
-        : PlatformScaffold(
-            iosContentBottomPadding: true,
-            iosContentPadding: _subpage[_pageIndex.value].needPadding,
-            appBar: PlatformAppBar(
-              title: Text(
-                S.of(context).app_name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              trailingActions: [
-                PlatformIconButton(
-                  material: (_, __) => MaterialIconButtonData(
-                      tooltip:
-                          _subpageActionButtonTextBuilders[_pageIndex.value](
+        builder: (BuildContext context) => _personInfo.value == null
+            // Show an empty container if no person info is set
+            ? PlatformScaffold(
+                iosContentBottomPadding: true,
+                iosContentPadding: true,
+                appBar: PlatformAppBar(
+                  title: Text(S.of(context).app_name),
+                  trailingActions: [
+                    PlatformIconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                          _subpageActionButtonIconBuilders[_pageIndex.value](
                               context)),
-                  padding: EdgeInsets.zero,
-                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-                  onPressed: _onPressActionButton,
-                )
-              ],
-            ),
-            body: MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: _pageIndex),
-                ChangeNotifierProvider.value(value: _connectStatus),
-                ChangeNotifierProvider.value(value: _personInfo),
-                Provider.value(value: _preferences),
-              ],
-              child: IndexedStack(index: _pageIndex.value, children: _subpage),
-            ),
-            bottomNavBar: PlatformNavBar(
-              items: [
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.purple,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.dashboard)
-                      : Icon(SFSymbols.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
+                      onPressed: _onPressActionButton,
+                    )
+                  ],
                 ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.indigo,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.forum)
-                      : Icon(SFSymbols.text_bubble),
-                  label: S.of(context).forum,
+                body: Container(),
+              )
+            : PlatformScaffold(
+                iosContentBottomPadding: true,
+                iosContentPadding: _subpage[_pageIndex.value].needPadding,
+                appBar: PlatformAppBar(
+                  title: TopController(
+                    child: Text(
+                      S.of(context).app_name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onDoubleTap: () => ScrollToTopEvent().fire(),
+                  ),
+                  trailingActions: [
+                    PlatformIconButton(
+                      material: (_, __) => MaterialIconButtonData(
+                          tooltip: _subpageActionButtonTextBuilders[
+                              _pageIndex.value](context)),
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                          _subpageActionButtonIconBuilders[_pageIndex.value](
+                              context)),
+                      onPressed: _onPressActionButton,
+                    )
+                  ],
                 ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.blue,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.calendar_today)
-                      : Icon(SFSymbols.calendar),
-                  label: S.of(context).timetable,
+                body: MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider.value(value: _pageIndex),
+                    ChangeNotifierProvider.value(value: _connectStatus),
+                    ChangeNotifierProvider.value(value: _personInfo),
+                    Provider.value(value: _preferences),
+                  ],
+                  child:
+                      IndexedStack(index: _pageIndex.value, children: _subpage),
                 ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Theme.of(context).primaryColor,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.settings)
-                      : Icon(SFSymbols.gear_alt), //TODO: Change Icon
-                  label: S.of(context).settings,
+                bottomNavBar: PlatformNavBar(
+                  items: [
+                    BottomNavigationBarItem(
+                      //backgroundColor: Colors.purple,
+                      icon: PlatformX.isAndroid
+                          ? Icon(Icons.dashboard)
+                          : Icon(SFSymbols.square_stack_3d_up_fill),
+                      label: S.of(context).dashboard,
+                    ),
+                    BottomNavigationBarItem(
+                      //backgroundColor: Colors.indigo,
+                      icon: PlatformX.isAndroid
+                          ? Icon(Icons.forum)
+                          : Icon(SFSymbols.text_bubble),
+                      label: S.of(context).forum,
+                    ),
+                    BottomNavigationBarItem(
+                      //backgroundColor: Colors.blue,
+                      icon: PlatformX.isAndroid
+                          ? Icon(Icons.calendar_today)
+                          : Icon(SFSymbols.calendar),
+                      label: S.of(context).timetable,
+                    ),
+                    BottomNavigationBarItem(
+                      //backgroundColor: Theme.of(context).primaryColor,
+                      icon: PlatformX.isAndroid
+                          ? Icon(Icons.settings)
+                          : Icon(SFSymbols.gear_alt), //TODO: Change Icon
+                      label: S.of(context).settings,
+                    ),
+                  ],
+                  currentIndex: _pageIndex.value,
+                  material: (_, __) => MaterialNavBarData(
+                    type: BottomNavigationBarType.fixed,
+                    selectedIconTheme:
+                        BottomNavigationBarTheme.of(context).selectedIconTheme,
+                    unselectedIconTheme: BottomNavigationBarTheme.of(context)
+                        .unselectedIconTheme,
+                  ),
+                  itemChanged: (index) {
+                    if (index != _pageIndex.value) {
+                      setState(() => _pageIndex.value = index);
+                    }
+                  },
                 ),
-              ],
-              currentIndex: _pageIndex.value,
-              material: (_, __) => MaterialNavBarData(
-                type: BottomNavigationBarType.fixed,
-                selectedIconTheme:
-                    BottomNavigationBarTheme.of(context).selectedIconTheme,
-                unselectedIconTheme:
-                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
-              ),
-              itemChanged: (index) {
-                if (index != _pageIndex.value) {
-                  setState(() => _pageIndex.value = index);
-                }
-              },
-            ),
-          ));
+              ));
   }
 }

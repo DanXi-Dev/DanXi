@@ -23,6 +23,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
   List<Tag> _tags;
   List<int> _tagDays;
   bool _selectable = true;
+  ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -67,53 +69,62 @@ class _CardDetailPageState extends State<CardDetailPage> {
   Widget build(BuildContext context) {
     return PlatformProvider(
         builder: (BuildContext context) => PlatformScaffold(
-      iosContentBottomPadding: true,
-      iosContentPadding: true,
-      appBar: PlatformAppBar(title: Text(S.of(context).ecard_balance_log)),
-      body: Column(children: [
-        TagContainer(
-            fillRandomColor: false,
-            fixedColor: Colors.purple,
-            fontSize: 16,
-            enabled: _selectable,
-            singleChoice: true,
-            defaultChoice: -1,
-            onChoice: (Tag tag, list) async {
-              int index = _tags.indexOf(tag);
-              if (index >= 0) {
-                // Make the tags not clickable when data's being retrieved
-                setState(() {
-                  tag.checkedIcon =
-                      PlatformX.isAndroid ? Icons.pending : SFSymbols.hourglass;
-                  _selectable = false;
-                });
-                _cardInfo.records = await Retrier.runAsyncWithRetryForever(() =>
-                    CardRepository.getInstance()
-                        .loadCardRecord(_tagDays[index]));
-                setState(() {
-                  tag.checkedIcon =
-                      PlatformX.isAndroid ? Icons.check : SFSymbols.checkmark;
-                  _selectable = true;
-                });
-              }
-            },
-            tagList: _tags),
-        Expanded(
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: PlatformWidget(
-                    material: (_, __) => Scrollbar(
-                        interactive: PlatformX.isDesktop,
-                        child: ListView(
-                          children: _getListWidgets(),
-                        )),
-                    cupertino: (_, __) => CupertinoScrollbar(
-                            child: ListView(
-                          children: _getListWidgets(),
-                        ))))),
-      ]),
-    ));
+              iosContentBottomPadding: true,
+              iosContentPadding: true,
+              appBar: PlatformAppBar(
+                  title: TopController(
+                controller: _controller,
+                child: Text(S.of(context).ecard_balance_log),
+              )),
+              body: Column(children: [
+                TagContainer(
+                    fillRandomColor: false,
+                    fixedColor: Colors.purple,
+                    fontSize: 16,
+                    enabled: _selectable,
+                    singleChoice: true,
+                    defaultChoice: -1,
+                    onChoice: (Tag tag, list) async {
+                      int index = _tags.indexOf(tag);
+                      if (index >= 0) {
+                        // Make the tags not clickable when data's being retrieved
+                        setState(() {
+                          tag.checkedIcon = PlatformX.isAndroid
+                              ? Icons.pending
+                              : SFSymbols.hourglass;
+                          _selectable = false;
+                        });
+                        _cardInfo.records =
+                            await Retrier.runAsyncWithRetryForever(() =>
+                                CardRepository.getInstance()
+                                    .loadCardRecord(_tagDays[index]));
+                        setState(() {
+                          tag.checkedIcon = PlatformX.isAndroid
+                              ? Icons.check
+                              : SFSymbols.checkmark;
+                          _selectable = true;
+                        });
+                      }
+                    },
+                    tagList: _tags),
+                Expanded(
+                    child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: PlatformWidget(
+                            material: (_, __) => Scrollbar(
+                                interactive: PlatformX.isDesktop,
+                                child: ListView(
+                                  controller: _controller,
+                                  children: _getListWidgets(),
+                                )),
+                            cupertino: (_, __) => CupertinoScrollbar(
+                                    child: ListView(
+                                  controller: _controller,
+                                  children: _getListWidgets(),
+                                ))))),
+              ]),
+            ));
   }
 
   List<Widget> _getListWidgets() {

@@ -26,6 +26,7 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:data_plugin/bmob/response/bmob_registered.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
 import 'package:dio/dio.dart';
@@ -55,6 +56,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   BmobUser _loginUser;
   static StreamSubscription _postSubscription;
   static StreamSubscription _refreshSubscription;
+  static StreamSubscription _goTopSubscription;
   ScrollController _controller = ScrollController();
   ConnectionStatus _loginStatus = ConnectionStatus.NONE;
 
@@ -71,6 +73,12 @@ class _BBSSubpageState extends State<BBSSubpage>
       _refreshSubscription = Constant.eventBus
           .on<RetrieveNewPostEvent>()
           .listen((_) => refreshSelf());
+    }
+    if (_goTopSubscription == null) {
+      _goTopSubscription =
+          Constant.eventBus.on<ScrollToTopEvent>().listen((event) {
+        TopController.scrollToTop(_controller);
+      });
     }
   }
 
@@ -91,7 +99,6 @@ class _BBSSubpageState extends State<BBSSubpage>
       builder: (_) => PlatformAlertDialog(
         title: Text(S.of(context).login_with_uis),
         content: Material(
-            //color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
           leading: PlatformX.isAndroid
               ? Icon(Icons.account_circle)

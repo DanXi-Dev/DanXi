@@ -20,6 +20,7 @@ import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,54 +38,60 @@ class BBSPostDetail extends StatefulWidget {
 }
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
-
   BBSPost _post;
   BmobUser _user;
+  ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
         builder: (BuildContext context) => PlatformScaffold(
-      iosContentPadding: true,
-      iosContentBottomPadding: true,
-      appBar: PlatformAppBar(
-        title: Text(S.of(context).forum),
-        trailingActions: [
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: PlatformX.isAndroid
-                ? const Icon(Icons.reply)
-                : const Icon(SFSymbols.arrowshape_turn_up_left),
-            onPressed: () {
-              Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-                "post": BBSPost.newReply(_user.objectId, _post.objectId)
-              });
-            },
-          )
-        ],
-      ),
-      body: RefreshIndicator(
-          color: Theme.of(context).accentColor,
-          onRefresh: () async {
-            refreshSelf();
-          },
-          child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: FutureBuilder(
-                builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-                  if (snapshot.hasData) {
-                    var l = snapshot.data;
-                    return ListView.builder(
-                        itemBuilder: (context, index) =>
-                            _getListItem(l[index], index),
-                        //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
-                        itemCount: l.length);
-                  }
-                  return Container();
-                },
-                future: PostRepository.getInstance().loadReplies(_post)))),
-    ));
+              iosContentPadding: true,
+              iosContentBottomPadding: true,
+              appBar: PlatformAppBar(
+                title: TopController(
+                  controller: _controller,
+                  child: Text(S.of(context).forum),
+                ),
+                trailingActions: [
+                  PlatformIconButton(
+                    padding: EdgeInsets.zero,
+                    icon: PlatformX.isAndroid
+                        ? const Icon(Icons.reply)
+                        : const Icon(SFSymbols.arrowshape_turn_up_left),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed("/bbs/newPost", arguments: {
+                        "post": BBSPost.newReply(_user.objectId, _post.objectId)
+                      });
+                    },
+                  )
+                ],
+              ),
+              body: RefreshIndicator(
+                  color: Theme.of(context).accentColor,
+                  onRefresh: () async {
+                    refreshSelf();
+                  },
+                  child: MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: FutureBuilder(
+                          builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
+                            if (snapshot.hasData) {
+                              var l = snapshot.data;
+                              return ListView.builder(
+                                  controller: _controller,
+                                  itemBuilder: (context, index) =>
+                                      _getListItem(l[index], index),
+                                  //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
+                                  itemCount: l.length);
+                            }
+                            return Container();
+                          },
+                          future: PostRepository.getInstance()
+                              .loadReplies(_post)))),
+            ));
   }
 
   Widget _getListItem(BBSPost e, int index) => Material(
@@ -99,24 +106,31 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             const SizedBox(height: 2),
             Align(
               alignment: Alignment.topLeft,
-              child:  Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
                   e.replyTo == "0"
                       ? Column()
                       : Text(
-                        S.of(context).reply_to(int.parse(e.replyTo, radix: 36)),
-                        style: TextStyle(fontSize: 10, color: Theme.of(context).accentColor)),
-                    Text("No. ${int.parse(e.objectId, radix: 36)}",
-                        style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor)),
-                  ],
-                ),
+                          S
+                              .of(context)
+                              .reply_to(int.parse(e.replyTo, radix: 36)),
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: Theme.of(context).accentColor)),
+                  Text("No. ${int.parse(e.objectId, radix: 36)}",
+                      style: TextStyle(
+                          fontSize: 10, color: Theme.of(context).hintColor)),
+                ],
+              ),
             ),
             const SizedBox(height: 2),
             Align(
               alignment: Alignment.topLeft,
-              child: Text(e.content,
-                          style: TextStyle(fontSize: 16),),
+              child: Text(
+                e.content,
+                style: TextStyle(fontSize: 16),
+              ),
             )
           ],
         ),
@@ -131,7 +145,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
                   Text(
                     e.author,
-                    style: TextStyle(color: Theme.of(context).accentColor, fontSize: 12),
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor, fontSize: 12),
                   ),
                   Text(
                     e.createdAt,

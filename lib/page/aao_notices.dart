@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -68,26 +69,30 @@ class _AAONoticesListState extends State<AAONoticesList> {
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
-        builder: (BuildContext context) =>PlatformScaffold(
-      iosContentBottomPadding: true,
-      iosContentPadding: true,
-      appBar: PlatformAppBar(title: Text(S.of(context).fudan_aao_notices)),
-      body: Column(
-        children: [
-          Expanded(
-              child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: Scrollbar(
-                      interactive: PlatformX.isDesktop,
-                      controller: _controller,
-                      child: ListView(
-                        controller: _controller,
-                        children: _getListWidgets(),
-                      ))))
-        ],
-      ),
-    ));
+        builder: (BuildContext context) => PlatformScaffold(
+              iosContentBottomPadding: true,
+              iosContentPadding: true,
+              appBar: PlatformAppBar(
+                  title: TopController(
+                child: Text(S.of(context).fudan_aao_notices),
+                controller: _controller,
+              )),
+              body: Column(
+                children: [
+                  Expanded(
+                      child: MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true,
+                          child: Scrollbar(
+                              interactive: PlatformX.isDesktop,
+                              controller: _controller,
+                              child: ListView(
+                                controller: _controller,
+                                children: _getListWidgets(),
+                              ))))
+                ],
+              ),
+            ));
   }
 
   List<Widget> _getListWidgets() {
@@ -97,7 +102,9 @@ class _AAONoticesListState extends State<AAONoticesList> {
       widgets.add(Material(
           color: isCupertino(context) ? Colors.white : null,
           child: ListTile(
-            leading: PlatformX.isAndroid ? Icon(Icons.info) : Icon(SFSymbols.info_circle_fill),
+            leading: PlatformX.isAndroid
+                ? Icon(Icons.info)
+                : Icon(SFSymbols.info_circle_fill),
             title: Text(value.title),
             subtitle: Text(value.time),
             onTap: () => launch(value.url),

@@ -15,10 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -37,32 +36,38 @@ class OpenSourceLicenseList extends StatefulWidget {
 
 class _OpenSourceListState extends State<OpenSourceLicenseList> {
   List<LicenseItem> _items;
+  ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
         builder: (BuildContext context) => PlatformScaffold(
-      iosContentBottomPadding: true,
-      iosContentPadding: true,
-      appBar: PlatformAppBar(
-          title: Text(S.of(context).open_source_software_licenses)),
-      body: Column(children: [
-        Expanded(
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: PlatformWidget(
-                    material: (_, __) => Scrollbar(
-                        interactive: PlatformX.isDesktop,
-                        child: ListView(
-                          children: _getListWidgets(),
-                        )),
-                    cupertino: (_, __) => CupertinoScrollbar(
-                            child: ListView(
-                          children: _getListWidgets(),
-                        ))))),
-      ]),
-    ));
+              iosContentBottomPadding: true,
+              iosContentPadding: true,
+              appBar: PlatformAppBar(
+                  title: TopController(
+                controller: _controller,
+                child: Text(S.of(context).open_source_software_licenses),
+              )),
+              body: Column(children: [
+                Expanded(
+                    child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: PlatformWidget(
+                            material: (_, __) => Scrollbar(
+                                interactive: PlatformX.isDesktop,
+                                child: ListView(
+                                  controller: _controller,
+                                  children: _getListWidgets(),
+                                )),
+                            cupertino: (_, __) => CupertinoScrollbar(
+                                    child: ListView(
+                                  controller: _controller,
+                                  children: _getListWidgets(),
+                                ))))),
+              ]),
+            ));
   }
 
   List<Widget> _getListWidgets() {
