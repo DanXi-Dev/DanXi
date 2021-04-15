@@ -178,16 +178,15 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                 PlatformX.isMaterial(context)
                     ? Icon(
                         Icons.location_on_outlined,
-                        color: Colors.deepPurple,
+                        color: Theme.of(context).accentColor,
                       )
                     : Icon(
                         SFSymbols.location_circle,
+                        color: Theme.of(context).accentColor,
                       ),
                 Text(
                   zoneName,
-                  style: PlatformX.isMaterial(context)
-                      ? TextStyle(fontSize: 18, color: Colors.deepPurple)
-                      : TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18, color: Theme.of(context).accentColor,)
                 ),
               ],
             ),

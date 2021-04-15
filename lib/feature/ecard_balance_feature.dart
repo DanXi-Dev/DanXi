@@ -111,7 +111,7 @@ class EcardBalanceFeature extends Feature {
                             0.5
                         ? Colors.black
                         : Colors.white,
-                        fontSize: 11),
+                        fontSize: 12),
               ),
             ),
             const SizedBox(

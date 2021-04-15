@@ -76,72 +76,78 @@ class DiningHallCrowdednessFeature extends Feature {
               keySubtitle = keyUnprocessed.split('\n')[1];
             switch (key) {
               case '北区':
-                crowdednessSum[0] += value.current;
+                crowdednessSum[0] += value.current / value.max;
                 break;
               case '南区':
                 if (keySubtitle == '') {
-                  crowdednessSum[1] += value.current;
+                  crowdednessSum[1] += value.current / value.max;
                 } else {
                   switch (keySubtitle) {
                     case '南苑餐厅':
-                      crowdednessSum[3] += value.current;
+                      //WARNING: Workaround defective data
+                      //crowdednessSum[3] += value.current / value.max;
                       break;
                     case '教工快餐':
-                      crowdednessSum[4] += value.current;
+                      crowdednessSum[4] += value.current / value.max;
                       break;
                     default:
-                      crowdednessSum[1] += value.current;
+                      crowdednessSum[1] += value.current / value.max;
                   }
                 }
                 break;
               case '旦苑':
-                crowdednessSum[2] += value.current;
+                crowdednessSum[2] += value.current / value.max;
                 break;
             }
           }
         });
-        switch (crowdednessSum.indexOf(crowdednessSum.reduce(min))) {
-          case 0:
-            _leastCrowdedCanteen = '北区';
-            break;
-          case 1:
-            _leastCrowdedCanteen = '南区';
-            break;
-          case 2:
-            _leastCrowdedCanteen = '旦苑';
-            break;
-          case 3:
-            _leastCrowdedCanteen = '南苑';
-            break;
-          case 4:
-            _leastCrowdedCanteen = '南区教工';
-            break;
-          default:
-            _leastCrowdedCanteen = 'NULL';
-        }
         switch (crowdednessSum.indexOf(crowdednessSum.reduce(max))) {
           case 0:
-            _mostCrowdedCanteen = '北区';
+            _mostCrowdedCanteen = '北区餐厅';
             break;
           case 1:
-            _mostCrowdedCanteen = '南区';
+            _mostCrowdedCanteen = '南区餐厅';
             break;
           case 2:
-            _mostCrowdedCanteen = '旦苑';
+            _mostCrowdedCanteen = '旦苑餐厅';
             break;
           case 3:
-            _mostCrowdedCanteen = '南苑';
+            _mostCrowdedCanteen = '南苑餐厅';
             break;
           case 4:
-            _mostCrowdedCanteen = '南区教工';
+            _mostCrowdedCanteen = '南区教工餐厅';
             break;
           default:
             _mostCrowdedCanteen = 'NULL';
         }
+        crowdednessSum[3] = 9999; //WARNING: Workaround defective data
+        switch (crowdednessSum.indexOf(crowdednessSum.reduce(min))) {
+          case 0:
+            _leastCrowdedCanteen = '北区餐厅';
+            break;
+          case 1:
+            _leastCrowdedCanteen = '南区餐厅';
+            break;
+          case 2:
+            _leastCrowdedCanteen = '旦苑餐厅';
+            break;
+          case 3:
+            _leastCrowdedCanteen = '南苑餐厅';
+            break;
+          case 4:
+            _leastCrowdedCanteen = '南区教工餐厅';
+            break;
+          default:
+            _leastCrowdedCanteen = 'NULL';
+        }
       }
       else {
-        _mostCrowdedCanteen = '(unimplemented)';
-        _leastCrowdedCanteen = '(unimplemented)';
+        var crowdedness = new Map<String, double>();
+        _trafficInfos.forEach((key, value) {
+          if (value.current != 0) crowdedness[key] = value.current / value.max;
+        });
+        _mostCrowdedCanteen = crowdedness.keys.firstWhere((element) => crowdedness[element] == crowdedness.values.reduce(max), orElse: () => 'null');
+        _leastCrowdedCanteen = crowdedness.keys.firstWhere((element) => crowdedness[element] == crowdedness.values.reduce(min), orElse: () => 'null');
       }
 
       _status = ConnectionStatus.DONE;
@@ -200,7 +206,7 @@ class DiningHallCrowdednessFeature extends Feature {
                 0.5
                 ? Colors.black
                 : Colors.white,
-                fontSize: 11),),
+                fontSize: 12),),
           ),
           const SizedBox(width: 7,),
           Text(_mostCrowdedCanteen),
@@ -215,7 +221,7 @@ class DiningHallCrowdednessFeature extends Feature {
                 0.5
                 ? Colors.black
                 : Colors.white,
-                fontSize: 11),),
+                fontSize: 12),),
           ),
           const SizedBox(width: 7,),
           Text(_leastCrowdedCanteen),
