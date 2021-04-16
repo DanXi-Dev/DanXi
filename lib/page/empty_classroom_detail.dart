@@ -174,10 +174,18 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
               title: Text(element.roomName),
-              subtitle: Text(element.busy.map((e) => e ? '1' : '0').join()),
+              subtitle: Row(
+                children: element.busy.map((e) {
+                  return Expanded(
+                      child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 4),
+                    height: 16,
+                    color: e ? Colors.red : Colors.green,
+                  ));
+                }).toList(),
+              ),
             )));
       });
-
     return widgets;
   }
 
