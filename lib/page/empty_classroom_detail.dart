@@ -161,7 +161,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           groupValue: _selectBuildingIndex,
                           children: _buildingList,
                         )),
-                const SizedBox(height: 10),
+                const SizedBox(height: 15),
                 ForgettableFutureBuilder(
                   builder: (BuildContext context,
                       AsyncSnapshot<List<RoomInfo>> snapshot) {
@@ -219,11 +219,13 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(element.roomName,),
+                        const SizedBox(width: 1,),
+                        Text(element.roomName, style: TextStyle(fontSize: 18),),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: _buildBusinessViewForRoom(element),
-                        )
+                        ),
+                        const SizedBox(width: 1,),
                       ]
                   ),
                   Divider(),
@@ -246,7 +248,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         margin: EdgeInsets.symmetric(horizontal: 2),
         height: 22,
       ));
-      if (_time++ % 5 == 0) _list.add(SizedBox(width: 5,));
+      if (_time++ % 5 == 0) _list.add(SizedBox(width: 7,));
     });
     return _list;
   }
