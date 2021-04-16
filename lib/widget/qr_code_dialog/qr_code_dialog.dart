@@ -69,7 +69,7 @@ class _QRDialogState extends State<QRDialog> {
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   @override
-  Widget build(BuildContext context) => PlatformAlertDialog(
+  Widget build(BuildContext context) => AlertDialog(
         title: Text(S.of(context).fudan_qr_code),
         content: GestureDetector(
             onTap: () {
@@ -105,7 +105,7 @@ class _QRDialogState extends State<QRDialog> {
                           }
                         })))),
         actions: <Widget>[
-          PlatformDialogAction(
+          TextButton(
               child: PlatformText(S.of(context).i_see),
               onPressed: () {
                 ScreenProxy.setBrightness(widget.originBrightness);
