@@ -95,6 +95,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         ),
         material: (_, __) => ListTile(
           title: Text(e.key),
+          subtitle: Text(e.value.fileName),
           onTap: () => _startShare(e.value),
         ),
       );

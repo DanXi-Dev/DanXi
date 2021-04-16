@@ -24,6 +24,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
+import 'package:dan_xi/repository/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
@@ -144,14 +145,17 @@ class DiningHallCrowdednessFeature extends Feature {
           default:
             _leastCrowdedCanteen = 'NULL';
         }
-      }
-      else {
+      } else {
         var crowdedness = new Map<String, double>();
         _trafficInfos.forEach((key, value) {
           if (value.current != 0) crowdedness[key] = value.current / value.max;
         });
-        _mostCrowdedCanteen = crowdedness.keys.firstWhere((element) => crowdedness[element] == crowdedness.values.reduce(max), orElse: () => 'null');
-        _leastCrowdedCanteen = crowdedness.keys.firstWhere((element) => crowdedness[element] == crowdedness.values.reduce(min), orElse: () => 'null');
+        _mostCrowdedCanteen = crowdedness.keys.firstWhere(
+            (element) => crowdedness[element] == crowdedness.values.reduce(max),
+            orElse: () => 'null');
+        _leastCrowdedCanteen = crowdedness.keys.firstWhere(
+            (element) => crowdedness[element] == crowdedness.values.reduce(min),
+            orElse: () => 'null');
       }
       _status = ConnectionStatus.DONE;
       return;
@@ -188,7 +192,8 @@ class DiningHallCrowdednessFeature extends Feature {
         return S.of(context).loading;
       case ConnectionStatus.DONE:
         if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null)
-          return S.of(context).most_least_crowded_canteen(_mostCrowdedCanteen, _leastCrowdedCanteen);
+          return S.of(context).most_least_crowded_canteen(
+              _mostCrowdedCanteen, _leastCrowdedCanteen);
         return '';
       case ConnectionStatus.FAILED:
         return S.of(context).failed;
@@ -208,31 +213,42 @@ class DiningHallCrowdednessFeature extends Feature {
             decoration: BoxDecoration(
                 color: Theme.of(context).hintColor.withOpacity(0.3),
                 borderRadius: BorderRadius.all(Radius.circular(4.0))),
-            child: Text(S.of(context).tag_most_crowded, style: TextStyle(color:
-            Theme.of(context).hintColor.computeLuminance() >=
-                0.5
-                ? Colors.black
-                : Colors.white,
-                fontSize: 12),),
+            child: Text(
+              S.of(context).tag_most_crowded,
+              style: TextStyle(
+                  color: Theme.of(context).hintColor.computeLuminance() >= 0.5
+                      ? Colors.black
+                      : Colors.white,
+                  fontSize: 12),
+            ),
           ),
-          const SizedBox(width: 7,),
+          const SizedBox(
+            width: 7,
+          ),
           Text(_mostCrowdedCanteen),
-          const SizedBox(width: 7,),
+          const SizedBox(
+            width: 7,
+          ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
             decoration: BoxDecoration(
                 color: Theme.of(context).hintColor.withOpacity(0.3),
                 borderRadius: BorderRadius.all(Radius.circular(4.0))),
-            child: Text(S.of(context).tag_least_crowded, style: TextStyle(color:
-            Theme.of(context).hintColor.computeLuminance() >=
-                0.5
-                ? Colors.black
-                : Colors.white,
-                fontSize: 12),),
+            child: Text(
+              S.of(context).tag_least_crowded,
+              style: TextStyle(
+                  color: Theme.of(context).hintColor.computeLuminance() >= 0.5
+                      ? Colors.black
+                      : Colors.white,
+                  fontSize: 12),
+            ),
           ),
-          const SizedBox(width: 7,),
+          const SizedBox(
+            width: 7,
+          ),
           Text(_leastCrowdedCanteen),
-      ],);
+        ],
+      );
     }
     return null;
   }
