@@ -27,6 +27,7 @@ import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
+import 'package:dan_xi/page/empty_classroom_detail.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
@@ -80,6 +81,8 @@ class DanxiApp extends StatelessWidget {
         CardDetailPage(arguments: arguments),
     '/card/crowdData': (context, {arguments}) =>
         CardCrowdData(arguments: arguments),
+    '/room/detail': (context, {arguments}) =>
+        EmptyClassroomDetailPage(arguments: arguments),
     '/bbs/postDetail': (context, {arguments}) =>
         BBSPostDetail(arguments: arguments),
     '/bbs/newPost': (context, {arguments}) =>

@@ -82,7 +82,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                     FeatureListItem(feature: EcardBalanceFeature()),
                     FeatureListItem(feature: DiningHallCrowdednessFeature()),
                     FeatureListItem(feature: FudanAAONoticesFeature()),
-                    // FeatureListItem(feature: EmptyClassroomFeature()),
+                    FeatureListItem(feature: EmptyClassroomFeature()),
                   ],
                 )),
                 Card(child: FeatureListItem(feature: FudanDailyFeature())),

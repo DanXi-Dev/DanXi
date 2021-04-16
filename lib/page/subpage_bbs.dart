@@ -189,29 +189,33 @@ class _BBSSubpageState extends State<BBSSubpage>
           removeTop: true,
           child: FutureBuilder(
               builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-                if (snapshot.hasData) {
-                  // If login failed
-                  if (snapshot.data == null) {
-                    return _buildErrorPage();
-                  } else {
-                    return _buildPage(snapshot.data);
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return _buildLoadingPage();
+                    case ConnectionState.done:
+                      if (snapshot.hasError) {
+                        return _buildErrorPage(error: snapshot.error);
+                      } else {
+                        var l = snapshot.data;
+                        return ListView.builder(
+                            controller: _controller,
+                            itemBuilder: (context, index) =>
+                                _buildPage(snapshot.data),
+                            //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
+                            itemCount: l.length);
+                      }
+                      break;
                   }
-                } else if (snapshot.hasError) {
-                  return _buildErrorPage(error: snapshot.error);
-                } else {
-                  return _buildLoadingPage();
-                }
-              },
-              future: loginAndLoadPost(context.personInfo))
-        )
-    );
+                  return null;
+                },
+                future: loginAndLoadPost(context.personInfo))));
   }
 
-  Widget _buildLoadingPage() {
-    return GestureDetector(
-      child: Center(child: CircularProgressIndicator()),
-    );
-  }
+  Widget _buildLoadingPage() => GestureDetector(
+        child: Center(child: CircularProgressIndicator()),
+      );
 
   Widget _buildErrorPage({Exception error}) {
     return GestureDetector(
