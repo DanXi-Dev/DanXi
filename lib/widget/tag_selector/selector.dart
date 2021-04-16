@@ -24,7 +24,7 @@ import 'package:flutter/widgets.dart';
 /*
 Originally by @hemantkhorwal on Github.
 Refactor a lot.
-Redistribute via License GPL3.0 instead of MIT.
+Redistribute via License GPL 3.0 instead of MIT.
 
 Copyright (c) 2020 Hemant Khorwal
 
@@ -96,8 +96,7 @@ class _TagContainerState extends State<TagContainer> {
   Color iconColor = Colors.white;
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     this.tagList = widget.tagList;
     widget.iconColor == null
         ? this.iconColor = Colors.white
@@ -116,10 +115,6 @@ class _TagContainerState extends State<TagContainer> {
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplyer(widget.fixedColor);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Material(
         child: Container(
       margin: const EdgeInsets.only(top: 16),

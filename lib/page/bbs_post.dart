@@ -78,23 +78,44 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       removeTop: true,
                       child: FutureBuilder(
                           builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-                            if (snapshot.hasData) {
-                              var l = snapshot.data;
-                              return ListView.builder(
-                                  controller: _controller,
-                                  itemBuilder: (context, index) =>
-                                      _getListItem(l[index], index),
-                                  //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
-                                  itemCount: l.length);
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                              case ConnectionState.waiting:
+                              case ConnectionState.active:
+                                return GestureDetector(
+                                  child: Center(
+                                      child: CircularProgressIndicator()),
+                                );
+                                break;
+                              case ConnectionState.done:
+                                if (snapshot.hasError) {
+                                  return _buildErrorWidget();
+                                } else {
+                                  var l = snapshot.data;
+                                  return ListView.builder(
+                                      controller: _controller,
+                                      itemBuilder: (context, index) =>
+                                          _getListItem(l[index], index),
+                                      //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
+                                      itemCount: l.length);
+                                }
+                                break;
                             }
-                            return GestureDetector(
-                              child: Center(child: CircularProgressIndicator()),
-                            );
+                            return null;
                           },
                           future: PostRepository.getInstance()
                               .loadReplies(_post)))),
             ));
   }
+
+  Widget _buildErrorWidget() => GestureDetector(
+        child: Center(
+          child: Text(S.of(context).failed),
+        ),
+        onTap: () {
+          refreshSelf();
+        },
+      );
 
   Widget _getListItem(BBSPost e, int index) => Material(
       color: isCupertino(context) ? Colors.white : null,
