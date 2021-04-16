@@ -45,11 +45,13 @@ class EmptyClassroomDetailPage extends StatefulWidget {
 }
 
 class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
-  PersonInfo _personInfo; // ignore: unused_field
+  PersonInfo _personInfo;
 
-  Campus _selectItem = Campus.NONE; //Material
-  int _selectCampusIndex = 0; //Cupertino
-  Map<int,Text> _buildingList;
+  List<Tag> _campusTags;
+  int _selectCampusIndex = 0;
+
+  List<Tag> _buildingTags;
+  Map<int, Text> _buildingList;
   int _selectBuildingIndex = 0;
 
   ScrollController _controller = ScrollController();
@@ -58,14 +60,6 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     _selectCampusIndex =
         SettingsProvider.of(await SharedPreferences.getInstance()).campus.index;
     refreshSelf();
-  }
-
-  List<DropdownMenuItem<int>> _buildMaterialDropdownButtonBuildingList() {
-    var _list = [];
-    _buildingList.forEach((key, value) {
-      _list.add(DropdownMenuItem(child: value, value: key,));
-    });
-    return _list;
   }
 
   @override
@@ -77,41 +71,54 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Build tags and texts.
+    _campusTags = Constant.CAMPUS_VALUES
+        .map((e) => Tag(e.displayTitle(context),
+            PlatformX.isAndroid ? Icons.location_on : SFSymbols.location))
+        .toList();
+    _buildingTags = Constant.CAMPUS_VALUES[_selectCampusIndex]
+        .getTeachingBuildings()
+        .map((e) =>
+            Tag(e, PlatformX.isAndroid ? Icons.home_work : SFSymbols.location))
+        .toList();
     _buildingList = Constant.CAMPUS_VALUES[_selectCampusIndex]
         .getTeachingBuildings()
         .map((e) => Text(e))
-        .toList(growable: false)
+        .toList()
         .asMap();
+
     return PlatformProvider(
         builder: (BuildContext context) => PlatformScaffold(
               iosContentBottomPadding: true,
               iosContentPadding: true,
               appBar: PlatformAppBar(
                   title: TopController(
-                controller: _controller,
-                child: Text(S.of(context).empty_classrooms),
-              )),
+                    controller: _controller,
+                    child: Text(S.of(context).empty_classrooms),
+                  )),
               body: Column(children: [
                 SizedBox(
-                  height: PlatformX.isMaterial(context) ? 0 : 10,
+                  height: PlatformX.isMaterial(context) ? 0 : 12,
                 ),
                 PlatformWidget(
-                    material: (_, __) => DropdownButton<Campus>(
-                      items: Constant.CAMPUS_VALUES.map((e) {
-                        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
-                      }).toList(growable: false),
-                      // Don't select anything if _selectItem == Campus.NONE
-                      value:
-                      _selectItem == Campus.NONE ? null : _selectItem,
-                      hint: Text(_selectItem.displayTitle(context)),
-                      onChanged: (Campus e) {
-                        _selectItem = e;
-                        _selectBuildingIndex = 0;
-                        refreshSelf();
-                      },
-                    ),
-                    cupertino: (_, __) =>
-                        CupertinoSlidingSegmentedControl<int>(
+                    material: (_, __) => TagContainer(
+                        fillRandomColor: false,
+                        fixedColor: Colors.purple,
+                        fontSize: 16,
+                        enabled: true,
+                        singleChoice: true,
+                        defaultChoice: _selectCampusIndex,
+                        onChoice: (Tag tag, list) {
+                          int index = _campusTags.indexWhere(
+                              (element) => element.tagTitle == tag.tagTitle);
+                          if (index >= 0 && index != _selectCampusIndex) {
+                            _selectCampusIndex = index;
+                            _selectBuildingIndex = 0;
+                            refreshSelf();
+                          }
+                        },
+                        tagList: _campusTags),
+                    cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
                           onValueChanged: (int value) {
                             _selectCampusIndex = value;
                             _selectBuildingIndex = 0;
@@ -120,26 +127,31 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           groupValue: _selectCampusIndex,
                           children: Constant.CAMPUS_VALUES
                               .map((e) => Text(e.displayTitle(context)))
-                              .toList(growable: false)
+                              .toList()
                               .asMap(),
                         )),
                 //Building Selector
                 SizedBox(
-                  height: PlatformX.isMaterial(context) ? 0 : 10,
+                  height: PlatformX.isMaterial(context) ? 0 : 12,
                 ),
                 PlatformWidget(
-                    material: (_, __) => DropdownButton(
-                      items: _buildMaterialDropdownButtonBuildingList(),
-                      // Don't select anything if _selectItem == Campus.NONE
-                      value: _selectBuildingIndex,
-                      hint: _buildingList[_selectBuildingIndex],
-                      onChanged: (int value) {
-                        _selectBuildingIndex = value;
-                        refreshSelf();
-                      },
-                    ),
-                    cupertino: (_, __) =>
-                        CupertinoSlidingSegmentedControl<int>(
+                    material: (_, __) => TagContainer(
+                        fillRandomColor: false,
+                        fixedColor: Colors.blue,
+                        fontSize: 16,
+                        enabled: true,
+                        singleChoice: true,
+                        defaultChoice: _selectBuildingIndex,
+                        onChoice: (Tag tag, list) {
+                          int index = _buildingTags.indexWhere(
+                              (element) => element.tagTitle == tag.tagTitle);
+                          if (index >= 0 && index != _selectBuildingIndex) {
+                            _selectBuildingIndex = index;
+                            refreshSelf();
+                          }
+                        },
+                        tagList: _buildingTags),
+                    cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
                           onValueChanged: (int value) {
                             if (value >= 0 && value != _selectBuildingIndex) {
                               _selectBuildingIndex = value;
@@ -162,20 +174,20 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         return snapshot.hasError
                             ? _buildErrorWidget()
                             : Expanded(
-                                child: MediaQuery.removePadding(
-                                    context: context,
-                                    removeTop: true,
-                                    child: PlatformWidget(
-                                        material: (_, __) => Scrollbar(
-                                            interactive: PlatformX.isDesktop,
+                            child: MediaQuery.removePadding(
+                                context: context,
+                                removeTop: true,
+                                child: PlatformWidget(
+                                    material: (_, __) => Scrollbar(
+                                        interactive: PlatformX.isDesktop,
+                                        child: ListView(
+                                          controller: _controller,
+                                          children: _getListWidgets(
+                                              snapshot.data),
+                                        )),
+                                    cupertino: (_, __) =>
+                                        CupertinoScrollbar(
                                             child: ListView(
-                                              controller: _controller,
-                                              children: _getListWidgets(
-                                                  snapshot.data),
-                                            )),
-                                        cupertino: (_, __) =>
-                                            CupertinoScrollbar(
-                                                child: ListView(
                                               controller: _controller,
                                               children: _getListWidgets(
                                                   snapshot.data),
@@ -186,9 +198,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   },
                   future: EmptyClassroomRepository.getInstance()
                       .getBuildingRoomInfo(
-                          _personInfo,
-                          _buildingList[_selectBuildingIndex].data,
-                          DateTime.now()),
+                      _personInfo,
+                      _buildingList[_selectBuildingIndex].data,
+                      DateTime.now()),
                 ),
               ]),
             ));
