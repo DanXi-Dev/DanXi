@@ -46,18 +46,18 @@ class DiningHallCrowdednessFeature extends Feature {
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
     Campus preferredCampus = SettingsProvider.of(_preferences).campus;
-    await DiningHallCrowdednessRepository.getInstance()
+    _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;
       }
-    }).then((value) => generateSummary(preferredCampus, value));
+    });
+    if (_status != ConnectionStatus.FATAL_ERROR) generateSummary(preferredCampus);
     notifyUpdate();
   }
 
-  void generateSummary(Campus preferredCampus, Map<String, TrafficInfo> __trafficInfos) {
-    _trafficInfos = __trafficInfos;
+  void generateSummary(Campus preferredCampus) {
     //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
       if (preferredCampus == Campus.HANDAN_CAMPUS) {
@@ -158,9 +158,10 @@ class DiningHallCrowdednessFeature extends Feature {
             orElse: () => 'null');
       }
       _status = ConnectionStatus.DONE;
-      return;
     }
-    _status = ConnectionStatus.FAILED;
+    else {
+      _status = ConnectionStatus.FAILED;
+    }
   }
 
   @override
