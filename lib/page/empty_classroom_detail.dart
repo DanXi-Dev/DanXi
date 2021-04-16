@@ -47,9 +47,9 @@ class EmptyClassroomDetailPage extends StatefulWidget {
 class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   PersonInfo _personInfo; // ignore: unused_field
 
-  List<Tag> _campusTags;
-  int _selectCampusIndex = 0;
-  List<Tag> _buildingTags;
+  Campus _selectItem = Campus.NONE; //Material
+  int _selectCampusIndex = 0; //Cupertino
+  Map<int,Text> _buildingList;
   int _selectBuildingIndex = 0;
 
   ScrollController _controller = ScrollController();
@@ -58,6 +58,14 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     _selectCampusIndex =
         SettingsProvider.of(await SharedPreferences.getInstance()).campus.index;
     refreshSelf();
+  }
+
+  List<DropdownMenuItem<int>> _buildMaterialDropdownButtonBuildingList() {
+    var _list = [];
+    _buildingList.forEach((key, value) {
+      _list.add(DropdownMenuItem(child: value, value: key,));
+    });
+    return _list;
   }
 
   @override
@@ -69,15 +77,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    _campusTags = Constant.CAMPUS_VALUES
-        .map((e) => Tag(e.displayTitle(context),
-            PlatformX.isAndroid ? Icons.location_on : SFSymbols.location))
-        .toList();
-    _buildingTags = Constant.CAMPUS_VALUES[_selectCampusIndex]
+    _buildingList = Constant.CAMPUS_VALUES[_selectCampusIndex]
         .getTeachingBuildings()
-        .map((e) =>
-            Tag(e, PlatformX.isAndroid ? Icons.home_work : SFSymbols.location))
-        .toList();
+        .map((e) => Text(e))
+        .toList(growable: false)
+        .asMap();
     return PlatformProvider(
         builder: (BuildContext context) => PlatformScaffold(
               iosContentBottomPadding: true,
@@ -88,39 +92,63 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 child: Text(S.of(context).empty_classrooms),
               )),
               body: Column(children: [
-                TagContainer(
-                    fillRandomColor: false,
-                    fixedColor: Colors.purple,
-                    fontSize: 16,
-                    enabled: true,
-                    singleChoice: true,
-                    defaultChoice: _selectCampusIndex,
-                    onChoice: (Tag tag, list) {
-                      int index = _campusTags.indexWhere(
-                          (element) => element.tagTitle == tag.tagTitle);
-                      if (index >= 0 && index != _selectCampusIndex) {
-                        _selectCampusIndex = index;
+                SizedBox(
+                  height: PlatformX.isMaterial(context) ? 0 : 10,
+                ),
+                PlatformWidget(
+                    material: (_, __) => DropdownButton<Campus>(
+                      items: Constant.CAMPUS_VALUES.map((e) {
+                        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
+                      }).toList(growable: false),
+                      // Don't select anything if _selectItem == Campus.NONE
+                      value:
+                      _selectItem == Campus.NONE ? null : _selectItem,
+                      hint: Text(_selectItem.displayTitle(context)),
+                      onChanged: (Campus e) {
+                        _selectItem = e;
                         _selectBuildingIndex = 0;
                         refreshSelf();
-                      }
-                    },
-                    tagList: _campusTags),
-                TagContainer(
-                    fillRandomColor: false,
-                    fixedColor: Colors.blue,
-                    fontSize: 16,
-                    enabled: true,
-                    singleChoice: true,
-                    defaultChoice: _selectBuildingIndex,
-                    onChoice: (Tag tag, list) {
-                      int index = _buildingTags.indexWhere(
-                          (element) => element.tagTitle == tag.tagTitle);
-                      if (index >= 0 && index != _selectBuildingIndex) {
-                        _selectBuildingIndex = index;
+                      },
+                    ),
+                    cupertino: (_, __) =>
+                        CupertinoSlidingSegmentedControl<int>(
+                          onValueChanged: (int value) {
+                            _selectCampusIndex = value;
+                            _selectBuildingIndex = 0;
+                            refreshSelf();
+                          },
+                          groupValue: _selectCampusIndex,
+                          children: Constant.CAMPUS_VALUES
+                              .map((e) => Text(e.displayTitle(context)))
+                              .toList(growable: false)
+                              .asMap(),
+                        )),
+                //Building Selector
+                SizedBox(
+                  height: PlatformX.isMaterial(context) ? 0 : 10,
+                ),
+                PlatformWidget(
+                    material: (_, __) => DropdownButton(
+                      items: _buildMaterialDropdownButtonBuildingList(),
+                      // Don't select anything if _selectItem == Campus.NONE
+                      value: _selectBuildingIndex,
+                      hint: _buildingList[_selectBuildingIndex],
+                      onChanged: (int value) {
+                        _selectBuildingIndex = value;
                         refreshSelf();
-                      }
-                    },
-                    tagList: _buildingTags),
+                      },
+                    ),
+                    cupertino: (_, __) =>
+                        CupertinoSlidingSegmentedControl<int>(
+                          onValueChanged: (int value) {
+                            if (value >= 0 && value != _selectBuildingIndex) {
+                              _selectBuildingIndex = value;
+                              refreshSelf();
+                            }
+                          },
+                          groupValue: _selectBuildingIndex,
+                          children: _buildingList,
+                        )),
                 ForgettableFutureBuilder(
                   builder: (BuildContext context,
                       AsyncSnapshot<List<RoomInfo>> snapshot) {
@@ -159,7 +187,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   future: EmptyClassroomRepository.getInstance()
                       .getBuildingRoomInfo(
                           _personInfo,
-                          _buildingTags[_selectBuildingIndex].tagTitle,
+                          _buildingList[_selectBuildingIndex].data,
                           DateTime.now()),
                 ),
               ]),
