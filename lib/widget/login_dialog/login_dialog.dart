@@ -98,7 +98,7 @@ class _LoginDialogState extends State<LoginDialog> {
       testInternetAccess();
     }
 
-    return PlatformAlertDialog(
+    return AlertDialog(
       title: Text(S.of(context).login_uis),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -109,31 +109,32 @@ class _LoginDialogState extends State<LoginDialog> {
             textAlign: TextAlign.start,
             style: TextStyle(fontSize: 12, color: Colors.red),
           ),
-          PlatformTextField(
+          TextField(
             controller: _nameController,
             keyboardType: TextInputType.number,
-            material: (_, __) => MaterialTextFieldData(
+            //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
                     icon: PlatformX.isAndroid
                         ? Icon(Icons.perm_identity)
-                        : Icon(SFSymbols.person_crop_circle))),
-            cupertino: (_, __) => CupertinoTextFieldData(
-                placeholder: S.of(context).login_uis_uid),
+                        : Icon(SFSymbols.person_crop_circle)),
+            //),
+            /*cupertino: (_, __) => CupertinoTextFieldData(
+                placeholder: S.of(context).login_uis_uid),*/
             autofocus: true,
           ),
           if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
-          PlatformTextField(
+          TextField(
             controller: _pwdController,
-            material: (_, __) => MaterialTextFieldData(
+            //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
               labelText: S.of(context).login_uis_pwd,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.lock_outline)
-                  : Icon(SFSymbols.lock_circle),
-            )),
-            cupertino: (_, __) => CupertinoTextFieldData(
-                placeholder: S.of(context).login_uis_pwd),
+                  : Icon(SFSymbols.lock_circle),),
+            //)),
+            /*cupertino: (_, __) => CupertinoTextFieldData(
+                placeholder: S.of(context).login_uis_pwd),*/
             obscureText: true,
             onSubmitted: (_) {
               _tryLogin(_nameController.text, _pwdController.text)
@@ -182,7 +183,7 @@ class _LoginDialogState extends State<LoginDialog> {
         ],
       ),
       actions: [
-        if (widget.forceLogin) PlatformDialogAction(
+        if (widget.forceLogin) TextButton(
           child: Text(S
               .of(context)
               .cancel),
@@ -190,7 +191,7 @@ class _LoginDialogState extends State<LoginDialog> {
               Navigator.of(context).pop();
             }
         ),
-        PlatformDialogAction(
+        TextButton(
           child: Text(S.of(context).login),
           onPressed: () {
             _tryLogin(_nameController.text, _pwdController.text)
