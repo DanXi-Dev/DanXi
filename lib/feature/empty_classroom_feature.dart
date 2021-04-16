@@ -38,14 +38,17 @@ class EmptyClassroomFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
+    /*if (_status == ConnectionStatus.NONE) {
       _subTitle = S.of(context).loading;
-    }
-    _subTitle = "TODO: is a stub";
+    }*/
+    _subTitle = S.of(context).tap_to_view;
   }
 
   @override
   String get mainTitle => S.of(context).empty_classrooms;
+
+  @override
+  String get subTitle => _subTitle;
 
   @override
   Widget get icon => PlatformX.isAndroid
