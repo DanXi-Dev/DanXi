@@ -161,6 +161,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           groupValue: _selectBuildingIndex,
                           children: _buildingList,
                         )),
+                const SizedBox(height: 10),
                 ForgettableFutureBuilder(
                   builder: (BuildContext context,
                       AsyncSnapshot<List<RoomInfo>> snapshot) {
@@ -212,21 +213,42 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
       data.forEach((element) {
         widgets.add(Material(
             color: isCupertino(context) ? Colors.white : null,
-            child: ListTile(
-              title: Text(element.roomName),
-              subtitle: Row(
-                children: element.busy.map((e) {
-                  return Expanded(
-                      child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 4),
-                    height: 16,
-                    color: e ? Colors.red : Colors.green,
-                  ));
-                }).toList(),
-              ),
+            child:
+            Column(
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(element.roomName,),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: _buildBusinessViewForRoom(element),
+                        )
+                      ]
+                  ),
+                  Divider(),
+                ]
+              //subtitle: Divider(height: 5,),
             )));
       });
     return widgets;
+  }
+
+  List<Widget> _buildBusinessViewForRoom(RoomInfo roomInfo) {
+    var _list = <Widget>[];
+    var _time = 1;
+    roomInfo.busy.forEach((element) {
+      _list.add(Container(
+        decoration: BoxDecoration(
+            color: element ? Colors.red : Colors.green,
+            borderRadius: BorderRadius.all(Radius.circular(5.0))),
+        width: MediaQuery.of(context).size.width / 32,
+        margin: EdgeInsets.symmetric(horizontal: 2),
+        height: 22,
+      ));
+      if (_time++ % 5 == 0) _list.add(SizedBox(width: 5,));
+    });
+    return _list;
   }
 
   Widget _buildLoadingWidget() => GestureDetector(

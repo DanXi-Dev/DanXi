@@ -41,14 +41,13 @@ class EmptyClassroomFeature extends Feature {
     /*if (_status == ConnectionStatus.NONE) {
       _subTitle = S.of(context).loading;
     }*/
-    _subTitle = S.of(context).tap_to_view;
   }
 
   @override
   String get mainTitle => S.of(context).empty_classrooms;
 
   @override
-  String get subTitle => _subTitle;
+  String get subTitle => _subTitle = S.of(context).tap_to_view;
 
   @override
   Widget get icon => PlatformX.isAndroid
