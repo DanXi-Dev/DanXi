@@ -50,11 +50,22 @@ class ShareTimetableEvent {}
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   static StreamSubscription _shareSubscription;
+
+  /// A map of all converters.
+  ///
+  /// A converter is to export the time table as a single file, e.g. .ics.
   Map<String, TimetableConverter> converters;
+
+  /// The time table it fetched.
   TimeTable _table;
+
+  ///The week it's showing on the time table.
   TimeNow _showingTime;
+
+  /// Start time of the term.
   static final START_TIME = DateTime(2021, 3, 1); //TODO: Make this dynamic
   ConnectionStatus _status = ConnectionStatus.NONE;
+  bool _forceLoadFromRemote = false;
 
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
@@ -158,7 +169,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         future: Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTableLocally(
                 context.personInfo,
-                startTime: START_TIME)));
+                startTime: START_TIME,
+                forceLoadFromRemote: _forceLoadFromRemote)));
   }
 
   goToPrev() {
@@ -188,19 +200,21 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         children: [
           PlatformIconButton(
             icon: Icon(Icons.chevron_left),
-            onPressed: _showingTime.week >= 0 ? goToPrev : null,
+            onPressed: _showingTime.week > 0 ? goToPrev : null,
           ),
           Text(S.of(context).week(_showingTime.week)),
           PlatformIconButton(
             icon: Icon(Icons.chevron_right),
-            onPressed:
-                _showingTime.week <= TimeTable.MAX_WEEK ? goToNext : null,
+            onPressed: _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
           )
         ],
       ),
       Expanded(
-          child: ScheduleView(_table.toDayEvents(_showingTime.week), style,
-              _table.now(), _showingTime.week))
+          child: RefreshIndicator(
+        onRefresh: () async => refreshSelf(),
+        child: ScheduleView(_table.toDayEvents(_showingTime.week), style,
+            _table.now(), _showingTime.week),
+      ))
     ]);
   }
 

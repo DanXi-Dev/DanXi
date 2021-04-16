@@ -52,6 +52,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
+    LicenseItem("auto_size_text", LICENSE_MIT,
+        "hhttps://github.com/leisim/auto_size_text"),
     LicenseItem("beautifulsoup", LICENSE_APACHE_2_0,
         "https://github.com/Sach97/beautifulsoup.dart"),
     LicenseItem("build_runner", LICENSE_BSD,

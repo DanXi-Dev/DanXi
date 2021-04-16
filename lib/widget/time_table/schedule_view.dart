@@ -17,6 +17,7 @@
 
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/material.dart';
@@ -42,13 +43,14 @@ class _ScheduleViewState extends State<ScheduleView> {
 
   @override
   Widget build(BuildContext context) {
+    Widget table;
+    table = GridView.count(
+        crossAxisCount: widget.laneEventsList.length + 1,
+        children: _buildTable(),
+        childAspectRatio: 0.8,
+        shrinkWrap: true);
     return MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: GridView.count(
-          crossAxisCount: widget.laneEventsList.length + 1,
-          children: _buildTable(),
-        ));
+        context: context, removeTop: true, child: table);
   }
 
   List<Widget> _buildTable() {
@@ -129,24 +131,14 @@ class _ScheduleViewState extends State<ScheduleView> {
             decoration: BoxDecoration(
                 color: Theme.of(context).accentColor,
                 borderRadius: BorderRadius.circular(4)),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(event.course.courseName,
-                  style: Theme.of(context).textTheme.overline.copyWith(
-                      fontSize: 11,
-                      color: Theme.of(context).accentColorBrightness ==
-                              Brightness.light
-                          ? Colors.black
-                          : Colors.white)),
-              Text(event.course.roomName,
-                  style: Theme.of(context).textTheme.overline.copyWith(
-                      fontSize: 10,
-                      color: Theme.of(context).accentColorBrightness ==
-                              Brightness.light
-                          ? Colors.black
-                          : Colors.white)),
-              //Text(event.course.roomId, style: Theme.of(context).textTheme.overline.copyWith(fontSize: 10, color: Theme.of(context).accentColorBrightness == Brightness.light ? Colors.black : Colors.white)),
-            ]),
+            child: AutoSizeText(
+                event.course.courseName + '\n' + event.course.roomName,
+                minFontSize: 8,
+                style: Theme.of(context).textTheme.overline.copyWith(
+                    color: Theme.of(context).accentColorBrightness ==
+                            Brightness.light
+                        ? Colors.black
+                        : Colors.white)),
           ),
         );
       });
