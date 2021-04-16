@@ -18,6 +18,8 @@
 		8A2CE705261AA62700F08FC4 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2CE704261AA62700F08FC4 /* ComplicationController.swift */; };
 		8A2CE707261AA62700F08FC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A2CE706261AA62700F08FC4 /* Assets.xcassets */; };
 		8A2CE70B261AA62700F08FC4 /* watchExtension.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8A2CE6EF261AA62600F08FC4 /* watchExtension.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8A4B6C8C26298CF600D16369 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8A2CE6F1261AA62600F08FC4 /* Interface.storyboard */; };
+		8A4B6CBC2629919B00D16369 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A4B6CBA2629919B00D16369 /* Localizable.strings */; };
 		8A71C052261AC81F00E05213 /* NSImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C04E261AC81F00E05213 /* NSImage+.swift */; };
 		8A71C053261AC81F00E05213 /* NSColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C04F261AC81F00E05213 /* NSColor+.swift */; };
 		8A71C054261AC81F00E05213 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C050261AC81F00E05213 /* UIImage+.swift */; };
@@ -130,6 +132,8 @@
 		8A2CE704261AA62700F08FC4 /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
 		8A2CE706261AA62700F08FC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A2CE708261AA62700F08FC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8A4B6CBB2629919B00D16369 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8A4B6CBF262991B000D16369 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		8A71C04E261AC81F00E05213 /* NSImage+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSImage+.swift"; sourceTree = "<group>"; };
 		8A71C04F261AC81F00E05213 /* NSColor+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSColor+.swift"; sourceTree = "<group>"; };
 		8A71C050261AC81F00E05213 /* UIImage+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
@@ -274,6 +278,7 @@
 				8A71C051261AC81F00E05213 /* UIColor+.swift */,
 				8A71C050261AC81F00E05213 /* UIImage+.swift */,
 				8A2CE700261AA62700F08FC4 /* InterfaceController.swift */,
+				8A4B6CBA2629919B00D16369 /* Localizable.strings */,
 				8A2CE702261AA62700F08FC4 /* ExtensionDelegate.swift */,
 				8A2CE704261AA62700F08FC4 /* ComplicationController.swift */,
 				8A2CE706261AA62700F08FC4 /* Assets.xcassets */,
@@ -452,6 +457,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A4B6C8C26298CF600D16369 /* Interface.storyboard in Resources */,
+				8A4B6CBC2629919B00D16369 /* Localizable.strings in Resources */,
 				8A2CE707261AA62700F08FC4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -618,6 +625,15 @@
 			name = Interface.storyboard;
 			sourceTree = "<group>";
 		};
+		8A4B6CBA2629919B00D16369 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8A4B6CBB2629919B00D16369 /* Base */,
+				8A4B6CBF262991B000D16369 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -683,7 +699,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -703,7 +719,7 @@
 				DEVELOPMENT_TEAM = KF7M99CN68;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -747,7 +763,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.2;
+				WATCHOS_DEPLOYMENT_TARGET = 5.0;
 			};
 			name = Debug;
 		};
@@ -777,7 +793,7 @@
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.2;
+				WATCHOS_DEPLOYMENT_TARGET = 5.0;
 			};
 			name = Release;
 		};
@@ -807,7 +823,7 @@
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.2;
+				WATCHOS_DEPLOYMENT_TARGET = 5.0;
 			};
 			name = Profile;
 		};
@@ -841,7 +857,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.2;
+				WATCHOS_DEPLOYMENT_TARGET = 5.0;
 			};
 			name = Debug;
 		};
@@ -873,7 +889,7 @@
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.2;
+				WATCHOS_DEPLOYMENT_TARGET = 5.0;
 			};
 			name = Release;
 		};
@@ -905,7 +921,7 @@
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.2;
+				WATCHOS_DEPLOYMENT_TARGET = 5.0;
 			};
 			name = Profile;
 		};
@@ -959,7 +975,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1011,7 +1027,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -1033,7 +1049,7 @@
 				DEVELOPMENT_TEAM = KF7M99CN68;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1060,7 +1076,7 @@
 				DEVELOPMENT_TEAM = KF7M99CN68;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
