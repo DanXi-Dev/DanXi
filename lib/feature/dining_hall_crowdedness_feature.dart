@@ -45,14 +45,18 @@ class DiningHallCrowdednessFeature extends Feature {
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
     Campus preferredCampus = SettingsProvider.of(_preferences).campus;
-    _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
+    await DiningHallCrowdednessRepository.getInstance()
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {
         _status = ConnectionStatus.FATAL_ERROR;
       }
-    });
+    }).then((value) => generateSummary(preferredCampus, value));
+    notifyUpdate();
+  }
 
+  void generateSummary(Campus preferredCampus, Map<String, TrafficInfo> __trafficInfos) {
+    _trafficInfos = __trafficInfos;
     //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
       if (preferredCampus == Campus.HANDAN_CAMPUS) {
@@ -84,8 +88,8 @@ class DiningHallCrowdednessFeature extends Feature {
                 } else {
                   switch (keySubtitle) {
                     case '南苑餐厅':
-                      //WARNING: Workaround defective data
-                      //crowdednessSum[3] += value.current / value.max;
+                    //WARNING: Workaround defective data
+                    //crowdednessSum[3] += value.current / value.max;
                       break;
                     case '教工快餐':
                       crowdednessSum[4] += value.current / value.max;
@@ -149,10 +153,10 @@ class DiningHallCrowdednessFeature extends Feature {
         _mostCrowdedCanteen = crowdedness.keys.firstWhere((element) => crowdedness[element] == crowdedness.values.reduce(max), orElse: () => 'null');
         _leastCrowdedCanteen = crowdedness.keys.firstWhere((element) => crowdedness[element] == crowdedness.values.reduce(min), orElse: () => 'null');
       }
-
       _status = ConnectionStatus.DONE;
+      return;
     }
-    notifyUpdate();
+    _status = ConnectionStatus.FAILED;
   }
 
   @override
@@ -163,6 +167,9 @@ class DiningHallCrowdednessFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
+      _trafficInfos = null;
+      _mostCrowdedCanteen = "";
+      _leastCrowdedCanteen = "";
       _loadCrowdednessSummary(_info).catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
