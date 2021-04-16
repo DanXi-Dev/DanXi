@@ -317,221 +317,222 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
 
             //About Page
             Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ListTile(
-                    leading: PlatformX.isMaterial(context)
-                        ? const Icon(Icons.info)
-                        : const Icon(SFSymbols.info_circle),
-                    title: Text(S.of(context).about),
-                  ),
-                  Container(
-                    padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
-                    child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            S.of(context).app_description_title,
-                            textScaleFactor: 1.1,
-                          ),
-                          Divider(),
-                          Text(S.of(context).app_description),
-                          const SizedBox(
-                            height: 16,
-                          ),
+              child: ExpansionTile(
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.info)
+                      : const Icon(SFSymbols.info_circle),
+                  title: Text(S.of(context).about),
+                  //subtitle: Text("Click to view"),
+                  children: <Widget> [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
+                          child: new Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  S.of(context).app_description_title,
+                                  textScaleFactor: 1.1,
+                                ),
+                                Divider(),
+                                Text(S.of(context).app_description),
+                                const SizedBox(
+                                  height: 16,
+                                ),
 
-                          //Terms and Conditions
-                          Text(
-                            S.of(context).terms_and_conditions_title,
-                            textScaleFactor: 1.1,
-                          ),
-                          Divider(),
-                          RichText(
-                              text: TextSpan(children: [
-                            TextSpan(
-                              style: defaultText,
-                              text: S.of(context).terms_and_conditions_content,
-                            ),
-                            TextSpan(
-                                style: linkText,
-                                text: S.of(context).terms_and_conditions,
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    await launch(
-                                        S.of(context).terms_and_conditions_url);
-                                    //TODO: Add Links
-                                  }),
-                            TextSpan(
-                              style: defaultText,
-                              text: S.of(context).and,
-                            ),
-                            TextSpan(
-                                style: linkText,
-                                text: S.of(context).privacy_policy,
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    await launch(
-                                        S.of(context).privacy_policy_url);
-                                  }),
-                            TextSpan(
-                              style: defaultText,
-                              text: S
-                                  .of(context)
-                                  .terms_and_conditions_content_end,
-                            ),
-                            TextSpan(
-                              style: defaultText,
-                              text: S.of(context).view_ossl,
-                            ),
-                            TextSpan(
-                                style: linkText,
-                                text:
-                                    S.of(context).open_source_software_licenses,
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.of(context).pushNamed(
-                                        "/about/openLicense",
-                                        arguments: {"items": _LICENSE_ITEMS});
-                                  }),
-                          ])),
+                                //Terms and Conditions
+                                Text(
+                                  S.of(context).terms_and_conditions_title,
+                                  textScaleFactor: 1.1,
+                                ),
+                                Divider(),
+                                RichText(
+                                    text: TextSpan(children: [
+                                  TextSpan(
+                                    style: defaultText,
+                                    text: S.of(context).terms_and_conditions_content,
+                                  ),
+                                  TextSpan(
+                                      style: linkText,
+                                      text: S.of(context).terms_and_conditions,
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          await launch(
+                                              S.of(context).terms_and_conditions_url);
+                                          //TODO: Add Links
+                                        }),
+                                  TextSpan(
+                                    style: defaultText,
+                                    text: S.of(context).and,
+                                  ),
+                                  TextSpan(
+                                      style: linkText,
+                                      text: S.of(context).privacy_policy,
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          await launch(
+                                              S.of(context).privacy_policy_url);
+                                        }),
+                                  TextSpan(
+                                    style: defaultText,
+                                    text: S
+                                        .of(context)
+                                        .terms_and_conditions_content_end,
+                                  ),
+                                  TextSpan(
+                                    style: defaultText,
+                                    text: S.of(context).view_ossl,
+                                  ),
+                                  TextSpan(
+                                      style: linkText,
+                                      text:
+                                          S.of(context).open_source_software_licenses,
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Navigator.of(context).pushNamed(
+                                              "/about/openLicense",
+                                              arguments: {"items": _LICENSE_ITEMS});
+                                        }),
+                                ])),
 
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Text(
-                            S.of(context).authors,
-                            textScaleFactor: 1.1,
-                          ),
-                          Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  InkWell(
-                                    child: Container(
-                                        width: _avatarSize,
-                                        height: _avatarSize,
-                                        decoration: new BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: new DecorationImage(
-                                                fit: BoxFit.fill,
-                                                image: new AssetImage(S
-                                                    .of(context)
-                                                    .dev_image_url_1)))),
-                                    onTap: () =>
-                                        launch(S.of(context).dev_page_1),
-                                  ),
-                                  const SizedBox(height: _avatarNameSpacing),
-                                  Text(
-                                    S.of(context).dev_name_1,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: _avatarSpacing),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  InkWell(
-                                    child: Container(
-                                        width: _avatarSize,
-                                        height: _avatarSize,
-                                        decoration: new BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: new DecorationImage(
-                                                fit: BoxFit.fill,
-                                                image: new AssetImage(S
-                                                    .of(context)
-                                                    .dev_image_url_2)))),
-                                    onTap: () =>
-                                        launch(S.of(context).dev_page_2),
-                                  ),
-                                  const SizedBox(height: _avatarNameSpacing),
-                                  Text(
-                                    S.of(context).dev_name_2,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: _avatarSpacing),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  InkWell(
-                                    child: Container(
-                                        width: _avatarSize,
-                                        height: _avatarSize,
-                                        decoration: new BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: new DecorationImage(
-                                                fit: BoxFit.fill,
-                                                image: new AssetImage(S
-                                                    .of(context)
-                                                    .dev_image_url_3)))),
-                                    onTap: () {
-                                      launch(S.of(context).dev_page_3);
-                                    },
-                                  ),
-                                  const SizedBox(height: _avatarNameSpacing),
-                                  Text(
-                                    S.of(context).dev_name_3,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Text(
-                                S.of(context).author_descriptor,
-                                textScaleFactor: 0.7,
-                                textAlign: TextAlign.right,
-                                //style: TextStyle(fontStyle: FontStyle.italic)),
-                              )
-                            ],
-                          ),
-                        ]),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      TextButton(
-                        child: Text(S.of(context).contact_us),
-                        onPressed: () async {
-                          final Email email = Email(
-                            body: '',
-                            subject: S.of(context).app_feedback,
-                            recipients: [S.of(context).feedback_email],
-                            isHTML: false,
-                          );
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                Text(
+                                  S.of(context).authors,
+                                  textScaleFactor: 1.1,
+                                ),
+                                Divider(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        InkWell(
+                                          child: Container(
+                                              width: _avatarSize,
+                                              height: _avatarSize,
+                                              decoration: new BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: new DecorationImage(
+                                                      fit: BoxFit.fill,
+                                                      image: new AssetImage(S
+                                                          .of(context)
+                                                          .dev_image_url_1)))),
+                                          onTap: () =>
+                                              launch(S.of(context).dev_page_1),
+                                        ),
+                                        const SizedBox(height: _avatarNameSpacing),
+                                        Text(
+                                          S.of(context).dev_name_1,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: _avatarSpacing),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        InkWell(
+                                          child: Container(
+                                              width: _avatarSize,
+                                              height: _avatarSize,
+                                              decoration: new BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: new DecorationImage(
+                                                      fit: BoxFit.fill,
+                                                      image: new AssetImage(S
+                                                          .of(context)
+                                                          .dev_image_url_2)))),
+                                          onTap: () =>
+                                              launch(S.of(context).dev_page_2),
+                                        ),
+                                        const SizedBox(height: _avatarNameSpacing),
+                                        Text(
+                                          S.of(context).dev_name_2,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: _avatarSpacing),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        InkWell(
+                                          child: Container(
+                                              width: _avatarSize,
+                                              height: _avatarSize,
+                                              decoration: new BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: new DecorationImage(
+                                                      fit: BoxFit.fill,
+                                                      image: new AssetImage(S
+                                                          .of(context)
+                                                          .dev_image_url_3)))),
+                                          onTap: () {
+                                            launch(S.of(context).dev_page_3);
+                                          },
+                                        ),
+                                        const SizedBox(height: _avatarNameSpacing),
+                                        Text(
+                                          S.of(context).dev_name_3,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    Text(
+                                      S.of(context).author_descriptor,
+                                      textScaleFactor: 0.7,
+                                      textAlign: TextAlign.right,
+                                      //style: TextStyle(fontStyle: FontStyle.italic)),
+                                    )
+                                  ],
+                                ),
+                              ]),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            TextButton(
+                              child: Text(S.of(context).contact_us),
+                              onPressed: () async {
+                                final Email email = Email(
+                                  body: '',
+                                  subject: S.of(context).app_feedback,
+                                  recipients: [S.of(context).feedback_email],
+                                  isHTML: false,
+                                );
 
-                          await FlutterEmailSender.send(email);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        child: Text(S.of(context).project_page),
-                        onPressed: () {
-                          launch(S.of(context).project_url);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                                await FlutterEmailSender.send(email);
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            TextButton(
+                              child: Text(S.of(context).project_page),
+                              onPressed: () {
+                                launch(S.of(context).project_url);
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                      ],
+                    ),
+                  ],
+                ),
+            ])),
           ]),
         ));
   }
