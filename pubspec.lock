@@ -36,6 +36,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.5.0"
+  auto_size_text:
+    dependency: "direct main"
+    description:
+      name: auto_size_text
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.0"
   beautifulsoup:
     dependency: "direct main"
     description:

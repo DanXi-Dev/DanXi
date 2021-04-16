@@ -42,18 +42,23 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Description"),
         "app_feedback": MessageLookupByLibrary.simpleMessage(" App Feedback"),
         "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
-        "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
-    "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
-    "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
-    "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
-    "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "contact_us" : MessageLookupByLibrary.simpleMessage("Contact Us"),
-    "cupertino" : MessageLookupByLibrary.simpleMessage("Cupertino"),
-    "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
-    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
-    "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
-    "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
-    "default_campus" : MessageLookupByLibrary.simpleMessage("Current Campus"),
+        "author_descriptor": MessageLookupByLibrary.simpleMessage(
+            "Passionate developers from\nEngineering @ Fudan University"),
+        "authors": MessageLookupByLibrary.simpleMessage("Developers"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "change_account":
+            MessageLookupByLibrary.simpleMessage("Switch Account"),
+        "choose_area": MessageLookupByLibrary.simpleMessage("Select Campus"),
+        "contact_us": MessageLookupByLibrary.simpleMessage("Contact Us"),
+        "cupertino": MessageLookupByLibrary.simpleMessage("Cupertino"),
+        "current_connection":
+            MessageLookupByLibrary.simpleMessage("Current Connection"),
+        "current_connection_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to obtain WLAN information, Precise Location permission required"),
+        "current_connection_no_wifi":
+            MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
+        "dashboard": MessageLookupByLibrary.simpleMessage("Dashboard"),
+        "default_campus" : MessageLookupByLibrary.simpleMessage("Current Campus"),
     "dev_image_url_1" : MessageLookupByLibrary.simpleMessage("assets/graphics/w568w.jpeg"),
     "dev_image_url_2" : MessageLookupByLibrary.simpleMessage("assets/graphics/kavinzhao.jpeg"),
     "dev_image_url_3" : MessageLookupByLibrary.simpleMessage("assets/graphics/kyln24.jpeg"),
@@ -117,16 +122,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage(""),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
-    "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reply_to" : m2,
-    "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
-    "share" : MessageLookupByLibrary.simpleMessage("Share"),
-    "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
-    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
-    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+        "project_url": MessageLookupByLibrary.simpleMessage(
+            "https://github.com/w568w/DanXi"),
+        "reply_to": m2,
+        "select_campus": MessageLookupByLibrary.simpleMessage("Select Campus"),
+        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "share": MessageLookupByLibrary.simpleMessage("Share"),
+        "share_as_ics": MessageLookupByLibrary.simpleMessage("Export as ICS"),
+        "tag_least_crowded":
+            MessageLookupByLibrary.simpleMessage("Least Crowded"),
+        "tag_most_crowded":
+            MessageLookupByLibrary.simpleMessage("Most Crowded"),
+        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
+        "terms_and_conditions":
+            MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
         "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
             "Your use of this application is governed under "),
         "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(

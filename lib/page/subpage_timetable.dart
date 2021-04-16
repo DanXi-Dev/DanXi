@@ -188,13 +188,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         children: [
           PlatformIconButton(
             icon: Icon(Icons.chevron_left),
-            onPressed: _showingTime.week >= 0 ? goToPrev : null,
+            onPressed: _showingTime.week > 0 ? goToPrev : null,
           ),
           Text(S.of(context).week(_showingTime.week)),
           PlatformIconButton(
             icon: Icon(Icons.chevron_right),
-            onPressed:
-                _showingTime.week <= TimeTable.MAX_WEEK ? goToNext : null,
+            onPressed: _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
           )
         ],
       ),

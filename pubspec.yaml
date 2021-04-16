@@ -58,7 +58,7 @@ dependencies:
   screen: ^0.0.5
   flutter_sfsymbols: ^2.0.0
   flutter_email_sender: ^5.0.0
-
+  auto_size_text: ^2.1.0
   #TODO: ical breaks the dependency relation
   ical: ^0.1.3
   url_launcher: ^6.0.3
