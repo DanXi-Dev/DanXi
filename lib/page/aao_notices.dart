@@ -73,6 +73,22 @@ class _AAONoticesListState extends State<AAONoticesList> {
               iosContentBottomPadding: true,
               iosContentPadding: true,
               appBar: PlatformAppBar(
+                  cupertino: (_, __) => CupertinoNavigationBarData(
+                    // Issue with cupertino where a bar with no transparency
+                    // will push the list down. Adding some alpha value fixes it (in a hacky way)
+                    backgroundColor: Colors.white.withAlpha(254),
+                    leading: MediaQuery(
+                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      child: CupertinoNavigationBarBackButton(),
+                    ),
+                    title: MediaQuery(
+                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      child: TopController(
+                        child: Text(S.of(context).fudan_aao_notices),
+                        controller: _controller,
+                      ),
+                    ),
+                  ),
                   title: TopController(
                 child: Text(S.of(context).fudan_aao_notices),
                 controller: _controller,

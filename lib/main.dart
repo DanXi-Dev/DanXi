@@ -392,12 +392,31 @@ class _HomePageState extends State<HomePage> {
                 iosContentBottomPadding: true,
                 iosContentPadding: _subpage[_pageIndex.value].needPadding,
                 appBar: PlatformAppBar(
-                  title: TopController(
-                    child: Text(
-                      S.of(context).app_name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                  cupertino: (_, __) => CupertinoNavigationBarData(
+                    // Issue with cupertino where a bar with no transparency
+                    // will push the list down. Adding some alpha value fixes it (in a hacky way)
+                    backgroundColor: Colors.white.withAlpha(254),
+                    /*leading: MediaQuery(
+                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      child: CupertinoNavigationBarBackButton(),
+                    ),*/
+                    title: MediaQuery(
+                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      child: TopController(
+                        child: Text(
+                          S.of(context).app_name,),
+                        onDoubleTap: () => ScrollToTopEvent().fire(),
+                      ),
                     ),
-                    onDoubleTap: () => ScrollToTopEvent().fire(),
+                  ),
+                  material: (_, __) => MaterialAppBarData(
+                    title: TopController(
+                      child: Text(
+                        S.of(context).app_name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      onDoubleTap: () => ScrollToTopEvent().fire(),
+                    ),
                   ),
                   trailingActions: [
                     PlatformIconButton(
