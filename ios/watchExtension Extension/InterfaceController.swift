@@ -11,7 +11,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     func refreshQR() {
         label.setHidden(false)
         QRImage.setHidden(true)
-        label.setText("Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone.")
+        label.setText(NSLocalizedString("Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone.", comment: "Updating"))
         sendString(text: "refresh")
     }
     
@@ -22,7 +22,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 session.sendMessage(["qr_text": text], replyHandler: nil)
             }
         }else{
-            label.setText("iPhone Unreachable.") //TODO: Internationalization?
+            label.setText(NSLocalizedString("iPhone Unreachable.", comment: "iPhone Unreachable"))
         }
     }
     
@@ -43,7 +43,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
          session.activate();
         }
         
-        label.setText("Connecting") //TODO: Internationalization?
+        label.setText(NSLocalizedString("Connecting...", comment: "Connecting"))
     }
     
     override func willActivate() {
@@ -65,7 +65,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             QRImage.setHidden(false)
         }
         else {
-            label.setText("Failed to generate QR. Please file bug report.")
+            label.setText(NSLocalizedString("Failed to generate QR. Please file bug report.", comment: "Failed to generate QR. Please file bug report."))
         }
     }
 

@@ -1,3 +1,11 @@
+/* 
+  Localizable.strings
+  Runner
+
+  Created by Kavin Zhao on 2021/4/16.
+  
+*/
+
 
 /* Class = "WKInterfaceLabel"; text = "Label"; ObjectID = "4Td-to-NdO"; */
 "4Td-to-NdO.text" = "Label";
