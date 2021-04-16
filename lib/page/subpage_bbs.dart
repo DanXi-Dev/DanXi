@@ -185,26 +185,22 @@ class _BBSSubpageState extends State<BBSSubpage>
         color: Theme.of(context).accentColor,
         onRefresh: () async => refreshSelf(),
         child: MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: FutureBuilder(
-              builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
+            context: context,
+            removeTop: true,
+            child: FutureBuilder(
+                builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
+                  print(snapshot.toString());
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
                       return _buildLoadingPage();
+                      break;
                     case ConnectionState.done:
                       if (snapshot.hasError) {
                         return _buildErrorPage(error: snapshot.error);
                       } else {
-                        var l = snapshot.data;
-                        return ListView.builder(
-                            controller: _controller,
-                            itemBuilder: (context, index) =>
-                                _buildPage(snapshot.data),
-                            //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
-                            itemCount: l.length);
+                        return _buildPage(snapshot.data);
                       }
                       break;
                   }
@@ -255,17 +251,21 @@ class _BBSSubpageState extends State<BBSSubpage>
               leading: Icon(SFSymbols.quote_bubble_fill),
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
-              title: Text(e.content,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16),), //TODO: Support Dynamic Font
+              title: Text(
+                e.content,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16),
+              ),
+              //TODO: Support Dynamic Font
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     e.author,
-                    style: TextStyle(color: Theme.of(context).accentColor, fontSize: 12),
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor, fontSize: 12),
                   ),
                   Text(
                     e.createdAt,
