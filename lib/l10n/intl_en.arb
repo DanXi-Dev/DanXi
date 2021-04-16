@@ -46,12 +46,12 @@
     "and": " and ",
     "view_ossl": "This app is made possible thanks to various open-source software. View ",
     "privacy_policy": "Privacy Policy",
-    "terms_and_conditions_content_end": "By logging in, you indicate that you have read and consent to these policies. ",
+    "terms_and_conditions_content_end": ". By logging in, you indicate that you have read and consent to these policies. ",
     "contact_us": "Contact Us",
     "theme": "Theme",
     "material": "Material",
     "cupertino": "Cupertino",
-    "app_feedback": " App Feedback",
+    "app_feedback": "[Feedback]",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -80,8 +80,9 @@
     "last_15_days":"Last 15 days",
     "last_30_days":"Last 30 days",
     "dashboard":"Dashboard",
-    "forum":"The \"Hole\"",
+    "forum":"Tree Hole",
     "timetable":"Agenda",
+    "week":"Week {week}",
     "new_post":"New Post",
     "post_failed":"Network error, post failed.",
     "share":"Share",
@@ -99,9 +100,9 @@
     "login_failed":"Login failed. Check your ID and/or password.",
 
     "project_url": "https:\/\/github.com\/w568w\/DanXi",
-    "dev_name_1": "许冬\n[w568w]",
-    "dev_name_2": "赵行健\n[kavinzhao]",
-    "dev_name_3": "郭虹麟\n[KYLN24]",
+    "dev_name_1": "Xu Dong\n[w568w]",
+    "dev_name_2": "Zhao Xingjian\n[kavinzhao]",
+    "dev_name_3": "Guo Honglin\n[KYLN24]",
     "dev_page_1": "https:\/\/github.com\/w568w",
     "dev_page_2": "https:\/\/github.com\/kavinzhao",
     "dev_page_3": "https:\/\/github.com\/KYLN24",
@@ -109,8 +110,7 @@
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
 
-    "week":"Week {week}",
-    "feedback_email": "",
-    "terms_and_conditions_url" : "",
-    "privacy_policy_url" : ""
+    "feedback_email": "danxi_dev@protonmail.com",
+    "terms_and_conditions_url" : "https://danxi-dev.github.io/terms-and-condition",
+    "privacy_policy_url" : "https://danxi-dev.github.io/privacy"
 }

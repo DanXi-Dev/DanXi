@@ -11,11 +11,14 @@ Maybe the best all-rounded service app for Fudan University students!
  
 **Only support Chinese (Simplified) and English language at the moment. Come on to help us!**    
 
-- Campus card balance and consumption records
+- Campus card balance and transactions
 - Dining hall traffic
-- Shortcut for Fudan Daily
-- Shortcut for Fudan QR Code
-- Timetable and export as .ics file
+- Automatic COVID-19 Safety Check-in
+- Shortcut for Fudan QR Code (with support for Apple Watch)
+- View empty classrooms
+- Tree Hole
+- View timetable and export as .ics file
+- Show Notices from Academic Affairs Office
 
 (Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
 This application is still at the very initial development stage, welcome to join the development and donation~

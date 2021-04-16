@@ -98,7 +98,9 @@ class DanxiApp extends StatelessWidget {
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
                 theme: CupertinoThemeData(
-              brightness: Brightness.light,
+                    brightness: Brightness.light,
+                    primaryColor: Color(0xFF007AFF), //Apple Blue
+                    //primaryContrastingColor: Color(0xFF007AFF), //Apple Blue
             )),
             material: (_, __) => MaterialAppData(
                 //themeMode: ThemeMode.light,

@@ -495,10 +495,10 @@ class S {
     );
   }
 
-  /// `By logging in, you indicate that you have read and consent to these policies. `
+  /// `. By logging in, you indicate that you have read and consent to these policies. `
   String get terms_and_conditions_content_end {
     return Intl.message(
-      'By logging in, you indicate that you have read and consent to these policies. ',
+      '. By logging in, you indicate that you have read and consent to these policies. ',
       name: 'terms_and_conditions_content_end',
       desc: '',
       args: [],
@@ -545,10 +545,10 @@ class S {
     );
   }
 
-  /// ` App Feedback`
+  /// `[Feedback]`
   String get app_feedback {
     return Intl.message(
-      ' App Feedback',
+      '[Feedback]',
       name: 'app_feedback',
       desc: '',
       args: [],
@@ -805,10 +805,10 @@ class S {
     );
   }
 
-  /// `The "Hole"`
+  /// `Tree Hole`
   String get forum {
     return Intl.message(
-      'The "Hole"',
+      'Tree Hole',
       name: 'forum',
       desc: '',
       args: [],
@@ -822,6 +822,16 @@ class S {
       name: 'timetable',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Week {week}`
+  String week(Object week) {
+    return Intl.message(
+      'Week $week',
+      name: 'week',
+      desc: '',
+      args: [week],
     );
   }
 
@@ -955,30 +965,30 @@ class S {
     );
   }
 
-  /// `许冬\n[w568w]`
+  /// `Xu Dong\n[w568w]`
   String get dev_name_1 {
     return Intl.message(
-      '许冬\n[w568w]',
+      'Xu Dong\n[w568w]',
       name: 'dev_name_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `赵行健\n[kavinzhao]`
+  /// `Zhao Xingjian\n[kavinzhao]`
   String get dev_name_2 {
     return Intl.message(
-      '赵行健\n[kavinzhao]',
+      'Zhao Xingjian\n[kavinzhao]',
       name: 'dev_name_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `郭虹麟\n[KYLN24]`
+  /// `Guo Honglin\n[KYLN24]`
   String get dev_name_3 {
     return Intl.message(
-      '郭虹麟\n[KYLN24]',
+      'Guo Honglin\n[KYLN24]',
       name: 'dev_name_3',
       desc: '',
       args: [],
@@ -1045,40 +1055,30 @@ class S {
     );
   }
 
-  /// `Week {week}`
-  String week(Object week) {
-    return Intl.message(
-      'Week $week',
-      name: 'week',
-      desc: '',
-      args: [week],
-    );
-  }
-
-  /// ``
+  /// `danxi_dev@protonmail.com`
   String get feedback_email {
     return Intl.message(
-      '',
+      'danxi_dev@protonmail.com',
       name: 'feedback_email',
       desc: '',
       args: [],
     );
   }
 
-  /// ``
+  /// `https://danxi-dev.github.io/terms-and-condition`
   String get terms_and_conditions_url {
     return Intl.message(
-      '',
+      'https://danxi-dev.github.io/terms-and-condition',
       name: 'terms_and_conditions_url',
       desc: '',
       args: [],
     );
   }
 
-  /// ``
+  /// `https://danxi-dev.github.io/privacy`
   String get privacy_policy_url {
     return Intl.message(
-      '',
+      'https://danxi-dev.github.io/privacy',
       name: 'privacy_policy_url',
       desc: '',
       args: [],

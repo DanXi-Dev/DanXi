@@ -21,8 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
-  static m1(mostCrowded, leastCrowded) =>
-      "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
+  static m1(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
   static m2(name) => "Reply No.${name}";
 
@@ -31,40 +30,32 @@ class MessageLookup extends MessageLookupByLibrary {
   static m4(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-
-  static _notInlinedMessages(_) => <String, Function>{
-        "about": MessageLookupByLibrary.simpleMessage("About This App"),
-        "account": MessageLookupByLibrary.simpleMessage("Account"),
-        "and": MessageLookupByLibrary.simpleMessage(" and "),
-        "app_description": MessageLookupByLibrary.simpleMessage(
-            "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
-        "app_description_title":
-            MessageLookupByLibrary.simpleMessage("Description"),
-        "app_feedback": MessageLookupByLibrary.simpleMessage(" App Feedback"),
-        "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
-        "author_descriptor": MessageLookupByLibrary.simpleMessage(
-            "Passionate developers from\nEngineering @ Fudan University"),
-        "authors": MessageLookupByLibrary.simpleMessage("Developers"),
-        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
-        "change_account":
-            MessageLookupByLibrary.simpleMessage("Switch Account"),
-        "choose_area": MessageLookupByLibrary.simpleMessage("Select Campus"),
-        "contact_us": MessageLookupByLibrary.simpleMessage("Contact Us"),
-        "cupertino": MessageLookupByLibrary.simpleMessage("Cupertino"),
-        "current_connection":
-            MessageLookupByLibrary.simpleMessage("Current Connection"),
-        "current_connection_failed": MessageLookupByLibrary.simpleMessage(
-            "Failed to obtain WLAN information, Precise Location permission required"),
-        "current_connection_no_wifi":
-            MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
-        "dashboard": MessageLookupByLibrary.simpleMessage("Dashboard"),
-        "default_campus" : MessageLookupByLibrary.simpleMessage("Current Campus"),
+  static _notInlinedMessages(_) => <String, Function> {
+    "about" : MessageLookupByLibrary.simpleMessage("About This App"),
+    "account" : MessageLookupByLibrary.simpleMessage("Account"),
+    "and" : MessageLookupByLibrary.simpleMessage(" and "),
+    "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
+    "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
+    "app_feedback" : MessageLookupByLibrary.simpleMessage("[Feedback]"),
+    "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
+    "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
+    "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
+    "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
+    "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
+    "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
+    "contact_us" : MessageLookupByLibrary.simpleMessage("Contact Us"),
+    "cupertino" : MessageLookupByLibrary.simpleMessage("Cupertino"),
+    "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
+    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
+    "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
+    "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
+    "default_campus" : MessageLookupByLibrary.simpleMessage("Current Campus"),
     "dev_image_url_1" : MessageLookupByLibrary.simpleMessage("assets/graphics/w568w.jpeg"),
     "dev_image_url_2" : MessageLookupByLibrary.simpleMessage("assets/graphics/kavinzhao.jpeg"),
     "dev_image_url_3" : MessageLookupByLibrary.simpleMessage("assets/graphics/kyln24.jpeg"),
-    "dev_name_1" : MessageLookupByLibrary.simpleMessage("许冬\n[w568w]"),
-    "dev_name_2" : MessageLookupByLibrary.simpleMessage("赵行健\n[kavinzhao]"),
-    "dev_name_3" : MessageLookupByLibrary.simpleMessage("郭虹麟\n[KYLN24]"),
+    "dev_name_1" : MessageLookupByLibrary.simpleMessage("Xu Dong\n[w568w]"),
+    "dev_name_2" : MessageLookupByLibrary.simpleMessage("Zhao Xingjian\n[kavinzhao]"),
+    "dev_name_3" : MessageLookupByLibrary.simpleMessage("Guo Honglin\n[KYLN24]"),
     "dev_page_1" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w"),
     "dev_page_2" : MessageLookupByLibrary.simpleMessage("https://github.com/kavinzhao"),
     "dev_page_3" : MessageLookupByLibrary.simpleMessage("https://github.com/KYLN24"),
@@ -74,9 +65,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
-    "feedback_email" : MessageLookupByLibrary.simpleMessage(""),
+    "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
-    "forum" : MessageLookupByLibrary.simpleMessage("The \"Hole\""),
+    "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("Automatic COVID-19 Safety Check-In"),
@@ -120,40 +111,30 @@ class MessageLookup extends MessageLookupByLibrary {
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "post_failed" : MessageLookupByLibrary.simpleMessage("Network error, post failed."),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
-    "privacy_policy_url" : MessageLookupByLibrary.simpleMessage(""),
+    "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
-        "project_url": MessageLookupByLibrary.simpleMessage(
-            "https://github.com/w568w/DanXi"),
-        "reply_to": m2,
-        "select_campus": MessageLookupByLibrary.simpleMessage("Select Campus"),
-        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
-        "share": MessageLookupByLibrary.simpleMessage("Share"),
-        "share_as_ics": MessageLookupByLibrary.simpleMessage("Export as ICS"),
-        "tag_least_crowded":
-            MessageLookupByLibrary.simpleMessage("Least Crowded"),
-        "tag_most_crowded":
-            MessageLookupByLibrary.simpleMessage("Most Crowded"),
-        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
-        "terms_and_conditions":
-            MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
-        "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
-            "Your use of this application is governed under "),
-        "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(
-            "By logging in, you indicate that you have read and consent to these policies. "),
-        "terms_and_conditions_title":
-            MessageLookupByLibrary.simpleMessage("Legal"),
-        "terms_and_conditions_url": MessageLookupByLibrary.simpleMessage(""),
-        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
-        "tick_failed": MessageLookupByLibrary.simpleMessage(
-            "Failed to check in. Check your internet connection."),
-        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
-            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-        "ticking": MessageLookupByLibrary.simpleMessage("Checking in..."),
-        "timetable": MessageLookupByLibrary.simpleMessage("Agenda"),
-        "view_ossl": MessageLookupByLibrary.simpleMessage(
-            "This app is made possible thanks to various open-source software. View "),
-        "week": m3,
-        "welcome": m4,
-        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("Zhangjiang")
-      };
+    "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
+    "reply_to" : m2,
+    "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
+    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
+    "share" : MessageLookupByLibrary.simpleMessage("Share"),
+    "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
+    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
+    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
+    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
+    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
+    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". By logging in, you indicate that you have read and consent to these policies. "),
+    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
+    "terms_and_conditions_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/terms-and-condition"),
+    "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
+    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
+    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
+    "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
+    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
+    "week" : m3,
+    "welcome" : m4,
+    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
+  };
 }
