@@ -19,6 +19,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
 
 /// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
@@ -40,6 +41,10 @@ class PlatformX {
   static bool get isMobile => isAndroid || isIOS;
 
   static bool get isDesktop => !isMobile;
+
+  static Color backgroundColor(BuildContext context) {
+    return isMaterial(context) ? null : Theme.of(context).cardColor;
+  }
 
   static bool isMaterial(BuildContext context) =>
       platformImpl.isMaterial(context);

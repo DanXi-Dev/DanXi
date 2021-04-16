@@ -17,6 +17,7 @@
 
 import 'dart:math';
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -114,16 +115,17 @@ class _TagContainerState extends State<TagContainer> {
     this.fillRandomColor = widget.fillRandomColor;
     fillRandomColor
         ? randomColorApplier()
-        : fixedColorApplyer(widget.fixedColor);
+        : fixedColorApplier(widget.fixedColor);
     return Material(
+        color: PlatformX.backgroundColor(context),
         child: Container(
-      margin: const EdgeInsets.only(top: 16),
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      child: Wrap(
-        spacing: 8,
-        children: tagList.map((e) => _buildTag(e)).toList(),
-      ),
-    ));
+          margin: const EdgeInsets.only(top: 16),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+          child: Wrap(
+            spacing: 8,
+            children: tagList.map((e) => _buildTag(e)).toList(),
+          ),
+        ));
   }
 
   Widget _buildTag(Tag data) {
@@ -170,7 +172,7 @@ class _TagContainerState extends State<TagContainer> {
     }
   }
 
-  fixedColorApplyer(Color fixedColor) {
+  fixedColorApplier(Color fixedColor) {
     // for (int i = 0; i <= tagList.length - 1; i++) {
     //   tagList[i].tagColor = fixedColor;
     // }
