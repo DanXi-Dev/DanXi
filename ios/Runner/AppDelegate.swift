@@ -67,7 +67,7 @@ import WatchConnectivity
     //TODO: WARNING This might not pass App Store Review
     appCtrlChannel.setMethodCallHandler({
         (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-       if(call.method == "exit"){
+       /*if(call.method == "exit"){
         UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
                 Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { (timer) in
                     exit(0)
@@ -75,7 +75,7 @@ import WatchConnectivity
        }
        else if(call.method == "minimize"){
          UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
-        }
+        }*/
        })
     
     GeneratedPluginRegistrant.register(with: self)

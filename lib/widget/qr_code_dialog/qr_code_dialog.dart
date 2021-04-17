@@ -88,13 +88,17 @@ class _QRDialogState extends State<QRDialog> {
                         builder: (BuildContext context,
                             AsyncSnapshot<String> snapshot) {
                           if (snapshot.hasData) {
-                            _status = ConnectionStatus.DONE;
-                            return QrImage(
-                              data: snapshot.data,
-                              size: 200.0,
-                              foregroundColor: Colors.black,
-                              backgroundColor: Colors.white,
-                            );
+                            if (snapshot.data != "") {
+                              _status = ConnectionStatus.DONE;
+                              return QrImage(
+                                data: snapshot.data,
+                                size: 200.0,
+                                foregroundColor: Colors.black,
+                                backgroundColor: Colors.white,
+                              );
+                            }
+                            _status = ConnectionStatus.FATAL_ERROR;
+                            return Text(S.of(context).fail_to_acquire_qr);
                           } else if (snapshot.hasError &&
                               _status == ConnectionStatus.CONNECTING) {
                             _status = ConnectionStatus.FAILED;
