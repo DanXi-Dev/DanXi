@@ -45,6 +45,7 @@ import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:data_plugin/bmob/bmob.dart';
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -95,63 +96,72 @@ class DanxiApp extends StatelessWidget {
         OpenSourceLicenseList(arguments: arguments),
   };
 
+  changeSizeOnDesktop() async {
+    if (PlatformX.isDesktop) {
+      await DesktopWindow.setWindowSize(Size(540, 960));
+    }
+  }
+
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) => PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
-      builder: (BuildContext context) => PlatformApp(
-            title: 'Danxi',
-            cupertino: (_, __) => CupertinoAppData(
-                theme: CupertinoThemeData(
-              brightness: Brightness.light,
-              primaryColor: Color(0xFF007AFF), //Apple Blue
-              //primaryContrastingColor: Color(0xFF007AFF), //Apple Blue
-            )),
-            material: (_, __) => MaterialAppData(
-                //themeMode: ThemeMode.light,
-                theme: ThemeData(
-                  brightness: Brightness.light,
-                  primarySwatch: Colors.blue,
-                  /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
+  Widget build(BuildContext context) {
+    changeSizeOnDesktop();
+    return PlatformProvider(
+        // initialPlatform: TargetPlatform.iOS,
+        builder: (BuildContext context) => PlatformApp(
+              title: 'Danxi',
+              cupertino: (_, __) => CupertinoAppData(
+                  theme: CupertinoThemeData(
+                brightness: Brightness.light,
+                primaryColor: Color(0xFF007AFF), //Apple Blue
+                //primaryContrastingColor: Color(0xFF007AFF), //Apple Blue
+              )),
+              material: (_, __) => MaterialAppData(
+                  //themeMode: ThemeMode.light,
+                  theme: ThemeData(
+                    brightness: Brightness.light,
+                    primarySwatch: Colors.blue,
+                    /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
                       selectedIconTheme: IconThemeData(color: Theme.of(context).primaryColor),
                       unselectedIconTheme: IconThemeData(color: Colors.black),
                       selectedItemColor: Colors.black,
                       unselectedItemColor: Colors.black),*/
-                ),
-                darkTheme: ThemeData(
-                  brightness: Brightness.dark,
-                  //primarySwatch: Colors.teal,
-                  /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                  ),
+                  darkTheme: ThemeData(
+                    brightness: Brightness.dark,
+                    //primarySwatch: Colors.teal,
+                    /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
                       selectedIconTheme: IconThemeData(color: Colors.white),
                       unselectedIconTheme: IconThemeData(color: Colors.white),
                       selectedItemColor: Colors.white,
                       unselectedItemColor: Colors.white),*/
-                  // textTheme: new TextTheme(
-                  //   bodyText2: new TextStyle(color: Colors.red),
-                  //   headline1: new TextStyle(fontSize: 78),
-                  //   button: new TextStyle(color: Colors.green),
-                  // ),
-                )),
-            localizationsDelegates: [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: HomePage(),
-            onGenerateRoute: (settings) {
-              final Function pageContentBuilder = this.routes[settings.name];
-              if (pageContentBuilder != null) {
-                return platformPageRoute(
-                    context: context,
-                    builder: (context) => pageContentBuilder(context,
-                        arguments: settings.arguments));
-              }
-              return null;
-            },
-            navigatorKey: Catcher.navigatorKey,
-          ));
+                    // textTheme: new TextTheme(
+                    //   bodyText2: new TextStyle(color: Colors.red),
+                    //   headline1: new TextStyle(fontSize: 78),
+                    //   button: new TextStyle(color: Colors.green),
+                    // ),
+                  )),
+              localizationsDelegates: [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              home: HomePage(),
+              onGenerateRoute: (settings) {
+                final Function pageContentBuilder = this.routes[settings.name];
+                if (pageContentBuilder != null) {
+                  return platformPageRoute(
+                      context: context,
+                      builder: (context) => pageContentBuilder(context,
+                          arguments: settings.arguments));
+                }
+                return null;
+              },
+              navigatorKey: Catcher.navigatorKey,
+            ));
+  }
 }
 
 class HomePage extends StatefulWidget {

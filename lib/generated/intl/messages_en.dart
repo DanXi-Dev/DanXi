@@ -44,17 +44,22 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Description"),
         "app_feedback": MessageLookupByLibrary.simpleMessage("[Feedback]"),
         "app_name": MessageLookupByLibrary.simpleMessage("DanXi"),
-        "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers from\nEngineering @ Fudan University"),
-    "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
-    "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
-    "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
-    "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "contact_us" : MessageLookupByLibrary.simpleMessage("Contact Us"),
-    "cupertino" : MessageLookupByLibrary.simpleMessage("Cupertino"),
-    "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
-    "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
-    "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
-    "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
+        "author_descriptor": MessageLookupByLibrary.simpleMessage(
+            "Passionate developers from\nEngineering @ Fudan University"),
+        "authors": MessageLookupByLibrary.simpleMessage("Developers"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "change_account":
+            MessageLookupByLibrary.simpleMessage("Switch Account"),
+        "choose_area": MessageLookupByLibrary.simpleMessage("Select Campus"),
+        "contact_us": MessageLookupByLibrary.simpleMessage("Contact Us"),
+        "cupertino": MessageLookupByLibrary.simpleMessage("Cupertino"),
+        "current_connection":
+            MessageLookupByLibrary.simpleMessage("Current Connection"),
+        "current_connection_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to obtain WLAN information, Precise Location permission required"),
+        "current_connection_no_wifi":
+            MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
+        "dashboard": MessageLookupByLibrary.simpleMessage("Dashboard"),
         "default_campus":
             MessageLookupByLibrary.simpleMessage("Current Campus"),
         "dev_image_url_1":
@@ -112,18 +117,25 @@ class MessageLookup extends MessageLookupByLibrary {
         "i_see": MessageLookupByLibrary.simpleMessage("OK"),
         "jiangwan_campus": MessageLookupByLibrary.simpleMessage("Jiangwan"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
-        "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
-    "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
-    "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction"),
-    "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
-    "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
-    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
-    "login" : MessageLookupByLibrary.simpleMessage("Login"),
-    "login_failed" : MessageLookupByLibrary.simpleMessage("Login failed. Check your ID and/or password."),
-    "login_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually."),
-    "login_issue_1_action" : MessageLookupByLibrary.simpleMessage("Open UIS Login Page"),
-    "login_uis" : MessageLookupByLibrary.simpleMessage("Fudan UIS Login"),
-    "login_uis_description" : MessageLookupByLibrary.simpleMessage("Your login information is only sent to Fudan servers via secure connection."),
+        "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
+        "last_transaction":
+            MessageLookupByLibrary.simpleMessage("Last Transaction"),
+        "late_night": MessageLookupByLibrary.simpleMessage(
+            "The dead of midnight is the noon of thought."),
+        "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
+        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
+            "Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
+        "login": MessageLookupByLibrary.simpleMessage("Login"),
+        "login_failed": MessageLookupByLibrary.simpleMessage(
+            "Login failed. Check your ID and/or password."),
+        "login_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually."),
+        "login_issue_1_action":
+            MessageLookupByLibrary.simpleMessage("Open UIS Login Page"),
+        "login_uis": MessageLookupByLibrary.simpleMessage("Fudan UIS Login"),
+        "login_uis_description": MessageLookupByLibrary.simpleMessage(
+            "Your login information is only sent to Fudan servers via secure connection."),
         "login_uis_pwd": MessageLookupByLibrary.simpleMessage("Password"),
         "login_uis_uid": MessageLookupByLibrary.simpleMessage("ID"),
         "login_with_uis":

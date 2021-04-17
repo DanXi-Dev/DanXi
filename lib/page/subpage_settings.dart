@@ -65,6 +65,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     LicenseItem("cupertino_icons", LICENSE_MIT,
         "https://github.com/flutter/cupertino_icons"),
     LicenseItem("data_plugin", LICENSE_NO, "https://github.com/chaozhouzhang"),
+    LicenseItem("desktop_window", LICENSE_MIT,
+        "https://github.com/mix1009/desktop_window"),
     LicenseItem("dio_cookie_manager", LICENSE_MIT,
         "https://github.com/flutterchina/dio"),
     LicenseItem(
@@ -73,8 +75,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/marcojakob/dart-event-bus"),
     LicenseItem("flutter", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/flutter/flutter"),
-    LicenseItem(
-        "flutter_email_sender", LICENSE_APACHE_2_0,
+    LicenseItem("flutter_email_sender", LICENSE_APACHE_2_0,
         "https://github.com/sidlatau/flutter_email_sender"),
     LicenseItem("flutter_inappwebview", LICENSE_APACHE_2_0,
         "https://github.com/pichillilorenzo/flutter_inappwebview"),
