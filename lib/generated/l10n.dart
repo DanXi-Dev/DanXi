@@ -35,10 +35,10 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  /// `DanXi`
+  /// `Danxi`
   String get app_name {
     return Intl.message(
-      'DanXi',
+      'Danxi',
       name: 'app_name',
       desc: '',
       args: [],

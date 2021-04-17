@@ -39,7 +39,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "app_description" : MessageLookupByLibrary.simpleMessage("由几位复旦本科学生用爱发电打造的微型复旦综合服务App，希望能为你的生活提供便利~"),
     "app_description_title" : MessageLookupByLibrary.simpleMessage("简介"),
     "app_feedback" : MessageLookupByLibrary.simpleMessage("【反馈】"),
-    "app_name" : MessageLookupByLibrary.simpleMessage("旦兮 α"),
+    "app_name" : MessageLookupByLibrary.simpleMessage("旦兮"),
     "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering @ Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("开发者"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
