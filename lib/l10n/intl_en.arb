@@ -1,5 +1,6 @@
 {
     "app_name":"DanXi",
+    "developer_announcement":"DevTeam Announcement {date}",
     "fudan_qr_code":"Fudan QR Code",
     "welcome":"Welcome, {name}",
     "current_connection":"Current Connection",

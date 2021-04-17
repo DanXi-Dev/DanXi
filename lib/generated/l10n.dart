@@ -45,6 +45,16 @@ class S {
     );
   }
 
+  /// `DevTeam Announcement {date}`
+  String developer_announcement(Object date) {
+    return Intl.message(
+      'DevTeam Announcement $date',
+      name: 'developer_announcement',
+      desc: '',
+      args: [date],
+    );
+  }
+
   /// `Fudan QR Code`
   String get fudan_qr_code {
     return Intl.message(

@@ -1,5 +1,6 @@
 {
     "app_name":"旦兮 α",
+    "developer_announcement":"开发组公告 {date}",
     "fudan_qr_code":"复活码",
     "welcome":"欢迎你，{name}",
     "current_connection":"当前连接",

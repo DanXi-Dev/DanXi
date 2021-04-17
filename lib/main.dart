@@ -21,6 +21,7 @@ import 'package:catcher/catcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
@@ -36,6 +37,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
@@ -269,6 +271,7 @@ class _HomePageState extends State<HomePage> {
                 ));
       }
     });
+    _loadAnnouncement();
     _loadOrInitSharedPreference().then((_) {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)
@@ -401,10 +404,13 @@ class _HomePageState extends State<HomePage> {
                       child: CupertinoNavigationBarBackButton(),
                     ),*/
                     title: MediaQuery(
-                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      data: MediaQueryData(
+                          textScaleFactor:
+                              MediaQuery.textScaleFactorOf(context)),
                       child: TopController(
                         child: Text(
-                          S.of(context).app_name,),
+                          S.of(context).app_name,
+                        ),
                         onDoubleTap: () => ScrollToTopEvent().fire(),
                       ),
                     ),
@@ -487,5 +493,25 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ));
+  }
+
+  Future<void> _loadAnnouncement() async {
+    Announcement announcement =
+        await AnnouncementRepository.getInstance().getLastNewAnnouncement();
+    if (announcement != null) {
+      showPlatformDialog(
+          context: context,
+          builder: (BuildContext context) => PlatformAlertDialog(
+                title: Text(S
+                    .of(context)
+                    .developer_announcement(announcement.createdAt)),
+                content: Text(announcement.content),
+                actions: <Widget>[
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).i_see),
+                      onPressed: () => Navigator.pop(context)),
+                ],
+              ));
+    }
   }
 }
