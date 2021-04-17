@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
@@ -139,7 +140,18 @@ class _LoginDialogState extends State<LoginDialog> {
             onSubmitted: (_) {
               _tryLogin(_nameController.text, _pwdController.text)
                   .catchError((e) {
-                _errorText = S.of(context).login_failed;
+                if (e is CredentialsInvalidException) {
+                  _errorText = S.of(context).credentials_invalid;
+                }
+                else if (e is CaptchaNeededException) {
+                  _errorText = S.of(context).captcha_needed;
+                }
+                else if (e is GeneralLoginFailedException) {
+                  _errorText = S.of(context).weak_password;
+                }
+                else {
+                  _errorText = S.of(context).connection_failed;
+                }
                 _pwdController.text = "";
                 refreshSelf();
               });
@@ -195,7 +207,18 @@ class _LoginDialogState extends State<LoginDialog> {
           onPressed: () {
             _tryLogin(_nameController.text, _pwdController.text)
                 .catchError((e) {
-              _errorText = S.of(context).login_failed;
+              if (e is CredentialsInvalidException) {
+                _errorText = S.of(context).credentials_invalid;
+              }
+              else if (e is CaptchaNeededException) {
+                _errorText = S.of(context).captcha_needed;
+              }
+              else if (e is GeneralLoginFailedException) {
+                _errorText = S.of(context).weak_password;
+              }
+              else {
+                _errorText = S.of(context).connection_failed;
+              }
               _pwdController.text = "";
               refreshSelf();
             });

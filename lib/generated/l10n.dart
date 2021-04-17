@@ -975,11 +975,41 @@ class S {
     );
   }
 
-  /// `Login failed. Check your ID and/or password.`
-  String get login_failed {
+  /// `Login failed. Check your Internet connection.\nMake sure to grant WLAN & Celluar permission when prompted.`
+  String get connection_failed {
     return Intl.message(
-      'Login failed. Check your ID and/or password.',
-      name: 'login_failed',
+      'Login failed. Check your Internet connection.\nMake sure to grant WLAN & Celluar permission when prompted.',
+      name: 'connection_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid username or password`
+  String get credentials_invalid {
+    return Intl.message(
+      'Invalid username or password',
+      name: 'credentials_invalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Captcha needed, please following the on-screen instructions.`
+  String get captcha_needed {
+    return Intl.message(
+      'Captcha needed, please following the on-screen instructions.',
+      name: 'captcha_needed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again.`
+  String get weak_password {
+    return Intl.message(
+      'Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again.',
+      name: 'weak_password',
       desc: '',
       args: [],
     );
@@ -1090,16 +1120,6 @@ class S {
     return Intl.message(
       'danxi_dev@protonmail.com',
       name: 'feedback_email',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `https://danxi-dev.github.io/terms-and-condition`
-  String get terms_and_conditions_url {
-    return Intl.message(
-      'https://danxi-dev.github.io/terms-and-condition',
-      name: 'terms_and_conditions_url',
       desc: '',
       args: [],
     );

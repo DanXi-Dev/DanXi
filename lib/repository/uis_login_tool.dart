@@ -24,6 +24,8 @@ import 'package:dio/dio.dart';
 
 class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
+  static const String CREDENTIALS_INVALID = "用户名或者密码有误";
+  static const String WEAK_PASSWORD = "弱密码提示";
 
   static Future<Response> loginUIS(Dio dio, String serviceUrl,
       NonpersistentCookieJar jar, PersonInfo info) async {
@@ -45,11 +47,21 @@ class UISLoginTool {
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     Response response = await DioUtils.processRedirect(dio, res);
-    if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
+    if (response.data.toString().contains(CREDENTIALS_INVALID)) {
+    throw CredentialsInvalidException();
+    }
+    else if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
       CaptchaNeededException().fire();
+      throw CaptchaNeededException();
+    }
+    else if (response.data.toString().contains(WEAK_PASSWORD)) {
+      //TODO: Actually, the response (looks like) always contains Weak Password Warning if login is unsuccessful. We should modify this later.
+      throw GeneralLoginFailedException();
     }
     return response;
   }
 }
 
 class CaptchaNeededException implements Exception {}
+class CredentialsInvalidException implements Exception {}
+class GeneralLoginFailedException implements Exception {}
