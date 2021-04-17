@@ -1015,6 +1015,16 @@ class S {
     );
   }
 
+  /// `Failed to obtain QR code. Please make sure you have activated the QR code in eHall.`
+  String get fail_to_acquire_qr {
+    return Intl.message(
+      'Failed to obtain QR code. Please make sure you have activated the QR code in eHall.',
+      name: 'fail_to_acquire_qr',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `https://github.com/w568w/DanXi`
   String get project_url {
     return Intl.message(

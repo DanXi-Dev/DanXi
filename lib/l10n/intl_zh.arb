@@ -1,7 +1,7 @@
 {
     "app_name":"旦兮 α",
     "developer_announcement":"开发组公告 {date}",
-    "fudan_qr_code":"复活码",
+    "fudan_qr_code":"复旦生活码",
     "welcome":"欢迎你，{name}",
     "current_connection":"当前连接",
     "ecard_balance":"校园卡余额",
@@ -102,6 +102,7 @@
     "credentials_invalid": "用户名/密码错误",
     "captcha_needed": "需要输入验证码，请遵循屏幕上的提示。",
     "weak_password": "登录失败，未知错误\n请注意：目前旦兮不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。",
+    "fail_to_acquire_qr": "无法获取复活码，请确保您已在eHall中开通复活码。",
 
     "dev_name_1": "许冬\n[w568w]",
     "dev_name_2": "赵行健\n[kavinzhao]",

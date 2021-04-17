@@ -104,6 +104,7 @@
     "credentials_invalid": "Invalid username or password",
     "captcha_needed": "Captcha needed, please following the on-screen instructions.",
     "weak_password": "Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again.",
+    "fail_to_acquire_qr": "Failed to obtain QR code. Please make sure you have activated the QR code in eHall.",
 
     "project_url": "https:\/\/github.com\/w568w\/DanXi",
     "dev_name_1": "Xu Dong\n[w568w]",

@@ -69,6 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
+    "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
     "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
