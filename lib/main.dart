@@ -96,7 +96,7 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) => PlatformProvider(
-    // initialPlatform: TargetPlatform.iOS,
+    initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => PlatformApp(
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
@@ -333,7 +333,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadOrInitSharedPreference({bool forceLogin = false}) async {
     _preferences = await SharedPreferences.getInstance();
 
-    if (!forceLogin && _preferences.containsKey("id")) {
+    if (!forceLogin && PersonInfo.verifySharedPreferences(_preferences)) {
       setState(() =>
           _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));
     } else {

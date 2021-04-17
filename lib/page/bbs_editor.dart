@@ -21,6 +21,7 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:data_plugin/bmob/response/bmob_saved.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -60,30 +61,17 @@ class BBSEditorPageState extends State<BBSEditorPage> {
         builder: (BuildContext context) => PlatformScaffold(
         iosContentBottomPadding: true,
         iosContentPadding: true,
-        appBar: PlatformAppBar(
-          cupertino: (_, __) => CupertinoNavigationBarData(
-            // Issue with cupertino where a bar with no transparency
-            // will push the list down. Adding some alpha value fixes it (in a hacky way)
-            backgroundColor: Colors.white.withAlpha(254),
-            leading: MediaQuery(
-              data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-              child: CupertinoNavigationBarBackButton(),
+            appBar: PlatformAppBarX(
+              title: Text(S.of(context).forum_post_enter_content),
+              trailingActions: [
+                PlatformIconButton(
+                    padding: EdgeInsets.zero,
+                    icon: PlatformX.isAndroid
+                        ? const Icon(Icons.send)
+                        : const Icon(SFSymbols.paperplane),
+                    onPressed: _canSend ? _sendDocument : null)
+              ],
             ),
-            title: MediaQuery(
-              data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-              child: Text(S.of(context).forum_post_enter_content)
-              ),
-            ),
-          title: Text(S.of(context).forum_post_enter_content),
-          trailingActions: [
-            PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: PlatformX.isAndroid
-                    ? const Icon(Icons.send)
-                    : const Icon(SFSymbols.paperplane),
-                onPressed: _canSend ? _sendDocument : null)
-          ],
-        ),
         body: Padding(
             padding: EdgeInsets.all(4),
             child: Column(

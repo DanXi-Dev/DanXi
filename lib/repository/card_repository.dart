@@ -30,11 +30,11 @@ class CardRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fecard.fudan.edu.cn%2Fepay%2Fj_spring_cas_security_check";
   static const String USER_DETAIL_URL =
-      "https://ecard.fudan.edu.cn/epay/myepay/index";
+      "https://ecard.fudan.edu.cn/epaytest/myepay/index";
   static const String CONSUME_DETAIL_URL =
-      "https://ecard.fudan.edu.cn/epay/consume/query";
+      "https://ecard.fudan.edu.cn/epaytest/consume/query";
   static const String CONSUME_DETAIL_CSRF_URL =
-      "https://ecard.fudan.edu.cn/epay/consume/index";
+      "https://ecard.fudan.edu.cn/epaytest/consume/index";
 
   static const Map<String, String> _CONSUME_DETAIL_HEADER = {
     "User-Agent":

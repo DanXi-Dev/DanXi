@@ -22,7 +22,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/forgettable_future_builder.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:dan_xi/widget/top_controller.dart';
@@ -89,33 +89,18 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
     return PlatformProvider(
         builder: (BuildContext context) => PlatformScaffold(
-              iosContentBottomPadding: true,
+          iosContentBottomPadding: true,
               iosContentPadding: true,
-              appBar: PlatformAppBar(
-                  cupertino: (_, __) => CupertinoNavigationBarData(
-                    // Issue with cupertino where a bar with no transparency
-                    // will push the list down. Adding some alpha value fixes it (in a hacky way)
-                    backgroundColor: Colors.white.withAlpha(254),
-                    leading: MediaQuery(
-                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                      child: CupertinoNavigationBarBackButton(),
-                    ),
-                    title: MediaQuery(
-                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                      child: TopController(
-                        child: Text(S.of(context).empty_classrooms),
-                        controller: _controller,
-                      ),
-                    ),
-                  ),
+              appBar: PlatformAppBarX(
                   title: TopController(
-                    controller: _controller,
-                    child: Text(S.of(context).empty_classrooms),
-                  )),
+                controller: _controller,
+                child: Text(S.of(context).empty_classrooms),
+              )),
               body: Column(children: [
                 SizedBox(
                   height: PlatformX.isMaterial(context) ? 0 : 12,
                 ),
+                // Use different widgets on iOS/Android: Tag/Tab.
                 PlatformWidget(
                     material: (_, __) => TagContainer(
                         fillRandomColor: false,
@@ -178,7 +163,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           children: _buildingList,
                         )),
                 const SizedBox(height: 15),
-                ForgettableFutureBuilder(
+            FutureBuilder(
                   builder: (BuildContext context,
                       AsyncSnapshot<List<RoomInfo>> snapshot) {
                     switch (snapshot.connectionState) {
@@ -191,20 +176,20 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         return snapshot.hasError
                             ? _buildErrorWidget()
                             : Expanded(
-                            child: MediaQuery.removePadding(
-                                context: context,
-                                removeTop: true,
-                                child: PlatformWidget(
-                                    material: (_, __) => Scrollbar(
-                                        interactive: PlatformX.isDesktop,
-                                        child: ListView(
-                                          controller: _controller,
-                                          children: _getListWidgets(
-                                              snapshot.data),
-                                        )),
-                                    cupertino: (_, __) =>
-                                        CupertinoScrollbar(
+                                child: MediaQuery.removePadding(
+                                    context: context,
+                                    removeTop: true,
+                                    child: PlatformWidget(
+                                        material: (_, __) => Scrollbar(
+                                            interactive: PlatformX.isDesktop,
                                             child: ListView(
+                                              controller: _controller,
+                                              children: _getListWidgets(
+                                                  snapshot.data),
+                                            )),
+                                        cupertino: (_, __) =>
+                                            CupertinoScrollbar(
+                                                child: ListView(
                                               controller: _controller,
                                               children: _getListWidgets(
                                                   snapshot.data),
@@ -215,9 +200,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   },
                   future: EmptyClassroomRepository.getInstance()
                       .getBuildingRoomInfo(
-                      _personInfo,
-                      _buildingList[_selectBuildingIndex].data,
-                      DateTime.now()),
+                          _personInfo,
+                          _buildingList[_selectBuildingIndex].data,
+                          DateTime.now()),
                 ),
               ]),
             ));
@@ -229,25 +214,29 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
       data.forEach((element) {
         widgets.add(Material(
             color: isCupertino(context) ? Colors.white : null,
-            child:
-            Column(
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        const SizedBox(width: 1,),
-                        Text(element.roomName, style: TextStyle(fontSize: 18),),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: _buildBusinessViewForRoom(element),
-                        ),
-                        const SizedBox(width: 1,),
-                      ]
-                  ),
-                  Divider(),
-                ]
-              //subtitle: Divider(height: 5,),
-            )));
+            child: Column(children: [
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    const SizedBox(
+                      width: 1,
+                    ),
+                    Text(
+                      element.roomName,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: _buildBusinessViewForRoom(element),
+                    ),
+                    const SizedBox(
+                      width: 1,
+                    ),
+                  ]),
+              Divider(),
+            ]
+                //subtitle: Divider(height: 5,),
+                )));
       });
     return widgets;
   }
@@ -264,7 +253,10 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         margin: EdgeInsets.symmetric(horizontal: 2),
         height: 22,
       ));
-      if (_time++ % 5 == 0) _list.add(SizedBox(width: 7,));
+      if (_time++ % 5 == 0)
+        _list.add(SizedBox(
+          width: 7,
+        ));
     });
     return _list;
   }

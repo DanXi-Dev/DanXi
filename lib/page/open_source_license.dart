@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,23 +45,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
         builder: (BuildContext context) => PlatformScaffold(
               iosContentBottomPadding: true,
               iosContentPadding: true,
-              appBar: PlatformAppBar(
-                  cupertino: (_, __) => CupertinoNavigationBarData(
-                    // Issue with cupertino where a bar with no transparency
-                    // will push the list down. Adding some alpha value fixes it (in a hacky way)
-                    backgroundColor: Colors.white.withAlpha(254),
-                    leading: MediaQuery(
-                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                      child: CupertinoNavigationBarBackButton(),
-                    ),
-                    title: MediaQuery(
-                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                      child: TopController(
-                        child: Text(S.of(context).open_source_software_licenses),
-                        controller: _controller,
-                      ),
-                    ),
-                  ),
+          appBar: PlatformAppBarX(
                   title: TopController(
                 controller: _controller,
                 child: Text(S.of(context).open_source_software_licenses),

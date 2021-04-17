@@ -26,6 +26,15 @@ class PersonInfo {
     name = "";
   }
 
+  static bool verifySharedPreferences(SharedPreferences preferences) {
+    return preferences.containsKey("id") &&
+        preferences.containsKey("password") &&
+        preferences.containsKey("name") &&
+        preferences.getString("id") != null &&
+        preferences.getString("password") != null &&
+        preferences.getString("name") != null;
+  }
+
   factory PersonInfo.fromSharedPreferences(SharedPreferences preferences) {
     return PersonInfo(preferences.getString("id"),
         preferences.getString("password"), preferences.getString("name"));

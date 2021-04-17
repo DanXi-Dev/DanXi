@@ -20,6 +20,7 @@ import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
 import 'package:flutter/cupertino.dart';
@@ -48,23 +49,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         builder: (BuildContext context) => PlatformScaffold(
               iosContentPadding: true,
               iosContentBottomPadding: true,
-              appBar: PlatformAppBar(
-                cupertino: (_, __) => CupertinoNavigationBarData(
-                  // Issue with cupertino where a bar with no transparency
-                  // will push the list down. Adding some alpha value fixes it (in a hacky way)
-                  backgroundColor: Colors.white.withAlpha(254),
-                  leading: MediaQuery(
-                    data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                    child: CupertinoNavigationBarBackButton(),
-                  ),
-                  title: MediaQuery(
-                    data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                    child: TopController(
-                      child: Text(S.of(context).forum),
-                      controller: _controller,
-                    ),
-                  ),
-                ),
+          appBar: PlatformAppBarX(
                 title: TopController(
                   controller: _controller,
                   child: Text(S.of(context).forum),
