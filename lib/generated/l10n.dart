@@ -845,6 +845,26 @@ class S {
     );
   }
 
+  /// `Report this post`
+  String get report {
+    return Intl.message(
+      'Report this post',
+      name: 'report',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Report success`
+  String get report_success {
+    return Intl.message(
+      'Report success',
+      name: 'report_success',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Network error, post failed.`
   String get post_failed {
     return Intl.message(

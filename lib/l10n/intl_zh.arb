@@ -82,6 +82,8 @@
     "timetable":"日程",
     "week":"第 {week} 周",
     "new_post":"发布新帖子",
+    "report":"举报该帖子",
+    "report_success":"举报成功",
     "post_failed":"网络错误，帖子发布失败",
     "share":"分享",
     "login_with_uis":"将使用以下信息匿名登录树洞",

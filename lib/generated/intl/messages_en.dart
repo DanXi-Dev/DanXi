@@ -105,27 +105,41 @@ class MessageLookup extends MessageLookupByLibrary {
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
     "material" : MessageLookupByLibrary.simpleMessage("Material"),
-    "most_least_crowded_canteen" : m1,
-    "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
-    "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
-    "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
-    "post_failed" : MessageLookupByLibrary.simpleMessage("Network error, post failed."),
-    "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
-    "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
-    "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
-    "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reply_to" : m2,
-    "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
-    "share" : MessageLookupByLibrary.simpleMessage("Share"),
-    "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
-    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
-    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
-    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". By logging in, you indicate that you have read and consent to these policies. "),
-    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
+        "most_least_crowded_canteen": m1,
+        "new_post": MessageLookupByLibrary.simpleMessage("New Post"),
+        "open_source_software_licenses": MessageLookupByLibrary.simpleMessage(
+            "Open Source Software Licenses"),
+        "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
+            "It\'s not dining time right now."),
+        "post_failed":
+            MessageLookupByLibrary.simpleMessage("Network error, post failed."),
+        "privacy_policy":
+            MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+        "privacy_policy_url": MessageLookupByLibrary.simpleMessage(
+            "https://danxi-dev.github.io/privacy"),
+        "project_page": MessageLookupByLibrary.simpleMessage("Project Page"),
+        "project_url": MessageLookupByLibrary.simpleMessage(
+            "https://github.com/w568w/DanXi"),
+        "reply_to": m2,
+        "report": MessageLookupByLibrary.simpleMessage("Report this post"),
+        "report_success":
+            MessageLookupByLibrary.simpleMessage("Report success"),
+        "select_campus": MessageLookupByLibrary.simpleMessage("Select Campus"),
+        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "share": MessageLookupByLibrary.simpleMessage("Share"),
+        "share_as_ics": MessageLookupByLibrary.simpleMessage("Export as ICS"),
+        "tag_least_crowded":
+            MessageLookupByLibrary.simpleMessage("Least Crowded"),
+        "tag_most_crowded":
+            MessageLookupByLibrary.simpleMessage("Most Crowded"),
+        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
+        "terms_and_conditions":
+            MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+        "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
+            "Your use of this application is governed under "),
+        "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(
+            ". By logging in, you indicate that you have read and consent to these policies. "),
+        "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
     "terms_and_conditions_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/terms-and-condition"),
     "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
     "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),

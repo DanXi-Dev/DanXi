@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
@@ -118,77 +119,122 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  Widget _getListItem(BBSPost e, int index) => Material(
-      color: isCupertino(context) ? Colors.white : null,
-      child: Card(
-          child: ListTile(
-        leading: Icon(SFSymbols.quote_bubble_fill),
-        //visualDensity: VisualDensity(vertical: 2),
-        dense: false,
-        title: Column(
-          children: [
-            const SizedBox(height: 2),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  e.replyTo == "0"
-                      ? Column()
-                      : Text(
-                          S
-                              .of(context)
-                              .reply_to(int.parse(e.replyTo, radix: 36)),
-                          style: TextStyle(
-                              fontSize: 10,
-                              color: Theme.of(context).accentColor)),
-                  Text("No. ${int.parse(e.objectId, radix: 36)}",
-                      style: TextStyle(
-                          fontSize: 10, color: Theme.of(context).hintColor)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 2),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                e.content,
-                style: TextStyle(fontSize: 16),
-              ),
-            )
-          ],
-        ),
-        subtitle: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const SizedBox(height: 2),
-                  Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
-                  Text(
-                    e.author,
-                    style: TextStyle(
-                        color: Theme.of(context).accentColor, fontSize: 12),
-                  ),
-                  Text(
-                    e.createdAt,
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        onTap: () {
-          Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-            "post": BBSPost.newReply(_user.objectId, _post.objectId,
-                replyTo: index > 0 ? e.objectId : "0"),
-            "replyTo": e.author
-          });
+  List<Widget> _buildContextMenu() {
+    List<Widget> list = [];
+    list.add(PlatformWidget(
+      cupertino: (_, __) => CupertinoActionSheetAction(
+        onPressed: () {
+          // TODO: report stub
+          Navigator.of(context).pop();
+          Noticing.showNotice(context, S.of(context).report_success);
         },
-      )));
+        child: Text(S.of(context).report),
+      ),
+      material: (_, __) => ListTile(
+        title: Text(S.of(context).report),
+        onTap: () {
+          // TODO: report stub
+          Navigator.of(context).pop();
+          Noticing.showNotice(context, S.of(context).report_success);
+        },
+      ),
+    ));
+    return list;
+  }
+
+  Widget _getListItem(BBSPost e, int index) => Material(
+      color: PlatformX.backgroundColor(context),
+      child: GestureDetector(
+        onLongPress: () {
+          showPlatformModalSheet(
+              context: context,
+              builder: (_) => PlatformWidget(
+                    cupertino: (_, __) => CupertinoActionSheet(
+                      actions: _buildContextMenu(),
+                      cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    material: (_, __) => Container(
+                      height: 300,
+                      child: Column(
+                        children: _buildContextMenu(),
+                      ),
+                    ),
+                  ));
+        },
+        child: Card(
+            child: ListTile(
+          leading: Icon(SFSymbols.quote_bubble_fill),
+          dense: false,
+          title: Column(
+            children: [
+              const SizedBox(height: 2),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    e.replyTo == "0"
+                        ? Column()
+                        : Text(
+                            S
+                                .of(context)
+                                .reply_to(int.parse(e.replyTo, radix: 36)),
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: Theme.of(context).accentColor)),
+                    Text("No. ${int.parse(e.objectId, radix: 36)}",
+                        style: TextStyle(
+                            fontSize: 10, color: Theme.of(context).hintColor)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 2),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  e.content,
+                  style: TextStyle(fontSize: 16),
+                ),
+              )
+            ],
+          ),
+          subtitle: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const SizedBox(height: 2),
+                    Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
+                    Text(
+                      e.author,
+                      style: TextStyle(
+                          color: Theme.of(context).accentColor, fontSize: 12),
+                    ),
+                    Text(
+                      e.createdAt,
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          onTap: () {
+            Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
+              "post": BBSPost.newReply(_user.objectId, _post.objectId,
+                  replyTo: index > 0 ? e.objectId : "0"),
+              "replyTo": e.author
+            });
+          },
+        )),
+      ));
 
   @override
   void initState() {

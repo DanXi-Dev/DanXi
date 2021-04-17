@@ -84,6 +84,8 @@
     "timetable":"Agenda",
     "week":"Week {week}",
     "new_post":"New Post",
+    "report":"Report this post",
+    "report_success":"Report success",
     "post_failed":"Network error, post failed.",
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
