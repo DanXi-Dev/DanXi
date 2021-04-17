@@ -20,8 +20,9 @@
 
 ## 我们需要赞助！
 由于开发团队没有能力支持高额的 Apple Developer Program 费用（发布应用至App Store和TestFlight所必需），我们正在寻找赞助。
-
-有意者可联系 danxi_dev@protonmail.com
+您可以通过爱发电平台赞助我们 https://afdian.net/@danxi-dev  
+然而爱发电平台会抽成，所以有赞助希望能直接通过邮件联系我们！
+我们的邮箱：[danxi_dev@protonmail.com](mailto:danxi_dev@protonmail.com)
 
 # 安装
 注意：本应用仍处于早期开发阶段，也许会有不可预料的 Bug 发生。  
