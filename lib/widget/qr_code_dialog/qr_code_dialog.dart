@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
@@ -87,26 +86,28 @@ class _QRDialogState extends State<QRDialog> {
                             .getQRCode(widget.personInfo),
                         builder: (BuildContext context,
                             AsyncSnapshot<String> snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data != "") {
-                              _status = ConnectionStatus.DONE;
-                              return QrImage(
-                                data: snapshot.data,
-                                size: 200.0,
-                                foregroundColor: Colors.black,
-                                backgroundColor: Colors.white,
-                              );
-                            }
-                            _status = ConnectionStatus.FATAL_ERROR;
-                            return Text(S.of(context).fail_to_acquire_qr);
-                          } else if (snapshot.hasError &&
-                              _status == ConnectionStatus.CONNECTING) {
-                            _status = ConnectionStatus.FAILED;
-                            return Text(S.of(context).failed);
-                          } else {
-                            _status = ConnectionStatus.CONNECTING;
-                            return Text(S.of(context).loading_qr_code);
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                            case ConnectionState.waiting:
+                            case ConnectionState.active:
+                              return Text(S.of(context).loading_qr_code);
+                              break;
+                            case ConnectionState.done:
+                              if (snapshot.hasError) {
+                                _status = ConnectionStatus.FAILED;
+                                return Text(S.of(context).failed);
+                              } else {
+                                _status = ConnectionStatus.DONE;
+                                return QrImage(
+                                  data: snapshot.data,
+                                  size: 200.0,
+                                  foregroundColor: Colors.black,
+                                  backgroundColor: Colors.white,
+                                );
+                              }
+                              break;
                           }
+                          return null;
                         })))),
         actions: <Widget>[
           TextButton(

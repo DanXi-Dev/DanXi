@@ -26,7 +26,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,12 +76,10 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 
   void testInternetAccess() async {
-    try {
-      await Dio().get('http://captive.apple.com');
-      //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
-    } catch (e) {
-      //TODO: No internet Access
-    }
+    //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
+    await Dio()
+        .get('http://captive.apple.com')
+        .catchError((ignoredError) => null);
   }
 
   @override
@@ -114,11 +111,11 @@ class _LoginDialogState extends State<LoginDialog> {
             controller: _nameController,
             keyboardType: TextInputType.number,
             //material: (_, __) => MaterialTextFieldData(
-                decoration: InputDecoration(
-                    labelText: S.of(context).login_uis_uid,
-                    icon: PlatformX.isAndroid
-                        ? Icon(Icons.perm_identity)
-                        : Icon(SFSymbols.person_crop_circle)),
+            decoration: InputDecoration(
+                labelText: S.of(context).login_uis_uid,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.perm_identity)
+                    : Icon(SFSymbols.person_crop_circle)),
             //),
             /*cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_uid),*/
@@ -128,11 +125,12 @@ class _LoginDialogState extends State<LoginDialog> {
           TextField(
             controller: _pwdController,
             //material: (_, __) => MaterialTextFieldData(
-                decoration: InputDecoration(
+            decoration: InputDecoration(
               labelText: S.of(context).login_uis_pwd,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.lock_outline)
-                  : Icon(SFSymbols.lock_circle),),
+                  : Icon(SFSymbols.lock_circle),
+            ),
             //)),
             /*cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_pwd),*/
@@ -142,14 +140,11 @@ class _LoginDialogState extends State<LoginDialog> {
                   .catchError((e) {
                 if (e is CredentialsInvalidException) {
                   _errorText = S.of(context).credentials_invalid;
-                }
-                else if (e is CaptchaNeededException) {
+                } else if (e is CaptchaNeededException) {
                   _errorText = S.of(context).captcha_needed;
-                }
-                else if (e is GeneralLoginFailedException) {
+                } else if (e is GeneralLoginFailedException) {
                   _errorText = S.of(context).weak_password;
-                }
-                else {
+                } else {
                   _errorText = S.of(context).connection_failed;
                 }
                 _pwdController.text = "";
@@ -157,7 +152,9 @@ class _LoginDialogState extends State<LoginDialog> {
               });
             },
           ),
-          const SizedBox(height: 25,),
+          const SizedBox(
+            height: 25,
+          ),
           //Legal
           RichText(
               text: TextSpan(children: [
@@ -186,22 +183,18 @@ class _LoginDialogState extends State<LoginDialog> {
                   }),
             TextSpan(
               style: defaultText,
-              text: S
-                      .of(context)
-                      .terms_and_conditions_content_end,
-                ),
-              ])),
+              text: S.of(context).terms_and_conditions_content_end,
+            ),
+          ])),
         ],
       ),
       actions: [
-        if (widget.forceLogin) TextButton(
-          child: Text(S
-              .of(context)
-              .cancel),
-          onPressed: () {
-              Navigator.of(context).pop();
-            }
-        ),
+        if (widget.forceLogin)
+          TextButton(
+              child: Text(S.of(context).cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              }),
         TextButton(
           child: Text(S.of(context).login),
           onPressed: () {
@@ -209,14 +202,11 @@ class _LoginDialogState extends State<LoginDialog> {
                 .catchError((e) {
               if (e is CredentialsInvalidException) {
                 _errorText = S.of(context).credentials_invalid;
-              }
-              else if (e is CaptchaNeededException) {
+              } else if (e is CaptchaNeededException) {
                 _errorText = S.of(context).captcha_needed;
-              }
-              else if (e is GeneralLoginFailedException) {
+              } else if (e is GeneralLoginFailedException) {
                 _errorText = S.of(context).weak_password;
-              }
-              else {
+              } else {
                 _errorText = S.of(context).connection_failed;
               }
               _pwdController.text = "";
