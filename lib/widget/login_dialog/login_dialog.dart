@@ -149,33 +149,32 @@ class _LoginDialogState extends State<LoginDialog> {
           //Legal
           RichText(
               text: TextSpan(children: [
-                TextSpan(
-                  style: defaultText,
-                  text: S.of(context).terms_and_conditions_content,
-                ),
-                TextSpan(
-                    style: linkText,
-                    text: S.of(context).terms_and_conditions,
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () async {
-                        await launch(
-                            S.of(context).terms_and_conditions_url);
-                      }),
-                TextSpan(
-                  style: defaultText,
-                  text: S.of(context).and,
-                ),
-                TextSpan(
-                    style: linkText,
-                    text: S.of(context).privacy_policy,
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () async {
-                        await launch(
-                            S.of(context).privacy_policy_url);
-                      }),
-                TextSpan(
-                  style: defaultText,
-                  text: S
+            TextSpan(
+              style: defaultText,
+              text: S.of(context).terms_and_conditions_content,
+            ),
+            // TextSpan(
+            //     style: linkText,
+            //     text: S.of(context).terms_and_conditions,
+            //     recognizer: TapGestureRecognizer()
+            //       ..onTap = () async {
+            //         await launch(
+            //             S.of(context).terms_and_conditions_url);
+            //       }),
+            // TextSpan(
+            //   style: defaultText,
+            //   text: S.of(context).and,
+            // ),
+            TextSpan(
+                style: linkText,
+                text: S.of(context).privacy_policy,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    await launch(S.of(context).privacy_policy_url);
+                  }),
+            TextSpan(
+              style: defaultText,
+              text: S
                       .of(context)
                       .terms_and_conditions_content_end,
                 ),

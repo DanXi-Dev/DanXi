@@ -177,9 +177,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     double _avatarSize =
         (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
     const double _avatarNameSpacing = 4;
-    var defaultText =
-        Theme.of(context).textTheme.bodyText2;
-    var linkText = Theme.of(context)
+    TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
+    TextStyle linkText = Theme.of(context)
         .textTheme
         .bodyText2
         .copyWith(color: Theme.of(context).accentColor);
@@ -352,34 +351,36 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                 Divider(),
                                 RichText(
                                     text: TextSpan(children: [
-                                  TextSpan(
-                                    style: defaultText,
-                                    text: S.of(context).terms_and_conditions_content,
-                                  ),
-                                  TextSpan(
-                                      style: linkText,
-                                      text: S.of(context).terms_and_conditions,
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () async {
-                                          await launch(
-                                              S.of(context).terms_and_conditions_url);
-                                          //TODO: Add Links
-                                        }),
-                                  TextSpan(
-                                    style: defaultText,
-                                    text: S.of(context).and,
-                                  ),
-                                  TextSpan(
-                                      style: linkText,
-                                      text: S.of(context).privacy_policy,
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () async {
-                                          await launch(
-                                              S.of(context).privacy_policy_url);
-                                        }),
-                                  TextSpan(
-                                    style: defaultText,
-                                    text: S
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S
+                                      .of(context)
+                                      .terms_and_conditions_content,
+                                ),
+                                // TextSpan(
+                                //     style: linkText,
+                                //     text: S.of(context).terms_and_conditions,
+                                //     recognizer: TapGestureRecognizer()
+                                //       ..onTap = () async {
+                                //         await launch(
+                                //             S.of(context).terms_and_conditions_url);
+                                //         //TODO: Add Links
+                                //       }),
+                                // TextSpan(
+                                //   style: defaultText,
+                                //   text: S.of(context).and,
+                                // ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S.of(context).privacy_policy,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        await launch(
+                                            S.of(context).privacy_policy_url);
+                                      }),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S
                                         .of(context)
                                         .terms_and_conditions_content_end,
                                   ),

@@ -245,7 +245,7 @@ class DiningHallCrowdednessFeature extends Feature {
             ),
           ),
           const SizedBox(
-            width: 7,
+            width: 8,
           ),
           Text(_leastCrowdedCanteen),
         ],

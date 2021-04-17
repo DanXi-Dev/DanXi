@@ -98,7 +98,7 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) => PlatformProvider(
-    // initialPlatform: TargetPlatform.iOS,
+      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => PlatformApp(
             title: 'Danxi',
             cupertino: (_, __) => CupertinoAppData(
@@ -271,7 +271,9 @@ class _HomePageState extends State<HomePage> {
                 ));
       }
     });
-    _loadAnnouncement();
+
+    // Load the latest announcement. Just ignore the network error.
+    _loadAnnouncement().catchError((ignored) {});
     _loadOrInitSharedPreference().then((_) {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)
