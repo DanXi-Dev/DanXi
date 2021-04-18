@@ -174,9 +174,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
 
-    const double _avatarSpacing = 56;
+    const double _avatarSpacing = 32;
     double _avatarSize =
-        (MediaQuery.of(context).size.width - _avatarSpacing * 3 - 40) / 3;
+        (MediaQuery.of(context).size.width - _avatarSpacing * 4 - 40) / 4;
     const double _avatarNameSpacing = 4;
     TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)
@@ -412,6 +412,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                   textScaleFactor: 1.1,
                                 ),
                                 Divider(),
+                                const SizedBox(height: 5,),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -489,6 +490,33 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                         const SizedBox(height: _avatarNameSpacing),
                                         Text(
                                           S.of(context).dev_name_3,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: _avatarSpacing),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        InkWell(
+                                          child: Container(
+                                              width: _avatarSize,
+                                              height: _avatarSize,
+                                              decoration: new BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: new DecorationImage(
+                                                      fit: BoxFit.fill,
+                                                      image: new AssetImage(S
+                                                          .of(context)
+                                                          .dev_image_url_4)))),
+                                          onTap: () {
+                                            launch(S.of(context).dev_page_4);
+                                          },
+                                        ),
+                                        const SizedBox(height: _avatarNameSpacing),
+                                        Text(
+                                          S.of(context).dev_name_4,
                                           textAlign: TextAlign.center,
                                         ),
                                       ],

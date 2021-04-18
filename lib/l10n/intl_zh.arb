@@ -34,7 +34,6 @@
     "open_source_software_licenses": "开源软件许可协议",
     "project_page": "项目页面",
     "authors": "开发者",
-    "author_descriptor": "Passionate developers\nfrom Engineering @ Fudan University",
     "app_description_title": "简介",
     "app_description": "由几位复旦本科学生用爱发电打造的微型复旦综合服务App，希望能为你的生活提供便利~",
     "account": "切换账户",
@@ -102,9 +101,5 @@
     "credentials_invalid": "用户名/密码错误",
     "captcha_needed": "需要输入验证码，请遵循屏幕上的提示。",
     "weak_password": "登录失败，未知错误\n请注意：目前旦兮不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。",
-    "fail_to_acquire_qr": "无法获取复活码，请确保您已在eHall中开通复活码。",
-
-    "dev_name_1": "许冬\n[w568w]",
-    "dev_name_2": "赵行健\n[kavinzhao]",
-    "dev_name_3": "郭虹麟\n[KYLN24]"
+    "fail_to_acquire_qr": "无法获取复活码，请确保您已在eHall中开通复活码。"
 }

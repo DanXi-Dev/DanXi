@@ -355,10 +355,10 @@ class S {
     );
   }
 
-  /// `Passionate developers from\nEngineering @ Fudan University`
+  /// `Passionate developers\nfrom Engineering & Economics\nat Fudan University`
   String get author_descriptor {
     return Intl.message(
-      'Passionate developers from\nEngineering @ Fudan University',
+      'Passionate developers\nfrom Engineering & Economics\nat Fudan University',
       name: 'author_descriptor',
       desc: '',
       args: [],
@@ -1035,31 +1035,41 @@ class S {
     );
   }
 
-  /// `Xu Dong\n[w568w]`
+  /// `w568w`
   String get dev_name_1 {
     return Intl.message(
-      'Xu Dong\n[w568w]',
+      'w568w',
       name: 'dev_name_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `Zhao Xingjian\n[kavinzhao]`
+  /// `kavinzhao`
   String get dev_name_2 {
     return Intl.message(
-      'Zhao Xingjian\n[kavinzhao]',
+      'kavinzhao',
       name: 'dev_name_2',
       desc: '',
       args: [],
     );
   }
 
-  /// `Guo Honglin\n[KYLN24]`
+  /// `KYLN24`
   String get dev_name_3 {
     return Intl.message(
-      'Guo Honglin\n[KYLN24]',
+      'KYLN24',
       name: 'dev_name_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `hasbai`
+  String get dev_name_4 {
+    return Intl.message(
+      'hasbai',
+      name: 'dev_name_4',
       desc: '',
       args: [],
     );
@@ -1095,6 +1105,16 @@ class S {
     );
   }
 
+  /// `https://github.com/hasbai`
+  String get dev_page_4 {
+    return Intl.message(
+      'https://github.com/hasbai',
+      name: 'dev_page_4',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `assets/graphics/w568w.jpeg`
   String get dev_image_url_1 {
     return Intl.message(
@@ -1120,6 +1140,16 @@ class S {
     return Intl.message(
       'assets/graphics/kyln24.jpeg',
       name: 'dev_image_url_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `assets/graphics/hasbai.jpeg`
+  String get dev_image_url_4 {
+    return Intl.message(
+      'assets/graphics/hasbai.jpeg',
+      name: 'dev_image_url_4',
       desc: '',
       args: [],
     );
