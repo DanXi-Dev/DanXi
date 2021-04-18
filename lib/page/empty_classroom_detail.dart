@@ -180,18 +180,18 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                 children: <Widget> [
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    width: MediaQuery.of(context).size.width / 32 * 6 + 7,
-                                    child:Text("｜" + S.of(context).morning, overflow: TextOverflow.visible,),
+                                    width: (MediaQuery.of(context).size.width / 32 + 4) * 5 + 7,
+                                    child:Text("| " + S.of(context).morning, overflow: TextOverflow.fade,),
                                   ),
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    width: MediaQuery.of(context).size.width / 32 * 6 + 7,
-                                    child:Text("｜" + S.of(context).afternoon, overflow: TextOverflow.visible,),
+                                    width: (MediaQuery.of(context).size.width / 32 + 4) * 5 + 7,
+                                    child:Text("| " + S.of(context).afternoon, overflow: TextOverflow.fade,),
                                   ),
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    width: MediaQuery.of(context).size.width / 32 * 5 + 7,
-                                    child:Text("｜" + S.of(context).evening, overflow: TextOverflow.visible,),
+                                    width: (MediaQuery.of(context).size.width / 32 + 4) * 4,
+                                    child:Text("| " + S.of(context).evening, overflow: TextOverflow.fade,),
                                   ),
                                 ],
                               ),
