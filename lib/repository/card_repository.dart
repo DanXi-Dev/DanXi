@@ -180,11 +180,6 @@ class CardInfo {
   String name;
   List<CardRecord> records;
 
-  Future<List<CardRecord>> loadRecords(int logDays) async {
-    this.records = await Retrier.runAsyncWithRetry(
-        () => CardRepository.getInstance().loadCardRecord(logDays));
-    return this.records;
-  }
 }
 
 class CardRecord {

@@ -54,9 +54,7 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
       return res.data is Map
           ? res.data['d']
           : jsonDecode(res.data.toString())['d'];
-    } catch (e) {
-      print(e);
-    }
+    } catch (ignored) {}
     return null;
   }
 

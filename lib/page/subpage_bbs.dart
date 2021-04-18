@@ -144,8 +144,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   ///
   FutureOr<BmobUser> handleError(
       PersonInfo info, dynamic e, StackTrace trace) async {
-    print(e);
-    print(trace);
     if (e is DioError) {
       DioError error = e;
       if (error.type == DioErrorType.RESPONSE) {
@@ -189,7 +187,6 @@ class _BBSSubpageState extends State<BBSSubpage>
             removeTop: true,
             child: FutureBuilder(
                 builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-                  print(snapshot.toString());
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
@@ -197,7 +194,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                       return _buildLoadingPage();
                       break;
                     case ConnectionState.done:
-                      if (snapshot.hasError) {
+                      if (snapshot.hasError || !snapshot.hasData) {
                         return _buildErrorPage(error: snapshot.error);
                       } else {
                         return _buildPage(snapshot.data);

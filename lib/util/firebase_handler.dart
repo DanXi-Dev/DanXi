@@ -24,9 +24,7 @@ class FirebaseHandler extends ReportHandler {
   static FirebaseCrashlytics crashlytics;
 
   static initFirebase() async {
-    print("initializeApp...");
     await Firebase.initializeApp();
-    print("initialized!!");
     crashlytics = FirebaseCrashlytics.instance;
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   }

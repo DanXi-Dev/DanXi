@@ -37,7 +37,6 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   factory QRCodeRepository.getInstance() => _instance;
 
   Future<String> getQRCode(PersonInfo info) async {
-    print("call qrcode!");
     await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
     Response res = await dio.get(QR_URL);
     Beautifulsoup soup = Beautifulsoup(res.data.toString());

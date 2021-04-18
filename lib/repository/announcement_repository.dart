@@ -57,7 +57,6 @@ class AnnouncementRepository {
         .addWhereGreaterThanOrEqualTo(
             "maxVersion", int.parse(packageInfo.buildNumber));
     var list = await query.queryObjects();
-    print(list);
     if (list.length > 0) {
       return Announcement.fromJson(list[0]);
     } else {

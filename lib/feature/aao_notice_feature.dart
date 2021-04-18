@@ -18,35 +18,35 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
 
 class FudanAAONoticesFeature extends Feature {
   List<Notice> _initialData;
+  ConnectionStatus _status = ConnectionStatus.NONE;
 
-  void _loadNotices() async {
-    _initialData = await Retrier.runAsyncWithRetry(() =>
-        FudanAAORepository.getInstance()
-            .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, 1));
+  Future<void> _loadNotices() async {
+    _status = ConnectionStatus.CONNECTING;
+    _initialData = await FudanAAORepository.getInstance()
+        .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, 1);
+    _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
 
   @override
   void buildFeature() {
-    // Only load card data once.
+    // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_initialData == null) {
-      _loadNotices();
+    if (_status == ConnectionStatus.NONE) {
+      _loadNotices().catchError((e) {
+        _status = ConnectionStatus.FAILED;
+        notifyUpdate();
+      });
     }
   }
 
@@ -54,8 +54,25 @@ class FudanAAONoticesFeature extends Feature {
   String get mainTitle => S.of(context).fudan_aao_notices;
 
   @override
-  String get subTitle =>
-      _initialData == null ? S.of(context).loading : _initialData.first.title;
+  String get subTitle {
+    switch (_status) {
+      case ConnectionStatus.NONE:
+      case ConnectionStatus.CONNECTING:
+        return S.of(context).loading;
+      case ConnectionStatus.DONE:
+        return _initialData.first.title;
+        return '';
+      case ConnectionStatus.FAILED:
+      case ConnectionStatus.FATAL_ERROR:
+        return S.of(context).failed;
+    }
+    return '';
+  }
+
+  void refreshData() {
+    _status = ConnectionStatus.NONE;
+    notifyUpdate();
+  }
 
   @override
   Widget get icon => PlatformX.isAndroid
@@ -67,12 +84,14 @@ class FudanAAONoticesFeature extends Feature {
     if (_initialData != null) {
       Navigator.of(context).pushNamed("/notice/aao/list",
           arguments: {"initialData": _initialData});
+    } else {
+      refreshData();
     }
   }
 
   @override
   Widget get trailing {
-    if (_initialData == null) {
+    if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
         scale: 0.5,
         child: CircularProgressIndicator(),
