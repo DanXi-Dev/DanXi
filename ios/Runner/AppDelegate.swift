@@ -1,5 +1,6 @@
 import UIKit
 import Flutter
+import Firebase
 import WatchConnectivity
 
 @available(iOS 9.3, *)
@@ -41,6 +42,7 @@ import WatchConnectivity
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    FirebaseApp.configure()
     //watchOS Support
     // You start you session with the watch by calling .activate() in your session.
     if(WCSession.isSupported()){
