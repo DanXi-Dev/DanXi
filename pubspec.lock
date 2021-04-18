@@ -332,6 +332,41 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.1.0"
+  firebase_core:
+    dependency: "direct main"
+    description:
+      name: firebase_core
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.7.0"
+  firebase_core_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_core_platform_interface
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.1"
+  firebase_core_web:
+    dependency: transitive
+    description:
+      name: firebase_core_web
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.1+3"
+  firebase_crashlytics:
+    dependency: "direct main"
+    description:
+      name: firebase_crashlytics
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.0+1"
+  firebase_crashlytics_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_crashlytics_platform_interface
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.6"
   fixnum:
     dependency: transitive
     description:
@@ -753,6 +788,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.4.0+10"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.5"
   screen:
     dependency: "direct main"
     description:

@@ -39,6 +39,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
@@ -65,16 +66,25 @@ final QuickActions quickActions = QuickActions();
 
 void main() {
   CatcherOptions debugOptions = CatcherOptions(PageReportMode(), [
+    FirebaseHandler(),
     ConsoleHandler()
   ], localizationOptions: [
     LocalizationOptions.buildDefaultEnglishOptions(),
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
+  CatcherOptions releaseOptions = CatcherOptions(SilentReportMode(), [
+    FirebaseHandler(),
+    ConsoleHandler()
+  ], localizationOptions: [
+    LocalizationOptions.buildDefaultEnglishOptions(),
+    LocalizationOptions.buildDefaultChineseOptions(),
+  ]);
+  WidgetsFlutterBinding.ensureInitialized();
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
-      releaseConfig: debugOptions);
+      releaseConfig: releaseOptions);
 }
 
 class DanxiApp extends StatelessWidget {
@@ -245,6 +255,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // Init for firebase services.
+    FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
     _personInfo.addListener(() {
       _rebuildPage();

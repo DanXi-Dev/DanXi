@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "859967910399",
+    "project_id": "danxi-e765c",
+    "storage_bucket": "danxi-e765c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859967910399:android:ce65a6929f5eafbf5a37ca",
+        "android_client_info": {
+          "package_name": "io.github.w568w.dan_xi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859967910399-2bvug8if8fkdmeld2oo324hp9845ntgj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqUjb40DipIBoX0atb3pIgKUimXLvU9uw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859967910399-2bvug8if8fkdmeld2oo324hp9845ntgj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

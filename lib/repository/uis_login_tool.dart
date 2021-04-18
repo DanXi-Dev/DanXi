@@ -48,13 +48,12 @@ class UISLoginTool {
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     Response response = await DioUtils.processRedirect(dio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
-    throw CredentialsInvalidException();
-    }
-    else if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
+      throw CredentialsInvalidException();
+    } else if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
+      // Notify [main.dart] to show up a dialog to guide users to log in mannually.
       CaptchaNeededException().fire();
       throw CaptchaNeededException();
-    }
-    else if (response.data.toString().contains(WEAK_PASSWORD)) {
+    } else if (response.data.toString().contains(WEAK_PASSWORD)) {
       //TODO: Actually, the response (looks like) always contains Weak Password Warning if login is unsuccessful. We should modify this later.
       throw GeneralLoginFailedException();
     }
@@ -63,5 +62,7 @@ class UISLoginTool {
 }
 
 class CaptchaNeededException implements Exception {}
+
 class CredentialsInvalidException implements Exception {}
+
 class GeneralLoginFailedException implements Exception {}

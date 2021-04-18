@@ -64,6 +64,8 @@ dependencies:
   url_launcher: ^6.0.3
   package_info: ^0.4.3
   desktop_window: ^0.4.0
+  firebase_core: ^0.7.0
+  firebase_crashlytics: ^0.4.0+1
 
 # every version of ical depends on intl ^0.16.0 and every version of flutter_localizations from sdk depends on intl 0.17.0-nullsafety.2
 # data_plugin 0.0.18 depends on cupertino_icons ^0.1.3 , which breaks SFSymbols (and I don't get why)
