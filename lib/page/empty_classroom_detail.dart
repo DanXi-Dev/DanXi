@@ -163,6 +163,43 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           children: _buildingList,
                         )),
                 const SizedBox(height: 15),
+                Container(
+                  padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+                  child:
+                  Column(
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                S.of(context).classroom,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget> [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: MediaQuery.of(context).size.width / 32 * 6 + 7,
+                                    child:Text("｜" + S.of(context).morning, overflow: TextOverflow.visible,),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: MediaQuery.of(context).size.width / 32 * 6 + 7,
+                                    child:Text("｜" + S.of(context).afternoon, overflow: TextOverflow.visible,),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: MediaQuery.of(context).size.width / 32 * 5 + 7,
+                                    child:Text("｜" + S.of(context).evening, overflow: TextOverflow.visible,),
+                                  ),
+                                ],
+                              ),
+                            ]),
+                        Divider(),
+                      ]
+                    //subtitle: Divider(height: 5,),
+                  ),),
             FutureBuilder(
                   builder: (BuildContext context,
                       AsyncSnapshot<List<RoomInfo>> snapshot) {
@@ -214,29 +251,27 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
       data.forEach((element) {
         widgets.add(Material(
             color: isCupertino(context) ? Colors.white : null,
-            child: Column(children: [
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    const SizedBox(
-                      width: 1,
-                    ),
-                    Text(
-                      element.roomName,
-                      style: TextStyle(fontSize: 18),
-                    ),
+            child: Container(
+              padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+              child: Column(
+                  children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: _buildBusinessViewForRoom(element),
-                    ),
-                    const SizedBox(
-                      width: 1,
-                    ),
-                  ]),
-              Divider(),
-            ]
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            element.roomName,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: _buildBusinessViewForRoom(element),
+                          ),
+                        ]),
+                    Divider(),
+                  ]
                 //subtitle: Divider(height: 5,),
-                )));
+              ),)
+            ));
       });
     return widgets;
   }

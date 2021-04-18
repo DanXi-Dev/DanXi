@@ -92,6 +92,11 @@
     "login_with_uis":"Sign in anonymously as:",
     "reply_to":"Reply No.{name}",
 
+    "classroom": "Classroom",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+
     "good_morning":"Every dawn is a new sunrise.",
     "good_noon":"Rise and shine.",
     "good_afternoon":"The afternoon knows what the morning never suspected.",

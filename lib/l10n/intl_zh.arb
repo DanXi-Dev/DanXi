@@ -89,6 +89,11 @@
     "login_with_uis":"将使用以下信息匿名登录树洞",
     "reply_to":"回复 No.{name}",
 
+    "classroom": "教室",
+    "morning": "上午",
+    "afternoon": "下午",
+    "evening": "晚上",
+
     "good_morning":"一日之计在于晨",
     "good_noon":"快到中午啦",
     "good_afternoon":"下午的悠闲时光~",

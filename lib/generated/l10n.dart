@@ -915,6 +915,46 @@ class S {
     );
   }
 
+  /// `Classroom`
+  String get classroom {
+    return Intl.message(
+      'Classroom',
+      name: 'classroom',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Morning`
+  String get morning {
+    return Intl.message(
+      'Morning',
+      name: 'morning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Afternoon`
+  String get afternoon {
+    return Intl.message(
+      'Afternoon',
+      name: 'afternoon',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Evening`
+  String get evening {
+    return Intl.message(
+      'Evening',
+      name: 'evening',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Every dawn is a new sunrise.`
   String get good_morning {
     return Intl.message(
