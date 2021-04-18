@@ -385,10 +385,10 @@ class S {
     );
   }
 
-  /// `Account`
+  /// `Switch Account`
   String get account {
     return Intl.message(
-      'Account',
+      'Switch Account',
       name: 'account',
       desc: '',
       args: [],

@@ -34,7 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About This App"),
-    "account" : MessageLookupByLibrary.simpleMessage("Account"),
+    "account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
     "and" : MessageLookupByLibrary.simpleMessage(" and "),
     "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
     "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
