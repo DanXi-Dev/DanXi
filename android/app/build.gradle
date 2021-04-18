@@ -31,6 +31,15 @@ def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
+
+// Skip Crashlytics upload. It breaks the process of building.
+gradle.taskGraph.whenReady {
+    tasks.each { task ->
+        if (task.name.contains("uploadCrashlyticsMappingFileRelease")) {
+            task.enabled = false
+        }
+    }
+}
 android {
     compileSdkVersion 30
 
