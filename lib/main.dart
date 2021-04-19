@@ -65,6 +65,7 @@ import 'generated/l10n.dart';
 final QuickActions quickActions = QuickActions();
 
 void main() {
+  // Config [Catcher] to catch uncaught exceptions.
   CatcherOptions debugOptions = CatcherOptions(PageReportMode(), [
     FirebaseHandler(),
     ConsoleHandler()
@@ -80,6 +81,7 @@ void main() {
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
   WidgetsFlutterBinding.ensureInitialized();
+  // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   Catcher(
       rootWidget: DanxiApp(),
@@ -131,25 +133,9 @@ class DanxiApp extends StatelessWidget {
                   theme: ThemeData(
                     brightness: Brightness.light,
                     primarySwatch: Colors.blue,
-                    /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                      selectedIconTheme: IconThemeData(color: Theme.of(context).primaryColor),
-                      unselectedIconTheme: IconThemeData(color: Colors.black),
-                      selectedItemColor: Colors.black,
-                      unselectedItemColor: Colors.black),*/
                   ),
                   darkTheme: ThemeData(
                     brightness: Brightness.dark,
-                    //primarySwatch: Colors.teal,
-                    /*bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                      selectedIconTheme: IconThemeData(color: Colors.white),
-                      unselectedIconTheme: IconThemeData(color: Colors.white),
-                      selectedItemColor: Colors.white,
-                      unselectedItemColor: Colors.white),*/
-                    // textTheme: new TextTheme(
-                    //   bodyText2: new TextStyle(color: Colors.red),
-                    //   headline1: new TextStyle(fontSize: 78),
-                    //   button: new TextStyle(color: Colors.green),
-                    // ),
                   )),
               localizationsDelegates: [
                 S.delegate,

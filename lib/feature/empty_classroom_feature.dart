@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 class EmptyClassroomFeature extends Feature {
   PersonInfo _info;
@@ -33,7 +34,7 @@ class EmptyClassroomFeature extends Feature {
 
   @override
   void buildFeature() {
-    _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
+    _info = context.personInfo;
 
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,

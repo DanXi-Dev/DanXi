@@ -50,6 +50,7 @@ class DiningHallCrowdednessFeature extends Feature {
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {
+        // If it's not time for a meal
         _status = ConnectionStatus.FATAL_ERROR;
       }
     });

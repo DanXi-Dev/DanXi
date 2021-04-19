@@ -18,16 +18,17 @@
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 class WelcomeFeature extends Feature {
   PersonInfo _info;
+
+  /// A sentence to show welcome to users depending on the time.
   String _helloQuote = "";
 
   @override
   void buildFeature() {
-    _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
+    _info = context.personInfo;
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
       _helloQuote = S.of(context).late_night;

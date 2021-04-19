@@ -19,14 +19,13 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
 
 class EcardBalanceFeature extends Feature {
   PersonInfo _info;
@@ -44,6 +43,7 @@ class EcardBalanceFeature extends Feature {
 
     _balance = _cardInfo.cash;
 
+    // If there's any transaction, we'll show it in the subtitle
     if (_cardInfo.records.isNotEmpty)
       _lastTransaction = _cardInfo.records.first;
     _status = ConnectionStatus.DONE;
@@ -52,7 +52,7 @@ class EcardBalanceFeature extends Feature {
 
   @override
   void buildFeature() {
-    _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
+    _info = context.personInfo;
 
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
@@ -107,11 +107,10 @@ class EcardBalanceFeature extends Feature {
               child: Text(
                 S.of(context).last_transaction,
                 style: TextStyle(
-                    color: Theme.of(context).hintColor.computeLuminance() >=
-                            0.5
+                    color: Theme.of(context).hintColor.computeLuminance() >= 0.5
                         ? Colors.black
                         : Colors.white,
-                        fontSize: 12),
+                    fontSize: 12),
               ),
             ),
             const SizedBox(

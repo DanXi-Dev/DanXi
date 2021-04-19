@@ -63,9 +63,9 @@ class FudanDailyFeature extends Feature {
     });
   }
 
-  Future<void> tickFudanDaily() async {
+  void tickFudanDaily() {
     if (!_hasTicked) {
-      await FudanDailyRepository.getInstance().tick(_info).then((_) {
+      FudanDailyRepository.getInstance().tick(_info).then((_) {
         refreshData();
       }, onError: (e) {
         if (e is NotTickYesterdayException) {

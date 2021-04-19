@@ -1,0 +1,57 @@
+/*
+ *     Copyright (C) 2021  w568w
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import 'package:flutter/widgets.dart';
+
+/// A helper class to convert [String],[WidgetBuilder],[List<Widget>] or something similar into [Widget].
+class SmartWidget {
+  static Widget toWidget(dynamic object, BuildContext context,
+      {Widget fallback,
+      AsyncSnapshot snapshot,
+      int index,
+      Widget child,
+      VoidCallback onStepContinue,
+      VoidCallback onStepCancel}) {
+    if (fallback == null) fallback = Container();
+    if (object == null) return fallback;
+
+    if (object is String) {
+      return Text(object);
+    } else if (object is WidgetBuilder) {
+      return object(context);
+    } else if (object is IndexedWidgetBuilder ||
+        object is NullableIndexedWidgetBuilder) {
+      return object(context, index);
+    } else if (object is TransitionBuilder) {
+      return object(context, child);
+    } else if (object is AsyncWidgetBuilder) {
+      return object(context, snapshot);
+    } else if (object is ControlsWidgetBuilder) {
+      return object(context,
+          onStepContinue: onStepContinue, onStepCancel: onStepCancel);
+    } else if (object is Function) {
+      return object();
+    } else if (object is Widget) {
+      return object;
+    } else if (object is List) {
+      return ListView(
+        children: object.map((e) => toWidget(e, context)),
+      );
+    }
+    return fallback;
+  }
+}
