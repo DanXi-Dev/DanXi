@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/model/time_table.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 
 class DayEvents {
   final String day;

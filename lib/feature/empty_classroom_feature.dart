@@ -15,22 +15,17 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
 class EmptyClassroomFeature extends Feature {
   PersonInfo _info;
-  ConnectionStatus _status = ConnectionStatus.NONE;
-  String _subTitle;
 
   @override
   void buildFeature() {
@@ -48,34 +43,17 @@ class EmptyClassroomFeature extends Feature {
   String get mainTitle => S.of(context).empty_classrooms;
 
   @override
-  String get subTitle => _subTitle = S.of(context).tap_to_view;
+  String get subTitle => S.of(context).tap_to_view;
 
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.room)
       : const Icon(SFSymbols.building_2_fill);
 
-  void refreshData() {
-    _status = ConnectionStatus.NONE;
-    _subTitle = S.of(context).loading;
-    notifyUpdate();
-  }
-
   @override
   void onTap() async {
     Navigator.of(context)
         .pushNamed('/room/detail', arguments: {'personInfo': _info});
-  }
-
-  @override
-  Widget get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
-      return ScaleTransform(
-        scale: 0.5,
-        child: CircularProgressIndicator(),
-      );
-    }
-    return null;
   }
 
   @override

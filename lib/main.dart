@@ -18,7 +18,6 @@
 import 'dart:async';
 
 import 'package:catcher/catcher.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/announcement.dart';
@@ -35,7 +34,6 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
@@ -175,9 +173,6 @@ class _HomePageState extends State<HomePage> {
   /// A description for current connection status.
   ValueNotifier<String> _connectStatus = ValueNotifier("");
 
-  /// Listener to connectivity changes.
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
-
   /// Listener to the failure of logging in caused by necessary captcha.
   ///
   /// Request user to log in manually in the browser.
@@ -231,10 +226,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    if (_connectivitySubscription != null) {
-      _connectivitySubscription.cancel();
-      _connectivitySubscription = null;
-    }
     super.dispose();
   }
 
@@ -351,15 +342,6 @@ class _HomePageState extends State<HomePage> {
           _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));
     } else {
       _showLoginDialog(forceLogin: forceLogin);
-    }
-
-    if (_preferences.containsKey(SettingsProvider.KEY_PREFERRED_THEME)) {
-      if (SettingsProvider.of(_preferences).theme ==
-          (PlatformX.isMaterial(context))) {
-        PlatformX.isMaterial(context)
-            ? PlatformProvider.of(context).changeToCupertinoPlatform()
-            : PlatformProvider.of(context).changeToMaterialPlatform();
-      }
     }
   }
 

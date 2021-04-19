@@ -23,7 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AnnouncementRepository {
   static const KEY_SEEN_ANNOUNCEMENT = "seen_announcement";
 
-  AnnouncementRepository._() {}
+  AnnouncementRepository._();
 
   static final _instance = AnnouncementRepository._();
 

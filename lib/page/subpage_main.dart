@@ -78,7 +78,6 @@ class _HomeSubpageState extends State<HomeSubpage>
                   children: [
                     FeatureListItem(feature: WelcomeFeature()),
                     Divider(),
-                    //FeatureListItem(feature: WlanFeature()),
                     FeatureListItem(feature: EcardBalanceFeature()),
                     FeatureListItem(feature: DiningHallCrowdednessFeature()),
                     FeatureListItem(feature: FudanAAONoticesFeature()),
