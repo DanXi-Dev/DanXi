@@ -32,7 +32,7 @@
     "open_source_software_licenses": "Open Source Software Licenses",
     "project_page": "Project Page",
     "authors": "Developers",
-    "author_descriptor": "Passionate developers from\nEngineering @ Fudan University",
+    "author_descriptor": "Passionate developers\nfrom Engineering & Economics\nat Fudan University",
     "app_description_title": "Description",
     "app_description": "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~",
     "account": "Switch Account",
@@ -92,6 +92,11 @@
     "login_with_uis":"Sign in anonymously as:",
     "reply_to":"Reply No.{name}",
 
+    "classroom": "Classroom",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+
     "good_morning":"Every dawn is a new sunrise.",
     "good_noon":"Rise and shine.",
     "good_afternoon":"The afternoon knows what the morning never suspected.",
@@ -107,15 +112,18 @@
     "fail_to_acquire_qr": "Failed to obtain QR code. Please make sure you have activated the QR code in eHall.",
 
     "project_url": "https:\/\/github.com\/w568w\/DanXi",
-    "dev_name_1": "Xu Dong\n[w568w]",
-    "dev_name_2": "Zhao Xingjian\n[kavinzhao]",
-    "dev_name_3": "Guo Honglin\n[KYLN24]",
+    "dev_name_1": "w568w",
+    "dev_name_2": "kavinzhao",
+    "dev_name_3": "KYLN24",
+    "dev_name_4": "hasbai",
     "dev_page_1": "https:\/\/github.com\/w568w",
     "dev_page_2": "https:\/\/github.com\/kavinzhao",
     "dev_page_3": "https:\/\/github.com\/KYLN24",
+    "dev_page_4": "https:\/\/github.com\/hasbai",
     "dev_image_url_1": "assets/graphics/w568w.jpeg",
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
+    "dev_image_url_4": "assets/graphics/hasbai.jpeg",
 
     "feedback_email": "danxi_dev@protonmail.com",
     "privacy_policy_url" : "https://danxi-dev.github.io/privacy"
