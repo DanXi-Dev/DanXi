@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> {
             icon: 'ic_launcher'),
       ]);
     }
-    initPlatformState(); //Init brightness control
+    _initPlatformState(); //Init brightness control
 
     // Init watchOS support
     const channel_a = const MethodChannel('watchAppActivated');
@@ -318,7 +318,7 @@ class _HomePageState extends State<HomePage> {
   double _brightness = 1.0;
 
   /// get current brightness so that we can restore it after showing QR code.
-  initPlatformState() async {
+  _initPlatformState() async {
     _brightness = await ScreenProxy.brightness;
   }
 

@@ -78,26 +78,21 @@ class BBSEditorPageState extends State<BBSEditorPage> {
               children: [
                 Expanded(
                   child: PlatformTextField(
-                    material: (_, __) => MaterialTextFieldData(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: _post.replyTo == "0"
-                              ? null
-                              : S.of(context).reply_to(_replyTo)),
-                    ),
-                    cupertino: (_, __) => CupertinoTextFieldData(
-                        placeholder: _post.replyTo == "0"
-                            ? null
-                            : S.of(context).reply_to(_replyTo)),
-                    style: TextStyle(fontSize: 18),
-                    expands: true,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.top,
-                    controller: _controller,
-                    maxLines: null,
-                    autofocus: true,
-                  ),
-                )
+                        material: (_, __) => MaterialTextFieldData(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        cupertino: (_, __) => CupertinoTextFieldData(),
+                        style: TextStyle(fontSize: 18),
+                        expands: true,
+                        textAlign: TextAlign.start,
+                        textAlignVertical: TextAlignVertical.top,
+                        controller: _controller,
+                        maxLines: null,
+                        autofocus: true,
+                      ),
+                    )
               ],
             ))));
   }
@@ -105,17 +100,18 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   Future<void> _sendDocument() {
     if (_controller.text.trim().isEmpty) {
     } else {
-      _post.content = _controller.text;
-      _canSend = false;
-      refreshSelf();
-      _post.save().then((BmobSaved value) {
-        Navigator.pop(context);
-        RetrieveNewPostEvent().fire();
-      }, onError: (_) {
-        _canSend = true;
-        refreshSelf();
-        Noticing.showNotice(context, S.of(context).post_failed);
-      });
+      // TODO
+      // _post.content = _controller.text;
+      // _canSend = false;
+      // refreshSelf();
+      // _post.save().then((BmobSaved value) {
+      //   Navigator.pop(context);
+      //   RetrieveNewPostEvent().fire();
+      // }, onError: (_) {
+      //   _canSend = true;
+      //   refreshSelf();
+      //   Noticing.showNotice(context, S.of(context).post_failed);
+      // });
     }
   }
 }

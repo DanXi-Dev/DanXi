@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -41,7 +42,6 @@ class BBSPostDetail extends StatefulWidget {
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
-  BmobUser _user;
   ScrollController _controller = ScrollController();
 
   @override
@@ -62,10 +62,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         ? const Icon(Icons.reply)
                         : const Icon(SFSymbols.arrowshape_turn_up_left),
                     onPressed: () {
-                      Navigator.of(context)
-                          .pushNamed("/bbs/newPost", arguments: {
-                        "post": BBSPost.newReply(_user.objectId, _post.objectId)
-                      });
+                      // TODO
+                      // Navigator.of(context)
+                      //     .pushNamed("/bbs/newPost", arguments: {
+                      //   "post": BBSPost.newReply(_user.objectId, _post.objectId)
+                      // });
                     },
                   )
                 ],
@@ -79,7 +80,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       context: context,
                       removeTop: true,
                       child: FutureBuilder(
-                          builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
+                          builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
                             switch (snapshot.connectionState) {
                               case ConnectionState.none:
                               case ConnectionState.waiting:
@@ -106,7 +107,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             return null;
                           },
                           future: PostRepository.getInstance()
-                              .loadReplies(_post)))),
+                              .loadReplies(_post, 1)))),
             ));
   }
 
@@ -142,7 +143,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     return list;
   }
 
-  Widget _getListItem(BBSPost e, int index) => Material(
+  Widget _getListItem(Reply e, int index) => Material(
       color: PlatformX.backgroundColor(context),
       child: GestureDetector(
         onLongPress: () {
@@ -178,16 +179,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    e.replyTo == "0"
+                    e.reply_to == null
                         ? Column()
-                        : Text(
-                            S
-                                .of(context)
-                                .reply_to(int.parse(e.replyTo, radix: 36)),
+                        : Text(S.of(context).reply_to(e.reply_to),
                             style: TextStyle(
                                 fontSize: 10,
                                 color: Theme.of(context).accentColor)),
-                    Text("No. ${int.parse(e.objectId, radix: 36)}",
+                    Text("No. ${e.id}",
                         style: TextStyle(
                             fontSize: 10, color: Theme.of(context).hintColor)),
                   ],
@@ -213,12 +211,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     const SizedBox(height: 2),
                     Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
                     Text(
-                      e.author,
+                      e.username,
                       style: TextStyle(
                           color: Theme.of(context).accentColor, fontSize: 12),
                     ),
                     Text(
-                      e.createdAt,
+                      e.date_created,
                       style: TextStyle(fontSize: 12),
                     ),
                   ],
@@ -227,11 +225,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             ],
           ),
           onTap: () {
-            Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-              "post": BBSPost.newReply(_user.objectId, _post.objectId,
-                  replyTo: index > 0 ? e.objectId : "0"),
-              "replyTo": e.author
-            });
+            // TODO
+            // Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
+            //   "post": BBSPost.newReply(_user.objectId, _post.objectId,
+            //       replyTo: index > 0 ? e.objectId : "0"),
+            //   "replyTo": e.author
+            // });
           },
         )),
       ));
@@ -240,6 +239,5 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   void initState() {
     super.initState();
     _post = widget.arguments['post'];
-    _user = widget.arguments['user'];
   }
 }

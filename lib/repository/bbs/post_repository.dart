@@ -17,15 +17,26 @@
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:data_plugin/bmob/response/bmob_registered.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
+import 'package:dio/dio.dart';
 
-class PostRepository {
+class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
 
   factory PostRepository.getInstance() => _instance;
+  static const String _BASE_URL = "https://www.fduhole.tk/v1";
 
-  PostRepository._();
+  /// The token used for session authentication.
+  ///
+  /// It should always be kept secretly. When testing, initialize with your own token.
+  String _token;
+
+  PostRepository._() {
+    initRepository();
+  }
 
   Future<BmobUser> login(PersonInfo personInfo) async {
     BmobUser user = BmobUser();
@@ -44,15 +55,30 @@ class PostRepository {
     return await user.register();
   }
 
-  Future<List<BBSPost>> loadPosts() async {
-    var list = await BBSPost.QUERY_ALL_POST.queryObjects();
-    return list.map((e) => BBSPost.fromJson(e)).toList();
+  requestToken() {
+    if (_token == null) throw NotLoginError();
   }
 
-  Future<List<BBSPost>> loadReplies(BBSPost post) async {
-    var list = await BBSPost.QUERY_ALL_REPLIES(post).queryObjects();
-    var bbsList = [post];
-    bbsList.addAll(list.map((e) => BBSPost.fromJson(e)));
-    return bbsList;
+  Map<String, String> get _tokenHeader {
+    requestToken();
+    return {"Authorization": "Token " + _token};
+  }
+
+  Future<List<BBSPost>> loadPosts(int page) async {
+    Response response = await dio.get(_BASE_URL + "/discussions/",
+        queryParameters: {"page": page},
+        options: Options(headers: _tokenHeader));
+    List result = response.data;
+    return result.map((e) => BBSPost.fromJson(e)).toList();
+  }
+
+  Future<List<Reply>> loadReplies(BBSPost post, int page) async {
+    Response response = await dio.get(_BASE_URL + "/posts/",
+        queryParameters: {"page": page, "id": post.id},
+        options: Options(headers: _tokenHeader));
+    List result = response.data;
+    return result.map((e) => Reply.fromJson(e)).toList();
   }
 }
+
+class NotLoginError implements Exception {}

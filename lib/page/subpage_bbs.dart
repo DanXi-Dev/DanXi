@@ -53,7 +53,6 @@ class RetrieveNewPostEvent {}
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
-  BmobUser _loginUser;
   static StreamSubscription _postSubscription;
   static StreamSubscription _refreshSubscription;
   static StreamSubscription _goTopSubscription;
@@ -65,8 +64,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     super.initState();
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-        Navigator.of(context).pushNamed("/bbs/newPost",
-            arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
+        // TODO
+        // Navigator.of(context).pushNamed("/bbs/newPost",
+        //     arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
       });
     }
     if (_refreshSubscription == null) {
@@ -162,18 +162,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   ///
   /// TODO: Load posts by page, instead of loading all of them at once
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
-    if (_loginUser == null || _loginUser.email != info.id) {
-      _loginStatus = ConnectionStatus.CONNECTING;
-      _loginUser = await PostRepository.getInstance()
-          .login(info)
-          .catchError((e, s) => handleError(info, e, s));
-    }
-    if (_loginUser != null) {
-      _loginStatus = ConnectionStatus.DONE;
-      return await PostRepository.getInstance().loadPosts();
-    } else {
-      return null;
-    }
+    //TODO
+    return await PostRepository.getInstance().loadPosts(1);
   }
 
   @override
@@ -249,7 +239,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
               title: Text(
-                e.content,
+                e.first_post.content,
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
@@ -260,19 +250,19 @@ class _BBSSubpageState extends State<BBSSubpage>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    e.author,
+                    e.first_post.username,
                     style: TextStyle(
                         color: Theme.of(context).accentColor, fontSize: 12),
                   ),
                   Text(
-                    e.createdAt,
+                    e.date_created,
                     style: TextStyle(fontSize: 12),
                   ),
                 ],
               ),
               onTap: () {
-                Navigator.of(context).pushNamed("/bbs/postDetail",
-                    arguments: {"post": e, "user": _loginUser});
+                Navigator.of(context)
+                    .pushNamed("/bbs/postDetail", arguments: {"post": e});
               }),
         ));
   }

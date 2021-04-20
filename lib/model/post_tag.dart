@@ -15,33 +15,20 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/post_tag.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'post.g.dart';
+part 'post_tag.g.dart';
 
 @JsonSerializable()
-class BBSPost {
-  int id;
-
-  // ignore: non_constant_identifier_names
-  Reply first_post;
+class PostTag {
+  String name;
+  String color;
   int count;
-  List<PostTag> tag;
-  Map<String, String> mapping;
 
-  // ignore: non_constant_identifier_names
-  String date_created;
+  PostTag(this.name, this.color, this.count);
 
-  // ignore: non_constant_identifier_names
-  String date_updated;
+  factory PostTag.fromJson(Map<String, dynamic> json) =>
+      _$PostTagFromJson(json);
 
-  factory BBSPost.fromJson(Map<String, dynamic> json) =>
-      _$BBSPostFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BBSPostToJson(this);
-
-  BBSPost(this.id, this.first_post, this.count, this.tag, this.mapping,
-      this.date_created, this.date_updated);
+  Map<String, dynamic> toJson() => _$PostTagToJson(this);
 }

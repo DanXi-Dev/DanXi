@@ -1,0 +1,27 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'reply.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Reply _$ReplyFromJson(Map<String, dynamic> json) {
+  return Reply(
+    json['id'] as int,
+    json['content'] as String,
+    json['username'] as String,
+    json['reply_to'] as int,
+    json['date_created'] as String,
+    json['discussion'] as int,
+  );
+}
+
+Map<String, dynamic> _$ReplyToJson(Reply instance) => <String, dynamic>{
+      'id': instance.id,
+      'content': instance.content,
+      'username': instance.username,
+      'reply_to': instance.reply_to,
+      'date_created': instance.date_created,
+      'discussion': instance.discussion,
+    };

@@ -8,28 +8,29 @@ part of 'post.dart';
 
 BBSPost _$BBSPostFromJson(Map<String, dynamic> json) {
   return BBSPost(
-    json['author'] as String,
-    json['content'] as String,
-    json['replyPost'] as String,
-    json['replyTo'] as String,
-  )
-    ..createdAt = json['createdAt'] as String
-    ..updatedAt = json['updatedAt'] as String
-    ..objectId = json['objectId'] as String
-    ..ACL = json['ACL'] as Map<String, dynamic>
-    ..upvote = json['upvote'] as int
-    ..report = json['report'] as int;
+    json['id'] as int,
+    json['first_post'] == null
+        ? null
+        : Reply.fromJson(json['first_post'] as Map<String, dynamic>),
+    json['count'] as int,
+    (json['tag'] as List)
+        ?.map((e) =>
+            e == null ? null : PostTag.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    (json['mapping'] as Map<String, dynamic>)?.map(
+      (k, e) => MapEntry(k, e as String),
+    ),
+    json['date_created'] as String,
+    json['date_updated'] as String,
+  );
 }
 
 Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'objectId': instance.objectId,
-      'ACL': instance.ACL,
-      'author': instance.author,
-      'content': instance.content,
-      'replyPost': instance.replyPost,
-      'replyTo': instance.replyTo,
-      'upvote': instance.upvote,
-      'report': instance.report,
+      'id': instance.id,
+      'first_post': instance.first_post,
+      'count': instance.count,
+      'tag': instance.tag,
+      'mapping': instance.mapping,
+      'date_created': instance.date_created,
+      'date_updated': instance.date_updated,
     };
