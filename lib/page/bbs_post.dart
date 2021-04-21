@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -194,9 +196,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               const SizedBox(height: 2),
               Align(
                 alignment: Alignment.topLeft,
-                child: Text(
+                child: HtmlWidget(
                   e.content,
-                  style: TextStyle(fontSize: 16),
+                  textStyle: TextStyle(fontSize: 16),
+                  onTapUrl: (url) => launch(url),
                 ),
               )
             ],

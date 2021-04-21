@@ -36,6 +36,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BBSSubpage extends PlatformSubpage {
   @override
@@ -325,14 +327,21 @@ class _BBSSubpageState extends State<BBSSubpage>
               leading: Icon(SFSymbols.quote_bubble_fill),
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
-              title: Text(
+              title: HtmlWidget(
+                e.first_post.content,
+                textStyle: TextStyle(fontSize: 16),
+                onTapUrl: (url) => launch(url),
+                customStylesBuilder: (element) {
+                    return {'max-lines': '1', 'text-overflow': 'ellipsis'};
+                },
+              ),
+              /*Text(
                 e.first_post.content,
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 16),
-              ),
-              //TODO: Support Dynamic Font
+              ),*/
               subtitle: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
