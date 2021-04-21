@@ -170,7 +170,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
         child: Card(
             child: ListTile(
-          leading: Icon(SFSymbols.quote_bubble_fill),
+              minLeadingWidth: 70,
+          leading: Text("[ ${e.username} ]", style: TextStyle(color: Theme.of(context).accentColor),),
           dense: false,
           title: Column(
             children: [
@@ -186,9 +187,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             style: TextStyle(
                                 fontSize: 10,
                                 color: Theme.of(context).accentColor)),
-                    Text("No. ${e.id}",
+                    /*Text("#${e.id}",
                         style: TextStyle(
-                            fontSize: 10, color: Theme.of(context).hintColor)),
+                            fontSize: 10, color: Theme.of(context).hintColor)),*/
                   ],
                 ),
               ),
@@ -206,17 +207,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           subtitle: Stack(
             children: [
               Align(
-                alignment: Alignment.topRight,
+                alignment: Alignment.bottomRight,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     const SizedBox(height: 2),
                     Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
-                    Text(
-                      e.username,
-                      style: TextStyle(
-                          color: Theme.of(context).accentColor, fontSize: 12),
-                    ),
                     Text(
                       e.date_created,
                       style: TextStyle(fontSize: 12),

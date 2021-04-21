@@ -181,12 +181,10 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   /// Login in and load all of the posts.
-  ///
-  /// TODO: Load posts by page, instead of loading all of them at once
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
-    //TODO:
-    await PostRepository.getInstance().initializeUser(info);
-    return await PostRepository.getInstance().loadPosts(_currentBBSPage);
+    var _postRepoInstance = PostRepository.getInstance();
+    if (!_postRepoInstance.isUserInitialized) await _postRepoInstance.initializeUser(info);
+    return await _postRepoInstance.loadPosts(_currentBBSPage);
   }
 
   @override
@@ -343,7 +341,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
           child: ListTile(
-              leading: Icon(SFSymbols.quote_bubble_fill),
+              leading: Text("#${e.id}", style: TextStyle(color: Theme.of(context).accentColor),),
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
               title: Text(
@@ -351,23 +349,37 @@ class _BBSSubpageState extends State<BBSSubpage>
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              subtitle: Column(
                 children: [
-                  Text(
+                  const SizedBox(height: 36,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      /*Text(
                     "\n#" + e.id.toString(),
                     style: TextStyle(
                         color: Theme.of(context).hintColor, fontSize: 12),
-                  ),
-                  Text(
-                    "\n" + e.date_created,
-                    style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
-                  ),
-                  Text(
-                    "\n" + e.count.toString(),
-                    style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
+                  ),*/
+                      Text(
+                        e.date_created,
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            e.count.toString() + " ",
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor, fontSize: 12),
+                          ),
+                          Icon(
+                            Icons.comment,
+                            size: 12,
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
