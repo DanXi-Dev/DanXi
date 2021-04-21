@@ -32,5 +32,5 @@ Map<String, dynamic> _$BmobUserToJson(BmobUser instance) => <String, dynamic>{
       'emailVerified': instance.emailVerified,
       'mobilePhoneNumber': instance.mobilePhoneNumber,
       'mobilePhoneNumberVerified': instance.mobilePhoneNumberVerified,
-      'sessionToken': instance.sessionToken
+      'sessionToken': instance.sessionToken,
     };

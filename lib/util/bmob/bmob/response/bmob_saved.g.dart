@@ -14,5 +14,5 @@ BmobSaved _$BmobSavedFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$BmobSavedToJson(BmobSaved instance) => <String, dynamic>{
       'createdAt': instance.createdAt,
-      'objectId': instance.objectId
+      'objectId': instance.objectId,
     };

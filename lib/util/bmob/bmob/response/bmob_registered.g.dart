@@ -17,5 +17,5 @@ Map<String, dynamic> _$BmobRegisteredToJson(BmobRegistered instance) =>
     <String, dynamic>{
       'createdAt': instance.createdAt,
       'objectId': instance.objectId,
-      'sessionToken': instance.sessionToken
+      'sessionToken': instance.sessionToken,
     };

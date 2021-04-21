@@ -18,5 +18,5 @@ Map<String, dynamic> _$BmobFileToJson(BmobFile instance) => <String, dynamic>{
       '__type': instance.type,
       'cdn': instance.cdn,
       'url': instance.url,
-      'filename': instance.filename
+      'filename': instance.filename,
     };

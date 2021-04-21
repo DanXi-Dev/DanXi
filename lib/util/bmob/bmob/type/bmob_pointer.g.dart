@@ -17,5 +17,5 @@ Map<String, dynamic> _$BmobPointerToJson(BmobPointer instance) =>
     <String, dynamic>{
       '__type': instance.type,
       'className': instance.className,
-      'objectId': instance.objectId
+      'objectId': instance.objectId,
     };

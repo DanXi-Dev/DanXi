@@ -27,5 +27,5 @@ Map<String, dynamic> _$BmobInstallationToJson(BmobInstallation instance) =>
       'deviceType': instance.deviceType,
       'installationId': instance.installationId,
       'timeZone': instance.timeZone,
-      'deviceToken': instance.deviceToken
+      'deviceToken': instance.deviceToken,
     };

@@ -14,5 +14,5 @@ BmobSms _$BmobSmsFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$BmobSmsToJson(BmobSms instance) => <String, dynamic>{
       'mobilePhoneNumber': instance.mobilePhoneNumber,
-      'template': instance.template
+      'template': instance.template,
     };

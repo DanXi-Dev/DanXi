@@ -15,4 +15,7 @@ BmobRelation _$BmobRelationFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$BmobRelationToJson(BmobRelation instance) =>
-    <String, dynamic>{'__op': instance.op, 'objects': instance.objects};
+    <String, dynamic>{
+      '__op': instance.op,
+      'objects': instance.objects,
+    };

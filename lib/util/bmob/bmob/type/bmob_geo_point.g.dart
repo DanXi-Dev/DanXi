@@ -17,5 +17,5 @@ Map<String, dynamic> _$BmobGeoPointToJson(BmobGeoPoint instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,
-      '__type': instance.type
+      '__type': instance.type,
     };

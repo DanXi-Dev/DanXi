@@ -20,5 +20,5 @@ Map<String, dynamic> _$ChangeToJson(Change instance) => <String, dynamic>{
       'tableName': instance.tableName,
       'objectId': instance.objectId,
       'action': instance.action,
-      'data': instance.data
+      'data': instance.data,
     };
