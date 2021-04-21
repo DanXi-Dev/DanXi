@@ -185,12 +185,10 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   /// Login in and load all of the posts.
-  ///
-  /// TODO: Load posts by page, instead of loading all of them at once
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
-    //TODO:
-    await PostRepository.getInstance().initializeUser(info);
-    return await PostRepository.getInstance().loadPosts(_currentBBSPage);
+    var _postRepoInstance = PostRepository.getInstance();
+    if (!_postRepoInstance.isUserInitialized) await _postRepoInstance.initializeUser(info);
+    return await _postRepoInstance.loadPosts(_currentBBSPage);
   }
 
   @override
