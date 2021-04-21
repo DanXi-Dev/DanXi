@@ -206,7 +206,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     case ConnectionState.waiting:
                     case ConnectionState.active:
                       if (_lastSnapshotData == null) return _buildLoadingPage();
-                      return _buildPageWhileLoading(_lastSnapshotData.data);
+                      return _buildPage(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:
                       if (snapshot.hasError || !snapshot.hasData) {
@@ -251,7 +251,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
               controller: _controller,
-              itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+              itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1,
               itemBuilder: (context, index) => _buildListItem(index, data),
             ),),
         cupertino: (_, __) => CupertinoScrollbar(
@@ -259,33 +259,9 @@ class _BBSSubpageState extends State<BBSSubpage>
             child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE, //TODO: Move this hard-coded number to a Constant
+                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
                 itemBuilder: (context, index) => _buildListItem(index, data),
             ),
-        )
-    );
-  }
-
-  Widget _buildPageWhileLoading(List<BBSPost> data) {
-    return PlatformWidget(
-      // Add a scrollbar on desktop platform
-        material: (_, __) => Scrollbar(
-            controller: _controller,
-            interactive: PlatformX.isDesktop,
-            child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              controller: _controller,
-              itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
-              itemBuilder: (context, index) => _buildListItem(index, data),
-            ),),
-        cupertino: (_, __) => CupertinoScrollbar(
-          controller: _controller,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _controller,
-            itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
-            itemBuilder: (context, index) => _buildListItem(index, data),
-          ),
         )
     );
   }
@@ -317,8 +293,9 @@ class _BBSSubpageState extends State<BBSSubpage>
         color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
           child: ListTile(
-              leading: Icon(SFSymbols.quote_bubble_fill),
-              visualDensity: VisualDensity(vertical: 2),
+              //leading: Icon(SFSymbols.quote_bubble_fill),
+              //visualDensity: VisualDensity(vertical: 2),
+              isThreeLine: false,
               dense: false,
               title: Text(
                 e.first_post.content,
@@ -328,17 +305,23 @@ class _BBSSubpageState extends State<BBSSubpage>
                 style: TextStyle(fontSize: 16),
               ),
               //TODO: Support Dynamic Font
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    e.first_post.username,
+                    "\n#" + e.id.toString(),
                     style: TextStyle(
-                        color: Theme.of(context).accentColor, fontSize: 12),
+                        color: Theme.of(context).hintColor, fontSize: 12),
                   ),
                   Text(
-                    e.date_created,
-                    style: TextStyle(fontSize: 12),
+                    "\n" + e.date_created,
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 12),
+                  ),
+                  Text(
+                    "\n" + e.count.toString(),
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 12),
                   ),
                 ],
               ),
