@@ -1,21 +1,54 @@
 PODS:
   - catcher (0.0.1):
     - Flutter
-  - data_plugin (0.0.1):
+  - device_info_plus (0.0.1):
     - Flutter
-  - device_info (0.0.1):
+  - DKImagePickerController/Core (4.3.2):
+    - DKImagePickerController/ImageDataManager
+    - DKImagePickerController/Resource
+  - DKImagePickerController/ImageDataManager (4.3.2)
+  - DKImagePickerController/PhotoGallery (4.3.2):
+    - DKImagePickerController/Core
+    - DKPhotoGallery
+  - DKImagePickerController/Resource (4.3.2)
+  - DKPhotoGallery (0.0.17):
+    - DKPhotoGallery/Core (= 0.0.17)
+    - DKPhotoGallery/Model (= 0.0.17)
+    - DKPhotoGallery/Preview (= 0.0.17)
+    - DKPhotoGallery/Resource (= 0.0.17)
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Core (0.0.17):
+    - DKPhotoGallery/Model
+    - DKPhotoGallery/Preview
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Model (0.0.17):
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Preview (0.0.17):
+    - DKPhotoGallery/Model
+    - DKPhotoGallery/Resource
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Resource (0.0.17):
+    - SDWebImage
+    - SwiftyGif
+  - file_picker (0.0.1):
+    - DKImagePickerController/PhotoGallery
     - Flutter
   - Firebase/CoreOnly (7.3.0):
     - FirebaseCore (= 7.3.0)
   - Firebase/Crashlytics (7.3.0):
     - Firebase/CoreOnly
     - FirebaseCrashlytics (~> 7.3.0)
-  - firebase_core (0.7.0):
+  - firebase_core (1.0.4):
     - Firebase/CoreOnly (= 7.3.0)
     - Flutter
-  - firebase_crashlytics (0.4.0-1):
+  - firebase_crashlytics (2.0.1):
     - Firebase/Crashlytics (= 7.3.0)
     - firebase_core
+    - Flutter
   - FirebaseCore (7.3.0):
     - FirebaseCoreDiagnostics (~> 7.0)
     - GoogleUtilities/Environment (~> 7.0)
@@ -40,6 +73,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_email_sender (0.0.1):
     - Flutter
+  - flutter_keyboard_visibility (0.0.1):
+    - Flutter
   - flutter_mailer (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
@@ -53,12 +88,16 @@ PODS:
     - GoogleUtilities/Environment
   - GoogleUtilities/UserDefaults (7.3.1):
     - GoogleUtilities/Logger
+  - image_picker (0.0.1):
+    - Flutter
   - nanopb (2.30906.0):
     - nanopb/decode (= 2.30906.0)
     - nanopb/encode (= 2.30906.0)
   - nanopb/decode (2.30906.0)
   - nanopb/encode (2.30906.0)
   - package_info (0.0.1):
+    - Flutter
+  - package_info_plus (0.4.5):
     - Flutter
   - path_provider (0.0.1):
     - Flutter
@@ -67,26 +106,33 @@ PODS:
     - Flutter
   - screen (0.0.1):
     - Flutter
+  - SDWebImage (5.11.0):
+    - SDWebImage/Core (= 5.11.0)
+  - SDWebImage/Core (5.11.0)
   - share (0.0.1):
     - Flutter
   - shared_preferences (0.0.1):
     - Flutter
+  - SwiftyGif (5.4.0)
   - Toast (4.0.0)
   - url_launcher (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - catcher (from `.symlinks/plugins/catcher/ios`)
-  - data_plugin (from `.symlinks/plugins/data_plugin/ios`)
-  - device_info (from `.symlinks/plugins/device_info/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
+  - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_crashlytics (from `.symlinks/plugins/firebase_crashlytics/ios`)
   - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `6.26.0`)
   - Flutter (from `Flutter`)
   - flutter_email_sender (from `.symlinks/plugins/flutter_email_sender/ios`)
+  - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - quick_actions (from `.symlinks/plugins/quick_actions/ios`)
   - screen (from `.symlinks/plugins/screen/ios`)
@@ -96,6 +142,8 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - DKImagePickerController
+    - DKPhotoGallery
     - Firebase
     - FirebaseCore
     - FirebaseCoreDiagnostics
@@ -105,15 +153,17 @@ SPEC REPOS:
     - GoogleUtilities
     - nanopb
     - PromisesObjC
+    - SDWebImage
+    - SwiftyGif
     - Toast
 
 EXTERNAL SOURCES:
   catcher:
     :path: ".symlinks/plugins/catcher/ios"
-  data_plugin:
-    :path: ".symlinks/plugins/data_plugin/ios"
-  device_info:
-    :path: ".symlinks/plugins/device_info/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
+  file_picker:
+    :path: ".symlinks/plugins/file_picker/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_crashlytics:
@@ -125,12 +175,18 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_email_sender:
     :path: ".symlinks/plugins/flutter_email_sender/ios"
+  flutter_keyboard_visibility:
+    :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
   flutter_mailer:
     :path: ".symlinks/plugins/flutter_mailer/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  image_picker:
+    :path: ".symlinks/plugins/image_picker/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   quick_actions:
@@ -150,12 +206,14 @@ CHECKOUT OPTIONS:
     :tag: 6.26.0
 
 SPEC CHECKSUMS:
-  catcher: e5585ed31458c849f4fd9c3719b2fcb0188b8918
-  data_plugin: 718d6550a02b30410748b3b7711ee393933070e6
-  device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
+  catcher: 67a006a3c121c4bbf1202d1e5ea186afb7ef4a18
+  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
+  DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
+  DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
+  file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   Firebase: 26223c695fe322633274198cb19dca8cb7e54416
-  firebase_core: 91b27774a52f41f8b58484a75edf71197ac01c59
-  firebase_crashlytics: e6ecb908f6249ce3757d18a812819a41495bf1cb
+  firebase_core: 4be162b452c4af1f8257dc7a55003ceacec028ac
+  firebase_crashlytics: 8e7b4f61dccbe21a2b07b10005f680afded8a9a6
   FirebaseCore: 4d3c72622ce0e2106aaa07bb4b2935ba2c370972
   FirebaseCoreDiagnostics: d50e11039e5984d92c8a512be2395f13df747350
   FirebaseCrashlytics: d31325312c92e2cb2f0386d589b9aa44e303d99b
@@ -163,18 +221,23 @@ SPEC CHECKSUMS:
   FirebaseInstallations: bf2ec8dbf36ff4c91af6b9a003d15855757680c1
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_email_sender: 02d7443217d8c41483223627972bfdc09f74276b
+  flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   GoogleDataTransport: 116c84c4bdeb76be2a7a46de51244368f9794eab
   GoogleUtilities: e1d9ed4e544fc32a93e00e721400cbc3f377200d
+  image_picker: 50e7c7ff960e5f58faa4d1f4af84a771c671bc4a
   nanopb: 1bf24dd71191072e120b83dd02d08f3da0d65e53
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
+  package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   quick_actions: 6cb2390c4dab0e737c94573c27e18d9666710720
   screen: abd91ca7bf3426e1cc3646d27e9b2358d6bf07b0
+  SDWebImage: 7acbb57630ac7db4a495547fb73916ff3e432f6b
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  SwiftyGif: 5d4af95df24caf1c570dbbcb32a3b8a0763bc6d7
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
 

@@ -66,6 +66,18 @@ class _BBSSubpageState extends State<BBSSubpage>
   bool isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
+  void refreshSelf() {
+    if (mounted) {
+      _currentBBSPage = 1;
+      _lastPageItems = [];
+      _lastSnapshotData = null;
+      _isRefreshing = true;
+      isEndIndicatorShown = false;
+      // ignore: invalid_use_of_protected_member
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -281,7 +293,6 @@ class _BBSSubpageState extends State<BBSSubpage>
                             : _currentBBSPage - 1) *
                         POST_COUNT_PER_PAGE +
                     1,
-                //TODO: Move this hard-coded number to a Constant
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, false),
               ),
@@ -296,7 +307,6 @@ class _BBSSubpageState extends State<BBSSubpage>
                             : _currentBBSPage - 1) *
                         POST_COUNT_PER_PAGE +
                     1,
-                //TODO: Move this hard-coded number to a Constant
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, false),
               ),
@@ -304,12 +314,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildListItem(int index, List<BBSPost> data, bool isNewData) {
-    print("index: " +
-        index.toString() +
-        " length: " +
-        _lastPageItems.length.toString() +
-        " isNEWDATA " +
-        isNewData.toString());
     if (isNewData && index >= _lastPageItems.length) {
       try {
         _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
@@ -341,6 +345,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
           child: ListTile(
+              contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
               leading: Text("#${e.id}", style: TextStyle(color: Theme.of(context).accentColor),),
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
