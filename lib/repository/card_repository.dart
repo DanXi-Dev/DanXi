@@ -109,7 +109,6 @@ class CardRepository extends BaseRepositoryWithDio {
   /// If [logDays] = 0, it will return the latest records;
   /// If [logDays] < 0, it will return null.
   Future<List<CardRecord>> loadCardRecord(int logDays) async {
-    print("Start load record.");
     if (logDays < 0) return null;
     //Get csrf id.
     var consumeCsrfPageResponse = await dio.get(CONSUME_DETAIL_CSRF_URL);

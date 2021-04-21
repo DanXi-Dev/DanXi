@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
@@ -28,6 +29,8 @@ class PostRepository extends BaseRepositoryWithDio {
 
   factory PostRepository.getInstance() => _instance;
   static const String _BASE_URL = "https://www.fduhole.tk/v1";
+
+  PersonInfo _info;
 
   /// The token used for session authentication.
   ///
@@ -55,8 +58,14 @@ class PostRepository extends BaseRepositoryWithDio {
     return await user.register();
   }
 
-  requestToken() {
-    if (_token == null) throw NotLoginError();
+  requestToken() async {
+    Response response = await dio.post(_BASE_URL + "/register/", data: {'api-key': Secret.FDUHOLE_API_KEY, 'email': "${_info.id}@fudan.edu.cn", "password": "APP_GENERATED_TEST_PASSWORD"});
+    if(response.statusCode == 200) _token = response.data["token"];
+    else {
+      _token = null;
+      print("failed " + response.statusCode.toString() + response.toString());
+      throw NotLoginError();
+    }
   }
 
   Map<String, String> get _tokenHeader {
@@ -64,7 +73,11 @@ class PostRepository extends BaseRepositoryWithDio {
     return {"Authorization": "Token " + _token};
   }
 
-  Future<List<BBSPost>> loadPosts(int page) async {
+  void initializeUser(PersonInfo info) {
+    _info = info; //TODO: Ensure [_info] is set before loading anything
+  }
+
+  Future<List<BBSPost>> loadPosts(int page, PersonInfo personInfo) async {
     Response response = await dio.get(_BASE_URL + "/discussions/",
         queryParameters: {"page": page},
         options: Options(headers: _tokenHeader));
