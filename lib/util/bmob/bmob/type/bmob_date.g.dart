@@ -12,5 +12,7 @@ BmobDate _$BmobDateFromJson(Map<String, dynamic> json) {
     ..type = json['__type'] as String;
 }
 
-Map<String, dynamic> _$BmobDateToJson(BmobDate instance) =>
-    <String, dynamic>{'iso': instance.iso, '__type': instance.type};
+Map<String, dynamic> _$BmobDateToJson(BmobDate instance) => <String, dynamic>{
+      'iso': instance.iso,
+      '__type': instance.type,
+    };

@@ -11,4 +11,6 @@ BmobHandled _$BmobHandledFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$BmobHandledToJson(BmobHandled instance) =>
-    <String, dynamic>{'msg': instance.msg};
+    <String, dynamic>{
+      'msg': instance.msg,
+    };

@@ -15,5 +15,5 @@ ServerTime _$ServerTimeFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ServerTimeToJson(ServerTime instance) =>
     <String, dynamic>{
       'timestamp': instance.timestamp,
-      'datetime': instance.datetime
+      'datetime': instance.datetime,
     };

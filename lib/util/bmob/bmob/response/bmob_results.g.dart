@@ -13,4 +13,7 @@ BmobResults _$BmobResultsFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$BmobResultsToJson(BmobResults instance) =>
-    <String, dynamic>{'results': instance.results, 'count': instance.count};
+    <String, dynamic>{
+      'results': instance.results,
+      'count': instance.count,
+    };

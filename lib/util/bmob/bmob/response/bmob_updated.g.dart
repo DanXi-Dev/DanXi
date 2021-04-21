@@ -11,4 +11,6 @@ BmobUpdated _$BmobUpdatedFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$BmobUpdatedToJson(BmobUpdated instance) =>
-    <String, dynamic>{'updatedAt': instance.updatedAt};
+    <String, dynamic>{
+      'updatedAt': instance.updatedAt,
+    };

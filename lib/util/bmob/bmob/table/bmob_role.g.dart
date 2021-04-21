@@ -24,5 +24,5 @@ Map<String, dynamic> _$BmobRoleToJson(BmobRole instance) => <String, dynamic>{
       'ACL': instance.ACL,
       'name': instance.name,
       'roles': instance.roles,
-      'users': instance.users
+      'users': instance.users,
     };
