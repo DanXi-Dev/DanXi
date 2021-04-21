@@ -65,7 +65,7 @@ dependencies:
 dependency_overrides:
   fluttertoast:
     git:
-      url: git@github.com:ponnamkarthik/FlutterToast.git
+      url: https://github.com/ponnamkarthik/FlutterToast.git
       ref: master
   html: ^0.15.0
 

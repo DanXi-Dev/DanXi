@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:event_bus/event_bus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class Constant {
@@ -31,6 +32,50 @@ class Constant {
   static String yuanSymbol(String num) {
     if (num == null || num.trim().isEmpty) return "";
     return '\u00A5' + num;
+  }
+
+  static Color getColorFromString(String color) {
+    switch (color) {
+      case 'red':
+        return Colors.red;
+      case 'pink':
+        return Colors.pink;
+      case 'purple':
+        return Colors.purple;
+      case 'deep-purple':
+        return Colors.deepPurple;
+      case 'indigo':
+        return Colors.indigo;
+      case 'blue':
+        return Colors.blue;
+      case 'light-blue':
+        return Colors.lightBlue;
+      case 'cyan':
+        return Colors.cyan;
+      case 'teal':
+        return Colors.teal;
+      case 'green':
+        return Colors.green;
+      case 'light-green':
+        return Colors.lightGreen;
+      case 'lime':
+        return Colors.lime;
+      case 'yellow':
+        return Colors.yellow;
+      case 'amber':
+        return Colors.amber;
+      case 'orange':
+        return Colors.orange;
+      case 'deep-orange':
+        return Colors.deepOrange;
+      case 'brown':
+        return Colors.brown;
+      case 'blue-grey':
+        return Colors.blueGrey;
+      case 'grey':
+        return Colors.grey;
+    }
+    return Colors.black;
   }
 
   /// A copy of [Campus.values], omitting [Campus.NONE].

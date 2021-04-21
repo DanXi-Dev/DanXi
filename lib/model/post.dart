@@ -28,7 +28,7 @@ class BBSPost {
   // ignore: non_constant_identifier_names
   Reply first_post;
   int count;
-  List<PostTag> tag;
+  List<PostTag> tags;
   Map<String, String> mapping;
 
   // ignore: non_constant_identifier_names
@@ -42,6 +42,6 @@ class BBSPost {
 
   Map<String, dynamic> toJson() => _$BBSPostToJson(this);
 
-  BBSPost(this.id, this.first_post, this.count, this.tag, this.mapping,
+  BBSPost(this.id, this.first_post, this.count, this.tags, this.mapping,
       this.date_created, this.date_updated);
 }

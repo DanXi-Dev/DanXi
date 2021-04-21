@@ -340,23 +340,61 @@ class _BBSSubpageState extends State<BBSSubpage>
     return soup.get_text();
   }
 
+
+
+  List<Widget> _generateTagWidgets(BBSPost e) {
+    List<Widget> _tags = [];
+    e.tags.forEach((element) { 
+      _tags.add(
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Constant.getColorFromString(element.color),
+              width: 1,),
+            borderRadius: BorderRadius.circular(16),
+            //color: Constant.getColorFromString(element.color).withAlpha(25),
+          ),
+          child: Text(
+            element.name,
+            style: TextStyle(
+                fontSize: 12,
+                color: Constant.getColorFromString(element.color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
+            ),
+          ),
+        )
+      );
+      _tags.add(const SizedBox(width: 6,));
+    });
+    return _tags;
+  }
+
   Widget _getListItem(BBSPost e) {
     return Material(
         color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
           child: ListTile(
-              contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              contentPadding: EdgeInsets.fromLTRB(15, 6, 6, 0),
               leading: Text("#${e.id}", style: TextStyle(color: Theme.of(context).accentColor),),
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
-              title: Text(
-                _renderTitle(e.first_post.content),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: _generateTagWidgets(e),
+                  ),
+                  const SizedBox(height: 2,),
+                  Text(
+                    _renderTitle(e.first_post.content),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
               subtitle: Column(
                 children: [
-                  const SizedBox(height: 36,),
+                  const SizedBox(height: 12,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

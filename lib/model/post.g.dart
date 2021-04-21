@@ -29,7 +29,7 @@ Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
       'id': instance.id,
       'first_post': instance.first_post,
       'count': instance.count,
-      'tag': instance.tag,
+      'tag': instance.tags,
       'mapping': instance.mapping,
       'date_created': instance.date_created,
       'date_updated': instance.date_updated,

@@ -484,7 +484,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: a692d2b7e8241c7751c8b5d0f10885cb072573f1
-      url: "git@github.com:ponnamkarthik/FlutterToast.git"
+      url: "https://github.com/ponnamkarthik/FlutterToast.git"
     source: git
     version: "8.0.5"
   glob:
@@ -841,7 +841,7 @@ packages:
     dependency: transitive
     description:
       name: quick_actions_platform_interface
-      url: "https://pub.flutter-io.cn"
+      url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
   quiver:
