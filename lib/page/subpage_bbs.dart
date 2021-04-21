@@ -59,9 +59,13 @@ class _BBSSubpageState extends State<BBSSubpage>
   ScrollController _controller = ScrollController();
   ConnectionStatus _loginStatus = ConnectionStatus.NONE;
 
+  int currentBBSPage;
+
   @override
   void initState() {
     super.initState();
+
+    currentBBSPage = 1;
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         // TODO
@@ -80,6 +84,17 @@ class _BBSSubpageState extends State<BBSSubpage>
         TopController.scrollToTop(_controller);
       });
     }
+    if(_controller != null) {
+      //Overscroll event
+      _controller.addListener(() {
+        if(_controller.offset >= _controller.position.maxScrollExtent &&
+            !_controller.position.outOfRange) {
+          currentBBSPage++;
+          refreshSelf();
+        }
+      });
+    }
+
   }
 
   @override
@@ -164,7 +179,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
     //TODO:
     await PostRepository.getInstance().initializeUser(info);
-    return await PostRepository.getInstance().loadPosts(1);
+    return await PostRepository.getInstance().loadPosts(currentBBSPage);
   }
 
   @override
