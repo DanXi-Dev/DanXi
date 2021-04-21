@@ -915,6 +915,16 @@ class S {
     );
   }
 
+  /// `You have reached the end.`
+  String get end_reached {
+    return Intl.message(
+      'You have reached the end.',
+      name: 'end_reached',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

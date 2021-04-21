@@ -91,6 +91,7 @@
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
     "reply_to":"Reply No.{name}",
+    "end_reached": "You have reached the end.",
 
     "classroom": "Classroom",
     "morning": "Morning",

@@ -59,13 +59,21 @@ class _BBSSubpageState extends State<BBSSubpage>
   ScrollController _controller = ScrollController();
   ConnectionStatus _loginStatus = ConnectionStatus.NONE;
 
-  int currentBBSPage;
+  int _currentBBSPage;
+  List<Widget> _lastPageItems;
+  AsyncSnapshot _lastSnapshotData;
+  bool _is_end_indicator_shown;
+  static const POST_COUNT_PER_PAGE = 10;
 
   @override
   void initState() {
     super.initState();
 
-    currentBBSPage = 1;
+    _currentBBSPage = 1;
+    _lastPageItems = [];
+    _lastSnapshotData = null;
+    _is_end_indicator_shown = false;
+
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         // TODO
@@ -87,10 +95,10 @@ class _BBSSubpageState extends State<BBSSubpage>
     if(_controller != null) {
       //Overscroll event
       _controller.addListener(() {
-        if(_controller.offset >= _controller.position.maxScrollExtent &&
-            !_controller.position.outOfRange) {
-          currentBBSPage++;
-          refreshSelf();
+        if(_controller.offset >= _controller.position.maxScrollExtent) {
+          setState(() {
+            _currentBBSPage++;
+          });
         }
       });
     }
@@ -179,7 +187,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
     //TODO:
     await PostRepository.getInstance().initializeUser(info);
-    return await PostRepository.getInstance().loadPosts(currentBBSPage);
+    return await PostRepository.getInstance().loadPosts(_currentBBSPage);
   }
 
   @override
@@ -197,12 +205,14 @@ class _BBSSubpageState extends State<BBSSubpage>
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return _buildLoadingPage();
+                      if (_lastSnapshotData == null) return _buildLoadingPage();
+                      return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:
                       if (snapshot.hasError || !snapshot.hasData) {
                         return _buildErrorPage(error: snapshot.error);
                       } else {
+                        _lastSnapshotData = snapshot;
                         return _buildPage(snapshot.data);
                       }
                       break;
@@ -217,15 +227,19 @@ class _BBSSubpageState extends State<BBSSubpage>
       );
 
   Widget _buildErrorPage({Exception error}) {
+    /*return Column(
+      children: [
+        if (_lastSnapshotData != null) _buildPage(_lastSnapshotData.data),*/
     return GestureDetector(
-      child: Center(
-        child: Text(S.of(context).failed),
-      ),
-      onTap: () {
-        _loginStatus = ConnectionStatus.NONE;
-        refreshSelf();
-      },
-    );
+          child: Center(
+            child: Text(S.of(context).failed),
+          ),
+          onTap: () {
+            _loginStatus = ConnectionStatus.NONE;
+            refreshSelf();
+          },
+        );
+    //  ],);
   }
 
   Widget _buildPage(List<BBSPost> data) {
@@ -234,16 +248,68 @@ class _BBSSubpageState extends State<BBSSubpage>
         material: (_, __) => Scrollbar(
             controller: _controller,
             interactive: PlatformX.isDesktop,
-            child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                children: data.map((e) => _getListItem(e)).toList())),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _controller,
+              itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+              itemBuilder: (context, index) => _buildListItem(index, data),
+            ),),
         cupertino: (_, __) => CupertinoScrollbar(
             controller: _controller,
-            child: ListView(
+            child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                children: data.map((e) => _getListItem(e)).toList())));
+                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE, //TODO: Move this hard-coded number to a Constant
+                itemBuilder: (context, index) => _buildListItem(index, data),
+            ),
+        )
+    );
+  }
+
+  Widget _buildPageWhileLoading(List<BBSPost> data) {
+    return PlatformWidget(
+      // Add a scrollbar on desktop platform
+        material: (_, __) => Scrollbar(
+            controller: _controller,
+            interactive: PlatformX.isDesktop,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _controller,
+              itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+              itemBuilder: (context, index) => _buildListItem(index, data),
+            ),),
+        cupertino: (_, __) => CupertinoScrollbar(
+          controller: _controller,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+            itemBuilder: (context, index) => _buildListItem(index, data),
+          ),
+        )
+    );
+  }
+
+  Widget _buildListItem(int index, List<BBSPost> data) {
+    //print("index: " + index.toString() + " length: " + _lastPageItems.length.toString());
+    if(index >= _lastPageItems.length) {
+      try {
+        _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
+      }
+      catch (e) {
+        if (!_is_end_indicator_shown) {
+          _is_end_indicator_shown = true;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget> [Divider(),Text(S.of(context).end_reached),],
+          );
+        }
+        return null;
+      }
+    }
+    if(index >= _currentBBSPage * POST_COUNT_PER_PAGE) return _buildLoadingPage();
+    //if(_lastPageItems[index] == null) print("ABOUT TO RETURN NULL");
+    return _lastPageItems[index];
   }
 
   Widget _getListItem(BBSPost e) {
