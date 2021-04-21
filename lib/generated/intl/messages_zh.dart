@@ -60,6 +60,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("校园卡余额"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("消费记录"),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("空教室"),
+    "end_reached" : MessageLookupByLibrary.simpleMessage("已经到底了"),
     "evening" : MessageLookupByLibrary.simpleMessage("晚上"),
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("无法获取复活码，请确保您已在eHall中开通复活码。"),
     "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),

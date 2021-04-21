@@ -93,7 +93,7 @@ class PostRepository extends BaseRepositoryWithDio {
     return {"Authorization": "Token " + _token};
   }
 
-  void initializeUser(PersonInfo info) async{
+  Future<void> initializeUser(PersonInfo info) async{
     await requestToken(info);
   }
 

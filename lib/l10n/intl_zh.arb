@@ -88,6 +88,7 @@
     "share":"分享",
     "login_with_uis":"将使用以下信息匿名登录树洞",
     "reply_to":"回复 No.{name}",
+    "end_reached": "已经到底了",
 
     "classroom": "教室",
     "morning": "上午",

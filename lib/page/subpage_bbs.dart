@@ -36,6 +36,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BBSSubpage extends PlatformSubpage {
   @override
@@ -59,13 +61,23 @@ class _BBSSubpageState extends State<BBSSubpage>
   ScrollController _controller = ScrollController();
   ConnectionStatus _loginStatus = ConnectionStatus.NONE;
 
-  int currentBBSPage;
+  int _currentBBSPage;
+  List<Widget> _lastPageItems;
+  AsyncSnapshot _lastSnapshotData;
+  bool _isRefreshing;
+  bool isEndIndicatorShown;
+  static const POST_COUNT_PER_PAGE = 10;
 
   @override
   void initState() {
     super.initState();
 
-    currentBBSPage = 1;
+    _currentBBSPage = 1;
+    _lastPageItems = [];
+    _lastSnapshotData = null;
+    _isRefreshing = true;
+    isEndIndicatorShown = false;
+
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         // TODO
@@ -87,10 +99,11 @@ class _BBSSubpageState extends State<BBSSubpage>
     if(_controller != null) {
       //Overscroll event
       _controller.addListener(() {
-        if(_controller.offset >= _controller.position.maxScrollExtent &&
-            !_controller.position.outOfRange) {
-          currentBBSPage++;
-          refreshSelf();
+        if(_controller.offset >= _controller.position.maxScrollExtent && !_isRefreshing) {
+          _isRefreshing = true;
+          setState(() {
+            _currentBBSPage++;
+          });
         }
       });
     }
@@ -179,7 +192,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
     //TODO:
     await PostRepository.getInstance().initializeUser(info);
-    return await PostRepository.getInstance().loadPosts(currentBBSPage);
+    return await PostRepository.getInstance().loadPosts(_currentBBSPage);
   }
 
   @override
@@ -197,12 +210,16 @@ class _BBSSubpageState extends State<BBSSubpage>
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return _buildLoadingPage();
+                      _isRefreshing = true;
+                      if (_lastSnapshotData == null) return _buildLoadingPage();
+                      return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:
+                      _isRefreshing = false;
                       if (snapshot.hasError || !snapshot.hasData) {
                         return _buildErrorPage(error: snapshot.error);
                       } else {
+                        _lastSnapshotData = snapshot;
                         return _buildPage(snapshot.data);
                       }
                       break;
@@ -212,20 +229,25 @@ class _BBSSubpageState extends State<BBSSubpage>
                 future: loginAndLoadPost(context.personInfo))));
   }
 
-  Widget _buildLoadingPage() => GestureDetector(
-        child: Center(child: CircularProgressIndicator()),
-      );
+  Widget _buildLoadingPage() => Container(
+    padding: EdgeInsets.all(7),
+    child: Center(child: CircularProgressIndicator()),
+  );
 
   Widget _buildErrorPage({Exception error}) {
+    /*return Column(
+      children: [
+        if (_lastSnapshotData != null) _buildPage(_lastSnapshotData.data),*/
     return GestureDetector(
-      child: Center(
-        child: Text(S.of(context).failed),
-      ),
-      onTap: () {
-        _loginStatus = ConnectionStatus.NONE;
-        refreshSelf();
-      },
-    );
+          child: Center(
+            child: Text(S.of(context).failed),
+          ),
+          onTap: () {
+            _loginStatus = ConnectionStatus.NONE;
+            refreshSelf();
+          },
+        );
+    //  ],);
   }
 
   Widget _buildPage(List<BBSPost> data) {
@@ -234,16 +256,67 @@ class _BBSSubpageState extends State<BBSSubpage>
         material: (_, __) => Scrollbar(
             controller: _controller,
             interactive: PlatformX.isDesktop,
-            child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                children: data.map((e) => _getListItem(e)).toList())),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _controller,
+              itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1,
+              itemBuilder: (context, index) => _buildListItem(index, data, true),
+            ),),
         cupertino: (_, __) => CupertinoScrollbar(
             controller: _controller,
-            child: ListView(
+            child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                children: data.map((e) => _getListItem(e)).toList())));
+                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
+                itemBuilder: (context, index) => _buildListItem(index, data, true),
+            ),
+        )
+    );
+  }
+
+  Widget _buildPageWhileLoading(List<BBSPost> data) {
+    return PlatformWidget(
+      // Add a scrollbar on desktop platform
+        material: (_, __) => Scrollbar(
+            controller: _controller,
+            interactive: PlatformX.isDesktop,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _controller,
+              itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+              itemBuilder: (context, index) => _buildListItem(index, data, false),
+            ),),
+        cupertino: (_, __) => CupertinoScrollbar(
+          controller: _controller,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+            itemBuilder: (context, index) => _buildListItem(index, data, false),
+          ),
+        )
+    );
+  }
+
+  Widget _buildListItem(int index, List<BBSPost> data, bool isNewData) {
+    print("index: " + index.toString() + " length: " + _lastPageItems.length.toString() + " isNEWDATA " + isNewData.toString());
+    if(isNewData && index >= _lastPageItems.length) {
+      try {
+        _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
+      }
+      catch (e) {
+        if (!isEndIndicatorShown) {
+          isEndIndicatorShown = true;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget> [Divider(),Text(S.of(context).end_reached),],
+          );
+        }
+        return null;
+      }
+    }
+    if(index >= _lastPageItems.length) return _buildLoadingPage();
+    return _lastPageItems[index];
   }
 
   Widget _getListItem(BBSPost e) {
@@ -254,25 +327,38 @@ class _BBSSubpageState extends State<BBSSubpage>
               leading: Icon(SFSymbols.quote_bubble_fill),
               visualDensity: VisualDensity(vertical: 2),
               dense: false,
-              title: Text(
+              title: HtmlWidget(
+                e.first_post.content,
+                textStyle: TextStyle(fontSize: 16),
+                onTapUrl: (url) => launch(url),
+                customStylesBuilder: (element) {
+                    return {'max-lines': '1', 'text-overflow': 'ellipsis'};
+                },
+              ),
+              /*Text(
                 e.first_post.content,
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 16),
-              ),
-              //TODO: Support Dynamic Font
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              ),*/
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    e.first_post.username,
+                    "\n#" + e.id.toString(),
                     style: TextStyle(
-                        color: Theme.of(context).accentColor, fontSize: 12),
+                        color: Theme.of(context).hintColor, fontSize: 12),
                   ),
                   Text(
-                    e.date_created,
-                    style: TextStyle(fontSize: 12),
+                    "\n" + e.date_created,
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 12),
+                  ),
+                  Text(
+                    "\n" + e.count.toString(),
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 12),
                   ),
                 ],
               ),
