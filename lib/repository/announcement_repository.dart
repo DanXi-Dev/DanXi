@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/model/announcement.dart';
-import 'package:data_plugin/bmob/bmob_query.dart';
+import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

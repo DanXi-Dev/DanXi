@@ -56,9 +56,9 @@ class CardRepository extends BaseRepositoryWithDio {
 
   factory CardRepository.getInstance() => _instance;
 
-  bool _testLoginSuccess() {
-    return cookieJar
-        .loadForRequest(Uri.parse("http://ecard.fudan.edu.cn/"))
+  Future<bool> _testLoginSuccess() async {
+    return (await cookieJar
+            .loadForRequest(Uri.parse("http://ecard.fudan.edu.cn/")))
         .any((element) => element.name == "iPlanetDirectoryPro");
   }
 
@@ -70,7 +70,7 @@ class CardRepository extends BaseRepositoryWithDio {
       } catch (e) {
         throw e;
       }
-      if (!_testLoginSuccess()) {
+      if (!await _testLoginSuccess()) {
         throw new LoginException();
       }
       return null;
@@ -156,7 +156,7 @@ class CardRepository extends BaseRepositoryWithDio {
   }
 
   Future<CardInfo> loadCardInfo(int logDays) async {
-    if (!_testLoginSuccess()) {
+    if (!await _testLoginSuccess()) {
       throw new LoginException();
     }
     var cardInfo = CardInfo();
@@ -177,7 +177,6 @@ class CardInfo {
   String cash;
   String name;
   List<CardRecord> records;
-
 }
 
 class CardRecord {

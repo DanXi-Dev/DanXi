@@ -59,8 +59,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           "setting.kind": "std",
           "startWeek": "1",
           "ids": termId,
-          "semester.id": cookieJar
-              .loadForRequest(Uri.parse(HOST))
+          "semester.id": (await cookieJar.loadForRequest(Uri.parse(HOST)))
               .firstWhere((element) => element.name == "semester.id")
               .value
         },

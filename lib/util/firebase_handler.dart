@@ -19,6 +19,7 @@ import 'package:catcher/catcher.dart';
 import 'package:catcher/model/platform_type.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/cupertino.dart';
 
 class FirebaseHandler extends ReportHandler {
   static FirebaseCrashlytics crashlytics;
@@ -31,11 +32,11 @@ class FirebaseHandler extends ReportHandler {
 
   @override
   List<PlatformType> getSupportedPlatforms() {
-    return [PlatformType.Android, PlatformType.iOS];
+    return [PlatformType.android, PlatformType.iOS];
   }
 
   @override
-  Future<bool> handle(Report error) async {
+  Future<bool> handle(Report error, BuildContext context) async {
     if (crashlytics != null) {
       await crashlytics.recordError(error.error, error.stackTrace);
     }

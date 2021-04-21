@@ -37,13 +37,14 @@ import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
-import 'package:data_plugin/bmob/bmob.dart';
+
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

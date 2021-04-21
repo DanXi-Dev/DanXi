@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:data_plugin/bmob/table/bmob_object.dart';
+import 'package:dan_xi/util/bmob/bmob/table/bmob_object.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'announcement.g.dart';

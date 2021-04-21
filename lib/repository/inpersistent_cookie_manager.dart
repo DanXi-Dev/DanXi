@@ -26,9 +26,6 @@ import 'package:cookie_jar/src/serializable_cookie.dart';
 //A copy of [DefaultCookieJar], but with an independent cookie storage.
 
 class NonpersistentCookieJar implements CookieJar {
-  /// [ignoreExpires]: save/load even cookies that have expired.
-  NonpersistentCookieJar({this.ignoreExpires = false});
-
   /// A array to save cookies.
   ///
   /// [domains[0]] save the cookies with "domain" attribute.
@@ -37,39 +34,44 @@ class NonpersistentCookieJar implements CookieJar {
   /// [domains[1]] save the cookies without "domain" attribute.
   /// These cookies are private for each host name.
   ///
-  List<
+  final List<
           Map<
-              String, //domain
+              String, //domain or host
               Map<
                   String, //path
                   Map<
                       String, //cookie name
                       SerializableCookie //cookie
-                      >>>> _domains =
+                      >>>> _cookies =
       <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
-  List<Map<String, Map<String, Map<String, SerializableCookie>>>> get domains =>
-      _domains;
+  NonpersistentCookieJar({this.ignoreExpires = false});
+
+  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
+      _cookies[0];
+
+  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
+      _cookies[1];
 
   @override
-  List<Cookie> loadForRequest(Uri uri) {
-    final List<Cookie> list = <Cookie>[];
-    final String urlPath = uri.path.isEmpty ? '/' : uri.path;
+  Future<List<Cookie>> loadForRequest(Uri uri) async {
+    final list = <Cookie>[];
+    final urlPath = uri.path.isEmpty ? '/' : uri.path;
     // Load cookies without "domain" attribute, include port.
-    final String hostname = uri.host;
-    for (String domain in domains[1].keys) {
+    final hostname = uri.host;
+    for (final domain in hostCookies.keys) {
       if (hostname == domain) {
-        final Map<String, Map<String, dynamic>> cookies =
-            domains[1][domain].cast<String, Map<String, dynamic>>();
+        final cookies =
+            hostCookies[domain].cast<String, Map<String, dynamic>>();
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
-        for (String path in keys) {
+        for (final path in keys) {
           if (urlPath.toLowerCase().contains(path)) {
-            final Map<String, dynamic> values = cookies[path];
-            for (String key in values.keys) {
+            final values = cookies[path];
+            for (final key in values.keys) {
               final SerializableCookie cookie = values[key];
               if (_check(uri.scheme, cookie)) {
                 if (list.indexWhere((e) => e.name == cookie.cookie.name) ==
@@ -83,7 +85,7 @@ class NonpersistentCookieJar implements CookieJar {
       }
     }
     // Load cookies with "domain" attribute, Ignore port.
-    domains[0].forEach(
+    domainCookies.forEach(
         (String domain, Map<String, Map<String, SerializableCookie>> cookies) {
       if (uri.host.contains(domain)) {
         cookies.forEach((String path, Map<String, SerializableCookie> values) {
@@ -101,11 +103,11 @@ class NonpersistentCookieJar implements CookieJar {
   }
 
   @override
-  void saveFromResponse(Uri uri, List<Cookie> cookies) {
-    for (Cookie cookie in cookies) {
-      String domain = cookie.domain;
+  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {
+    for (final cookie in cookies) {
+      var domain = cookie.domain;
       String path;
-      int index = 0;
+      var index = 0;
       // Save cookies with "domain" attribute
       if (domain != null) {
         if (domain.startsWith('.')) {
@@ -118,17 +120,17 @@ class NonpersistentCookieJar implements CookieJar {
         path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
         domain = uri.host;
       }
-      Map<String, Map<String, dynamic>> mapDomain =
-          domains[index][domain] ?? <String, Map<String, dynamic>>{};
+      var mapDomain =
+          _cookies[index][domain] ?? <String, Map<String, dynamic>>{};
       mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
 
-      final Map<String, dynamic> map = mapDomain[path] ?? <String, dynamic>{};
-      map[cookie.name] = new SerializableCookie(cookie);
+      final map = mapDomain[path] ?? <String, dynamic>{};
+      map[cookie.name] = SerializableCookie(cookie);
       if (_isExpired(map[cookie.name])) {
         map.remove(cookie.name);
       }
       mapDomain[path] = map.cast<String, SerializableCookie>();
-      domains[index][domain] =
+      _cookies[index][domain] =
           mapDomain.cast<String, Map<String, SerializableCookie>>();
     }
   }
@@ -137,20 +139,22 @@ class NonpersistentCookieJar implements CookieJar {
   /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
-  void delete(Uri uri, [bool withDomainSharedCookie = false]) {
-    final String host = uri.host;
-    domains[1].remove(host);
+  @override
+  Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]) async {
+    final host = uri.host;
+    hostCookies.remove(host);
     if (withDomainSharedCookie) {
-      domains[0].removeWhere(
-              (String domain, Map<String, Map<String, SerializableCookie>> v) =>
+      domainCookies.removeWhere(
+          (String domain, Map<String, Map<String, SerializableCookie>> v) =>
               uri.host.contains(domain));
     }
   }
 
   /// Delete all cookies in RAM
-  void deleteAll() {
-    domains[0].clear();
-    domains[1].clear();
+  @override
+  Future<void> deleteAll() async {
+    domainCookies.clear();
+    hostCookies.clear();
   }
 
   bool _isExpired(SerializableCookie cookie) {

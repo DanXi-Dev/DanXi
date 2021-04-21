@@ -26,10 +26,10 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
+import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/top_controller.dart';
-import 'package:data_plugin/bmob/response/bmob_registered.dart';
-import 'package:data_plugin/bmob/table/bmob_user.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -58,7 +58,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StreamSubscription _refreshSubscription;
   static StreamSubscription _goTopSubscription;
   ScrollController _controller = ScrollController();
-  ConnectionStatus _loginStatus = ConnectionStatus.NONE;
 
   int _currentBBSPage;
   List<Widget> _lastPageItems;
@@ -79,7 +78,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-        // TODO
+        // TODO Write new post
         // Navigator.of(context).pushNamed("/bbs/newPost",
         //     arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
       });
@@ -96,7 +95,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       });
     }
     if (_controller != null) {
-      //Overscroll event
+      // Over-scroll event
       _controller.addListener(() {
         if (_controller.offset >= _controller.position.maxScrollExtent &&
             !_isRefreshing) {
@@ -151,7 +150,6 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (result == null) {
       throw LoginException();
     } else {
-      _loginStatus = ConnectionStatus.DONE;
       return BmobUser()
         ..username = info.name
         ..email = info.id
@@ -172,12 +170,10 @@ class _BBSSubpageState extends State<BBSSubpage>
       PersonInfo info, dynamic e, StackTrace trace) async {
     if (e is DioError) {
       DioError error = e;
-      if (error.type == DioErrorType.RESPONSE) {
-        _loginStatus = ConnectionStatus.FATAL_ERROR;
+      if (error.type == DioErrorType.response) {
         return await register(info);
       } else {
         // If timeout
-        _loginStatus = ConnectionStatus.FAILED;
         return null;
       }
     }
@@ -241,7 +237,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: Text(S.of(context).failed),
       ),
       onTap: () {
-        _loginStatus = ConnectionStatus.NONE;
         refreshSelf();
       },
     );
