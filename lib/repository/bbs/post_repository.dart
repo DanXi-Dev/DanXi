@@ -46,23 +46,6 @@ class PostRepository extends BaseRepositoryWithDio {
     initRepository();
   }
 
-  Future<BmobUser> login(PersonInfo personInfo) async {
-    BmobUser user = BmobUser();
-    user.username = personInfo.name;
-    user.email = personInfo.id;
-    user.password = personInfo.password;
-    return await user.login();
-  }
-
-  Future<BmobRegistered> register(PersonInfo personInfo) async {
-    var user = BmobUser();
-    user
-      ..username = personInfo.name
-      ..email = "${personInfo.id}@fudan.edu.cn"
-      ..password = personInfo.password;
-    return await user.register();
-  }
-
   requestToken(PersonInfo info) async {
     //Pin HTTPS cert
     ByteData certBytes = await rootBundle.load('assets/FDUHOLE_R3.cer');
