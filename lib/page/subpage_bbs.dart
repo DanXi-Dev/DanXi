@@ -164,7 +164,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
     //TODO:
     PostRepository.getInstance().initializeUser(info);
-    return await PostRepository.getInstance().loadPosts(1, info);
+    return await PostRepository.getInstance().loadPosts(1);
   }
 
   @override

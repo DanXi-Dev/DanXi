@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
@@ -22,7 +24,9 @@ import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:data_plugin/bmob/response/bmob_registered.dart';
 import 'package:data_plugin/bmob/table/bmob_user.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -30,7 +34,8 @@ class PostRepository extends BaseRepositoryWithDio {
   factory PostRepository.getInstance() => _instance;
   static const String _BASE_URL = "https://www.fduhole.tk/v1";
 
-  PersonInfo _info;
+  //HTTPS Certificate Pinning
+  var secureDio = Dio();
 
   /// The token used for session authentication.
   ///
@@ -58,8 +63,20 @@ class PostRepository extends BaseRepositoryWithDio {
     return await user.register();
   }
 
-  requestToken() async {
-    Response response = await dio.post(_BASE_URL + "/register/", data: {'api-key': Secret.FDUHOLE_API_KEY, 'email': "${_info.id}@fudan.edu.cn", "password": "APP_GENERATED_TEST_PASSWORD"});
+  requestToken(PersonInfo info) async {
+    //Pin HTTPS cert
+    ByteData certBytes = await rootBundle.load('assets/FDUHOLE_R3.cer');
+    //TODO: Let's Encrypt Certificates expire every 90 days. We should find a way to pin certificate CA only
+    (secureDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate  = (client) {
+      SecurityContext sc = SecurityContext();
+      //file is the path of certificate
+      sc.setTrustedCertificatesBytes(certBytes.buffer.asUint8List());
+      HttpClient httpClient = HttpClient(context: sc);
+      return httpClient;
+    };
+
+
+    Response response = await secureDio.post(_BASE_URL + "/register/", data: {'api-key': Secret.FDUHOLE_API_KEY, 'email': "${info.id}@fudan.edu.cn", "password": "APP_GENERATED_TEST_PASSWORD"});
     if(response.statusCode == 200) _token = response.data["token"];
     else {
       _token = null;
@@ -69,15 +86,14 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Map<String, String> get _tokenHeader {
-    requestToken();
     return {"Authorization": "Token " + _token};
   }
 
   void initializeUser(PersonInfo info) {
-    _info = info; //TODO: Ensure [_info] is set before loading anything
+    requestToken(info); //TODO: IMPORTANT Ensure token is successfully obtained before continuing
   }
 
-  Future<List<BBSPost>> loadPosts(int page, PersonInfo personInfo) async {
+  Future<List<BBSPost>> loadPosts(int page) async {
     Response response = await dio.get(_BASE_URL + "/discussions/",
         queryParameters: {"page": page},
         options: Options(headers: _tokenHeader));
