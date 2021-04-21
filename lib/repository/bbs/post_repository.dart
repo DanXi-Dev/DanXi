@@ -69,14 +69,18 @@ class PostRepository extends BaseRepositoryWithDio {
     //TODO: Let's Encrypt Certificates expire every 90 days. We should find a way to pin certificate CA only
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate  = (client) {
       SecurityContext sc = SecurityContext();
-      //file is the path of certificate
       sc.setTrustedCertificatesBytes(certBytes.buffer.asUint8List());
       HttpClient httpClient = HttpClient(context: sc);
       return httpClient;
     };
 
 
-    Response response = await secureDio.post(_BASE_URL + "/register/", data: {'api-key': Secret.FDUHOLE_API_KEY, 'email': "${info.id}@fudan.edu.cn", "password": "APP_GENERATED_TEST_PASSWORD"});
+    Response response = await secureDio.post(_BASE_URL + "/register/",
+        data: {
+          'api-key': Secret.FDUHOLE_API_KEY,
+          'email': "${info.id}@fudan.edu.cn",
+          "password": "APP_GENERATED_TEST_PASSWORD"
+    });
     if(response.statusCode == 200) _token = response.data["token"];
     else {
       _token = null;
@@ -89,8 +93,8 @@ class PostRepository extends BaseRepositoryWithDio {
     return {"Authorization": "Token " + _token};
   }
 
-  void initializeUser(PersonInfo info) {
-    requestToken(info); //TODO: IMPORTANT Ensure token is successfully obtained before continuing
+  void initializeUser(PersonInfo info) async{
+    await requestToken(info);
   }
 
   Future<List<BBSPost>> loadPosts(int page) async {
