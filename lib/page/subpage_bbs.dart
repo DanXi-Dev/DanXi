@@ -62,7 +62,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   int _currentBBSPage;
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
-  bool _is_end_indicator_shown;
+  bool _isRefreshing;
+  bool isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
   @override
@@ -72,7 +73,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     _currentBBSPage = 1;
     _lastPageItems = [];
     _lastSnapshotData = null;
-    _is_end_indicator_shown = false;
+    _isRefreshing = true;
+    isEndIndicatorShown = false;
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -95,7 +97,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     if(_controller != null) {
       //Overscroll event
       _controller.addListener(() {
-        if(_controller.offset >= _controller.position.maxScrollExtent) {
+        if(_controller.offset >= _controller.position.maxScrollExtent && !_isRefreshing) {
+          _isRefreshing = true;
           setState(() {
             _currentBBSPage++;
           });
@@ -205,10 +208,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
+                      _isRefreshing = true;
                       if (_lastSnapshotData == null) return _buildLoadingPage();
-                      return _buildPage(_lastSnapshotData.data);
+                      return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:
+                      _isRefreshing = false;
                       if (snapshot.hasError || !snapshot.hasData) {
                         return _buildErrorPage(error: snapshot.error);
                       } else {
@@ -222,9 +227,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                 future: loginAndLoadPost(context.personInfo))));
   }
 
-  Widget _buildLoadingPage() => GestureDetector(
-        child: Center(child: CircularProgressIndicator()),
-      );
+  Widget _buildLoadingPage() => Container(
+    padding: EdgeInsets.all(7),
+    child: Center(child: CircularProgressIndicator()),
+  );
 
   Widget _buildErrorPage({Exception error}) {
     /*return Column(
@@ -252,7 +258,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               physics: const AlwaysScrollableScrollPhysics(),
               controller: _controller,
               itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1,
-              itemBuilder: (context, index) => _buildListItem(index, data),
+              itemBuilder: (context, index) => _buildListItem(index, data, true),
             ),),
         cupertino: (_, __) => CupertinoScrollbar(
             controller: _controller,
@@ -260,21 +266,45 @@ class _BBSSubpageState extends State<BBSSubpage>
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
                 itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
-                itemBuilder: (context, index) => _buildListItem(index, data),
+                itemBuilder: (context, index) => _buildListItem(index, data, true),
             ),
         )
     );
   }
 
-  Widget _buildListItem(int index, List<BBSPost> data) {
-    //print("index: " + index.toString() + " length: " + _lastPageItems.length.toString());
-    if(index >= _lastPageItems.length) {
+  Widget _buildPageWhileLoading(List<BBSPost> data) {
+    return PlatformWidget(
+      // Add a scrollbar on desktop platform
+        material: (_, __) => Scrollbar(
+            controller: _controller,
+            interactive: PlatformX.isDesktop,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _controller,
+              itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+              itemBuilder: (context, index) => _buildListItem(index, data, false),
+            ),),
+        cupertino: (_, __) => CupertinoScrollbar(
+          controller: _controller,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: (_lastSnapshotData == null ? _currentBBSPage : _currentBBSPage - 1) * POST_COUNT_PER_PAGE + 1, //TODO: Move this hard-coded number to a Constant
+            itemBuilder: (context, index) => _buildListItem(index, data, false),
+          ),
+        )
+    );
+  }
+
+  Widget _buildListItem(int index, List<BBSPost> data, bool isNewData) {
+    print("index: " + index.toString() + " length: " + _lastPageItems.length.toString() + " isNEWDATA " + isNewData.toString());
+    if(isNewData && index >= _lastPageItems.length) {
       try {
         _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
       }
       catch (e) {
-        if (!_is_end_indicator_shown) {
-          _is_end_indicator_shown = true;
+        if (!isEndIndicatorShown) {
+          isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget> [Divider(),Text(S.of(context).end_reached),],
@@ -283,8 +313,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         return null;
       }
     }
-    if(index >= _currentBBSPage * POST_COUNT_PER_PAGE) return _buildLoadingPage();
-    //if(_lastPageItems[index] == null) print("ABOUT TO RETURN NULL");
+    if(index >= _lastPageItems.length) return _buildLoadingPage();
     return _lastPageItems[index];
   }
 
@@ -293,9 +322,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
           child: ListTile(
-              //leading: Icon(SFSymbols.quote_bubble_fill),
-              //visualDensity: VisualDensity(vertical: 2),
-              isThreeLine: false,
+              leading: Icon(SFSymbols.quote_bubble_fill),
+              visualDensity: VisualDensity(vertical: 2),
               dense: false,
               title: Text(
                 e.first_post.content,
