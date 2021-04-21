@@ -59,14 +59,13 @@ class PostRepository extends BaseRepositoryWithDio {
 
     Response response = await dio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
-      'email': "${info.id}@fudan.edu.cn",
-      "password": "APP_GENERATED_TEST_PASSWORD"
+      'email': "${info.id}@fudan.edu.cn"
     });
     if (response.statusCode == 200)
       _token = response.data["token"];
     else {
       _token = null;
-      print("failed " + response.statusCode.toString() + response.toString());
+      print("failed to login to fduhole " + response.statusCode.toString() + response.toString());
       throw NotLoginError();
     }
   }
