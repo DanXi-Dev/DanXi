@@ -373,8 +373,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Material(
         //color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
-          margin: EdgeInsets.fromLTRB(10,8,10,8),
-          elevation: 4,
+          //margin: EdgeInsets.fromLTRB(10,8,10,8),
+          elevation: 5,
           child: ListTile(
               contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
               //visualDensity: VisualDensity(vertical: 2),

@@ -170,15 +170,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ));
         },
         child: Card(
-            margin: EdgeInsets.fromLTRB(10,8,10,8),
-            elevation: 4,
+            //margin: EdgeInsets.fromLTRB(10,8,10,8),
+            elevation: 5,
             child: ListTile(
           dense: false,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10,),
-
               if (index == 0)
                 Row(
                   children: _generateTagWidgets(_post),

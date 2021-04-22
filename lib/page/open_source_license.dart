@@ -76,7 +76,6 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
     if (_items != null)
       _items.forEach((element) {
         widgets.add(Material(
-            color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
               title: Text(element.name),
               subtitle: Text(element.license.licenseName),

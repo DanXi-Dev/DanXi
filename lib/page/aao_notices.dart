@@ -101,7 +101,6 @@ class _AAONoticesListState extends State<AAONoticesList> {
     if (_data == null) return widgets;
     _data.forEach((Notice value) {
       widgets.add(Material(
-          color: isCupertino(context) ? Colors.white : null,
           child: ListTile(
             leading: PlatformX.isAndroid
                 ? Icon(Icons.info)

@@ -133,7 +133,6 @@ class _CardDetailPageState extends State<CardDetailPage> {
     if (_cardInfo.records != null)
       _cardInfo.records.forEach((element) {
         widgets.add(Material(
-            color: isCupertino(context) ? Colors.white : null,
             child: ListTile(
               // leading: PlatformX.isAndroid
               //     ? Icon(Icons.monetization_on)

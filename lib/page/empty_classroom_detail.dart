@@ -250,7 +250,6 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     if (data != null)
       data.forEach((element) {
         widgets.add(Material(
-            color: isCupertino(context) ? Colors.white : null,
             child: Container(
               padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
               child: Column(
