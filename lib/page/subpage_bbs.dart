@@ -28,6 +28,7 @@ import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
 import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
+import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dio/dio.dart';
@@ -195,7 +196,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// Login in and load all of the posts.
   Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
     var _postRepoInstance = PostRepository.getInstance();
-    if (!_postRepoInstance.isUserInitialized) await _postRepoInstance.initializeUser(info);
+    if (!_postRepoInstance.isUserInitialized)
+      await _postRepoInstance.initializeUser(info);
     return await _postRepoInstance.loadPosts(_currentBBSPage);
   }
 
@@ -342,29 +344,33 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   List<Widget> _generateTagWidgets(BBSPost e) {
     List<Widget> _tags = [
-      const SizedBox(width: 2,),
+      const SizedBox(
+        width: 2,
+      ),
     ];
-    e.tags.forEach((element) { 
-      _tags.add(
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 7),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Constant.getColorFromString(element.color),
-              width: 1,),
-            borderRadius: BorderRadius.circular(16),
-            //color: Constant.getColorFromString(element.color).withAlpha(25),
+    e.tags.forEach((element) {
+      _tags.add(Container(
+        padding: EdgeInsets.symmetric(horizontal: 7),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Constant.getColorFromString(element.color),
+            width: 1,
           ),
-          child: Text(
-            element.name,
-            style: TextStyle(
-                fontSize: 14,
-                color: Constant.getColorFromString(element.color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
-            ),
-          ),
-        )
-      );
-      _tags.add(const SizedBox(width: 6,));
+          borderRadius: BorderRadius.circular(16),
+          //color: Constant.getColorFromString(element.color).withAlpha(25),
+        ),
+        child: Text(
+          element.name,
+          style: TextStyle(
+              fontSize: 14,
+              color: Constant.getColorFromString(element
+                  .color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
+              ),
+        ),
+      ));
+      _tags.add(const SizedBox(
+        width: 6,
+      ));
     });
     return _tags;
   }
@@ -373,65 +379,69 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Material(
         //color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
-          //margin: EdgeInsets.fromLTRB(10,8,10,8),
-          elevation: 5,
-          child: ListTile(
-              contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
-              //visualDensity: VisualDensity(vertical: 2),
-              dense: false,
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: _generateTagWidgets(e),
-                  ),
-                  const SizedBox(height: 10,),
-                  Text(
-                    _renderTitle(e.first_post.content),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+      //margin: EdgeInsets.fromLTRB(10,8,10,8)
+      child: ListTile(
+          contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
+          //visualDensity: VisualDensity(vertical: 2),
+          dense: false,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: _generateTagWidgets(e),
               ),
-              subtitle: Column(
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                _renderTitle(e.first_post.content),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          subtitle: Column(
+            children: [
+              const SizedBox(
+                height: 12,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(height: 12,),
+                  Text(
+                    "#${e.id}",
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 12),
+                  ),
+                  Text(
+                    HumanDuration.format(
+                        context, DateTime.parse(e.date_created)),
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 12),
+                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "#${e.id}",
-                        style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
-                      ),
-                      Text(
-                        e.date_created,
+                        e.count.toString() + " ",
                         style: TextStyle(
                             color: Theme.of(context).hintColor, fontSize: 12),
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            e.count.toString() + " ",
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor, fontSize: 12),
-                          ),
-                          Icon(
-                            SFSymbols.ellipses_bubble,
-                            size: 12,
-                            color: Theme.of(context).hintColor,
-                          ),
-                        ],
+                      Icon(
+                        SFSymbols.ellipses_bubble,
+                        size: 12,
+                        color: Theme.of(context).hintColor,
                       ),
                     ],
                   ),
                 ],
               ),
-              onTap: () {
-                Navigator.of(context)
-                    .pushNamed("/bbs/postDetail", arguments: {"post": e});
-              }),
-        ));
+            ],
+          ),
+          onTap: () {
+            Navigator.of(context)
+                .pushNamed("/bbs/postDetail", arguments: {"post": e});
+          }),
+    ));
   }
 
   @override

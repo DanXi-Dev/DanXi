@@ -127,5 +127,11 @@
     "dev_image_url_4": "assets/graphics/hasbai.jpeg",
 
     "feedback_email": "danxi_dev@protonmail.com",
-    "privacy_policy_url" : "https://danxi-dev.github.io/privacy"
+    "privacy_policy_url" : "https://danxi-dev.github.io/privacy",
+
+    "moment_ago":"Moment ago",
+    "second_ago":"{num} sec(s) ago",
+    "minute_ago":"{num} min(s) ago",
+    "hour_ago":"{num} hr(s) ago",
+    "day_ago":"{num} day(s) ago"
 }

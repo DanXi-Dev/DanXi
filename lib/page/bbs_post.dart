@@ -21,6 +21,7 @@ import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -171,7 +172,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
         child: Card(
             //margin: EdgeInsets.fromLTRB(10,8,10,8),
-            elevation: 5,
             child: ListTile(
           dense: false,
           title: Column(
@@ -224,9 +224,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     color: Theme.of(context).hintColor, fontSize: 12),
               ),
               Text(
-                e.date_created,
-                style: TextStyle(
-                    color: Theme.of(context).hintColor, fontSize: 12),
+                HumanDuration.format(context, DateTime.parse(e.date_created)),
+                style:
+                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
             ]),
             ]),

@@ -1224,6 +1224,56 @@ class S {
       args: [],
     );
   }
+
+  /// `Moment ago`
+  String get moment_ago {
+    return Intl.message(
+      'Moment ago',
+      name: 'moment_ago',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{num} sec(s) ago`
+  String second_ago(Object num) {
+    return Intl.message(
+      '$num sec(s) ago',
+      name: 'second_ago',
+      desc: '',
+      args: [num],
+    );
+  }
+
+  /// `{num} min(s) ago`
+  String minute_ago(Object num) {
+    return Intl.message(
+      '$num min(s) ago',
+      name: 'minute_ago',
+      desc: '',
+      args: [num],
+    );
+  }
+
+  /// `{num} hr(s) ago`
+  String hour_ago(Object num) {
+    return Intl.message(
+      '$num hr(s) ago',
+      name: 'hour_ago',
+      desc: '',
+      args: [num],
+    );
+  }
+
+  /// `{num} day(s) ago`
+  String day_ago(Object num) {
+    return Intl.message(
+      '$num day(s) ago',
+      name: 'day_ago',
+      desc: '',
+      args: [num],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
