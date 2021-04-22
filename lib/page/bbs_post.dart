@@ -147,7 +147,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _getListItem(Reply e, int index) => Material(
-      color: PlatformX.backgroundColor(context),
+      //color: PlatformX.backgroundColor(context),
       child: GestureDetector(
         onLongPress: () {
           showPlatformModalSheet(

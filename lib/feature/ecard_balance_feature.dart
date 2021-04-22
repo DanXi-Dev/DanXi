@@ -148,6 +148,7 @@ class EcardBalanceFeature extends Feature {
       return Text(
         Constant.yuanSymbol(_balance),
         textScaleFactor: 1.2,
+        style: TextStyle(color: num.tryParse(_balance) == null ? null : num.tryParse(_balance) < 20.0 ? Colors.red : null),
       );
     return null;
   }

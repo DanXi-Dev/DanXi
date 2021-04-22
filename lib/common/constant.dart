@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:event_bus/event_bus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -66,7 +67,7 @@ class Constant {
         backgroundColor: Colors.black,
         colorScheme: ColorScheme.dark(),
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(10,8,10,8),
+          margin: EdgeInsets.fromLTRB(7,8,7,8),
           elevation: 5,
           color: Color.fromRGBO(28, 28, 30, 1.0),
           //shadowColor: Color.fromRGBO(28, 28, 30, 50),
@@ -76,6 +77,7 @@ class Constant {
         ),
         canvasColor: Colors.black,
         dialogBackgroundColor: Color.fromRGBO(28, 28, 30, 1.0),
+        textTheme: Typography.whiteCupertino,
       );
     }
     return ThemeData(
