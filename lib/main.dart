@@ -113,29 +113,38 @@ class DanxiApp extends StatelessWidget {
     }
   }
 
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      brightness: Brightness.light,
+      primarySwatch: Colors.blue,
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: Colors.black,
+    );
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     changeSizeOnDesktop();
     return PlatformProvider(
         // initialPlatform: TargetPlatform.iOS,
-        builder: (BuildContext context) => PlatformApp(
+        builder: (BuildContext context) => Theme(
+          data: WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? _buildDarkTheme() : _buildLightTheme(),
+          child:
+            PlatformApp(
               title: 'Danxi',
               cupertino: (_, __) => CupertinoAppData(
-                  theme: CupertinoThemeData(
-                brightness: Brightness.light,
-                primaryColor: Color(0xFF007AFF), //Apple Blue
-                //primaryContrastingColor: Color(0xFF007AFF), //Apple Blue
-              )),
+                  //theme: MaterialBasedCupertinoThemeData(materialTheme: _buildLightTheme()),
+              ),
               material: (_, __) => MaterialAppData(
-                  //themeMode: ThemeMode.light,
-                  theme: ThemeData(
-                    brightness: Brightness.light,
-                    primarySwatch: Colors.blue,
-                  ),
-                  darkTheme: ThemeData(
-                    brightness: Brightness.dark,
-                  )),
+                  //theme: _buildLightTheme(),
+                  //darkTheme: _buildDarkTheme(),
+              ),
               localizationsDelegates: [
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
@@ -155,7 +164,8 @@ class DanxiApp extends StatelessWidget {
                 return null;
               },
               navigatorKey: Catcher.navigatorKey,
-            ));
+            )),
+    );
   }
 }
 
@@ -166,7 +176,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences _preferences;
 
   ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
@@ -178,6 +188,14 @@ class _HomePageState extends State<HomePage> {
   ///
   /// Request user to log in manually in the browser.
   StreamSubscription<CaptchaNeededException> _captchaSubscription;
+
+  //Dark/Light Theme Control
+  @override
+  void didChangePlatformBrightness() {
+    //TODO: on Platform Brightness Changes
+    print(WidgetsBinding.instance.window.platformBrightness); // should print Brightness.light / Brightness.dark when you switch
+    super.didChangePlatformBrightness(); // make sure you call this
+  }
 
   /// If we need to send the qr code to iWatch now.
   ///
@@ -391,7 +409,7 @@ class _HomePageState extends State<HomePage> {
                   cupertino: (_, __) => CupertinoNavigationBarData(
                     // Issue with cupertino where a bar with no transparency
                     // will push the list down. Adding some alpha value fixes it (in a hacky way)
-                    backgroundColor: Colors.white.withAlpha(254),
+                    //backgroundColor: Colors.white.withAlpha(254),
                     /*leading: MediaQuery(
                       data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
                       child: CupertinoNavigationBarBackButton(),
