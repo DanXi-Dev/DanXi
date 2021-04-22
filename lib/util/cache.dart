@@ -49,4 +49,25 @@ class Cache {
       return newValue;
     }
   }
+
+  /// Get a cached data.
+  ///
+  /// But network goes first.
+  static Future<T> getRemotely<T>(String key, Future<T> fetch(),
+      T decode(String cachedValue), String encode(T object),
+      {bool validate(T value)}) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (validate == null) {
+      validate = (v) => v != null;
+    }
+    T newValue = await fetch();
+    if (validate(newValue)) {
+      preferences.setString(key, encode(newValue));
+      return newValue;
+    } else {
+      // Fall back to local cache.
+      return get(key, fetch, decode, encode,
+          validate: (v) => v != null && validate(decode(v)));
+    }
+  }
 }

@@ -89,6 +89,12 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
     payload['jcjgqr'] = 0;
     payload['sfwztl'] = 0;
     payload['sftztl'] = 0;
+    // Copy vaccine injection's report data
+    (_historyData['oldInfo'] as Map).forEach((key, value) {
+      if ((key as String).startsWith('xs_')) {
+        payload[key] = value;
+      }
+    });
     return payload;
   }
 
@@ -103,7 +109,7 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };
-    Map payload = await Cache.get<Map>(
+    Map payload = await Cache.getRemotely<Map>(
         _KEY_PREF,
         () async => _buildPayloadFromHistory(),
         (cachedValue) => jsonDecode(cachedValue),
