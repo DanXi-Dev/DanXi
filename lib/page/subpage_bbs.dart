@@ -30,6 +30,7 @@ import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
 import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';

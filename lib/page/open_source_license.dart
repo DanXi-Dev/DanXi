@@ -41,34 +41,33 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-        builder: (BuildContext context) => PlatformScaffold(
-              iosContentBottomPadding: true,
-              iosContentPadding: true,
-          appBar: PlatformAppBarX(
-                  title: TopController(
-                controller: _controller,
-                child: Text(S.of(context).open_source_software_licenses),
-              )),
-              body: Column(children: [
-                Expanded(
-                    child: MediaQuery.removePadding(
-                        context: context,
-                        removeTop: true,
-                        child: PlatformWidget(
-                            material: (_, __) => Scrollbar(
-                                interactive: PlatformX.isDesktop,
-                                child: ListView(
-                                  controller: _controller,
-                                  children: _getListWidgets(),
-                                )),
-                            cupertino: (_, __) => CupertinoScrollbar(
-                                    child: ListView(
-                                  controller: _controller,
-                                  children: _getListWidgets(),
-                                ))))),
-              ]),
-            ));
+    return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
+      appBar: PlatformAppBarX(
+          title: TopController(
+        controller: _controller,
+        child: Text(S.of(context).open_source_software_licenses),
+      )),
+      body: Column(children: [
+        Expanded(
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: PlatformWidget(
+                    material: (_, __) => Scrollbar(
+                        interactive: PlatformX.isDesktop,
+                        child: ListView(
+                          controller: _controller,
+                          children: _getListWidgets(),
+                        )),
+                    cupertino: (_, __) => CupertinoScrollbar(
+                            child: ListView(
+                          controller: _controller,
+                          children: _getListWidgets(),
+                        ))))),
+      ]),
+    );
   }
 
   List<Widget> _getListWidgets() {
@@ -77,10 +76,10 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
       _items.forEach((element) {
         widgets.add(Material(
             child: ListTile(
-              title: Text(element.name),
-              subtitle: Text(element.license.licenseName),
-              onTap: () => launch(element.url),
-            )));
+          title: Text(element.name),
+          subtitle: Text(element.license.licenseName),
+          onTap: () => launch(element.url),
+        )));
       });
     return widgets;
   }

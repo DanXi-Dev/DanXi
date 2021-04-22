@@ -68,64 +68,60 @@ class _CardDetailPageState extends State<CardDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-        builder: (BuildContext context) => PlatformScaffold(
-              iosContentBottomPadding: true,
-              iosContentPadding: true,
-          appBar: PlatformAppBarX(
-                  title: TopController(
-                controller: _controller,
-                child: Text(S.of(context).ecard_balance_log),
-              )),
-              body: Column(children: [
-                TagContainer(
-                    fillRandomColor: false,
-                    fixedColor: Colors.purple,
-                    fontSize: 16,
-                    enabled: _selectable,
-                    singleChoice: true,
-                    defaultChoice: -1,
-                    onChoice: (Tag tag, list) async {
-                      int index = _tags.indexOf(tag);
-                      if (index >= 0) {
-                        // Make the tags not clickable when data's being retrieved
-                        setState(() {
-                          tag.checkedIcon = PlatformX.isAndroid
-                              ? Icons.pending
-                              : SFSymbols.hourglass;
-                          _selectable = false;
-                        });
-                        _cardInfo.records =
-                            await Retrier.runAsyncWithRetryForever(() =>
-                                CardRepository.getInstance()
-                                    .loadCardRecord(_tagDays[index]));
-                        setState(() {
-                          tag.checkedIcon = PlatformX.isAndroid
-                              ? Icons.check
-                              : SFSymbols.checkmark;
-                          _selectable = true;
-                        });
-                      }
-                    },
-                    tagList: _tags),
-                Expanded(
-                    child: MediaQuery.removePadding(
-                        context: context,
-                        removeTop: true,
-                        child: PlatformWidget(
-                            material: (_, __) => Scrollbar(
-                                interactive: PlatformX.isDesktop,
-                                child: ListView(
-                                  controller: _controller,
-                                  children: _getListWidgets(),
-                                )),
-                            cupertino: (_, __) => CupertinoScrollbar(
-                                    child: ListView(
-                                  controller: _controller,
-                                  children: _getListWidgets(),
-                                ))))),
-              ]),
-            ));
+    return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
+      appBar: PlatformAppBarX(
+          title: TopController(
+        controller: _controller,
+        child: Text(S.of(context).ecard_balance_log),
+      )),
+      body: Column(children: [
+        TagContainer(
+            fillRandomColor: false,
+            fixedColor: Colors.purple,
+            fontSize: 16,
+            enabled: _selectable,
+            singleChoice: true,
+            defaultChoice: -1,
+            onChoice: (Tag tag, list) async {
+              int index = _tags.indexOf(tag);
+              if (index >= 0) {
+                // Make the tags not clickable when data's being retrieved
+                setState(() {
+                  tag.checkedIcon =
+                      PlatformX.isAndroid ? Icons.pending : SFSymbols.hourglass;
+                  _selectable = false;
+                });
+                _cardInfo.records = await Retrier.runAsyncWithRetryForever(() =>
+                    CardRepository.getInstance()
+                        .loadCardRecord(_tagDays[index]));
+                setState(() {
+                  tag.checkedIcon =
+                      PlatformX.isAndroid ? Icons.check : SFSymbols.checkmark;
+                  _selectable = true;
+                });
+              }
+            },
+            tagList: _tags),
+        Expanded(
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: PlatformWidget(
+                    material: (_, __) => Scrollbar(
+                        interactive: PlatformX.isDesktop,
+                        child: ListView(
+                          controller: _controller,
+                          children: _getListWidgets(),
+                        )),
+                    cupertino: (_, __) => CupertinoScrollbar(
+                            child: ListView(
+                          controller: _controller,
+                          children: _getListWidgets(),
+                        ))))),
+      ]),
+    );
   }
 
   List<Widget> _getListWidgets() {
@@ -134,14 +130,14 @@ class _CardDetailPageState extends State<CardDetailPage> {
       _cardInfo.records.forEach((element) {
         widgets.add(Material(
             child: ListTile(
-              // leading: PlatformX.isAndroid
-              //     ? Icon(Icons.monetization_on)
-              //     : Icon(SFSymbols.money_dollar_circle_fill),
-              title: Text(element.location),
-              trailing: Text(Constant.yuanSymbol(element.payment)),
-              subtitle:
-                  Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
-            )));
+          // leading: PlatformX.isAndroid
+          //     ? Icon(Icons.monetization_on)
+          //     : Icon(SFSymbols.money_dollar_circle_fill),
+          title: Text(element.location),
+          trailing: Text(Constant.yuanSymbol(element.payment)),
+          subtitle:
+              Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
+        )));
       });
 
     return widgets;

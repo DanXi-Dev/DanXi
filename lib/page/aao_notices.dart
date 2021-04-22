@@ -69,31 +69,30 @@ class _AAONoticesListState extends State<AAONoticesList> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-        builder: (BuildContext context) => PlatformScaffold(
-              iosContentBottomPadding: true,
-              iosContentPadding: true,
-          appBar: PlatformAppBarX(
-                  title: TopController(
-                child: Text(S.of(context).fudan_aao_notices),
-                controller: _controller,
-              )),
-              body: Column(
-                children: [
-                  Expanded(
-                      child: MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: Scrollbar(
-                              interactive: PlatformX.isDesktop,
-                              controller: _controller,
-                              child: ListView(
-                                controller: _controller,
-                                children: _getListWidgets(),
-                              ))))
-                ],
-              ),
-            ));
+    return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
+      appBar: PlatformAppBarX(
+          title: TopController(
+        child: Text(S.of(context).fudan_aao_notices),
+        controller: _controller,
+      )),
+      body: Column(
+        children: [
+          Expanded(
+              child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: Scrollbar(
+                      interactive: PlatformX.isDesktop,
+                      controller: _controller,
+                      child: ListView(
+                        controller: _controller,
+                        children: _getListWidgets(),
+                      ))))
+        ],
+      ),
+    );
   }
 
   List<Widget> _getListWidgets() {
@@ -102,13 +101,13 @@ class _AAONoticesListState extends State<AAONoticesList> {
     _data.forEach((Notice value) {
       widgets.add(Material(
           child: ListTile(
-            leading: PlatformX.isAndroid
-                ? Icon(Icons.info)
-                : Icon(SFSymbols.info_circle_fill),
-            title: Text(value.title),
-            subtitle: Text(value.time),
-            onTap: () => launch(value.url),
-          )));
+        leading: PlatformX.isAndroid
+            ? Icon(Icons.info)
+            : Icon(SFSymbols.info_circle_fill),
+        title: Text(value.title),
+        subtitle: Text(value.time),
+        onTap: () => launch(value.url),
+      )));
     });
 
     return widgets;

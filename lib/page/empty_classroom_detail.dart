@@ -87,19 +87,18 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .toList()
         .asMap();
 
-    return PlatformProvider(
-        builder: (BuildContext context) => PlatformScaffold(
-          iosContentBottomPadding: true,
-              iosContentPadding: true,
-              appBar: PlatformAppBarX(
-                  title: TopController(
-                controller: _controller,
-                child: Text(S.of(context).empty_classrooms),
-              )),
-              body: Column(children: [
-                SizedBox(
-                  height: PlatformX.isMaterial(context) ? 0 : 12,
-                ),
+    return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
+      appBar: PlatformAppBarX(
+          title: TopController(
+        controller: _controller,
+        child: Text(S.of(context).empty_classrooms),
+      )),
+      body: Column(children: [
+        SizedBox(
+          height: PlatformX.isMaterial(context) ? 0 : 12,
+        ),
                 // Use different widgets on iOS/Android: Tag/Tab.
                 PlatformWidget(
                     material: (_, __) => TagContainer(
@@ -232,17 +231,16 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                                   snapshot.data),
                                             )))));
                         break;
-                    }
-                    return null;
-                  },
-                  future: EmptyClassroomRepository.getInstance()
-                      .getBuildingRoomInfo(
-                          _personInfo,
-                          _buildingList[_selectBuildingIndex].data,
-                          DateTime.now()),
-                ),
-              ]),
-            ));
+            }
+            return null;
+          },
+          future: EmptyClassroomRepository.getInstance().getBuildingRoomInfo(
+              _personInfo,
+              _buildingList[_selectBuildingIndex].data,
+              DateTime.now()),
+        ),
+      ]),
+    );
   }
 
   List<Widget> _getListWidgets(List<RoomInfo> data) {

@@ -28,6 +28,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -141,37 +142,28 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    return FutureBuilder(
-        builder: (_, AsyncSnapshot<TimeTable> snapshot) {
-          if (snapshot.hasData) {
-            return _buildPage(snapshot.data);
-          } else if (snapshot.hasError &&
-              _status == ConnectionStatus.CONNECTING) {
-            _status = ConnectionStatus.FAILED;
-            return GestureDetector(
-              onTap: () {
-                _status = ConnectionStatus.NONE;
-                refreshSelf();
-              },
-              child: Center(
-                child: Text(S.of(context).failed),
-              ),
-            );
-          } else {
-            _status = ConnectionStatus.CONNECTING;
-            return Container(
-              child: Center(
-                child: Text(S.of(context).loading),
-              ),
-            );
-          }
+    return FutureWidget(
+      successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) =>
+          _buildPage(snapshot.data),
+      future: Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
+          .loadTimeTableLocally(context.personInfo,
+              startTime: START_TIME,
+              forceLoadFromRemote: _forceLoadFromRemote)),
+      errorBuilder: GestureDetector(
+        onTap: () {
+          _status = ConnectionStatus.NONE;
+          refreshSelf();
         },
-        future: Retrier.runAsyncWithRetry(() =>
-            TimeTableRepository.getInstance().loadTimeTableLocally(
-                context.personInfo,
-                startTime: START_TIME,
-                forceLoadFromRemote: _forceLoadFromRemote)));
+        child: Center(
+          child: Text(S.of(context).failed),
+        ),
+      ),
+      loadingBuilder: Container(
+        child: Center(
+          child: Text(S.of(context).loading),
+        ),
+      ),
+    );
   }
 
   goToPrev() {
@@ -194,6 +186,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     _table = table;
     if (_showingTime == null) _showingTime = _table.now();
     _status = ConnectionStatus.DONE;
+
+    final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
 
     return Column(children: [
       Row(

@@ -65,7 +65,7 @@ class _ScheduleViewState extends State<ScheduleView> {
             padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
                 //color: PlatformX.isDarkMode(context) ? Colors.black12 : Colors.white,
-                color: Theme.of(context).hoverColor,
+                // color: Theme.of(context).hoverColor,
                 borderRadius: BorderRadius.circular(4)),
           ),
         ));

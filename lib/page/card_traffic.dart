@@ -75,48 +75,45 @@ class _CardCrowdDataState extends State<CardCrowdData> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-        builder: (BuildContext context) => PlatformScaffold(
-              iosContentBottomPadding: true,
-              iosContentPadding: true,
-          appBar: PlatformAppBarX(
-                  title: TopController(
-                      controller: _controller,
-                      child: Text(S.of(context).dining_hall_crowdedness))),
-              body: Column(
-                children: [
-                  SizedBox(
-                    height: PlatformX.isMaterial(context) ? 0 : 10,
+    return PlatformScaffold(
+      iosContentBottomPadding: true,
+      iosContentPadding: true,
+      appBar: PlatformAppBarX(
+          title: TopController(
+              controller: _controller,
+              child: Text(S.of(context).dining_hall_crowdedness))),
+      body: Column(
+        children: [
+          SizedBox(
+            height: PlatformX.isMaterial(context) ? 0 : 10,
+          ),
+          PlatformWidget(
+              material: (_, __) => DropdownButton<Campus>(
+                    items: _getItems(),
+                    // Don't select anything if _selectItem == Campus.NONE
+                    value: _selectItem == Campus.NONE ? null : _selectItem,
+                    hint: Text(_selectItem.displayTitle(context)),
+                    onChanged: (Campus e) => _onSelectedItemChanged(e),
                   ),
-                  PlatformWidget(
-                      material: (_, __) => DropdownButton<Campus>(
-                            items: _getItems(),
-                            // Don't select anything if _selectItem == Campus.NONE
-                            value:
-                                _selectItem == Campus.NONE ? null : _selectItem,
-                            hint: Text(_selectItem.displayTitle(context)),
-                            onChanged: (Campus e) => _onSelectedItemChanged(e),
-                          ),
-                      cupertino: (_, __) =>
-                          CupertinoSlidingSegmentedControl<int>(
-                            onValueChanged: (int value) {
-                              _sliding = value;
-                              _onSelectedItemChanged(Campus.values[_sliding]);
-                            },
-                            groupValue: _sliding,
-                            children: _getCupertinoItems(),
-                          )),
-                  Expanded(
-                      child: MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: ListView(
-                            controller: _controller,
-                            children: _getListWidgets(),
-                          )))
-                ],
-              ),
-            ));
+              cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
+                    onValueChanged: (int value) {
+                      _sliding = value;
+                      _onSelectedItemChanged(Campus.values[_sliding]);
+                    },
+                    groupValue: _sliding,
+                    children: _getCupertinoItems(),
+                  )),
+          Expanded(
+              child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: ListView(
+                    controller: _controller,
+                    children: _getListWidgets(),
+                  )))
+        ],
+      ),
+    );
   }
 
   List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
@@ -185,10 +182,11 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                         SFSymbols.location_circle,
                         color: Theme.of(context).accentColor,
                       ),
-                Text(
-                  zoneName,
-                  style: TextStyle(fontSize: 18, color: Theme.of(context).accentColor,)
-                ),
+                Text(zoneName,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).accentColor,
+                    )),
               ],
             ),
             Column(

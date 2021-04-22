@@ -117,40 +117,40 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     changeSizeOnDesktop();
+    ThemeData data = PlatformX.isDarkMode
+        ? Constant.darkTheme(PlatformX.isCupertino(context))
+        : Constant.lightTheme(PlatformX.isCupertino(context));
     return PlatformProvider(
-        // initialPlatform: TargetPlatform.iOS,
-        builder: (BuildContext context) => Theme(
-          data: WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? Constant.darkTheme(PlatformX.isCupertino(context)) : Constant.lightTheme(PlatformX.isCupertino(context)),
-          child:
-            PlatformApp(
-              title: 'Danxi',
-              cupertino: (_, __) => CupertinoAppData(
-                  //theme: MaterialBasedCupertinoThemeData(materialTheme: _buildLightTheme()),
-              ),
-              material: (_, __) => MaterialAppData(
-                  //theme: _buildLightTheme(),
-                  //darkTheme: _buildDarkTheme(),
-              ),
-              localizationsDelegates: [
-                S.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate
-              ],
-              supportedLocales: S.delegate.supportedLocales,
-              home: HomePage(),
-              onGenerateRoute: (settings) {
-                final Function pageContentBuilder = this.routes[settings.name];
-                if (pageContentBuilder != null) {
-                  return platformPageRoute(
-                      context: context,
-                      builder: (context) => pageContentBuilder(context,
-                          arguments: settings.arguments));
-                }
-                return null;
-              },
-              navigatorKey: Catcher.navigatorKey,
-            )),
+      builder: (BuildContext context) => Theme(
+        data: data,
+        child: PlatformApp(
+          title: 'Danxi',
+          cupertino: (_, __) => CupertinoAppData(
+              theme: CupertinoThemeData(
+                  textTheme: CupertinoTextThemeData(
+                      textStyle:
+                          TextStyle(color: data.textTheme.bodyText1.color)))),
+          localizationsDelegates: [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          home: HomePage(),
+          onGenerateRoute: (settings) {
+            final Function pageContentBuilder = this.routes[settings.name];
+            if (pageContentBuilder != null) {
+              return platformPageRoute(
+                  context: context,
+                  builder: (context) => pageContentBuilder(context,
+                      arguments: settings.arguments));
+            }
+            return null;
+          },
+          navigatorKey: Catcher.navigatorKey,
+        ),
+      ),
     );
   }
 }
@@ -179,7 +179,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didChangePlatformBrightness() {
     //TODO: on Platform Brightness Changes
-    print(WidgetsBinding.instance.window.platformBrightness); // should print Brightness.light / Brightness.dark when you switch
+    print(WidgetsBinding.instance.window
+        .platformBrightness); // should print Brightness.light / Brightness.dark when you switch
     super.didChangePlatformBrightness(); // make sure you call this
   }
 
@@ -368,128 +369,124 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-        builder: (BuildContext context) => _personInfo.value == null
-            // Show an empty container if no person info is set
-            ? PlatformScaffold(
-                iosContentBottomPadding: true,
-                iosContentPadding: true,
-                appBar: PlatformAppBar(
-                  title: Text(S.of(context).app_name),
-                  trailingActions: [
-                    PlatformIconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                          _subpageActionButtonIconBuilders[_pageIndex.value](
-                              context)),
-                      onPressed: _onPressActionButton,
-                    )
-                  ],
-                ),
-                body: Container(),
-              )
-            : PlatformScaffold(
-                iosContentBottomPadding: true,
-                iosContentPadding: _subpage[_pageIndex.value].needPadding,
-                appBar: PlatformAppBar(
-                  cupertino: (_, __) => CupertinoNavigationBarData(
-                    // Issue with cupertino where a bar with no transparency
-                    // will push the list down. Adding some alpha value fixes it (in a hacky way)
-                    //backgroundColor: Colors.white.withAlpha(254),
-                    /*leading: MediaQuery(
+    return _personInfo.value == null
+        // Show an empty container if no person info is set
+        ? PlatformScaffold(
+            iosContentBottomPadding: true,
+            iosContentPadding: true,
+            appBar: PlatformAppBar(
+              title: Text(S.of(context).app_name),
+              trailingActions: [
+                PlatformIconButton(
+                  padding: EdgeInsets.zero,
+                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+                  onPressed: _onPressActionButton,
+                )
+              ],
+            ),
+            body: Container(),
+          )
+        : PlatformScaffold(
+            iosContentBottomPadding: true,
+            iosContentPadding: _subpage[_pageIndex.value].needPadding,
+            appBar: PlatformAppBar(
+              cupertino: (_, __) => CupertinoNavigationBarData(
+                // Issue with cupertino where a bar with no transparency
+                // will push the list down. Adding some alpha value fixes it (in a hacky way)
+                //backgroundColor: Colors.white.withAlpha(254),
+                /*leading: MediaQuery(
                       data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
                       child: CupertinoNavigationBarBackButton(),
                     ),*/
-                    title: MediaQuery(
-                      data: MediaQueryData(
-                          textScaleFactor:
-                              MediaQuery.textScaleFactorOf(context)),
-                      child: TopController(
-                        child: Text(
-                          S.of(context).app_name,
-                        ),
-                        onDoubleTap: () => ScrollToTopEvent().fire(),
-                      ),
+                title: MediaQuery(
+                  data: MediaQueryData(
+                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                  child: TopController(
+                    child: Text(
+                      S.of(context).app_name,
                     ),
+                    onDoubleTap: () => ScrollToTopEvent().fire(),
                   ),
-                  material: (_, __) => MaterialAppBarData(
-                    title: TopController(
-                      child: Text(
-                        S.of(context).app_name,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onDoubleTap: () => ScrollToTopEvent().fire(),
-                    ),
+                ),
+              ),
+              material: (_, __) => MaterialAppBarData(
+                title: TopController(
+                  child: Text(
+                    S.of(context).app_name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  trailingActions: [
-                    PlatformIconButton(
-                      material: (_, __) => MaterialIconButtonData(
-                          tooltip: _subpageActionButtonTextBuilders[
-                              _pageIndex.value](context)),
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                          _subpageActionButtonIconBuilders[_pageIndex.value](
+                  onDoubleTap: () => ScrollToTopEvent().fire(),
+                ),
+              ),
+              trailingActions: [
+                PlatformIconButton(
+                  material: (_, __) => MaterialIconButtonData(
+                      tooltip:
+                          _subpageActionButtonTextBuilders[_pageIndex.value](
                               context)),
-                      onPressed: _onPressActionButton,
-                    )
-                  ],
+                  padding: EdgeInsets.zero,
+                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+                  onPressed: _onPressActionButton,
+                )
+              ],
+            ),
+            body: MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(value: _pageIndex),
+                ChangeNotifierProvider.value(value: _connectStatus),
+                ChangeNotifierProvider.value(value: _personInfo),
+                Provider.value(value: _preferences),
+              ],
+              child: IndexedStack(index: _pageIndex.value, children: _subpage),
+            ),
+            bottomNavBar: PlatformNavBar(
+              items: [
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.purple,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.dashboard)
+                      : Icon(SFSymbols.square_stack_3d_up_fill),
+                  label: S.of(context).dashboard,
                 ),
-                body: MultiProvider(
-                  providers: [
-                    ChangeNotifierProvider.value(value: _pageIndex),
-                    ChangeNotifierProvider.value(value: _connectStatus),
-                    ChangeNotifierProvider.value(value: _personInfo),
-                    Provider.value(value: _preferences),
-                  ],
-                  child:
-                      IndexedStack(index: _pageIndex.value, children: _subpage),
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.indigo,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.forum)
+                      : Icon(SFSymbols.text_bubble),
+                  label: S.of(context).forum,
                 ),
-                bottomNavBar: PlatformNavBar(
-                  items: [
-                    BottomNavigationBarItem(
-                      //backgroundColor: Colors.purple,
-                      icon: PlatformX.isAndroid
-                          ? Icon(Icons.dashboard)
-                          : Icon(SFSymbols.square_stack_3d_up_fill),
-                      label: S.of(context).dashboard,
-                    ),
-                    BottomNavigationBarItem(
-                      //backgroundColor: Colors.indigo,
-                      icon: PlatformX.isAndroid
-                          ? Icon(Icons.forum)
-                          : Icon(SFSymbols.text_bubble),
-                      label: S.of(context).forum,
-                    ),
-                    BottomNavigationBarItem(
-                      //backgroundColor: Colors.blue,
-                      icon: PlatformX.isAndroid
-                          ? Icon(Icons.calendar_today)
-                          : Icon(SFSymbols.calendar),
-                      label: S.of(context).timetable,
-                    ),
-                    BottomNavigationBarItem(
-                      //backgroundColor: Theme.of(context).primaryColor,
-                      icon: PlatformX.isAndroid
-                          ? Icon(Icons.settings)
-                          : Icon(SFSymbols.gear_alt), //TODO: Change Icon
-                      label: S.of(context).settings,
-                    ),
-                  ],
-                  currentIndex: _pageIndex.value,
-                  material: (_, __) => MaterialNavBarData(
-                    type: BottomNavigationBarType.fixed,
-                    selectedIconTheme:
-                        BottomNavigationBarTheme.of(context).selectedIconTheme,
-                    unselectedIconTheme: BottomNavigationBarTheme.of(context)
-                        .unselectedIconTheme,
-                  ),
-                  itemChanged: (index) {
-                    if (index != _pageIndex.value) {
-                      setState(() => _pageIndex.value = index);
-                    }
-                  },
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.blue,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.calendar_today)
+                      : Icon(SFSymbols.calendar),
+                  label: S.of(context).timetable,
                 ),
-              ));
+                BottomNavigationBarItem(
+                  //backgroundColor: Theme.of(context).primaryColor,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.settings)
+                      : Icon(SFSymbols.gear_alt), //TODO: Change Icon
+                  label: S.of(context).settings,
+                ),
+              ],
+              currentIndex: _pageIndex.value,
+              material: (_, __) => MaterialNavBarData(
+                type: BottomNavigationBarType.fixed,
+                selectedIconTheme:
+                    BottomNavigationBarTheme.of(context).selectedIconTheme,
+                unselectedIconTheme:
+                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
+              ),
+              itemChanged: (index) {
+                if (index != _pageIndex.value) {
+                  setState(() => _pageIndex.value = index);
+                }
+              },
+            ),
+          );
   }
 
   Future<void> _loadAnnouncement() async {

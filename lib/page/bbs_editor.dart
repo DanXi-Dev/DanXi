@@ -56,47 +56,46 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-        builder: (BuildContext context) => PlatformScaffold(
+    return PlatformScaffold(
         iosContentBottomPadding: true,
         iosContentPadding: true,
-            appBar: PlatformAppBarX(
-              title: Text(S.of(context).forum_post_enter_content),
-              trailingActions: [
-                PlatformIconButton(
-                    padding: EdgeInsets.zero,
-                    icon: PlatformX.isAndroid
-                        ? const Icon(Icons.send)
-                        : const Icon(SFSymbols.paperplane),
-                    onPressed: _canSend ? _sendDocument : null)
-              ],
-            ),
+        appBar: PlatformAppBarX(
+          title: Text(S.of(context).forum_post_enter_content),
+          trailingActions: [
+            PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: PlatformX.isAndroid
+                    ? const Icon(Icons.send)
+                    : const Icon(SFSymbols.paperplane),
+                onPressed: _canSend ? _sendDocument : null)
+          ],
+        ),
         body: Padding(
             padding: EdgeInsets.all(4),
             child: Column(
               children: [
                 Expanded(
                   child: PlatformTextField(
-                        material: (_, __) => MaterialTextFieldData(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        cupertino: (_, __) => CupertinoTextFieldData(),
-                        style: TextStyle(fontSize: 18),
-                        expands: true,
-                        textAlign: TextAlign.start,
-                        textAlignVertical: TextAlignVertical.top,
-                        controller: _controller,
-                        maxLines: null,
-                        autofocus: true,
+                    material: (_, __) => MaterialTextFieldData(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                       ),
-                    )
+                    ),
+                    cupertino: (_, __) => CupertinoTextFieldData(),
+                    style: TextStyle(fontSize: 18),
+                    expands: true,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.top,
+                    controller: _controller,
+                    maxLines: null,
+                    autofocus: true,
+                  ),
+                )
               ],
-            ))));
+            )));
   }
 
-  Future<void> _sendDocument() {
+  Future<void> _sendDocument() async {
     if (_controller.text.trim().isEmpty) {
     } else {
       // TODO

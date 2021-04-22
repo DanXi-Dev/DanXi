@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
 
 /// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
@@ -52,6 +53,6 @@ class PlatformX {
   static bool isCupertino(BuildContext context) =>
       platformImpl.isCupertino(context);
 
-  static bool isDarkMode(BuildContext context) =>
-      MediaQuery.of(context).platformBrightness == Brightness.dark;
+  static bool get isDarkMode =>
+      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
 }

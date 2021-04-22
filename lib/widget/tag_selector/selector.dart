@@ -18,6 +18,7 @@
 import 'dart:math';
 
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -116,16 +117,15 @@ class _TagContainerState extends State<TagContainer> {
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplier(widget.fixedColor);
-    return Material(
-        color: PlatformX.backgroundColor(context),
+    return ThemedMaterial(
         child: Container(
-          margin: const EdgeInsets.only(top: 16),
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-          child: Wrap(
-            spacing: 8,
-            children: tagList.map((e) => _buildTag(e)).toList(),
-          ),
-        ));
+      margin: const EdgeInsets.only(top: 16),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      child: Wrap(
+        spacing: 8,
+        children: tagList.map((e) => _buildTag(e)).toList(),
+      ),
+    ));
   }
 
   Widget _buildTag(Tag data) {

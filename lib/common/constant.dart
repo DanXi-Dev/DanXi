@@ -42,7 +42,6 @@ class Constant {
         accentColor: Color(0xFF007AFF),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10,8,10,8),
-          elevation: 5,
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -68,7 +67,6 @@ class Constant {
         colorScheme: ColorScheme.dark(),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(7,8,7,8),
-          elevation: 5,
           color: Color.fromRGBO(28, 28, 30, 1.0),
           //shadowColor: Color.fromRGBO(28, 28, 30, 50),
         ),
