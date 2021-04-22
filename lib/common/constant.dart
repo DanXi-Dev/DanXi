@@ -34,6 +34,44 @@ class Constant {
     return '\u00A5' + num;
   }
 
+  static ThemeData lightTheme(bool isCupertino) {
+    return ThemeData(
+      brightness: Brightness.light,
+      primarySwatch: Colors.blue,
+      cardTheme: CardTheme(
+        margin: EdgeInsets.fromLTRB(10,8,10,8),
+      ),
+    );
+  }
+
+  static ThemeData darkTheme(bool isCupertino) {
+    if (isCupertino) {
+      return ThemeData(
+        brightness: Brightness.dark,
+        accentColor: Color(0xFF007AFF),
+        scaffoldBackgroundColor: Colors.black,
+        backgroundColor: Colors.black,
+        colorScheme: ColorScheme.dark(),
+        cardTheme: CardTheme(
+          margin: EdgeInsets.fromLTRB(10,8,10,8),
+          elevation: 5,
+          color: Color.fromRGBO(28, 28, 30, 100),
+          shadowColor: Color.fromRGBO(28, 28, 30, 50),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
+        ),
+        canvasColor: Colors.black,
+      );
+    }
+    return ThemeData(
+      brightness: Brightness.dark,
+      cardTheme: CardTheme(
+        margin: EdgeInsets.fromLTRB(10,8,10,8),
+      ),
+    );
+  }
+
   static Color getColorFromString(String color) {
     switch (color) {
       case 'red':

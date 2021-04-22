@@ -178,9 +178,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
 
-    const double _avatarSpacing = 32;
+    const double _avatarSpacing = 28;
     double _avatarSize =
-        (MediaQuery.of(context).size.width - _avatarSpacing * 4 - 40) / 4;
+        (MediaQuery.of(context).size.width - _avatarSpacing * 4 - 60) / 4;
     const double _avatarNameSpacing = 4;
     TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)

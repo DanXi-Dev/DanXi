@@ -113,40 +113,6 @@ class DanxiApp extends StatelessWidget {
     }
   }
 
-  ThemeData _buildLightTheme() {
-    return ThemeData(
-      brightness: Brightness.light,
-      primarySwatch: Colors.blue,
-      cardTheme: CardTheme(
-        margin: EdgeInsets.fromLTRB(10,8,10,8),
-      ),
-    );
-  }
-
-  ThemeData _buildDarkTheme(BuildContext context) {
-    if (PlatformX.isCupertino(context)) {
-      return ThemeData(
-          brightness: Brightness.dark,
-          accentColor: Color(0xFF007AFF),
-          scaffoldBackgroundColor: Colors.black,
-          backgroundColor: Colors.black,
-          colorScheme: ColorScheme.dark(),
-          cardTheme: CardTheme(
-            margin: EdgeInsets.fromLTRB(10,8,10,8),
-            elevation: 5,
-            color: Color.fromRGBO(28, 28, 30, 100),
-            shadowColor: Color.fromRGBO(28, 28, 30, 50),
-          )
-      );
-    }
-    return ThemeData(
-        brightness: Brightness.dark,
-        cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(10,8,10,8),
-        ),
-    );
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -154,7 +120,7 @@ class DanxiApp extends StatelessWidget {
     return PlatformProvider(
         // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => Theme(
-          data: WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? _buildDarkTheme(context) : _buildLightTheme(),
+          data: WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? Constant.darkTheme(PlatformX.isCupertino(context)) : Constant.lightTheme(PlatformX.isCupertino(context)),
           child:
             PlatformApp(
               title: 'Danxi',
