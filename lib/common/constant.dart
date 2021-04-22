@@ -35,6 +35,19 @@ class Constant {
   }
 
   static ThemeData lightTheme(bool isCupertino) {
+    if (isCupertino) {
+      return ThemeData(
+        brightness: Brightness.light,
+        accentColor: Color(0xFF007AFF),
+        cardTheme: CardTheme(
+          margin: EdgeInsets.fromLTRB(10,8,10,8),
+          elevation: 5,
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
+        ),
+      );
+    }
     return ThemeData(
       brightness: Brightness.light,
       primarySwatch: Colors.blue,
@@ -55,13 +68,14 @@ class Constant {
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10,8,10,8),
           elevation: 5,
-          color: Color.fromRGBO(28, 28, 30, 100),
-          shadowColor: Color.fromRGBO(28, 28, 30, 50),
+          color: Color.fromRGBO(28, 28, 30, 1.0),
+          //shadowColor: Color.fromRGBO(28, 28, 30, 50),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
         ),
         canvasColor: Colors.black,
+        dialogBackgroundColor: Color.fromRGBO(28, 28, 30, 1.0),
       );
     }
     return ThemeData(
