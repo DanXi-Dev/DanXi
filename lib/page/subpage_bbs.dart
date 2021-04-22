@@ -340,14 +340,14 @@ class _BBSSubpageState extends State<BBSSubpage>
     return soup.get_text();
   }
 
-
-
   List<Widget> _generateTagWidgets(BBSPost e) {
-    List<Widget> _tags = [];
+    List<Widget> _tags = [
+      const SizedBox(width: 2,),
+    ];
     e.tags.forEach((element) { 
       _tags.add(
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 5),
+          padding: EdgeInsets.symmetric(horizontal: 7),
           decoration: BoxDecoration(
             border: Border.all(
               color: Constant.getColorFromString(element.color),
@@ -358,7 +358,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           child: Text(
             element.name,
             style: TextStyle(
-                fontSize: 12,
+                fontSize: 14,
                 color: Constant.getColorFromString(element.color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
             ),
           ),
@@ -371,12 +371,13 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _getListItem(BBSPost e) {
     return Material(
-        color: PlatformX.isCupertino(context) ? Colors.white : null,
+        //color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
+          margin: EdgeInsets.fromLTRB(10,8,10,8),
+          elevation: 4,
           child: ListTile(
-              contentPadding: EdgeInsets.fromLTRB(15, 6, 6, 0),
-              leading: Text("#${e.id}", style: TextStyle(color: Theme.of(context).accentColor),),
-              visualDensity: VisualDensity(vertical: 2),
+              contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
+              //visualDensity: VisualDensity(vertical: 2),
               dense: false,
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -384,10 +385,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                   Row(
                     children: _generateTagWidgets(e),
                   ),
-                  const SizedBox(height: 2,),
+                  const SizedBox(height: 10,),
                   Text(
                     _renderTitle(e.first_post.content),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -398,11 +399,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      /*Text(
-                    "\n#" + e.id.toString(),
-                    style: TextStyle(
+                      Text(
+                        "#${e.id}",
+                        style: TextStyle(
                         color: Theme.of(context).hintColor, fontSize: 12),
-                  ),*/
+                      ),
                       Text(
                         e.date_created,
                         style: TextStyle(
@@ -416,7 +417,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                                 color: Theme.of(context).hintColor, fontSize: 12),
                           ),
                           Icon(
-                            Icons.comment,
+                            SFSymbols.ellipses_bubble,
                             size: 12,
                             color: Theme.of(context).hintColor,
                           ),

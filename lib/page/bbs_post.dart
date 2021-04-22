@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
@@ -169,13 +170,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ));
         },
         child: Card(
+            margin: EdgeInsets.fromLTRB(10,8,10,8),
+            elevation: 4,
             child: ListTile(
-              minLeadingWidth: 70,
-          leading: Text("[ ${e.username} ]", style: TextStyle(color: Theme.of(context).accentColor),),
           dense: false,
           title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 2),
+              const SizedBox(height: 10,),
+
+              if (index == 0)
+                Row(
+                  children: _generateTagWidgets(_post),
+                ),
               Align(
                 alignment: Alignment.topLeft,
                 child: Row(
@@ -184,44 +191,46 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     e.reply_to == null
                         ? Column()
                         : Text(S.of(context).reply_to(e.reply_to),
-                            style: TextStyle(
-                                fontSize: 10,
-                                color: Theme.of(context).accentColor)),
+                        style: TextStyle(
+                            fontSize: 10,
+                            color: Theme.of(context).accentColor)),
                     /*Text("#${e.id}",
                         style: TextStyle(
                             fontSize: 10, color: Theme.of(context).hintColor)),*/
                   ],
                 ),
               ),
-              const SizedBox(height: 2),
+              Text("[${e.username}]", style: TextStyle(color: Theme.of(context).hintColor),),
+              const SizedBox(height: 8),
               Align(
                 alignment: Alignment.topLeft,
-                child: HtmlWidget(
+                child:
+                HtmlWidget(
                   e.content,
                   textStyle: TextStyle(fontSize: 16),
                   onTapUrl: (url) => launch(url),
                 ),
-              )
-            ],
-          ),
-          subtitle: Stack(
-            children: [
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const SizedBox(height: 2),
-                    Text("# ${index + 1}", style: TextStyle(fontSize: 12)),
-                    Text(
-                      e.date_created,
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),
+          subtitle: Column(
+            children: [
+            const SizedBox(height: 12,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+              Text(
+              "#${e.id}",
+                style: TextStyle(
+                    color: Theme.of(context).hintColor, fontSize: 12),
+              ),
+              Text(
+                e.date_created,
+                style: TextStyle(
+                    color: Theme.of(context).hintColor, fontSize: 12),
+              ),
+            ]),
+            ]),
           onTap: () {
             // TODO
             // Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
@@ -232,6 +241,35 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           },
         )),
       ));
+
+  List<Widget> _generateTagWidgets(BBSPost e) {
+    List<Widget> _tags = [
+      const SizedBox(width: 2,),
+    ];
+    e.tags.forEach((element) {
+      _tags.add(
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Constant.getColorFromString(element.color),
+                width: 1,),
+              borderRadius: BorderRadius.circular(16),
+              //color: Constant.getColorFromString(element.color).withAlpha(25),
+            ),
+            child: Text(
+              element.name,
+              style: TextStyle(
+                  fontSize: 14,
+                  color: Constant.getColorFromString(element.color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
+              ),
+            ),
+          )
+      );
+      _tags.add(const SizedBox(width: 6,));
+    });
+    return _tags;
+  }
 
   @override
   void initState() {
