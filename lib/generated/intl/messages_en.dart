@@ -124,7 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "logining" : MessageLookupByLibrary.simpleMessage("Logging in..."),
     "logout" : MessageLookupByLibrary.simpleMessage("Logout"),
     "logout_prompt" : MessageLookupByLibrary.simpleMessage("You need to restart this app for changes to take effect."),
-    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("Restart the app for changes to take effect"),
+    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("All data stored locally will be deleted."),
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
     "material" : MessageLookupByLibrary.simpleMessage("Material"),

@@ -40,7 +40,7 @@
     "logout": "退出登录",
     "logout_subtitle": "并删除此设备上的所有数据",
     "logout_question_prompt_title": "确定要退出登录吗？",
-    "logout_question_prompt": "改动将在app退出后生效",
+    "logout_question_prompt": "所有存储在本地的数据将被删除。",
     "logout_prompt": "重新启动app以删除数据",
     "terms_and_conditions_title": "法律",
     "terms_and_conditions_content": "登录即表示您已阅读并同意",

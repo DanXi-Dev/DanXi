@@ -39,7 +39,7 @@
     "logout": "Logout",
     "logout_subtitle": "And delete all data from this device",
     "logout_question_prompt_title": "Are you sure?",
-    "logout_question_prompt": "Restart the app for changes to take effect",
+    "logout_question_prompt": "All data stored locally will be deleted.",
     "logout_prompt": "You need to restart this app for changes to take effect.",
     "terms_and_conditions_title": "Legal",
     "terms_and_conditions_content": "Your use of this application is governed under ",

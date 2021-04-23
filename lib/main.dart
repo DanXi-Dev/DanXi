@@ -52,6 +52,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
@@ -113,23 +114,27 @@ class DanxiApp extends StatelessWidget {
     }
   }
 
+  ThemeData getTheme(BuildContext context) {
+    return PlatformX.isDarkMode
+        ? Constant.darkTheme(PlatformX.isCupertino(context))
+        : Constant.lightTheme(PlatformX.isCupertino(context));
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     changeSizeOnDesktop();
-    ThemeData data = PlatformX.isDarkMode
-        ? Constant.darkTheme(PlatformX.isCupertino(context))
-        : Constant.lightTheme(PlatformX.isCupertino(context));
-    return PlatformProvider(
+    return Phoenix(
+        child: PlatformProvider(
       builder: (BuildContext context) => Theme(
-        data: data,
+        data: getTheme(context),
         child: PlatformApp(
           title: 'Danxi',
           cupertino: (_, __) => CupertinoAppData(
               theme: CupertinoThemeData(
                   textTheme: CupertinoTextThemeData(
                       textStyle:
-                          TextStyle(color: data.textTheme.bodyText1.color)))),
+                          TextStyle(color: getTheme(context).textTheme.bodyText1.color)))),
           localizationsDelegates: [
             S.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -151,7 +156,7 @@ class DanxiApp extends StatelessWidget {
           navigatorKey: Catcher.navigatorKey,
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -178,10 +183,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   //Dark/Light Theme Control
   @override
   void didChangePlatformBrightness() {
-    //TODO: on Platform Brightness Changes
-    print(WidgetsBinding.instance.window
-        .platformBrightness); // should print Brightness.light / Brightness.dark when you switch
-    super.didChangePlatformBrightness(); // make sure you call this
+    super.didChangePlatformBrightness();
   }
 
   /// If we need to send the qr code to iWatch now.
@@ -232,6 +234,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -245,6 +248,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _rebuildPage();
       refreshSelf();
     });
+
+    WidgetsBinding.instance.addObserver(this);
+    final window = WidgetsBinding.instance.window;
+    window.onPlatformBrightnessChanged = () {
+      // This callback gets invoked every time brightness changes
+      Phoenix.rebirth(context);
+    };
+
+
     _captchaSubscription =
         Constant.eventBus.on<CaptchaNeededException>().listen((_) {
       // Deal with login issue described at [CaptchaNeededException].
@@ -468,7 +480,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   //backgroundColor: Theme.of(context).primaryColor,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.settings)
-                      : Icon(SFSymbols.gear_alt), //TODO: Change Icon
+                      : Icon(SFSymbols.gear_alt),
                   label: S.of(context).settings,
                 ),
               ],

@@ -425,10 +425,10 @@ class S {
     );
   }
 
-  /// `Restart the app for changes to take effect`
+  /// `All data stored locally will be deleted.`
   String get logout_question_prompt {
     return Intl.message(
-      'Restart the app for changes to take effect',
+      'All data stored locally will be deleted.',
       name: 'logout_question_prompt',
       desc: '',
       args: [],

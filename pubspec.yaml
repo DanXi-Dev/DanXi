@@ -61,6 +61,7 @@ dependencies:
   dio: ^4.0.0
   crypto: ^3.0.1
   shared_preferences: ^2.0.5
+  flutter_phoenix: ^1.0.0
 
 dependency_overrides:
   fluttertoast:

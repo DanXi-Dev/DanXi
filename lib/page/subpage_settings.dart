@@ -32,6 +32,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +83,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/pichillilorenzo/flutter_inappwebview"),
     LicenseItem("flutter_localizations", LICENSE_BSD_3_0_CLAUSE,
         "https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html"),
+    LicenseItem("flutter_phoenix", LICENSE_MIT, "https://github.com/mobiten/flutter_phoenix"),
     LicenseItem("flutter_platform_widgets", LICENSE_MIT,
         "https://github.com/stryder-dev/flutter_platform_widgets"),
     LicenseItem("flutter_progress_dialog", LICENSE_APACHE_2_0,
@@ -130,7 +132,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     await _preferences.clear().then((value) => {
-          FlutterApp.exitApp(),
+          Phoenix.rebirth(context)
         });
   }
 
@@ -158,7 +160,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     Function onTapListener = (Campus campus) {
       SettingsProvider.of(_preferences).campus = campus;
       Navigator.of(context).pop();
-      //TODO: Refresh Home Page
+      Phoenix.rebirth(context);
       refreshSelf();
     };
     Constant.CAMPUS_VALUES.forEach((value) {

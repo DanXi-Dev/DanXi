@@ -109,7 +109,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "logining" : MessageLookupByLibrary.simpleMessage("正在登录..."),
     "logout" : MessageLookupByLibrary.simpleMessage("退出登录"),
     "logout_prompt" : MessageLookupByLibrary.simpleMessage("重新启动app以删除数据"),
-    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("改动将在app退出后生效"),
+    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("所有存储在本地的数据将被删除。"),
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("确定要退出登录吗？"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("并删除此设备上的所有数据"),
     "minute_ago" : m4,
