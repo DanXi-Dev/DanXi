@@ -49,6 +49,29 @@ class Retrier {
     return await function().catchError(errorCatcher);
   }
 
+  /// Try to run [function] for [retryTimes] times asynchronously.
+  ///
+  /// If [function] throws an error, run [tryFix] to fix the problem. Then run it again.
+  ///
+  /// Notes: Any errors thrown by [tryFix] will be ignored.
+  ///
+  /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
+  static Future<E> tryAsyncWithFix<E>(
+      Future<E> function(), Future<void> tryFix(exception),
+      {int retryTimes = 3}) async {
+    Function errorCatcher;
+    errorCatcher = (e) async {
+      if (retryTimes > 0) {
+        retryTimes--;
+        await tryFix(e).catchError((ignored) {});
+        return await function().catchError(errorCatcher);
+      } else {
+        throw e;
+      }
+    };
+    return await function().catchError(errorCatcher);
+  }
+
   /// Try to run [function] asynchronously, and forever.
   /// Return the results of [function] if it executes successfully. Otherwise, it will be stuck in an infinite loop.
   static Future<E> runAsyncWithRetryForever<E>(Future<E> function()) async {

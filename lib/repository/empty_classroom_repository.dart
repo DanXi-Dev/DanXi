@@ -19,6 +19,7 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/src/response.dart';
 import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
@@ -38,13 +39,25 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
 
   factory EmptyClassroomRepository.getInstance() => _instance;
 
+  /// Get [RoomInfo]s at [buildingName] on [date].
+  ///
+  /// Request [PersonInfo] for logging in, if necessary.
   Future<List<RoomInfo>> getBuildingRoomInfo(
       PersonInfo info, String buildingName, DateTime date) async {
+    // To accelerate the retrieval of RoomInfo,
+    // only execute logging in when necessary.
+    return Retrier.tryAsyncWithFix(
+        () => _getBuildingRoomInfo(buildingName, date), (exception) async {
+      print(exception);
+      await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
+    });
+  }
+
+  Future<List<RoomInfo>> _getBuildingRoomInfo(
+      String buildingName, DateTime date) async {
     RegExp roomStatusMatcher = RegExp(r'(?<=div class=")\w+(?=")');
     List<RoomInfo> result = [];
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
     Response response = await dio.get(detailUrl(buildingName, date));
-
     Beautifulsoup soup = Beautifulsoup(response.data.toString());
     Element mainTable = soup.find(id: "table");
     List<Element> roomList = mainTable.querySelectorAll("tr")..removeAt(0);

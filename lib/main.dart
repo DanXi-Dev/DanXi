@@ -66,7 +66,7 @@ final QuickActions quickActions = QuickActions();
 
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
-  CatcherOptions debugOptions = CatcherOptions(PageReportMode(), [
+  CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
     FirebaseHandler(),
     ConsoleHandler()
   ], localizationOptions: [
@@ -124,6 +124,7 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     changeSizeOnDesktop();
+
     return Phoenix(
         child: PlatformProvider(
       builder: (BuildContext context) => Theme(
@@ -133,8 +134,9 @@ class DanxiApp extends StatelessWidget {
           cupertino: (_, __) => CupertinoAppData(
               theme: CupertinoThemeData(
                   textTheme: CupertinoTextThemeData(
-                      textStyle:
-                          TextStyle(color: getTheme(context).textTheme.bodyText1.color)))),
+                      textStyle: TextStyle(
+                          color:
+                              getTheme(context).textTheme.bodyText1.color)))),
           localizationsDelegates: [
             S.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -255,7 +257,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // This callback gets invoked every time brightness changes
       Phoenix.rebirth(context);
     };
-
 
     _captchaSubscription =
         Constant.eventBus.on<CaptchaNeededException>().listen((_) {

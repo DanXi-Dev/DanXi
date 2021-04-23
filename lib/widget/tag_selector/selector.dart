@@ -59,6 +59,7 @@ class TagContainer extends StatefulWidget {
   final double fontSize;
   final Function onChoice;
   final bool enabled;
+  final bool wrapped;
 
   TagContainer(
       {Key key,
@@ -71,7 +72,8 @@ class TagContainer extends StatefulWidget {
       this.iconColor,
       this.iconSize,
       this.fontSize,
-      this.enabled = true})
+      this.enabled = true,
+      this.wrapped = true})
       : assert(
             fillRandomColor || (fillRandomColor == false && fixedColor != null),
             "fixedColor can't be empty.");
@@ -117,15 +119,26 @@ class _TagContainerState extends State<TagContainer> {
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplier(widget.fixedColor);
-    return ThemedMaterial(
-        child: Container(
-      margin: const EdgeInsets.only(top: 16),
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      child: Wrap(
-        spacing: 8,
-        children: tagList.map((e) => _buildTag(e)).toList(),
-      ),
-    ));
+    if (widget.wrapped) {
+      return ThemedMaterial(
+          child: Container(
+              margin: const EdgeInsets.only(top: 16),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: Wrap(
+                spacing: 8,
+                children: tagList.map((e) => _buildTag(e)).toList(),
+              )));
+    } else
+      return ThemedMaterial(
+          child: Container(
+              margin: const EdgeInsets.only(top: 16),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: tagList.map((e) => _buildTag(e)).toList(),
+                ),
+              )));
   }
 
   Widget _buildTag(Tag data) {
