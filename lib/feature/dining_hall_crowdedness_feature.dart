@@ -205,9 +205,9 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  Row get customSubtitle {
+  Wrap get customSubtitle {
     if (_status == ConnectionStatus.DONE) {
-      return Row(
+      return Wrap(
         children: [
           Container(
             padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -226,7 +226,12 @@ class DiningHallCrowdednessFeature extends Feature {
           const SizedBox(
             width: 7,
           ),
-          Text(_mostCrowdedCanteen),
+          Text(
+            _mostCrowdedCanteen,
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
+            maxLines: 1,
+          ),
           const SizedBox(
             width: 7,
           ),
