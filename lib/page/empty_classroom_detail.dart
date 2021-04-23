@@ -275,6 +275,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   Widget _buildSlider(String dateIndicator) {
     return PlatformWidget(
       cupertino: (_, __) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(dateIndicator),
           PlatformSlider(

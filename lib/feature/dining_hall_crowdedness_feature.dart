@@ -53,7 +53,8 @@ class DiningHallCrowdednessFeature extends Feature {
         _status = ConnectionStatus.FATAL_ERROR;
       }
     });
-    if (_status != ConnectionStatus.FATAL_ERROR) generateSummary(preferredCampus);
+    if (_status != ConnectionStatus.FATAL_ERROR)
+      generateSummary(preferredCampus);
     notifyUpdate();
   }
 
@@ -89,8 +90,8 @@ class DiningHallCrowdednessFeature extends Feature {
                 } else {
                   switch (keySubtitle) {
                     case '南苑餐厅':
-                    //WARNING: Workaround defective data
-                    //crowdednessSum[3] += value.current / value.max;
+                      //WARNING: Workaround defective data
+                      //crowdednessSum[3] += value.current / value.max;
                       break;
                     case '教工快餐':
                       crowdednessSum[4] += value.current / value.max;
@@ -158,8 +159,7 @@ class DiningHallCrowdednessFeature extends Feature {
             orElse: () => 'null');
       }
       _status = ConnectionStatus.DONE;
-    }
-    else {
+    } else {
       _status = ConnectionStatus.FAILED;
     }
   }
@@ -247,7 +247,12 @@ class DiningHallCrowdednessFeature extends Feature {
           const SizedBox(
             width: 8,
           ),
-          Text(_leastCrowdedCanteen),
+          Text(
+            _leastCrowdedCanteen,
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
+            maxLines: 1,
+          ),
         ],
       );
     }
