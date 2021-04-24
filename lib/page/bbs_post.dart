@@ -24,6 +24,7 @@ import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,6 +33,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BBSPostDetail extends StatefulWidget {
@@ -64,11 +66,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ? const Icon(Icons.reply)
                 : const Icon(SFSymbols.arrowshape_turn_up_left),
             onPressed: () {
-              // TODO
-              // Navigator.of(context)
-              //     .pushNamed("/bbs/newPost", arguments: {
-              //   "post": BBSPost.newReply(_user.objectId, _post.objectId)
-              // });
+              BBSEditor.createNewReply(context, _post.id, null);
             },
           )
         ],
@@ -120,23 +118,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu() {
+  List<Widget> _buildContextMenu(Reply e) {
     List<Widget> list = [];
     list.add(PlatformWidget(
       cupertino: (_, __) => CupertinoActionSheetAction(
         onPressed: () {
-          // TODO: report stub
+          BBSEditor.reportPost(context, e.id);
+          //TODO: is the argument e.id correct?
           Navigator.of(context).pop();
-          Noticing.showNotice(context, S.of(context).report_success);
+          //Noticing.showNotice(context, S.of(context).report_success);
         },
         child: Text(S.of(context).report),
       ),
       material: (_, __) => ListTile(
         title: Text(S.of(context).report),
         onTap: () {
-          // TODO: report stub
+          BBSEditor.reportPost(context, e.id);
+          //TODO: is the argument e.id correct?
           Navigator.of(context).pop();
-          Noticing.showNotice(context, S.of(context).report_success);
+         // Noticing.showNotice(context, S.of(context).report_success);
         },
       ),
     ));
@@ -151,7 +151,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               context: context,
               builder: (_) => PlatformWidget(
                     cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildContextMenu(),
+                      actions: _buildContextMenu(e),
                       cancelButton: CupertinoActionSheetAction(
                         child: Text(S.of(context).cancel),
                         onPressed: () {
@@ -162,7 +162,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     material: (_, __) => Container(
                       height: 300,
                       child: Column(
-                        children: _buildContextMenu(),
+                        children: _buildContextMenu(e),
                       ),
                     ),
                   ));
@@ -231,12 +231,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             ]),
           ]),
           onTap: () {
-            // TODO
-            // Navigator.of(context).pushNamed("/bbs/newPost", arguments: {
-            //   "post": BBSPost.newReply(_user.objectId, _post.objectId,
-            //       replyTo: index > 0 ? e.objectId : "0"),
-            //   "replyTo": e.author
-            // });
+             BBSEditor.createNewReply(context, _post.id, e.id);
+             //TODO: Is the argument correct? Should we use [e.disscussion] or [_post.id] ?
           },
         )),
       ));

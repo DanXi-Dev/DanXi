@@ -55,7 +55,7 @@ dependencies:
   firebase_core: ^1.0.4
   firebase_crashlytics: ^2.0.1
   flutter_widget_from_html_core: ^0.6.0
-  flutter_quill: ^1.2.0
+  html_editor_enhanced: ^2.0.0+1
   intl: ^0.17.0-nullsafety.2
   http: ^0.13.1
   dio: ^4.0.0

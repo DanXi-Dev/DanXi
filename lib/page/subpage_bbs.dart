@@ -30,7 +30,7 @@ import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
 import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,6 +39,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 
 class BBSSubpage extends PlatformSubpage {
   @override
@@ -60,6 +61,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StreamSubscription _refreshSubscription;
   static StreamSubscription _goTopSubscription;
   ScrollController _controller = ScrollController();
+  HtmlEditorController controller = HtmlEditorController();
 
   int _currentBBSPage;
   List<Widget> _lastPageItems;
@@ -92,10 +94,11 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-        // TODO Write new post
-        // Navigator.of(context).pushNamed("/bbs/newPost",
-        //     arguments: {"post": BBSPost.newPost(_loginUser.objectId)});
+        BBSEditor.createNewPost(context);
       });
+
+        // To get text from editor:
+        // final txt = await controller.getText();
     }
     if (_refreshSubscription == null) {
       _refreshSubscription = Constant.eventBus
