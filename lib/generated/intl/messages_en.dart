@@ -31,13 +31,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m5(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m6(name) => "Reply No.${name}";
+  static m6(code) => "Reply failed (HTTP ${code})";
 
-  static m7(num) => "${num} sec(s) ago";
+  static m7(name) => "Reply No.${name}";
 
-  static m8(week) => "Week ${week}";
+  static m8(code) => "Report failed (HTTP ${code})";
 
-  static m9(name) => "Welcome, ${name}";
+  static m9(num) => "${num} sec(s) ago";
+
+  static m10(week) => "Week ${week}";
+
+  static m11(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -140,10 +144,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
     "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reply_to" : m6,
+    "reply_failed" : m6,
+    "reply_to" : m7,
     "report" : MessageLookupByLibrary.simpleMessage("Report this post"),
-    "report_success" : MessageLookupByLibrary.simpleMessage("Report success"),
-    "second_ago" : m7,
+    "report_failed" : m8,
+    "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
+    "second_ago" : m9,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
@@ -162,8 +168,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m8,
-    "welcome" : m9,
+    "week" : m10,
+    "welcome" : m11,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

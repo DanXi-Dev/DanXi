@@ -865,13 +865,33 @@ class S {
     );
   }
 
-  /// `Report success`
+  /// `Report success. Thank you for your contribution to our community.`
   String get report_success {
     return Intl.message(
-      'Report success',
+      'Report success. Thank you for your contribution to our community.',
       name: 'report_success',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Report failed (HTTP {code})`
+  String report_failed(Object code) {
+    return Intl.message(
+      'Report failed (HTTP $code)',
+      name: 'report_failed',
+      desc: '',
+      args: [code],
+    );
+  }
+
+  /// `Reply failed (HTTP {code})`
+  String reply_failed(Object code) {
+    return Intl.message(
+      'Reply failed (HTTP $code)',
+      name: 'reply_failed',
+      desc: '',
+      args: [code],
     );
   }
 

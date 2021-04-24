@@ -41,7 +41,7 @@ class BBSEditor {
     int responseCode = await PostRepository.getInstance().newReply(discussionId, postId, content);
     // Note: postId refers to the specific post the user is replying to, can be NULL
     if (responseCode != 200) {
-      Noticing.showNotice(context, "TODO: Request FAILED (HTTP $responseCode)");
+      Noticing.showNotice(context, S.of(context).reply_failed(responseCode));
     }
     else {
       //TODO: Refresh Page to load new reply
@@ -50,15 +50,14 @@ class BBSEditor {
 
   static Future<void> reportPost(BuildContext context, int postId) async {
     String content = await _showEditor(context);
-    content="Test report feature";
     if (content == null || content == "") return;
 
     int responseCode = await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
-      Noticing.showNotice(context, "TODO: Request FAILED (HTTP $responseCode)");
+      Noticing.showNotice(context, S.of(context).report_failed(responseCode));
     }
     else {
-      Noticing.showNotice(context, "TODO: Report Successful");
+      Noticing.showNotice(context, S.of(context).report_success);
     }
   }
 

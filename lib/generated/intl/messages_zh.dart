@@ -31,13 +31,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m5(mostCrowded, leastCrowded) => "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
 
-  static m6(name) => "回复 No.${name}";
+  static m6(code) => "回复失败 (HTTP ${code})";
 
-  static m7(num) => "${num} 秒前";
+  static m7(name) => "回复 No.${name}";
 
-  static m8(week) => "第 ${week} 周";
+  static m8(code) => "举报失败 (HTTP ${code})";
 
-  static m9(name) => "欢迎你，${name}";
+  static m9(num) => "${num} 秒前";
+
+  static m10(week) => "第 ${week} 周";
+
+  static m11(name) => "欢迎你，${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -122,10 +126,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("隐私政策"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目页面"),
-    "reply_to" : m6,
+    "reply_failed" : m6,
+    "reply_to" : m7,
     "report" : MessageLookupByLibrary.simpleMessage("举报该帖子"),
-    "report_success" : MessageLookupByLibrary.simpleMessage("举报成功"),
-    "second_ago" : m7,
+    "report_failed" : m8,
+    "report_success" : MessageLookupByLibrary.simpleMessage("举报成功，感谢您为维护良好社区环境所作出的贡献。"),
+    "second_ago" : m9,
     "select_campus" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
@@ -144,8 +150,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
     "weak_password" : MessageLookupByLibrary.simpleMessage("登录失败，未知错误\n请注意：目前旦兮不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
-    "week" : m8,
-    "welcome" : m9,
+    "week" : m10,
+    "welcome" : m11,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }
