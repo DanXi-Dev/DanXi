@@ -915,6 +915,16 @@ class S {
     );
   }
 
+  /// `This content is hidden. Tap to view`
+  String get folded {
+    return Intl.message(
+      'This content is hidden. Tap to view',
+      name: 'folded',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Share`
   String get share {
     return Intl.message(

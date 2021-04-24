@@ -28,7 +28,7 @@ class BBSPost {
   // ignore: non_constant_identifier_names
   Reply first_post;
   int count;
-  List<PostTag> tags;
+  List<PostTag> tag;
   Map<String, String> mapping;
 
   // ignore: non_constant_identifier_names
@@ -37,11 +37,14 @@ class BBSPost {
   // ignore: non_constant_identifier_names
   String date_updated;
 
+  // ignore: non_constant_identifier_names
+  bool is_folded;
+
   factory BBSPost.fromJson(Map<String, dynamic> json) =>
       _$BBSPostFromJson(json);
 
   Map<String, dynamic> toJson() => _$BBSPostToJson(this);
 
-  BBSPost(this.id, this.first_post, this.count, this.tags, this.mapping,
-      this.date_created, this.date_updated);
+  BBSPost(this.id, this.first_post, this.count, this.tag, this.mapping,
+      this.is_folded, this.date_created, this.date_updated);
 }

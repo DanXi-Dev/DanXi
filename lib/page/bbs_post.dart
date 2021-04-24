@@ -243,7 +243,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         width: 2,
       ),
     ];
-    e.tags.forEach((element) {
+    e.tag.forEach((element) {
       _tags.add(Container(
         padding: EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(

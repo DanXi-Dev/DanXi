@@ -79,6 +79,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("错误"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("枫林校区"),
+    "folded" : MessageLookupByLibrary.simpleMessage("该内容已折叠，点击查看"),
     "forum" : MessageLookupByLibrary.simpleMessage("树洞"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("发布"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("教务处通知"),

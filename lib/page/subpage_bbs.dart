@@ -286,7 +286,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
+                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE + 1,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, true),
               ),
@@ -360,7 +360,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         width: 2,
       ),
     ];
-    e.tags.forEach((element) {
+    e.tag.forEach((element) {
       _tags.add(Container(
         padding: EdgeInsets.symmetric(horizontal: 7),
         decoration: BoxDecoration(
@@ -405,6 +405,24 @@ class _BBSSubpageState extends State<BBSSubpage>
               const SizedBox(
                 height: 10,
               ),
+              e.is_folded ?
+              ListTileTheme(
+                dense: true,
+                child: ExpansionTile(
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  expandedAlignment: Alignment.topLeft,
+                  childrenPadding: EdgeInsets.symmetric(vertical: 4),
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(S.of(context).folded, style: TextStyle(color: Theme.of(context).hintColor),),
+                  children: [
+                    Text(
+                      _renderTitle(e.first_post.content),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ) :
               Text(
                 _renderTitle(e.first_post.content),
                 maxLines: 2,
