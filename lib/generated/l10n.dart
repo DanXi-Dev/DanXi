@@ -765,6 +765,16 @@ class S {
     );
   }
 
+  /// `Submit`
+  String get submit {
+    return Intl.message(
+      'Submit',
+      name: 'submit',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Last Transaction`
   String get last_transaction {
     return Intl.message(
@@ -945,13 +955,33 @@ class S {
     );
   }
 
-  /// `Reply No.{name}`
+  /// `Reply #{name}`
   String reply_to(Object name) {
     return Intl.message(
-      'Reply No.$name',
+      'Reply #$name',
       name: 'reply_to',
       desc: '',
       args: [name],
+    );
+  }
+
+  /// `Reason for reporting #{id}`
+  String reason_report_post(Object id) {
+    return Intl.message(
+      'Reason for reporting #$id',
+      name: 'reason_report_post',
+      desc: '',
+      args: [id],
+    );
+  }
+
+  /// `Swipe the toolbar to the right to see more styling options...`
+  String get editor_hint {
+    return Intl.message(
+      'Swipe the toolbar to the right to see more styling options...',
+      name: 'editor_hint',
+      desc: '',
+      args: [],
     );
   }
 

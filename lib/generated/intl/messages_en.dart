@@ -31,17 +31,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m5(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m6(code) => "Reply failed (HTTP ${code})";
+  static m6(id) => "Reason for reporting #${id}";
 
-  static m7(name) => "Reply No.${name}";
+  static m7(code) => "Reply failed (HTTP ${code})";
 
-  static m8(code) => "Report failed (HTTP ${code})";
+  static m8(name) => "Reply #${name}";
 
-  static m9(num) => "${num} sec(s) ago";
+  static m9(code) => "Report failed (HTTP ${code})";
 
-  static m10(week) => "Week ${week}";
+  static m10(num) => "${num} sec(s) ago";
 
-  static m11(name) => "Welcome, ${name}";
+  static m11(week) => "Week ${week}";
+
+  static m12(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -86,6 +88,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
+    "editor_hint" : MessageLookupByLibrary.simpleMessage("Swipe the toolbar to the right to see more styling options..."),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "end_reached" : MessageLookupByLibrary.simpleMessage("You have reached the end."),
     "evening" : MessageLookupByLibrary.simpleMessage("Evening"),
@@ -146,16 +149,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
     "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reply_failed" : m6,
-    "reply_to" : m7,
+    "reason_report_post" : m6,
+    "reply_failed" : m7,
+    "reply_to" : m8,
     "report" : MessageLookupByLibrary.simpleMessage("Report this post"),
-    "report_failed" : m8,
+    "report_failed" : m9,
     "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
-    "second_ago" : m9,
+    "second_ago" : m10,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
+    "submit" : MessageLookupByLibrary.simpleMessage("Submit"),
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
@@ -170,8 +175,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m10,
-    "welcome" : m11,
+    "week" : m11,
+    "welcome" : m12,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

@@ -72,6 +72,7 @@
     "loading_qr_code":"正在加载复活码...\n可能需要5~10秒，取决于复旦服务器。",
     "tap_to_view":"点击以查看",
     "forum_post_enter_content": "发布",
+    "submit": "发送",
     "last_transaction": "上次交易",
 
     "last_7_days":"过去 7 天",
@@ -91,7 +92,9 @@
     "folded": "该内容已折叠，点击查看",
     "share":"分享",
     "login_with_uis":"将使用以下信息匿名登录树洞",
-    "reply_to":"回复 No.{name}",
+    "reply_to":"回复#{name}",
+    "reason_report_post": "请填写举报理由(#{id})",
+    "editor_hint": "向右滑动工具栏以查看更多字体风格选项...",
     "end_reached": "已经到底了",
 
     "classroom": "教室",

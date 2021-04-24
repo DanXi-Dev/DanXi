@@ -75,6 +75,7 @@
     "loading_qr_code":"Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers.",
     "tap_to_view": "Tap to view",
     "forum_post_enter_content": "Post",
+    "submit": "Submit",
     "last_transaction": "Last Transaction",
 
     "last_7_days":"Last 7 days",
@@ -94,7 +95,9 @@
     "folded": "This content is hidden. Tap to view",
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
-    "reply_to":"Reply No.{name}",
+    "reply_to":"Reply #{name}",
+    "reason_report_post": "Reason for reporting #{id}",
+    "editor_hint": "Swipe the toolbar to the right to see more styling options...",
     "end_reached": "You have reached the end.",
 
     "classroom": "Classroom",
