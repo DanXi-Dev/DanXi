@@ -221,7 +221,15 @@ class _BBSSubpageState extends State<BBSSubpage>
                     case ConnectionState.waiting:
                     case ConnectionState.active:
                       _isRefreshing = true;
-                      if (_lastSnapshotData == null) return _buildLoadingPage();
+                      if (_lastSnapshotData == null) return Container(
+                        padding: EdgeInsets.all(8),
+                        child: Center(child: Column(
+                          children: [
+                            CircularProgressIndicator(),
+                            Text(S.of(context).loading_bbs_secure_connection),
+                          ]
+                        )),
+                      );
                       return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:

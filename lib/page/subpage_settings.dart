@@ -22,10 +22,8 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -53,6 +51,7 @@ class SettingsSubpage extends PlatformSubpage {
 class _SettingsSubpageState extends State<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
+    LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
     LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
     LicenseItem("auto_size_text", LICENSE_MIT,
         "hhttps://github.com/leisim/auto_size_text"),

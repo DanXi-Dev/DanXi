@@ -855,6 +855,16 @@ class S {
     );
   }
 
+  /// `Performing server security check, please wait...`
+  String get loading_bbs_secure_connection {
+    return Intl.message(
+      'Performing server security check, please wait...',
+      name: 'loading_bbs_secure_connection',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Report this post`
   String get report {
     return Intl.message(

@@ -62,6 +62,7 @@ dependencies:
   crypto: ^3.0.1
   shared_preferences: ^2.0.5
   flutter_phoenix: ^1.0.0
+  asn1lib: ^1.0.0
 
 dependency_overrides:
   fluttertoast:
@@ -96,7 +97,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/graphics/
-    - assets/FDUHOLE_R3.cer
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

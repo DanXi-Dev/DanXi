@@ -85,6 +85,7 @@
     "timetable":"Agenda",
     "week":"Week {week}",
     "new_post":"New Post",
+    "loading_bbs_secure_connection": "Performing server security check, please wait...",
     "report":"Report this post",
     "report_success":"Report success. Thank you for your contribution to our community.",
     "report_failed": "Report failed (HTTP {code})",

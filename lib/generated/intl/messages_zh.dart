@@ -101,6 +101,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_transaction" : MessageLookupByLibrary.simpleMessage("上次交易"),
     "late_night" : MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
     "loading" : MessageLookupByLibrary.simpleMessage("加载中..."),
+    "loading_bbs_secure_connection" : MessageLookupByLibrary.simpleMessage("正在进行服务器安全性检查，请稍等..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("正在加载复活码...\n可能需要5~10秒，取决于复旦服务器。"),
     "login" : MessageLookupByLibrary.simpleMessage("登录"),
     "login_issue_1" : MessageLookupByLibrary.simpleMessage("登录失败，旦兮无法完成 UIS 登录。\n出现此错误，很可能是由于您连续多次登录失败所致。\n您需要使用浏览器手动完成一次登录，从下一次登录开始，旦兮 即可妥善处理此情况。"),
