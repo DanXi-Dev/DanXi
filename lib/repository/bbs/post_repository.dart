@@ -22,6 +22,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
@@ -94,6 +95,22 @@ class PostRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
+  }
+
+  Future<int> newReply(int discussionId, int postId, String content) async {
+    // Suppose user is logged in. He should be.
+    Response response = await dio.post(_BASE_URL + "/posts/",
+        data: {"content": content, "discussion_id": discussionId, "post_id": postId},
+        options: Options(headers: _tokenHeader));
+    return response.statusCode;
+  }
+
+  Future<int> reportPost(int postId, String reason) async {
+    // Suppose user is logged in. He should be.
+    Response response = await dio.post(_BASE_URL + "/reports/",
+        data: {"post_id": postId, "reason": reason},
+        options: Options(headers: _tokenHeader));
+    return response.statusCode;
   }
 }
 

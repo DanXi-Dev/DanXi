@@ -123,9 +123,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     list.add(PlatformWidget(
       cupertino: (_, __) => CupertinoActionSheetAction(
         onPressed: () {
+          Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
           //TODO: is the argument e.id correct?
-          Navigator.of(context).pop();
           //Noticing.showNotice(context, S.of(context).report_success);
         },
         child: Text(S.of(context).report),
@@ -133,9 +133,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       material: (_, __) => ListTile(
         title: Text(S.of(context).report),
         onTap: () {
+          Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
           //TODO: is the argument e.id correct?
-          Navigator.of(context).pop();
          // Noticing.showNotice(context, S.of(context).report_success);
         },
       ),

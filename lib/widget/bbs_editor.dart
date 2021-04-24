@@ -16,6 +16,8 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
@@ -25,27 +27,39 @@ class BBSEditor {
   static Future<void> createNewPost(BuildContext context) async {
     //TODO: tag editor
     String content = await _showEditor(context);
+    if (content == null || content == "") return;
     //TODO: POST to server
     // Obtain token form postRepository
 
     //TODO: handle failure
   }
 
-  static Future<void> createNewReply(BuildContext context, num discussionId, num postId) async {
-    //TODO: tag editor
+  static Future<void> createNewReply(BuildContext context, int discussionId, int postId) async {
     String content = await _showEditor(context);
-    //TODO: POST to server
-    // Note: postId refers to the specific post the user is replying to, can be NULL
+    if (content == null || content == "") return;
 
-    //TODO: handle failure
+    int responseCode = await PostRepository.getInstance().newReply(discussionId, postId, content);
+    // Note: postId refers to the specific post the user is replying to, can be NULL
+    if (responseCode != 200) {
+      Noticing.showNotice(context, "TODO: Request FAILED (HTTP $responseCode)");
+    }
+    else {
+      //TODO: Refresh Page to load new reply
+    }
   }
 
-  static Future<void> reportPost(BuildContext context, num postId) async {
-    //TODO: tag editor
+  static Future<void> reportPost(BuildContext context, int postId) async {
     String content = await _showEditor(context);
-    //TODO: POST to server
+    content="Test report feature";
+    if (content == null || content == "") return;
 
-    //TODO: handle failure
+    int responseCode = await PostRepository.getInstance().reportPost(postId, content);
+    if (responseCode != 200) {
+      Noticing.showNotice(context, "TODO: Request FAILED (HTTP $responseCode)");
+    }
+    else {
+      Noticing.showNotice(context, "TODO: Report Successful");
+    }
   }
 
   static Future<String> _showEditor(BuildContext context) async {
@@ -58,7 +72,7 @@ class BBSEditor {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: MediaQuery.of(context).size.height - 300,
+                height: MediaQuery.of(context).size.height - 500,
                 width: MediaQuery.of(context).size.width - 50,
                 child: HtmlEditor(
                   controller: _controller, //required
@@ -80,7 +94,7 @@ class BBSEditor {
                       ]
                   ),
                   otherOptions: OtherOptions(
-                    height: MediaQuery.of(context).size.height - 500,
+                    height: MediaQuery.of(context).size.height - 800,
                   ),
                 ),
               )
