@@ -875,10 +875,10 @@ class S {
     );
   }
 
-  /// `Report this post`
+  /// `Report`
   String get report {
     return Intl.message(
-      'Report this post',
+      'Report',
       name: 'report',
       desc: '',
       args: [],

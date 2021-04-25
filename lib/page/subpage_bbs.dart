@@ -306,7 +306,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             ? _currentBBSPage
                             : _currentBBSPage - 1) *
                         POST_COUNT_PER_PAGE +
-                    1,
+                    2,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, false),
               ),
@@ -320,7 +320,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             ? _currentBBSPage
                             : _currentBBSPage - 1) *
                         POST_COUNT_PER_PAGE +
-                    1,
+                    2,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, false),
               ),

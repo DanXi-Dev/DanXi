@@ -152,7 +152,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "reason_report_post" : m6,
     "reply_failed" : m7,
     "reply_to" : m8,
-    "report" : MessageLookupByLibrary.simpleMessage("Report this post"),
+    "report" : MessageLookupByLibrary.simpleMessage("Report"),
     "report_failed" : m9,
     "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
     "second_ago" : m10,

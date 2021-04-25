@@ -84,7 +84,7 @@
     "week":"第 {week} 周",
     "new_post":"发布新帖子",
     "loading_bbs_secure_connection": "正在进行服务器安全性检查，请稍等...",
-    "report":"举报该帖子",
+    "report":"举报",
     "report_success":"举报成功，感谢您为维护良好社区环境所作出的贡献。",
     "report_failed": "举报失败 (HTTP {code})",
     "reply_failed": "回复失败 (HTTP {code})",

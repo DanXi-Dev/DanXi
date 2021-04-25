@@ -22,7 +22,6 @@ import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
-import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -33,7 +32,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BBSPostDetail extends StatefulWidget {
@@ -79,33 +77,37 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: MediaQuery.removePadding(
               context: context,
               removeTop: true,
-              child: FutureBuilder(
-                  builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return GestureDetector(
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                        break;
-                      case ConnectionState.done:
-                        if (snapshot.hasError) {
-                          return _buildErrorWidget();
-                        } else {
-                          var l = snapshot.data;
-                          return ListView.builder(
-                              controller: _controller,
-                              itemBuilder: (context, index) =>
-                                  _getListItem(l[index], index),
-                              //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
-                              itemCount: l.length);
-                        }
-                        break;
-                    }
-                    return null;
-                  },
-                  future: PostRepository.getInstance().loadReplies(_post, 1)))),
+              child: PrimaryScrollController(
+                controller: _controller,
+                child:
+                    FutureBuilder(
+                        builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                            case ConnectionState.waiting:
+                            case ConnectionState.active:
+                              return GestureDetector(
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                              break;
+                            case ConnectionState.done:
+                              if (snapshot.hasError) {
+                                return _buildErrorWidget();
+                              } else {
+                                var l = snapshot.data;
+                                return  ListView.builder(
+                                        primary: true,
+                                        itemBuilder: (context, index) =>
+                                            _getListItem(l[index], index),
+                                        itemCount: l.length);
+                              }
+                              break;
+                          }
+                          return null;
+                        },
+                        future: PostRepository.getInstance().loadReplies(_post, 1)),
+              )
+          )),
     );
   }
 
@@ -125,8 +127,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         onPressed: () {
           Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
-          //TODO: is the argument e.id correct?
-          //Noticing.showNotice(context, S.of(context).report_success);
         },
         child: Text(S.of(context).report),
       ),
@@ -135,8 +135,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         onTap: () {
           Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
-          //TODO: is the argument e.id correct?
-         // Noticing.showNotice(context, S.of(context).report_success);
         },
       ),
     ));
@@ -175,7 +173,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 10,
+                height: 8,
               ),
               if (index == 0)
                 Row(
@@ -198,11 +196,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ],
                 ),
               ),
-              Text(
-                "[${e.username}]",
-                style: TextStyle(color: Theme.of(context).hintColor),
+              Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    "[${e.username}]",
+                  ),
               ),
-              const SizedBox(height: 8),
               Align(
                 alignment: Alignment.topLeft,
                 child: HtmlWidget(
@@ -228,11 +227,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 style:
                     TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
+              TextButton(
+                  onPressed: () {
+                    BBSEditor.reportPost(context, e.id);
+                  },
+                  child: Text(S.of(context).report, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12))
+              ),
             ]),
           ]),
           onTap: () {
              BBSEditor.createNewReply(context, _post.id, e.id);
-             //TODO: Is the argument correct? Should we use [e.disscussion] or [_post.id] ?
           },
         )),
       ));

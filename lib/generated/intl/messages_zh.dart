@@ -134,7 +134,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "reason_report_post" : m6,
     "reply_failed" : m7,
     "reply_to" : m8,
-    "report" : MessageLookupByLibrary.simpleMessage("举报该帖子"),
+    "report" : MessageLookupByLibrary.simpleMessage("举报"),
     "report_failed" : m9,
     "report_success" : MessageLookupByLibrary.simpleMessage("举报成功，感谢您为维护良好社区环境所作出的贡献。"),
     "second_ago" : m10,
