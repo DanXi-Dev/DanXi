@@ -67,7 +67,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing;
-  bool isEndIndicatorShown;
+  bool _isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
   void refreshSelf() {
@@ -76,7 +76,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       _lastPageItems = [];
       _lastSnapshotData = null;
       _isRefreshing = true;
-      isEndIndicatorShown = false;
+      _isEndIndicatorShown = false;
       // ignore: invalid_use_of_protected_member
       setState(() {});
     }
@@ -90,7 +90,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _lastPageItems = [];
     _lastSnapshotData = null;
     _isRefreshing = true;
-    isEndIndicatorShown = false;
+    _isEndIndicatorShown = false;
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -115,7 +115,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       // Over-scroll event
       _controller.addListener(() {
         if (_controller.offset >= _controller.position.maxScrollExtent &&
-            !_isRefreshing) {
+            !_isRefreshing && !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {
             _currentBBSPage++;
@@ -276,7 +276,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1,
+                itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, true),
               ),
@@ -286,7 +286,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE + 1,
+                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, true),
               ),
@@ -306,7 +306,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             ? _currentBBSPage
                             : _currentBBSPage - 1) *
                         POST_COUNT_PER_PAGE +
-                    2,
+                    1,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, false),
               ),
@@ -320,7 +320,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             ? _currentBBSPage
                             : _currentBBSPage - 1) *
                         POST_COUNT_PER_PAGE +
-                    2,
+                    1,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, false),
               ),
@@ -332,13 +332,13 @@ class _BBSSubpageState extends State<BBSSubpage>
       try {
         _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
       } catch (e) {
-        if (!isEndIndicatorShown) {
-          isEndIndicatorShown = true;
+        if (!_isEndIndicatorShown) {
+          _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Divider(),
               Text(S.of(context).end_reached),
+              const SizedBox(height: 16,)
             ],
           );
         }
