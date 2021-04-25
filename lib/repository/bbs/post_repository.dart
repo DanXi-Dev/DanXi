@@ -24,11 +24,9 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/util/noticing.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -47,7 +45,6 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   requestToken(PersonInfo info) async {
-    // Crash on dio ^4.0.0
 
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)

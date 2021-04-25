@@ -46,6 +46,35 @@ class BBSPostDetail extends StatefulWidget {
 class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
   ScrollController _controller = ScrollController();
+  int _currentPage;
+  List<Widget> _previousWidgets;
+  bool _isRefreshing;
+  bool _isEndReached;
+  static const POST_COUNT_PER_PAGE = 10;
+
+  @override
+  void initState() {
+    super.initState();
+    _post = widget.arguments['post'];
+    
+    _currentPage = 1;
+    _previousWidgets = [];
+    _isRefreshing = true;
+    _isEndReached = false;
+
+    if (_controller != null) {
+      // Over-scroll event
+      _controller.addListener(() {
+        if (_controller.offset >= _controller.position.maxScrollExtent &&
+            !_isRefreshing && !_isEndReached) {
+          _isRefreshing = true;
+          setState(() {
+            _currentPage++;
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +115,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             case ConnectionState.none:
                             case ConnectionState.waiting:
                             case ConnectionState.active:
-                              return GestureDetector(
-                                child: Center(child: CircularProgressIndicator()),
+                              _isRefreshing = true;
+                              return ListView.builder(
+                                  primary: true,
+                                  itemBuilder: (context, index) =>
+                                      _buildListItem(null, index),
+                                  itemCount: _previousWidgets.length + 1,
                               );
                               break;
                             case ConnectionState.done:
+                              _isRefreshing = false;
+                              print(_previousWidgets.length);
                               if (snapshot.hasError) {
                                 return _buildErrorWidget();
                               } else {
@@ -98,17 +133,38 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 return  ListView.builder(
                                         primary: true,
                                         itemBuilder: (context, index) =>
-                                            _getListItem(l[index], index),
-                                        itemCount: l.length);
+                                            _buildListItem(l, index),
+                                        itemCount: l.length + (_currentPage - 1) * POST_COUNT_PER_PAGE);
                               }
                               break;
                           }
                           return null;
                         },
-                        future: PostRepository.getInstance().loadReplies(_post, 1)),
+                        future: PostRepository.getInstance().loadReplies(_post, _currentPage)),
               )
           )),
     );
+  }
+
+  Widget _buildListItem(List<Reply> e, int index) {
+    if (e != null) {
+      //print("DEBUG: e.length ${e.length} , index is ${index}");
+      if (e.length > index % POST_COUNT_PER_PAGE) {
+        _previousWidgets.add(_getListItem(e[index % POST_COUNT_PER_PAGE], index % POST_COUNT_PER_PAGE));
+      }
+      else {
+        // end reached
+        _isEndReached = true;
+        return Column(
+          children: [
+            Divider(),
+            Text(S.of(context).end_reached),
+          ],
+        );
+      }
+    }
+    if (index >= _previousWidgets.length) return GestureDetector(child: Center(child: CircularProgressIndicator()),);
+    return _previousWidgets[index];
   }
 
   Widget _buildErrorWidget() => GestureDetector(
@@ -272,11 +328,5 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       ));
     });
     return _tags;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _post = widget.arguments['post'];
   }
 }
