@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final window = WidgetsBinding.instance.window;
     window.onPlatformBrightnessChanged = () {
       // This callback gets invoked every time brightness changes
-      Phoenix.rebirth(context);
+      if (window.platformBrightness != Theme.of(context).brightness) Phoenix.rebirth(context);
     };
 
     _captchaSubscription =

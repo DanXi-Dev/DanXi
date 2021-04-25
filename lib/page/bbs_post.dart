@@ -356,6 +356,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
               TextButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
                   onPressed: () {
                     BBSEditor.reportPost(context, e.id);
                   },

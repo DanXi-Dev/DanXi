@@ -41,10 +41,10 @@ class CardRepository extends BaseRepositoryWithDio {
     "Accept": "text/xml",
     "Accept-Language": "zh-CN,en-US;q=0.7,en;q=0.3",
     "Content-Type": "application/x-www-form-urlencoded",
-    "Origin": "http://ecard.fudan.edu.cn",
+    "Origin": "https://ecard.fudan.edu.cn",
     "DNT": "1",
     "Connection": "keep-alive",
-    "Referer": "http://ecard.fudan.edu.cn/epay/consume/index",
+    "Referer": "https://ecard.fudan.edu.cn/epay/consume/index",
     "Sec-GPC": "1"
   };
 
@@ -58,7 +58,7 @@ class CardRepository extends BaseRepositoryWithDio {
 
   Future<bool> _testLoginSuccess() async {
     return (await cookieJar
-            .loadForRequest(Uri.parse("http://ecard.fudan.edu.cn/")))
+            .loadForRequest(Uri.parse("https://ecard.fudan.edu.cn/")))
         .any((element) => element.name == "iPlanetDirectoryPro");
   }
 
