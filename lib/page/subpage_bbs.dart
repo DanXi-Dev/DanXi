@@ -225,7 +225,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         padding: EdgeInsets.all(8),
                         child: Center(child: Column(
                           children: [
-                            CircularProgressIndicator(),
+                            PlatformCircularProgressIndicator(),
                             Text(S.of(context).loading_bbs_secure_connection),
                           ]
                         )),
@@ -249,7 +249,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildLoadingPage() => Container(
         padding: EdgeInsets.all(8),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: PlatformCircularProgressIndicator()),
       );
 
   Widget _buildErrorPage({Exception error}) {

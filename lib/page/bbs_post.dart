@@ -128,7 +128,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               if (_lastSnapshotData == null) return Container(
                                 padding: EdgeInsets.all(8),
                                 child: Center(
-                                  child: CircularProgressIndicator()
+                                  child: PlatformCircularProgressIndicator()
                                 ),
                               );
                               return _buildPageWhileLoading(_lastSnapshotData.data);
@@ -236,7 +236,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         return null;
       }
     }
-    if (index >= _lastReplies.length) return GestureDetector(child: Center(child: CircularProgressIndicator()),);
+    if (index >= _lastReplies.length) return GestureDetector(child: Center(child: PlatformCircularProgressIndicator()),);
     return _wrapListItemInCanvas(_lastReplies[index], index == 0) ;
   }
 

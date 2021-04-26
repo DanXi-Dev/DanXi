@@ -325,7 +325,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   }
 
   Widget _buildLoadingWidget() => GestureDetector(
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: PlatformCircularProgressIndicator()),
       );
 
   Widget _buildErrorWidget() {

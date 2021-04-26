@@ -194,7 +194,7 @@ class FudanDailyFeature extends Feature {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
         scale: 0.5,
-        child: CircularProgressIndicator(),
+        child: PlatformCircularProgressIndicator(),
       );
     }
     return null;
