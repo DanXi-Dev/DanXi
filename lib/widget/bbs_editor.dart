@@ -93,8 +93,8 @@ class BBSEditor {
                       ]
                   ),
                   otherOptions: OtherOptions(
-                    height: MediaQuery.of(context).size.height - 800,
-                  ),
+                    height: MediaQuery.of(context).size.height,
+                      ),
                 ),
               )
             ],

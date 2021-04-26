@@ -94,11 +94,14 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-        BBSEditor.createNewPost(context);
+        // BBSEditor.createNewPost(context);
+        Navigator.pushNamed(context, "/bbs/newPost").then((value) {
+          print(value);
+        });
       });
 
-        // To get text from editor:
-        // final txt = await controller.getText();
+      // To get text from editor:
+      // final txt = await controller.getText();
     }
     if (_refreshSubscription == null) {
       _refreshSubscription = Constant.eventBus
@@ -220,16 +223,16 @@ class _BBSSubpageState extends State<BBSSubpage>
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      _isRefreshing = true;
-                      if (_lastSnapshotData == null) return Container(
-                        padding: EdgeInsets.all(8),
-                        child: Center(child: Column(
-                          children: [
+                    _isRefreshing = true;
+                      if (_lastSnapshotData == null)
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          child: Center(
+                              child: Column(children: [
                             CircularProgressIndicator(),
                             Text(S.of(context).loading_bbs_secure_connection),
-                          ]
-                        )),
-                      );
+                          ])),
+                        );
                       return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:
