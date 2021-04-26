@@ -1055,6 +1055,16 @@ class S {
     );
   }
 
+  /// `Current date: `
+  String get current_date {
+    return Intl.message(
+      'Current date: ',
+      name: 'current_date',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Every dawn is a new sunrise.`
   String get good_morning {
     return Intl.message(

@@ -106,6 +106,7 @@
     "morning": "Morning",
     "afternoon": "Afternoon",
     "evening": "Evening",
+    "current_date": "Current date: ",
 
     "good_morning":"Every dawn is a new sunrise.",
     "good_noon":"Rise and shine.",

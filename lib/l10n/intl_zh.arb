@@ -103,6 +103,7 @@
     "morning": "上午",
     "afternoon": "下午",
     "evening": "晚上",
+    "current_date": "当前日前：",
 
     "good_morning":"一日之计在于晨",
     "good_noon":"快到中午啦",

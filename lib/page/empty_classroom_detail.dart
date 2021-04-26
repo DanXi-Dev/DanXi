@@ -72,6 +72,26 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     _loadDefaultRoom();
   }
 
+  DateTime selectDate;
+
+  Widget _buildCupertinoDatePicker() => Container(
+    height: MediaQuery.of(context).size.height / 3,
+    child: CupertinoDatePicker(
+        backgroundColor: Theme.of(context).bottomAppBarColor,
+        mode: CupertinoDatePickerMode.date,
+        initialDateTime: DateTime.now(),
+        minimumDate: DateTime.now().add(Duration(days: -1)),
+        maximumDate: DateTime.now().add(Duration(days: 14)),
+        onDateTimeChanged: (DateTime value) {
+          setState(() {
+            selectDate = value;
+          });
+        },
+  )
+
+
+  );
+
   @override
   Widget build(BuildContext context) {
     // Build tags and texts.
@@ -89,8 +109,10 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .map((e) => Text(e))
         .toList()
         .asMap();
-    DateTime selectDate =
-        DateTime.now().add(Duration(days: _selectDate.round()));
+
+    if(PlatformX.isMaterial(context)) selectDate = DateTime.now().add(Duration(days: _selectDate.round()));
+    else if (selectDate == null) selectDate = DateTime.now();
+
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
@@ -169,9 +191,28 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   children: _buildingList,
                 )),
         const SizedBox(height: 12),
-        _buildSlider(DateFormat("MM/dd").format(selectDate)),
+
+        PlatformWidget(
+            cupertino: (_, __) => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(S.of(context).current_date),
+                TextButton(
+                  onPressed: () {
+                    showCupertinoModalPopup(
+                        context: context,
+                        builder: (BuildContext context) => _buildCupertinoDatePicker()
+                    );
+                  },
+                  child: Text("${selectDate.month}/${selectDate.day}"),
+                ),
+              ],
+            ),
+          material: (_, __) => _buildSlider(DateFormat("MM/dd").format(selectDate)),
+        ),
+
         Container(
-          padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+          padding: EdgeInsets.fromLTRB(25, 10, 25, 0),
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
                 Widget>[

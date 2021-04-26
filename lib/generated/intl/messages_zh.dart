@@ -69,6 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "current_connection" : MessageLookupByLibrary.simpleMessage("当前连接"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("没有连接到WLAN"),
+    "current_date" : MessageLookupByLibrary.simpleMessage("当前日前："),
     "dashboard" : MessageLookupByLibrary.simpleMessage("首页"),
     "day_ago" : m0,
     "default_campus" : MessageLookupByLibrary.simpleMessage("当前校区"),

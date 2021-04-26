@@ -71,6 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("Not connected to WLAN"),
+    "current_date" : MessageLookupByLibrary.simpleMessage("Current date: "),
     "dashboard" : MessageLookupByLibrary.simpleMessage("Dashboard"),
     "day_ago" : m0,
     "default_campus" : MessageLookupByLibrary.simpleMessage("Current Campus"),
