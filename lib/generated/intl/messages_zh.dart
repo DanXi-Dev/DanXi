@@ -129,6 +129,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "morning" : MessageLookupByLibrary.simpleMessage("上午"),
     "most_least_crowded_canteen" : m6,
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
+    "no_summary" : MessageLookupByLibrary.simpleMessage("[无法显示此类型的消息]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("开源软件许可协议"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),

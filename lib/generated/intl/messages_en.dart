@@ -145,6 +145,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "morning" : MessageLookupByLibrary.simpleMessage("Morning"),
     "most_least_crowded_canteen" : m6,
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
+    "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "post_failed" : MessageLookupByLibrary.simpleMessage("Network error, post failed."),

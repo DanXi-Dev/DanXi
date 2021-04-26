@@ -501,7 +501,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
                   child: Text(
-                      _renderTitle(e.last_post.content),
+                      _renderTitle(e.last_post.content).trim() == "" ? S.of(context).no_summary : _renderTitle(e.last_post.content),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       //style: TextStyle(color: Theme.of(context).hintColor),

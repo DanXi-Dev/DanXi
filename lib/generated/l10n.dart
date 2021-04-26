@@ -1005,6 +1005,16 @@ class S {
     );
   }
 
+  /// `[Unable to display content of this type.]`
+  String get no_summary {
+    return Intl.message(
+      '[Unable to display content of this type.]',
+      name: 'no_summary',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
