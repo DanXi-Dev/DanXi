@@ -494,7 +494,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                   child: Text(
-                    S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.date_created))),
+                    S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.last_post.date_created))),
                     style: TextStyle(color: Theme.of(context).hintColor),
                   ),
                 ),

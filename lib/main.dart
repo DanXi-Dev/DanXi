@@ -123,7 +123,6 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     changeSizeOnDesktop();
-
     return Phoenix(
         child: PlatformProvider(
       builder: (BuildContext context) => Theme(
@@ -253,8 +252,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged = () {
       // This callback gets invoked every time brightness changes
-      //TODO: What's wrong with this code? why does the app refresh on every launch?
-      //if (WidgetsBinding.instance.platformDispatcher.platformBrightness != Theme.of(context).brightness) Phoenix.rebirth(context);
+      // TODO: What's wrong with this code? why does the app refresh on every launch?
+      // The timer below is a workaround to the issue.
+      Timer(Duration(milliseconds: 500), () {
+        if (WidgetsBinding.instance.platformDispatcher.platformBrightness != Theme.of(context).brightness) Phoenix.rebirth(context);
+      });
     };
 
     _captchaSubscription =
