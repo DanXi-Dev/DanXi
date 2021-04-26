@@ -137,9 +137,9 @@
     "feedback_email": "danxi_dev@protonmail.com",
     "privacy_policy_url" : "https://danxi-dev.github.io/privacy",
 
-    "moment_ago":"Moment ago",
-    "second_ago":"{num} sec(s) ago",
-    "minute_ago":"{num} min(s) ago",
-    "hour_ago":"{num} hr(s) ago",
-    "day_ago":"{num} day(s) ago"
+    "moment_ago":"A moment ago",
+    "second_ago":"{num} sec ago",
+    "minute_ago":"{num} min ago",
+    "hour_ago":"{num} hr ago",
+    "day_ago":"{num}d ago"
 }

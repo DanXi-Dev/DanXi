@@ -474,23 +474,32 @@ class _BBSSubpageState extends State<BBSSubpage>
                 .pushNamed("/bbs/postDetail", arguments: {"post": e});
           }),
 
+          if (!e.is_folded && e.last_post.id != e.first_post.id)
+          Divider(height: 4,),
+
         if (!e.is_folded && e.last_post.id != e.first_post.id)
         ListTile(
             dense: true,
-            //contentPadding: EdgeInsets.fromLTRB(48, 4, 4, 0),
+            minLeadingWidth: 16,
+            leading: Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
+              child: Icon(
+                  SFSymbols.quote_bubble,
+                  color: Theme.of(context).hintColor,
+              ),
+            ),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Divider(height: 8,),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(12, 8, 0, 4),
+                  padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                   child: Text(
                     S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.date_created))),
                     style: TextStyle(color: Theme.of(context).hintColor),
                   ),
                 ),
                 Padding(
-                    padding: EdgeInsets.fromLTRB(12, 0, 0, 8),
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
                   child: Text(
                       _renderTitle(e.last_post.content),
                       maxLines: 1,

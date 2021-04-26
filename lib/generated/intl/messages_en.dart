@@ -19,17 +19,17 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static m0(num) => "${num} day(s) ago";
+  static m0(num) => "${num}d ago";
 
   static m1(date) => "DevTeam Announcement ${date}";
 
   static m2(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
-  static m3(num) => "${num} hr(s) ago";
+  static m3(num) => "${num} hr ago";
 
   static m4(username, date) => "[${username}] replied ${date}:";
 
-  static m5(num) => "${num} min(s) ago";
+  static m5(num) => "${num} min ago";
 
   static m6(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m10(code) => "Report failed (HTTP ${code})";
 
-  static m11(num) => "${num} sec(s) ago";
+  static m11(num) => "${num} sec ago";
 
   static m12(week) => "Week ${week}";
 
@@ -141,7 +141,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
     "material" : MessageLookupByLibrary.simpleMessage("Material"),
     "minute_ago" : m5,
-    "moment_ago" : MessageLookupByLibrary.simpleMessage("Moment ago"),
+    "moment_ago" : MessageLookupByLibrary.simpleMessage("A moment ago"),
     "morning" : MessageLookupByLibrary.simpleMessage("Morning"),
     "most_least_crowded_canteen" : m6,
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),

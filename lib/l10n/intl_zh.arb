@@ -96,7 +96,7 @@
     "reason_report_post": "请填写举报理由(#{id})",
     "editor_hint": "向右滑动工具栏以查看更多字体风格选项...",
     "end_reached": "已经到底了",
-    "latest_reply": "[{username}]在{date}回复：",
+    "latest_reply": "[{username}] 在{date}回复：",
 
     "classroom": "教室",
     "morning": "上午",
@@ -118,8 +118,8 @@
     "fail_to_acquire_qr": "无法获取复活码，请确保您已在eHall中开通复活码。",
 
     "moment_ago":"刚刚",
-    "second_ago":"{num} 秒前",
-    "minute_ago":"{num} 分钟前",
-    "hour_ago":"{num} 小时前",
-    "day_ago":"{num} 天前"
+    "second_ago":"{num}秒前",
+    "minute_ago":"{num}分钟前",
+    "hour_ago":"{num}小时前",
+    "day_ago":"{num}天前"
 }

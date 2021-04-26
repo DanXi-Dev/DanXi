@@ -251,10 +251,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
 
     WidgetsBinding.instance.addObserver(this);
-    final window = WidgetsBinding.instance.window;
-    window.onPlatformBrightnessChanged = () {
+    WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged = () {
       // This callback gets invoked every time brightness changes
-      if (window.platformBrightness != Theme.of(context).brightness) Phoenix.rebirth(context);
+      //TODO: What's wrong with this code? why does the app refresh on every launch?
+      //if (WidgetsBinding.instance.platformDispatcher.platformBrightness != Theme.of(context).brightness) Phoenix.rebirth(context);
     };
 
     _captchaSubscription =

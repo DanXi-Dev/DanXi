@@ -1305,50 +1305,50 @@ class S {
     );
   }
 
-  /// `Moment ago`
+  /// `A moment ago`
   String get moment_ago {
     return Intl.message(
-      'Moment ago',
+      'A moment ago',
       name: 'moment_ago',
       desc: '',
       args: [],
     );
   }
 
-  /// `{num} sec(s) ago`
+  /// `{num} sec ago`
   String second_ago(Object num) {
     return Intl.message(
-      '$num sec(s) ago',
+      '$num sec ago',
       name: 'second_ago',
       desc: '',
       args: [num],
     );
   }
 
-  /// `{num} min(s) ago`
+  /// `{num} min ago`
   String minute_ago(Object num) {
     return Intl.message(
-      '$num min(s) ago',
+      '$num min ago',
       name: 'minute_ago',
       desc: '',
       args: [num],
     );
   }
 
-  /// `{num} hr(s) ago`
+  /// `{num} hr ago`
   String hour_ago(Object num) {
     return Intl.message(
-      '$num hr(s) ago',
+      '$num hr ago',
       name: 'hour_ago',
       desc: '',
       args: [num],
     );
   }
 
-  /// `{num} day(s) ago`
+  /// `{num}d ago`
   String day_ago(Object num) {
     return Intl.message(
-      '$num day(s) ago',
+      '${num}d ago',
       name: 'day_ago',
       desc: '',
       args: [num],

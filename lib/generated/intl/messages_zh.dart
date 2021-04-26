@@ -19,17 +19,17 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
-  static m0(num) => "${num} 天前";
+  static m0(num) => "${num}天前";
 
   static m1(date) => "开发组公告 ${date}";
 
   static m2(time) => "将在${time}秒后自动打卡，点击以取消";
 
-  static m3(num) => "${num} 小时前";
+  static m3(num) => "${num}小时前";
 
-  static m4(username, date) => "[${username}]在${date}回复：";
+  static m4(username, date) => "[${username}] 在${date}回复：";
 
-  static m5(num) => "${num} 分钟前";
+  static m5(num) => "${num}分钟前";
 
   static m6(mostCrowded, leastCrowded) => "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
 
@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m10(code) => "举报失败 (HTTP ${code})";
 
-  static m11(num) => "${num} 秒前";
+  static m11(num) => "${num}秒前";
 
   static m12(week) => "第 ${week} 周";
 
