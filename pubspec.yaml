@@ -63,7 +63,7 @@ dependencies:
   shared_preferences: ^2.0.5
   flutter_phoenix: ^1.0.0
   asn1lib: ^1.0.0
-
+  file_picker: ^3.0.1
   delta_markdown: ^0.2.0
   markdown: ^4.0.0
 

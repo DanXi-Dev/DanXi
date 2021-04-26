@@ -31,6 +31,7 @@ import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -95,9 +96,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         // BBSEditor.createNewPost(context);
-        Navigator.pushNamed(context, "/bbs/newPost").then((value) {
-          print(value);
-        });
+        Navigator.pushNamed(context, "/bbs/newPost")
+            .then((value) => PostRepository.getInstance().newPost(value))
+            .then((value) => refreshSelf());
       });
 
       // To get text from editor:
@@ -118,7 +119,8 @@ class _BBSSubpageState extends State<BBSSubpage>
       // Over-scroll event
       _controller.addListener(() {
         if (_controller.offset >= _controller.position.maxScrollExtent &&
-            !_isRefreshing && !_isEndIndicatorShown) {
+            !_isRefreshing &&
+            !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {
             _currentBBSPage++;
@@ -341,7 +343,9 @@ class _BBSSubpageState extends State<BBSSubpage>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(S.of(context).end_reached),
-              const SizedBox(height: 16,)
+              const SizedBox(
+                height: 16,
+              )
             ],
           );
         }
@@ -364,25 +368,9 @@ class _BBSSubpageState extends State<BBSSubpage>
       ),
     ];
     e.tag.forEach((element) {
-      _tags.add(Container(
-        padding: EdgeInsets.symmetric(horizontal: 7),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Constant.getColorFromString(element.color),
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          //color: Constant.getColorFromString(element.color).withAlpha(25),
-        ),
-        child: Text(
-          element.name,
-          style: TextStyle(
-              fontSize: 14,
-              color: Constant.getColorFromString(element
-                  .color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
-              ),
-        ),
-      ));
+      _tags.add(RoundChip(
+          label: element.name,
+          color: Constant.getColorFromString(element.color)));
       _tags.add(const SizedBox(
         width: 6,
       ));
@@ -392,12 +380,11 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _getListItem(BBSPost e) {
     return Material(
-        //color: PlatformX.isCupertino(context) ? Colors.white : null,
-        child: Card(
-      //margin: EdgeInsets.fromLTRB(10,8,10,8)
-      child: Column(
-        children: [
-          ListTile(
+      //color: PlatformX.isCupertino(context) ? Colors.white : null,
+      child: Card(
+          //margin: EdgeInsets.fromLTRB(10,8,10,8)
+          child: Column(children: [
+        ListTile(
             contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
             //visualDensity: VisualDensity(vertical: 2),
             dense: false,
@@ -410,29 +397,33 @@ class _BBSSubpageState extends State<BBSSubpage>
                 const SizedBox(
                   height: 10,
                 ),
-                e.is_folded ?
-                ListTileTheme(
-                  dense: true,
-                  child: ExpansionTile(
-                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                    expandedAlignment: Alignment.topLeft,
-                    childrenPadding: EdgeInsets.symmetric(vertical: 4),
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(S.of(context).folded, style: TextStyle(color: Theme.of(context).hintColor),),
-                    children: [
-                      Text(
+                e.is_folded
+                    ? ListTileTheme(
+                        dense: true,
+                        child: ExpansionTile(
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          expandedAlignment: Alignment.topLeft,
+                          childrenPadding: EdgeInsets.symmetric(vertical: 4),
+                          tilePadding: EdgeInsets.zero,
+                          title: Text(
+                            S.of(context).folded,
+                            style:
+                                TextStyle(color: Theme.of(context).hintColor),
+                          ),
+                          children: [
+                            Text(
+                              _renderTitle(e.first_post.content),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      )
+                    : Text(
                         _renderTitle(e.first_post.content),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                ) :
-                Text(
-                  _renderTitle(e.first_post.content),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
               ],
             ),
             subtitle: Column(
@@ -471,24 +462,24 @@ class _BBSSubpageState extends State<BBSSubpage>
                   ],
                 ),
               ],
-          ),
-          onTap: () {
-            Navigator.of(context)
-                .pushNamed("/bbs/postDetail", arguments: {"post": e});
-          }),
-
-          if (!e.is_folded && e.last_post.id != e.first_post.id)
-          Divider(height: 4,),
-
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .pushNamed("/bbs/postDetail", arguments: {"post": e});
+            }),
         if (!e.is_folded && e.last_post.id != e.first_post.id)
-        ListTile(
+          Divider(
+            height: 4,
+          ),
+        if (!e.is_folded && e.last_post.id != e.first_post.id)
+          ListTile(
             dense: true,
             minLeadingWidth: 16,
             leading: Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
               child: Icon(
-                  SFSymbols.quote_bubble,
-                  color: Theme.of(context).hintColor,
+                SFSymbols.quote_bubble,
+                color: Theme.of(context).hintColor,
               ),
             ),
             title: Column(
@@ -497,26 +488,28 @@ class _BBSSubpageState extends State<BBSSubpage>
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                   child: Text(
-                    S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.last_post.date_created))),
+                    S.of(context).latest_reply(
+                        e.last_post.username,
+                        HumanDuration.format(
+                            context, DateTime.parse(e.last_post.date_created))),
                     style: TextStyle(color: Theme.of(context).hintColor),
                   ),
                 ),
                 Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                  child: Text(
+                    child: Text(
                       _renderTitle(e.last_post.content),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       //style: TextStyle(color: Theme.of(context).hintColor),
-                      )
-                ),
+                    )),
               ],
             ),
-          onTap: () {
-            BBSEditor.createNewReply(context, e.id, e.last_post.id);
-          },)
-        ])
-        ),
+            onTap: () {
+              BBSEditor.createNewReply(context, e.id, e.last_post.id);
+            },
+          )
+      ])),
     );
   }
 

@@ -16,14 +16,18 @@
  */
 
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/round_chip.dart';
 import 'package:delta_markdown/delta_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +53,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   /// Whether the send button is enabled
   bool _canSend = true;
+  List<PostTag> _tags = [];
 
   @override
   void initState() {
@@ -75,7 +80,26 @@ class BBSEditorPageState extends State<BBSEditorPage> {
             padding: EdgeInsets.all(4),
             child: Column(
               children: [
-                QuillToolbar.basic(controller: _controller),
+                ..._tags.map((e) => RoundChip(
+                      label: e.name,
+                      color: Constant.getColorFromString(e.color),
+                      onTap: () {
+                        _tags.remove(e);
+                        refreshSelf();
+                      },
+                    )),
+                QuillToolbar.basic(
+                  controller: _controller,
+                  showBackgroundColorButton: false,
+                  showColorButton: false,
+                  showStrikeThrough: false,
+                  showUnderLineButton: false,
+                  showListCheck: false,
+                  // TODO Upload images
+                  // onImagePickCallback: (File file) async {
+                  //   return file.absolute.path;
+                  // },
+                ),
                 Expanded(
                   child: Container(
                     child: QuillEditor.basic(
@@ -94,18 +118,6 @@ class BBSEditorPageState extends State<BBSEditorPage> {
       String html = markdown.markdownToHtml(
           deltaToMarkdown(jsonEncode(_controller.document.toDelta().toJson())));
       Navigator.pop<String>(context, html);
-      // TODO
-      // _post.content = _controller.text;
-      // _canSend = false;
-      // refreshSelf();
-      // _post.save().then((BmobSaved value) {
-      //   Navigator.pop(context);
-      //   RetrieveNewPostEvent().fire();
-      // }, onError: (_) {
-      //   _canSend = true;
-      //   refreshSelf();
-      //   Noticing.showNotice(context, S.of(context).post_failed);
-      // });
     }
   }
 }
