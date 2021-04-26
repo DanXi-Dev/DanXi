@@ -392,86 +392,120 @@ class _BBSSubpageState extends State<BBSSubpage>
         //color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
       //margin: EdgeInsets.fromLTRB(10,8,10,8)
-      child: ListTile(
-          contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
-          //visualDensity: VisualDensity(vertical: 2),
-          dense: false,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: _generateTagWidgets(e),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              e.is_folded ?
-              ListTileTheme(
-                dense: true,
-                child: ExpansionTile(
-                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                  expandedAlignment: Alignment.topLeft,
-                  childrenPadding: EdgeInsets.symmetric(vertical: 4),
-                  tilePadding: EdgeInsets.zero,
-                  title: Text(S.of(context).folded, style: TextStyle(color: Theme.of(context).hintColor),),
-                  children: [
-                    Text(
-                      _renderTitle(e.first_post.content),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
+            //visualDensity: VisualDensity(vertical: 2),
+            dense: false,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: _generateTagWidgets(e),
                 ),
-              ) :
-              Text(
-                _renderTitle(e.first_post.content),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-          subtitle: Column(
-            children: [
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "#${e.id}",
-                    style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
-                  ),
-                  Text(
-                    HumanDuration.format(
-                        context, DateTime.parse(e.date_created)),
-                    style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
-                  ),
-                  Row(
+                const SizedBox(
+                  height: 10,
+                ),
+                e.is_folded ?
+                ListTileTheme(
+                  dense: true,
+                  child: ExpansionTile(
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    expandedAlignment: Alignment.topLeft,
+                    childrenPadding: EdgeInsets.symmetric(vertical: 4),
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(S.of(context).folded, style: TextStyle(color: Theme.of(context).hintColor),),
                     children: [
                       Text(
-                        e.count.toString() + " ",
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
-                      ),
-                      Icon(
-                        SFSymbols.ellipses_bubble,
-                        size: 12,
-                        color: Theme.of(context).hintColor,
+                        _renderTitle(e.first_post.content),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                ],
-              ),
-            ],
+                ) :
+                Text(
+                  _renderTitle(e.first_post.content),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            subtitle: Column(
+              children: [
+                const SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "#${e.id}",
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    ),
+                    Text(
+                      HumanDuration.format(
+                          context, DateTime.parse(e.date_created)),
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          e.count.toString() + " ",
+                          style: TextStyle(
+                              color: Theme.of(context).hintColor, fontSize: 12),
+                        ),
+                        Icon(
+                          SFSymbols.ellipses_bubble,
+                          size: 12,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
           ),
           onTap: () {
             Navigator.of(context)
                 .pushNamed("/bbs/postDetail", arguments: {"post": e});
           }),
-    ));
+
+        if (!e.is_folded && e.last_post.id != e.first_post.id)
+        ListTile(
+            dense: true,
+            //contentPadding: EdgeInsets.fromLTRB(48, 4, 4, 0),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Divider(height: 8,),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12, 8, 0, 4),
+                  child: Text(
+                    S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.date_created))),
+                    style: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                ),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(12, 0, 0, 8),
+                  child: Text(
+                      _renderTitle(e.last_post.content),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      //style: TextStyle(color: Theme.of(context).hintColor),
+                      )
+                ),
+              ],
+            ),
+          onTap: () {
+            BBSEditor.createNewReply(context, e.id, e.last_post.id);
+          },)
+        ])
+        ),
+    );
   }
 
   @override

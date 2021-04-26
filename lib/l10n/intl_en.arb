@@ -99,6 +99,7 @@
     "reason_report_post": "Reason for reporting #{id}",
     "editor_hint": "Swipe the toolbar to the right to see more styling options...",
     "end_reached": "You have reached the end.",
+    "latest_reply": "[{username}] replied {date}:",
 
     "classroom": "Classroom",
     "morning": "Morning",

@@ -40,6 +40,9 @@ class BBSPost {
   // ignore: non_constant_identifier_names
   bool is_folded;
 
+  // ignore: non_constant_identifier_names
+  Reply last_post;
+
   factory BBSPost.fromJson(Map<String, dynamic> json) =>
       _$BBSPostFromJson(json);
 

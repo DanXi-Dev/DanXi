@@ -995,6 +995,16 @@ class S {
     );
   }
 
+  /// `[{username}] replied {date}:`
+  String latest_reply(Object username, Object date) {
+    return Intl.message(
+      '[$username] replied $date:',
+      name: 'latest_reply',
+      desc: '',
+      args: [username, date],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

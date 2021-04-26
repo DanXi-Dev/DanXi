@@ -23,7 +23,9 @@ BBSPost _$BBSPostFromJson(Map<String, dynamic> json) {
     json['is_folded'] as bool,
     json['date_created'] as String,
     json['date_updated'] as String,
-  );
+  )..last_post = json['last_post'] == null
+      ? null
+      : Reply.fromJson(json['last_post'] as Map<String, dynamic>);
 }
 
 Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
@@ -35,4 +37,5 @@ Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
       'date_created': instance.date_created,
       'date_updated': instance.date_updated,
       'is_folded': instance.is_folded,
+      'last_post': instance.last_post,
     };

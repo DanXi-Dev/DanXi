@@ -296,7 +296,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         child: Card(
             //margin: EdgeInsets.fromLTRB(10,8,10,8),
             child: ListTile(
-          dense: false,
+          dense: true,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
