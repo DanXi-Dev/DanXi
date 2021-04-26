@@ -75,6 +75,7 @@
     "loading_qr_code":"Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers.",
     "tap_to_view": "Tap to view",
     "forum_post_enter_content": "Post",
+    "submit": "Submit",
     "last_transaction": "Last Transaction",
 
     "last_7_days":"Last 7 days",
@@ -86,15 +87,19 @@
     "week":"Week {week}",
     "new_post":"New Post",
     "loading_bbs_secure_connection": "Performing server security check, please wait...",
-    "report":"Report this post",
+    "report":"Report",
     "report_success":"Report success. Thank you for your contribution to our community.",
     "report_failed": "Report failed (HTTP {code})",
     "reply_failed": "Reply failed (HTTP {code})",
     "post_failed":"Network error, post failed.",
+    "folded": "This content is hidden. Tap to view",
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
-    "reply_to":"Reply No.{name}",
+    "reply_to":"Reply #{name}",
+    "reason_report_post": "Reason for reporting #{id}",
+    "editor_hint": "Swipe the toolbar to the right to see more styling options...",
     "end_reached": "You have reached the end.",
+    "latest_reply": "[{username}] replied {date}:",
 
     "classroom": "Classroom",
     "morning": "Morning",
@@ -132,9 +137,9 @@
     "feedback_email": "danxi_dev@protonmail.com",
     "privacy_policy_url" : "https://danxi-dev.github.io/privacy",
 
-    "moment_ago":"Moment ago",
-    "second_ago":"{num} sec(s) ago",
-    "minute_ago":"{num} min(s) ago",
-    "hour_ago":"{num} hr(s) ago",
-    "day_ago":"{num} day(s) ago"
+    "moment_ago":"A moment ago",
+    "second_ago":"{num} sec ago",
+    "minute_ago":"{num} min ago",
+    "hour_ago":"{num} hr ago",
+    "day_ago":"{num}d ago"
 }

@@ -26,7 +26,7 @@ class BBSEditor {
 
   static Future<void> createNewPost(BuildContext context) async {
     //TODO: tag editor
-    String content = await _showEditor(context);
+    String content = await _showEditor(context, "TODO: feature under construction");
     if (content == null || content == "") return;
     //TODO: POST to server
     // Obtain token form postRepository
@@ -35,7 +35,7 @@ class BBSEditor {
   }
 
   static Future<void> createNewReply(BuildContext context, int discussionId, int postId) async {
-    String content = await _showEditor(context);
+    String content = await _showEditor(context, postId == null ? S.of(context).reply_to(discussionId) : S.of(context).reply_to(postId));
     if (content == null || content == "") return;
 
     int responseCode = await PostRepository.getInstance().newReply(discussionId, postId, content);
@@ -49,7 +49,7 @@ class BBSEditor {
   }
 
   static Future<void> reportPost(BuildContext context, int postId) async {
-    String content = await _showEditor(context);
+    String content = await _showEditor(context, S.of(context).reason_report_post(postId));
     if (content == null || content == "") return;
 
     int responseCode = await PostRepository.getInstance().reportPost(postId, content);
@@ -61,43 +61,45 @@ class BBSEditor {
     }
   }
 
-  static Future<String> _showEditor(BuildContext context) async {
+  static Future<String> _showEditor(BuildContext context, String title) async {
     HtmlEditorController _controller = HtmlEditorController();
     await showPlatformDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text("TODO: post"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height - 500,
-                width: MediaQuery.of(context).size.width - 50,
-                child: HtmlEditor(
-                  controller: _controller, //required
+          title: Text(title),
+          content: Container(
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: HtmlEditor(
+                  controller: _controller,
                   htmlEditorOptions: HtmlEditorOptions(
-                    hint: "Your text here...",
-                    //initalText: "text content initial, if any",
+                    hint: S.of(context).editor_hint,
                   ),
                   htmlToolbarOptions: HtmlToolbarOptions(
                       defaultToolbarButtons: [
                         //add constructors here and set buttons to false, e.g.
                         StyleButtons(),
-                        FontSettingButtons(),
+                        FontSettingButtons(fontSizeUnit: false),
                         FontButtons(),
                         ColorButtons(),
                         ListButtons(),
-                        ParagraphButtons(lineHeight: false, caseConverter: false),
-                        InsertButtons(),
-                        OtherButtons(),
+                        ParagraphButtons(caseConverter: false),
+                        InsertButtons(audio: false, video: false, otherFile: false),
+                        OtherButtons(fullscreen: false, codeview: false,),
                       ]
                   ),
                   otherOptions: OtherOptions(
-                    height: MediaQuery.of(context).size.height,
-                      ),
+                    //height: MediaQuery.of(context).size.height * 0.5,
+                  ),
+                callbacks: Callbacks(
+                  onInit: () {
+                    _controller.setFullScreen();
+                  },
+                  onImageUpload: (fileUpload) {
+                    //TODO: handle this
+                  }
                 ),
-              )
-            ],
+                ),
           ),
           actions: [
             TextButton(
@@ -107,7 +109,7 @@ class BBSEditor {
                   return null;
                 }),
             TextButton(
-                child: Text("TODO: finished editing"),
+                child: Text(S.of(context).submit),
                 onPressed: () {
                   Navigator.of(context).pop();
                 }),

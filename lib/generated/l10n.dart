@@ -765,6 +765,16 @@ class S {
     );
   }
 
+  /// `Submit`
+  String get submit {
+    return Intl.message(
+      'Submit',
+      name: 'submit',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Last Transaction`
   String get last_transaction {
     return Intl.message(
@@ -865,10 +875,10 @@ class S {
     );
   }
 
-  /// `Report this post`
+  /// `Report`
   String get report {
     return Intl.message(
-      'Report this post',
+      'Report',
       name: 'report',
       desc: '',
       args: [],
@@ -915,6 +925,16 @@ class S {
     );
   }
 
+  /// `This content is hidden. Tap to view`
+  String get folded {
+    return Intl.message(
+      'This content is hidden. Tap to view',
+      name: 'folded',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Share`
   String get share {
     return Intl.message(
@@ -935,13 +955,33 @@ class S {
     );
   }
 
-  /// `Reply No.{name}`
+  /// `Reply #{name}`
   String reply_to(Object name) {
     return Intl.message(
-      'Reply No.$name',
+      'Reply #$name',
       name: 'reply_to',
       desc: '',
       args: [name],
+    );
+  }
+
+  /// `Reason for reporting #{id}`
+  String reason_report_post(Object id) {
+    return Intl.message(
+      'Reason for reporting #$id',
+      name: 'reason_report_post',
+      desc: '',
+      args: [id],
+    );
+  }
+
+  /// `Swipe the toolbar to the right to see more styling options...`
+  String get editor_hint {
+    return Intl.message(
+      'Swipe the toolbar to the right to see more styling options...',
+      name: 'editor_hint',
+      desc: '',
+      args: [],
     );
   }
 
@@ -952,6 +992,16 @@ class S {
       name: 'end_reached',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `[{username}] replied {date}:`
+  String latest_reply(Object username, Object date) {
+    return Intl.message(
+      '[$username] replied $date:',
+      name: 'latest_reply',
+      desc: '',
+      args: [username, date],
     );
   }
 
@@ -1255,50 +1305,50 @@ class S {
     );
   }
 
-  /// `Moment ago`
+  /// `A moment ago`
   String get moment_ago {
     return Intl.message(
-      'Moment ago',
+      'A moment ago',
       name: 'moment_ago',
       desc: '',
       args: [],
     );
   }
 
-  /// `{num} sec(s) ago`
+  /// `{num} sec ago`
   String second_ago(Object num) {
     return Intl.message(
-      '$num sec(s) ago',
+      '$num sec ago',
       name: 'second_ago',
       desc: '',
       args: [num],
     );
   }
 
-  /// `{num} min(s) ago`
+  /// `{num} min ago`
   String minute_ago(Object num) {
     return Intl.message(
-      '$num min(s) ago',
+      '$num min ago',
       name: 'minute_ago',
       desc: '',
       args: [num],
     );
   }
 
-  /// `{num} hr(s) ago`
+  /// `{num} hr ago`
   String hour_ago(Object num) {
     return Intl.message(
-      '$num hr(s) ago',
+      '$num hr ago',
       name: 'hour_ago',
       desc: '',
       args: [num],
     );
   }
 
-  /// `{num} day(s) ago`
+  /// `{num}d ago`
   String day_ago(Object num) {
     return Intl.message(
-      '$num day(s) ago',
+      '${num}d ago',
       name: 'day_ago',
       desc: '',
       args: [num],

@@ -22,7 +22,6 @@ import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
-import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -33,7 +32,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BBSPostDetail extends StatefulWidget {
@@ -48,6 +46,37 @@ class BBSPostDetail extends StatefulWidget {
 class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
   ScrollController _controller = ScrollController();
+  int _currentBBSPage;
+  List<Widget> _lastPageItems;
+  AsyncSnapshot _lastSnapshotData;
+  bool _isRefreshing;
+  bool _isEndIndicatorShown;
+  static const POST_COUNT_PER_PAGE = 10;
+
+  @override
+  void initState() {
+    super.initState();
+    _post = widget.arguments['post'];
+
+    _currentBBSPage = 1;
+    _lastPageItems = [];
+    _lastSnapshotData = null;
+    _isRefreshing = true;
+    _isEndIndicatorShown = false;
+
+    if (_controller != null) {
+      // Over-scroll event
+      _controller.addListener(() {
+        if (_controller.offset >= _controller.position.maxScrollExtent &&
+            !_isRefreshing && !_isEndIndicatorShown) {
+          _isRefreshing = true;
+          setState(() {
+            _currentBBSPage++;
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,34 +108,135 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: MediaQuery.removePadding(
               context: context,
               removeTop: true,
-              child: FutureBuilder(
-                  builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return GestureDetector(
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                        break;
-                      case ConnectionState.done:
-                        if (snapshot.hasError) {
-                          return _buildErrorWidget();
-                        } else {
-                          var l = snapshot.data;
-                          return ListView.builder(
-                              controller: _controller,
-                              itemBuilder: (context, index) =>
-                                  _getListItem(l[index], index),
-                              //separatorBuilder: (_, __) => Divider(color: Colors.grey,),
-                              itemCount: l.length);
-                        }
-                        break;
-                    }
-                    return null;
-                  },
-                  future: PostRepository.getInstance().loadReplies(_post, 1)))),
+              child: PrimaryScrollController(
+                controller: _controller,
+                child:
+                    FutureBuilder(
+                        builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                            case ConnectionState.waiting:
+                            case ConnectionState.active:
+                              _isRefreshing = true;
+                              /*return ListView.builder(
+                                  primary: true,
+                                  itemBuilder: (context, index) =>
+                                      _buildListItem(null, index),
+                                  itemCount: _lastPageItems.length + 1,
+                              );*/
+                              _isRefreshing = true;
+                              if (_lastSnapshotData == null) return Container(
+                                padding: EdgeInsets.all(8),
+                                child: Center(
+                                  child: CircularProgressIndicator()
+                                ),
+                              );
+                              return _buildPageWhileLoading(_lastSnapshotData.data);
+                              break;
+                            case ConnectionState.done:
+                              _isRefreshing = false;
+                              if (snapshot.hasError) {
+                                return _buildErrorWidget();
+                              } else {
+                                _lastSnapshotData = snapshot;
+                                var l = snapshot.data;
+                                return _buildPage(snapshot.data);
+                                /*return  ListView.builder(
+                                        primary: true,
+                                        itemBuilder: (context, index) =>
+                                            _buildListItem(l, index),
+                                        itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE);*/
+                              }
+                              break;
+                          }
+                          return null;
+                        },
+                        future: PostRepository.getInstance().loadReplies(_post, _currentBBSPage)),
+              )
+          )),
     );
+  }
+
+  Widget _buildPage(List<Reply> data) {
+    return PlatformWidget(
+      // Add a scrollbar on desktop platform
+        material: (_, __) => Scrollbar(
+          controller: _controller,
+          interactive: PlatformX.isDesktop,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
+            itemBuilder: (context, index) =>
+                _buildListItem(index, data, true),
+          ),
+        ),
+        cupertino: (_, __) => CupertinoScrollbar(
+          controller: _controller,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
+            itemBuilder: (context, index) =>
+                _buildListItem(index, data, true),
+          ),
+        ));
+  }
+
+  Widget _buildPageWhileLoading(List<Reply> data) {
+    return PlatformWidget(
+      // Add a scrollbar on desktop platform
+        material: (_, __) => Scrollbar(
+          controller: _controller,
+          interactive: PlatformX.isDesktop,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: (_lastSnapshotData == null
+                ? _currentBBSPage
+                : _currentBBSPage - 1) *
+                POST_COUNT_PER_PAGE +
+                1,
+            itemBuilder: (context, index) =>
+                _buildListItem(index, data, false),
+          ),
+        ),
+        cupertino: (_, __) => CupertinoScrollbar(
+          controller: _controller,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _controller,
+            itemCount: (_lastSnapshotData == null
+                ? _currentBBSPage
+                : _currentBBSPage - 1) *
+                POST_COUNT_PER_PAGE +
+                1,
+            itemBuilder: (context, index) =>
+                _buildListItem(index, data, false),
+          ),
+        ));
+  }
+
+  Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
+    if (isNewData && index >= _lastPageItems.length) {
+      try {
+        _lastPageItems.add(_getListItem(e[index % POST_COUNT_PER_PAGE], index));
+      } catch (e) {
+        if (!_isEndIndicatorShown) {
+          _isEndIndicatorShown = true;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(S.of(context).end_reached),
+              const SizedBox(height: 16,)
+            ],
+          );
+        }
+        return null;
+      }
+    }
+    if (index >= _lastPageItems.length) return GestureDetector(child: Center(child: CircularProgressIndicator()),);
+    return _lastPageItems[index];
   }
 
   Widget _buildErrorWidget() => GestureDetector(
@@ -125,8 +255,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         onPressed: () {
           Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
-          //TODO: is the argument e.id correct?
-          //Noticing.showNotice(context, S.of(context).report_success);
         },
         child: Text(S.of(context).report),
       ),
@@ -135,8 +263,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         onTap: () {
           Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
-          //TODO: is the argument e.id correct?
-         // Noticing.showNotice(context, S.of(context).report_success);
         },
       ),
     ));
@@ -170,12 +296,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         child: Card(
             //margin: EdgeInsets.fromLTRB(10,8,10,8),
             child: ListTile(
-          dense: false,
+          dense: true,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 10,
+                height: 8,
               ),
               if (index == 0)
                 Row(
@@ -198,11 +324,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ],
                 ),
               ),
-              Text(
-                "[${e.username}]",
-                style: TextStyle(color: Theme.of(context).hintColor),
+              Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    "[${e.username}]",
+                  ),
               ),
-              const SizedBox(height: 8),
               Align(
                 alignment: Alignment.topLeft,
                 child: HtmlWidget(
@@ -228,11 +355,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 style:
                     TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
+              TextButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () {
+                    BBSEditor.reportPost(context, e.id);
+                  },
+                  child: Text(S.of(context).report, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12))
+              ),
             ]),
           ]),
           onTap: () {
              BBSEditor.createNewReply(context, _post.id, e.id);
-             //TODO: Is the argument correct? Should we use [e.disscussion] or [_post.id] ?
           },
         )),
       ));
@@ -243,7 +378,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         width: 2,
       ),
     ];
-    e.tags.forEach((element) {
+    e.tag.forEach((element) {
       _tags.add(Container(
         padding: EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
@@ -268,11 +403,5 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       ));
     });
     return _tags;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _post = widget.arguments['post'];
   }
 }

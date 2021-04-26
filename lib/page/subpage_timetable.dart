@@ -62,6 +62,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   ///The week it's showing on the time table.
   TimeNow _showingTime;
+  AsyncSnapshot _lastSnapshot;
 
   /// Start time of the term.
   static final START_TIME = DateTime(2021, 3, 1); //TODO: Make this dynamic
@@ -106,6 +107,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   void initState() {
     super.initState();
+    _lastSnapshot = null;
     converters = {S.current.share_as_ics: ICSConverter()};
     if (_shareSubscription == null) {
       _shareSubscription =
@@ -143,8 +145,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Widget build(BuildContext context) {
     super.build(context);
     return FutureWidget(
-      successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) =>
-          _buildPage(snapshot.data),
+      successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        _lastSnapshot = snapshot;
+        return _buildPage(snapshot.data);
+      },
       future: Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
           .loadTimeTableLocally(context.personInfo,
               startTime: START_TIME,
@@ -158,11 +162,11 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           child: Text(S.of(context).failed),
         ),
       ),
-      loadingBuilder: Container(
+      loadingBuilder: _lastSnapshot == null ? Container(
         child: Center(
           child: Text(S.of(context).loading),
-        ),
-      ),
+        )) :
+      _buildPage(_lastSnapshot.data),
     );
   }
 
@@ -186,8 +190,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     _table = table;
     if (_showingTime == null) _showingTime = _table.now();
     _status = ConnectionStatus.DONE;
-
-    final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
 
     return Column(children: [
       Row(

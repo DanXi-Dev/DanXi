@@ -72,6 +72,7 @@
     "loading_qr_code":"正在加载复活码...\n可能需要5~10秒，取决于复旦服务器。",
     "tap_to_view":"点击以查看",
     "forum_post_enter_content": "发布",
+    "submit": "发送",
     "last_transaction": "上次交易",
 
     "last_7_days":"过去 7 天",
@@ -83,15 +84,19 @@
     "week":"第 {week} 周",
     "new_post":"发布新帖子",
     "loading_bbs_secure_connection": "正在进行服务器安全性检查，请稍等...",
-    "report":"举报该帖子",
+    "report":"举报",
     "report_success":"举报成功，感谢您为维护良好社区环境所作出的贡献。",
     "report_failed": "举报失败 (HTTP {code})",
     "reply_failed": "回复失败 (HTTP {code})",
     "post_failed":"网络错误，帖子发布失败",
+    "folded": "该内容已折叠，点击查看",
     "share":"分享",
     "login_with_uis":"将使用以下信息匿名登录树洞",
-    "reply_to":"回复 No.{name}",
+    "reply_to":"回复#{name}",
+    "reason_report_post": "请填写举报理由(#{id})",
+    "editor_hint": "向右滑动工具栏以查看更多字体风格选项...",
     "end_reached": "已经到底了",
+    "latest_reply": "[{username}] 在{date}回复：",
 
     "classroom": "教室",
     "morning": "上午",
@@ -113,8 +118,8 @@
     "fail_to_acquire_qr": "无法获取复活码，请确保您已在eHall中开通复活码。",
 
     "moment_ago":"刚刚",
-    "second_ago":"{num} 秒前",
-    "minute_ago":"{num} 分钟前",
-    "hour_ago":"{num} 小时前",
-    "day_ago":"{num} 天前"
+    "second_ago":"{num}秒前",
+    "minute_ago":"{num}分钟前",
+    "hour_ago":"{num}小时前",
+    "day_ago":"{num}天前"
 }

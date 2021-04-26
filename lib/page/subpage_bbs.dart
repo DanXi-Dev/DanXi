@@ -67,7 +67,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing;
-  bool isEndIndicatorShown;
+  bool _isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
   void refreshSelf() {
@@ -76,7 +76,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       _lastPageItems = [];
       _lastSnapshotData = null;
       _isRefreshing = true;
-      isEndIndicatorShown = false;
+      _isEndIndicatorShown = false;
       // ignore: invalid_use_of_protected_member
       setState(() {});
     }
@@ -90,7 +90,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _lastPageItems = [];
     _lastSnapshotData = null;
     _isRefreshing = true;
-    isEndIndicatorShown = false;
+    _isEndIndicatorShown = false;
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -118,7 +118,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       // Over-scroll event
       _controller.addListener(() {
         if (_controller.offset >= _controller.position.maxScrollExtent &&
-            !_isRefreshing) {
+            !_isRefreshing && !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {
             _currentBBSPage++;
@@ -279,7 +279,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + 1,
+                itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
                 itemBuilder: (context, index) =>
                     _buildListItem(index, data, true),
               ),
@@ -335,13 +335,13 @@ class _BBSSubpageState extends State<BBSSubpage>
       try {
         _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
       } catch (e) {
-        if (!isEndIndicatorShown) {
-          isEndIndicatorShown = true;
+        if (!_isEndIndicatorShown) {
+          _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Divider(),
               Text(S.of(context).end_reached),
+              const SizedBox(height: 16,)
             ],
           );
         }
@@ -363,7 +363,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         width: 2,
       ),
     ];
-    e.tags.forEach((element) {
+    e.tag.forEach((element) {
       _tags.add(Container(
         padding: EdgeInsets.symmetric(horizontal: 7),
         decoration: BoxDecoration(
@@ -395,68 +395,129 @@ class _BBSSubpageState extends State<BBSSubpage>
         //color: PlatformX.isCupertino(context) ? Colors.white : null,
         child: Card(
       //margin: EdgeInsets.fromLTRB(10,8,10,8)
-      child: ListTile(
-          contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
-          //visualDensity: VisualDensity(vertical: 2),
-          dense: false,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: _generateTagWidgets(e),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Text(
-                _renderTitle(e.first_post.content),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-          subtitle: Column(
-            children: [
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "#${e.id}",
-                    style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
-                  ),
-                  Text(
-                    HumanDuration.format(
-                        context, DateTime.parse(e.date_created)),
-                    style: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 12),
-                  ),
-                  Row(
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
+            //visualDensity: VisualDensity(vertical: 2),
+            dense: false,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: _generateTagWidgets(e),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                e.is_folded ?
+                ListTileTheme(
+                  dense: true,
+                  child: ExpansionTile(
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    expandedAlignment: Alignment.topLeft,
+                    childrenPadding: EdgeInsets.symmetric(vertical: 4),
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(S.of(context).folded, style: TextStyle(color: Theme.of(context).hintColor),),
                     children: [
                       Text(
-                        e.count.toString() + " ",
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
-                      ),
-                      Icon(
-                        SFSymbols.ellipses_bubble,
-                        size: 12,
-                        color: Theme.of(context).hintColor,
+                        _renderTitle(e.first_post.content),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                ],
-              ),
-            ],
+                ) :
+                Text(
+                  _renderTitle(e.first_post.content),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            subtitle: Column(
+              children: [
+                const SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "#${e.id}",
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    ),
+                    Text(
+                      HumanDuration.format(
+                          context, DateTime.parse(e.date_created)),
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          e.count.toString() + " ",
+                          style: TextStyle(
+                              color: Theme.of(context).hintColor, fontSize: 12),
+                        ),
+                        Icon(
+                          SFSymbols.ellipses_bubble,
+                          size: 12,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
           ),
           onTap: () {
             Navigator.of(context)
                 .pushNamed("/bbs/postDetail", arguments: {"post": e});
           }),
-    ));
+
+          if (!e.is_folded && e.last_post.id != e.first_post.id)
+          Divider(height: 4,),
+
+        if (!e.is_folded && e.last_post.id != e.first_post.id)
+        ListTile(
+            dense: true,
+            minLeadingWidth: 16,
+            leading: Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
+              child: Icon(
+                  SFSymbols.quote_bubble,
+                  color: Theme.of(context).hintColor,
+              ),
+            ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
+                  child: Text(
+                    S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.last_post.date_created))),
+                    style: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                ),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
+                  child: Text(
+                      _renderTitle(e.last_post.content),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      //style: TextStyle(color: Theme.of(context).hintColor),
+                      )
+                ),
+              ],
+            ),
+          onTap: () {
+            BBSEditor.createNewReply(context, e.id, e.last_post.id);
+          },)
+        ])
+        ),
+    );
   }
 
   @override
