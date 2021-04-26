@@ -114,7 +114,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_controller != null) {
       // Over-scroll event
       _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent &&
+        if (_controller.offset >= _controller.position.maxScrollExtent * 0.8 &&
             !_isRefreshing && !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {
@@ -223,12 +223,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                       _isRefreshing = true;
                       if (_lastSnapshotData == null) return Container(
                         padding: EdgeInsets.all(8),
-                        child: Center(child: Column(
-                          children: [
-                            PlatformCircularProgressIndicator(),
-                            Text(S.of(context).loading_bbs_secure_connection),
-                          ]
-                        )),
+                        child: Center(
+                            child: PlatformCircularProgressIndicator(),
+                        ),
                       );
                       return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;

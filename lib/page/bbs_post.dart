@@ -67,7 +67,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_controller != null) {
       // Over-scroll event
       _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent &&
+        if (_controller.offset >= _controller.position.maxScrollExtent * 0.8 &&
             !_isRefreshing && !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {

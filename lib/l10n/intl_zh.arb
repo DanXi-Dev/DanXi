@@ -96,7 +96,7 @@
     "reason_report_post": "请填写举报理由(#{id})",
     "editor_hint": "向右滑动工具栏以查看更多字体风格选项...",
     "end_reached": "已经到底了",
-    "latest_reply": "[{username}] 在{date}回复：",
+    "latest_reply": "[{username}]于{date}回复：",
     "no_summary": "[无法显示此类型的消息]",
 
     "classroom": "教室",
