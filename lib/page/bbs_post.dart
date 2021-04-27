@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
@@ -68,9 +66,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
     if (_controller != null) {
       // Over-scroll event
-      double _threshold = window.physicalSize.height * 0.2;
       _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent -  _threshold &&
+        if (_controller.offset >= _controller.position.maxScrollExtent * 0.8 &&
             !_isRefreshing && !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {
