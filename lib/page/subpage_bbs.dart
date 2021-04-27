@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -113,8 +114,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
     if (_controller != null) {
       // Over-scroll event
+      double _threshold = window.physicalSize.height * 0.2;
       _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent * 0.8 &&
+        if (_controller.offset >= _controller.position.maxScrollExtent -  _threshold &&
             !_isRefreshing && !_isEndIndicatorShown) {
           _isRefreshing = true;
           setState(() {
