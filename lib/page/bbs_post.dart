@@ -151,7 +151,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           }
                           return null;
                         },
-                        future: PostRepository.getInstance().loadReplies(_post, _currentBBSPage)),
+                        future: PostRepository.getInstance().loadReplies(_post, _currentBBSPage, 0)),
               )
           )),
     );

@@ -202,7 +202,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     var _postRepoInstance = PostRepository.getInstance();
     if (!_postRepoInstance.isUserInitialized)
       await _postRepoInstance.initializeUser(info);
-    return await _postRepoInstance.loadPosts(_currentBBSPage);
+    return await _postRepoInstance.loadPosts(_currentBBSPage, 0);
   }
 
   @override

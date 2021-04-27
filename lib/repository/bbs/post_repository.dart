@@ -22,6 +22,7 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
@@ -88,20 +89,56 @@ class PostRepository extends BaseRepositoryWithDio {
     await requestToken(info);
   }
 
-  Future<List<BBSPost>> loadPosts(int page) async {
+  /*  [sortBy] Values
+   *  value 0: default (last replied)
+   *  value 1: last created
+   */
+  Future<List<BBSPost>> loadPosts(int page, int sortBy) async {
+    Map<String,dynamic> qp;
+    switch (sortBy) {
+      case 1:
+        qp = {"page": page, "order": "last_created"};
+        break;
+      default:
+        qp = {"page": page};
+    }
     Response response = await dio.get(_BASE_URL + "/discussions/",
-        queryParameters: {"page": page},
+        queryParameters: qp,
         options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
 
-  Future<List<Reply>> loadReplies(BBSPost post, int page) async {
+  Future<List<Reply>> loadReplies(BBSPost post, int page, int sortBy) async {
+    Map<String,dynamic> qp;
+    switch (sortBy) {
+      case 1:
+        qp = {"page": page, "id": post.id, "order": "last_created"};
+        break;
+      default:
+        qp = {"page": page, "id": post.id};
+    }
     Response response = await dio.get(_BASE_URL + "/posts/",
-        queryParameters: {"page": page, "id": post.id},
+        queryParameters: qp,
         options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
+  }
+
+  Future<List<BBSPost>> loadSearchResults(String searchString) async {
+    Response response = await dio.get(_BASE_URL + "/posts/",
+        queryParameters: {"search": searchString},
+        options: Options(headers: _tokenHeader));
+    List result = response.data;
+    return result.map((e) => BBSPost.fromJson(e)).toList();
+  }
+
+  Future<int> newPost(String content, List<PostTag> tags) async {
+    // TODO: Warning: User might not be logged in
+    Response response = await dio.post(_BASE_URL + "/posts/",
+        data: {"content": content, "tags": tags},
+        options: Options(headers: _tokenHeader));
+    return response.statusCode;
   }
 
   Future<int> newReply(int discussionId, int postId, String content) async {
