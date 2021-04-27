@@ -271,9 +271,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _wrapListItemInCanvas(Reply e, bool generateTags) => Material(
-          child: _getListItems(e, generateTags));
+          child: _getListItems(e, generateTags, false));
 
-  Widget _getListItems(Reply e, bool generateTags) => GestureDetector(
+  Widget _getListItems(Reply e, bool generateTags, bool isNested) => GestureDetector(
     onLongPress: () {
       showPlatformModalSheet(
           context: context,
@@ -296,7 +296,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           ));
     },
     child: Card(
-      //margin: EdgeInsets.fromLTRB(10,8,10,8),
+        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
         child: ListTile(
           dense: true,
           title: Column(
@@ -316,10 +316,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ),
               ),
 
-              if (e.reply_to != null)
+              if (e.reply_to != null && !isNested)
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child:  _getListItems(_lastReplies.firstWhere((element) => element.id == e.reply_to), false),
+                  child:  _getListItems(_lastReplies.firstWhere((element) => element.id == e.reply_to), false, true),
                 ),
 
               Align(
