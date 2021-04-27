@@ -27,7 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m3(num) => "${num}小时前";
 
-  static m4(username, date) => "[${username}]于${date}回复：";
+  static m4(username, date) => "[${username}] 于${date}回复：";
 
   static m5(num) => "${num}分钟前";
 

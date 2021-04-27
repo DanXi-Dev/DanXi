@@ -94,7 +94,7 @@ class FudanAAONoticesFeature extends Feature {
   Widget get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: 0.5,
+        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }
