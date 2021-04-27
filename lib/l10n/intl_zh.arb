@@ -62,7 +62,7 @@
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",
     "current_connection_no_wifi":"没有连接到WLAN",
     "login_uis":"登录复旦UIS",
-    "login_uis_description":"您的用户名和密码仅会被用于登录复旦UIS",
+    "login_uis_description":"您的密码仅会被用于登录复旦UIS",
     "login_uis_uid":"学号",
     "login_uis_pwd":"密码",
     "cancel":"取消",

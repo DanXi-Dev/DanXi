@@ -42,6 +42,9 @@ class Constant {
         accentColor: Color(0xFF007AFF),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10,8,10,8),
+          //elevation: 0,
+          //color: Color.fromRGBO(199, 199, 204, 0.4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -67,8 +70,9 @@ class Constant {
         colorScheme: ColorScheme.dark(),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(7,8,7,8),
-          color: Color.fromRGBO(28, 28, 30, 1.0),
-          //shadowColor: Color.fromRGBO(28, 28, 30, 50),
+          color: Color.fromRGBO(72, 72, 74, 0.5),
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),

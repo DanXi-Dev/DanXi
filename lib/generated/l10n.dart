@@ -665,10 +665,10 @@ class S {
     );
   }
 
-  /// `Your login information is only sent to Fudan servers via secure connection.`
+  /// `Your password is only sent to Fudan servers via secure connection.`
   String get login_uis_description {
     return Intl.message(
-      'Your login information is only sent to Fudan servers via secure connection.',
+      'Your password is only sent to Fudan servers via secure connection.',
       name: 'login_uis_description',
       desc: '',
       args: [],

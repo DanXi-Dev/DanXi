@@ -130,7 +130,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "login_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually."),
     "login_issue_1_action" : MessageLookupByLibrary.simpleMessage("Open UIS Login Page"),
     "login_uis" : MessageLookupByLibrary.simpleMessage("Fudan UIS Login"),
-    "login_uis_description" : MessageLookupByLibrary.simpleMessage("Your login information is only sent to Fudan servers via secure connection."),
+    "login_uis_description" : MessageLookupByLibrary.simpleMessage("Your password is only sent to Fudan servers via secure connection."),
     "login_uis_pwd" : MessageLookupByLibrary.simpleMessage("Password"),
     "login_uis_uid" : MessageLookupByLibrary.simpleMessage("ID"),
     "login_with_uis" : MessageLookupByLibrary.simpleMessage("Sign in anonymously as:"),
