@@ -26,6 +26,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/util/bmob/bmob/realtime/change.dart';
 import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
 import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
@@ -61,6 +62,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StreamSubscription _refreshSubscription;
   static StreamSubscription _goTopSubscription;
   ScrollController _controller = ScrollController();
+
   HtmlEditorController controller = HtmlEditorController();
 
   int _currentBBSPage;
@@ -113,14 +115,16 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
     if (_controller != null) {
       // Over-scroll event
-      _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent * 0.8 &&
-            !_isRefreshing && !_isEndIndicatorShown) {
-          _isRefreshing = true;
-          setState(() {
-            _currentBBSPage++;
-          });
-        }
+      _controller.addListener(_scrollListener);
+    }
+  }
+
+  void _scrollListener() {
+    if (_controller.position.extentAfter < 500 &&
+        !_isRefreshing && !_isEndIndicatorShown) {
+      _isRefreshing = true;
+      setState(() {
+        _currentBBSPage++;
       });
     }
   }
@@ -130,6 +134,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     super.dispose();
     if (_postSubscription != null) _postSubscription.cancel();
     if (_refreshSubscription != null) _refreshSubscription.cancel();
+    _controller.removeListener(_scrollListener);
     _postSubscription = null;
     _refreshSubscription = null;
   }

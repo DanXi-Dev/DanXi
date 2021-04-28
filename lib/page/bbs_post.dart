@@ -65,17 +65,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _isEndIndicatorShown = false;
 
     if (_controller != null) {
-      // Over-scroll event
-      _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent * 0.8 &&
-            !_isRefreshing && !_isEndIndicatorShown) {
-          _isRefreshing = true;
-          setState(() {
-            _currentBBSPage++;
-          });
-        }
+      _controller.addListener(_scrollListener);
+    }
+  }
+
+  void _scrollListener() {
+    if (_controller.position.extentAfter < 500 &&
+        !_isRefreshing && !_isEndIndicatorShown) {
+      _isRefreshing = true;
+      setState(() {
+        _currentBBSPage++;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.removeListener(_scrollListener);
   }
 
   @override
