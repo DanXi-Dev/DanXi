@@ -226,7 +226,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
-    if (isNewData && index >= _lastReplies.length && !_isEndIndicatorShown) {
+    if (isNewData && index >= _lastReplies.length && !_isEndIndicatorShown && !_isRefreshing) {
           _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,

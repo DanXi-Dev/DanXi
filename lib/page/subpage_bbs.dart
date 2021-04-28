@@ -333,7 +333,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildListItem(int index, List<BBSPost> data) {
-    if (index >= _lastPageItems.length && !_isEndIndicatorShown) {
+    if (index >= _lastPageItems.length && !_isRefreshing && !_isEndIndicatorShown) {
           _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,

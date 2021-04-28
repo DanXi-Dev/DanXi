@@ -386,7 +386,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return _personInfo.value == null
         // Show an empty container if no person info is set
         ? PlatformScaffold(
-            iosContentBottomPadding: true,
+            iosContentBottomPadding: false,
             iosContentPadding: true,
             appBar: PlatformAppBar(
               title: Text(S.of(context).app_name),
@@ -402,7 +402,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             body: Container(),
           )
         : PlatformScaffold(
-            iosContentBottomPadding: true,
+            iosContentBottomPadding: false,
             iosContentPadding: _subpage[_pageIndex.value].needPadding,
             appBar: PlatformAppBar(
               cupertino: (_, __) => CupertinoNavigationBarData(
