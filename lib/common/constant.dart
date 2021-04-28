@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:math';
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,7 +23,7 @@ import 'package:flutter/widgets.dart';
 
 class Constant {
   static const bool IS_PRODUCTION_ENVIRONMENT =
-      bool.fromEnvironment('dart.vm.product');
+  bool.fromEnvironment('dart.vm.product');
 
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
@@ -43,7 +41,10 @@ class Constant {
         brightness: Brightness.light,
         accentColor: Color(0xFF007AFF),
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
+          margin: EdgeInsets.fromLTRB(10,8,10,8),
+          //elevation: 0,
+          //color: Color.fromRGBO(199, 199, 204, 0.4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0),),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -54,7 +55,7 @@ class Constant {
       brightness: Brightness.light,
       primarySwatch: Colors.blue,
       cardTheme: CardTheme(
-        margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
+        margin: EdgeInsets.fromLTRB(10,8,10,8),
       ),
     );
   }
@@ -68,9 +69,10 @@ class Constant {
         backgroundColor: Colors.black,
         colorScheme: ColorScheme.dark(),
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(7, 8, 7, 8),
-          color: Color.fromRGBO(28, 28, 30, 1.0),
-          //shadowColor: Color.fromRGBO(28, 28, 30, 50),
+          margin: EdgeInsets.fromLTRB(7,8,7,8),
+          color: Color.fromRGBO(72, 72, 74, 0.5),
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0),),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -88,32 +90,6 @@ class Constant {
     );
   }
 
-  static const List<String> TAG_COLOR_LIST = [
-    'red',
-    'pink',
-    'purple',
-    'deep-purple',
-    'indigo',
-    'blue',
-    'light-blue',
-    'cyan',
-    'teal',
-    'green',
-    'light-green',
-    'lime',
-    'yellow',
-    'amber',
-    'orange',
-    'deep-orange',
-    'brown',
-    'blue-grey',
-    'grey'
-  ];
-
-  static String get randomColor =>
-      TAG_COLOR_LIST[Random().nextInt(TAG_COLOR_LIST.length)];
-
-  /// Get the [Color] from a color string.
   static Color getColorFromString(String color) {
     switch (color) {
       case 'red':
