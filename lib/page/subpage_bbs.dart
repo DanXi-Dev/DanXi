@@ -25,18 +25,13 @@ import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
-import 'package:dan_xi/repository/card_repository.dart';
-import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
-import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -101,10 +96,11 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         Navigator.pushNamed(context, "/bbs/newPost")
-            .then<int>((value) => value is PostEditorText
-                ? PostRepository.getInstance()
-                    .newPost(value?.content, tags: value?.tags)
-                : 0)
+            .then<int>((value) =>
+        value is PostEditorText
+            ? PostRepository.getInstance()
+            .newPost(value?.content, tags: value?.tags)
+            : 0)
             .then((value) => refreshSelf());
       });
     }
@@ -116,8 +112,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_goTopSubscription == null) {
       _goTopSubscription =
           Constant.eventBus.on<ScrollToTopEvent>().listen((event) {
-        TopController.scrollToTop(_controller);
-      });
+            TopController.scrollToTop(_controller);
+          });
     }
     if (_controller != null) {
       // Over-scroll event
@@ -143,6 +139,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_refreshSubscription != null) _refreshSubscription.cancel();
     _postSubscription = null;
     _refreshSubscription = null;
+    _controller.removeListener(_scrollListener);
   }
 
   /// Login in and load all of the posts.
@@ -157,7 +154,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
-        color: Theme.of(context).accentColor,
+        color: Theme
+            .of(context)
+            .accentColor,
         onRefresh: () async => refreshSelf(),
         child: MediaQuery.removePadding(
             context: context,
@@ -166,6 +165,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                 future: loginAndLoadPost(context.personInfo),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
+                  snapshot.data.forEach((element) {
+                    _lastPageItems.add(_getListItem(element));
+                  });
                   _isRefreshing = false;
                   _lastSnapshotData = snapshot;
                   return _buildPage(snapshot.data);
@@ -187,15 +189,18 @@ class _BBSSubpageState extends State<BBSSubpage>
                 })));
   }
 
-  Widget _buildLoadingPage() => Container(
+  Widget _buildLoadingPage() =>
+      Container(
         padding: EdgeInsets.all(8),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: PlatformCircularProgressIndicator()),
       );
 
   Widget _buildErrorPage({Exception error}) {
     return GestureDetector(
       child: Center(
-        child: Text(S.of(context).failed),
+        child: Text(S
+            .of(context)
+            .failed),
       ),
       onTap: () {
         refreshSelf();
@@ -204,51 +209,49 @@ class _BBSSubpageState extends State<BBSSubpage>
     //  ],);
   }
 
-  Widget _buildPage(List<BBSPost> data) => WithScrollbar(
+  Widget _buildPage(List<BBSPost> data) =>
+      WithScrollbar(
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _controller,
           itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
-          itemBuilder: (context, index) => _buildListItem(index, data, true),
+          itemBuilder: (context, index) => _buildListItem(index, data),
         ),
         controller: _controller,
       );
 
-  Widget _buildPageWhileLoading(List<BBSPost> data) => WithScrollbar(
+  Widget _buildPageWhileLoading(List<BBSPost> data) =>
+      WithScrollbar(
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _controller,
           itemCount: (_lastSnapshotData == null
-                      ? _currentBBSPage
-                      : _currentBBSPage - 1) *
-                  POST_COUNT_PER_PAGE +
+              ? _currentBBSPage
+              : _currentBBSPage - 1) *
+              POST_COUNT_PER_PAGE +
               1,
-          itemBuilder: (context, index) => _buildListItem(index, data, false),
+          itemBuilder: (context, index) => _buildListItem(index, data),
         ),
         controller: _controller,
       );
 
-  Widget _buildListItem(int index, List<BBSPost> data, bool isNewData) {
-    if (isNewData && index >= _lastPageItems.length) {
-      try {
-        _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
-      } catch (e) {
-        if (!_isEndIndicatorShown) {
-          _isEndIndicatorShown = true;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(S.of(context).end_reached),
-              const SizedBox(
-                height: 16,
-              )
-            ],
-          );
-        }
-        return null;
-      }
+  Widget _buildListItem(int index, List<BBSPost> data) {
+    if (!_isEndIndicatorShown && !_isRefreshing &&
+        index >= _lastPageItems.length) {
+      _isEndIndicatorShown = true;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(S
+              .of(context)
+              .end_reached),
+          const SizedBox(
+            height: 16,
+          )
+        ],
+      );
     }
-    if (index >= _lastPageItems.length) return _buildLoadingPage();
+    if (index >= _lastPageItems.length) return _isEndIndicatorShown ? Container() : _buildLoadingPage();
     return _lastPageItems[index];
   }
 

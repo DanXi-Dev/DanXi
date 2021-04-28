@@ -69,7 +69,6 @@ class Constant {
         accentColor: Color(0xFF007AFF),
         scaffoldBackgroundColor: Colors.black,
         backgroundColor: Colors.black,
-        colorScheme: ColorScheme.dark(),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(7,8,7,8),
           color: Color.fromRGBO(72, 72, 74, 0.5),
@@ -91,7 +90,7 @@ class Constant {
       ),
     );
   }
-  
+
   static const List<String> TAG_COLOR_LIST = [
     'red',
     'pink',

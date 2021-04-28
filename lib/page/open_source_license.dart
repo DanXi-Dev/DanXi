@@ -16,7 +16,6 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
