@@ -25,6 +25,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class EcardBalanceFeature extends Feature {
@@ -102,7 +103,7 @@ class EcardBalanceFeature extends Feature {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
-                  color: Theme.of(context).hintColor.withOpacity(0.3),
+                  color: Theme.of(context).hintColor.withOpacity(0.25),
                   borderRadius: BorderRadius.all(Radius.circular(4.0))),
               child: Text(
                 S.of(context).last_transaction,
@@ -141,8 +142,8 @@ class EcardBalanceFeature extends Feature {
   Widget get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: 0.5,
-        child: CircularProgressIndicator(),
+        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        child: PlatformCircularProgressIndicator(),
       );
     } else if (_status == ConnectionStatus.DONE)
       return Text(

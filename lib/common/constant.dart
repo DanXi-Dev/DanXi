@@ -83,7 +83,7 @@ class Constant {
     return ThemeData(
       brightness: Brightness.dark,
       cardTheme: CardTheme(
-        margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
+        margin: EdgeInsets.fromLTRB(10,8,10,8),
       ),
     );
   }

@@ -665,10 +665,10 @@ class S {
     );
   }
 
-  /// `Your login information is only sent to Fudan servers via secure connection.`
+  /// `Your password is only sent to Fudan servers via secure connection.`
   String get login_uis_description {
     return Intl.message(
-      'Your login information is only sent to Fudan servers via secure connection.',
+      'Your password is only sent to Fudan servers via secure connection.',
       name: 'login_uis_description',
       desc: '',
       args: [],
@@ -1005,6 +1005,16 @@ class S {
     );
   }
 
+  /// `[Unable to display content of this type.]`
+  String get no_summary {
+    return Intl.message(
+      '[Unable to display content of this type.]',
+      name: 'no_summary',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
@@ -1040,6 +1050,16 @@ class S {
     return Intl.message(
       'Evening',
       name: 'evening',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current date: `
+  String get current_date {
+    return Intl.message(
+      'Current date: ',
+      name: 'current_date',
       desc: '',
       args: [],
     );

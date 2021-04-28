@@ -65,7 +65,7 @@
     "current_connection_failed":"Failed to obtain WLAN information, Precise Location permission required",
     "current_connection_no_wifi":"Not connected to WLAN",
     "login_uis":"Fudan UIS Login",
-    "login_uis_description":"Your login information is only sent to Fudan servers via secure connection.",
+    "login_uis_description":"Your password is only sent to Fudan servers via secure connection.",
     "login_uis_uid":"ID",
     "login_uis_pwd":"Password",
     "cancel":"Cancel",
@@ -100,11 +100,13 @@
     "editor_hint": "Swipe the toolbar to the right to see more styling options...",
     "end_reached": "You have reached the end.",
     "latest_reply": "[{username}] replied {date}:",
+    "no_summary": "[Unable to display content of this type.]",
 
     "classroom": "Classroom",
     "morning": "Morning",
     "afternoon": "Afternoon",
     "evening": "Evening",
+    "current_date": "Current date: ",
 
     "good_morning":"Every dawn is a new sunrise.",
     "good_noon":"Rise and shine.",

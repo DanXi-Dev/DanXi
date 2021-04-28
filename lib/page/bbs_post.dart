@@ -47,7 +47,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
   ScrollController _controller = ScrollController();
   int _currentBBSPage;
-  List<Widget> _lastPageItems;
+  List<Reply> _lastReplies;
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing;
   bool _isEndIndicatorShown;
@@ -59,23 +59,42 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _post = widget.arguments['post'];
 
     _currentBBSPage = 1;
-    _lastPageItems = [];
+    _lastReplies = [];
     _lastSnapshotData = null;
     _isRefreshing = true;
     _isEndIndicatorShown = false;
 
     if (_controller != null) {
-      // Over-scroll event
-      _controller.addListener(() {
-        if (_controller.offset >= _controller.position.maxScrollExtent &&
-            !_isRefreshing && !_isEndIndicatorShown) {
-          _isRefreshing = true;
-          setState(() {
-            _currentBBSPage++;
-          });
-        }
+      _controller.addListener(_scrollListener);
+    }
+  }
+
+  void refreshSelf() {
+    if (mounted) {
+      _currentBBSPage = 1;
+      _lastReplies = [];
+      _lastSnapshotData = null;
+      _isRefreshing = true;
+      _isEndIndicatorShown = false;
+      // ignore: invalid_use_of_protected_member
+      setState(() {});
+    }
+  }
+
+  void _scrollListener() {
+    if (_controller.position.extentAfter < 500 &&
+        !_isRefreshing && !_isEndIndicatorShown) {
+      _isRefreshing = true;
+      setState(() {
+        _currentBBSPage++;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.removeListener(_scrollListener);
   }
 
   @override
@@ -128,12 +147,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               if (_lastSnapshotData == null) return Container(
                                 padding: EdgeInsets.all(8),
                                 child: Center(
-                                  child: CircularProgressIndicator()
+                                  child: PlatformCircularProgressIndicator()
                                 ),
                               );
                               return _buildPageWhileLoading(_lastSnapshotData.data);
                               break;
                             case ConnectionState.done:
+                              _lastReplies.addAll(snapshot.data);
                               _isRefreshing = false;
                               if (snapshot.hasError) {
                                 return _buildErrorWidget();
@@ -151,7 +171,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           }
                           return null;
                         },
-                        future: PostRepository.getInstance().loadReplies(_post, _currentBBSPage)),
+                        future: PostRepository.getInstance().loadReplies(_post, _currentBBSPage, 0)),
               )
           )),
     );
@@ -218,11 +238,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
-    if (isNewData && index >= _lastPageItems.length) {
-      try {
-        _lastPageItems.add(_getListItem(e[index % POST_COUNT_PER_PAGE], index));
-      } catch (e) {
-        if (!_isEndIndicatorShown) {
+    if (isNewData && index >= _lastReplies.length && !_isEndIndicatorShown && !_isRefreshing) {
           _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -231,12 +247,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               const SizedBox(height: 16,)
             ],
           );
-        }
-        return null;
-      }
     }
-    if (index >= _lastPageItems.length) return GestureDetector(child: Center(child: CircularProgressIndicator()),);
-    return _lastPageItems[index];
+    if (index >= _lastReplies.length) return _isEndIndicatorShown ? Container() : GestureDetector(child: Center(child: PlatformCircularProgressIndicator()),);
+    return _wrapListItemInCanvas(_lastReplies[index], index == 0) ;
   }
 
   Widget _buildErrorWidget() => GestureDetector(
@@ -269,67 +282,58 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     return list;
   }
 
-  Widget _getListItem(Reply e, int index) => Material(
-          //color: PlatformX.backgroundColor(context),
-          child: GestureDetector(
-        onLongPress: () {
-          showPlatformModalSheet(
-              context: context,
-              builder: (_) => PlatformWidget(
-                    cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildContextMenu(e),
-                      cancelButton: CupertinoActionSheetAction(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ),
-                    material: (_, __) => Container(
-                      height: 300,
-                      child: Column(
-                        children: _buildContextMenu(e),
-                      ),
-                    ),
-                  ));
-        },
-        child: Card(
-            //margin: EdgeInsets.fromLTRB(10,8,10,8),
-            child: ListTile(
+  Widget _wrapListItemInCanvas(Reply e, bool generateTags) => Material(
+          child: _getListItems(e, generateTags, false));
+
+  Widget _getListItems(Reply e, bool generateTags, bool isNested) => GestureDetector(
+    onLongPress: () {
+      showPlatformModalSheet(
+          context: context,
+          builder: (_) => PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheet(
+              actions: _buildContextMenu(e),
+              cancelButton: CupertinoActionSheetAction(
+                child: Text(S.of(context).cancel),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+            material: (_, __) => Container(
+              height: 300,
+              child: Column(
+                children: _buildContextMenu(e),
+              ),
+            ),
+          ));
+    },
+    child: Card(
+        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : (e.username == _post.first_post.username ? Color.alphaBlend(Constant.getColorFromString(_post.tag.first.color).withOpacity(0.1) , Theme.of(context).cardColor) : null),
+        child: ListTile(
           dense: true,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 8,
-              ),
-              if (index == 0)
-                Row(
-                  children: _generateTagWidgets(_post),
-                ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    e.reply_to == null
-                        ? Column()
-                        : Text(S.of(context).reply_to(e.reply_to),
-                            style: TextStyle(
-                                fontSize: 10,
-                                color: Theme.of(context).accentColor)),
-                    /*Text("#${e.id}",
-                        style: TextStyle(
-                            fontSize: 10, color: Theme.of(context).hintColor)),*/
-                  ],
-                ),
-              ),
-              Padding(
+              if (generateTags)
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Text(
-                    "[${e.username}]",
+                  child: Row(
+                    children: _generateTagWidgets(_post),
                   ),
+                ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: Text(
+                  "[${e.username}]",
+                ),
               ),
+
+              if (e.reply_to != null && !isNested)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child:  _getListItems(_lastReplies.firstWhere((element) => element.id == e.reply_to), false, true),
+                ),
+
               Align(
                 alignment: Alignment.topLeft,
                 child: HtmlWidget(
@@ -342,35 +346,32 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           ),
           subtitle: Column(children: [
             const SizedBox(
-              height: 12,
+              height: 8,
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(
                 "#${e.id}",
                 style:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+                TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
               Text(
                 HumanDuration.format(context, DateTime.parse(e.date_created)),
                 style:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+                TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
-              TextButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  ),
-                  onPressed: () {
-                    BBSEditor.reportPost(context, e.id);
-                  },
-                  child: Text(S.of(context).report, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12))
+              GestureDetector(
+                child: Text(S.of(context).report, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
+                onTap: () {
+                  BBSEditor.reportPost(context, e.id);
+                },
               ),
             ]),
           ]),
           onTap: () {
-             BBSEditor.createNewReply(context, _post.id, e.id);
+            BBSEditor.createNewReply(context, _post.id, e.id);
           },
         )),
-      ));
+  );
 
   List<Widget> _generateTagWidgets(BBSPost e) {
     List<Widget> _tags = [

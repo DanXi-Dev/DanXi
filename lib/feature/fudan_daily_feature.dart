@@ -193,8 +193,8 @@ class FudanDailyFeature extends Feature {
   Widget get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: 0.5,
-        child: CircularProgressIndicator(),
+        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        child: PlatformCircularProgressIndicator(),
       );
     }
     return null;

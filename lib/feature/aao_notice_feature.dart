@@ -23,6 +23,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class FudanAAONoticesFeature extends Feature {
@@ -93,8 +94,8 @@ class FudanAAONoticesFeature extends Feature {
   Widget get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: 0.5,
-        child: CircularProgressIndicator(),
+        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        child: PlatformCircularProgressIndicator(),
       );
     }
     return null;

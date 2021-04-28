@@ -27,7 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m3(num) => "${num}小时前";
 
-  static m4(username, date) => "[${username}] 在${date}回复：";
+  static m4(username, date) => "[${username}] 于${date}回复：";
 
   static m5(num) => "${num}分钟前";
 
@@ -69,6 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "current_connection" : MessageLookupByLibrary.simpleMessage("当前连接"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("没有连接到WLAN"),
+    "current_date" : MessageLookupByLibrary.simpleMessage("当前日前："),
     "dashboard" : MessageLookupByLibrary.simpleMessage("首页"),
     "day_ago" : m0,
     "default_campus" : MessageLookupByLibrary.simpleMessage("当前校区"),
@@ -114,7 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "login_issue_1" : MessageLookupByLibrary.simpleMessage("登录失败，旦兮无法完成 UIS 登录。\n出现此错误，很可能是由于您连续多次登录失败所致。\n您需要使用浏览器手动完成一次登录，从下一次登录开始，旦兮 即可妥善处理此情况。"),
     "login_issue_1_action" : MessageLookupByLibrary.simpleMessage("打开UIS登录页面"),
     "login_uis" : MessageLookupByLibrary.simpleMessage("登录复旦UIS"),
-    "login_uis_description" : MessageLookupByLibrary.simpleMessage("您的用户名和密码仅会被用于登录复旦UIS"),
+    "login_uis_description" : MessageLookupByLibrary.simpleMessage("您的密码仅会被用于登录复旦UIS"),
     "login_uis_pwd" : MessageLookupByLibrary.simpleMessage("密码"),
     "login_uis_uid" : MessageLookupByLibrary.simpleMessage("学号"),
     "login_with_uis" : MessageLookupByLibrary.simpleMessage("将使用以下信息匿名登录树洞"),
@@ -129,6 +130,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "morning" : MessageLookupByLibrary.simpleMessage("上午"),
     "most_least_crowded_canteen" : m6,
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
+    "no_summary" : MessageLookupByLibrary.simpleMessage("[无法显示此类型的消息]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("开源软件许可协议"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),
