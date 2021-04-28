@@ -141,6 +141,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               return _buildPageWhileLoading(_lastSnapshotData.data);
                               break;
                             case ConnectionState.done:
+                              _lastReplies.addAll(snapshot.data);
                               _isRefreshing = false;
                               if (snapshot.hasError) {
                                 return _buildErrorWidget();
@@ -225,12 +226,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
-    if (isNewData && index >= _lastReplies.length) {
-      try {
-        // TODO: migrate to [_lastReplies.addAll(e)];
-        _lastReplies.add(e[index % POST_COUNT_PER_PAGE]);
-      } catch (e) {
-        if (!_isEndIndicatorShown) {
+    if (isNewData && index >= _lastReplies.length && !_isEndIndicatorShown) {
           _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -239,11 +235,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               const SizedBox(height: 16,)
             ],
           );
-        }
-        return null;
-      }
     }
-    if (index >= _lastReplies.length) return GestureDetector(child: Center(child: PlatformCircularProgressIndicator()),);
+    if (index >= _lastReplies.length) return _isEndIndicatorShown ? Container() : GestureDetector(child: Center(child: PlatformCircularProgressIndicator()),);
     return _wrapListItemInCanvas(_lastReplies[index], index == 0) ;
   }
 
@@ -303,7 +296,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           ));
     },
     child: Card(
-        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
+        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : (e.username == _post.first_post.username ? Color.alphaBlend(Constant.getColorFromString(_post.tag.first.color).withOpacity(0.1) , Theme.of(context).cardColor) : null),
         child: ListTile(
           dense: true,
           title: Column(

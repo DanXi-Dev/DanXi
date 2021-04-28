@@ -235,6 +235,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                       return _buildPageWhileLoading(_lastSnapshotData.data);
                       break;
                     case ConnectionState.done:
+                      snapshot.data.forEach((element) {
+                        _lastPageItems.add(_getListItem(element));
+                      });
                       _isRefreshing = false;
                       if (snapshot.hasError || !snapshot.hasData) {
                         return _buildErrorPage(error: snapshot.error);
@@ -280,7 +283,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 controller: _controller,
                 itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
                 itemBuilder: (context, index) =>
-                    _buildListItem(index, data, true),
+                    _buildListItem(index, data),
               ),
             ),
         cupertino: (_, __) => CupertinoScrollbar(
@@ -290,7 +293,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 controller: _controller,
                 itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
                 itemBuilder: (context, index) =>
-                    _buildListItem(index, data, true),
+                    _buildListItem(index, data),
               ),
             ));
   }
@@ -310,7 +313,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         POST_COUNT_PER_PAGE +
                     1,
                 itemBuilder: (context, index) =>
-                    _buildListItem(index, data, false),
+                    _buildListItem(index, data),
               ),
             ),
         cupertino: (_, __) => CupertinoScrollbar(
@@ -324,17 +327,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                         POST_COUNT_PER_PAGE +
                     1,
                 itemBuilder: (context, index) =>
-                    _buildListItem(index, data, false),
+                    _buildListItem(index, data),
               ),
             ));
   }
 
-  Widget _buildListItem(int index, List<BBSPost> data, bool isNewData) {
-    if (isNewData && index >= _lastPageItems.length) {
-      try {
-        _lastPageItems.add(_getListItem(data[index % POST_COUNT_PER_PAGE]));
-      } catch (e) {
-        if (!_isEndIndicatorShown) {
+  Widget _buildListItem(int index, List<BBSPost> data) {
+    if (index >= _lastPageItems.length && !_isEndIndicatorShown) {
           _isEndIndicatorShown = true;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -343,11 +342,8 @@ class _BBSSubpageState extends State<BBSSubpage>
               const SizedBox(height: 16,)
             ],
           );
-        }
-        return null;
-      }
     }
-    if (index >= _lastPageItems.length) return _buildLoadingPage();
+    if (index >= _lastPageItems.length) return _isEndIndicatorShown ? Container() : _buildLoadingPage();
     return _lastPageItems[index];
   }
 
