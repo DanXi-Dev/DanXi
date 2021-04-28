@@ -18,6 +18,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:html_editor_enhanced/utils/shims/dart_ui.dart';
 
+/// A round chip, usually used as a tag, to match the tag widget of fduhole's web style.
 class RoundChip extends StatefulWidget {
   final String label;
   final VoidCallback onTap;

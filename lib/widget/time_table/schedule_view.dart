@@ -25,6 +25,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:intl/intl.dart';
 
+/// A time table widget, usually used to show student's course schedule table.
 class ScheduleView extends StatefulWidget {
   final List<DayEvents> laneEventsList;
   final TimetableStyle timetableStyle;

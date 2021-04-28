@@ -15,9 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/cupertino.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:flutter/widgets.dart';
 
+/// A widget that listens to the double tap on its child,
+/// controlling a [ScrollController] or calling [onDoubleTap] method to scroll to the top.
+///
+/// Usually wrap a [Text] widget in [PlatformAppBarX].
 class TopController extends StatefulWidget {
   final Widget child;
   final ScrollController controller;

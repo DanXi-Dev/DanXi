@@ -75,14 +75,14 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
       case ConnectionState.none:
       case ConnectionState.waiting:
       case ConnectionState.active:
-        return SmartWidget.toWidget(widget.loadingBuilder, context,
+        return SmartWidget.toWidget<T>(widget.loadingBuilder, context,
             snapshot: _snapshot);
       case ConnectionState.done:
         if (_snapshot.hasError || !_snapshot.hasData) {
-          return SmartWidget.toWidget(widget.errorBuilder, context,
+          return SmartWidget.toWidget<T>(widget.errorBuilder, context,
               snapshot: _snapshot);
         } else {
-          return SmartWidget.toWidget(widget.successBuilder, context,
+          return SmartWidget.toWidget<T>(widget.successBuilder, context,
               snapshot: _snapshot);
         }
     }

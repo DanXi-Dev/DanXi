@@ -21,19 +21,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
-
 class BBSEditor {
-
-  static Future<void> createNewPost(BuildContext context) async {
-    //TODO: tag editor
-    String content = await _showEditor(context, "TODO: feature under construction");
-    if (content == null || content == "") return;
-    //TODO: POST to server
-    // Obtain token form postRepository
-
-    //TODO: handle failure
-  }
-
   static Future<void> createNewReply(BuildContext context, int discussionId, int postId) async {
     String content = await _showEditor(context, postId == null ? S.of(context).reply_to(discussionId) : S.of(context).reply_to(postId));
     if (content == null || content == "") return;

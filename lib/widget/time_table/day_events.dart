@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/model/time_table.dart';
 import 'package:flutter/widgets.dart';
-
+/// [DayEvents] is a list of [Event]s on a specific day.
 class DayEvents {
   final String day;
 

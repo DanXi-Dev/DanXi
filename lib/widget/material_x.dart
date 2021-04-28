@@ -19,6 +19,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// A container of [Material] that applies the app's theme settings on it.
+///
+/// Use it anywhere you need a [Material].
 class ThemedMaterial extends StatefulWidget {
   final Widget child;
 

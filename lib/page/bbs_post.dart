@@ -137,13 +137,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             case ConnectionState.waiting:
                             case ConnectionState.active:
                               _isRefreshing = true;
-                              /*return ListView.builder(
-                                  primary: true,
-                                  itemBuilder: (context, index) =>
-                                      _buildListItem(null, index),
-                                  itemCount: _lastPageItems.length + 1,
-                              );*/
-                              _isRefreshing = true;
                               if (_lastSnapshotData == null) return Container(
                                 padding: EdgeInsets.all(8),
                                 child: Center(
@@ -161,17 +154,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 _lastSnapshotData = snapshot;
                                 var l = snapshot.data;
                                 return _buildPage(snapshot.data);
-                                /*return  ListView.builder(
+                            /*return  ListView.builder(
                                         primary: true,
                                         itemBuilder: (context, index) =>
                                             _buildListItem(l, index),
                                         itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE);*/
-                              }
-                              break;
                           }
-                          return null;
-                        },
-                        future: PostRepository.getInstance().loadReplies(_post, _currentBBSPage, 0)),
+                          break;
+                      }
+                      return null;
+                    },
+                    future: PostRepository.getInstance()
+                        .loadReplies(_post, _currentBBSPage)),
               )
           )),
     );

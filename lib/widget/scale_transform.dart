@@ -17,6 +17,7 @@
 
 import 'package:flutter/widgets.dart';
 
+/// A widget that will scale its child at specific scale.
 class ScaleTransform extends StatelessWidget {
   final Widget child;
   final double scale;

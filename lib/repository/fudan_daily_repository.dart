@@ -67,6 +67,9 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
         new DateFormat('yyyyMMdd').format(DateTime.now());
   }
 
+  /// Build a payload from [_historyData].
+  ///
+  /// If failed, return null.
   Map _buildPayloadFromHistory() {
     if (_historyData == null || _historyData['oldInfo'] is! Map) {
       return null;

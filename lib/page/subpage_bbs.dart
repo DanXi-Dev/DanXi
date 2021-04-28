@@ -31,6 +31,9 @@ import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/future_widget.dart';
+import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,6 +43,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
+
+import 'bbs_editor.dart';
 
 class BBSSubpage extends PlatformSubpage {
   @override
@@ -94,11 +99,13 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     if (_postSubscription == null) {
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-        BBSEditor.createNewPost(context);
+        Navigator.pushNamed(context, "/bbs/newPost")
+            .then<int>((value) => value is PostEditorText
+                ? PostRepository.getInstance()
+                    .newPost(value?.content, tags: value?.tags)
+                : 0)
+            .then((value) => refreshSelf());
       });
-
-        // To get text from editor:
-        // final txt = await controller.getText();
     }
     if (_refreshSubscription == null) {
       _refreshSubscription = Constant.eventBus
@@ -119,7 +126,8 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   void _scrollListener() {
     if (_controller.position.extentAfter < 500 &&
-        !_isRefreshing && !_isEndIndicatorShown) {
+        !_isRefreshing &&
+        !_isEndIndicatorShown) {
       _isRefreshing = true;
       setState(() {
         _currentBBSPage++;
@@ -134,69 +142,6 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_refreshSubscription != null) _refreshSubscription.cancel();
     _postSubscription = null;
     _refreshSubscription = null;
-  }
-
-  /// Pop up a dialog to request for signing up and complete registration
-  Future<BmobUser> register(PersonInfo info) async {
-    BmobRegistered result = await showPlatformDialog<BmobRegistered>(
-      barrierDismissible: false,
-      context: context,
-      builder: (_) => PlatformAlertDialog(
-        title: Text(S.of(context).login_with_uis),
-        content: Material(
-            child: ListTile(
-          leading: PlatformX.isAndroid
-              ? Icon(Icons.account_circle)
-              : Icon(SFSymbols.person_crop_circle_fill),
-          title: Text(info.name),
-          subtitle: Text(info.id),
-        )),
-        actions: [
-          PlatformButton(
-              onPressed: () async {
-                //TODO
-                Navigator.pop(context, null);
-              },
-              child: Text(S.of(context).login)),
-          PlatformButton(
-              onPressed: () async {
-                Navigator.pop(context, null);
-              },
-              child: Text(S.of(context).cancel)),
-        ],
-      ),
-    );
-    if (result == null) {
-      throw LoginException();
-    } else {
-      return BmobUser()
-        ..username = info.name
-        ..email = info.id
-        ..password = info.password
-        ..sessionToken = result.sessionToken
-        ..objectId = result.objectId
-        ..createdAt = result.createdAt;
-    }
-  }
-
-  /// Handle login error.
-  ///
-  /// Some common types:
-  /// Connection failed: DioError [DioErrorType.CONNECT_TIMEOUT]: Connecting timed out [10000ms]
-  /// Password is wrong or no account: DioError [DioErrorType.RESPONSE]: Http status error [400]
-  ///
-  FutureOr<BmobUser> handleError(
-      PersonInfo info, dynamic e, StackTrace trace) async {
-    if (e is DioError) {
-      DioError error = e;
-      if (error.type == DioErrorType.response) {
-        return await register(info);
-      } else {
-        // If timeout
-        return null;
-      }
-    }
-    throw e;
   }
 
   /// Login in and load all of the posts.
@@ -216,34 +161,29 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: MediaQuery.removePadding(
             context: context,
             removeTop: true,
-            child: FutureBuilder(
-                builder: (_, AsyncSnapshot<List<BBSPost>> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      _isRefreshing = true;
-                      if (_lastSnapshotData == null) return Container(
-                        padding: EdgeInsets.all(8),
-                        child: Center(
-                            child: PlatformCircularProgressIndicator(),
-                        ),
-                      );
-                      return _buildPageWhileLoading(_lastSnapshotData.data);
-                      break;
-                    case ConnectionState.done:
-                      _isRefreshing = false;
-                      if (snapshot.hasError || !snapshot.hasData) {
-                        return _buildErrorPage(error: snapshot.error);
-                      } else {
-                        _lastSnapshotData = snapshot;
-                        return _buildPage(snapshot.data);
-                      }
-                      break;
-                  }
-                  return null;
+            child: FutureWidget<List<BBSPost>>(
+                future: loginAndLoadPost(context.personInfo),
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<BBSPost>> snapshot) {
+                  _isRefreshing = false;
+                  _lastSnapshotData = snapshot;
+                  return _buildPage(snapshot.data);
                 },
-                future: loginAndLoadPost(context.personInfo))));
+                errorBuilder: (BuildContext context,
+                    AsyncSnapshot<List<BBSPost>> snapshot) {
+                  return _buildErrorPage(error: snapshot.error);
+                },
+                loadingBuilder: () {
+                  _isRefreshing = true;
+                  if (_lastSnapshotData == null)
+                    return Container(
+                      padding: EdgeInsets.all(8),
+                      child: Center(
+                        child: PlatformCircularProgressIndicator(),
+                      ),
+                    );
+                  return _buildPageWhileLoading(_lastSnapshotData.data);
+                })));
   }
 
   Widget _buildLoadingPage() => Container(
@@ -252,9 +192,6 @@ class _BBSSubpageState extends State<BBSSubpage>
       );
 
   Widget _buildErrorPage({Exception error}) {
-    /*return Column(
-      children: [
-        if (_lastSnapshotData != null) _buildPage(_lastSnapshotData.data),*/
     return GestureDetector(
       child: Center(
         child: Text(S.of(context).failed),
@@ -337,7 +274,9 @@ class _BBSSubpageState extends State<BBSSubpage>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(S.of(context).end_reached),
-              const SizedBox(height: 16,)
+              const SizedBox(
+                height: 16,
+              )
             ],
           );
         }
@@ -348,6 +287,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     return _lastPageItems[index];
   }
 
+  /// Render the text from a clip of [html].
   String _renderTitle(String html) {
     var soup = Beautifulsoup(html);
     return soup.get_text();
@@ -360,24 +300,9 @@ class _BBSSubpageState extends State<BBSSubpage>
       ),
     ];
     e.tag.forEach((element) {
-      _tags.add(Container(
-        padding: EdgeInsets.symmetric(horizontal: 7),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Constant.getColorFromString(element.color),
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          //color: Constant.getColorFromString(element.color).withAlpha(25),
-        ),
-        child: Text(
-          element.name,
-          style: TextStyle(
-              fontSize: 14,
-              color: Constant.getColorFromString(element
-                  .color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
-              ),
-        ),
+      _tags.add(RoundChip(
+        label: element.name,
+        color: Constant.getColorFromString(element.color),
       ));
       _tags.add(const SizedBox(
         width: 6,
@@ -387,15 +312,11 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _getListItem(BBSPost e) {
-    return Material(
-        //color: PlatformX.isCupertino(context) ? Colors.white : null,
-        child: Card(
-      //margin: EdgeInsets.fromLTRB(10,8,10,8)
-      child: Column(
-        children: [
-          ListTile(
+    return ThemedMaterial(
+      child: Card(
+          child: Column(children: [
+        ListTile(
             contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
-            //visualDensity: VisualDensity(vertical: 2),
             dense: false,
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,29 +327,33 @@ class _BBSSubpageState extends State<BBSSubpage>
                 const SizedBox(
                   height: 10,
                 ),
-                e.is_folded ?
-                ListTileTheme(
-                  dense: true,
-                  child: ExpansionTile(
-                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                    expandedAlignment: Alignment.topLeft,
-                    childrenPadding: EdgeInsets.symmetric(vertical: 4),
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(S.of(context).folded, style: TextStyle(color: Theme.of(context).hintColor),),
-                    children: [
-                      Text(
+                e.is_folded
+                    ? ListTileTheme(
+                        dense: true,
+                        child: ExpansionTile(
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          expandedAlignment: Alignment.topLeft,
+                          childrenPadding: EdgeInsets.symmetric(vertical: 4),
+                          tilePadding: EdgeInsets.zero,
+                          title: Text(
+                            S.of(context).folded,
+                            style:
+                                TextStyle(color: Theme.of(context).hintColor),
+                          ),
+                          children: [
+                            Text(
+                              _renderTitle(e.first_post.content),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      )
+                    : Text(
                         _renderTitle(e.first_post.content),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                ) :
-                Text(
-                  _renderTitle(e.first_post.content),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
               ],
             ),
             subtitle: Column(
@@ -467,24 +392,24 @@ class _BBSSubpageState extends State<BBSSubpage>
                   ],
                 ),
               ],
-          ),
-          onTap: () {
-            Navigator.of(context)
-                .pushNamed("/bbs/postDetail", arguments: {"post": e});
-          }),
-
-          if (!e.is_folded && e.last_post.id != e.first_post.id)
-          Divider(height: 4,),
-
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .pushNamed("/bbs/postDetail", arguments: {"post": e});
+            }),
         if (!e.is_folded && e.last_post.id != e.first_post.id)
-        ListTile(
+          Divider(
+            height: 4,
+          ),
+        if (!e.is_folded && e.last_post.id != e.first_post.id)
+          ListTile(
             dense: true,
             minLeadingWidth: 16,
             leading: Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
               child: Icon(
-                  SFSymbols.quote_bubble,
-                  color: Theme.of(context).hintColor,
+                SFSymbols.quote_bubble,
+                color: Theme.of(context).hintColor,
               ),
             ),
             title: Column(
@@ -493,26 +418,30 @@ class _BBSSubpageState extends State<BBSSubpage>
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                   child: Text(
-                    S.of(context).latest_reply(e.last_post.username, HumanDuration.format(context, DateTime.parse(e.last_post.date_created))),
+                    S.of(context).latest_reply(
+                        e.last_post.username,
+                        HumanDuration.format(
+                            context, DateTime.parse(e.last_post.date_created))),
                     style: TextStyle(color: Theme.of(context).hintColor),
                   ),
                 ),
                 Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                  child: Text(
-                      _renderTitle(e.last_post.content).trim().isEmpty ? S.of(context).no_summary : _renderTitle(e.last_post.content),
+                    child: Text(
+                      _renderTitle(e.last_post.content).trim().isEmpty
+                          ? S.of(context).no_summary
+                          : _renderTitle(e.last_post.content),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       //style: TextStyle(color: Theme.of(context).hintColor),
-                      )
-                ),
+                    )),
               ],
             ),
-          onTap: () {
-            BBSEditor.createNewReply(context, e.id, e.last_post.id);
-          },)
-        ])
-        ),
+            onTap: () {
+              BBSEditor.createNewReply(context, e.id, e.last_post.id);
+            },
+          )
+      ])),
     );
   }
 

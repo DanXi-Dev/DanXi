@@ -48,6 +48,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 * */
+
+/// A container of [ChoiceChip], allowing users to choose from a list of [Tag]s.
 class TagContainer extends StatefulWidget {
   final List<Tag> tagList;
   final bool fillRandomColor;

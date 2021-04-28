@@ -18,6 +18,9 @@
 import 'package:dan_xi/model/time_table.dart';
 import 'package:flutter/widgets.dart';
 
+/// [Event] represents a specific course at a specific time.
+///
+/// Usually ignore [course.times], treat the [course] as a single event.
 class Event {
   final Course course;
 
