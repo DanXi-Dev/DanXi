@@ -380,13 +380,21 @@ class PostRepository extends BaseRepositoryWithDio {
     return result.map((e) => Reply.fromJson(e)).toList();
   }
 
+  Future<List<PostTag>> loadTags() async {
+    Response response = await dio.get(_BASE_URL + "/tags/",
+        options: Options(headers: _tokenHeader));
+    List result = response.data;
+    return result.map((e) => PostTag.fromJson(e)).toList();
+  }
+
   Future<int> newPost(String content, {List<PostTag> tags}) async {
+    if (content == null) return 0;
     if (tags == null) tags = [];
     // Suppose user is logged in. He should be.
     Response response = await dio.post(_BASE_URL + "/discussions/",
         data: {
           "content": content,
-          "tags": jsonEncode(tags.map((e) => e.toJson()))
+          "tags": tags.map((e) => e.toJson()).toList()
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;

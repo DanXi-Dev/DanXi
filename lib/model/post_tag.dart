@@ -15,15 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'post_tag.g.dart';
 
 @JsonSerializable()
-class PostTag {
-  String name;
-  String color;
-  int count;
+class PostTag extends Taggable {
+  final String name;
+  final String color;
+  final int count;
 
   PostTag(this.name, this.color, this.count);
 
@@ -31,4 +32,7 @@ class PostTag {
       _$PostTagFromJson(json);
 
   Map<String, dynamic> toJson() => _$PostTagToJson(this);
+
+  @override
+  List<Object> get props => [name];
 }

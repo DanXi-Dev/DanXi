@@ -42,6 +42,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
+import 'bbs_editor.dart';
+
 class BBSSubpage extends PlatformSubpage {
   @override
   bool get needPadding => true;
@@ -97,7 +99,10 @@ class _BBSSubpageState extends State<BBSSubpage>
       _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
         // BBSEditor.createNewPost(context);
         Navigator.pushNamed(context, "/bbs/newPost")
-            .then((value) => PostRepository.getInstance().newPost(value))
+            .then<int>((value) => value is PostEditorText
+                ? PostRepository.getInstance()
+                    .newPost(value?.content, tags: value?.tags)
+                : 0)
             .then((value) => refreshSelf());
       });
 

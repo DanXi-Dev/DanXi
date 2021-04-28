@@ -66,6 +66,7 @@ dependencies:
   file_picker: ^3.0.1
   delta_markdown: ^0.2.0
   markdown: ^4.0.0
+  flutter_tagging: ^3.0.0
 
 dependency_overrides:
   flutter_quill:
