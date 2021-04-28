@@ -27,6 +27,7 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -75,8 +76,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   DateTime selectDate;
 
   Widget _buildCupertinoDatePicker() => Container(
-    height: MediaQuery.of(context).size.height / 3,
-    child: CupertinoDatePicker(
+      height: MediaQuery.of(context).size.height / 3,
+      child: CupertinoDatePicker(
         backgroundColor: Theme.of(context).bottomAppBarColor,
         mode: CupertinoDatePickerMode.date,
         initialDateTime: DateTime.now(),
@@ -87,10 +88,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             selectDate = value;
           });
         },
-  )
-
-
-  );
+      ));
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +108,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .toList()
         .asMap();
 
-    if(PlatformX.isMaterial(context)) selectDate = DateTime.now().add(Duration(days: _selectDate.round()));
+    if (PlatformX.isMaterial(context))
+      selectDate = DateTime.now().add(Duration(days: _selectDate.round()));
     else if (selectDate == null) selectDate = DateTime.now();
 
     return PlatformScaffold(
@@ -193,22 +192,23 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         const SizedBox(height: 12),
 
         PlatformWidget(
-            cupertino: (_, __) => Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(S.of(context).current_date),
-                TextButton(
-                  onPressed: () {
-                    showCupertinoModalPopup(
-                        context: context,
-                        builder: (BuildContext context) => _buildCupertinoDatePicker()
-                    );
-                  },
-                  child: Text("${selectDate.month}/${selectDate.day}"),
-                ),
-              ],
-            ),
-          material: (_, __) => _buildSlider(DateFormat("MM/dd").format(selectDate)),
+          cupertino: (_, __) => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(S.of(context).current_date),
+              TextButton(
+                onPressed: () {
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          _buildCupertinoDatePicker());
+                },
+                child: Text("${selectDate.month}/${selectDate.day}"),
+              ),
+            ],
+          ),
+          material: (_, __) =>
+              _buildSlider(DateFormat("MM/dd").format(selectDate)),
         ),
 
         Container(
@@ -266,18 +266,13 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         child: MediaQuery.removePadding(
                             context: context,
                             removeTop: true,
-                            child: PlatformWidget(
-                                material: (_, __) => Scrollbar(
-                                    interactive: PlatformX.isDesktop,
-                                    child: ListView(
-                                      controller: _controller,
-                                      children: _getListWidgets(snapshot.data),
-                                    )),
-                                cupertino: (_, __) => CupertinoScrollbar(
-                                        child: ListView(
-                                      controller: _controller,
-                                      children: _getListWidgets(snapshot.data),
-                                    ))))),
+                            child: WithScrollbar(
+                              controller: _controller,
+                              child: ListView(
+                                controller: _controller,
+                                children: _getListWidgets(snapshot.data),
+                              ),
+                            ))),
             errorBuilder: _buildErrorWidget(),
             loadingBuilder: _buildLoadingWidget())
       ]),

@@ -21,6 +21,7 @@ import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -83,8 +84,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
               child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
-                  child: Scrollbar(
-                      interactive: PlatformX.isDesktop,
+                  child: WithScrollbar(
                       controller: _controller,
                       child: ListView(
                         controller: _controller,

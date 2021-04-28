@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -54,18 +55,13 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
             child: MediaQuery.removePadding(
                 context: context,
                 removeTop: true,
-                child: PlatformWidget(
-                    material: (_, __) => Scrollbar(
-                        interactive: PlatformX.isDesktop,
-                        child: ListView(
-                          controller: _controller,
-                          children: _getListWidgets(),
-                        )),
-                    cupertino: (_, __) => CupertinoScrollbar(
-                            child: ListView(
-                          controller: _controller,
-                          children: _getListWidgets(),
-                        ))))),
+                child: WithScrollbar(
+                  child: ListView(
+                    controller: _controller,
+                    children: _getListWidgets(),
+                  ),
+                  controller: _controller,
+                ))),
       ]),
     );
   }

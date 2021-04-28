@@ -25,7 +25,9 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -83,7 +85,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   void _scrollListener() {
     if (_controller.position.extentAfter < 500 &&
-        !_isRefreshing && !_isEndIndicatorShown) {
+        !_isRefreshing &&
+        !_isEndIndicatorShown) {
       _isRefreshing = true;
       setState(() {
         _currentBBSPage++;
@@ -129,36 +132,29 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               removeTop: true,
               child: PrimaryScrollController(
                 controller: _controller,
-                child:
-                    FutureBuilder(
-                        builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.none:
-                            case ConnectionState.waiting:
-                            case ConnectionState.active:
-                              _isRefreshing = true;
-                              if (_lastSnapshotData == null) return Container(
-                                padding: EdgeInsets.all(8),
-                                child: Center(
-                                  child: PlatformCircularProgressIndicator()
-                                ),
-                              );
-                              return _buildPageWhileLoading(_lastSnapshotData.data);
-                              break;
-                            case ConnectionState.done:
-                              _lastReplies.addAll(snapshot.data);
-                              _isRefreshing = false;
-                              if (snapshot.hasError) {
-                                return _buildErrorWidget();
-                              } else {
-                                _lastSnapshotData = snapshot;
-                                var l = snapshot.data;
-                                return _buildPage(snapshot.data);
-                            /*return  ListView.builder(
-                                        primary: true,
-                                        itemBuilder: (context, index) =>
-                                            _buildListItem(l, index),
-                                        itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE);*/
+                child: FutureBuilder(
+                    builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          _isRefreshing = true;
+                          if (_lastSnapshotData == null)
+                            return Container(
+                              padding: EdgeInsets.all(8),
+                              child: Center(
+                                  child: PlatformCircularProgressIndicator()),
+                            );
+                          return _buildPageWhileLoading(_lastSnapshotData.data);
+                          break;
+                        case ConnectionState.done:
+                          _lastReplies.addAll(snapshot.data);
+                          _isRefreshing = false;
+                          if (snapshot.hasError) {
+                            return _buildErrorWidget();
+                          } else {
+                            _lastSnapshotData = snapshot;
+                            return _buildPage(snapshot.data);
                           }
                           break;
                       }
@@ -166,84 +162,59 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     },
                     future: PostRepository.getInstance()
                         .loadReplies(_post, _currentBBSPage)),
-              )
-          )),
+              ))),
     );
   }
 
-  Widget _buildPage(List<Reply> data) {
-    return PlatformWidget(
-      // Add a scrollbar on desktop platform
-        material: (_, __) => Scrollbar(
+  Widget _buildPage(List<Reply> data) => WithScrollbar(
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
           controller: _controller,
-          interactive: PlatformX.isDesktop,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _controller,
-            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
-            itemBuilder: (context, index) =>
-                _buildListItem(index, data, true),
-          ),
+          itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
+          itemBuilder: (context, index) => _buildListItem(index, data, true),
         ),
-        cupertino: (_, __) => CupertinoScrollbar(
-          controller: _controller,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _controller,
-            itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
-            itemBuilder: (context, index) =>
-                _buildListItem(index, data, true),
-          ),
-        ));
-  }
+        controller: _controller,
+      );
 
   Widget _buildPageWhileLoading(List<Reply> data) {
-    return PlatformWidget(
-      // Add a scrollbar on desktop platform
-        material: (_, __) => Scrollbar(
-          controller: _controller,
-          interactive: PlatformX.isDesktop,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _controller,
-            itemCount: (_lastSnapshotData == null
-                ? _currentBBSPage
-                : _currentBBSPage - 1) *
+    return WithScrollbar(
+      controller: _controller,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: _controller,
+        itemCount: (_lastSnapshotData == null
+                    ? _currentBBSPage
+                    : _currentBBSPage - 1) *
                 POST_COUNT_PER_PAGE +
-                1,
-            itemBuilder: (context, index) =>
-                _buildListItem(index, data, false),
-          ),
-        ),
-        cupertino: (_, __) => CupertinoScrollbar(
-          controller: _controller,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _controller,
-            itemCount: (_lastSnapshotData == null
-                ? _currentBBSPage
-                : _currentBBSPage - 1) *
-                POST_COUNT_PER_PAGE +
-                1,
-            itemBuilder: (context, index) =>
-                _buildListItem(index, data, false),
-          ),
-        ));
+            1,
+        itemBuilder: (context, index) => _buildListItem(index, data, false),
+      ),
+    );
   }
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
-    if (isNewData && index >= _lastReplies.length && !_isEndIndicatorShown && !_isRefreshing) {
-          _isEndIndicatorShown = true;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(S.of(context).end_reached),
-              const SizedBox(height: 16,)
-            ],
-          );
+    if (isNewData &&
+        index >= _lastReplies.length &&
+        !_isEndIndicatorShown &&
+        !_isRefreshing) {
+      _isEndIndicatorShown = true;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(S.of(context).end_reached),
+          const SizedBox(
+            height: 16,
+          )
+        ],
+      );
     }
-    if (index >= _lastReplies.length) return _isEndIndicatorShown ? Container() : GestureDetector(child: Center(child: PlatformCircularProgressIndicator()),);
-    return _wrapListItemInCanvas(_lastReplies[index], index == 0) ;
+    if (index >= _lastReplies.length)
+      return _isEndIndicatorShown
+          ? Container()
+          : GestureDetector(
+              child: Center(child: PlatformCircularProgressIndicator()),
+            );
+    return _wrapListItemInCanvas(_lastReplies[index], index == 0);
   }
 
   Widget _buildErrorWidget() => GestureDetector(
@@ -276,117 +247,133 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     return list;
   }
 
-  Widget _wrapListItemInCanvas(Reply e, bool generateTags) => Material(
-          child: _getListItems(e, generateTags, false));
+  Widget _wrapListItemInCanvas(Reply e, bool generateTags) =>
+      Material(child: _getListItems(e, generateTags, false));
 
-  Widget _getListItems(Reply e, bool generateTags, bool isNested) => GestureDetector(
-    onLongPress: () {
-      showPlatformModalSheet(
-          context: context,
-          builder: (_) => PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheet(
-              actions: _buildContextMenu(e),
-              cancelButton: CupertinoActionSheetAction(
-                child: Text(S.of(context).cancel),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-            material: (_, __) => Container(
-              height: 300,
-              child: Column(
-                children: _buildContextMenu(e),
-              ),
-            ),
-          ));
-    },
-    child: Card(
-        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
-        child: ListTile(
-          dense: true,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (generateTags)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: _generateTagWidgets(_post),
-                  ),
-                ),
-
-              Row(
+  Widget _getListItems(Reply e, bool generateTags, bool isNested) =>
+      GestureDetector(
+        onLongPress: () {
+          showPlatformModalSheet(
+              context: context,
+              builder: (_) => PlatformWidget(
+                    cupertino: (_, __) => CupertinoActionSheet(
+                      actions: _buildContextMenu(e),
+                      cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    material: (_, __) => Container(
+                      height: 300,
+                      child: Column(
+                        children: _buildContextMenu(e),
+                      ),
+                    ),
+                  ));
+        },
+        child: Card(
+            color:
+                isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
+            child: ListTile(
+              dense: true,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (e.username == _post.first_post.username)
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                    decoration: BoxDecoration(
-                    color: Constant.getColorFromString(_post.tag.first.color).withOpacity(0.8),
-                    borderRadius: BorderRadius.all(Radius.circular(4.0))),
-                    child: Text(
-                    "OP",
-                    style: TextStyle(
-                    color: Theme.of(context).hintColor.computeLuminance() >= 0.5
-                    ? Colors.black
-                        : Colors.white,
-                    fontSize: 12),
+                  if (generateTags)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: _generateTagWidgets(_post),
+                      ),
                     ),
+                  Row(
+                    children: [
+                      if (e.username == _post.first_post.username)
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                          decoration: BoxDecoration(
+                              color: Constant.getColorFromString(
+                                      _post.tag.first.color)
+                                  .withOpacity(0.8),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.0))),
+                          child: Text(
+                            "OP",
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                            .hintColor
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white,
+                                fontSize: 12),
+                          ),
+                        ),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                        child: Text(
+                          "[${e.username}]",
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (e.reply_to != null && !isNested)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: _getListItems(
+                          _lastReplies.firstWhere(
+                              (element) => element.id == e.reply_to),
+                          false,
+                          true),
                     ),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                    child: Text(
-                      "[${e.username}]",
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: HtmlWidget(
+                      e.content,
+                      textStyle: TextStyle(fontSize: 16),
+                      onTapUrl: (url) => launch(url),
                     ),
                   ),
                 ],
               ),
-
-              if (e.reply_to != null && !isNested)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child:  _getListItems(_lastReplies.firstWhere((element) => element.id == e.reply_to), false, true),
+              subtitle: Column(children: [
+                const SizedBox(
+                  height: 8,
                 ),
-
-              Align(
-                alignment: Alignment.topLeft,
-                child: HtmlWidget(
-                  e.content,
-                  textStyle: TextStyle(fontSize: 16),
-                  onTapUrl: (url) => launch(url),
-                ),
-              ),
-            ],
-          ),
-          subtitle: Column(children: [
-            const SizedBox(
-              height: 8,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(
-                "#${e.id}",
-                style:
-                TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
-              ),
-              Text(
-                HumanDuration.format(context, DateTime.parse(e.date_created)),
-                style:
-                TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
-              ),
-              GestureDetector(
-                child: Text(S.of(context).report, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
-                onTap: () {
-                  BBSEditor.reportPost(context, e.id);
-                },
-              ),
-            ]),
-          ]),
-          onTap: () {
-            BBSEditor.createNewReply(context, _post.id, e.id);
-          },
-        )),
-  );
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "#${e.id}",
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      ),
+                      Text(
+                        HumanDuration.format(
+                            context, DateTime.parse(e.date_created)),
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      ),
+                      GestureDetector(
+                        child: Text(S.of(context).report,
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12)),
+                        onTap: () {
+                          BBSEditor.reportPost(context, e.id);
+                        },
+                      ),
+                    ]),
+              ]),
+              onTap: () {
+                BBSEditor.createNewReply(context, _post.id, e.id);
+              },
+            )),
+      );
 
   List<Widget> _generateTagWidgets(BBSPost e) {
     List<Widget> _tags = [
@@ -395,24 +382,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       ),
     ];
     e.tag.forEach((element) {
-      _tags.add(Container(
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Constant.getColorFromString(element.color),
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          //color: Constant.getColorFromString(element.color).withAlpha(25),
-        ),
-        child: Text(
-          element.name,
-          style: TextStyle(
-              fontSize: 14,
-              color: Constant.getColorFromString(element
-                  .color) //.computeLuminance() <= 0.5 ? Colors.black : Colors.white,
-              ),
-        ),
+      _tags.add(RoundChip(
+        label: element.name,
+        color: Constant.getColorFromString(element.color),
       ));
       _tags.add(const SizedBox(
         width: 6,

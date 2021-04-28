@@ -25,6 +25,7 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -108,18 +109,13 @@ class _CardDetailPageState extends State<CardDetailPage> {
             child: MediaQuery.removePadding(
                 context: context,
                 removeTop: true,
-                child: PlatformWidget(
-                    material: (_, __) => Scrollbar(
-                        interactive: PlatformX.isDesktop,
-                        child: ListView(
-                          controller: _controller,
-                          children: _getListWidgets(),
-                        )),
-                    cupertino: (_, __) => CupertinoScrollbar(
-                            child: ListView(
-                          controller: _controller,
-                          children: _getListWidgets(),
-                        ))))),
+                child: WithScrollbar(
+                  controller: _controller,
+                  child: ListView(
+                    controller: _controller,
+                    children: _getListWidgets(),
+                  ),
+                ))),
       ]),
     );
   }

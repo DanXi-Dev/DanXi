@@ -35,6 +35,7 @@ import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -203,65 +204,29 @@ class _BBSSubpageState extends State<BBSSubpage>
     //  ],);
   }
 
-  Widget _buildPage(List<BBSPost> data) {
-    return PlatformWidget(
-        // Add a scrollbar on desktop platform
-        material: (_, __) => Scrollbar(
-              controller: _controller,
-              interactive: PlatformX.isDesktop,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
-                itemBuilder: (context, index) =>
-                    _buildListItem(index, data, true),
-              ),
-            ),
-        cupertino: (_, __) => CupertinoScrollbar(
-              controller: _controller,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
-                itemBuilder: (context, index) =>
-                    _buildListItem(index, data, true),
-              ),
-            ));
-  }
+  Widget _buildPage(List<BBSPost> data) => WithScrollbar(
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _controller,
+          itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
+          itemBuilder: (context, index) => _buildListItem(index, data, true),
+        ),
+        controller: _controller,
+      );
 
-  Widget _buildPageWhileLoading(List<BBSPost> data) {
-    return PlatformWidget(
-      // Add a scrollbar on desktop platform
-        material: (_, __) => Scrollbar(
-              controller: _controller,
-              interactive: PlatformX.isDesktop,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                itemCount: (_lastSnapshotData == null
-                            ? _currentBBSPage
-                            : _currentBBSPage - 1) *
-                        POST_COUNT_PER_PAGE +
-                    1,
-                itemBuilder: (context, index) =>
-                    _buildListItem(index, data, false),
-              ),
-            ),
-        cupertino: (_, __) => CupertinoScrollbar(
-              controller: _controller,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                itemCount: (_lastSnapshotData == null
-                            ? _currentBBSPage
-                            : _currentBBSPage - 1) *
-                        POST_COUNT_PER_PAGE +
-                    1,
-                itemBuilder: (context, index) =>
-                    _buildListItem(index, data, false),
-              ),
-            ));
-  }
+  Widget _buildPageWhileLoading(List<BBSPost> data) => WithScrollbar(
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _controller,
+          itemCount: (_lastSnapshotData == null
+                      ? _currentBBSPage
+                      : _currentBBSPage - 1) *
+                  POST_COUNT_PER_PAGE +
+              1,
+          itemBuilder: (context, index) => _buildListItem(index, data, false),
+        ),
+        controller: _controller,
+      );
 
   Widget _buildListItem(int index, List<BBSPost> data, bool isNewData) {
     if (isNewData && index >= _lastPageItems.length) {
