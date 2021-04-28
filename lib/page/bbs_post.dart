@@ -116,7 +116,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ? const Icon(Icons.reply)
                 : const Icon(SFSymbols.arrowshape_turn_up_left),
             onPressed: () {
-              BBSEditor.createNewReply(context, _post.id, null);
+              BBSEditor.createNewReply(context, _post.id, null).then((value) => refreshSelf());
             },
           )
         ],
@@ -369,7 +369,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ]),
               ]),
               onTap: () {
-                BBSEditor.createNewReply(context, _post.id, e.id);
+                BBSEditor.createNewReply(context, _post.id, e.id).then((value) => refreshSelf());
               },
             )),
       );
