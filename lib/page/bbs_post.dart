@@ -302,7 +302,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           ));
     },
     child: Card(
-        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : (e.username == _post.first_post.username ? Color.alphaBlend(Constant.getColorFromString(_post.tag.first.color).withOpacity(0.1) , Theme.of(context).cardColor) : null),
+        color: isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
         child: ListTile(
           dense: true,
           title: Column(
@@ -315,11 +315,32 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     children: _generateTagWidgets(_post),
                   ),
                 ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 6),
-                child: Text(
-                  "[${e.username}]",
-                ),
+
+              Row(
+                children: [
+                  if (e.username == _post.first_post.username)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                    decoration: BoxDecoration(
+                    color: Constant.getColorFromString(_post.tag.first.color).withOpacity(0.8),
+                    borderRadius: BorderRadius.all(Radius.circular(4.0))),
+                    child: Text(
+                    "OP",
+                    style: TextStyle(
+                    color: Theme.of(context).hintColor.computeLuminance() >= 0.5
+                    ? Colors.black
+                        : Colors.white,
+                    fontSize: 12),
+                    ),
+                    ),
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                    child: Text(
+                      "[${e.username}]",
+                    ),
+                  ),
+                ],
               ),
 
               if (e.reply_to != null && !isNested)
