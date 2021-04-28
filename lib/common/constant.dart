@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/cupertino.dart';
@@ -89,7 +91,33 @@ class Constant {
       ),
     );
   }
+  
+  static const List<String> TAG_COLOR_LIST = [
+    'red',
+    'pink',
+    'purple',
+    'deep-purple',
+    'indigo',
+    'blue',
+    'light-blue',
+    'cyan',
+    'teal',
+    'green',
+    'light-green',
+    'lime',
+    'yellow',
+    'amber',
+    'orange',
+    'deep-orange',
+    'brown',
+    'blue-grey',
+    'grey'
+  ];
 
+  static String get randomColor =>
+      TAG_COLOR_LIST[Random().nextInt(TAG_COLOR_LIST.length)];
+
+  /// Get the [Color] from a color string.
   static Color getColorFromString(String color) {
     switch (color) {
       case 'red':
