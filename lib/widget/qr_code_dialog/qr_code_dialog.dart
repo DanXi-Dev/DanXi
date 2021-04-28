@@ -95,7 +95,7 @@ class _QRDialogState extends State<QRDialog> {
                             case ConnectionState.done:
                               if (snapshot.hasError) {
                                 _status = ConnectionStatus.FAILED;
-                                return Text(S.of(context).failed);
+                                return Text(S.of(context).fail_to_acquire_qr);
                               } else {
                                 _status = ConnectionStatus.DONE;
                                 return QrImage(

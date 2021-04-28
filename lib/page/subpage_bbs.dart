@@ -26,7 +26,6 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/card_repository.dart';
-import 'package:dan_xi/util/bmob/bmob/realtime/change.dart';
 import 'package:dan_xi/util/bmob/bmob/response/bmob_registered.dart';
 import 'package:dan_xi/util/bmob/bmob/table/bmob_user.dart';
 import 'package:dan_xi/util/human_duration.dart';
