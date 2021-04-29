@@ -51,7 +51,7 @@ class BBSEditor {
 
   static Future<String> _showEditor(BuildContext context, String title) async {
     HtmlEditorController _controller = HtmlEditorController();
-    await showPlatformDialog(
+    return await showPlatformDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: Text(title),
@@ -93,17 +93,15 @@ class BBSEditor {
             TextButton(
                 child: Text(S.of(context).cancel),
                 onPressed: () {
-                  Navigator.of(context).pop();
-                  return null;
+                  Navigator.of(context).pop<String>(null);
                 }),
             TextButton(
                 child: Text(S.of(context).submit),
-                onPressed: () {
-                  Navigator.of(context).pop();
+                onPressed: () async {
+                  Navigator.of(context).pop<String>(await _controller.getText());
                 }),
           ],
         )
     );
-    return await _controller.getText();
   }
 }
