@@ -17,6 +17,7 @@
 
 import 'package:catcher/catcher.dart';
 import 'package:catcher/model/platform_type.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,9 +26,11 @@ class FirebaseHandler extends ReportHandler {
   static FirebaseCrashlytics crashlytics;
 
   static initFirebase() async {
-    await Firebase.initializeApp();
-    crashlytics = FirebaseCrashlytics.instance;
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    if (PlatformX.isMobile) {
+      await Firebase.initializeApp();
+      crashlytics = FirebaseCrashlytics.instance;
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    }
   }
 
   @override
