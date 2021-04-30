@@ -1015,6 +1015,16 @@ class S {
     );
   }
 
+  /// `[Image]`
+  String get image_tag {
+    return Intl.message(
+      '[Image]',
+      name: 'image_tag',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

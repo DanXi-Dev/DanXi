@@ -258,6 +258,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// Render the text from a clip of [html].
   String _renderTitle(String html) {
     var soup = Beautifulsoup(html);
+    var images = soup.find_all("img");
+    if (images.length > 0) return soup.get_text() + S.of(context).image_tag;
     return soup.get_text();
   }
 

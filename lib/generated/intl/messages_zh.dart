@@ -101,6 +101,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "handan_campus" : MessageLookupByLibrary.simpleMessage("邯郸校区"),
     "hour_ago" : m3,
     "i_see" : MessageLookupByLibrary.simpleMessage("好"),
+    "image_tag" : MessageLookupByLibrary.simpleMessage("[图片]"),
     "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("江湾校区"),
     "last_15_days" : MessageLookupByLibrary.simpleMessage("过去 15 天"),
     "last_30_days" : MessageLookupByLibrary.simpleMessage("过去 30 天"),
