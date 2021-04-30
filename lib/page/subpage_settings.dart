@@ -22,6 +22,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -158,7 +159,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     Function onTapListener = (Campus campus) {
       SettingsProvider.of(_preferences).campus = campus;
       Navigator.of(context).pop();
-      Phoenix.rebirth(context);
+      RefreshHomepageEvent().fire();
       refreshSelf();
     };
     Constant.CAMPUS_VALUES.forEach((value) {

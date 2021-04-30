@@ -227,14 +227,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
         (cxt) => null,
-        (cxt) => PlatformIcons(cxt).search,
+        (cxt) => SFSymbols.search,
         (cxt) => null,
         (cxt) => null
   ];
 
   final List<Function> _subpageLeadingActionButtonIconBuilders = [
         (cxt) => null,
-        (cxt) => SFSymbols.sort_down,
+        (cxt) => SFSymbols.sort_down_circle,
         (cxt) => null,
         (cxt) => null
   ];

@@ -15,6 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
@@ -42,15 +45,31 @@ class HomeSubpage extends PlatformSubpage {
   HomeSubpage({Key key});
 }
 
+class RefreshHomepageEvent {}
+
 class _HomeSubpageState extends State<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
+  static StreamSubscription _refreshSubscription;
+
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    if (_refreshSubscription == null) {
+      _refreshSubscription = Constant.eventBus
+          .on<RefreshHomepageEvent>()
+          .listen((_) => refreshSelf());
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_refreshSubscription != null) _refreshSubscription.cancel();
+    _refreshSubscription = null;
   }
 
   //Get current brightness with _brightness
