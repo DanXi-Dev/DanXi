@@ -217,7 +217,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
-  final List<Function> _subpageActionButtonIconBuilders = [
+  final List<Function> _subpageRightmostActionButtonIconBuilders = [
     (cxt) => null,
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
@@ -225,12 +225,40 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     (cxt) => null
   ];
 
+  final List<Function> _subpageRightsecondActionButtonIconBuilders = [
+        (cxt) => null,
+        (cxt) => PlatformIcons(cxt).search,
+        (cxt) => null,
+        (cxt) => null
+  ];
+
+  final List<Function> _subpageLeadingActionButtonIconBuilders = [
+        (cxt) => null,
+        (cxt) => SFSymbols.sort_down,
+        (cxt) => null,
+        (cxt) => null
+  ];
+
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
-  final List<Function> _subpageActionButtonTextBuilders = [
+  final List<Function> _subpageRightmostActionButtonTextBuilders = [
     (cxt) => null,
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
     (cxt) => null,
+  ];
+  
+  final List<Function> _subpageRightsecondActionButtonTextBuilders = [
+        (cxt) => null,
+        (cxt) => S.of(cxt).new_post, //TODO: search
+        (cxt) => null,
+        (cxt) => null,
+  ];
+
+  final List<Function> _subpageLeadingActionButtonTextBuilders = [
+        (cxt) => null,
+        (cxt) => S.of(cxt).new_post, //TODO: sort by
+        (cxt) => null,
+        (cxt) => null,
   ];
 
   @override
@@ -367,17 +395,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// When user clicks the action button on appbar
-  void _onPressActionButton() async {
+  void _onPressRightmostActionButton() async {
     switch (_pageIndex.value) {
-      case 0:
-        break;
+      //Entries omitted
       case 1:
         AddNewPostEvent().fire();
         break;
       case 2:
         ShareTimetableEvent().fire();
         break;
-      case 3:
+    }
+  }
+
+  void _onPressRightsecondActionButton() async {
+    switch (_pageIndex.value) {
+    //Entries omitted
+      case 1:
+        AddNewPostEvent().fire(); //TODO: search event
+        break;
+    }
+  }
+
+  void _onPressLeadingActionButton() async {
+    switch (_pageIndex.value) {
+    //Entries omitted
+      case 1:
+        AddNewPostEvent().fire(); //TODO: change sort order
         break;
     }
   }
@@ -394,9 +437,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               trailingActions: [
                 PlatformIconButton(
                   padding: EdgeInsets.zero,
-                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                  icon: Icon(_subpageRightmostActionButtonIconBuilders[_pageIndex.value](
                       context)),
-                  onPressed: _onPressActionButton,
+                  onPressed: _onPressRightmostActionButton,
                 )
               ],
             ),
@@ -407,13 +450,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             iosContentPadding: _subpage[_pageIndex.value].needPadding,
             appBar: PlatformAppBar(
               cupertino: (_, __) => CupertinoNavigationBarData(
-                // Issue with cupertino where a bar with no transparency
-                // will push the list down. Adding some alpha value fixes it (in a hacky way)
-                //backgroundColor: Colors.white.withAlpha(254),
-                /*leading: MediaQuery(
-                      data: MediaQueryData(textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                      child: CupertinoNavigationBarBackButton(),
-                    ),*/
                 title: MediaQuery(
                   data: MediaQueryData(
                       textScaleFactor: MediaQuery.textScaleFactorOf(context)),
@@ -434,17 +470,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   onDoubleTap: () => ScrollToTopEvent().fire(),
                 ),
               ),
+              leading: PlatformIconButton(
+                material: (_, __) => MaterialIconButtonData(
+                    tooltip:
+                    _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
+                        context)),
+                padding: EdgeInsets.zero,
+                icon: Icon(_subpageLeadingActionButtonIconBuilders[_pageIndex.value](
+                    context)),
+                onPressed: _onPressLeadingActionButton,
+              ),
               trailingActions: [
                 PlatformIconButton(
                   material: (_, __) => MaterialIconButtonData(
                       tooltip:
-                          _subpageActionButtonTextBuilders[_pageIndex.value](
+                      _subpageRightsecondActionButtonTextBuilders[_pageIndex.value](
+                          context)),
+                  padding: EdgeInsets.zero,
+                  icon: Icon(_subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+                  onPressed: _onPressRightsecondActionButton,
+                ),
+                PlatformIconButton(
+                  material: (_, __) => MaterialIconButtonData(
+                      tooltip:
+                          _subpageRightmostActionButtonTextBuilders[_pageIndex.value](
                               context)),
                   padding: EdgeInsets.zero,
-                  icon: Icon(_subpageActionButtonIconBuilders[_pageIndex.value](
+                  icon: Icon(_subpageRightmostActionButtonIconBuilders[_pageIndex.value](
                       context)),
-                  onPressed: _onPressActionButton,
-                )
+                  onPressed: _onPressRightmostActionButton,
+                ),
               ],
             ),
             body: MultiProvider(

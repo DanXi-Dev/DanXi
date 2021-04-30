@@ -53,13 +53,16 @@ class BBSSubpage extends PlatformSubpage {
 }
 
 class AddNewPostEvent {}
-
 class RetrieveNewPostEvent {}
+class SearchEvent {}
+class SortOrderChangedEvent {}
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
   static StreamSubscription _postSubscription;
   static StreamSubscription _refreshSubscription;
+  static StreamSubscription _searchSubscription;
+  static StreamSubscription _sortOrderChangedSubscription;
   static StreamSubscription _goTopSubscription;
   ScrollController _controller = ScrollController();
   HtmlEditorController controller = HtmlEditorController();
@@ -115,6 +118,20 @@ class _BBSSubpageState extends State<BBSSubpage>
             TopController.scrollToTop(_controller);
           });
     }
+    if (_searchSubscription == null) {
+      _searchSubscription =
+          Constant.eventBus.on<SearchEvent>().listen((event) {
+            //TODO: show search view
+          });
+    }
+    if (_sortOrderChangedSubscription == null) {
+      _sortOrderChangedSubscription =
+          Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
+            //TODO: change sort order
+          });
+    }
+
+
     if (_controller != null) {
       // Over-scroll event
       _controller.addListener(_scrollListener);
@@ -137,8 +154,12 @@ class _BBSSubpageState extends State<BBSSubpage>
     super.dispose();
     if (_postSubscription != null) _postSubscription.cancel();
     if (_refreshSubscription != null) _refreshSubscription.cancel();
+    if (_searchSubscription != null) _searchSubscription.cancel();
+    if (_sortOrderChangedSubscription != null) _sortOrderChangedSubscription.cancel();
     _postSubscription = null;
     _refreshSubscription = null;
+    _searchSubscription = null;
+    _sortOrderChangedSubscription = null;
     _controller.removeListener(_scrollListener);
   }
 
