@@ -61,8 +61,12 @@ class FudanAAONoticesFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
       case ConnectionStatus.DONE:
-        return _initialData.first.title;
-        return '';
+        if (_initialData != null) {
+          return _initialData.length > 0 ? _initialData.first?.title : null;
+        } else {
+          return null;
+        }
+        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context).failed;
