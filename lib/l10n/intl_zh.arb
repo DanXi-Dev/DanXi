@@ -98,6 +98,7 @@
     "end_reached": "已经到底了",
     "latest_reply": "[{username}] 于{date}回复：",
     "no_summary": "[无法显示此类型的消息]",
+    "image_tag": "[图片]",
 
     "classroom": "教室",
     "morning": "上午",

@@ -101,6 +101,7 @@
     "end_reached": "You have reached the end.",
     "latest_reply": "[{username}] replied {date}:",
     "no_summary": "[Unable to display content of this type.]",
+    "image_tag": "[Image]",
 
     "classroom": "Classroom",
     "morning": "Morning",
