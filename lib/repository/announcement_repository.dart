@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementRepository {
@@ -55,7 +55,7 @@ class AnnouncementRepository {
     BmobQuery query = BmobQuery<Announcement>()
         .setOrder("-createdAt")
         .addWhereGreaterThanOrEqualTo(
-            "maxVersion", int.parse(packageInfo.buildNumber));
+            "maxVersion", int.tryParse(packageInfo.buildNumber) ?? 0);
     var list = await query.queryObjects();
     if (list.length > 0) {
       return Announcement.fromJson(list[0]);
