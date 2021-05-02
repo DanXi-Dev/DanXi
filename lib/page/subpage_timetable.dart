@@ -32,6 +32,7 @@ import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
@@ -208,7 +209,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       ),
       Expanded(
           child: RefreshIndicator(
-        onRefresh: () async => refreshSelf(),
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              refreshSelf();
+            },
         child: ScheduleView(_table.toDayEvents(_showingTime.week), style,
             _table.now(), _showingTime.week),
       ))

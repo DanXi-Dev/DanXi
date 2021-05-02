@@ -35,6 +35,7 @@ import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -64,8 +65,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StreamSubscription _searchSubscription;
   static StreamSubscription _sortOrderChangedSubscription;
   static StreamSubscription _goTopSubscription;
-  ScrollController _controller = ScrollController();
-  HtmlEditorController controller = HtmlEditorController();
+  final ScrollController _controller = ScrollController();
+  final HtmlEditorController controller = HtmlEditorController();
 
   int _currentBBSPage;
   List<Widget> _lastPageItems;
@@ -178,7 +179,10 @@ class _BBSSubpageState extends State<BBSSubpage>
         color: Theme
             .of(context)
             .accentColor,
-        onRefresh: () async => refreshSelf(),
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          refreshSelf();
+          },
         child: MediaQuery.removePadding(
             context: context,
             removeTop: true,

@@ -30,6 +30,7 @@ import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -53,7 +54,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
-    LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
     LicenseItem("auto_size_text", LICENSE_MIT,
         "hhttps://github.com/leisim/auto_size_text"),
     LicenseItem("beautifulsoup", LICENSE_APACHE_2_0,
@@ -62,13 +62,12 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/dart-lang/build/tree/master/build_runner"),
     LicenseItem(
         "catcher", LICENSE_APACHE_2_0, "https://github.com/jhomlala/catcher"),
-    LicenseItem("connectivity_plus", LICENSE_BSD,
-        "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/"),
     LicenseItem("cupertino_icons", LICENSE_MIT,
         "https://github.com/flutter/cupertino_icons"),
     LicenseItem("data_plugin", LICENSE_NO, "https://github.com/chaozhouzhang"),
     LicenseItem("desktop_window", LICENSE_MIT,
         "https://github.com/mix1009/desktop_window"),
+    LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
     LicenseItem("dio_cookie_manager", LICENSE_MIT,
         "https://github.com/flutterchina/dio"),
     LicenseItem(
@@ -102,8 +101,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
     LicenseItem("json_serializable", LICENSE_BSD,
         "https://github.com/google/json_serializable.dart/tree/master/json_serializable"),
-    LicenseItem("network_info_plus", LICENSE_BSD,
-        "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/"),
     LicenseItem(
         "package_info", LICENSE_BSD, "https://github.com/flutter/plugins"),
     LicenseItem(
@@ -192,7 +189,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         .copyWith(color: Theme.of(context).accentColor);
 
     return RefreshIndicator(
-        onRefresh: () async => refreshSelf(),
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          refreshSelf();
+        },
         child: MediaQuery.removePadding(
           context: context,
           removeTop: true,

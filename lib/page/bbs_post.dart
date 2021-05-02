@@ -29,6 +29,7 @@ import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -124,6 +125,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       body: RefreshIndicator(
           color: Theme.of(context).accentColor,
           onRefresh: () async {
+            HapticFeedback.mediumImpact();
             refreshSelf();
           },
           child: MediaQuery.removePadding(

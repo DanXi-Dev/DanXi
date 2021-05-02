@@ -32,6 +32,7 @@ import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
@@ -85,7 +86,10 @@ class _HomeSubpageState extends State<HomeSubpage>
     super.build(context);
 
     return RefreshIndicator(
-        onRefresh: () async => refreshSelf(),
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          refreshSelf();
+        },
         child: MediaQuery.removePadding(
             context: context,
             removeTop: true,
