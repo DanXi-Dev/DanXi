@@ -1025,6 +1025,36 @@ class S {
     );
   }
 
+  /// `Last replied`
+  String get last_replied {
+    return Intl.message(
+      'Last replied',
+      name: 'last_replied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last created`
+  String get last_created {
+    return Intl.message(
+      'Last created',
+      name: 'last_created',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sort order`
+  String get sort_order {
+    return Intl.message(
+      'Sort order',
+      name: 'sort_order',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

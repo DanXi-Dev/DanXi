@@ -15,12 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
@@ -361,9 +360,18 @@ class PostRepository extends BaseRepositoryWithDio {
     await requestToken(info);
   }
 
-  Future<List<BBSPost>> loadPosts(int page) async {
+  Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
+    Map<String,dynamic> qp;
+    switch (sortBy) {
+      case SortOrder.LAST_CREATED:
+        qp = {"page": page, "order": "last_created"};
+        break;
+      case SortOrder.LAST_REPLIED:
+        qp = {"page": page};
+        break;
+    }
     Response response = await dio.get(_BASE_URL + "/discussions/",
-        queryParameters: {"page": page},
+        queryParameters: qp,
         options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();

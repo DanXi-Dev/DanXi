@@ -56,7 +56,10 @@ class BBSSubpage extends PlatformSubpage {
 class AddNewPostEvent {}
 class RetrieveNewPostEvent {}
 class SearchEvent {}
-class SortOrderChangedEvent {}
+class SortOrderChangedEvent {
+  SortOrder newOrder;
+  SortOrderChangedEvent(this.newOrder);
+}
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
@@ -69,6 +72,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   final HtmlEditorController controller = HtmlEditorController();
 
   int _currentBBSPage;
+  SortOrder _sortOrder;
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing;
@@ -77,13 +81,14 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   void refreshSelf() {
     if (mounted) {
-      _currentBBSPage = 1;
-      _lastPageItems = [];
-      _lastSnapshotData = null;
-      _isRefreshing = true;
-      _isEndIndicatorShown = false;
       // ignore: invalid_use_of_protected_member
-      setState(() {});
+      setState(() {
+        _currentBBSPage = 1;
+        _lastPageItems = [];
+        _lastSnapshotData = null;
+        _isRefreshing = true;
+        _isEndIndicatorShown = false;
+      });
     }
   }
 
@@ -91,6 +96,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   void initState() {
     super.initState();
 
+    _sortOrder = _sortOrder ?? SortOrder.LAST_REPLIED;
     _currentBBSPage = 1;
     _lastPageItems = [];
     _lastSnapshotData = null;
@@ -128,7 +134,14 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_sortOrderChangedSubscription == null) {
       _sortOrderChangedSubscription =
           Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-            //TODO: change sort order
+            _sortOrder = event.newOrder;
+            setState(() {
+              _currentBBSPage = 1;
+              _lastPageItems = [];
+              _lastSnapshotData = null;
+              _isRefreshing = true;
+              _isEndIndicatorShown = false;
+            });
           });
     }
 
@@ -165,11 +178,11 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   /// Login in and load all of the posts.
-  Future<List<BBSPost>> loginAndLoadPost(PersonInfo info) async {
+  Future<List<BBSPost>> loginAndLoadPost(PersonInfo info, SortOrder sortOrder) async {
     var _postRepoInstance = PostRepository.getInstance();
     if (!_postRepoInstance.isUserInitialized)
       await _postRepoInstance.initializeUser(info);
-    return await _postRepoInstance.loadPosts(_currentBBSPage);
+    return await _postRepoInstance.loadPosts(_currentBBSPage, sortOrder);
   }
 
   @override
@@ -187,7 +200,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             context: context,
             removeTop: true,
             child: FutureWidget<List<BBSPost>>(
-                future: loginAndLoadPost(context.personInfo),
+                future: loginAndLoadPost(context.personInfo, _sortOrder),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
                   snapshot.data.forEach((element) {

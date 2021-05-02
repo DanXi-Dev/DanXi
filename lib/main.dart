@@ -256,7 +256,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageLeadingActionButtonTextBuilders = [
         (cxt) => null,
-        (cxt) => S.of(cxt).new_post, //TODO: sort by
+        (cxt) => S.of(cxt).sort_order,
         (cxt) => null,
         (cxt) => null,
   ];
@@ -420,9 +420,49 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (_pageIndex.value) {
     //Entries omitted
       case 1:
-        AddNewPostEvent().fire(); //TODO: change sort order
+        showPlatformModalSheet(
+            context: context,
+            builder: (_) => PlatformWidget(
+              cupertino: (_, __) => CupertinoActionSheet(
+                title: Text(S.of(context).sort_order),
+                actions: _buildSortOptionsList(),
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              material: (_, __) => Container(
+                height: 300,
+                child: Column(
+                  children: _buildSortOptionsList(),
+                ),
+              ),
+            ));
         break;
     }
+  }
+
+  List<Widget> _buildSortOptionsList() {
+    List<Widget> list = [];
+    Function onTapListener = (SortOrder newOrder) {
+      Navigator.of(context).pop();
+      SortOrderChangedEvent(newOrder).fire();
+    };
+    SortOrder.values.forEach((value) {
+      list.add(PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () => onTapListener(value),
+          child: Text(value.displayTitle(context)),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(value.displayTitle(context)),
+          onTap: () => onTapListener(value),
+        ),
+      ));
+    });
+    return list;
   }
 
   @override

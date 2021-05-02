@@ -223,3 +223,19 @@ extension CampusEx on Campus {
 }
 
 enum ConnectionStatus { NONE, CONNECTING, DONE, FAILED, FATAL_ERROR }
+
+enum SortOrder { LAST_REPLIED, LAST_CREATED }
+
+extension SortOrderEx on SortOrder {
+  String displayTitle(BuildContext context) {
+    switch (this) {
+      case SortOrder.LAST_REPLIED:
+        return S.of(context).last_replied;
+        break;
+      case SortOrder.LAST_CREATED:
+        return S.of(context).last_created;
+        break;
+    }
+    return null;
+  }
+}

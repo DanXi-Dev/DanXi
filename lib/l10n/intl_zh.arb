@@ -99,6 +99,9 @@
     "latest_reply": "[{username}] 于{date}回复：",
     "no_summary": "[无法显示此类型的消息]",
     "image_tag": "[图片]",
+    "last_replied": "最近回复",
+    "last_created": "最近创建",
+    "sort_order": "排序方式",
 
     "classroom": "教室",
     "morning": "上午",
