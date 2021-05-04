@@ -95,7 +95,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/yamarkz/flutter_timetable_view"),
     LicenseItem("flutter_widget_from_html_core", LICENSE_MIT,
         "https://github.com/daohoangson/flutter_widget_from_html"),
-    LicenseItem("html_editor_enhanced", LICENSE_MIT, "https://github.com/tneotia/html-editor-enhanced"),
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
     LicenseItem("ical", LICENSE_BSD, "https://github.com/dartclub/ical"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),

@@ -83,7 +83,7 @@
     "timetable":"日程",
     "week":"第 {week} 周",
     "new_post":"发布新帖子",
-    "uploading_image":"上传图片中...",
+    "uploading_image":"正在上传图片...",
     "uploading_image_failed":"上传图片失败，请检查网络连接",
     "loading_bbs_secure_connection": "正在进行服务器安全性检查，请稍等...",
     "report":"举报",

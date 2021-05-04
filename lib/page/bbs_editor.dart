@@ -127,8 +127,10 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                           ),
                       onChanged: () {}),
                 ),
-                BBSEditorWidget(
-                  controller: _controller,
+                Expanded(
+                    child: BBSEditorWidget(
+                      controller: _controller,
+                    ),
                 )
               ],
             )));
@@ -165,8 +167,7 @@ class BBSEditorWidget extends StatefulWidget {
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: Column(
+    return  Column(
       children: [
         QuillToolbar.basic(
           controller: widget.controller,
@@ -199,7 +200,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           ),
         )
       ],
-    ));
+    );
   }
 }
 

@@ -90,13 +90,16 @@ class _ScheduleViewState extends State<ScheduleView> {
             child: Column(
           children: [
             Text((slot + 1).toString()),
-            Text(
-              startTime,
-              style: TextStyle(fontSize: 12),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 5),
+              child: Text(
+                startTime,
+                style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+              ),
             ),
             Text(
               endTime,
-              style: TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
             )
           ],
         )),

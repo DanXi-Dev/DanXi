@@ -875,10 +875,10 @@ class S {
     );
   }
 
-  /// `Uploading failed. Check your internet connection.`
+  /// `Failed to upload image. Please check your internet connection.`
   String get uploading_image_failed {
     return Intl.message(
-      'Uploading failed. Check your internet connection.',
+      'Failed to upload image. Please check your internet connection.',
       name: 'uploading_image_failed',
       desc: '',
       args: [],
@@ -935,10 +935,10 @@ class S {
     );
   }
 
-  /// `Network error, post failed.`
+  /// `Failed to post. Please check your internet connection.`
   String get post_failed {
     return Intl.message(
-      'Network error, post failed.',
+      'Failed to post. Please check your internet connection.',
       name: 'post_failed',
       desc: '',
       args: [],

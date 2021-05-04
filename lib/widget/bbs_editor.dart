@@ -66,9 +66,10 @@ class BBSEditor {
               content: Container(
                 height: MediaQuery.of(context).size.height * 0.4,
                 width: MediaQuery.of(context).size.width * 0.9,
-                child: BBSEditorWidget(
+                child:
+                BBSEditorWidget(
                   controller: _controller,
-                ),
+                )
               ),
               actions: [
                 PlatformDialogAction(
@@ -78,7 +79,7 @@ class BBSEditor {
                     }),
                 PlatformDialogAction(
                     child: Text(S.of(context).submit),
-                    onPressed: () async {
+                    onPressed: () {
                       Navigator.of(context)
                           .pop<String>(BBSEditorWidget.getText(_controller));
                     }),
