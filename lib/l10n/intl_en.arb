@@ -86,6 +86,8 @@
     "timetable":"Agenda",
     "week":"Week {week}",
     "new_post":"New Post",
+    "uploading_image":"Uploading image...",
+    "uploading_image_failed":"Uploading failed. Check your internet connection.",
     "loading_bbs_secure_connection": "Performing server security check, please wait...",
     "report":"Report",
     "report_success":"Report success. Thank you for your contribution to our community.",

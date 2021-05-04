@@ -317,24 +317,25 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   requestToken(PersonInfo info) async {
-
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
-         .onHttpClientCreate = (client) {
-       SecurityContext sc = SecurityContext(withTrustedRoots: false);
-       HttpClient httpClient = HttpClient(context: sc);
-       httpClient.badCertificateCallback=(X509Certificate certificate, String host, int port) {
-         // This badCertificateCallback will always be called since we have no trusted certificate.
-         ASN1Parser p = ASN1Parser(certificate.der);
-         ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
-         ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
-         ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
-         ASN1BitString pubKeyBits = pubKeyElement.elements[1] as ASN1BitString;
+        .onHttpClientCreate = (client) {
+      SecurityContext sc = SecurityContext(withTrustedRoots: false);
+      HttpClient httpClient = HttpClient(context: sc);
+      httpClient.badCertificateCallback =
+          (X509Certificate certificate, String host, int port) {
+        // This badCertificateCallback will always be called since we have no trusted certificate.
+        ASN1Parser p = ASN1Parser(certificate.der);
+        ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
+        ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
+        ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
+        ASN1BitString pubKeyBits = pubKeyElement.elements[1] as ASN1BitString;
 
-         if (listEquals(pubKeyBits.stringValue, PINNED_CERTIFICATE)) return true; // Allow connection when public key matches
-         return false;
-       };
-       return httpClient;
+        if (listEquals(pubKeyBits.stringValue, PINNED_CERTIFICATE))
+          return true; // Allow connection when public key matches
+        return false;
+      };
+      return httpClient;
     };
 
     Response response = await secureDio.post(_BASE_URL + "/register/", data: {
@@ -345,7 +346,9 @@ class PostRepository extends BaseRepositoryWithDio {
       _token = response.data["token"];
     else {
       _token = null;
-      print("failed to login to fduhole " + response.statusCode.toString() + response.toString());
+      print("failed to login to fduhole " +
+          response.statusCode.toString() +
+          response.toString());
       throw NotLoginError();
     }
   }
@@ -356,12 +359,12 @@ class PostRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token == null ? false : true;
 
-  Future<void> initializeUser(PersonInfo info) async{
+  Future<void> initializeUser(PersonInfo info) async {
     await requestToken(info);
   }
 
   Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
-    Map<String,dynamic> qp;
+    Map<String, dynamic> qp;
     switch (sortBy) {
       case SortOrder.LAST_CREATED:
         qp = {"page": page, "order": "last_created"};
@@ -371,8 +374,7 @@ class PostRepository extends BaseRepositoryWithDio {
         break;
     }
     Response response = await dio.get(_BASE_URL + "/discussions/",
-        queryParameters: qp,
-        options: Options(headers: _tokenHeader));
+        queryParameters: qp, options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
@@ -384,6 +386,7 @@ class PostRepository extends BaseRepositoryWithDio {
     List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
   }
+
   Future<List<BBSPost>> loadSearchResults(String searchString) async {
     Response response = await dio.get(_BASE_URL + "/posts/",
         queryParameters: {"search": searchString},
@@ -391,6 +394,7 @@ class PostRepository extends BaseRepositoryWithDio {
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
+
   Future<List<PostTag>> loadTags() async {
     Response response = await dio.get(_BASE_URL + "/tags/",
         options: Options(headers: _tokenHeader));
@@ -411,10 +415,24 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
+  Future<String> uploadImage(File file) async {
+    String path = file.absolute.path;
+    String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
+    Response response = await dio.post(_BASE_URL + "/images/",
+        data: FormData.fromMap(
+            {"img": await MultipartFile.fromFile(path, filename: fileName)}),
+        options: Options(headers: _tokenHeader));
+    return response.data['url'];
+  }
+
   Future<int> newReply(int discussionId, int postId, String content) async {
     // Suppose user is logged in. He should be.
     Response response = await dio.post(_BASE_URL + "/posts/",
-        data: {"content": content, "discussion_id": discussionId, "post_id": postId},
+        data: {
+          "content": content,
+          "discussion_id": discussionId,
+          "post_id": postId
+        },
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }

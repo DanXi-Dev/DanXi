@@ -172,20 +172,32 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit" : MessageLookupByLibrary.simpleMessage("Submit"),
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
-    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". By logging in, you indicate that you have read and consent to these policies. "),
-    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
-    "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
-    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
-    "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
-    "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m12,
-    "welcome" : m13,
-    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
-  };
+        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
+        "terms_and_conditions":
+            MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+        "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
+            "Your use of this application is governed under "),
+        "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(
+            ". By logging in, you indicate that you have read and consent to these policies. "),
+        "terms_and_conditions_title":
+            MessageLookupByLibrary.simpleMessage("Legal"),
+        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Check your internet connection."),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+        "ticking": MessageLookupByLibrary.simpleMessage("Checking in..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("Agenda"),
+        "uploading_image":
+            MessageLookupByLibrary.simpleMessage("Uploading image..."),
+        "uploading_image_failed": MessageLookupByLibrary.simpleMessage(
+            "Uploading failed. Check your internet connection."),
+        "view_ossl": MessageLookupByLibrary.simpleMessage(
+            "This app is made possible thanks to various open-source software. View "),
+        "weak_password": MessageLookupByLibrary.simpleMessage(
+            "Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
+        "week": m12,
+        "welcome": m13,
+        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("Zhangjiang")
+      };
 }

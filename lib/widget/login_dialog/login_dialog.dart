@@ -27,6 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,7 +60,7 @@ class _LoginDialogState extends State<LoginDialog> {
     if (id.length * password.length == 0) {
       return;
     }
-    var progressDialog = showProgressDialog(
+    ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
     PersonInfo newInfo = PersonInfo.createNewInfo(id, password);
     await CardRepository.getInstance().login(newInfo).then((_) async {

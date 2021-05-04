@@ -154,20 +154,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit" : MessageLookupByLibrary.simpleMessage("发送"),
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("最空闲"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("最拥挤"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("使用条款"),
-    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("登录即表示您已阅读并同意"),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage("。"),
-    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("法律"),
-    "theme" : MessageLookupByLibrary.simpleMessage("主题"),
-    "tick_failed" : MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接"),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
-    "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
-    "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
-    "weak_password" : MessageLookupByLibrary.simpleMessage("登录失败，未知错误\n请注意：目前旦兮不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
-    "week" : m12,
-    "welcome" : m13,
-    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
-  };
+        "tap_to_view": MessageLookupByLibrary.simpleMessage("点击以查看"),
+        "terms_and_conditions": MessageLookupByLibrary.simpleMessage("使用条款"),
+        "terms_and_conditions_content":
+            MessageLookupByLibrary.simpleMessage("登录即表示您已阅读并同意"),
+        "terms_and_conditions_content_end":
+            MessageLookupByLibrary.simpleMessage("。"),
+        "terms_and_conditions_title":
+            MessageLookupByLibrary.simpleMessage("法律"),
+        "theme": MessageLookupByLibrary.simpleMessage("主题"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage("打卡失败，请检查网络连接"),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用 旦兮，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦兮 即可妥善处理此情况。"),
+        "ticking": MessageLookupByLibrary.simpleMessage("正在打卡..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("日程"),
+        "uploading_image": MessageLookupByLibrary.simpleMessage("上传图片中..."),
+        "uploading_image_failed":
+            MessageLookupByLibrary.simpleMessage("上传图片失败，请检查网络连接"),
+        "view_ossl": MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
+        "weak_password": MessageLookupByLibrary.simpleMessage(
+            "登录失败，未知错误\n请注意：目前旦兮不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
+        "week": m12,
+        "welcome": m13,
+        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("张江校区")
+      };
 }

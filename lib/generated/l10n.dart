@@ -865,6 +865,26 @@ class S {
     );
   }
 
+  /// `Uploading image...`
+  String get uploading_image {
+    return Intl.message(
+      'Uploading image...',
+      name: 'uploading_image',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Uploading failed. Check your internet connection.`
+  String get uploading_image_failed {
+    return Intl.message(
+      'Uploading failed. Check your internet connection.',
+      name: 'uploading_image_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Performing server security check, please wait...`
   String get loading_bbs_secure_connection {
     return Intl.message(
