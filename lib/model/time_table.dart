@@ -46,10 +46,10 @@ class Event {
 
 @JsonSerializable()
 class TimeTable {
-  static final DateTime MONDAY = DateTime.utc(2021, 3, 22);
+  static final DateTime kMonday = DateTime.utc(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
-  static final List<TableEventTime> COURSE_SLOT_START_TIME = [
+  static final List<TableEventTime> kCourseSlotStartTime = [
     TableEventTime(hour: 8, minute: 0),
     TableEventTime(hour: 8, minute: 55),
     TableEventTime(hour: 9, minute: 55),
@@ -124,7 +124,7 @@ class TimeTable {
     for (int i = 0; i < 7; i++) {
       if (!compact || table[i].isNotEmpty)
         result.add(DayEvents(
-            day: DateFormat.E().format(MONDAY.add(Duration(days: i))),
+            day: DateFormat.E().format(kMonday.add(Duration(days: i))),
             events: table[i]));
     }
     return result;

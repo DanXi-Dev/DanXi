@@ -65,7 +65,6 @@ class _ScheduleViewState extends State<ScheduleView> {
             margin: EdgeInsets.all(2),
             padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
-                //color: PlatformX.isDarkMode(context) ? Colors.black12 : Colors.white,
                 color: Theme.of(context).hintColor.withOpacity(0.14),
                 borderRadius: BorderRadius.circular(4)),
           ),
@@ -79,12 +78,28 @@ class _ScheduleViewState extends State<ScheduleView> {
 
     // Build time indicator
     for (int slot = 0; slot <= _maxSlot; slot++) {
+      String startTime =
+          DateFormat("HH:mm").format(TimeTable.kCourseSlotStartTime[slot]);
+      String endTime = DateFormat("HH:mm").format(TimeTable
+          .kCourseSlotStartTime[slot]
+          .addMin(TimeTable.MINUTES_OF_COURSE));
       result[cols * (slot + 1)] = SizedBox(
         width: widget.timetableStyle.timeItemWidth,
         height: widget.timetableStyle.timeItemHeight,
         child: Center(
-          child: Text((slot + 1).toString()),
-        ),
+            child: Column(
+          children: [
+            Text((slot + 1).toString()),
+            Text(
+              startTime,
+              style: TextStyle(fontSize: 12),
+            ),
+            Text(
+              endTime,
+              style: TextStyle(fontSize: 12),
+            )
+          ],
+        )),
       );
     }
 

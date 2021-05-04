@@ -183,7 +183,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   Widget _buildPage(TimeTable table) {
     TimetableStyle style = TimetableStyle(
-        startHour: TimeTable.COURSE_SLOT_START_TIME[0].hour,
+        startHour: TimeTable.kCourseSlotStartTime[0].hour,
         laneHeight: 16,
         laneWidth: (MediaQuery.of(context).size.width - 50) / 5,
         timeItemWidth: 16,
