@@ -16,92 +16,73 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:flutter_quill/widgets/controller.dart';
+
 class BBSEditor {
-  static Future<void> createNewReply(BuildContext context, int discussionId, int postId) async {
-    String content = await _showEditor(context, postId == null ? S.of(context).reply_to(discussionId) : S.of(context).reply_to(postId));
+  static Future<void> createNewReply(
+      BuildContext context, int discussionId, int postId) async {
+    String content = await _showEditor(
+        context,
+        postId == null
+            ? S.of(context).reply_to(discussionId)
+            : S.of(context).reply_to(postId));
     if (content == null || content == "") return;
 
-    int responseCode = await PostRepository.getInstance().newReply(discussionId, postId, content);
+    int responseCode = await PostRepository.getInstance()
+        .newReply(discussionId, postId, content);
     // Note: postId refers to the specific post the user is replying to, can be NULL
     if (responseCode != 200) {
       Noticing.showNotice(context, S.of(context).reply_failed(responseCode));
-    }
-    else {
+    } else {
       //TODO: Refresh Page to load new reply
     }
   }
 
   static Future<void> reportPost(BuildContext context, int postId) async {
-    String content = await _showEditor(context, S.of(context).reason_report_post(postId));
+    String content =
+        await _showEditor(context, S.of(context).reason_report_post(postId));
     if (content == null || content == "") return;
 
-    int responseCode = await PostRepository.getInstance().reportPost(postId, content);
+    int responseCode =
+        await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
       Noticing.showNotice(context, S.of(context).report_failed(responseCode));
-    }
-    else {
+    } else {
       Noticing.showNotice(context, S.of(context).report_success);
     }
   }
 
   static Future<String> _showEditor(BuildContext context, String title) async {
-    HtmlEditorController _controller = HtmlEditorController();
+    QuillController _controller = QuillController.basic();
     return await showPlatformDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text(title),
-          content: Container(
-              height: MediaQuery.of(context).size.height * 0.4,
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: HtmlEditor(
+              title: Text(title),
+              content: Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: BBSEditorWidget(
                   controller: _controller,
-                  htmlEditorOptions: HtmlEditorOptions(
-                    hint: S.of(context).editor_hint,
-                  ),
-                  htmlToolbarOptions: HtmlToolbarOptions(
-                      defaultToolbarButtons: [
-                        //add constructors here and set buttons to false, e.g.
-                        StyleButtons(),
-                        FontSettingButtons(fontSizeUnit: false),
-                        FontButtons(),
-                        ColorButtons(),
-                        ListButtons(),
-                        ParagraphButtons(caseConverter: false),
-                        InsertButtons(audio: false, video: false, otherFile: false),
-                        OtherButtons(fullscreen: false, codeview: false,),
-                      ]
-                  ),
-                  otherOptions: OtherOptions(
-                    //height: MediaQuery.of(context).size.height * 0.5,
-                  ),
-                callbacks: Callbacks(
-                  onInit: () {
-                    _controller.setFullScreen();
-                  },
-                  onImageUpload: (fileUpload) {
-                    //TODO: handle this
-                  }
                 ),
-                ),
-          ),
-          actions: [
-            TextButton(
-                child: Text(S.of(context).cancel),
-                onPressed: () {
-                  Navigator.of(context).pop<String>(null);
-                }),
-            TextButton(
-                child: Text(S.of(context).submit),
-                onPressed: () async {
-                  Navigator.of(context).pop<String>(await _controller.getText());
-                }),
-          ],
-        )
-    );
+              ),
+              actions: [
+                PlatformDialogAction(
+                    child: Text(S.of(context).cancel),
+                    onPressed: () {
+                      Navigator.of(context).pop<String>(null);
+                    }),
+                PlatformDialogAction(
+                    child: Text(S.of(context).submit),
+                    onPressed: () async {
+                      Navigator.of(context)
+                          .pop<String>(BBSEditorWidget.getText(_controller));
+                    }),
+              ],
+            ));
   }
 }

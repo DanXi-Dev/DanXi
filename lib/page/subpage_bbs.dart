@@ -39,7 +39,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
 
 import 'bbs_editor.dart';
 
@@ -69,7 +68,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StreamSubscription _sortOrderChangedSubscription;
   static StreamSubscription _goTopSubscription;
   final ScrollController _controller = ScrollController();
-  final HtmlEditorController controller = HtmlEditorController();
 
   int _currentBBSPage;
   SortOrder _sortOrder;
