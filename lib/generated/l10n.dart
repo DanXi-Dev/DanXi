@@ -995,10 +995,10 @@ class S {
     );
   }
 
-  /// `Write something...\nHint: Swipe the toolbar to the right to see more styling options`
+  /// `Write something... (Hint: Swipe the toolbar to the right to see more styling options.)`
   String get editor_hint {
     return Intl.message(
-      'Write something...\nHint: Swipe the toolbar to the right to see more styling options',
+      'Write something... (Hint: Swipe the toolbar to the right to see more styling options.)',
       name: 'editor_hint',
       desc: '',
       args: [],

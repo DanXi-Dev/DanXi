@@ -77,7 +77,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("校园卡余额"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("消费记录"),
-    "editor_hint" : MessageLookupByLibrary.simpleMessage("写点什么…\n提示：向右滑动工具栏以查看更多字体风格选项"),
+    "editor_hint" : MessageLookupByLibrary.simpleMessage("写点什么...（提示：向右滑动工具栏以查看更多字体风格选项）"),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("空教室"),
     "end_reached" : MessageLookupByLibrary.simpleMessage("已经到底了"),
     "evening" : MessageLookupByLibrary.simpleMessage("晚上"),
