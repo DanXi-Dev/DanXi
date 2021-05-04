@@ -31,7 +31,7 @@ class BBSEditor {
         postId == null
             ? S.of(context).reply_to(discussionId)
             : S.of(context).reply_to(postId));
-    if (content == null || content == "") return;
+    if (content == null || content.trim() == "") return;
 
     int responseCode = await PostRepository.getInstance()
         .newReply(discussionId, postId, content);
@@ -46,7 +46,7 @@ class BBSEditor {
   static Future<void> reportPost(BuildContext context, int postId) async {
     String content =
         await _showEditor(context, S.of(context).reason_report_post(postId));
-    if (content == null || content == "") return;
+    if (content == null || content.trim() == "") return;
 
     int responseCode =
         await PostRepository.getInstance().reportPost(postId, content);

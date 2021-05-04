@@ -165,38 +165,64 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
+  final _focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    var quillEditor = QuillEditor(
+      keyboardAppearance: PlatformX.isDarkMode ? Brightness.dark : Brightness
+          .light,
+      focusNode: _focusNode,
+      autoFocus: true,
+      controller: widget.controller,
+      scrollController: ScrollController(),
+      expands: false,
+      padding: EdgeInsets.zero,
+      readOnly: false,
+      scrollable: true,
+      placeholder: S.of(context).editor_hint,
+    );
+    return Column(
       children: [
-        QuillToolbar.basic(
-          controller: widget.controller,
-          showBackgroundColorButton: false,
-          showColorButton: false,
-          showStrikeThrough: false,
-          showUnderLineButton: false,
-          showListCheck: false,
-          onImagePickCallback: (File file) async {
-            ProgressFuture progressDialog = showProgressDialog(
-                loadingText: S.of(context).uploading_image, context: context);
-            return await PostRepository.getInstance().uploadImage(file).then(
-                (value) {
-              progressDialog.dismiss(showAnim: false);
-              return value;
-            }, onError: (e) {
-              progressDialog.dismiss(showAnim: false);
-              Noticing.showNotice(
-                  context, S.of(context).uploading_image_failed);
-              return null;
-            });
-          },
+        Theme(
+          data: ThemeData(
+            canvasColor: Colors.transparent,
+            iconTheme: IconThemeData(
+              color: Theme.of(context).textTheme.bodyText1.color,
+            ),
+          ),
+          child: QuillToolbar.basic(
+            controller: widget.controller,
+            showBackgroundColorButton: false,
+            showColorButton: true,
+            showStrikeThrough: false,
+            showUnderLineButton: true,
+            showListCheck: false,
+            showHistory: false,
+            onImagePickCallback: (File file) async {
+              ProgressFuture progressDialog = showProgressDialog(
+                  loadingText: S
+                      .of(context)
+                      .uploading_image, context: context);
+              return await PostRepository.getInstance().uploadImage(file).then(
+                      (value) {
+                    progressDialog.dismiss(showAnim: false);
+                    return value;
+                  }, onError: (e) {
+                progressDialog.dismiss(showAnim: false);
+                Noticing.showNotice(
+                    context, S
+                    .of(context)
+                    .uploading_image_failed);
+                return null;
+              });
+            },
+          ),
         ),
+
         Expanded(
           child: Container(
-            child: QuillEditor.basic(
-              controller: widget.controller,
-              readOnly: false, // true for view only mode
-            ),
+            child: quillEditor,
           ),
         )
       ],

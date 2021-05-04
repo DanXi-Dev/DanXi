@@ -42,6 +42,7 @@ class Constant {
       return ThemeData(
         brightness: Brightness.light,
         accentColor: Color(0xFF007AFF),
+        toggleableActiveColor: Color(0xFF007AFF),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10,8,10,8),
           //elevation: 0,
@@ -67,6 +68,7 @@ class Constant {
       return ThemeData(
         brightness: Brightness.dark,
         accentColor: Color(0xFF007AFF),
+        toggleableActiveColor: Color(0xFF007AFF),
         scaffoldBackgroundColor: Colors.black,
         backgroundColor: Colors.black,
         cardTheme: CardTheme(

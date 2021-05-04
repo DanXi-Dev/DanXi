@@ -73,13 +73,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   void refreshSelf() {
     if (mounted) {
-      _currentBBSPage = 1;
+      // ignore: invalid_use_of_protected_member
+      setState(() {
+        _currentBBSPage = 1;
       _lastReplies = [];
       _lastSnapshotData = null;
       _isRefreshing = true;
       _isEndIndicatorShown = false;
-      // ignore: invalid_use_of_protected_member
-      setState(() {});
+      });
     }
   }
 

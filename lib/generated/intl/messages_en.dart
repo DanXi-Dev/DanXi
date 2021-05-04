@@ -91,7 +91,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
-    "editor_hint" : MessageLookupByLibrary.simpleMessage("Swipe the toolbar to the right to see more styling options..."),
+    "editor_hint" : MessageLookupByLibrary.simpleMessage("Write something...\nHint: Swipe the toolbar to the right to see more styling options"),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "end_reached" : MessageLookupByLibrary.simpleMessage("You have reached the end."),
     "evening" : MessageLookupByLibrary.simpleMessage("Evening"),
