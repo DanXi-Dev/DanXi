@@ -215,7 +215,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           child: ListView.builder(
             primary: true,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
+            itemCount:
+                (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
             itemBuilder: (context, index) => _buildListItem(index, data),
           ),
           controller: PrimaryScrollController.of(context),
@@ -296,8 +297,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                   height: 10,
                 ),
                 e.is_folded
-                    ? ListTileTheme(
-                        dense: true,
+                    ? Theme(
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
                         child: ExpansionTile(
                           expandedCrossAxisAlignment: CrossAxisAlignment.start,
                           expandedAlignment: Alignment.topLeft,
@@ -305,8 +307,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                           tilePadding: EdgeInsets.zero,
                           title: Text(
                             S.of(context).folded,
-                            style:
-                                TextStyle(color: Theme.of(context).hintColor),
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12),
                           ),
                           children: [
                             Text(

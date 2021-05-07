@@ -25,7 +25,7 @@ import 'package:flutter/widgets.dart';
 
 class Constant {
   static const bool IS_PRODUCTION_ENVIRONMENT =
-  bool.fromEnvironment('dart.vm.product');
+      bool.fromEnvironment('dart.vm.product');
 
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
@@ -44,10 +44,12 @@ class Constant {
         accentColor: Color(0xFF007AFF),
         toggleableActiveColor: Color(0xFF007AFF),
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(10,8,10,8),
+          margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
           //elevation: 0,
           //color: Color.fromRGBO(199, 199, 204, 0.4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0),),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -58,7 +60,7 @@ class Constant {
       brightness: Brightness.light,
       primarySwatch: Colors.blue,
       cardTheme: CardTheme(
-        margin: EdgeInsets.fromLTRB(10,8,10,8),
+        margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
       ),
     );
   }
@@ -72,10 +74,12 @@ class Constant {
         scaffoldBackgroundColor: Colors.black,
         backgroundColor: Colors.black,
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(7,8,7,8),
+          margin: EdgeInsets.fromLTRB(7, 8, 7, 8),
           color: Color.fromRGBO(72, 72, 74, 0.5),
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0),),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -88,7 +92,7 @@ class Constant {
     return ThemeData(
       brightness: Brightness.dark,
       cardTheme: CardTheme(
-        margin: EdgeInsets.fromLTRB(10,8,10,8),
+        margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
       ),
     );
   }
@@ -215,7 +219,7 @@ extension CampusEx on Campus {
       case Campus.ZHANGJIANG_CAMPUS:
         return S.of(context).zhangjiang_campus;
         break;
-    // Select area when it's none
+      // Select area when it's none
       case Campus.NONE:
         return S.of(context).choose_area;
         break;

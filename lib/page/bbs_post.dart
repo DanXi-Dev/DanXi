@@ -147,7 +147,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: ListView.builder(
             primary: true,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
+            itemCount:
+                (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
             itemBuilder: (context, index) => _buildListItem(index, data, true),
           ),
           controller: PrimaryScrollController.of(context),

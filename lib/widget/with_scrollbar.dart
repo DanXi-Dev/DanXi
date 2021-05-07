@@ -48,4 +48,3 @@ class _WithScrollbarState extends State<WithScrollbar> {
             ));
   }
 }
-

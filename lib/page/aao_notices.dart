@@ -48,14 +48,15 @@ class _AAONoticesListState extends State<AAONoticesList> {
   void initState() {
     super.initState();
     _data = widget.arguments['initialData'];
-
   }
 
   @override
   void didChangeDependencies() {
     _controller = PrimaryScrollController.of(context);
-    if (_controller != null) {_controller.addListener(() {
-        if (_controller.position.pixels == _controller.position.maxScrollExtent) {
+    if (_controller != null) {
+      _controller.addListener(() {
+        if (_controller.position.pixels ==
+            _controller.position.maxScrollExtent) {
           if (_status != ConnectionStatus.CONNECTING) _loadNextPage();
         }
       });
