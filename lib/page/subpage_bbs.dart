@@ -26,6 +26,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
@@ -53,24 +54,30 @@ class BBSSubpage extends PlatformSubpage {
 }
 
 class AddNewPostEvent {}
+
 class RetrieveNewPostEvent {}
+
 class SearchEvent {}
+
 class SortOrderChangedEvent {
   SortOrder newOrder;
+
   SortOrderChangedEvent(this.newOrder);
 }
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
-  static StreamSubscription _postSubscription;
-  static StreamSubscription _refreshSubscription;
-  static StreamSubscription _searchSubscription;
-  static StreamSubscription _sortOrderChangedSubscription;
-  static StreamSubscription _goTopSubscription;
+  static StateStreamListener _postSubscription = StateStreamListener();
+  static StateStreamListener _refreshSubscription = StateStreamListener();
+  static StateStreamListener _searchSubscription = StateStreamListener();
+  static StateStreamListener _sortOrderChangedSubscription =
+      StateStreamListener();
+  static StateStreamListener _goTopSubscription = StateStreamListener();
   final ScrollController _controller = ScrollController();
 
   int _currentBBSPage;
   SortOrder _sortOrder;
+
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing;
@@ -93,7 +100,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void initState() {
     super.initState();
-
     _sortOrder = _sortOrder ?? SortOrder.LAST_REPLIED;
     _currentBBSPage = 1;
     _lastPageItems = [];
@@ -101,48 +107,38 @@ class _BBSSubpageState extends State<BBSSubpage>
     _isRefreshing = true;
     _isEndIndicatorShown = false;
 
-    if (_postSubscription == null) {
-      _postSubscription = Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-        Navigator.pushNamed(context, "/bbs/newPost")
-            .then<int>((value) =>
-        value is PostEditorText
-            ? PostRepository.getInstance()
-            .newPost(value?.content, tags: value?.tags)
-            : 0)
-            .then((value) => refreshSelf());
-      });
-    }
-    if (_refreshSubscription == null) {
-      _refreshSubscription = Constant.eventBus
-          .on<RetrieveNewPostEvent>()
-          .listen((_) => refreshSelf());
-    }
-    if (_goTopSubscription == null) {
-      _goTopSubscription =
-          Constant.eventBus.on<ScrollToTopEvent>().listen((event) {
-            TopController.scrollToTop(_controller);
-          });
-    }
-    if (_searchSubscription == null) {
-      _searchSubscription =
-          Constant.eventBus.on<SearchEvent>().listen((event) {
-            //TODO: show search view
-          });
-    }
-    if (_sortOrderChangedSubscription == null) {
-      _sortOrderChangedSubscription =
-          Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-            _sortOrder = event.newOrder;
-            setState(() {
-              _currentBBSPage = 1;
-              _lastPageItems = [];
-              _lastSnapshotData = null;
-              _isRefreshing = true;
-              _isEndIndicatorShown = false;
-            });
-          });
-    }
-
+    _postSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<AddNewPostEvent>().listen((_) {
+          Navigator.pushNamed(context, "/bbs/newPost")
+              .then<int>((value) => value is PostEditorText
+                  ? PostRepository.getInstance()
+                      .newPost(value?.content, tags: value?.tags)
+                  : 0)
+              .then((value) => refreshSelf());
+        }),
+        hashCode);
+    _refreshSubscription.bindOnlyInvalid(
+        Constant.eventBus
+            .on<RetrieveNewPostEvent>()
+            .listen((_) => refreshSelf()),
+        hashCode);
+    _goTopSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<ScrollToTopEvent>().listen((event) {
+          TopController.scrollToTop(_controller);
+        }),
+        hashCode);
+    _searchSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<SearchEvent>().listen((event) {
+          //TODO: show search view
+        }),
+        hashCode);
+    _sortOrderChangedSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
+          print(event.newOrder);
+          _sortOrder = event.newOrder;
+          refreshSelf();
+        }),
+        hashCode);
 
     if (_controller != null) {
       // Over-scroll event
@@ -164,19 +160,17 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void dispose() {
     super.dispose();
-    if (_postSubscription != null) _postSubscription.cancel();
-    if (_refreshSubscription != null) _refreshSubscription.cancel();
-    if (_searchSubscription != null) _searchSubscription.cancel();
-    if (_sortOrderChangedSubscription != null) _sortOrderChangedSubscription.cancel();
-    _postSubscription = null;
-    _refreshSubscription = null;
-    _searchSubscription = null;
-    _sortOrderChangedSubscription = null;
+    _postSubscription.cancel();
+    _refreshSubscription.cancel();
+    _searchSubscription.cancel();
+    _sortOrderChangedSubscription.cancel();
     _controller.removeListener(_scrollListener);
   }
 
   /// Login in and load all of the posts.
-  Future<List<BBSPost>> loginAndLoadPost(PersonInfo info, SortOrder sortOrder) async {
+  Future<List<BBSPost>> loginAndLoadPost(
+      PersonInfo info, SortOrder sortOrder) async {
+    print("Loading with " + _sortOrder.toString());
     var _postRepoInstance = PostRepository.getInstance();
     if (!_postRepoInstance.isUserInitialized)
       await _postRepoInstance.initializeUser(info);
@@ -187,13 +181,11 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget build(BuildContext context) {
     super.build(context);
     return RefreshIndicator(
-        color: Theme
-            .of(context)
-            .accentColor,
+        color: Theme.of(context).accentColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           refreshSelf();
-          },
+        },
         child: MediaQuery.removePadding(
             context: context,
             removeTop: true,
@@ -225,8 +217,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 })));
   }
 
-  Widget _buildLoadingPage() =>
-      Container(
+  Widget _buildLoadingPage() => Container(
         padding: EdgeInsets.all(8),
         child: Center(child: PlatformCircularProgressIndicator()),
       );
@@ -234,9 +225,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildErrorPage({Exception error}) {
     return GestureDetector(
       child: Center(
-        child: Text(S
-            .of(context)
-            .failed),
+        child: Text(S.of(context).failed),
       ),
       onTap: () {
         refreshSelf();
@@ -245,8 +234,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     //  ],);
   }
 
-  Widget _buildPage(List<BBSPost> data) =>
-      WithScrollbar(
+  Widget _buildPage(List<BBSPost> data) => WithScrollbar(
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _controller,
@@ -256,15 +244,14 @@ class _BBSSubpageState extends State<BBSSubpage>
         controller: _controller,
       );
 
-  Widget _buildPageWhileLoading(List<BBSPost> data) =>
-      WithScrollbar(
+  Widget _buildPageWhileLoading(List<BBSPost> data) => WithScrollbar(
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _controller,
           itemCount: (_lastSnapshotData == null
-              ? _currentBBSPage
-              : _currentBBSPage - 1) *
-              POST_COUNT_PER_PAGE +
+                      ? _currentBBSPage
+                      : _currentBBSPage - 1) *
+                  POST_COUNT_PER_PAGE +
               1,
           itemBuilder: (context, index) => _buildListItem(index, data),
         ),
@@ -272,22 +259,22 @@ class _BBSSubpageState extends State<BBSSubpage>
       );
 
   Widget _buildListItem(int index, List<BBSPost> data) {
-    if (!_isEndIndicatorShown && !_isRefreshing &&
+    if (!_isEndIndicatorShown &&
+        !_isRefreshing &&
         index >= _lastPageItems.length) {
       _isEndIndicatorShown = true;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Text(S
-              .of(context)
-              .end_reached),
+          Text(S.of(context).end_reached),
           const SizedBox(
             height: 16,
           )
         ],
       );
     }
-    if (index >= _lastPageItems.length) return _isEndIndicatorShown ? Container() : _buildLoadingPage();
+    if (index >= _lastPageItems.length)
+      return _isEndIndicatorShown ? Container() : _buildLoadingPage();
     return _lastPageItems[index];
   }
 

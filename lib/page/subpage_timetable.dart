@@ -27,6 +27,7 @@ import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -51,7 +52,7 @@ class ShareTimetableEvent {}
 
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
-  static StreamSubscription _shareSubscription;
+  static StateStreamListener _shareSubscription = StateStreamListener();
 
   /// A map of all converters.
   ///
@@ -110,29 +111,28 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     super.initState();
     _lastSnapshot = null;
     converters = {S.current.share_as_ics: ICSConverter()};
-    if (_shareSubscription == null) {
-      _shareSubscription =
-          Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
-        if (_table == null) return;
-        showPlatformModalSheet(
-            context: context,
-            builder: (_) => PlatformWidget(
-                  cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildShareList(),
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+    _shareSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
+          if (_table == null) return;
+          showPlatformModalSheet(
+              context: context,
+              builder: (_) => PlatformWidget(
+                    cupertino: (_, __) => CupertinoActionSheet(
+                      actions: _buildShareList(),
+                      cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
                     ),
-                  ),
-                  material: (_, __) => Container(
-                    height: 200,
-                    child: Column(children: _buildShareList()),
-                  ),
-                ));
-      });
-    }
+                    material: (_, __) => Container(
+                      height: 200,
+                      child: Column(children: _buildShareList()),
+                    ),
+                  ));
+        }),
+        hashCode);
   }
 
   @override
@@ -163,11 +163,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           child: Text(S.of(context).failed),
         ),
       ),
-      loadingBuilder: _lastSnapshot == null ? Container(
-        child: Center(
-          child: Text(S.of(context).loading),
-        )) :
-      _buildPage(_lastSnapshot.data),
+      loadingBuilder: _lastSnapshot == null
+          ? Container(
+              child: Center(
+              child: Text(S.of(context).loading),
+            ))
+          : _buildPage(_lastSnapshot.data),
     );
   }
 
@@ -209,10 +210,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       ),
       Expanded(
           child: RefreshIndicator(
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              refreshSelf();
-            },
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          refreshSelf();
+        },
         child: ScheduleView(_table.toDayEvents(_showingTime.week), style,
             _table.now(), _showingTime.week),
       ))

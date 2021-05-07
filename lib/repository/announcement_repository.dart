@@ -51,16 +51,19 @@ class AnnouncementRepository {
   }
 
   Future<Announcement> getLastAnnouncement() async {
+    List<Announcement> list = await getAnnouncements();
+    print(list);
+    return list.length > 0 ? list[0] : null;
+  }
+
+  Future<List<Announcement>> getAnnouncements() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    BmobQuery query = BmobQuery<Announcement>()
+    BmobQuery<Announcement> query = BmobQuery<Announcement>()
         .setOrder("-createdAt")
         .addWhereGreaterThanOrEqualTo(
             "maxVersion", int.tryParse(packageInfo.buildNumber) ?? 0);
-    var list = await query.queryObjects();
-    if (list.length > 0) {
-      return Announcement.fromJson(list[0]);
-    } else {
-      return null;
-    }
+    return (await query.queryObjects())
+        .map<Announcement>((e) => Announcement.fromJson(e))
+        .toList();
   }
 }

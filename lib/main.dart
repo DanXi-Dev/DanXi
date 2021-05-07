@@ -41,6 +41,7 @@ import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
@@ -179,7 +180,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Listener to the failure of logging in caused by necessary captcha.
   ///
   /// Request user to log in manually in the browser.
-  StreamSubscription<CaptchaNeededException> _captchaSubscription;
+  StateStreamListener<CaptchaNeededException> _captchaSubscription =
+      StateStreamListener();
 
   //Dark/Light Theme Control
   @override
@@ -226,17 +228,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ];
 
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
-        (cxt) => null,
-        (cxt) => SFSymbols.search,
-        (cxt) => null,
-        (cxt) => null
+    (cxt) => null,
+    (cxt) => SFSymbols.search,
+    (cxt) => null,
+    (cxt) => null
   ];
 
   final List<Function> _subpageLeadingActionButtonIconBuilders = [
-        (cxt) => null,
-        (cxt) => SFSymbols.sort_down_circle,
-        (cxt) => null,
-        (cxt) => null
+    (cxt) => null,
+    (cxt) => SFSymbols.sort_down_circle,
+    (cxt) => null,
+    (cxt) => null
   ];
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
@@ -246,24 +248,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     (cxt) => S.of(cxt).share,
     (cxt) => null,
   ];
-  
+
   final List<Function> _subpageRightsecondActionButtonTextBuilders = [
-        (cxt) => null,
-        (cxt) => S.of(cxt).new_post, //TODO: search
-        (cxt) => null,
-        (cxt) => null,
+    (cxt) => null,
+    (cxt) => S.of(cxt).new_post, //TODO: search
+    (cxt) => null,
+    (cxt) => null,
   ];
 
   final List<Function> _subpageLeadingActionButtonTextBuilders = [
-        (cxt) => null,
-        (cxt) => S.of(cxt).sort_order,
-        (cxt) => null,
-        (cxt) => null,
+    (cxt) => null,
+    (cxt) => S.of(cxt).sort_order,
+    (cxt) => null,
+    (cxt) => null,
   ];
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _captchaSubscription.cancel();
     super.dispose();
   }
 
@@ -279,46 +282,49 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
 
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged = () {
+    WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
+        () {
       // This callback gets invoked every time brightness changes
       // TODO: What's wrong with this code? why does the app refresh on every launch?
       // The timer below is a workaround to the issue.
       Timer(Duration(milliseconds: 500), () {
-        if (WidgetsBinding.instance.platformDispatcher.platformBrightness != Theme.of(context).brightness) Phoenix.rebirth(context);
+        if (WidgetsBinding.instance.platformDispatcher.platformBrightness !=
+            Theme.of(context).brightness) Phoenix.rebirth(context);
       });
     };
 
-    _captchaSubscription =
+    _captchaSubscription.bindOnlyInvalid(
         Constant.eventBus.on<CaptchaNeededException>().listen((_) {
-      // Deal with login issue described at [CaptchaNeededException].
-      if (!_isDialogShown) {
-        _isDialogShown = true;
-        showPlatformDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (_) => PlatformAlertDialog(
-                  title: Text(S.of(context).fatal_error),
-                  content: Text(S.of(context).login_issue_1),
-                  actions: [
-                    PlatformDialogAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () {
-                        _isDialogShown = false;
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    PlatformDialogAction(
-                      child: Text(S.of(context).login_issue_1_action),
-                      onPressed: () {
-                        _isDialogShown = false;
-                        Navigator.of(context).pop();
-                        launch(Constant.UIS_URL);
-                      },
-                    ),
-                  ],
-                ));
-      }
-    });
+          // Deal with login issue described at [CaptchaNeededException].
+          if (!_isDialogShown) {
+            _isDialogShown = true;
+            showPlatformDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (_) => PlatformAlertDialog(
+                      title: Text(S.of(context).fatal_error),
+                      content: Text(S.of(context).login_issue_1),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text(S.of(context).cancel),
+                          onPressed: () {
+                            _isDialogShown = false;
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        PlatformDialogAction(
+                          child: Text(S.of(context).login_issue_1_action),
+                          onPressed: () {
+                            _isDialogShown = false;
+                            Navigator.of(context).pop();
+                            launch(Constant.UIS_URL);
+                          },
+                        ),
+                      ],
+                    ));
+          }
+        }),
+        hashCode);
 
     // Load the latest announcement. Just ignore the network error.
     _loadAnnouncement().catchError((ignored) {});
@@ -423,23 +429,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         showPlatformModalSheet(
             context: context,
             builder: (_) => PlatformWidget(
-              cupertino: (_, __) => CupertinoActionSheet(
-                title: Text(S.of(context).sort_order),
-                actions: _buildSortOptionsList(),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              material: (_, __) => Container(
-                height: 300,
-                child: Column(
-                  children: _buildSortOptionsList(),
-                ),
-              ),
-            ));
+                  cupertino: (_, __) => CupertinoActionSheet(
+                    title: Text(S.of(context).sort_order),
+                    actions: _buildSortOptionsList(),
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  material: (_, __) => Container(
+                    height: 300,
+                    child: Column(
+                      children: _buildSortOptionsList(),
+                    ),
+                  ),
+                ));
         break;
     }
   }
@@ -477,8 +483,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               trailingActions: [
                 PlatformIconButton(
                   padding: EdgeInsets.zero,
-                  icon: Icon(_subpageRightmostActionButtonIconBuilders[_pageIndex.value](
-                      context)),
+                  icon: Icon(_subpageRightmostActionButtonIconBuilders[
+                      _pageIndex.value](context)),
                   onPressed: _onPressRightmostActionButton,
                 )
               ],
@@ -512,33 +518,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
               leading: PlatformIconButton(
                 material: (_, __) => MaterialIconButtonData(
-                    tooltip:
-                    _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
-                        context)),
+                    tooltip: _subpageLeadingActionButtonTextBuilders[
+                        _pageIndex.value](context)),
                 padding: EdgeInsets.zero,
-                icon: Icon(_subpageLeadingActionButtonIconBuilders[_pageIndex.value](
-                    context)),
+                icon: Icon(
+                    _subpageLeadingActionButtonIconBuilders[_pageIndex.value](
+                        context)),
                 onPressed: _onPressLeadingActionButton,
               ),
               trailingActions: [
                 PlatformIconButton(
                   material: (_, __) => MaterialIconButtonData(
-                      tooltip:
-                      _subpageRightsecondActionButtonTextBuilders[_pageIndex.value](
-                          context)),
+                      tooltip: _subpageRightsecondActionButtonTextBuilders[
+                          _pageIndex.value](context)),
                   padding: EdgeInsets.zero,
-                  icon: Icon(_subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
-                      context)),
+                  icon: Icon(_subpageRightsecondActionButtonIconBuilders[
+                      _pageIndex.value](context)),
                   onPressed: _onPressRightsecondActionButton,
                 ),
                 PlatformIconButton(
                   material: (_, __) => MaterialIconButtonData(
-                      tooltip:
-                          _subpageRightmostActionButtonTextBuilders[_pageIndex.value](
-                              context)),
+                      tooltip: _subpageRightmostActionButtonTextBuilders[
+                          _pageIndex.value](context)),
                   padding: EdgeInsets.zero,
-                  icon: Icon(_subpageRightmostActionButtonIconBuilders[_pageIndex.value](
-                      context)),
+                  icon: Icon(_subpageRightmostActionButtonIconBuilders[
+                      _pageIndex.value](context)),
                   onPressed: _onPressRightmostActionButton,
                 ),
               ],

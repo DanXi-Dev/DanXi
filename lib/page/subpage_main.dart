@@ -29,6 +29,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/material.dart';
@@ -53,24 +54,23 @@ class _HomeSubpageState extends State<HomeSubpage>
   @override
   bool get wantKeepAlive => true;
 
-  static StreamSubscription _refreshSubscription;
+  static StateStreamListener _refreshSubscription = StateStreamListener();
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
-    if (_refreshSubscription == null) {
-      _refreshSubscription = Constant.eventBus
-          .on<RefreshHomepageEvent>()
-          .listen((_) => refreshSelf());
-    }
+    _refreshSubscription.bindOnlyInvalid(
+        Constant.eventBus
+            .on<RefreshHomepageEvent>()
+            .listen((_) => refreshSelf()),
+        hashCode);
   }
 
   @override
   void dispose() {
     super.dispose();
-    if (_refreshSubscription != null) _refreshSubscription.cancel();
-    _refreshSubscription = null;
+    _refreshSubscription.cancel();
   }
 
   //Get current brightness with _brightness
