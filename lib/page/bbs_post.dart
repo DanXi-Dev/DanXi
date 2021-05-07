@@ -25,7 +25,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
-import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +46,6 @@ class BBSPostDetail extends StatefulWidget {
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
-  ScrollController _controller;
   int _currentBBSPage;
   List<Reply> _lastReplies;
   AsyncSnapshot _lastSnapshotData;
@@ -67,43 +65,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _isEndIndicatorShown = false;
   }
 
-  @override
-  void didChangeDependencies() {
-    _controller = PrimaryScrollController.of(context);
-    if (_controller != null) {
-      _controller.addListener(_scrollListener);
-    }
-    super.didChangeDependencies();
-  }
-
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {
         _currentBBSPage = 1;
-      _lastReplies = [];
-      _lastSnapshotData = null;
-      _isRefreshing = true;
-      _isEndIndicatorShown = false;
+        _lastReplies = [];
+        _lastSnapshotData = null;
+        _isRefreshing = true;
+        _isEndIndicatorShown = false;
       });
     }
-  }
-
-  void _scrollListener() {
-    if (_controller.position.extentAfter < 500 &&
-        !_isRefreshing &&
-        !_isEndIndicatorShown) {
-      _isRefreshing = true;
-      setState(() {
-        _currentBBSPage++;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.removeListener(_scrollListener);
   }
 
   @override
@@ -112,10 +84,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       iosContentPadding: true,
       iosContentBottomPadding: true,
       appBar: PlatformAppBarX(
-        title: TopController(
-          controller: _controller,
-          child: Text(S.of(context).forum),
-        ),
+        title: Text(S.of(context).forum),
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,
@@ -123,7 +92,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ? const Icon(Icons.reply)
                 : const Icon(SFSymbols.arrowshape_turn_up_left),
             onPressed: () {
-              BBSEditor.createNewReply(context, _post.id, null).then((value) => refreshSelf());
+              BBSEditor.createNewReply(context, _post.id, null)
+                  .then((value) => refreshSelf());
             },
           )
         ],
@@ -135,69 +105,65 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             refreshSelf();
           },
           child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: PrimaryScrollController(
-                controller: _controller,
-                child: FutureBuilder(
-                    builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                        case ConnectionState.active:
-                          _isRefreshing = true;
-                          if (_lastSnapshotData == null)
-                            return Container(
-                              padding: EdgeInsets.all(8),
-                              child: Center(
-                                  child: PlatformCircularProgressIndicator()),
-                            );
-                          return _buildPageWhileLoading(_lastSnapshotData.data);
-                          break;
-                        case ConnectionState.done:
-                          _lastReplies.addAll(snapshot.data);
-                          _isRefreshing = false;
-                          if (snapshot.hasError) {
-                            return _buildErrorWidget();
-                          } else {
-                            _lastSnapshotData = snapshot;
-                            return _buildPage(snapshot.data);
-                          }
-                          break;
+            context: context,
+            removeTop: true,
+            child: FutureBuilder(
+                builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      _isRefreshing = true;
+                      if (_lastSnapshotData == null)
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          child: Center(
+                              child: PlatformCircularProgressIndicator()),
+                        );
+                      return _buildPage(_lastSnapshotData.data, true);
+                      break;
+                    case ConnectionState.done:
+                      _lastReplies.addAll(snapshot.data);
+                      _isRefreshing = false;
+                      if (snapshot.hasError) {
+                        return _buildErrorWidget();
+                      } else {
+                        _lastSnapshotData = snapshot;
+                        return _buildPage(snapshot.data, false);
                       }
-                      return null;
-                    },
-                    future: PostRepository.getInstance()
-                        .loadReplies(_post, _currentBBSPage)),
-              ))),
+                      break;
+                  }
+                  return null;
+                },
+                future: PostRepository.getInstance()
+                    .loadReplies(_post, _currentBBSPage)),
+          )),
     );
   }
 
-  Widget _buildPage(List<Reply> data) => WithScrollbar(
-        child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: _controller,
-          itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
-          itemBuilder: (context, index) => _buildListItem(index, data, true),
+  Widget _buildPage(List<Reply> data, bool isLoading) =>
+      NotificationListener<ScrollNotification>(
+        child: WithScrollbar(
+          child: ListView.builder(
+            primary: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
+            itemBuilder: (context, index) => _buildListItem(index, data, true),
+          ),
+          controller: PrimaryScrollController.of(context),
         ),
-        controller: _controller,
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.extentAfter < 500 &&
+              !_isRefreshing &&
+              !_isEndIndicatorShown) {
+            _isRefreshing = true;
+            setState(() {
+              _currentBBSPage++;
+            });
+          }
+          return false;
+        },
       );
-
-  Widget _buildPageWhileLoading(List<Reply> data) {
-    return WithScrollbar(
-      controller: _controller,
-      child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        controller: _controller,
-        itemCount: (_lastSnapshotData == null
-                    ? _currentBBSPage
-                    : _currentBBSPage - 1) *
-                POST_COUNT_PER_PAGE +
-            1,
-        itemBuilder: (context, index) => _buildListItem(index, data, false),
-      ),
-    );
-  }
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
     if (isNewData &&
@@ -377,7 +343,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ]),
               ]),
               onTap: () {
-                BBSEditor.createNewReply(context, _post.id, e.id).then((value) => refreshSelf());
+                BBSEditor.createNewReply(context, _post.id, e.id)
+                    .then((value) => refreshSelf());
               },
             )),
       );

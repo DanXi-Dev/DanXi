@@ -31,7 +31,6 @@ import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/round_chip.dart';
-import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -72,8 +71,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StateStreamListener _searchSubscription = StateStreamListener();
   static StateStreamListener _sortOrderChangedSubscription =
       StateStreamListener();
-  static StateStreamListener _goTopSubscription = StateStreamListener();
-  ScrollController _controller;
 
   int _currentBBSPage;
   SortOrder _sortOrder;
@@ -122,11 +119,6 @@ class _BBSSubpageState extends State<BBSSubpage>
             .on<RetrieveNewPostEvent>()
             .listen((_) => refreshSelf()),
         hashCode);
-    _goTopSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<ScrollToTopEvent>().listen((event) {
-          TopController.scrollToTop(_controller);
-        }),
-        hashCode);
     _searchSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SearchEvent>().listen((event) {
           //TODO: show search view
@@ -142,33 +134,12 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   @override
-  void didChangeDependencies() {
-    _controller = PrimaryScrollController.of(context);
-    if (_controller != null) {
-      _controller.addListener(_scrollListener);
-    }
-    super.didChangeDependencies();
-  }
-
-  void _scrollListener() {
-    if (_controller.position.extentAfter < 500 &&
-        !_isRefreshing &&
-        !_isEndIndicatorShown) {
-      _isRefreshing = true;
-      setState(() {
-        _currentBBSPage++;
-      });
-    }
-  }
-
-  @override
   void dispose() {
     super.dispose();
     _postSubscription.cancel();
     _refreshSubscription.cancel();
     _searchSubscription.cancel();
     _sortOrderChangedSubscription.cancel();
-    _controller.removeListener(_scrollListener);
   }
 
   /// Login in and load all of the posts.
@@ -202,7 +173,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                   });
                   _isRefreshing = false;
                   _lastSnapshotData = snapshot;
-                  return _buildPage(snapshot.data);
+                  return _buildPage(snapshot.data, false);
                 },
                 errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
@@ -217,7 +188,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         child: PlatformCircularProgressIndicator(),
                       ),
                     );
-                  return _buildPageWhileLoading(_lastSnapshotData.data);
+                  return _buildPage(_lastSnapshotData.data, true);
                 })));
   }
 
@@ -238,28 +209,28 @@ class _BBSSubpageState extends State<BBSSubpage>
     //  ],);
   }
 
-  Widget _buildPage(List<BBSPost> data) => WithScrollbar(
-        child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: _controller,
-          itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE,
-          itemBuilder: (context, index) => _buildListItem(index, data),
+  Widget _buildPage(List<BBSPost> data, bool isLoading) =>
+      NotificationListener<ScrollNotification>(
+        child: WithScrollbar(
+          child: ListView.builder(
+            primary: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
+            itemBuilder: (context, index) => _buildListItem(index, data),
+          ),
+          controller: PrimaryScrollController.of(context),
         ),
-        controller: _controller,
-      );
-
-  Widget _buildPageWhileLoading(List<BBSPost> data) => WithScrollbar(
-        child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: _controller,
-          itemCount: (_lastSnapshotData == null
-                      ? _currentBBSPage
-                      : _currentBBSPage - 1) *
-                  POST_COUNT_PER_PAGE +
-              1,
-          itemBuilder: (context, index) => _buildListItem(index, data),
-        ),
-        controller: _controller,
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.extentAfter < 500 &&
+              !_isRefreshing &&
+              !_isEndIndicatorShown) {
+            _isRefreshing = true;
+            setState(() {
+              _currentBBSPage++;
+            });
+          }
+          return false;
+        },
       );
 
   Widget _buildListItem(int index, List<BBSPost> data) {
