@@ -58,7 +58,6 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   int _selectBuildingIndex = 0;
 
   double _selectDate = 0;
-  ScrollController _controller = ScrollController();
 
   _loadDefaultRoom() async {
     _selectCampusIndex =
@@ -117,7 +116,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
       iosContentPadding: true,
       appBar: PlatformAppBarX(
           title: TopController(
-        controller: _controller,
+        controller: PrimaryScrollController.of(context),
         child: Text(S.of(context).empty_classrooms),
       )),
       body: Column(children: [
@@ -267,9 +266,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                             context: context,
                             removeTop: true,
                             child: WithScrollbar(
-                              controller: _controller,
+                              controller: PrimaryScrollController.of(context),
                               child: ListView(
-                                controller: _controller,
+                                controller: PrimaryScrollController.of(context),
                                 children: _getListWidgets(snapshot.data),
                               ),
                             ))),

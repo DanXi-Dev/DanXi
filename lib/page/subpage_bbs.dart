@@ -73,7 +73,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   static StateStreamListener _sortOrderChangedSubscription =
       StateStreamListener();
   static StateStreamListener _goTopSubscription = StateStreamListener();
-  final ScrollController _controller = ScrollController();
+  ScrollController _controller;
 
   int _currentBBSPage;
   SortOrder _sortOrder;
@@ -139,11 +139,15 @@ class _BBSSubpageState extends State<BBSSubpage>
           refreshSelf();
         }),
         hashCode);
+  }
 
+  @override
+  void didChangeDependencies() {
+    _controller = PrimaryScrollController.of(context);
     if (_controller != null) {
-      // Over-scroll event
       _controller.addListener(_scrollListener);
     }
+    super.didChangeDependencies();
   }
 
   void _scrollListener() {

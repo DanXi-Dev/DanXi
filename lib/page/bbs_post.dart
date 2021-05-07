@@ -47,7 +47,7 @@ class BBSPostDetail extends StatefulWidget {
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
-  ScrollController _controller = ScrollController();
+  ScrollController _controller;
   int _currentBBSPage;
   List<Reply> _lastReplies;
   AsyncSnapshot _lastSnapshotData;
@@ -65,10 +65,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _lastSnapshotData = null;
     _isRefreshing = true;
     _isEndIndicatorShown = false;
+  }
 
+  @override
+  void didChangeDependencies() {
+    _controller = PrimaryScrollController.of(context);
     if (_controller != null) {
       _controller.addListener(_scrollListener);
     }
+    super.didChangeDependencies();
   }
 
   void refreshSelf() {

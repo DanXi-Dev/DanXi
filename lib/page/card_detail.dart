@@ -49,7 +49,6 @@ class _CardDetailPageState extends State<CardDetailPage> {
   List<Tag> _tags;
   List<int> _tagDays;
   bool _selectable = true;
-  ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -74,7 +73,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       iosContentPadding: true,
       appBar: PlatformAppBarX(
           title: TopController(
-        controller: _controller,
+        controller: PrimaryScrollController.of(context),
         child: Text(S.of(context).ecard_balance_log),
       )),
       body: Column(children: [
@@ -110,9 +109,9 @@ class _CardDetailPageState extends State<CardDetailPage> {
                 context: context,
                 removeTop: true,
                 child: WithScrollbar(
-                  controller: _controller,
+                  controller: PrimaryScrollController.of(context),
                   child: ListView(
-                    controller: _controller,
+                    controller: PrimaryScrollController.of(context),
                     children: _getListWidgets(),
                   ),
                 ))),

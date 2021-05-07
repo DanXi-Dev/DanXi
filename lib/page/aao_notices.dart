@@ -41,18 +41,26 @@ class AAONoticesList extends StatefulWidget {
 class _AAONoticesListState extends State<AAONoticesList> {
   List<Notice> _data;
   int _page = 1;
-  ScrollController _controller = ScrollController();
+  ScrollController _controller;
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   @override
   void initState() {
     super.initState();
     _data = widget.arguments['initialData'];
-    _controller.addListener(() {
-      if (_controller.position.pixels == _controller.position.maxScrollExtent) {
-        if (_status != ConnectionStatus.CONNECTING) _loadNextPage();
-      }
-    });
+
+  }
+
+  @override
+  void didChangeDependencies() {
+    _controller = PrimaryScrollController.of(context);
+    if (_controller != null) {_controller.addListener(() {
+        if (_controller.position.pixels == _controller.position.maxScrollExtent) {
+          if (_status != ConnectionStatus.CONNECTING) _loadNextPage();
+        }
+      });
+    }
+    super.didChangeDependencies();
   }
 
   Future<void> _loadNextPage() async {

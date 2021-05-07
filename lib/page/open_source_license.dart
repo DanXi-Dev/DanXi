@@ -37,7 +37,6 @@ class OpenSourceLicenseList extends StatefulWidget {
 
 class _OpenSourceListState extends State<OpenSourceLicenseList> {
   List<LicenseItem> _items;
-  ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
       iosContentPadding: true,
       appBar: PlatformAppBarX(
           title: TopController(
-        controller: _controller,
+        controller: PrimaryScrollController.of(context),
         child: Text(S.of(context).open_source_software_licenses),
       )),
       body: Column(children: [
@@ -56,10 +55,10 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
                 removeTop: true,
                 child: WithScrollbar(
                   child: ListView(
-                    controller: _controller,
+                    controller: PrimaryScrollController.of(context),
                     children: _getListWidgets(),
                   ),
-                  controller: _controller,
+                  controller: PrimaryScrollController.of(context),
                 ))),
       ]),
     );

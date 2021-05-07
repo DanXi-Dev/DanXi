@@ -47,7 +47,6 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   Map<String, TrafficInfo> _trafficInfos;
   Campus _selectItem = Campus.NONE;
   int _sliding;
-  ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -81,7 +80,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
       iosContentPadding: true,
       appBar: PlatformAppBarX(
           title: TopController(
-              controller: _controller,
+              controller: PrimaryScrollController.of(context),
               child: Text(S.of(context).dining_hall_crowdedness))),
       body: Column(
         children: [
@@ -109,9 +108,9 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                   context: context,
                   removeTop: true,
                   child: WithScrollbar(
-                    controller: _controller,
+                    controller: PrimaryScrollController.of(context),
                     child: ListView(
-                      controller: _controller,
+                      controller: PrimaryScrollController.of(context),
                       children: _getListWidgets(),
                     ),
                   )))
