@@ -19,4 +19,5 @@ import 'package:flutter/widgets.dart';
 
 abstract class PlatformSubpage extends StatefulWidget {
   final bool needPadding = true;
+  final bool needBottomPadding = false;
 }

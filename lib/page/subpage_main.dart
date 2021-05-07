@@ -42,6 +42,9 @@ class HomeSubpage extends PlatformSubpage {
   bool get needPadding => true;
 
   @override
+  bool get needBottomPadding => true;
+
+  @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
   HomeSubpage({Key key});

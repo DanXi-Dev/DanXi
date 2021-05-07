@@ -45,6 +45,9 @@ class SettingsSubpage extends PlatformSubpage {
   bool get needPadding => true;
 
   @override
+  bool get needBottomPadding => true;
+
+  @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 
   SettingsSubpage({Key key});

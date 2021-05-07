@@ -492,7 +492,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             body: Container(),
           )
         : PlatformScaffold(
-            iosContentBottomPadding: false,
+            iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
             iosContentPadding: _subpage[_pageIndex.value].needPadding,
             appBar: PlatformAppBar(
               cupertino: (_, __) => CupertinoNavigationBarData(
