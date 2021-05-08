@@ -100,14 +100,12 @@ class BmobDio {
 
     var requestUrl = options.baseUrl + path;
     var headers = options.headers.toString();
-    print('Get请求启动! url：$requestUrl ,body: $data ,headers:$headers');
     Response response = await dio.get(
       requestUrl,
       queryParameters: data,
       cancelToken: cancelToken,
     );
 
-    print('Get请求结果：' + response.toString());
     return response.data;
   }
 
@@ -117,13 +115,11 @@ class BmobDio {
 
     var requestUrl = options.baseUrl + path;
     var headers = options.headers.toString();
-    print('Post请求启动! url：$requestUrl ,body: $data ,headers:$headers');
     Response response = await dio.post(
       requestUrl,
       data: Stream.fromFuture(data),
       cancelToken: cancelToken,
     );
-    print('Post请求结果：' + response.toString());
 
     return response.data;
   }
@@ -134,13 +130,11 @@ class BmobDio {
 
     var requestUrl = options.baseUrl + path;
     var headers = options.headers.toString();
-    print('Post请求启动! url：$requestUrl ,body: $data ,headers:$headers');
     Response response = await dio.post(
       requestUrl,
       data: data,
       cancelToken: cancelToken,
     );
-    print('Post请求结果：' + response.toString());
     return response.data;
   }
 
@@ -153,10 +147,8 @@ class BmobDio {
     options.headers.addAll(getHeaders(path, ""));
 
     var requestUrl = options.baseUrl + path;
-    print('Delete请求启动! url：$requestUrl ,body: $data');
     Response response =
         await dio.delete(requestUrl, data: data, cancelToken: cancelToken);
-    print('Delete请求结果：' + response.toString());
     return response.data;
   }
 
@@ -165,10 +157,8 @@ class BmobDio {
     options.headers.addAll(getHeaders(path, data));
 
     var requestUrl = options.baseUrl + path;
-    print('Put请求启动! url：$requestUrl ,body: $data');
     Response response =
         await dio.put(requestUrl, data: data, cancelToken: cancelToken);
-    print('Put请求结果：' + response.toString());
     return response.data;
   }
 
@@ -177,13 +167,11 @@ class BmobDio {
     options.headers.addAll(getHeaders(requestUrl, data));
 
     var headers = options.headers.toString();
-    print('Get请求启动! url：$requestUrl ,body: $data ,headers:$headers');
     Response response = await dio.get(
       requestUrl,
       queryParameters: data,
       cancelToken: cancelToken,
     );
-    print('Get请求结果：' + response.toString());
     return response.data;
   }
 

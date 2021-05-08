@@ -378,7 +378,6 @@ class PostRepository extends BaseRepositoryWithDio {
         qp = {"page": page};
         break;
     }
-
     Response response = await dio.get(_BASE_URL + "/discussions/",
         queryParameters: qp, options: Options(headers: _tokenHeader)).onError((error, stackTrace) {
           if (error.response.statusCode == 401) {
@@ -387,7 +386,6 @@ class PostRepository extends BaseRepositoryWithDio {
           }
           throw error;
     });
-    debugPrint(response.data);
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
