@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'bmob_dio.dart';
 import 'bmob.dart';
 import 'response/bmob_handled.dart';

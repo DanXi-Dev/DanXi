@@ -148,7 +148,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     print("Loading with " + _sortOrder.toString());
     var _postRepoInstance = PostRepository.getInstance();
     if (!_postRepoInstance.isUserInitialized)
-      await _postRepoInstance.initializeUser(info);
+      await _postRepoInstance.requestToken(info).onError((error, stackTrace) {
+        return null;
+      });
     return await _postRepoInstance.loadPosts(_currentBBSPage, sortOrder);
   }
 
@@ -177,7 +179,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 },
                 errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
-                  return _buildErrorPage(error: snapshot.error);
+                  return _buildErrorPage(error: snapshot.error.toString());
                 },
                 loadingBuilder: () {
                   _isRefreshing = true;
@@ -197,10 +199,10 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: Center(child: PlatformCircularProgressIndicator()),
       );
 
-  Widget _buildErrorPage({Exception error}) {
+  Widget _buildErrorPage({String error}) {
     return GestureDetector(
       child: Center(
-        child: Text(S.of(context).failed),
+        child: Text(S.of(context).failed + '\n\n' + error),
       ),
       onTap: () {
         refreshSelf();

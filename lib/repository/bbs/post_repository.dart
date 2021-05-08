@@ -28,6 +28,8 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
+import 'package:pointycastle/api.dart' as crypto;
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -316,7 +318,7 @@ class PostRepository extends BaseRepositoryWithDio {
     initRepository();
   }
 
-  requestToken(PersonInfo info) async {
+  Future<void> requestToken(PersonInfo info) async {
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
@@ -333,23 +335,23 @@ class PostRepository extends BaseRepositoryWithDio {
 
         if (listEquals(pubKeyBits.stringValue, PINNED_CERTIFICATE))
           return true; // Allow connection when public key matches
-        return false;
+        throw NotLoginError("Invalid HTTPS Certificate");
       };
       return httpClient;
     };
 
+    crypto.PublicKey publicKey = RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
+
     Response response = await secureDio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
-      'email': "${info.id}@fudan.edu.cn"
-    });
-    if (response.statusCode == 200)
+      'email': "${info.id}@fudan.edu.cn",
+      'id': encrypt(info.id, publicKey)
+    }).onError((error, stackTrace) => throw NotLoginError(error.toString()));
+    try {
       _token = response.data["token"];
-    else {
+    } catch (e, stackTrace) {
       _token = null;
-      print("failed to login to fduhole " +
-          response.statusCode.toString() +
-          response.toString());
-      throw NotLoginError();
+      throw NotLoginError(e.toString());
     }
   }
 
@@ -359,11 +361,8 @@ class PostRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token == null ? false : true;
 
-  Future<void> initializeUser(PersonInfo info) async {
-    await requestToken(info);
-  }
-
   Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
+    print(_token);
     Map<String, dynamic> qp;
     switch (sortBy) {
       case SortOrder.LAST_CREATED:
@@ -446,4 +445,7 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 }
 
-class NotLoginError implements Exception {}
+class NotLoginError implements Exception {
+  String errorMessage;
+  NotLoginError(this.errorMessage);
+}
