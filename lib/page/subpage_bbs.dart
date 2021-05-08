@@ -126,7 +126,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         hashCode);
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-          print(event.newOrder);
           _sortOrder = event.newOrder;
           refreshSelf();
         }),
@@ -145,12 +144,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// Login in and load all of the posts.
   Future<List<BBSPost>> loginAndLoadPost(
       PersonInfo info, SortOrder sortOrder) async {
-    print("Loading with " + _sortOrder.toString());
     var _postRepoInstance = PostRepository.getInstance();
     if (!_postRepoInstance.isUserInitialized)
-      await _postRepoInstance.requestToken(info).onError((error, stackTrace) {
-        return null;
-      });
+      await _postRepoInstance.requestToken(info);
     return await _postRepoInstance.loadPosts(_currentBBSPage, sortOrder);
   }
 
@@ -179,6 +175,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 },
                 errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
+                  if (snapshot.error is NotLoginError) return _buildErrorPage(error: (snapshot.error as NotLoginError).errorMessage);
                   return _buildErrorPage(error: snapshot.error.toString());
                 },
                 loadingBuilder: () {
@@ -202,7 +199,10 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildErrorPage({String error}) {
     return GestureDetector(
       child: Center(
-        child: Text(S.of(context).failed + '\n\n' + error),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 48),
+          child: Text(S.of(context).failed + '\n\n' + error,),
+        ),
       ),
       onTap: () {
         refreshSelf();

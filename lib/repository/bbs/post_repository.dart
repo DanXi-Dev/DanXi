@@ -345,7 +345,7 @@ class PostRepository extends BaseRepositoryWithDio {
     Response response = await secureDio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
       'email': "${info.id}@fudan.edu.cn",
-      'id': encrypt(info.id, publicKey)
+      'ID': encrypt(info.id, publicKey)
     }).onError((error, stackTrace) => throw NotLoginError(error.toString()));
     try {
       _token = response.data["token"];
@@ -362,7 +362,6 @@ class PostRepository extends BaseRepositoryWithDio {
   bool get isUserInitialized => _token == null ? false : true;
 
   Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
-    print(_token);
     Map<String, dynamic> qp;
     switch (sortBy) {
       case SortOrder.LAST_CREATED:
