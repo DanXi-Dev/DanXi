@@ -107,6 +107,7 @@
     "last_replied": "Last replied",
     "last_created": "Last created",
     "sort_order": "Sort order",
+    "error_login_expired": "Login Expired. Tap to login again",
 
     "classroom": "Classroom",
     "morning": "Morning",

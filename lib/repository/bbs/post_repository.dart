@@ -24,12 +24,16 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:pointycastle/api.dart' as crypto;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -318,7 +322,11 @@ class PostRepository extends BaseRepositoryWithDio {
     initRepository();
   }
 
-  Future<void> requestToken(PersonInfo info) async {
+  initializeUser(PersonInfo info, SharedPreferences _preferences) async {
+    _token = SettingsProvider.of(_preferences).fduholeToken ?? await requestToken(info, _preferences);
+  }
+
+  Future<String> requestToken(PersonInfo info, SharedPreferences _preferences) async {
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
@@ -348,9 +356,8 @@ class PostRepository extends BaseRepositoryWithDio {
       'ID': encrypt(info.id, publicKey)
     }).onError((error, stackTrace) => throw NotLoginError(error.toString()));
     try {
-      _token = response.data["token"];
+      return SettingsProvider.of(_preferences).fduholeToken = response.data["token"];
     } catch (e, stackTrace) {
-      _token = null;
       throw NotLoginError(e.toString());
     }
   }
@@ -359,7 +366,7 @@ class PostRepository extends BaseRepositoryWithDio {
     return {"Authorization": "Token " + _token};
   }
 
-  bool get isUserInitialized => _token == null ? false : true;
+  bool get isUserInitialized => _token != null;
 
   Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
     Map<String, dynamic> qp;
@@ -371,8 +378,16 @@ class PostRepository extends BaseRepositoryWithDio {
         qp = {"page": page};
         break;
     }
+
     Response response = await dio.get(_BASE_URL + "/discussions/",
-        queryParameters: qp, options: Options(headers: _tokenHeader));
+        queryParameters: qp, options: Options(headers: _tokenHeader)).onError((error, stackTrace) {
+          if (error.response.statusCode == 401) {
+            _token = null;
+            throw LoginExpiredError;
+          }
+          throw error;
+    });
+    debugPrint(response.data);
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
@@ -448,3 +463,5 @@ class NotLoginError implements Exception {
   String errorMessage;
   NotLoginError(this.errorMessage);
 }
+
+class LoginExpiredError implements Exception {}
