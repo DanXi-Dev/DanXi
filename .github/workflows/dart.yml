@@ -20,5 +20,7 @@ jobs:
       #Testing is still useless at the moment.
       #- run: flutter test
     - run: ./build_ios pre
-    - run: flutter build apk
+      # Use debug profile to sign with no specific keystore
+    - run: flutter build apk --debug
+
 
