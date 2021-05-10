@@ -70,8 +70,8 @@ dependencies:
 dependency_overrides:
   flutter_quill:
     git:
-      url: git://github.com/singerdmx/flutter-quill.git
-      ref: dev
+      url: git://github.com/w568w/flutter-quill.git
+      ref: master
   fluttertoast:
     git:
       url: https://github.com/ponnamkarthik/FlutterToast.git
