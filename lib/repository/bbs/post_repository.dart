@@ -356,8 +356,9 @@ class PostRepository extends BaseRepositoryWithDio {
       'ID': encrypt(info.id, publicKey)
     }).onError((error, stackTrace) => throw NotLoginError(error.toString()));
     try {
-      return SettingsProvider.of(_preferences).fduholeToken = response.data["token"];
-    } catch (e, stackTrace) {
+      return SettingsProvider.of(_preferences).fduholeToken =
+          response.data["token"];
+    } catch (e) {
       throw NotLoginError(e.toString());
     }
   }

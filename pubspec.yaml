@@ -67,6 +67,7 @@ dependencies:
   markdown: ^4.0.0
   flutter_tagging: ^3.0.0
   rsa_encrypt: ^2.0.0
+  clipboard: ^0.1.3
 
 dependency_overrides:
   flutter_quill:

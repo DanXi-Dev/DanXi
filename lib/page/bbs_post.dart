@@ -15,12 +15,15 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -215,6 +218,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         onTap: () {
           Navigator.of(context).pop();
           BBSEditor.reportPost(context, e.id);
+        },
+      ),
+    ));
+    list.add(PlatformWidget(
+      cupertino: (_, __) => CupertinoActionSheetAction(
+        onPressed: () {
+          Navigator.of(context).pop();
+          FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
+              Noticing.showNotice(context, S.of(context).copy_success));
+        },
+        child: Text(S.of(context).copy),
+      ),
+      material: (_, __) => ListTile(
+        title: Text(S.of(context).copy),
+        onTap: () {
+          Navigator.of(context).pop();
+          FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
+              Noticing.showNotice(context, S.of(context).copy_success));
         },
       ),
     ));

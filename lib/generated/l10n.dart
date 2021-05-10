@@ -905,6 +905,26 @@ class S {
     );
   }
 
+  /// `Copy text content`
+  String get copy {
+    return Intl.message(
+      'Copy text content',
+      name: 'copy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text copied.`
+  String get copy_success {
+    return Intl.message(
+      'Text copied.',
+      name: 'copy_success',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Report success. Thank you for your contribution to our community.`
   String get report_success {
     return Intl.message(

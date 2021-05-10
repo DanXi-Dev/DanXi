@@ -45,6 +45,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bbs_editor.dart';
 
+/// Render the text from a clip of [html].
+String renderText(String html, String imagePlaceholder) {
+  var soup = Beautifulsoup(html);
+  var images = soup.find_all("img");
+  if (images.length > 0) return soup.get_text() + imagePlaceholder;
+  return soup.get_text();
+}
+
 class BBSSubpage extends PlatformSubpage {
   @override
   bool get needPadding => true;
@@ -135,7 +143,6 @@ class _BBSSubpageState extends State<BBSSubpage>
           refreshSelf();
         }),
         hashCode);
-
   }
 
   @override
@@ -158,7 +165,8 @@ class _BBSSubpageState extends State<BBSSubpage>
       PersonInfo info, SortOrder sortOrder) async {
     if (!PostRepository.getInstance().isUserInitialized)
       await PostRepository.getInstance().initializeUser(info, _preferences);
-    return await PostRepository.getInstance().loadPosts(_currentBBSPage, sortOrder);
+    return await PostRepository.getInstance()
+        .loadPosts(_currentBBSPage, sortOrder);
   }
 
   @override
@@ -188,9 +196,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                     AsyncSnapshot<List<BBSPost>> snapshot) {
                   if (snapshot.error == LoginExpiredError) {
                     SettingsProvider.of(_preferences).deleteSavedFduholeToken();
-                    return _buildErrorPage(error: S.of(context).error_login_expired);
-                  }
-                  else if (snapshot.error is NotLoginError) return _buildErrorPage(error: (snapshot.error as NotLoginError).errorMessage);
+                    return _buildErrorPage(
+                        error: S.of(context).error_login_expired);
+                  } else if (snapshot.error is NotLoginError)
+                    return _buildErrorPage(
+                        error: (snapshot.error as NotLoginError).errorMessage);
                   return _buildErrorPage(error: snapshot.error.toString());
                 },
                 loadingBuilder: () {
@@ -216,7 +226,9 @@ class _BBSSubpageState extends State<BBSSubpage>
       child: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 48),
-          child: Text(S.of(context).failed + '\n\nThe error was:\n' + error,),
+          child: Text(
+            S.of(context).failed + '\n\nThe error was:\n' + error,
+          ),
         ),
       ),
       onTap: () {
@@ -271,14 +283,6 @@ class _BBSSubpageState extends State<BBSSubpage>
     return _lastPageItems[index];
   }
 
-  /// Render the text from a clip of [html].
-  String _renderTitle(String html) {
-    var soup = Beautifulsoup(html);
-    var images = soup.find_all("img");
-    if (images.length > 0) return soup.get_text() + S.of(context).image_tag;
-    return soup.get_text();
-  }
-
   List<Widget> _generateTagWidgets(BBSPost e) {
     List<Widget> _tags = [
       const SizedBox(
@@ -297,7 +301,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     return _tags;
   }
 
-  Widget _getListItem(BBSPost e) {
+  Widget _getListItem(BBSPost postElement) {
     return ThemedMaterial(
       child: Card(
           child: Column(children: [
@@ -308,12 +312,12 @@ class _BBSSubpageState extends State<BBSSubpage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: _generateTagWidgets(e),
+                  children: _generateTagWidgets(postElement),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                e.is_folded
+                    postElement.is_folded
                     ? Theme(
                         data: Theme.of(context)
                             .copyWith(dividerColor: Colors.transparent),
@@ -330,7 +334,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                           ),
                           children: [
                             Text(
-                              _renderTitle(e.first_post.content),
+                              renderText(postElement.first_post.content,
+                                  S.of(context).image_tag),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -338,7 +343,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                         ),
                       )
                     : Text(
-                        _renderTitle(e.first_post.content),
+                        renderText(postElement.first_post.content,
+                            S.of(context).image_tag),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -353,20 +359,20 @@ class _BBSSubpageState extends State<BBSSubpage>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "#${e.id}",
+                      "#${postElement.id}",
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12),
                     ),
                     Text(
                       HumanDuration.format(
-                          context, DateTime.parse(e.date_created)),
+                          context, DateTime.parse(postElement.date_created)),
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12),
                     ),
                     Row(
                       children: [
                         Text(
-                          e.count.toString() + " ",
+                          postElement.count.toString() + " ",
                           style: TextStyle(
                               color: Theme.of(context).hintColor, fontSize: 12),
                         ),
@@ -382,14 +388,16 @@ class _BBSSubpageState extends State<BBSSubpage>
               ],
             ),
             onTap: () {
-              Navigator.of(context)
-                  .pushNamed("/bbs/postDetail", arguments: {"post": e});
+              Navigator.of(context).pushNamed("/bbs/postDetail",
+                  arguments: {"post": postElement});
             }),
-        if (!e.is_folded && e.last_post.id != e.first_post.id)
+        if (!postElement.is_folded &&
+            postElement.last_post.id != postElement.first_post.id)
           Divider(
             height: 4,
           ),
-        if (!e.is_folded && e.last_post.id != e.first_post.id)
+        if (!postElement.is_folded &&
+            postElement.last_post.id != postElement.first_post.id)
           ListTile(
             dense: true,
             minLeadingWidth: 16,
@@ -407,27 +415,32 @@ class _BBSSubpageState extends State<BBSSubpage>
                   padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                   child: Text(
                     S.of(context).latest_reply(
-                        e.last_post.username,
+                        postElement.last_post.username,
                         HumanDuration.format(
-                            context, DateTime.parse(e.last_post.date_created))),
+                            context,
+                            DateTime.parse(
+                                postElement.last_post.date_created))),
                     style: TextStyle(color: Theme.of(context).hintColor),
                   ),
                 ),
                 Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
                     child: Text(
-                      _renderTitle(e.last_post.content).trim().isEmpty
+                      renderText(postElement.last_post.content,
+                                  S.of(context).image_tag)
+                              .trim()
+                              .isEmpty
                           ? S.of(context).no_summary
-                          : _renderTitle(e.last_post.content),
+                          : renderText(postElement.last_post.content,
+                              S.of(context).image_tag),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       //style: TextStyle(color: Theme.of(context).hintColor),
                     )),
               ],
             ),
-            onTap: () {
-              BBSEditor.createNewReply(context, e.id, e.last_post.id);
-            },
+            onTap: () => BBSEditor.createNewReply(
+                context, postElement.id, postElement.last_post.id),
           )
       ])),
     );
