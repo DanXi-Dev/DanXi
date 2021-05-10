@@ -39,7 +39,7 @@ class _WithScrollbarState extends State<WithScrollbar> {
         // Add a scrollbar on desktop platform
         material: (_, __) => Scrollbar(
               controller: widget.controller,
-              interactive: PlatformX.isDesktop,
+              // interactive: PlatformX.isDesktop,
               child: widget.child,
             ),
         cupertino: (_, __) => CustomCupertinoScrollbar(
