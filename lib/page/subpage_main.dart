@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:async';
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';

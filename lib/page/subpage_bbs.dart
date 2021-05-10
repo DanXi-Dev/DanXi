@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
@@ -39,6 +40,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bbs_editor.dart';
 
@@ -80,6 +83,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   bool _isRefreshing;
   bool _isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
+
+  SharedPreferences _preferences;
 
   void refreshSelf() {
     if (mounted) {
@@ -126,11 +131,17 @@ class _BBSSubpageState extends State<BBSSubpage>
         hashCode);
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-          print(event.newOrder);
           _sortOrder = event.newOrder;
           refreshSelf();
         }),
         hashCode);
+
+  }
+
+  @override
+  void didChangeDependencies() {
+    _preferences = Provider.of<SharedPreferences>(context);
+    super.didChangeDependencies();
   }
 
   @override
@@ -145,11 +156,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// Login in and load all of the posts.
   Future<List<BBSPost>> loginAndLoadPost(
       PersonInfo info, SortOrder sortOrder) async {
-    print("Loading with " + _sortOrder.toString());
-    var _postRepoInstance = PostRepository.getInstance();
-    if (!_postRepoInstance.isUserInitialized)
-      await _postRepoInstance.initializeUser(info);
-    return await _postRepoInstance.loadPosts(_currentBBSPage, sortOrder);
+    if (!PostRepository.getInstance().isUserInitialized)
+      await PostRepository.getInstance().initializeUser(info, _preferences);
+    return await PostRepository.getInstance().loadPosts(_currentBBSPage, sortOrder);
   }
 
   @override
@@ -177,7 +186,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                 },
                 errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
-                  return _buildErrorPage(error: snapshot.error);
+                  if (snapshot.error == LoginExpiredError) {
+                    SettingsProvider.of(_preferences).deleteSavedFduholeToken();
+                    return _buildErrorPage(error: S.of(context).error_login_expired);
+                  }
+                  else if (snapshot.error is NotLoginError) return _buildErrorPage(error: (snapshot.error as NotLoginError).errorMessage);
+                  return _buildErrorPage(error: snapshot.error.toString());
                 },
                 loadingBuilder: () {
                   _isRefreshing = true;
@@ -197,10 +211,13 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: Center(child: PlatformCircularProgressIndicator()),
       );
 
-  Widget _buildErrorPage({Exception error}) {
+  Widget _buildErrorPage({String error}) {
     return GestureDetector(
       child: Center(
-        child: Text(S.of(context).failed),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 48),
+          child: Text(S.of(context).failed + '\n\nThe error was:\n' + error,),
+        ),
       ),
       onTap: () {
         refreshSelf();

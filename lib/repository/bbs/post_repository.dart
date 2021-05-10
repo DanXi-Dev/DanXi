@@ -24,10 +24,16 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
+import 'package:pointycastle/api.dart' as crypto;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -316,7 +322,11 @@ class PostRepository extends BaseRepositoryWithDio {
     initRepository();
   }
 
-  requestToken(PersonInfo info) async {
+  initializeUser(PersonInfo info, SharedPreferences _preferences) async {
+    _token = SettingsProvider.of(_preferences).fduholeToken ?? await requestToken(info, _preferences);
+  }
+
+  Future<String> requestToken(PersonInfo info, SharedPreferences _preferences) async {
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
@@ -333,23 +343,22 @@ class PostRepository extends BaseRepositoryWithDio {
 
         if (listEquals(pubKeyBits.stringValue, PINNED_CERTIFICATE))
           return true; // Allow connection when public key matches
-        return false;
+        throw NotLoginError("Invalid HTTPS Certificate");
       };
       return httpClient;
     };
 
+    crypto.PublicKey publicKey = RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
+
     Response response = await secureDio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
-      'email': "${info.id}@fudan.edu.cn"
-    });
-    if (response.statusCode == 200)
-      _token = response.data["token"];
-    else {
-      _token = null;
-      print("failed to login to fduhole " +
-          response.statusCode.toString() +
-          response.toString());
-      throw NotLoginError();
+      'email': "${info.id}@fudan.edu.cn",
+      'ID': encrypt(info.id, publicKey)
+    }).onError((error, stackTrace) => throw NotLoginError(error.toString()));
+    try {
+      return SettingsProvider.of(_preferences).fduholeToken = response.data["token"];
+    } catch (e, stackTrace) {
+      throw NotLoginError(e.toString());
     }
   }
 
@@ -357,11 +366,7 @@ class PostRepository extends BaseRepositoryWithDio {
     return {"Authorization": "Token " + _token};
   }
 
-  bool get isUserInitialized => _token == null ? false : true;
-
-  Future<void> initializeUser(PersonInfo info) async {
-    await requestToken(info);
-  }
+  bool get isUserInitialized => _token != null;
 
   Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
     Map<String, dynamic> qp;
@@ -374,7 +379,13 @@ class PostRepository extends BaseRepositoryWithDio {
         break;
     }
     Response response = await dio.get(_BASE_URL + "/discussions/",
-        queryParameters: qp, options: Options(headers: _tokenHeader));
+        queryParameters: qp, options: Options(headers: _tokenHeader)).onError((error, stackTrace) {
+          if (error.response.statusCode == 401) {
+            _token = null;
+            throw LoginExpiredError;
+          }
+          throw error;
+    });
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
@@ -446,4 +457,9 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 }
 
-class NotLoginError implements Exception {}
+class NotLoginError implements Exception {
+  String errorMessage;
+  NotLoginError(this.errorMessage);
+}
+
+class LoginExpiredError implements Exception {}

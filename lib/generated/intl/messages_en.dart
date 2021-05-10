@@ -94,6 +94,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "editor_hint" : MessageLookupByLibrary.simpleMessage("Write something... (Hint: Swipe the toolbar to the right to see more styling options.)"),
     "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
     "end_reached" : MessageLookupByLibrary.simpleMessage("You have reached the end."),
+    "error_login_expired" : MessageLookupByLibrary.simpleMessage("Login Expired. Tap to login again"),
     "evening" : MessageLookupByLibrary.simpleMessage("Evening"),
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),

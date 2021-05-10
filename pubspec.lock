@@ -818,6 +818,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.0"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
   pool:
     dependency: transitive
     description:
@@ -888,6 +895,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
+  rsa_encrypt:
+    dependency: "direct main"
+    description:
+      name: rsa_encrypt
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   screen:
     dependency: "direct main"
     description:

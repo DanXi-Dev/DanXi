@@ -1075,6 +1075,16 @@ class S {
     );
   }
 
+  /// `Login Expired. Tap to login again`
+  String get error_login_expired {
+    return Intl.message(
+      'Login Expired. Tap to login again',
+      name: 'error_login_expired',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
