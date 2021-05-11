@@ -905,20 +905,20 @@ class S {
     );
   }
 
-  /// `Copy text content`
+  /// `Copy`
   String get copy {
     return Intl.message(
-      'Copy text content',
+      'Copy',
       name: 'copy',
       desc: '',
       args: [],
     );
   }
 
-  /// `Text copied.`
+  /// `Text copied`
   String get copy_success {
     return Intl.message(
-      'Text copied.',
+      'Text copied',
       name: 'copy_success',
       desc: '',
       args: [],

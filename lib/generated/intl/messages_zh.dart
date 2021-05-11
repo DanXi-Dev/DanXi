@@ -66,7 +66,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "classroom" : MessageLookupByLibrary.simpleMessage("教室"),
     "connection_failed" : MessageLookupByLibrary.simpleMessage("登陆失败，请检查网络连接\n请确保已授予“WLAN和蜂窝数据”联网权限。"),
     "contact_us" : MessageLookupByLibrary.simpleMessage("联系我们"),
-    "copy" : MessageLookupByLibrary.simpleMessage("复制文本内容"),
+    "copy" : MessageLookupByLibrary.simpleMessage("复制"),
     "copy_success" : MessageLookupByLibrary.simpleMessage("复制成功"),
     "credentials_invalid" : MessageLookupByLibrary.simpleMessage("用户名/密码错误"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("当前连接"),

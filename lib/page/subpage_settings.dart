@@ -373,7 +373,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                         //       ..onTap = () async {
                                         //         await launch(
                                         //             S.of(context).terms_and_conditions_url);
-                                        //         //TODO: Add Links
                                         //       }),
                                         // TextSpan(
                                         //   style: defaultText,

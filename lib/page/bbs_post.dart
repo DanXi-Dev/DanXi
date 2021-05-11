@@ -224,8 +224,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       cupertino: (_, __) => CupertinoActionSheetAction(
         onPressed: () {
           Navigator.of(context).pop();
-          FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
-              Noticing.showNotice(context, S.of(context).copy_success));
+          FlutterClipboard.copy(renderText(e.content, ''));
         },
         child: Text(S.of(context).copy),
       ),
