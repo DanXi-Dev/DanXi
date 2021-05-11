@@ -42,10 +42,10 @@ PODS:
   - Firebase/Crashlytics (7.11.0):
     - Firebase/CoreOnly
     - FirebaseCrashlytics (~> 7.11.0)
-  - firebase_core (1.1.0):
+  - firebase_core (1.1.1):
     - Firebase/CoreOnly (= 7.11.0)
     - Flutter
-  - firebase_crashlytics (2.0.2):
+  - firebase_crashlytics (2.0.3):
     - Firebase/Crashlytics (= 7.11.0)
     - firebase_core
     - Flutter
@@ -209,8 +209,8 @@ SPEC CHECKSUMS:
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   Firebase: c121feb35e4126c0b355e3313fa9b487d47319fd
-  firebase_core: 84dcd80ac6d29c3d1039071b7306ee99688eb9c7
-  firebase_crashlytics: 1bf37e6bace6394a2bab8f316de395f49a836189
+  firebase_core: 54856a8a39b8f3e35f34fdd3373f3b92a1daa68b
+  firebase_crashlytics: 1e72fe7a913faa6bc73f75794a5f68947e26623e
   FirebaseCore: 907447d8917a4d3eb0cce2829c5a0ad21d90b432
   FirebaseCoreDiagnostics: 68ad972f99206cef818230f3f3179d52ccfb7f8c
   FirebaseCrashlytics: 272b675aa9d1e9bae1f9e1449fcc1f2cf6042806

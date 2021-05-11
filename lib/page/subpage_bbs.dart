@@ -53,6 +53,27 @@ String renderText(String html, String imagePlaceholder) {
   return soup.get_text();
 }
 
+/// Turn tags into Widgets
+const KEY_NO_TAG = "默认";
+List<Widget> generateTagWidgets(BBSPost e) {
+  List<Widget> _tags = [
+    const SizedBox(
+      width: 2,
+    ),
+  ];
+  e.tag.forEach((element) {
+    if (element.name == KEY_NO_TAG) return [Container()];
+    _tags.add(RoundChip(
+      label: element.name,
+      color: Constant.getColorFromString(element.color),
+    ));
+    _tags.add(const SizedBox(
+      width: 6,
+    ));
+  });
+  return _tags;
+}
+
 class BBSSubpage extends PlatformSubpage {
   @override
   bool get needPadding => true;
@@ -283,24 +304,6 @@ class _BBSSubpageState extends State<BBSSubpage>
     return _lastPageItems[index];
   }
 
-  List<Widget> _generateTagWidgets(BBSPost e) {
-    List<Widget> _tags = [
-      const SizedBox(
-        width: 2,
-      ),
-    ];
-    e.tag.forEach((element) {
-      _tags.add(RoundChip(
-        label: element.name,
-        color: Constant.getColorFromString(element.color),
-      ));
-      _tags.add(const SizedBox(
-        width: 6,
-      ));
-    });
-    return _tags;
-  }
-
   Widget _getListItem(BBSPost postElement) {
     return ThemedMaterial(
       child: Card(
@@ -312,12 +315,12 @@ class _BBSSubpageState extends State<BBSSubpage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: _generateTagWidgets(postElement),
+                  children: generateTagWidgets(postElement),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                    postElement.is_folded
+                postElement.is_folded
                     ? Theme(
                         data: Theme.of(context)
                             .copyWith(dividerColor: Colors.transparent),
