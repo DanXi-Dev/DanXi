@@ -27,7 +27,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -280,7 +279,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: Row(
-                        children: _generateTagWidgets(_post),
+                        children: generateTagWidgets(_post),
                       ),
                     ),
                   Row(
@@ -327,11 +326,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ),
                   Align(
                     alignment: Alignment.topLeft,
-                    child: HtmlWidget(
-                      e.content,
-                      textStyle: TextStyle(fontSize: 16),
-                      onTapUrl: (url) => launch(url),
-                    ),
+                    child: isNested
+                        // If content is being quoted, limit its height so that the view won't be too long.
+                        ? Text(
+                            renderText(e.content, S.of(context).image_tag),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : HtmlWidget(
+                            e.content,
+                            textStyle: TextStyle(fontSize: 16),
+                            onTapUrl: (url) => launch(url),
+                          ),
                   ),
                 ],
               ),
@@ -370,22 +376,4 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               },
             )),
       );
-
-  List<Widget> _generateTagWidgets(BBSPost e) {
-    List<Widget> _tags = [
-      const SizedBox(
-        width: 2,
-      ),
-    ];
-    e.tag.forEach((element) {
-      _tags.add(RoundChip(
-        label: element.name,
-        color: Constant.getColorFromString(element.color),
-      ));
-      _tags.add(const SizedBox(
-        width: 6,
-      ));
-    });
-    return _tags;
-  }
 }
