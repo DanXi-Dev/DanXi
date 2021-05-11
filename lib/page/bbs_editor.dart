@@ -87,8 +87,8 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                       initialItems: _tags,
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: InputDecoration(
-                          hintText: 'Search Tags',
-                          labelText: 'Select Tags',
+                          hintText: '',
+                          labelText: S.of(context).select_tags,
                         ),
                       ),
                       findSuggestions: (String filter) async {
@@ -110,7 +110,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                                 Icons.add_circle,
                                 color: Colors.white,
                               ),
-                              label: Text('Add New Tag'),
+                              label: Text(S.of(context).add_new_tag),
                               labelStyle: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14.0,
@@ -128,9 +128,9 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                       onChanged: () {}),
                 ),
                 Expanded(
-                    child: BBSEditorWidget(
-                      controller: _controller,
-                    ),
+                  child: BBSEditorWidget(
+                    controller: _controller,
+                  ),
                 )
               ],
             )));
@@ -170,8 +170,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   @override
   Widget build(BuildContext context) {
     var quillEditor = QuillEditor(
-      keyboardAppearance: PlatformX.isDarkMode ? Brightness.dark : Brightness
-          .light,
+      keyboardAppearance:
+          PlatformX.isDarkMode ? Brightness.dark : Brightness.light,
       focusNode: _focusNode,
       autoFocus: true,
       controller: widget.controller,
@@ -201,25 +201,20 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
             showHistory: false,
             onImagePickCallback: (File file) async {
               ProgressFuture progressDialog = showProgressDialog(
-                  loadingText: S
-                      .of(context)
-                      .uploading_image, context: context);
+                  loadingText: S.of(context).uploading_image, context: context);
               return await PostRepository.getInstance().uploadImage(file).then(
-                      (value) {
-                    progressDialog.dismiss(showAnim: false);
-                    return value;
-                  }, onError: (e) {
+                  (value) {
+                progressDialog.dismiss(showAnim: false);
+                return value;
+              }, onError: (e) {
                 progressDialog.dismiss(showAnim: false);
                 Noticing.showNotice(
-                    context, S
-                    .of(context)
-                    .uploading_image_failed);
+                    context, S.of(context).uploading_image_failed);
                 return null;
               });
             },
           ),
         ),
-
         Expanded(
           child: Container(
             child: quillEditor,

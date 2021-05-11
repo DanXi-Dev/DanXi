@@ -107,6 +107,8 @@
     "last_created": "最近创建",
     "sort_order": "排序方式",
     "error_login_expired": "登录已过期，点击以重新登录",
+    "select_tags": "选择标签",
+    "add_new_tag": "增加新的标签",
 
     "classroom": "教室",
     "morning": "上午",

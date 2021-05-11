@@ -1105,6 +1105,26 @@ class S {
     );
   }
 
+  /// `Select Tags`
+  String get select_tags {
+    return Intl.message(
+      'Select Tags',
+      name: 'select_tags',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add new tag`
+  String get add_new_tag {
+    return Intl.message(
+      'Add new tag',
+      name: 'add_new_tag',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
