@@ -37,6 +37,7 @@ class _RoundChipState extends State<RoundChip> {
       onTap: widget.onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 6),
+        height: 24,
         decoration: BoxDecoration(
           border: Border.all(
             color: widget.color,
@@ -44,9 +45,11 @@ class _RoundChipState extends State<RoundChip> {
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Text(
-          widget.label,
-          style: TextStyle(fontSize: 14, color: widget.color),
+        child: Center(
+          child: Text(
+            widget.label,
+            style: TextStyle(fontSize: 14, color: widget.color),
+          ),
         ),
       ),
     );

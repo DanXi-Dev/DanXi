@@ -91,8 +91,7 @@ class DiningHallCrowdednessFeature extends Feature {
                 } else {
                   switch (keySubtitle) {
                     case '南苑餐厅':
-                      //WARNING: Workaround defective data
-                      //crowdednessSum[3] += value.current / value.max;
+                      crowdednessSum[3] += value.current / value.max;
                       break;
                     case '教工快餐':
                       crowdednessSum[4] += value.current / value.max;
@@ -127,7 +126,6 @@ class DiningHallCrowdednessFeature extends Feature {
           default:
             _mostCrowdedCanteen = 'NULL';
         }
-        crowdednessSum[3] = 9999; //WARNING: Workaround defective data
         switch (crowdednessSum.indexOf(crowdednessSum.reduce(min))) {
           case 0:
             _leastCrowdedCanteen = '北区餐厅';

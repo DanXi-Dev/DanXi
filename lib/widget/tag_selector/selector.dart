@@ -17,7 +17,6 @@
 
 import 'dart:math';
 
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
