@@ -86,7 +86,7 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
     payload['sfjcwhry'] = 0;
     payload['sfjchbry'] = 0;
     payload['sfcyglq'] = 0;
-    payload['sfzx'] = 1;
+    // payload['sfzx'] = 1;
     payload['sfcxzysx'] = 0;
     payload['sfyyjc'] = 0;
     payload['jcjgqr'] = 0;
