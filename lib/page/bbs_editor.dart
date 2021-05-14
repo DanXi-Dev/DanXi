@@ -116,7 +116,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w300,
                               ),
-                              backgroundColor: Colors.green,
+                              backgroundColor: Theme.of(context).accentColor,
                             ),
                           ),
                       configureChip: (lang) => ChipConfiguration(

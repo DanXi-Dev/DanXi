@@ -26,6 +26,7 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:dan_xi/widget/small_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -208,22 +209,11 @@ class DiningHallCrowdednessFeature extends Feature {
     if (_status == ConnectionStatus.DONE) {
       return Wrap(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-            decoration: BoxDecoration(
-                color: Theme.of(context).hintColor.withOpacity(0.25),
-                borderRadius: BorderRadius.all(Radius.circular(4.0))),
-            child: Text(
-              S.of(context).tag_most_crowded,
-              style: TextStyle(
-                  color: Theme.of(context).hintColor.computeLuminance() >= 0.5
-                      ? Colors.black
-                      : Colors.white,
-                  fontSize: 12),
-            ),
+          SmallTag(
+            label: S.of(context).tag_most_crowded,
           ),
           const SizedBox(
-            width: 7,
+            width: 6,
           ),
           Text(
             _mostCrowdedCanteen,
@@ -232,21 +222,10 @@ class DiningHallCrowdednessFeature extends Feature {
             maxLines: 1,
           ),
           const SizedBox(
-            width: 7,
+            width: 6,
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-            decoration: BoxDecoration(
-                color: Theme.of(context).hintColor.withOpacity(0.25),
-                borderRadius: BorderRadius.all(Radius.circular(4.0))),
-            child: Text(
-              S.of(context).tag_least_crowded,
-              style: TextStyle(
-                  color: Theme.of(context).hintColor.computeLuminance() >= 0.5
-                      ? Colors.black
-                      : Colors.white,
-                  fontSize: 12),
-            ),
+          SmallTag(
+            label: S.of(context).tag_least_crowded,
           ),
           const SizedBox(
             width: 8,
