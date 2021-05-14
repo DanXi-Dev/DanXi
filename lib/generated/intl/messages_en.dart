@@ -33,30 +33,36 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m6(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m7(id) => "Reason for reporting #${id}";
+  static m7(courseName, courseLeft) =>
+      "Next course is ${courseName}, ${courseLeft} left";
 
-  static m8(code) => "Reply failed (HTTP ${code})";
+  static m8(id) => "Reason for reporting #${id}";
 
-  static m9(name) => "Reply #${name}";
+  static m9(code) => "Reply failed (HTTP ${code})";
 
-  static m10(code) => "Report failed (HTTP ${code})";
+  static m10(name) => "Reply #${name}";
 
-  static m11(num) => "${num} sec ago";
+  static m11(code) => "Report failed (HTTP ${code})";
 
-  static m12(week) => "Week ${week}";
+  static m12(num) => "${num} sec ago";
 
-  static m13(name) => "Welcome, ${name}";
+  static m13(week) => "Week ${week}";
+
+  static m14(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function> {
-    "about" : MessageLookupByLibrary.simpleMessage("About This App"),
-    "account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
-    "add_new_tag" : MessageLookupByLibrary.simpleMessage("Add new tag"),
-    "afternoon" : MessageLookupByLibrary.simpleMessage("Afternoon"),
-    "and" : MessageLookupByLibrary.simpleMessage(" and "),
-    "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
-    "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
-    "app_feedback" : MessageLookupByLibrary.simpleMessage("[Feedback]"),
+
+  static _notInlinedMessages(_) => <String, Function>{
+        "about": MessageLookupByLibrary.simpleMessage("About This App"),
+        "account": MessageLookupByLibrary.simpleMessage("Switch Account"),
+        "add_new_tag": MessageLookupByLibrary.simpleMessage("Add new tag"),
+        "afternoon": MessageLookupByLibrary.simpleMessage("Afternoon"),
+        "and": MessageLookupByLibrary.simpleMessage(" and "),
+        "app_description": MessageLookupByLibrary.simpleMessage(
+            "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
+        "app_description_title":
+            MessageLookupByLibrary.simpleMessage("Description"),
+        "app_feedback" : MessageLookupByLibrary.simpleMessage("[Feedback]"),
     "app_name" : MessageLookupByLibrary.simpleMessage("Danxi"),
     "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering & Economics\nat Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
@@ -143,56 +149,84 @@ class MessageLookup extends MessageLookupByLibrary {
     "login_with_uis" : MessageLookupByLibrary.simpleMessage("Sign in anonymously as:"),
     "logining" : MessageLookupByLibrary.simpleMessage("Logging in..."),
     "logout" : MessageLookupByLibrary.simpleMessage("Logout"),
-    "logout_prompt" : MessageLookupByLibrary.simpleMessage("You need to restart this app for changes to take effect."),
-    "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("All data stored locally will be deleted."),
-    "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
-    "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
-    "material" : MessageLookupByLibrary.simpleMessage("Material"),
-    "minute_ago" : m5,
-    "moment_ago" : MessageLookupByLibrary.simpleMessage("A moment ago"),
-    "morning" : MessageLookupByLibrary.simpleMessage("Morning"),
-    "most_least_crowded_canteen" : m6,
-    "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
-    "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
-    "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
-    "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
-    "post_failed" : MessageLookupByLibrary.simpleMessage("Failed to post. Please check your internet connection."),
-    "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
-    "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
-    "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
-    "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reason_report_post" : m7,
-    "reply_failed" : m8,
-    "reply_to" : m9,
-    "report" : MessageLookupByLibrary.simpleMessage("Report"),
-    "report_failed" : m10,
-    "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
-    "second_ago" : m11,
-    "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "select_tags" : MessageLookupByLibrary.simpleMessage("Select Tags"),
-    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
-    "share" : MessageLookupByLibrary.simpleMessage("Share"),
-    "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
-    "sort_order" : MessageLookupByLibrary.simpleMessage("Sort order"),
-    "submit" : MessageLookupByLibrary.simpleMessage("Submit"),
-    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
-    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
-    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". By logging in, you indicate that you have read and consent to these policies. "),
-    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
-    "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
-    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
-    "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "uploading_image" : MessageLookupByLibrary.simpleMessage("Uploading image..."),
-    "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("Failed to upload image. Please check your internet connection."),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
-    "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m12,
-    "welcome" : m13,
-    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
-  };
+        "logout_prompt": MessageLookupByLibrary.simpleMessage(
+            "You need to restart this app for changes to take effect."),
+        "logout_question_prompt": MessageLookupByLibrary.simpleMessage(
+            "All data stored locally will be deleted."),
+        "logout_question_prompt_title":
+            MessageLookupByLibrary.simpleMessage("Are you sure?"),
+        "logout_subtitle": MessageLookupByLibrary.simpleMessage(
+            "And delete all data from this device"),
+        "material": MessageLookupByLibrary.simpleMessage("Material"),
+        "minute_ago": m5,
+        "moment_ago": MessageLookupByLibrary.simpleMessage("A moment ago"),
+        "morning": MessageLookupByLibrary.simpleMessage("Morning"),
+        "most_least_crowded_canteen": m6,
+        "new_post": MessageLookupByLibrary.simpleMessage("New Post"),
+        "next_course_is": m7,
+        "next_course_none":
+            MessageLookupByLibrary.simpleMessage("No course left today."),
+        "no_summary": MessageLookupByLibrary.simpleMessage(
+            "[Unable to display content of this type.]"),
+        "open_source_software_licenses": MessageLookupByLibrary.simpleMessage(
+            "Open Source Software Licenses"),
+        "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
+            "It\'s not dining time right now."),
+        "post_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to post. Please check your internet connection."),
+        "privacy_policy":
+            MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+        "privacy_policy_url": MessageLookupByLibrary.simpleMessage(
+            "https://danxi-dev.github.io/privacy"),
+        "project_page": MessageLookupByLibrary.simpleMessage("Project Page"),
+        "project_url": MessageLookupByLibrary.simpleMessage(
+            "https://github.com/w568w/DanXi"),
+        "reason_report_post": m8,
+        "reply_failed": m9,
+        "reply_to": m10,
+        "report": MessageLookupByLibrary.simpleMessage("Report"),
+        "report_failed": m11,
+        "report_success": MessageLookupByLibrary.simpleMessage(
+            "Report success. Thank you for your contribution to our community."),
+        "second_ago": m12,
+        "select_campus": MessageLookupByLibrary.simpleMessage("Select Campus"),
+        "select_tags": MessageLookupByLibrary.simpleMessage("Select Tags"),
+        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "share": MessageLookupByLibrary.simpleMessage("Share"),
+        "share_as_ics": MessageLookupByLibrary.simpleMessage("Export as ICS"),
+        "sort_order": MessageLookupByLibrary.simpleMessage("Sort order"),
+        "submit": MessageLookupByLibrary.simpleMessage("Submit"),
+        "tag_least_crowded":
+            MessageLookupByLibrary.simpleMessage("Least Crowded"),
+        "tag_most_crowded":
+            MessageLookupByLibrary.simpleMessage("Most Crowded"),
+        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
+        "terms_and_conditions":
+            MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+        "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
+            "Your use of this application is governed under "),
+        "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(
+            ". By logging in, you indicate that you have read and consent to these policies. "),
+        "terms_and_conditions_title":
+            MessageLookupByLibrary.simpleMessage("Legal"),
+        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Check your internet connection."),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+        "ticking": MessageLookupByLibrary.simpleMessage("Checking in..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("Agenda"),
+        "today_course": MessageLookupByLibrary.simpleMessage("Courses Today"),
+        "uploading_image":
+            MessageLookupByLibrary.simpleMessage("Uploading image..."),
+        "uploading_image_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to upload image. Please check your internet connection."),
+        "view_ossl": MessageLookupByLibrary.simpleMessage(
+            "This app is made possible thanks to various open-source software. View "),
+        "weak_password": MessageLookupByLibrary.simpleMessage(
+            "Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
+        "week": m13,
+        "welcome": m14,
+        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("Zhangjiang")
+      };
 }

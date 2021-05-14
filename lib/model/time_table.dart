@@ -46,6 +46,9 @@ class Event {
 
 @JsonSerializable()
 class TimeTable {
+  /// Start time of the term.
+  static DateTime START_TIME = DateTime(2021, 3, 1); //TODO: Make this dynamic
+
   static final DateTime kMonday = DateTime.utc(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
@@ -76,7 +79,7 @@ class TimeTable {
   factory TimeTable.fromHtml(DateTime startTime, String tablePageSource) {
     TimeTable newTable = new TimeTable()..startTime = startTime;
     RegExp courseMatcher =
-        RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
+    RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
     for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
       newTable.courses.add(Course.fromHtmlPart(matchedCourse.group(0)));
     }

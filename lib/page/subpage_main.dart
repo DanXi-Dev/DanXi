@@ -21,6 +21,7 @@ import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
+import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -101,6 +102,7 @@ class _HomeSubpageState extends State<HomeSubpage>
                     child: Column(
                   children: [
                     FeatureListItem(feature: WelcomeFeature()),
+                    FeatureListItem(feature: NextCourseFeature()),
                     Divider(),
                     FeatureListItem(feature: EcardBalanceFeature()),
                     FeatureListItem(feature: DiningHallCrowdednessFeature()),

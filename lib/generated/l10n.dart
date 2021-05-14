@@ -75,6 +75,36 @@ class S {
     );
   }
 
+  /// `Courses Today`
+  String get today_course {
+    return Intl.message(
+      'Courses Today',
+      name: 'today_course',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next course is {courseName}, {courseLeft} left`
+  String next_course_is(Object courseName, Object courseLeft) {
+    return Intl.message(
+      'Next course is $courseName, $courseLeft left',
+      name: 'next_course_is',
+      desc: '',
+      args: [courseName, courseLeft],
+    );
+  }
+
+  /// `No course left today.`
+  String get next_course_none {
+    return Intl.message(
+      'No course left today.',
+      name: 'next_course_none',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Current Connection`
   String get current_connection {
     return Intl.message(

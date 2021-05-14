@@ -23,6 +23,7 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:dan_xi/widget/small_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -100,19 +101,8 @@ class EcardBalanceFeature extends Feature {
       else
         return Row(
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).hintColor.withOpacity(0.25),
-                  borderRadius: BorderRadius.all(Radius.circular(4.0))),
-              child: Text(
-                S.of(context).last_transaction,
-                style: TextStyle(
-                    color: Theme.of(context).hintColor.computeLuminance() >= 0.5
-                        ? Colors.black
-                        : Colors.white,
-                    fontSize: 12),
-              ),
+            SmallTag(
+              label: S.of(context).last_transaction,
             ),
             const SizedBox(
               width: 4,
@@ -149,7 +139,12 @@ class EcardBalanceFeature extends Feature {
       return Text(
         Constant.yuanSymbol(_balance),
         textScaleFactor: 1.2,
-        style: TextStyle(color: num.tryParse(_balance) == null ? null : num.tryParse(_balance) < 20.0 ? Theme.of(context).errorColor : null),
+        style: TextStyle(
+            color: num.tryParse(_balance) == null
+                ? null
+                : num.tryParse(_balance) < 20.0
+                    ? Theme.of(context).errorColor
+                    : null),
       );
     return null;
   }

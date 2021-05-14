@@ -65,11 +65,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   TimeNow _showingTime;
   AsyncSnapshot _lastSnapshot;
 
-  /// Start time of the term.
-  static final START_TIME = DateTime(2021, 3, 1); //TODO: Make this dynamic
-  ConnectionStatus _status = ConnectionStatus.NONE;
-  bool _forceLoadFromRemote = false;
-
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
     Navigator.of(context).pop();
@@ -149,12 +144,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         return _buildPage(snapshot.data);
       },
       future: Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
-          .loadTimeTableLocally(context.personInfo,
-              startTime: START_TIME,
-              forceLoadFromRemote: _forceLoadFromRemote)),
+          .loadTimeTableLocally(context.personInfo)),
       errorBuilder: GestureDetector(
         onTap: () {
-          _status = ConnectionStatus.NONE;
           refreshSelf();
         },
         child: Center(
@@ -189,7 +181,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemHeight: 140);
     _table = table;
     if (_showingTime == null) _showingTime = _table.now();
-    _status = ConnectionStatus.DONE;
 
     return Column(children: [
       Row(
