@@ -133,7 +133,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildSearchTextField() {
     return Padding(
-      padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
         onSubmitted: (value) {
           Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {

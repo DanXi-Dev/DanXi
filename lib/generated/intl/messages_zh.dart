@@ -33,7 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m6(mostCrowded, leastCrowded) => "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
 
-  static m7(courseName, courseLeft) => "下一节课是${courseName}，还有 ${courseLeft} 节课";
+  static m7(courseName, courseLeft) => "下一节课是${courseName}，今日还有${courseLeft}节课";
 
   static m8(id) => "请填写举报理由(#${id})";
 
@@ -140,7 +140,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "most_least_crowded_canteen" : m6,
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
     "next_course_is" : m7,
-    "next_course_none" : MessageLookupByLibrary.simpleMessage("今日课程已全部结束"),
+    "next_course_none" : MessageLookupByLibrary.simpleMessage("今日的课程已全部结束"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[无法显示此类型的消息]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("开源软件许可协议"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),

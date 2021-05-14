@@ -149,7 +149,7 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  bool get clickable => true;
+  bool get clickable => false;
 }
 
 class LiveCourseModel {

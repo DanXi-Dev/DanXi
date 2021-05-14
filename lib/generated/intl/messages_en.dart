@@ -33,7 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m6(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m7(courseName, courseLeft) => "Next course is ${courseName}, ${courseLeft} left";
+  static m7(courseName, courseLeft) => "Next course is ${courseName}, you have ${courseLeft} courses left today";
 
   static m8(id) => "Reason for reporting #${id}";
 
@@ -156,7 +156,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "most_least_crowded_canteen" : m6,
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
     "next_course_is" : m7,
-    "next_course_none" : MessageLookupByLibrary.simpleMessage("No course left today."),
+    "next_course_none" : MessageLookupByLibrary.simpleMessage("You have completed today\'s courses"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
