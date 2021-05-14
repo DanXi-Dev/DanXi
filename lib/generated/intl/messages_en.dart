@@ -167,6 +167,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "report" : MessageLookupByLibrary.simpleMessage("Report"),
     "report_failed" : m10,
     "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
+    "search_result" : MessageLookupByLibrary.simpleMessage("Search Result"),
     "second_ago" : m11,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "select_tags" : MessageLookupByLibrary.simpleMessage("Select Tags"),

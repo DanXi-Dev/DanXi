@@ -112,6 +112,7 @@
     "error_login_expired": "Login Expired. Tap to login again",
     "select_tags": "Select Tags",
     "add_new_tag": "Add new tag",
+    "search_result": "Search Result",
 
     "classroom": "Classroom",
     "morning": "Morning",

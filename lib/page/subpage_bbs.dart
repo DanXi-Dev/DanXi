@@ -56,12 +56,12 @@ String renderText(String html, String imagePlaceholder) {
 /// Turn tags into Widgets
 const KEY_NO_TAG = "默认";
 List<Widget> generateTagWidgets(BBSPost e) {
+  if (e == null || e.tag == null) return [Container()];
   List<Widget> _tags = [
     const SizedBox(
       width: 2,
     ),
   ];
-
   e.tag.forEach((element) {
     if (element.name == KEY_NO_TAG) return [Container()];
     _tags.add(RoundChip(
@@ -112,8 +112,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   bool _isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
-  String _searchText;
-
   SharedPreferences _preferences;
 
   void refreshSelf() {
@@ -131,22 +129,15 @@ class _BBSSubpageState extends State<BBSSubpage>
     _lastSnapshotData = null;
     _isRefreshing = true;
     _isEndIndicatorShown = false;
-    _searchText = null;
   }
 
   Widget _buildSearchTextField() {
     return Padding(
       padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
       child: CupertinoSearchTextField(
-        placeholder: _searchText,
         onSubmitted: (value) {
-          _searchText = value;
-          setState(() {
-            _currentBBSPage = 1;
-            _lastPageItems = [_buildSearchTextField()];
-            _lastSnapshotData = null;
-            _isRefreshing = true;
-            _isEndIndicatorShown = false;
+          Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+            "post": PostRepository.getInstance().loadSearchResults(value)
           });
         },
       ),
@@ -157,7 +148,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   void initState() {
     super.initState();
     _sortOrder = SortOrder.LAST_REPLIED;
-
     _initialize();
 
     _postSubscription.bindOnlyInvalid(
@@ -220,10 +210,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             context: context,
             removeTop: true,
             child: FutureWidget<List<BBSPost>>(
-                future: _searchText == null
-                    ? loginAndLoadPost(context.personInfo, _sortOrder)
-                    : PostRepository.getInstance()
-                        .loadSearchResults(_searchText),
+                future: loginAndLoadPost(context.personInfo, _sortOrder),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
                   snapshot.data.forEach((element) {

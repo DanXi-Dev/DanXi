@@ -55,10 +55,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   bool _isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
+  Future<List<Reply>> _searchResult;
+
   @override
   void initState() {
     super.initState();
-    _post = widget.arguments['post'];
+
+    if (widget.arguments['post'] is BBSPost)
+      _post = widget.arguments['post'];
+    else {
+      _searchResult = widget.arguments['post'];
+      // Create a dummy post for displaying search result
+      _post = new BBSPost(-1, new Reply(-1, "", "", null, "", -1), -1, null,
+          null, false, "", "");
+    }
 
     _currentBBSPage = 1;
     _lastReplies = [];
@@ -86,7 +96,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       iosContentPadding: true,
       iosContentBottomPadding: true,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).forum),
+        title: Text(_searchResult == null
+            ? S.of(context).forum
+            : S.of(context).search_result),
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,
@@ -137,8 +149,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   }
                   return null;
                 },
-                future: PostRepository.getInstance()
-                    .loadReplies(_post, _currentBBSPage)),
+                // Display search result instead, when it is available
+                future: _searchResult == null
+                    ? PostRepository.getInstance()
+                        .loadReplies(_post, _currentBBSPage)
+                    : _searchResult),
           )),
     );
   }
@@ -314,12 +329,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ),
                     ],
                   ),
-                  if (e.reply_to != null && !isNested)
+                  if (e.reply_to != null && !isNested && _searchResult == null)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: _getListItems(
                           _lastReplies.firstWhere(
-                              (element) => element.id == e.reply_to),
+                            (element) => element.id == e.reply_to,
+                          ),
                           false,
                           true),
                     ),

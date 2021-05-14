@@ -1125,6 +1125,16 @@ class S {
     );
   }
 
+  /// `Search Result`
+  String get search_result {
+    return Intl.message(
+      'Search Result',
+      name: 'search_result',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

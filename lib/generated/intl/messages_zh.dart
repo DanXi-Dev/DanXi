@@ -149,6 +149,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "report" : MessageLookupByLibrary.simpleMessage("举报"),
     "report_failed" : m10,
     "report_success" : MessageLookupByLibrary.simpleMessage("举报成功，感谢您为维护良好社区环境所作出的贡献。"),
+    "search_result" : MessageLookupByLibrary.simpleMessage("搜索结果"),
     "second_ago" : m11,
     "select_campus" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "select_tags" : MessageLookupByLibrary.simpleMessage("选择标签"),

@@ -109,6 +109,7 @@
     "error_login_expired": "登录已过期，点击以重新登录",
     "select_tags": "选择标签",
     "add_new_tag": "增加新的标签",
+    "search_result": "搜索结果",
 
     "classroom": "教室",
     "morning": "上午",
