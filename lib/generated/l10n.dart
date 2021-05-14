@@ -85,20 +85,20 @@ class S {
     );
   }
 
-  /// `Next course is {courseName}, {courseLeft} left`
+  /// `Next course is {courseName}, you have {courseLeft} courses left today`
   String next_course_is(Object courseName, Object courseLeft) {
     return Intl.message(
-      'Next course is $courseName, $courseLeft left',
+      'Next course is $courseName, you have $courseLeft courses left today',
       name: 'next_course_is',
       desc: '',
       args: [courseName, courseLeft],
     );
   }
 
-  /// `No course left today.`
+  /// `You have completed today's courses`
   String get next_course_none {
     return Intl.message(
-      'No course left today.',
+      'You have completed today\'s courses',
       name: 'next_course_none',
       desc: '',
       args: [],
