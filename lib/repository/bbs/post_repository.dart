@@ -323,10 +323,12 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   initializeUser(PersonInfo info, SharedPreferences _preferences) async {
-    _token = SettingsProvider.of(_preferences).fduholeToken ?? await requestToken(info, _preferences);
+    _token = SettingsProvider.of(_preferences).fduholeToken ??
+        await requestToken(info, _preferences);
   }
 
-  Future<String> requestToken(PersonInfo info, SharedPreferences _preferences) async {
+  Future<String> requestToken(
+      PersonInfo info, SharedPreferences _preferences) async {
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
@@ -348,7 +350,8 @@ class PostRepository extends BaseRepositoryWithDio {
       return httpClient;
     };
 
-    crypto.PublicKey publicKey = RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
+    crypto.PublicKey publicKey =
+        RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
 
     Response response = await secureDio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
@@ -379,13 +382,15 @@ class PostRepository extends BaseRepositoryWithDio {
         qp = {"page": page};
         break;
     }
-    Response response = await dio.get(_BASE_URL + "/discussions/",
-        queryParameters: qp, options: Options(headers: _tokenHeader)).onError((error, stackTrace) {
-          if (error.response.statusCode == 401) {
-            _token = null;
-            throw LoginExpiredError;
-          }
-          throw error;
+    Response response = await dio
+        .get(_BASE_URL + "/discussions/",
+            queryParameters: qp, options: Options(headers: _tokenHeader))
+        .onError((error, stackTrace) {
+      if (error.response.statusCode == 401) {
+        _token = null;
+        throw LoginExpiredError;
+      }
+      throw error;
     });
     List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();

@@ -61,6 +61,7 @@ List<Widget> generateTagWidgets(BBSPost e) {
       width: 2,
     ),
   ];
+
   e.tag.forEach((element) {
     if (element.name == KEY_NO_TAG) return [Container()];
     _tags.add(RoundChip(
@@ -88,8 +89,6 @@ class AddNewPostEvent {}
 
 class RetrieveNewPostEvent {}
 
-class SearchEvent {}
-
 class SortOrderChangedEvent {
   SortOrder newOrder;
 
@@ -113,30 +112,53 @@ class _BBSSubpageState extends State<BBSSubpage>
   bool _isEndIndicatorShown;
   static const POST_COUNT_PER_PAGE = 10;
 
+  String _searchText;
+
   SharedPreferences _preferences;
 
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {
-        _currentBBSPage = 1;
-        _lastPageItems = [];
-        _lastSnapshotData = null;
-        _isRefreshing = true;
-        _isEndIndicatorShown = false;
+        _initialize();
       });
     }
+  }
+
+  void _initialize() {
+    _currentBBSPage = 1;
+    _lastPageItems = [_buildSearchTextField()];
+    _lastSnapshotData = null;
+    _isRefreshing = true;
+    _isEndIndicatorShown = false;
+    _searchText = null;
+  }
+
+  Widget _buildSearchTextField() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
+      child: CupertinoSearchTextField(
+        placeholder: _searchText,
+        onSubmitted: (value) {
+          _searchText = value;
+          setState(() {
+            _currentBBSPage = 1;
+            _lastPageItems = [_buildSearchTextField()];
+            _lastSnapshotData = null;
+            _isRefreshing = true;
+            _isEndIndicatorShown = false;
+          });
+        },
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    _sortOrder = _sortOrder ?? SortOrder.LAST_REPLIED;
-    _currentBBSPage = 1;
-    _lastPageItems = [];
-    _lastSnapshotData = null;
-    _isRefreshing = true;
-    _isEndIndicatorShown = false;
+    _sortOrder = SortOrder.LAST_REPLIED;
+
+    _initialize();
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -152,11 +174,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         Constant.eventBus
             .on<RetrieveNewPostEvent>()
             .listen((_) => refreshSelf()),
-        hashCode);
-    _searchSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<SearchEvent>().listen((event) {
-          //TODO: show search view
-        }),
         hashCode);
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
@@ -203,7 +220,10 @@ class _BBSSubpageState extends State<BBSSubpage>
             context: context,
             removeTop: true,
             child: FutureWidget<List<BBSPost>>(
-                future: loginAndLoadPost(context.personInfo, _sortOrder),
+                future: _searchText == null
+                    ? loginAndLoadPost(context.personInfo, _sortOrder)
+                    : PostRepository.getInstance()
+                        .loadSearchResults(_searchText),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
                   snapshot.data.forEach((element) {

@@ -229,7 +229,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
     (cxt) => null,
-    (cxt) => SFSymbols.search,
+    (cxt) => null, //SFSymbols.search,
     (cxt) => null,
     (cxt) => null
   ];
@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonTextBuilders = [
     (cxt) => null,
-    (cxt) => S.of(cxt).new_post, //TODO: search
+    (cxt) => null, //S.of(cxt).new_post,
     (cxt) => null,
     (cxt) => null,
   ];
@@ -415,7 +415,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onPressRightsecondActionButton() async {
     switch (_pageIndex.value) {
-    //Entries omitted
+      //Entries omitted
       case 1:
         AddNewPostEvent().fire(); //TODO: search event
         break;
@@ -424,7 +424,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onPressLeadingActionButton() async {
     switch (_pageIndex.value) {
-    //Entries omitted
+      //Entries omitted
       case 1:
         showPlatformModalSheet(
             context: context,
@@ -492,7 +492,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             body: Container(),
           )
         : PlatformScaffold(
-            iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
+            iosContentBottomPadding:
+                _subpage[_pageIndex.value].needBottomPadding,
             iosContentPadding: _subpage[_pageIndex.value].needPadding,
             appBar: PlatformAppBar(
               cupertino: (_, __) => CupertinoNavigationBarData(

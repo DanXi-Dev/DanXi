@@ -15,11 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'custom_cupertino_scrollbar.dart';
+//import 'custom_cupertino_scrollbar.dart';
 
 /// A widget that will add a scroll bar for its child.
 class WithScrollbar extends StatefulWidget {
@@ -42,7 +42,7 @@ class _WithScrollbarState extends State<WithScrollbar> {
               // interactive: PlatformX.isDesktop,
               child: widget.child,
             ),
-        cupertino: (_, __) => CustomCupertinoScrollbar(
+        cupertino: (_, __) => CupertinoScrollbar(
               controller: widget.controller,
               child: widget.child,
             ));
