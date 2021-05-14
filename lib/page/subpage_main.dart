@@ -46,26 +46,26 @@ class HomeSubpage extends PlatformSubpage {
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
-  HomeSubpage({Key key});
+  HomeSubpage({Key key}) {
+    print("A HomeSubpage is created!");
+  }
 }
 
 class RefreshHomepageEvent {}
 
-class _HomeSubpageState extends State<HomeSubpage>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  static StateStreamListener _refreshSubscription = StateStreamListener();
+class _HomeSubpageState extends State<HomeSubpage> {
+  StateStreamListener _refreshSubscription = StateStreamListener();
 
   @override
   void initState() {
+    print("initState on $hashCode");
     super.initState();
     initPlatformState();
     _refreshSubscription.bindOnlyInvalid(
-        Constant.eventBus
-            .on<RefreshHomepageEvent>()
-            .listen((_) => refreshSelf()),
+        Constant.eventBus.on<RefreshHomepageEvent>().listen((_) {
+          print("Receive request to $hashCode");
+          refreshSelf();
+        }),
         hashCode);
   }
 
@@ -85,8 +85,7 @@ class _HomeSubpageState extends State<HomeSubpage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
+    print("Build on $hashCode");
     return RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.mediumImpact();

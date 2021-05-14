@@ -18,6 +18,7 @@
 import 'dart:async';
 
 import 'package:catcher/catcher.dart';
+import 'package:catcher/model/platform_type.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/announcement.dart';
@@ -127,6 +128,7 @@ class DanxiApp extends StatelessWidget {
     changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
+          initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -138,26 +140,26 @@ class DanxiApp extends StatelessWidget {
                           color:
                               getTheme(context).textTheme.bodyText1.color)))),
           localizationsDelegates: [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate
-          ],
-          supportedLocales: S.delegate.supportedLocales,
-          home: HomePage(),
-          onGenerateRoute: (settings) {
-            final Function pageContentBuilder = this.routes[settings.name];
-            if (pageContentBuilder != null) {
-              return platformPageRoute(
-                  context: context,
-                  builder: (context) => pageContentBuilder(context,
-                      arguments: settings.arguments));
-            }
-            return null;
-          },
-          navigatorKey: Catcher.navigatorKey,
-        ),
-      ),
+                    S.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate
+                  ],
+                  supportedLocales: S.delegate.supportedLocales,
+                  home: HomePage(),
+                  onGenerateRoute: (settings) {
+                    final Function pageContentBuilder = this.routes[settings.name];
+                    if (pageContentBuilder != null) {
+                      return platformPageRoute(
+                          context: context,
+                          builder: (context) => pageContentBuilder(context,
+                              arguments: settings.arguments));
+                    }
+                    return null;
+                  },
+                  navigatorKey: Catcher.navigatorKey,
+                ),
+              ),
     ));
   }
 }
@@ -200,10 +202,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpages. They will be displayed as tab pages.
   List<PlatformSubpage> _subpage = [
-    HomeSubpage(),
-    BBSSubpage(),
-    TimetableSubPage(),
-    SettingsSubpage()
   ];
 
   /// Force app to refresh pages.
@@ -273,10 +271,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    print("initState on Main");
     // Init for firebase services.
     FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
     _personInfo.addListener(() {
+      print("Person info changed!");
       _rebuildPage();
       refreshSelf();
     });
@@ -556,6 +556,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Provider.value(value: _preferences),
               ],
               child: IndexedStack(index: _pageIndex.value, children: _subpage),
+              // child: _subpage[_pageIndex.value],
             ),
             bottomNavBar: PlatformNavBar(
               items: [

@@ -55,6 +55,7 @@ String renderText(String html, String imagePlaceholder) {
 
 /// Turn tags into Widgets
 const KEY_NO_TAG = "默认";
+
 List<Widget> generateTagWidgets(BBSPost e) {
   if (e == null || e.tag == null) return [Container()];
   List<Widget> _tags = [
@@ -97,11 +98,10 @@ class SortOrderChangedEvent {
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
-  static StateStreamListener _postSubscription = StateStreamListener();
-  static StateStreamListener _refreshSubscription = StateStreamListener();
-  static StateStreamListener _searchSubscription = StateStreamListener();
-  static StateStreamListener _sortOrderChangedSubscription =
-      StateStreamListener();
+  StateStreamListener _postSubscription = StateStreamListener();
+  StateStreamListener _refreshSubscription = StateStreamListener();
+  StateStreamListener _searchSubscription = StateStreamListener();
+  StateStreamListener _sortOrderChangedSubscription = StateStreamListener();
 
   int _currentBBSPage;
   SortOrder _sortOrder;

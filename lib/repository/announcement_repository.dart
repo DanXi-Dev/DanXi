@@ -52,7 +52,6 @@ class AnnouncementRepository {
 
   Future<Announcement> getLastAnnouncement() async {
     List<Announcement> list = await getAnnouncements();
-    print(list);
     return list.length > 0 ? list[0] : null;
   }
 
