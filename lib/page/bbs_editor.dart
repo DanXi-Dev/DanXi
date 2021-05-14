@@ -121,7 +121,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                           ),
                       configureChip: (lang) => ChipConfiguration(
                             label: Text(lang.name),
-                            backgroundColor: Colors.green,
+                            backgroundColor: Theme.of(context).accentColor,
                             labelStyle: TextStyle(color: Colors.white),
                             deleteIconColor: Colors.white,
                           ),
@@ -194,9 +194,9 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           child: QuillToolbar.basic(
             controller: widget.controller,
             showBackgroundColorButton: false,
-            showColorButton: true,
+            showColorButton: false,
             showStrikeThrough: false,
-            showUnderLineButton: true,
+            showUnderLineButton: false,
             showListCheck: false,
             showHistory: false,
             onImagePickCallback: (File file) async {
