@@ -81,8 +81,7 @@ class EcardBalanceFeature extends Feature {
         if (_lastTransaction == null)
           return "";
         else
-          return S.of(context).last_transaction +
-              Constant.yuanSymbol(_lastTransaction?.payment) +
+          return Constant.yuanSymbol(_lastTransaction?.payment) +
               " " +
               _lastTransaction?.location;
         break;
@@ -93,7 +92,7 @@ class EcardBalanceFeature extends Feature {
     return '';
   }
 
-  @override
+  /*@override
   Row get customSubtitle {
     if (_status == ConnectionStatus.DONE) {
       if (_lastTransaction == null)
@@ -123,7 +122,7 @@ class EcardBalanceFeature extends Feature {
         );
     }
     return null;
-  }
+  }*/
 
   //@override
   //String get tertiaryTitle => _lastTransaction?.location;

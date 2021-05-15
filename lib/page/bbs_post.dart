@@ -386,9 +386,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ),
                     ]),
               ]),
-              onTap: () {
-                BBSEditor.createNewReply(context, _post.id, e.id)
-                    .then((value) => refreshSelf());
+              onTap: () async {
+                if (_searchResult == null)
+                  BBSEditor.createNewReply(context, _post.id, e.id)
+                      .then((value) => refreshSelf());
+                else
+                  // TODO: Show some kind of loading dialog here
+                  Navigator.of(context).pushNamed("/bbs/postDetail",
+                      arguments: {
+                        "post": await PostRepository.getInstance()
+                            .loadSpecificPost(e.discussion)
+                      });
               },
             )),
       );

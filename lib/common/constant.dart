@@ -45,7 +45,7 @@ class Constant {
         toggleableActiveColor: Color(0xFF007AFF),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
-          //elevation: 0,
+          elevation: 2,
           //color: Color.fromRGBO(199, 199, 204, 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
