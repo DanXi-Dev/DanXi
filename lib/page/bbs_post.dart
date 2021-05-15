@@ -100,16 +100,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             ? S.of(context).forum
             : S.of(context).search_result),
         trailingActions: [
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: PlatformX.isAndroid
-                ? const Icon(Icons.reply)
-                : const Icon(SFSymbols.arrowshape_turn_up_left),
-            onPressed: () {
-              BBSEditor.createNewReply(context, _post.id, null)
-                  .then((value) => refreshSelf());
-            },
-          )
+          if (_searchResult == null)
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isAndroid
+                  ? const Icon(Icons.reply)
+                  : const Icon(SFSymbols.arrowshape_turn_up_left),
+              onPressed: () {
+                BBSEditor.createNewReply(context, _post.id, null)
+                    .then((value) => refreshSelf());
+              },
+            )
         ],
       ),
       body: RefreshIndicator(

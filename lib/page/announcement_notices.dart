@@ -43,17 +43,10 @@ class AnnouncementList extends StatefulWidget {
 
 class _AnnouncementListState extends State<AnnouncementList> {
   List<Announcement> _data = [];
-  ScrollController _controller;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    _controller = PrimaryScrollController.of(context);
-    super.didChangeDependencies();
   }
 
   @override
@@ -62,9 +55,8 @@ class _AnnouncementListState extends State<AnnouncementList> {
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-          title: TopController(
-        child: Text(S.of(context).developer_announcement('')),
-        controller: _controller,
+          title: Text(
+        S.of(context).developer_announcement(''),
       )),
       body: FutureWidget(
         future: AnnouncementRepository.getInstance().getAnnouncements(),
@@ -77,9 +69,9 @@ class _AnnouncementListState extends State<AnnouncementList> {
                       context: context,
                       removeTop: true,
                       child: WithScrollbar(
-                          controller: _controller,
+                          controller: PrimaryScrollController.of(context),
                           child: ListView(
-                            controller: _controller,
+                            primary: true,
                             children: _getListWidgets(),
                           ))))
             ],

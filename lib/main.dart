@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonIconBuilders = [
-    (cxt) => Icons.notifications,
+    (cxt) => PlatformX.isAndroid ? Icons.notifications : SFSymbols.bell_circle,
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
@@ -418,12 +418,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _onPressRightsecondActionButton() async {
-    switch (_pageIndex.value) {
+    /*switch (_pageIndex.value) {
       //Entries omitted
       case 1:
-        AddNewPostEvent().fire(); //TODO: search event
+        AddNewPostEvent().fire();
         break;
-    }
+    }*/
   }
 
   void _onPressLeadingActionButton() async {
