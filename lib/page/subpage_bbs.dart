@@ -56,24 +56,27 @@ String renderText(String html, String imagePlaceholder) {
 /// Turn tags into Widgets
 const KEY_NO_TAG = "默认";
 
-List<Widget> generateTagWidgets(BBSPost e) {
-  if (e == null || e.tag == null) return [Container()];
-  List<Widget> _tags = [
-    const SizedBox(
-      width: 2,
-    ),
-  ];
+Widget generateTagWidgets(BBSPost e) {
+  if (e == null || e.tag == null) return Container();
+  List<Widget> _tags = [];
   e.tag.forEach((element) {
     if (element.name == KEY_NO_TAG) return [Container()];
-    _tags.add(RoundChip(
-      label: element.name,
-      color: Constant.getColorFromString(element.color),
-    ));
-    _tags.add(const SizedBox(
-      width: 6,
-    ));
+    _tags.add(Flex(
+        direction: Axis.horizontal,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RoundChip(
+            label: element.name,
+            color: Constant.getColorFromString(element.color),
+          ),
+        ]));
   });
-  return _tags;
+  return Wrap(
+    direction: Axis.horizontal,
+    spacing: 4,
+    runSpacing: 4,
+    children: _tags,
+  );
 }
 
 class BBSSubpage extends PlatformSubpage {
@@ -321,9 +324,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: generateTagWidgets(postElement),
-                ),
+                generateTagWidgets(postElement),
                 const SizedBox(
                   height: 10,
                 ),
