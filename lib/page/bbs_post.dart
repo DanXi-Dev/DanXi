@@ -143,7 +143,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         return _buildErrorWidget();
                       } else {
                         _lastSnapshotData = snapshot;
-                        return _buildPage(snapshot.data, false);
+                        if (_searchResult == null)
+                          return _buildPage(snapshot.data, false);
+                        // Only use scroll notification when data is paged
+                        return NotificationListener<ScrollNotification>(
+                            child: _buildPage(snapshot.data, false),
+                            onNotification: (ScrollNotification scrollInfo) {
+                              if (scrollInfo.metrics.extentAfter < 500 &&
+                                  !_isRefreshing &&
+                                  !_isEndIndicatorShown) {
+                                _isRefreshing = true;
+                                setState(() {
+                                  _currentBBSPage++;
+                                });
+                              }
+                              return false;
+                            });
                       }
                       break;
                   }
@@ -158,29 +173,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     );
   }
 
-  Widget _buildPage(List<Reply> data, bool isLoading) =>
-      NotificationListener<ScrollNotification>(
-        child: WithScrollbar(
-          child: ListView.builder(
-            primary: true,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount:
-                (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
-            itemBuilder: (context, index) => _buildListItem(index, data, true),
-          ),
-          controller: PrimaryScrollController.of(context),
+  Widget _buildPage(List<Reply> data, bool isLoading) => WithScrollbar(
+        child: ListView.builder(
+          primary: true,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE +
+              (isLoading ? 1 - POST_COUNT_PER_PAGE : 0),
+          itemBuilder: (context, index) => _buildListItem(index, data, true),
         ),
-        onNotification: (ScrollNotification scrollInfo) {
-          if (scrollInfo.metrics.extentAfter < 500 &&
-              !_isRefreshing &&
-              !_isEndIndicatorShown) {
-            _isRefreshing = true;
-            setState(() {
-              _currentBBSPage++;
-            });
-          }
-          return false;
-        },
+        controller: PrimaryScrollController.of(context),
       );
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
