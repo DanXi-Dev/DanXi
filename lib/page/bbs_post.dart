@@ -135,7 +135,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           child: Center(
                               child: PlatformCircularProgressIndicator()),
                         );
-                      return _buildPage(_lastSnapshotData.data, true);
+                      if (_searchResult != null)
+                        return _buildPage(_lastSnapshotData.data, true);
+                      // Only use scroll notification when data is paged
+                      return NotificationListener<ScrollNotification>(
+                          child: _buildPage(snapshot.data, true),
+                          onNotification: (ScrollNotification scrollInfo) {
+                            if (scrollInfo.metrics.extentAfter < 500 &&
+                                !_isRefreshing &&
+                                !_isEndIndicatorShown) {
+                              _isRefreshing = true;
+                              setState(() {
+                                _currentBBSPage++;
+                              });
+                            }
+                            return false;
+                          });
                       break;
                     case ConnectionState.done:
                       _lastReplies.addAll(snapshot.data);
@@ -144,7 +159,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         return _buildErrorWidget();
                       } else {
                         _lastSnapshotData = snapshot;
-                        if (_searchResult == null)
+                        if (_searchResult != null)
                           return _buildPage(snapshot.data, false);
                         // Only use scroll notification when data is paged
                         return NotificationListener<ScrollNotification>(
