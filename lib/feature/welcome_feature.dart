@@ -20,6 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,9 +51,15 @@ class WelcomeFeature extends Feature {
   String get mainTitle => S.of(context).welcome(_info?.name);
 
   @override
-  String get subTitle {
+  String get subTitle => _helloQuote;
+
+  @override
+  Widget get customSubtitle {
     if (SettingsProvider.of(Provider.of<SharedPreferences>(context)).debugMode)
-      return "Debug mode enabled. Welcome, developer.";
-    return _helloQuote;
+      return Text(
+        "Welcome, developer. [Debug Mode Enabled]",
+        style: TextStyle(color: Colors.red),
+      );
+    return null;
   }
 }

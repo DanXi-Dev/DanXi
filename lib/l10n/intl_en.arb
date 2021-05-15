@@ -55,8 +55,8 @@
     "terms_and_conditions_content_end": ". By logging in, you indicate that you have read and consent to these policies. ",
     "contact_us": "Contact Us",
     "theme": "Theme",
-    "material": "Material",
-    "cupertino": "Cupertino",
+    "material": "[WARNING: DEBUG FEATURE] Material",
+    "cupertino": "[WARNING: DEBUG FEATURE] Cupertino",
     "app_feedback": "[Feedback]",
 
     "handan_campus": "Handan",

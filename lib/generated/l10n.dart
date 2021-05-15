@@ -585,20 +585,20 @@ class S {
     );
   }
 
-  /// `Material`
+  /// `[WARNING: DEBUG FEATURE] Material`
   String get material {
     return Intl.message(
-      'Material',
+      '[WARNING: DEBUG FEATURE] Material',
       name: 'material',
       desc: '',
       args: [],
     );
   }
 
-  /// `Cupertino`
+  /// `[WARNING: DEBUG FEATURE] Cupertino`
   String get cupertino {
     return Intl.message(
-      'Cupertino',
+      '[WARNING: DEBUG FEATURE] Cupertino',
       name: 'cupertino',
       desc: '',
       args: [],

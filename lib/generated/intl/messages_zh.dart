@@ -99,7 +99,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("教务处通知"),
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("平安复旦打卡"),
     "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("应校方要求，自动打卡功能不再可用，敬请谅解。"),
-    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[警告：该功能仅供DEBUG使用] 点击自动打卡"),
+    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[警告：该功能仅限DEBUG使用] 点击自动打卡"),
     "fudan_daily_tick_countdown" : m2,
     "fudan_daily_tick_link" : MessageLookupByLibrary.simpleMessage("今日未打卡，点击打开打卡页面"),
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("今日已打卡"),
