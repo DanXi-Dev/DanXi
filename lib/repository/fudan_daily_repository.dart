@@ -101,30 +101,32 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
     return payload;
   }
 
-  Future<void> tick(PersonInfo info) async {
-    if (_historyData == null) {
-      _historyData =
-          await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
-    }
-    Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
-      "Origin": "https://zlapp.fudan.edu.cn",
-      "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
-    };
-    Map payload = await Cache.getRemotely<Map>(
-        _KEY_PREF,
-        () async => _buildPayloadFromHistory(),
-        (cachedValue) => jsonDecode(cachedValue),
-        (object) => jsonEncode(object));
-    if (payload == null) {
-      throw NotTickYesterdayException();
-    }
-    await dio.post(SAVE_URL,
-        data: payload.encodeMap(),
-        options:
-            DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));
-  }
+  Future<void> tick(PersonInfo info) async => throw UnimplementedError();
+//{
+// if (_historyData == null) {
+//   _historyData =
+//       await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
+// }
+// Map<String, String> headers = {
+//   "User-Agent":
+//       "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
+//   "Origin": "https://zlapp.fudan.edu.cn",
+//   "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
+// };
+// Map payload = await Cache.getRemotely<Map>(
+//     _KEY_PREF,
+//     () async => _buildPayloadFromHistory(),
+//     (cachedValue) => jsonDecode(cachedValue),
+//     (object) => jsonEncode(object));
+// if (payload == null) {
+//   throw NotTickYesterdayException();
+// }
+//
+// await dio.post(SAVE_URL,
+//     data: payload.encodeMap(),
+//     options:
+//         DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));
+//}
 }
 
 class NotTickYesterdayException implements Exception {}
