@@ -18,7 +18,10 @@
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeFeature extends Feature {
   PersonInfo _info;
@@ -47,8 +50,9 @@ class WelcomeFeature extends Feature {
   String get mainTitle => S.of(context).welcome(_info?.name);
 
   @override
-  String get subTitle => _helloQuote;
-
-  @override
-  String get tertiaryTitle => null;
+  String get subTitle {
+    if (SettingsProvider.of(Provider.of<SharedPreferences>(context)).debugMode)
+      return "Debug mode enabled. Welcome, developer.";
+    return _helloQuote;
+  }
 }

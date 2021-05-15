@@ -32,6 +32,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FudanDailyFeature extends Feature {
   PersonInfo _info;
@@ -40,7 +41,7 @@ class FudanDailyFeature extends Feature {
   bool _hasTicked;
   SharedPreferences _preferences;
 
-  int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
+  //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
 
   Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
@@ -50,13 +51,17 @@ class FudanDailyFeature extends Feature {
 
       if (ticked) {
         _subTitle = S.of(context).fudan_daily_ticked;
-        _countdownRemainingTime = -2;
-      } else if (shouldAutomaticallyTickToday) {
+        //_countdownRemainingTime = -2;
+      } /*else if (shouldAutomaticallyTickToday) {
         _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
         notifyUpdate();
         startCountdown();
-      } else {
-        _subTitle = S.of(context).fudan_daily_tick;
+      }*/
+      else {
+        if (SettingsProvider.of(_preferences).debugMode)
+          _subTitle = S.of(context).fudan_daily_tick;
+        else
+          _subTitle = S.of(context).fudan_daily_tick_link;
       }
       _hasTicked = ticked;
       notifyUpdate();
@@ -79,7 +84,7 @@ class FudanDailyFeature extends Feature {
     }
   }
 
-  void startCountdown() {
+  /*void startCountdown() {
     _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
     notifyUpdate();
     Timer(Duration(seconds: 1), handleTimeout);
@@ -94,7 +99,7 @@ class FudanDailyFeature extends Feature {
       _countdownRemainingTime--;
       startCountdown();
     }
-  }
+  }*/
 
   @override
   void buildFeature() {
@@ -120,6 +125,9 @@ class FudanDailyFeature extends Feature {
   @override
   String get subTitle => _subTitle;
 
+  //@override
+  //String get tertiaryTitle => S.of(context).fudan_daily_disabled_notice;
+
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.cloud_upload)
@@ -139,7 +147,7 @@ class FudanDailyFeature extends Feature {
             ));
   }
 
-  bool get shouldAutomaticallyTickToday {
+  /*bool get shouldAutomaticallyTickToday {
     DateTime now = new DateTime.now();
     DateTime todayDate = new DateTime(now.year, now.month, now.day);
     return SettingsProvider.of(_preferences).autoTickCancelDate !=
@@ -155,7 +163,7 @@ class FudanDailyFeature extends Feature {
       SettingsProvider.of(_preferences).autoTickCancelDate =
           todayDate.toString();
     }
-  }
+  }*/
 
   /// Restart the loading process
   void refreshData() {
@@ -169,7 +177,7 @@ class FudanDailyFeature extends Feature {
     switch (_status) {
       case ConnectionStatus.DONE:
         // If it's counting down, we'll cancel it
-        if (_countdownRemainingTime >= 0) {
+        /*if (_countdownRemainingTime >= 0) {
           _countdownRemainingTime = -2;
           _subTitle = S.of(context).fudan_daily_tick;
           //Don't try to tick again today
@@ -177,7 +185,11 @@ class FudanDailyFeature extends Feature {
           notifyUpdate();
         } else {
           tickFudanDaily();
-        }
+        }*/
+        if (SettingsProvider.of(_preferences).debugMode)
+          tickFudanDaily();
+        else
+          launch("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily");
         break;
       case ConnectionStatus.FAILED:
         refreshData();

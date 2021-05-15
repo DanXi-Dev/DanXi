@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
@@ -23,6 +24,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OpenSourceLicenseList extends StatefulWidget {
@@ -38,14 +40,30 @@ class OpenSourceLicenseList extends StatefulWidget {
 class _OpenSourceListState extends State<OpenSourceLicenseList> {
   List<LicenseItem> _items;
 
+  int debugModeEnableStatus = 0;
+
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-          title: TopController(
-        controller: PrimaryScrollController.of(context),
+          title: GestureDetector(
+        onLongPress: () async {
+          if (debugModeEnableStatus++ > 2) {
+            SharedPreferences _pref = await SharedPreferences.getInstance();
+            if (_pref.containsKey("DEBUG"))
+              Noticing.showNotice(context,
+                  "Debug mode is already enabled, Welcome, developer.");
+            else {
+              // Enable debug mode
+              Noticing.showNotice(context,
+                  "Debug mode enabled. Welcome, developer.\nRefresh for changes to take effect.");
+              _pref.setBool("DEBUG",
+                  true); // This key either don't exist, or will be true
+            }
+          }
+        },
         child: Text(S.of(context).open_source_software_licenses),
       )),
       body: Column(children: [

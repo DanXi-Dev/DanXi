@@ -16,16 +16,15 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider {
   SharedPreferences _preferences;
 
   static const String KEY_PREFERRED_CAMPUS = "campus";
-  static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
-      "autotick_last_cancel_date";
-  static const String KEY_PREFERRED_THEME = "theme";
+  //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
+  //    "autotick_last_cancel_date";
+  //static const String KEY_PREFERRED_THEME = "theme";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
 
   SettingsProvider._(this._preferences);
@@ -52,6 +51,7 @@ class SettingsProvider {
   }
 
   //FudanDaily AutoTick
+  /*
   String get autoTickCancelDate {
     if (_preferences.containsKey(KEY_AUTOTICK_LAST_CANCEL_DATE)) {
       return _preferences.getString(KEY_AUTOTICK_LAST_CANCEL_DATE);
@@ -74,7 +74,7 @@ class SettingsProvider {
 
   set theme(int theme) {
     _preferences.setInt(KEY_PREFERRED_THEME, theme);
-  }
+  }*/
 
   //Token
   String get fduholeToken {
@@ -84,9 +84,11 @@ class SettingsProvider {
     return null;
   }
 
-  set fduholeToken (String value) {
+  set fduholeToken(String value) {
     _preferences.setString(KEY_FDUHOLE_TOKEN, value);
   }
 
   void deleteSavedFduholeToken() => _preferences.remove(KEY_FDUHOLE_TOKEN);
+
+  bool get debugMode => _preferences.containsKey("DEBUG");
 }

@@ -178,9 +178,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
     final Color _originalDividerColor = Theme.of(context).dividerColor;
-    const double _avatarSpacing = 28;
+    const double _avatarSpacing = 24;
     double _avatarSize =
-        (MediaQuery.of(context).size.width - _avatarSpacing * 4 - 60) / 4;
+        (MediaQuery.of(context).size.width - _avatarSpacing * 4 - 64) / 4;
     const double _avatarNameSpacing = 4;
     TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)
@@ -282,7 +282,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
               ),
             ),
 
-            if (!Constant.IS_PRODUCTION_ENVIRONMENT)
+            if (SettingsProvider.of(_preferences).debugMode)
               //Theme Selection
               Card(
                 child: ListTile(
@@ -299,17 +299,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                             .changeToCupertinoPlatform()
                         : PlatformProvider.of(context)
                             .changeToMaterialPlatform();
-                    if (SettingsProvider.of(_preferences).theme == null) {
-                      SettingsProvider.of(_preferences).theme =
-                          (Theme.of(context).platform == TargetPlatform.android)
-                              ? 1
-                              : 0;
-                    } else {
-                      SettingsProvider.of(_preferences).theme =
-                          (SettingsProvider.of(_preferences).theme == 0)
-                              ? 1
-                              : 0;
-                    }
                   },
                 ),
               ),

@@ -195,10 +195,10 @@ class S {
     );
   }
 
-  /// `Automatic COVID-19 Safety Check-In`
+  /// `COVID-19 Safety Check-In`
   String get fudan_daily {
     return Intl.message(
-      'Automatic COVID-19 Safety Check-In',
+      'COVID-19 Safety Check-In',
       name: 'fudan_daily',
       desc: '',
       args: [],
@@ -215,10 +215,30 @@ class S {
     );
   }
 
-  /// `Tap to check in`
+  /// `Tap to open check-in webpage`
+  String get fudan_daily_tick_link {
+    return Intl.message(
+      'Tap to open check-in webpage',
+      name: 'fudan_daily_tick_link',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `In response to request from the University, Auto-CheckIn is no longer available.`
+  String get fudan_daily_disabled_notice {
+    return Intl.message(
+      'In response to request from the University, Auto-CheckIn is no longer available.',
+      name: 'fudan_daily_disabled_notice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `[WARNING: DEBUG FEATURE] Tap to check in`
   String get fudan_daily_tick {
     return Intl.message(
-      'Tap to check in',
+      '[WARNING: DEBUG FEATURE] Tap to check in',
       name: 'fudan_daily_tick',
       desc: '',
       args: [],
