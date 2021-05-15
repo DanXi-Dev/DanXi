@@ -272,8 +272,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           child: ListView.builder(
             primary: true,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount:
-                (_currentBBSPage) * POST_COUNT_PER_PAGE + (isLoading ? 1 : 0),
+            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE +
+                (isLoading ? 1 - POST_COUNT_PER_PAGE : 0),
             itemBuilder: (context, index) => _buildListItem(index, data),
           ),
           controller: PrimaryScrollController.of(context),
