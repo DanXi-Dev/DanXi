@@ -27,6 +27,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+/// A dialog to show Fudan QR code.
+///
+/// Also contains methods to send qr code to Apple Watch.
 class QRHelper {
   static void showQRCode(
       BuildContext context, PersonInfo personInfo, double brightness) {

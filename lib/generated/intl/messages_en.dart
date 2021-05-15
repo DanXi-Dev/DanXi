@@ -45,20 +45,25 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m12(num) => "${num} sec ago";
 
-  static m13(week) => "Week ${week}";
+  static m13(count) => "Popularity: ${count}";
 
-  static m14(name) => "Welcome, ${name}";
+  static m14(week) => "Week ${week}";
+
+  static m15(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static _notInlinedMessages(_) => <String, Function> {
-    "about" : MessageLookupByLibrary.simpleMessage("About This App"),
-    "account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
-    "add_new_tag" : MessageLookupByLibrary.simpleMessage("Add new tag"),
-    "afternoon" : MessageLookupByLibrary.simpleMessage("Afternoon"),
-    "and" : MessageLookupByLibrary.simpleMessage(" and "),
-    "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
-    "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
-    "app_feedback" : MessageLookupByLibrary.simpleMessage("[Feedback]"),
+
+  static _notInlinedMessages(_) => <String, Function>{
+        "about": MessageLookupByLibrary.simpleMessage("About This App"),
+        "account": MessageLookupByLibrary.simpleMessage("Switch Account"),
+        "add_new_tag": MessageLookupByLibrary.simpleMessage("Add new tag"),
+        "afternoon": MessageLookupByLibrary.simpleMessage("Afternoon"),
+        "and": MessageLookupByLibrary.simpleMessage(" and "),
+        "app_description": MessageLookupByLibrary.simpleMessage(
+            "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
+        "app_description_title":
+            MessageLookupByLibrary.simpleMessage("Description"),
+        "app_feedback" : MessageLookupByLibrary.simpleMessage("[Feedback]"),
     "app_name" : MessageLookupByLibrary.simpleMessage("Danxi"),
     "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering & Economics\nat Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
@@ -170,35 +175,49 @@ class MessageLookup extends MessageLookupByLibrary {
     "reply_to" : m10,
     "report" : MessageLookupByLibrary.simpleMessage("Report"),
     "report_failed" : m11,
-    "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
-    "search_result" : MessageLookupByLibrary.simpleMessage("Search Result"),
-    "second_ago" : m12,
-    "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
-    "select_tags" : MessageLookupByLibrary.simpleMessage("Select Tags"),
-    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
-    "share" : MessageLookupByLibrary.simpleMessage("Share"),
-    "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
-    "sort_order" : MessageLookupByLibrary.simpleMessage("Sort order"),
-    "submit" : MessageLookupByLibrary.simpleMessage("Submit"),
-    "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
-    "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
-    "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
-    "terms_and_conditions" : MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
-    "terms_and_conditions_content" : MessageLookupByLibrary.simpleMessage("Your use of this application is governed under "),
-    "terms_and_conditions_content_end" : MessageLookupByLibrary.simpleMessage(". By logging in, you indicate that you have read and consent to these policies. "),
-    "terms_and_conditions_title" : MessageLookupByLibrary.simpleMessage("Legal"),
-    "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
-    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
-    "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "today_course" : MessageLookupByLibrary.simpleMessage("Courses Today"),
-    "uploading_image" : MessageLookupByLibrary.simpleMessage("Uploading image..."),
-    "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("Failed to upload image. Please check your internet connection."),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
-    "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m13,
-    "welcome" : m14,
-    "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
-  };
+        "report_success": MessageLookupByLibrary.simpleMessage(
+            "Report success. Thank you for your contribution to our community."),
+        "search_result": MessageLookupByLibrary.simpleMessage("Search Result"),
+        "second_ago": m12,
+        "select_campus": MessageLookupByLibrary.simpleMessage("Select Campus"),
+        "select_tags": MessageLookupByLibrary.simpleMessage("Select Tags"),
+        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "share": MessageLookupByLibrary.simpleMessage("Share"),
+        "share_as_ics": MessageLookupByLibrary.simpleMessage("Export as ICS"),
+        "sort_order": MessageLookupByLibrary.simpleMessage("Sort order"),
+        "submit": MessageLookupByLibrary.simpleMessage("Submit"),
+        "tag_count": m13,
+        "tag_least_crowded":
+            MessageLookupByLibrary.simpleMessage("Least Crowded"),
+        "tag_most_crowded":
+            MessageLookupByLibrary.simpleMessage("Most Crowded"),
+        "tap_to_view": MessageLookupByLibrary.simpleMessage("Tap to view"),
+        "terms_and_conditions":
+            MessageLookupByLibrary.simpleMessage("Terms and Conditions"),
+        "terms_and_conditions_content": MessageLookupByLibrary.simpleMessage(
+            "Your use of this application is governed under "),
+        "terms_and_conditions_content_end": MessageLookupByLibrary.simpleMessage(
+            ". By logging in, you indicate that you have read and consent to these policies. "),
+        "terms_and_conditions_title":
+            MessageLookupByLibrary.simpleMessage("Legal"),
+        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Check your internet connection."),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+        "ticking": MessageLookupByLibrary.simpleMessage("Checking in..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("Agenda"),
+        "today_course": MessageLookupByLibrary.simpleMessage("Courses Today"),
+        "uploading_image":
+            MessageLookupByLibrary.simpleMessage("Uploading image..."),
+        "uploading_image_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to upload image. Please check your internet connection."),
+        "view_ossl": MessageLookupByLibrary.simpleMessage(
+            "This app is made possible thanks to various open-source software. View "),
+        "weak_password": MessageLookupByLibrary.simpleMessage(
+            "Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
+        "week": m14,
+        "welcome": m15,
+        "zhangjiang_campus": MessageLookupByLibrary.simpleMessage("Zhangjiang")
+      };
 }

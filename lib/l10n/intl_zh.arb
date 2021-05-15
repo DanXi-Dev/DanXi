@@ -113,6 +113,7 @@
     "select_tags": "选择标签",
     "add_new_tag": "增加新的标签",
     "search_result": "搜索结果",
+    "tag_count":"标签热度: {count}",
 
     "classroom": "教室",
     "morning": "上午",

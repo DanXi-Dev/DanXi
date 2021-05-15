@@ -116,6 +116,7 @@
     "select_tags": "Select Tags",
     "add_new_tag": "Add new tag",
     "search_result": "Search Result",
+    "tag_count":"Popularity: {count}",
 
     "classroom": "Classroom",
     "morning": "Morning",

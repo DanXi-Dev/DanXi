@@ -104,7 +104,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
                             title: Text(tag.name),
-                            subtitle: Text(tag.count.toString()),
+                            subtitle: Text(S.of(context).tag_count(tag.count)),
                             additionWidget: Chip(
                               avatar: Icon(
                                 Icons.add_circle,
@@ -204,6 +204,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                   loadingText: S.of(context).uploading_image, context: context);
               return await PostRepository.getInstance().uploadImage(file).then(
                   (value) {
+                    //"showAnim: true" makes it crash. Don't know the reason.
                 progressDialog.dismiss(showAnim: false);
                 return value;
               }, onError: (e) {

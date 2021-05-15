@@ -24,6 +24,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/aao_notices.dart';
+import 'package:dan_xi/page/announcement_notices.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
@@ -108,6 +109,8 @@ class DanxiApp extends StatelessWidget {
         AAONoticesList(arguments: arguments),
     '/about/openLicense': (context, {arguments}) =>
         OpenSourceLicenseList(arguments: arguments),
+    '/announcement/list': (context, {arguments}) =>
+        AnnouncementList(arguments: arguments),
   };
 
   changeSizeOnDesktop() async {
@@ -128,7 +131,7 @@ class DanxiApp extends StatelessWidget {
     changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
-          initialPlatform: TargetPlatform.iOS,
+      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -140,26 +143,26 @@ class DanxiApp extends StatelessWidget {
                           color:
                               getTheme(context).textTheme.bodyText1.color)))),
           localizationsDelegates: [
-                    S.delegate,
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate
-                  ],
-                  supportedLocales: S.delegate.supportedLocales,
-                  home: HomePage(),
-                  onGenerateRoute: (settings) {
-                    final Function pageContentBuilder = this.routes[settings.name];
-                    if (pageContentBuilder != null) {
-                      return platformPageRoute(
-                          context: context,
-                          builder: (context) => pageContentBuilder(context,
-                              arguments: settings.arguments));
-                    }
-                    return null;
-                  },
-                  navigatorKey: Catcher.navigatorKey,
-                ),
-              ),
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          home: HomePage(),
+          onGenerateRoute: (settings) {
+            final Function pageContentBuilder = this.routes[settings.name];
+            if (pageContentBuilder != null) {
+              return platformPageRoute(
+                  context: context,
+                  builder: (context) => pageContentBuilder(context,
+                      arguments: settings.arguments));
+            }
+            return null;
+          },
+          navigatorKey: Catcher.navigatorKey,
+        ),
+      ),
     ));
   }
 }
@@ -201,8 +204,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.
-  List<PlatformSubpage> _subpage = [
-  ];
+  List<PlatformSubpage> _subpage = [];
 
   /// Force app to refresh pages.
   ///
@@ -218,7 +220,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonIconBuilders = [
-    (cxt) => null,
+    (cxt) => Icons.notifications,
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
@@ -241,7 +243,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonTextBuilders = [
-    (cxt) => null,
+    (cxt) => S.of(cxt).developer_announcement(''),
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
     (cxt) => null,
@@ -403,7 +405,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// When user clicks the action button on appbar
   void _onPressRightmostActionButton() async {
     switch (_pageIndex.value) {
-      //Entries omitted
+      case 0:
+        Navigator.of(context).pushNamed('/announcement/list');
+        break;
       case 1:
         AddNewPostEvent().fire();
         break;
@@ -473,137 +477,141 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return _personInfo.value == null
-        // Show an empty container if no person info is set
-        ? PlatformScaffold(
-            iosContentBottomPadding: false,
-            iosContentPadding: true,
-            appBar: PlatformAppBar(
-              title: Text(S.of(context).app_name),
-              trailingActions: [
-                PlatformIconButton(
-                  padding: EdgeInsets.zero,
-                  icon: Icon(_subpageRightmostActionButtonIconBuilders[
-                      _pageIndex.value](context)),
-                  onPressed: _onPressRightmostActionButton,
-                )
-              ],
+    if (_personInfo.value == null) {
+      // Show an empty container if no person info is set
+      return PlatformScaffold(
+        iosContentBottomPadding: false,
+        iosContentPadding: true,
+        appBar: PlatformAppBar(
+          title: Text(S.of(context).app_name),
+          trailingActions: [
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                  _subpageRightmostActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+              onPressed: _onPressRightmostActionButton,
+            )
+          ],
+        ),
+        body: Container(),
+      );
+    } else {
+      return PlatformScaffold(
+        iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
+        iosContentPadding: _subpage[_pageIndex.value].needPadding,
+        appBar: PlatformAppBar(
+          cupertino: (_, __) => CupertinoNavigationBarData(
+            title: MediaQuery(
+              data: MediaQueryData(
+                  textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+              child: TopController(
+                child: Text(
+                  S.of(context).app_name,
+                ),
+                onDoubleTap: () => ScrollToTopEvent().fire(),
+              ),
             ),
-            body: Container(),
-          )
-        : PlatformScaffold(
-            iosContentBottomPadding:
-                _subpage[_pageIndex.value].needBottomPadding,
-            iosContentPadding: _subpage[_pageIndex.value].needPadding,
-            appBar: PlatformAppBar(
-              cupertino: (_, __) => CupertinoNavigationBarData(
-                title: MediaQuery(
-                  data: MediaQueryData(
-                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                  child: TopController(
-                    child: Text(
-                      S.of(context).app_name,
-                    ),
-                    onDoubleTap: () => ScrollToTopEvent().fire(),
-                  ),
-                ),
+          ),
+          material: (_, __) => MaterialAppBarData(
+            title: TopController(
+              child: Text(
+                S.of(context).app_name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              material: (_, __) => MaterialAppBarData(
-                title: TopController(
-                  child: Text(
-                    S.of(context).app_name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  onDoubleTap: () => ScrollToTopEvent().fire(),
-                ),
-              ),
-              leading: PlatformIconButton(
-                material: (_, __) => MaterialIconButtonData(
-                    tooltip: _subpageLeadingActionButtonTextBuilders[
-                        _pageIndex.value](context)),
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                    _subpageLeadingActionButtonIconBuilders[_pageIndex.value](
+              onDoubleTap: () => ScrollToTopEvent().fire(),
+            ),
+          ),
+          leading: PlatformIconButton(
+            material: (_, __) => MaterialIconButtonData(
+                tooltip:
+                    _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
                         context)),
-                onPressed: _onPressLeadingActionButton,
-              ),
-              trailingActions: [
-                PlatformIconButton(
-                  material: (_, __) => MaterialIconButtonData(
-                      tooltip: _subpageRightsecondActionButtonTextBuilders[
-                          _pageIndex.value](context)),
-                  padding: EdgeInsets.zero,
-                  icon: Icon(_subpageRightsecondActionButtonIconBuilders[
+            padding: EdgeInsets.zero,
+            icon: Icon(
+                _subpageLeadingActionButtonIconBuilders[_pageIndex.value](
+                    context)),
+            onPressed: _onPressLeadingActionButton,
+          ),
+          trailingActions: [
+            PlatformIconButton(
+              material: (_, __) => MaterialIconButtonData(
+                  tooltip: _subpageRightsecondActionButtonTextBuilders[
                       _pageIndex.value](context)),
-                  onPressed: _onPressRightsecondActionButton,
-                ),
-                PlatformIconButton(
-                  material: (_, __) => MaterialIconButtonData(
-                      tooltip: _subpageRightmostActionButtonTextBuilders[
-                          _pageIndex.value](context)),
-                  padding: EdgeInsets.zero,
-                  icon: Icon(_subpageRightmostActionButtonIconBuilders[
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                  _subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+              onPressed: _onPressRightsecondActionButton,
+            ),
+            PlatformIconButton(
+              material: (_, __) => MaterialIconButtonData(
+                  tooltip: _subpageRightmostActionButtonTextBuilders[
                       _pageIndex.value](context)),
-                  onPressed: _onPressRightmostActionButton,
-                ),
-              ],
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                  _subpageRightmostActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+              onPressed: _onPressRightmostActionButton,
             ),
-            body: MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: _pageIndex),
-                ChangeNotifierProvider.value(value: _connectStatus),
-                ChangeNotifierProvider.value(value: _personInfo),
-                Provider.value(value: _preferences),
-              ],
-              child: IndexedStack(index: _pageIndex.value, children: _subpage),
-              // child: _subpage[_pageIndex.value],
+          ],
+        ),
+        body: MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: _pageIndex),
+            ChangeNotifierProvider.value(value: _connectStatus),
+            ChangeNotifierProvider.value(value: _personInfo),
+            Provider.value(value: _preferences),
+          ],
+          child: IndexedStack(index: _pageIndex.value, children: _subpage),
+        ),
+        bottomNavBar: PlatformNavBar(
+          items: [
+            BottomNavigationBarItem(
+              //backgroundColor: Colors.purple,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.dashboard)
+                  : Icon(SFSymbols.square_stack_3d_up_fill),
+              label: S.of(context).dashboard,
             ),
-            bottomNavBar: PlatformNavBar(
-              items: [
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.purple,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.dashboard)
-                      : Icon(SFSymbols.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.indigo,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.forum)
-                      : Icon(SFSymbols.text_bubble),
-                  label: S.of(context).forum,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.blue,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.calendar_today)
-                      : Icon(SFSymbols.calendar),
-                  label: S.of(context).timetable,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Theme.of(context).primaryColor,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.settings)
-                      : Icon(SFSymbols.gear_alt),
-                  label: S.of(context).settings,
-                ),
-              ],
-              currentIndex: _pageIndex.value,
-              material: (_, __) => MaterialNavBarData(
-                type: BottomNavigationBarType.fixed,
-                selectedIconTheme:
-                    BottomNavigationBarTheme.of(context).selectedIconTheme,
-                unselectedIconTheme:
-                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
-              ),
-              itemChanged: (index) {
-                if (index != _pageIndex.value) {
-                  setState(() => _pageIndex.value = index);
-                }
-              },
+            BottomNavigationBarItem(
+              //backgroundColor: Colors.indigo,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.forum)
+                  : Icon(SFSymbols.text_bubble),
+              label: S.of(context).forum,
             ),
-          );
+            BottomNavigationBarItem(
+              //backgroundColor: Colors.blue,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.calendar_today)
+                  : Icon(SFSymbols.calendar),
+              label: S.of(context).timetable,
+            ),
+            BottomNavigationBarItem(
+              //backgroundColor: Theme.of(context).primaryColor,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.settings)
+                  : Icon(SFSymbols.gear_alt),
+              label: S.of(context).settings,
+            ),
+          ],
+          currentIndex: _pageIndex.value,
+          material: (_, __) => MaterialNavBarData(
+            type: BottomNavigationBarType.fixed,
+            selectedIconTheme:
+                BottomNavigationBarTheme.of(context).selectedIconTheme,
+            unselectedIconTheme:
+                BottomNavigationBarTheme.of(context).unselectedIconTheme,
+          ),
+          itemChanged: (index) {
+            if (index != _pageIndex.value) {
+              setState(() => _pageIndex.value = index);
+            }
+          },
+        ),
+      );
+    }
   }
 
   Future<void> _loadAnnouncement() async {
