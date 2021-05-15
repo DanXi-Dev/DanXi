@@ -1165,6 +1165,16 @@ class S {
     );
   }
 
+  /// `Popularity: {count}`
+  String tag_count(Object count) {
+    return Intl.message(
+      'Popularity: $count',
+      name: 'tag_count',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

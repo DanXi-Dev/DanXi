@@ -32,6 +32,9 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
+///
+/// Also contains the logic to process logging in.
 class LoginDialog extends StatefulWidget {
   final SharedPreferences sharedPreferences;
   final ValueNotifier<PersonInfo> personInfo;
