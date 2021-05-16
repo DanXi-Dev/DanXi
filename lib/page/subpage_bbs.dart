@@ -56,7 +56,7 @@ String renderText(String html, String imagePlaceholder) {
 /// Turn tags into Widgets
 const KEY_NO_TAG = "默认";
 
-Widget generateTagWidgets(BBSPost e) {
+Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
   if (e == null || e.tag == null) return Container();
   List<Widget> _tags = [];
   e.tag.forEach((element) {
@@ -66,6 +66,7 @@ Widget generateTagWidgets(BBSPost e) {
         mainAxisSize: MainAxisSize.min,
         children: [
           RoundChip(
+            onTap: () => onTap(element.name),
             label: element.name,
             color: Constant.getColorFromString(element.color),
           ),
@@ -108,6 +109,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   int _currentBBSPage;
   SortOrder _sortOrder;
+  String _tagFilter;
 
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
@@ -132,6 +134,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _lastSnapshotData = null;
     _isRefreshing = true;
     _isEndIndicatorShown = false;
+    _tagFilter = null;
   }
 
   Widget _buildSearchTextField() {
@@ -213,7 +216,10 @@ class _BBSSubpageState extends State<BBSSubpage>
             context: context,
             removeTop: true,
             child: FutureWidget<List<BBSPost>>(
-                future: loginAndLoadPost(context.personInfo, _sortOrder),
+                future: _tagFilter == null
+                    ? loginAndLoadPost(context.personInfo, _sortOrder)
+                    : PostRepository.getInstance()
+                        .loadTagFilteredPosts(_tagFilter, _sortOrder),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
                   snapshot.data.forEach((element) {
@@ -282,7 +288,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           controller: PrimaryScrollController.of(context),
         ),
         onNotification: (ScrollNotification scrollInfo) {
-          if (scrollInfo.metrics.extentAfter < 500 &&
+          if (_tagFilter == null &&
+              scrollInfo.metrics.extentAfter < 500 &&
               !_isRefreshing &&
               !_isEndIndicatorShown) {
             _isRefreshing = true;
@@ -324,7 +331,21 @@ class _BBSSubpageState extends State<BBSSubpage>
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                generateTagWidgets(postElement),
+                generateTagWidgets(postElement, (String tagname) {
+                  setState(() {
+                    _tagFilter = tagname;
+                    _currentBBSPage = 1;
+                    _lastPageItems = [
+                      Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Text(S.of(context).filtering_by_tag(_tagFilter)),
+                      )
+                    ];
+                    _lastSnapshotData = null;
+                    _isRefreshing = true;
+                    _isEndIndicatorShown = false;
+                  });
+                }),
                 const SizedBox(
                   height: 10,
                 ),

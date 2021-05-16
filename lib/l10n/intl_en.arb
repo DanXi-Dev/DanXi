@@ -119,6 +119,7 @@
     "add_new_tag": "Add new tag",
     "search_result": "Search Result",
     "tag_count":"Popularity: {count}",
+    "filtering_by_tag": "Filtering by \"{tag}\", pull down and refresh to return to timeline.",
 
     "classroom": "Classroom",
     "morning": "Morning",

@@ -1195,6 +1195,16 @@ class S {
     );
   }
 
+  /// `Filtering by "{tag}", pull down and refresh to return to timeline.`
+  String filtering_by_tag(Object tag) {
+    return Intl.message(
+      'Filtering by "$tag", pull down and refresh to return to timeline.',
+      name: 'filtering_by_tag',
+      desc: '',
+      args: [tag],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

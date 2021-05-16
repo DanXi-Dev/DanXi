@@ -23,33 +23,35 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(date) => "DevTeam Announcement ${date}";
 
-  static m2(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
+  static m2(tag) => "Filtering by \"${tag}\", pull down and refresh to return to timeline.";
 
-  static m3(num) => "${num} hr ago";
+  static m3(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
-  static m4(username, date) => "[${username}] replied ${date}:";
+  static m4(num) => "${num} hr ago";
 
-  static m5(num) => "${num} min ago";
+  static m5(username, date) => "[${username}] replied ${date}:";
 
-  static m6(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
+  static m6(num) => "${num} min ago";
 
-  static m7(courseName, courseLeft) => "Next course is ${courseName}, you have ${courseLeft} courses left today";
+  static m7(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m8(id) => "Reason for reporting #${id}";
+  static m8(courseName, courseLeft) => "Next course is ${courseName}, you have ${courseLeft} courses left today";
 
-  static m9(code) => "Reply failed (HTTP ${code})";
+  static m9(id) => "Reason for reporting #${id}";
 
-  static m10(name) => "Reply #${name}";
+  static m10(code) => "Reply failed (HTTP ${code})";
 
-  static m11(code) => "Report failed (HTTP ${code})";
+  static m11(name) => "Reply #${name}";
 
-  static m12(num) => "${num} sec ago";
+  static m12(code) => "Report failed (HTTP ${code})";
 
-  static m13(count) => "Popularity: ${count}";
+  static m13(num) => "${num} sec ago";
 
-  static m14(week) => "Week ${week}";
+  static m14(count) => "Popularity: ${count}";
 
-  static m15(name) => "Welcome, ${name}";
+  static m15(week) => "Week ${week}";
+
+  static m16(name) => "Welcome, ${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -108,6 +110,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
     "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
+    "filtering_by_tag" : m2,
     "folded" : MessageLookupByLibrary.simpleMessage("This content is hidden. Tap to view"),
     "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
@@ -115,7 +118,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("COVID-19 Safety Check-In"),
     "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("In response to request from the University, Auto-CheckIn is no longer available."),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Tap to check in"),
-    "fudan_daily_tick_countdown" : m2,
+    "fudan_daily_tick_countdown" : m3,
     "fudan_daily_tick_link" : MessageLookupByLibrary.simpleMessage("Tap to open check-in webpage"),
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
@@ -124,7 +127,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_night" : MessageLookupByLibrary.simpleMessage("Goodnight stars, goodnight air, goodnight noises everywhere."),
     "good_noon" : MessageLookupByLibrary.simpleMessage("Rise and shine."),
     "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan"),
-    "hour_ago" : m3,
+    "hour_ago" : m4,
     "i_see" : MessageLookupByLibrary.simpleMessage("OK"),
     "image_tag" : MessageLookupByLibrary.simpleMessage("[Image]"),
     "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("Jiangwan"),
@@ -135,7 +138,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_replied" : MessageLookupByLibrary.simpleMessage("Last replied"),
     "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction"),
     "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
-    "latest_reply" : m4,
+    "latest_reply" : m5,
     "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
     "loading_bbs_secure_connection" : MessageLookupByLibrary.simpleMessage("Performing server security check, please wait..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
@@ -154,12 +157,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("Are you sure?"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
     "material" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Material"),
-    "minute_ago" : m5,
+    "minute_ago" : m6,
     "moment_ago" : MessageLookupByLibrary.simpleMessage("A moment ago"),
     "morning" : MessageLookupByLibrary.simpleMessage("Morning"),
-    "most_least_crowded_canteen" : m6,
+    "most_least_crowded_canteen" : m7,
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
-    "next_course_is" : m7,
+    "next_course_is" : m8,
     "next_course_none" : MessageLookupByLibrary.simpleMessage("You have completed today\'s courses"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
@@ -169,14 +172,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
     "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
-    "reason_report_post" : m8,
-    "reply_failed" : m9,
-    "reply_to" : m10,
+    "reason_report_post" : m9,
+    "reply_failed" : m10,
+    "reply_to" : m11,
     "report" : MessageLookupByLibrary.simpleMessage("Report"),
-    "report_failed" : m11,
+    "report_failed" : m12,
     "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
     "search_result" : MessageLookupByLibrary.simpleMessage("Search Result"),
-    "second_ago" : m12,
+    "second_ago" : m13,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "select_tags" : MessageLookupByLibrary.simpleMessage("Select Tags"),
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
@@ -184,7 +187,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
     "sort_order" : MessageLookupByLibrary.simpleMessage("Sort order"),
     "submit" : MessageLookupByLibrary.simpleMessage("Submit"),
-    "tag_count" : m13,
+    "tag_count" : m14,
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
@@ -202,8 +205,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("Failed to upload image. Please check your internet connection."),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m14,
-    "welcome" : m15,
+    "week" : m15,
+    "welcome" : m16,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

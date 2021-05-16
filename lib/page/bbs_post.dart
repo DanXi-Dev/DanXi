@@ -309,7 +309,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   if (generateTags)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(_post),
+                      child: generateTagWidgets(_post, null),
                     ),
                   Row(
                     children: [

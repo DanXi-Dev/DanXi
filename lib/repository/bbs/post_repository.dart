@@ -31,6 +31,7 @@ import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:provider/provider.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:pointycastle/api.dart' as crypto;
@@ -643,7 +644,7 @@ class PostRepository extends BaseRepositoryWithDio {
         qp = {"page": page, "order": "last_created"};
         break;
       case SortOrder.LAST_REPLIED:
-        qp = {"page": page};
+        qp = {"page": page, "order": "last_updated"};
         break;
     }
     Response response = await dio
@@ -665,6 +666,31 @@ class PostRepository extends BaseRepositoryWithDio {
         queryParameters: {"discussion_id": disscussionId.toString()},
         options: Options(headers: _tokenHeader));
     return BBSPost.fromJson(response.data);
+  }
+
+  Future<List<BBSPost>> loadTagFilteredPosts(
+      String tag, SortOrder sortBy) async {
+    Map<String, dynamic> qp;
+    switch (sortBy) {
+      case SortOrder.LAST_CREATED:
+        qp = {"order": "last_created", "tag_name": tag};
+        break;
+      case SortOrder.LAST_REPLIED:
+        qp = {"order": "last_updated", "tag_name": tag};
+        break;
+    }
+    Response response = await dio
+        .get(_BASE_URL + "/discussions/",
+            queryParameters: qp, options: Options(headers: _tokenHeader))
+        .onError((error, stackTrace) {
+      if (error.response.statusCode == 401) {
+        _token = null;
+        throw LoginExpiredError;
+      }
+      throw error;
+    });
+    List result = response.data;
+    return result.map((e) => BBSPost.fromJson(e)).toList();
   }
 
   Future<List<Reply>> loadReplies(BBSPost post, int page) async {

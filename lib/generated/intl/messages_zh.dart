@@ -23,33 +23,35 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(date) => "开发组公告 ${date}";
 
-  static m2(time) => "将在${time}秒后自动打卡，点击以取消";
+  static m2(tag) => "已按照标签\"${tag}\"筛选，下拉刷新以回到时间线";
 
-  static m3(num) => "${num}小时前";
+  static m3(time) => "将在${time}秒后自动打卡，点击以取消";
 
-  static m4(username, date) => "[${username}] 于${date}回复：";
+  static m4(num) => "${num}小时前";
 
-  static m5(num) => "${num}分钟前";
+  static m5(username, date) => "[${username}] 于${date}回复：";
 
-  static m6(mostCrowded, leastCrowded) => "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
+  static m6(num) => "${num}分钟前";
 
-  static m7(courseName, courseLeft) => "下一节课是${courseName}，今日还有${courseLeft}节课";
+  static m7(mostCrowded, leastCrowded) => "[排队最多]${mostCrowded}餐厅 [排队最少]${leastCrowded}餐厅";
 
-  static m8(id) => "请填写举报理由(#${id})";
+  static m8(courseName, courseLeft) => "下一节课是${courseName}，今日还有${courseLeft}节课";
 
-  static m9(code) => "回复失败 (HTTP ${code})";
+  static m9(id) => "请填写举报理由(#${id})";
 
-  static m10(name) => "回复#${name}";
+  static m10(code) => "回复失败 (HTTP ${code})";
 
-  static m11(code) => "举报失败 (HTTP ${code})";
+  static m11(name) => "回复#${name}";
 
-  static m12(num) => "${num}秒前";
+  static m12(code) => "举报失败 (HTTP ${code})";
 
-  static m13(count) => "标签热度: ${count}";
+  static m13(num) => "${num}秒前";
 
-  static m14(week) => "第 ${week} 周";
+  static m14(count) => "标签热度: ${count}";
 
-  static m15(name) => "欢迎你，${name}";
+  static m15(week) => "第 ${week} 周";
+
+  static m16(name) => "欢迎你，${name}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -93,6 +95,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("错误"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("枫林校区"),
+    "filtering_by_tag" : m2,
     "folded" : MessageLookupByLibrary.simpleMessage("该内容已折叠，点击查看"),
     "forum" : MessageLookupByLibrary.simpleMessage("树洞"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("发布"),
@@ -100,7 +103,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fudan_daily" : MessageLookupByLibrary.simpleMessage("平安复旦打卡"),
     "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("应校方要求，自动打卡功能不再可用，敬请谅解。"),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[警告：该功能仅限DEBUG使用] 点击自动打卡"),
-    "fudan_daily_tick_countdown" : m2,
+    "fudan_daily_tick_countdown" : m3,
     "fudan_daily_tick_link" : MessageLookupByLibrary.simpleMessage("今日未打卡，点击打开打卡页面"),
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("今日已打卡"),
     "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("复旦生活码"),
@@ -109,7 +112,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_night" : MessageLookupByLibrary.simpleMessage("晚上好~"),
     "good_noon" : MessageLookupByLibrary.simpleMessage("快到中午啦"),
     "handan_campus" : MessageLookupByLibrary.simpleMessage("邯郸校区"),
-    "hour_ago" : m3,
+    "hour_ago" : m4,
     "i_see" : MessageLookupByLibrary.simpleMessage("好"),
     "image_tag" : MessageLookupByLibrary.simpleMessage("[图片]"),
     "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("江湾校区"),
@@ -120,7 +123,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "last_replied" : MessageLookupByLibrary.simpleMessage("最近回复"),
     "last_transaction" : MessageLookupByLibrary.simpleMessage("上次交易"),
     "late_night" : MessageLookupByLibrary.simpleMessage("披星戴月，不负韶华"),
-    "latest_reply" : m4,
+    "latest_reply" : m5,
     "loading" : MessageLookupByLibrary.simpleMessage("加载中..."),
     "loading_bbs_secure_connection" : MessageLookupByLibrary.simpleMessage("正在进行服务器安全性检查，请稍等..."),
     "loading_qr_code" : MessageLookupByLibrary.simpleMessage("正在加载复活码...\n可能需要5~10秒，取决于复旦服务器。"),
@@ -138,12 +141,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "logout_question_prompt" : MessageLookupByLibrary.simpleMessage("所有存储在本地的数据将被删除。"),
     "logout_question_prompt_title" : MessageLookupByLibrary.simpleMessage("确定要退出登录吗？"),
     "logout_subtitle" : MessageLookupByLibrary.simpleMessage("并删除此设备上的所有数据"),
-    "minute_ago" : m5,
+    "minute_ago" : m6,
     "moment_ago" : MessageLookupByLibrary.simpleMessage("刚刚"),
     "morning" : MessageLookupByLibrary.simpleMessage("上午"),
-    "most_least_crowded_canteen" : m6,
+    "most_least_crowded_canteen" : m7,
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
-    "next_course_is" : m7,
+    "next_course_is" : m8,
     "next_course_none" : MessageLookupByLibrary.simpleMessage("今日的课程已全部结束"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[无法显示此类型的消息]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("开源软件许可协议"),
@@ -151,14 +154,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("隐私政策"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目页面"),
-    "reason_report_post" : m8,
-    "reply_failed" : m9,
-    "reply_to" : m10,
+    "reason_report_post" : m9,
+    "reply_failed" : m10,
+    "reply_to" : m11,
     "report" : MessageLookupByLibrary.simpleMessage("举报"),
-    "report_failed" : m11,
+    "report_failed" : m12,
     "report_success" : MessageLookupByLibrary.simpleMessage("举报成功，感谢您为维护良好社区环境所作出的贡献。"),
     "search_result" : MessageLookupByLibrary.simpleMessage("搜索结果"),
-    "second_ago" : m12,
+    "second_ago" : m13,
     "select_campus" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "select_tags" : MessageLookupByLibrary.simpleMessage("选择标签"),
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
@@ -166,7 +169,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("导出为ICS"),
     "sort_order" : MessageLookupByLibrary.simpleMessage("排序方式"),
     "submit" : MessageLookupByLibrary.simpleMessage("发送"),
-    "tag_count" : m13,
+    "tag_count" : m14,
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("最空闲"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("最拥挤"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),
@@ -184,8 +187,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("上传图片失败，请检查网络连接"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
     "weak_password" : MessageLookupByLibrary.simpleMessage("登录失败，未知错误\n请注意：目前旦兮不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
-    "week" : m14,
-    "welcome" : m15,
+    "week" : m15,
+    "welcome" : m16,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }

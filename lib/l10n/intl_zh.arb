@@ -116,6 +116,7 @@
     "add_new_tag": "增加新的标签",
     "search_result": "搜索结果",
     "tag_count":"标签热度: {count}",
+    "filtering_by_tag": "已按照标签\"{tag}\"筛选，下拉刷新以回到时间线",
 
     "classroom": "教室",
     "morning": "上午",
