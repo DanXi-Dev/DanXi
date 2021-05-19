@@ -38,7 +38,7 @@ class FudanDailyFeature extends Feature {
   PersonInfo _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
   String _subTitle;
-  bool _hasTicked;
+  bool _hasTicked = true;
   SharedPreferences _preferences;
 
   //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
@@ -51,13 +51,7 @@ class FudanDailyFeature extends Feature {
 
       if (ticked) {
         _subTitle = S.of(context).fudan_daily_ticked;
-        //_countdownRemainingTime = -2;
-      } /*else if (shouldAutomaticallyTickToday) {
-        _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
-        notifyUpdate();
-        startCountdown();
-      }*/
-      else {
+      } else {
         if (SettingsProvider.of(_preferences).debugMode)
           _subTitle = S.of(context).fudan_daily_tick;
         else

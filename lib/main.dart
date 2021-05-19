@@ -131,7 +131,7 @@ class DanxiApp extends StatelessWidget {
     changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
+      initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -497,118 +497,125 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         body: Container(),
       );
     } else {
-      return PlatformScaffold(
-        iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
-        iosContentPadding: _subpage[_pageIndex.value].needPadding,
-        appBar: PlatformAppBar(
-          cupertino: (_, __) => CupertinoNavigationBarData(
-            title: MediaQuery(
-              data: MediaQueryData(
-                  textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-              child: TopController(
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: _pageIndex),
+          ChangeNotifierProvider.value(value: _connectStatus),
+          ChangeNotifierProvider.value(value: _personInfo),
+          Provider.value(value: _preferences),
+        ],
+        child: PlatformScaffold(
+          iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
+          iosContentPadding: _subpage[_pageIndex.value].needPadding,
+          appBar: PlatformAppBar(
+            cupertino: (_, __) => CupertinoNavigationBarData(
+              title: MediaQuery(
+                data: MediaQueryData(
+                    textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                child: TopController(
+                  child: Text(
+                    S.of(context).app_name,
+                  ),
+                  onDoubleTap: () => ScrollToTopEvent().fire(),
+                ),
+              ),
+            ),
+            material: (_, __) => MaterialAppBarData(
+              title: TopController(
                 child: Text(
                   S.of(context).app_name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 onDoubleTap: () => ScrollToTopEvent().fire(),
               ),
             ),
-          ),
-          material: (_, __) => MaterialAppBarData(
-            title: TopController(
-              child: Text(
-                S.of(context).app_name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+            leading: PlatformIconButton(
+              material: (_, __) => MaterialIconButtonData(
+                  tooltip:
+                      _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
+                          context)),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                  _subpageLeadingActionButtonIconBuilders[_pageIndex.value](
+                      context)),
+              onPressed: _onPressLeadingActionButton,
+            ),
+            trailingActions: [
+              PlatformIconButton(
+                material: (_, __) => MaterialIconButtonData(
+                    tooltip: _subpageRightsecondActionButtonTextBuilders[
+                        _pageIndex.value](context)),
+                padding: EdgeInsets.zero,
+                icon: Icon(_subpageRightsecondActionButtonIconBuilders[
+                    _pageIndex.value](context)),
+                onPressed: _onPressRightsecondActionButton,
               ),
-              onDoubleTap: () => ScrollToTopEvent().fire(),
-            ),
-          ),
-          leading: PlatformIconButton(
-            material: (_, __) => MaterialIconButtonData(
-                tooltip:
-                    _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
+              PlatformIconButton(
+                material: (_, __) => MaterialIconButtonData(
+                    tooltip: _subpageRightmostActionButtonTextBuilders[
+                        _pageIndex.value](context)),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                    _subpageRightmostActionButtonIconBuilders[_pageIndex.value](
                         context)),
-            padding: EdgeInsets.zero,
-            icon: Icon(
-                _subpageLeadingActionButtonIconBuilders[_pageIndex.value](
-                    context)),
-            onPressed: _onPressLeadingActionButton,
+                onPressed: _onPressRightmostActionButton,
+              ),
+            ],
           ),
-          trailingActions: [
-            PlatformIconButton(
-              material: (_, __) => MaterialIconButtonData(
-                  tooltip: _subpageRightsecondActionButtonTextBuilders[
-                      _pageIndex.value](context)),
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                  _subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-              onPressed: _onPressRightsecondActionButton,
-            ),
-            PlatformIconButton(
-              material: (_, __) => MaterialIconButtonData(
-                  tooltip: _subpageRightmostActionButtonTextBuilders[
-                      _pageIndex.value](context)),
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                  _subpageRightmostActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-              onPressed: _onPressRightmostActionButton,
-            ),
-          ],
-        ),
-        body: MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: _pageIndex),
-            ChangeNotifierProvider.value(value: _connectStatus),
-            ChangeNotifierProvider.value(value: _personInfo),
-            Provider.value(value: _preferences),
-          ],
-          child: IndexedStack(index: _pageIndex.value, children: _subpage),
-        ),
-        bottomNavBar: PlatformNavBar(
-          items: [
-            BottomNavigationBarItem(
-              //backgroundColor: Colors.purple,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.dashboard)
-                  : Icon(SFSymbols.square_stack_3d_up_fill),
-              label: S.of(context).dashboard,
-            ),
-            BottomNavigationBarItem(
-              //backgroundColor: Colors.indigo,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.forum)
-                  : Icon(SFSymbols.text_bubble),
-              label: S.of(context).forum,
-            ),
-            BottomNavigationBarItem(
-              //backgroundColor: Colors.blue,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.calendar_today)
-                  : Icon(SFSymbols.calendar),
-              label: S.of(context).timetable,
-            ),
-            BottomNavigationBarItem(
-              //backgroundColor: Theme.of(context).primaryColor,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.settings)
-                  : Icon(SFSymbols.gear_alt),
-              label: S.of(context).settings,
-            ),
-          ],
-          currentIndex: _pageIndex.value,
-          material: (_, __) => MaterialNavBarData(
-            type: BottomNavigationBarType.fixed,
-            selectedIconTheme:
-                BottomNavigationBarTheme.of(context).selectedIconTheme,
-            unselectedIconTheme:
-                BottomNavigationBarTheme.of(context).unselectedIconTheme,
+          body: IndexedStack(
+            index: _pageIndex.value,
+            children: _subpage,
           ),
-          itemChanged: (index) {
-            if (index != _pageIndex.value) {
-              setState(() => _pageIndex.value = index);
-            }
-          },
+
+          // 2021-5-19 @w568w:
+          // Override the builder to prevent the repeatedly built states.
+          // I don't know why it works...
+          cupertinoTabChildBuilder: (_, index) => _subpage[index],
+          bottomNavBar: PlatformNavBar(
+            items: [
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.purple,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.dashboard)
+                    : Icon(SFSymbols.square_stack_3d_up_fill),
+                label: S.of(context).dashboard,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.indigo,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.forum)
+                    : Icon(SFSymbols.text_bubble),
+                label: S.of(context).forum,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.blue,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.calendar_today)
+                    : Icon(SFSymbols.calendar),
+                label: S.of(context).timetable,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Theme.of(context).primaryColor,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.settings)
+                    : Icon(SFSymbols.gear_alt),
+                label: S.of(context).settings,
+              ),
+            ],
+            currentIndex: _pageIndex.value,
+            material: (_, __) => MaterialNavBarData(
+              type: BottomNavigationBarType.fixed,
+              selectedIconTheme:
+                  BottomNavigationBarTheme.of(context).selectedIconTheme,
+              unselectedIconTheme:
+                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
+            ),
+            itemChanged: (index) {
+              if (index != _pageIndex.value) {
+                setState(() => _pageIndex.value = index);
+              }
+            },
+          ),
         ),
       );
     }
