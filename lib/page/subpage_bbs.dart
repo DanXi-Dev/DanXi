@@ -53,9 +53,9 @@ String renderText(String html, String imagePlaceholder) {
   return soup.get_text();
 }
 
-/// Turn tags into Widgets
 const KEY_NO_TAG = "默认";
 
+/// Turn tags into Widgets
 Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
   if (e == null || e.tag == null) return Container();
   List<Widget> _tags = [];
@@ -142,6 +142,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
         onSubmitted: (value) {
+          if (value.trim() == "") return;
           Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
             "post": PostRepository.getInstance().loadSearchResults(value)
           });

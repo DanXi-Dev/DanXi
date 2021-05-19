@@ -125,6 +125,14 @@ class FudanDailyFeature extends Feature {
   @override
   String get subTitle => _subTitle;
 
+  @override
+  Widget get customSubtitle => _hasTicked
+      ? null
+      : Text(
+          S.of(context).fudan_daily_tick_link,
+          style: TextStyle(color: Colors.red),
+        );
+
   //@override
   //String get tertiaryTitle => S.of(context).fudan_daily_disabled_notice;
 
