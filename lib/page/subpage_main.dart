@@ -46,9 +46,7 @@ class HomeSubpage extends PlatformSubpage {
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
-  HomeSubpage({Key key}) {
-    print("A HomeSubpage is created!");
-  }
+  HomeSubpage({Key key}) {}
 }
 
 class RefreshHomepageEvent {}
@@ -58,12 +56,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   @override
   void initState() {
-    print("initState on $hashCode");
     super.initState();
     initPlatformState();
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshHomepageEvent>().listen((_) {
-          print("Receive request to $hashCode");
           refreshSelf();
         }),
         hashCode);
@@ -85,7 +81,6 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   @override
   Widget build(BuildContext context) {
-    print("Build on $hashCode");
     return RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.mediumImpact();

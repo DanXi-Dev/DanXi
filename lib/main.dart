@@ -301,10 +301,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ));
   }
 
+  DateTime _lastRefreshTime;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // After the app returns from the background
+        // Refresh the homepage if it hasn't been refreshed for 30 minutes
+        // To keep the data up-to-date.
+        if (DateTime.now()
+                .difference(_lastRefreshTime)
+                .compareTo(Duration(minutes: 30)) >
+            0) {
+          _lastRefreshTime = DateTime.now();
+          RefreshHomepageEvent().fire();
+        }
+        break;
+      case AppLifecycleState.inactive:
+        // Ignored
+        break;
+      case AppLifecycleState.paused:
+        // Ignored
+        break;
+      case AppLifecycleState.detached:
+        // Ignored
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    print("initState on Main");
     // Init for firebase services.
     FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
@@ -480,6 +508,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    _lastRefreshTime = DateTime.now();
     if (_personInfo.value == null) {
       // Show an empty container if no person info is set
       return PlatformScaffold(
