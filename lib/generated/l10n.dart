@@ -615,6 +615,36 @@ class S {
     );
   }
 
+  /// `Acknowledgements`
+  String get acknowledgements {
+    return Intl.message(
+      'Acknowledgements',
+      name: 'acknowledgements',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We would like to acknowledge `
+  String get acknowledgements_1 {
+    return Intl.message(
+      'We would like to acknowledge ',
+      name: 'acknowledgements_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ` for designing the icon of this app.`
+  String get acknowledgements_2 {
+    return Intl.message(
+      ' for designing the icon of this app.',
+      name: 'acknowledgements_2',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(
@@ -1490,6 +1520,26 @@ class S {
     return Intl.message(
       'assets/graphics/hasbai.jpeg',
       name: 'dev_image_url_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ivan Fei`
+  String get acknowledgement_name_1 {
+    return Intl.message(
+      'Ivan Fei',
+      name: 'acknowledgement_name_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://github.com/ivanfei-1`
+  String get acknowledgement_link_1 {
+    return Intl.message(
+      'https://github.com/ivanfei-1',
+      name: 'acknowledgement_link_1',
       desc: '',
       args: [],
     );

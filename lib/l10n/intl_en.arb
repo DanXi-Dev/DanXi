@@ -58,6 +58,9 @@
     "material": "[WARNING: DEBUG FEATURE] Material",
     "cupertino": "[WARNING: DEBUG FEATURE] Cupertino",
     "app_feedback": "[Feedback]",
+    "acknowledgements": "Acknowledgements",
+    "acknowledgements_1": "We would like to acknowledge ",
+    "acknowledgements_2": " for designing the icon of this app.",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",
@@ -154,6 +157,8 @@
     "dev_image_url_2": "assets/graphics/kavinzhao.jpeg",
     "dev_image_url_3": "assets/graphics/kyln24.jpeg",
     "dev_image_url_4": "assets/graphics/hasbai.jpeg",
+    "acknowledgement_name_1": "Ivan Fei",
+    "acknowledgement_link_1": "https:\/\/github.com\/ivanfei-1",
 
     "feedback_email": "danxi_dev@protonmail.com",
     "privacy_policy_url" : "https://danxi-dev.github.io/privacy",
