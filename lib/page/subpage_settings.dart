@@ -355,18 +355,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                               .of(context)
                                               .terms_and_conditions_content,
                                         ),
-                                        // TextSpan(
-                                        //     style: linkText,
-                                        //     text: S.of(context).terms_and_conditions,
-                                        //     recognizer: TapGestureRecognizer()
-                                        //       ..onTap = () async {
-                                        //         await launch(
-                                        //             S.of(context).terms_and_conditions_url);
-                                        //       }),
-                                        // TextSpan(
-                                        //   style: defaultText,
-                                        //   text: S.of(context).and,
-                                        // ),
                                         TextSpan(
                                             style: linkText,
                                             text: S.of(context).privacy_policy,
@@ -404,6 +392,48 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                       const SizedBox(
                                         height: 16,
                                       ),
+
+                                      //Acknowledgement
+                                      Text(
+                                        S.of(context).acknowledgements,
+                                        textScaleFactor: 1.1,
+                                      ),
+                                      Divider(
+                                        color: _originalDividerColor,
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      RichText(
+                                          text: TextSpan(children: [
+                                        TextSpan(
+                                          style: defaultText,
+                                          text:
+                                              S.of(context).acknowledgements_1,
+                                        ),
+                                        TextSpan(
+                                            style: linkText,
+                                            text: S
+                                                .of(context)
+                                                .acknowledgement_name_1,
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () async {
+                                                await launch(S
+                                                    .of(context)
+                                                    .acknowledgement_link_1);
+                                              }),
+                                        TextSpan(
+                                          style: defaultText,
+                                          text:
+                                              S.of(context).acknowledgements_2,
+                                        ),
+                                      ])),
+
+                                      const SizedBox(
+                                        height: 16,
+                                      ),
+
+                                      // Authors
                                       Text(
                                         S.of(context).authors,
                                         textScaleFactor: 1.1,

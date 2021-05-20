@@ -57,6 +57,11 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About This App"),
     "account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
+    "acknowledgement_link_1" : MessageLookupByLibrary.simpleMessage("https://github.com/ivanfei-1"),
+    "acknowledgement_name_1" : MessageLookupByLibrary.simpleMessage("Ivan Fei"),
+    "acknowledgements" : MessageLookupByLibrary.simpleMessage("Acknowledgements"),
+    "acknowledgements_1" : MessageLookupByLibrary.simpleMessage("We would like to acknowledge "),
+    "acknowledgements_2" : MessageLookupByLibrary.simpleMessage(" for designing the icon of this app."),
     "add_new_tag" : MessageLookupByLibrary.simpleMessage("Add new tag"),
     "afternoon" : MessageLookupByLibrary.simpleMessage("Afternoon"),
     "and" : MessageLookupByLibrary.simpleMessage(" and "),
