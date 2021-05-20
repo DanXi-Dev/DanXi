@@ -103,8 +103,18 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                           PostTag(value, Constant.randomColor, 0),
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
-                            title: Text(tag.name),
-                            subtitle: Text(S.of(context).tag_count(tag.count)),
+                            title: Text(
+                              tag.name,
+                              style: TextStyle(
+                                  color:
+                                      Constant.getColorFromString(tag.color)),
+                            ),
+                            subtitle: Text(
+                              S.of(context).tag_count(tag.count),
+                              style: TextStyle(
+                                  color:
+                                      Constant.getColorFromString(tag.color)),
+                            ),
                             additionWidget: Chip(
                               avatar: Icon(
                                 Icons.add_circle,
@@ -121,9 +131,20 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                           ),
                       configureChip: (lang) => ChipConfiguration(
                             label: Text(lang.name),
-                            backgroundColor: Theme.of(context).accentColor,
-                            labelStyle: TextStyle(color: Colors.white),
-                            deleteIconColor: Colors.white,
+                            backgroundColor:
+                                Constant.getColorFromString(lang.color),
+                            labelStyle: TextStyle(
+                                color: Constant.getColorFromString(lang.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white),
+                            deleteIconColor:
+                                Constant.getColorFromString(lang.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white,
                           ),
                       onChanged: () {}),
                 ),
@@ -204,7 +225,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                   loadingText: S.of(context).uploading_image, context: context);
               return await PostRepository.getInstance().uploadImage(file).then(
                   (value) {
-                    //"showAnim: true" makes it crash. Don't know the reason.
+                //"showAnim: true" makes it crash. Don't know the reason.
                 progressDialog.dismiss(showAnim: false);
                 return value;
               }, onError: (e) {
