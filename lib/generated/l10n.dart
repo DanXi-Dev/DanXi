@@ -325,6 +325,16 @@ class S {
     );
   }
 
+  /// `Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.`
+  String get location_permission_denied_promot {
+    return Intl.message(
+      'Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.',
+      name: 'location_permission_denied_promot',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Empty Classrooms`
   String get empty_classrooms {
     return Intl.message(

@@ -30,6 +30,7 @@
     "tick_issue_1":"打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用旦夕，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦夕即可妥善处理此情况。",
     "login_issue_1":"登录失败，旦夕无法完成 UIS 登录。\n出现此错误，很可能是由于您连续多次登录失败所致。\n您需要使用浏览器手动完成一次登录，从下一次登录开始，旦夕即可妥善处理此情况。",
     "login_issue_1_action":"打开UIS登录页面",
+    "location_permission_denied_promot": "位置信息不可用，您将无法在app中打卡平安复旦。如果希望重新授予定位权限，请在设置中更改定位服务授权。",
 
     "empty_classrooms": "空教室",
     "settings": "设置",
@@ -58,8 +59,8 @@
     "theme": "主题",
     "app_feedback": "【反馈】",
     "acknowledgements": "致谢",
-    "acknowledgements_1": "我们非常感谢",
-    "acknowledgements_2": "为本app设计图标。",
+    "acknowledgements_1": "我们想要感谢 ",
+    "acknowledgements_2": " 为本app设计图标",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",

@@ -192,12 +192,18 @@ class FudanDailyFeature extends Feature {
         if (SettingsProvider.of(_preferences).debugMode)
           tickFudanDaily();
         else {
-          Permission.locationWhenInUse.request();
-          // TODO: Handle user denial
+          if (PlatformX.isMobile) {
+            // Request Location Permission
+            if (await Permission.locationWhenInUse.request() !=
+                PermissionStatus.granted) {
+              Noticing.showNotice(
+                  context, S.of(context).location_permission_denied_promot);
+              return;
+            }
+          }
           BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
               FudanDailyRepository.getInstance().cookieJar);
         }
-
         break;
       case ConnectionStatus.FAILED:
         refreshData();

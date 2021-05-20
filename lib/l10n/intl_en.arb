@@ -28,6 +28,7 @@
     "tick_issue_1":"Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.",
     "login_issue_1":"Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually.",
     "login_issue_1_action":"Open UIS Login Page",
+    "location_permission_denied_promot": "Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.",
 
     "empty_classrooms": "Empty Classrooms",
     "settings": "Settings",

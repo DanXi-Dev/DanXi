@@ -403,9 +403,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                       Divider(
                                         color: _originalDividerColor,
                                       ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
                                       RichText(
                                           text: TextSpan(children: [
                                         TextSpan(
