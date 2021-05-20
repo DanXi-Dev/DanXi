@@ -79,7 +79,7 @@ class TimeTable {
   factory TimeTable.fromHtml(DateTime startTime, String tablePageSource) {
     TimeTable newTable = new TimeTable()..startTime = startTime;
     RegExp courseMatcher =
-    RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
+        RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
     for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
       newTable.courses.add(Course.fromHtmlPart(matchedCourse.group(0)));
     }
@@ -111,7 +111,7 @@ class TimeTable {
 
   /// Convert the specific [week]'s timetable to [DayEvents], usually for a [ScheduleView].
   ///
-  /// If [compact], it will not add the days to [result] when no course is taken.
+  /// If [compact], it will not add the days to [result] on which no course takes place.
   List<DayEvents> toDayEvents(int week, {bool compact = true}) {
     Map<int, List<Event>> table = Map();
     List<DayEvents> result = [];
@@ -128,7 +128,8 @@ class TimeTable {
       if (!compact || table[i].isNotEmpty)
         result.add(DayEvents(
             day: DateFormat.E().format(kMonday.add(Duration(days: i))),
-            events: table[i]));
+            events: table[i],
+            weekday: i));
     }
     return result;
   }

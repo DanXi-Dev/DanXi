@@ -131,7 +131,6 @@ class DanxiApp extends StatelessWidget {
     changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
-      initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -270,6 +269,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  /// Deal with login issue described at [CaptchaNeededException].
+  _dealWithCaptchaNeededException() {
+    if (_isDialogShown) {
+      return;
+    }
+    _isDialogShown = true;
+    showPlatformDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => PlatformAlertDialog(
+              title: Text(S.of(context).fatal_error),
+              content: Text(S.of(context).login_issue_1),
+              actions: [
+                PlatformDialogAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () {
+                    _isDialogShown = false;
+                    Navigator.of(context).pop();
+                  },
+                ),
+                PlatformDialogAction(
+                  child: Text(S.of(context).login_issue_1_action),
+                  onPressed: () {
+                    _isDialogShown = false;
+                    Navigator.of(context).pop();
+                    launch(Constant.UIS_URL);
+                  },
+                ),
+              ],
+            ));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -278,7 +309,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
     _personInfo.addListener(() {
-      print("Person info changed!");
       _rebuildPage();
       refreshSelf();
     });
@@ -296,36 +326,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     };
 
     _captchaSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<CaptchaNeededException>().listen((_) {
-          // Deal with login issue described at [CaptchaNeededException].
-          if (!_isDialogShown) {
-            _isDialogShown = true;
-            showPlatformDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (_) => PlatformAlertDialog(
-                      title: Text(S.of(context).fatal_error),
-                      content: Text(S.of(context).login_issue_1),
-                      actions: [
-                        PlatformDialogAction(
-                          child: Text(S.of(context).cancel),
-                          onPressed: () {
-                            _isDialogShown = false;
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        PlatformDialogAction(
-                          child: Text(S.of(context).login_issue_1_action),
-                          onPressed: () {
-                            _isDialogShown = false;
-                            Navigator.of(context).pop();
-                            launch(Constant.UIS_URL);
-                          },
-                        ),
-                      ],
-                    ));
-          }
-        }),
+        Constant.eventBus
+            .on<CaptchaNeededException>()
+            .listen((_) => _dealWithCaptchaNeededException()),
         hashCode);
 
     // Load the latest announcement. Just ignore the network error.

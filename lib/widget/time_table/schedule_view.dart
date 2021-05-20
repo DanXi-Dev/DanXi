@@ -108,7 +108,7 @@ class _ScheduleViewState extends State<ScheduleView> {
 
     // Build day indicator & courses
     for (int day = 0; day < widget.laneEventsList.length; day++) {
-      int deltaDay = day -
+      int deltaDay = widget.laneEventsList[day].weekday -
           widget.today.weekday +
           (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));

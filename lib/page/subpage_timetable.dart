@@ -29,6 +29,7 @@ import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/widget/future_widget.dart';
+import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -181,6 +182,14 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemHeight: 140);
     _table = table;
     if (_showingTime == null) _showingTime = _table.now();
+    List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week);
+
+    // If the number of the days which have at least one lesson is less than 2,
+    // It will show every day of the week,
+    // in order to prevent the grid of [ScheduleView] becomes too large.
+    if (scheduleData.length <= 2) {
+      scheduleData = _table.toDayEvents(_showingTime.week, compact: false);
+    }
 
     return Column(children: [
       Row(
@@ -199,12 +208,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       ),
       Expanded(
           child: RefreshIndicator(
-        onRefresh: () async {
+            onRefresh: () async {
           HapticFeedback.mediumImpact();
           refreshSelf();
         },
-        child: ScheduleView(_table.toDayEvents(_showingTime.week), style,
-            _table.now(), _showingTime.week),
+        child:
+            ScheduleView(scheduleData, style, _table.now(), _showingTime.week),
       ))
     ]);
   }
