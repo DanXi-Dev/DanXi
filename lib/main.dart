@@ -18,7 +18,6 @@
 import 'dart:async';
 
 import 'package:catcher/catcher.dart';
-import 'package:catcher/model/platform_type.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/announcement.dart';
@@ -131,6 +130,7 @@ class DanxiApp extends StatelessWidget {
     changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
+      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(

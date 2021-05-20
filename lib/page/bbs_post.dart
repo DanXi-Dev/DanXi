@@ -82,7 +82,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   void refreshSelf() {
     if (mounted) {
-      // ignore: invalid_use_of_protected_member
       setState(() {
         _currentBBSPage = 1;
         _lastReplies = [];
@@ -156,7 +155,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           });
                       break;
                     case ConnectionState.done:
-                      _lastReplies.addAll(snapshot.data);
+                      // Prevent refreshing repeatedly
+                      if (_lastReplies.isEmpty ||
+                          snapshot.data.isEmpty ||
+                          _lastReplies.last.id != snapshot.data.last.id)
+                        _lastReplies.addAll(snapshot.data);
                       _isRefreshing = false;
                       if (snapshot.hasError) {
                         return _buildErrorWidget();

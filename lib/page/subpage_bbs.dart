@@ -142,7 +142,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
         onSubmitted: (value) {
-          if (value.trim() == "") return;
+          if (value.trim().isEmpty) return;
           Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
             "post": PostRepository.getInstance().loadSearchResults(value)
           });
