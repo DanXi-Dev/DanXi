@@ -23,8 +23,8 @@ import 'package:url_launcher/url_launcher.dart';
 class BrowserUtil {
   static InAppBrowserClassOptions options = InAppBrowserClassOptions(
       crossPlatform: InAppBrowserOptions(
-          hideUrlBar: PlatformX
-              .isAndroid), // TODO: No context here so can't use isMaterial
+          hideUrlBar:
+              PlatformX.isAndroid), // No context here so can't use isMaterial
       ios: IOSInAppBrowserOptions(
         presentationStyle: IOSUIModalPresentationStyle.POPOVER,
       ),
@@ -61,7 +61,18 @@ class BrowserUtil {
         });
       });
     });
-    InAppBrowser().openUrlRequest(
+    CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)), options: options);
+  }
+}
+
+class CustomInAppBrowser extends InAppBrowser {
+  @override
+  Future<GeolocationPermissionShowPromptResponse> androidOnGeolocationPermissionsShowPrompt(String origin) {
+    if (origin == '''https://zlapp.fudan.edu.cn/''') return Future.value(GeolocationPermissionShowPromptResponse(
+        origin: origin, allow: true, retain: true));
+    // Only give geolocation permission on PAFD site
+    return Future.value(GeolocationPermissionShowPromptResponse(
+        origin: origin, allow: false, retain: false));
   }
 }
