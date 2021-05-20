@@ -96,7 +96,9 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                           _allTags =
                               await PostRepository.getInstance().loadTags();
                         return _allTags
-                            .takeWhile((value) => value.name.contains(filter))
+                            .where((value) => value.name
+                                .toLowerCase()
+                                .contains(filter.toLowerCase()))
                             .toList();
                       },
                       additionCallback: (value) =>
