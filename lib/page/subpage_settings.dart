@@ -107,6 +107,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "package_info", LICENSE_BSD, "https://github.com/flutter/plugins"),
     LicenseItem(
         "path_provider", LICENSE_BSD, "https://github.com/flutter/plugins"),
+    LicenseItem("permission_handler", LICENSE_MIT,
+        "https://github.com/baseflowit/flutter-permission-handler"),
     LicenseItem(
         "provider", LICENSE_MIT, "https://github.com/rrousselGit/provider"),
     LicenseItem(

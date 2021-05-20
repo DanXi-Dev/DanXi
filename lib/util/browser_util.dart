@@ -25,8 +25,12 @@ class BrowserUtil {
       crossPlatform: InAppBrowserOptions(
           hideUrlBar: PlatformX
               .isAndroid), // TODO: No context here so can't use isMaterial
+      ios: IOSInAppBrowserOptions(
+        presentationStyle: IOSUIModalPresentationStyle.POPOVER,
+      ),
       inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(javaScriptEnabled: true)));
+        crossPlatform: InAppWebViewOptions(javaScriptEnabled: true),
+      ));
 
   static openUrl(String url, NonpersistentCookieJar cookieJar) {
     if (PlatformX.isDesktop) {

@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -190,9 +191,13 @@ class FudanDailyFeature extends Feature {
         }*/
         if (SettingsProvider.of(_preferences).debugMode)
           tickFudanDaily();
-        else
+        else {
+          Permission.locationWhenInUse.request();
+          // TODO: Handle user denial
           BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
               FudanDailyRepository.getInstance().cookieJar);
+        }
+
         break;
       case ConnectionStatus.FAILED:
         refreshData();
