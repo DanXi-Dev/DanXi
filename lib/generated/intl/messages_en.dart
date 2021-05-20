@@ -68,7 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "app_description" : MessageLookupByLibrary.simpleMessage("A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~"),
     "app_description_title" : MessageLookupByLibrary.simpleMessage("Description"),
     "app_feedback" : MessageLookupByLibrary.simpleMessage("[Feedback]"),
-    "app_name" : MessageLookupByLibrary.simpleMessage("Danxi"),
+    "app_name" : MessageLookupByLibrary.simpleMessage("DanXi"),
     "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering & Economics\nat Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),

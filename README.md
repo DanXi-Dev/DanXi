@@ -1,8 +1,10 @@
 中文版 [English Version](README_EN.md)
-# 旦兮
+# 旦夕
 ![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)  
   
-日月光华，旦复旦兮.  
+（原名旦兮）
+
+日月光华，旦复旦兮.
   
 可能是为 FDUer 准备的,最好的一站式服务 APP!  
 

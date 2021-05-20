@@ -18,7 +18,6 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
-import 'package:dan_xi/repository/fudan_daily_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
@@ -30,7 +29,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AAONoticesList extends StatefulWidget {
   final Map<String, dynamic> arguments;
