@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
@@ -191,7 +192,8 @@ class FudanDailyFeature extends Feature {
         if (SettingsProvider.of(_preferences).debugMode)
           tickFudanDaily();
         else
-          launch("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily");
+          BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
+              FudanDailyRepository.getInstance().cookieJar);
         break;
       case ConnectionStatus.FAILED:
         refreshData();
