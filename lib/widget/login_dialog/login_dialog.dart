@@ -20,6 +20,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
@@ -30,7 +31,6 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
 ///
@@ -171,7 +171,7 @@ class _LoginDialogState extends State<LoginDialog> {
             //     text: S.of(context).terms_and_conditions,
             //     recognizer: TapGestureRecognizer()
             //       ..onTap = () async {
-            //         await launch(
+            //         await BrowserUtil.openUrl(
             //             S.of(context).terms_and_conditions_url);
             //       }),
             // TextSpan(
@@ -183,7 +183,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 text: S.of(context).privacy_policy,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () async {
-                    await launch(S.of(context).privacy_policy_url);
+                    await BrowserUtil.openUrl(S.of(context).privacy_policy_url);
                   }),
             TextSpan(
               style: defaultText,

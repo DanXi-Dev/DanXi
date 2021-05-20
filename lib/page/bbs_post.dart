@@ -22,6 +22,7 @@ import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -38,7 +39,6 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -372,7 +372,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         : HtmlWidget(
                             e.content,
                             textStyle: TextStyle(fontSize: 16),
-                            onTapUrl: (url) => launch(url),
+                            onTapUrl: (url) => BrowserUtil.openUrl(url),
                           ),
                   ),
                 ],

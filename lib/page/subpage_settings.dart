@@ -25,6 +25,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -37,7 +38,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class SettingsSubpage extends PlatformSubpage {
@@ -362,7 +362,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                             text: S.of(context).privacy_policy,
                                             recognizer: TapGestureRecognizer()
                                               ..onTap = () async {
-                                                await launch(S
+                                                await BrowserUtil.openUrl(S
                                                     .of(context)
                                                     .privacy_policy_url);
                                               }),
@@ -417,7 +417,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                 .acknowledgement_name_1,
                                             recognizer: TapGestureRecognizer()
                                               ..onTap = () async {
-                                                await launch(S
+                                                await BrowserUtil.openUrl(S
                                                     .of(context)
                                                     .acknowledgement_link_1);
                                               }),
@@ -464,8 +464,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                             image: new AssetImage(S
                                                                 .of(context)
                                                                 .dev_image_url_1)))),
-                                                onTap: () => launch(
-                                                    S.of(context).dev_page_1),
+                                                onTap: () =>
+                                                    BrowserUtil.openUrl(S
+                                                        .of(context)
+                                                        .dev_page_1),
                                               ),
                                               const SizedBox(
                                                   height: _avatarNameSpacing),
@@ -493,8 +495,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                             image: new AssetImage(S
                                                                 .of(context)
                                                                 .dev_image_url_2)))),
-                                                onTap: () => launch(
-                                                    S.of(context).dev_page_2),
+                                                onTap: () =>
+                                                    BrowserUtil.openUrl(S
+                                                        .of(context)
+                                                        .dev_page_2),
                                               ),
                                               const SizedBox(
                                                   height: _avatarNameSpacing),
@@ -523,7 +527,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                                 .of(context)
                                                                 .dev_image_url_3)))),
                                                 onTap: () {
-                                                  launch(
+                                                  BrowserUtil.openUrl(
                                                       S.of(context).dev_page_3);
                                                 },
                                               ),
@@ -554,7 +558,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                                 .of(context)
                                                                 .dev_image_url_4)))),
                                                 onTap: () {
-                                                  launch(
+                                                  BrowserUtil.openUrl(
                                                       S.of(context).dev_page_4);
                                                 },
                                               ),
@@ -606,7 +610,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                   TextButton(
                                     child: Text(S.of(context).project_page),
                                     onPressed: () {
-                                      launch(S.of(context).project_url);
+                                      BrowserUtil.openUrl(
+                                          S.of(context).project_url);
                                     },
                                   ),
                                   const SizedBox(width: 8),

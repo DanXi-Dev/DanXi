@@ -46,7 +46,7 @@ class HomeSubpage extends PlatformSubpage {
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
-  HomeSubpage({Key key}) {}
+  HomeSubpage({Key key});
 }
 
 class RefreshHomepageEvent {}

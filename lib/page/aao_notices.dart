@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -117,7 +118,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
         title: Text(value.title),
         subtitle: Text(value.time),
         onTap: () => BrowserUtil.openUrl(
-            value.url, FudanAAORepository.getInstance().cookieJar),
+            value.url, CardRepository.getInstance().cookieJar),
       )));
     });
 

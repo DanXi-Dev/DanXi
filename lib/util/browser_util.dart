@@ -32,35 +32,37 @@ class BrowserUtil {
         crossPlatform: InAppWebViewOptions(javaScriptEnabled: true),
       ));
 
-  static openUrl(String url, NonpersistentCookieJar cookieJar) {
+  static openUrl(String url, [NonpersistentCookieJar cookieJar]) {
     if (PlatformX.isDesktop) {
       launch(url);
       return;
     }
-    cookieJar.hostCookies.forEach((host, value) {
-      value.forEach((path, value) {
-        value.forEach((name, cookie) {
-          CookieManager.instance().setCookie(
-              url: Uri.parse(url),
-              name: name,
-              value: cookie.cookie.value,
-              domain: cookie.cookie.domain,
-              isSecure: cookie.cookie.secure);
+    if (cookieJar != null) {
+      cookieJar.hostCookies.forEach((host, value) {
+        value.forEach((path, value) {
+          value.forEach((name, cookie) {
+            CookieManager.instance().setCookie(
+                url: Uri.parse(url),
+                name: name,
+                value: cookie.cookie.value,
+                domain: cookie.cookie.domain,
+                isSecure: cookie.cookie.secure);
+          });
         });
       });
-    });
-    cookieJar.domainCookies.forEach((host, value) {
-      value.forEach((path, value) {
-        value.forEach((name, cookie) {
-          CookieManager.instance().setCookie(
-              url: Uri.parse(url),
-              name: name,
-              value: cookie.cookie.value,
-              domain: cookie.cookie.domain,
-              isSecure: cookie.cookie.secure);
+      cookieJar.domainCookies.forEach((host, value) {
+        value.forEach((path, value) {
+          value.forEach((name, cookie) {
+            CookieManager.instance().setCookie(
+                url: Uri.parse(url),
+                name: name,
+                value: cookie.cookie.value,
+                domain: cookie.cookie.domain,
+                isSecure: cookie.cookie.secure);
+          });
         });
       });
-    });
+    }
     CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)), options: options);
   }
@@ -68,9 +70,11 @@ class BrowserUtil {
 
 class CustomInAppBrowser extends InAppBrowser {
   @override
-  Future<GeolocationPermissionShowPromptResponse> androidOnGeolocationPermissionsShowPrompt(String origin) {
-    if (origin == '''https://zlapp.fudan.edu.cn/''') return Future.value(GeolocationPermissionShowPromptResponse(
-        origin: origin, allow: true, retain: true));
+  Future<GeolocationPermissionShowPromptResponse>
+      androidOnGeolocationPermissionsShowPrompt(String origin) {
+    if (origin == '''https://zlapp.fudan.edu.cn/''')
+      return Future.value(GeolocationPermissionShowPromptResponse(
+          origin: origin, allow: true, retain: true));
     // Only give geolocation permission on PAFD site
     return Future.value(GeolocationPermissionShowPromptResponse(
         origin: origin, allow: false, retain: false));

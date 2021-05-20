@@ -24,12 +24,10 @@ class FlutterApp {
   static void exitApp() {
     if (PlatformX.isAndroid) {
       SystemNavigator.pop(animated: true);
-    }
-    else if (PlatformX.isIOS) {
+    } else if (PlatformX.isIOS) {
       const channel = const MethodChannel('appControl');
-      channel.invokeMethod('exit'); //TODO: WARNING This might not pass App Store Review
-    }
-    else {
+      channel.invokeMethod('exit');
+    } else {
       exit(0);
     }
   }

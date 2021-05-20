@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-
 class DataPlugin {
   static Future<String> get platformVersion async {
     return "";

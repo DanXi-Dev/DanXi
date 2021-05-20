@@ -39,6 +39,7 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
@@ -60,7 +61,6 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'generated/l10n.dart';
 
@@ -294,7 +294,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   onPressed: () {
                     _isDialogShown = false;
                     Navigator.of(context).pop();
-                    launch(Constant.UIS_URL);
+                    BrowserUtil.openUrl(Constant.UIS_URL);
                   },
                 ),
               ],

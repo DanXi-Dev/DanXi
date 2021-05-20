@@ -26,7 +26,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/round_chip.dart';
 import 'package:delta_markdown/delta_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

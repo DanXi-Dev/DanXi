@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
@@ -24,7 +25,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OpenSourceLicenseList extends StatefulWidget {
   /// 'items': A list of [LicenseItem] to display on the page
@@ -89,7 +89,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
             child: ListTile(
           title: Text(element.name),
           subtitle: Text(element.license.licenseName),
-          onTap: () => launch(element.url),
+          onTap: () => BrowserUtil.openUrl(element.url),
         )));
       });
     return widgets;
