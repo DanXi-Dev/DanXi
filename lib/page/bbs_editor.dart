@@ -26,6 +26,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/round_chip.dart';
 import 'package:delta_markdown/delta_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -111,11 +112,24 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                                   color:
                                       Constant.getColorFromString(tag.color)),
                             ),
-                            subtitle: Text(
-                              S.of(context).tag_count(tag.count),
-                              style: TextStyle(
-                                  color:
-                                      Constant.getColorFromString(tag.color)),
+                            subtitle: Row(
+                              children: [
+                                Icon(
+                                  SFSymbols.flame,
+                                  color: Constant.getColorFromString(tag.color),
+                                  size: 12,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  tag.count.toString(),
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Constant.getColorFromString(
+                                          tag.color)),
+                                ),
+                              ],
                             ),
                             additionWidget: Chip(
                               avatar: Icon(

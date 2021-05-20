@@ -34,6 +34,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -405,13 +407,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (_searchResult == null)
                   BBSEditor.createNewReply(context, _post.id, e.id)
                       .then((value) => refreshSelf());
-                else
-                  // TODO: Show some kind of loading dialog here
+                else {
+                  ProgressFuture progressDialog = showProgressDialog(
+                      loadingText: S.of(context).loading, context: context);
                   Navigator.of(context).pushNamed("/bbs/postDetail",
                       arguments: {
                         "post": await PostRepository.getInstance()
                             .loadSpecificPost(e.discussion)
                       });
+                  progressDialog.dismiss();
+                }
               },
             )),
       );

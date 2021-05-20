@@ -195,7 +195,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _sortOrderChangedSubscription.cancel();
   }
 
-  /// Login in and load all of the posts.
+  /// Log in and load all of the posts.
   Future<List<BBSPost>> loginAndLoadPost(
       PersonInfo info, SortOrder sortOrder) async {
     if (!PostRepository.getInstance().isUserInitialized)
