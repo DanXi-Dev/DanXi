@@ -33,7 +33,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class FudanDailyFeature extends Feature {
   PersonInfo _info;

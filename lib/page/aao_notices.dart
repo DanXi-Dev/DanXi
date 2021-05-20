@@ -18,6 +18,8 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -116,7 +118,8 @@ class _AAONoticesListState extends State<AAONoticesList> {
             : Icon(SFSymbols.info_circle_fill),
         title: Text(value.title),
         subtitle: Text(value.time),
-        onTap: () => launch(value.url),
+        onTap: () => BrowserUtil.openUrl(
+            value.url, FudanAAORepository.getInstance().cookieJar),
       )));
     });
 
