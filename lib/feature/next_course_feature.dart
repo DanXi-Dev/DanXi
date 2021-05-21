@@ -38,9 +38,13 @@ class NextCourseFeature extends Feature {
 
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
-    TimeTable timetable = await Retrier.runAsyncWithRetry(() async =>
-        await TimeTableRepository.getInstance()
-            .loadTimeTableLocally(context.personInfo));
+    TimeTable timetable = await Retrier.runAsyncWithRetry(() async {
+      // TODO: Sometimes the server returns a 500 error.
+      // Put a delay before retrying.
+      await Future.delayed(Duration(milliseconds: 100));
+      return await TimeTableRepository.getInstance()
+          .loadTimeTableLocally(context.personInfo);
+    });
     _data = getNextCourse(timetable);
     _status = ConnectionStatus.DONE;
     notifyUpdate();

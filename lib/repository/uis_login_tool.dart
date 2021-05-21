@@ -34,7 +34,7 @@ class UISLoginTool {
     ArgumentError.checkNotNull(dio);
     ArgumentError.checkNotNull(serviceUrl);
     if ((await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
-      Response res = await dio.get(serviceUrl,
+      Response res = await dio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
       if (res.statusCode == 302) {
         return null;
