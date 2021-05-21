@@ -43,7 +43,7 @@ class _WithScrollbarState extends State<WithScrollbar> {
               // interactive: PlatformX.isDesktop,
               child: widget.child,
             ),
-        cupertino: (_, __) => CustomCupertinoScrollbar(
+        cupertino: (_, __) => CupertinoScrollbar(
               controller: widget.controller,
               child: widget.child,
             ));

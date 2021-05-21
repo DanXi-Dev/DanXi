@@ -26,7 +26,6 @@ class BmobBatch {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userJson = prefs.get("user");
-    print(userJson);
     BmobUser bmobUser;
     if (userJson != null) {
       bmobUser = json.decode(userJson);
@@ -71,12 +70,6 @@ class BmobBatch {
       }
     }
     params["requests"] = list;
-    print(params.toString());
-
-    List responseData =
-        await BmobDio.getInstance().post(Bmob.BMOB_API_BATCH, data: params);
-
-    print(responseData.toString());
 
     return list;
   }

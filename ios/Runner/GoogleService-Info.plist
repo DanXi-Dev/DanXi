@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>859967910399-p8ts9j0fv80gcf9psnot42oq1uljptho.apps.googleusercontent.com</string>
+	<string>859967910399-0oqmbqoajlvqm5v2obmtur86l5a9uqe6.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.859967910399-p8ts9j0fv80gcf9psnot42oq1uljptho</string>
+	<string>com.googleusercontent.apps.859967910399-0oqmbqoajlvqm5v2obmtur86l5a9uqe6</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAX0xoaLj8VxiLYik_7vJObvfGGlqnAcC4</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>io.github.danxi-dev.danxi</string>
+	<string>io.github.danxi-dev.dan-xi</string>
 	<key>PROJECT_ID</key>
 	<string>danxi-e765c</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:859967910399:ios:814791911ad92e9c5a37ca</string>
+	<string>1:859967910399:ios:4de3f251c92a391b5a37ca</string>
 </dict>
 </plist>

@@ -172,7 +172,6 @@ class BmobQuery<T> {
       url = url + "where=" + json.encode(where);
     }
     Map map = await BmobDio.getInstance().get(url, data: getParams());
-    print(map);
     BmobResults bmobResults = BmobResults.fromJson(map);
     return bmobResults.count;
   }
@@ -349,7 +348,6 @@ class BmobQuery<T> {
     url = url + getStatistics();
     Map map = await BmobDio.getInstance().get(url, data: getParams());
     BmobResults bmobResults = BmobResults.fromJson(map);
-    print(bmobResults.results);
     return bmobResults.results;
   }
 

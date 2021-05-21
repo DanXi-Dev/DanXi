@@ -21,9 +21,6 @@
 		8A2CE70B261AA62700F08FC4 /* watchExtension.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8A2CE6EF261AA62600F08FC4 /* watchExtension.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8A4B6C8C26298CF600D16369 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8A2CE6F1261AA62600F08FC4 /* Interface.storyboard */; };
 		8A4B6CBC2629919B00D16369 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A4B6CBA2629919B00D16369 /* Localizable.strings */; };
-		8A4B6CD5262BDA1A00D16369 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8A4B6CD4262BDA1A00D16369 /* GoogleService-Info.plist */; };
-		8A4B6CD6262BDA1A00D16369 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8A4B6CD4262BDA1A00D16369 /* GoogleService-Info.plist */; };
-		8A4B6CD7262BDA1A00D16369 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8A4B6CD4262BDA1A00D16369 /* GoogleService-Info.plist */; };
 		8A71C052261AC81F00E05213 /* NSImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C04E261AC81F00E05213 /* NSImage+.swift */; };
 		8A71C053261AC81F00E05213 /* NSColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C04F261AC81F00E05213 /* NSColor+.swift */; };
 		8A71C054261AC81F00E05213 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C050261AC81F00E05213 /* UIImage+.swift */; };
@@ -58,6 +55,9 @@
 		8A71C095261AC85A00E05213 /* AnError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C087261AC85900E05213 /* AnError.swift */; };
 		8A71C096261AC85A00E05213 /* QRCodeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C088261AC85900E05213 /* QRCodeModel.swift */; };
 		8A71C097261AC85A00E05213 /* QRMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A71C089261AC85A00E05213 /* QRMode.swift */; };
+		8AAA75822657A6230053E836 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AAA75812657A6230053E836 /* GoogleService-Info.plist */; };
+		8AAA75832657A6230053E836 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AAA75812657A6230053E836 /* GoogleService-Info.plist */; };
+		8AAA75842657A6230053E836 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AAA75812657A6230053E836 /* GoogleService-Info.plist */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -138,7 +138,6 @@
 		8A2CE708261AA62700F08FC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8A4B6CBB2629919B00D16369 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8A4B6CBF262991B000D16369 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		8A4B6CD4262BDA1A00D16369 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8A71C04E261AC81F00E05213 /* NSImage+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSImage+.swift"; sourceTree = "<group>"; };
 		8A71C04F261AC81F00E05213 /* NSColor+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSColor+.swift"; sourceTree = "<group>"; };
 		8A71C050261AC81F00E05213 /* UIImage+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
@@ -175,6 +174,7 @@
 		8A71C087261AC85900E05213 /* AnError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnError.swift; sourceTree = "<group>"; };
 		8A71C088261AC85900E05213 /* QRCodeModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeModel.swift; sourceTree = "<group>"; };
 		8A71C089261AC85A00E05213 /* QRMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRMode.swift; sourceTree = "<group>"; };
+		8AAA75812657A6230053E836 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8AD96B9F261DAD0C0081F6F4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		8AD96BA0261DAD0C0081F6F4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		8AD96BA1261DAD0C0081F6F4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Interface.strings"; sourceTree = "<group>"; };
@@ -328,6 +328,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				8AAA75812657A6230053E836 /* GoogleService-Info.plist */,
 				1AA319AA25EE71BB00BF9D7C /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -337,7 +338,6 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
-				8A4B6CD4262BDA1A00D16369 /* GoogleService-Info.plist */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -457,7 +457,7 @@
 			files = (
 				8A2CE6F5261AA62700F08FC4 /* Assets.xcassets in Resources */,
 				8A2CE6F3261AA62600F08FC4 /* Interface.storyboard in Resources */,
-				8A4B6CD6262BDA1A00D16369 /* GoogleService-Info.plist in Resources */,
+				8AAA75832657A6230053E836 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -466,7 +466,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A4B6C8C26298CF600D16369 /* Interface.storyboard in Resources */,
-				8A4B6CD7262BDA1A00D16369 /* GoogleService-Info.plist in Resources */,
+				8AAA75842657A6230053E836 /* GoogleService-Info.plist in Resources */,
 				8A4B6CBC2629919B00D16369 /* Localizable.strings in Resources */,
 				8A2CE707261AA62700F08FC4 /* Assets.xcassets in Resources */,
 			);
@@ -478,7 +478,7 @@
 			files = (
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
-				8A4B6CD5262BDA1A00D16369 /* GoogleService-Info.plist in Resources */,
+				8AAA75822657A6230053E836 /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 			);

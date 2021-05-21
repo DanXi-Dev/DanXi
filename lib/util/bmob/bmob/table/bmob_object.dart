@@ -69,7 +69,6 @@ abstract class BmobObject {
   Future<BmobSaved> save() async {
     Map<String, dynamic> map = getParams();
     String params = getParamsJsonFromParamsMap(map);
-    print(params);
     String tableName = BmobUtils.getTableName(this);
     switch (tableName) {
       case "BmobInstallation":
@@ -92,7 +91,6 @@ abstract class BmobObject {
       throw bmobError;
     } else {
       String params = getParamsJsonFromParamsMap(map);
-      print(params);
       String tableName = BmobUtils.getTableName(this);
       Map responseData = await BmobDio.getInstance().put(
           Bmob.BMOB_API_CLASSES + tableName + Bmob.BMOB_API_SLASH + objectId,

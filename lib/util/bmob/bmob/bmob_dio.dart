@@ -54,7 +54,6 @@ class BmobDio {
     for (var i = 0; i < length; i++) {
       left = left + alphabet[Random().nextInt(alphabet.length)];
     }
-    print(left);
     return left;
   }
 
@@ -66,9 +65,7 @@ class BmobDio {
         nonceStrKey +
         data.toString() +
         Bmob.bmobSDKVersion;
-    print(origin);
     var md5 = generateMd5(origin);
-    print(md5);
     return md5;
   }
 
@@ -82,7 +79,6 @@ class BmobDio {
   ///获取时间戳 秒
   getSafeTimestamp() {
     int second = (new DateTime.now().millisecondsSinceEpoch) ~/ 1000;
-    print(second);
     return second.toString();
   }
 
