@@ -54,17 +54,17 @@ Thanks for your understanding and support! :)
 ## Flutter version that we're using
 ```shell script
 $ flutter --version
-Flutter 2.1.0-12.1.pre • channel dev • https://github.com/flutter/flutter.git
-Framework • revision 8264cb3e8a (3 weeks ago) • 2021-03-10 12:37:57 -0800
-Engine • revision 711ab3fda0
-Tools • Dart 2.13.0 (build 2.13.0-116.0.dev)
+Flutter 2.2.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision b22742018b (6 days ago) • 2021-05-14 19:12:57 -0700
+Engine • revision a9d88a4d18
+Tools • Dart 2.13.0
 ```
 ## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  
   
 To build this app, you need to [download Flutter SDK](https://flutter.dev/docs/get-started/install) and install it.    
   
-If you are building for `Windows`, you should also install and configure [`Visual Studio`](https://visualstudio.microsoft.com/downloads/).    
+If you are building for `Windows`, you should also [install and configure]((https://visualstudio.microsoft.com/downloads/)) `Visual Studio`.    
   
 If you are building for `Android`, you should also [install and configure](https://developer.android.com/studio)`Android Command Line Tools`.   
 

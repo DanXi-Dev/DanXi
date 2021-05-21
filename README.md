@@ -60,10 +60,10 @@
 ## 我们当前使用的 Flutter 编译版本
 ```shell script
 $ flutter --version
-Flutter 2.1.0-12.1.pre • channel dev • https://github.com/flutter/flutter.git
-Framework • revision 8264cb3e8a (3 weeks ago) • 2021-03-10 12:37:57 -0800
-Engine • revision 711ab3fda0
-Tools • Dart 2.13.0 (build 2.13.0-116.0.dev)
+Flutter 2.2.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision b22742018b (6 days ago) • 2021-05-14 19:12:57 -0700
+Engine • revision a9d88a4d18
+Tools • Dart 2.13.0
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
