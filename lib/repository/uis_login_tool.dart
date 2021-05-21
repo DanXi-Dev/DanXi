@@ -36,7 +36,6 @@ class UISLoginTool {
     if ((await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
       Response res = await dio.get(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-      print(res.statusCode);
       if (res.statusCode == 302) {
         return null;
       }

@@ -23,6 +23,7 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +38,9 @@ class NextCourseFeature extends Feature {
 
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
-    TimeTable timetable = await TimeTableRepository.getInstance()
-        .loadTimeTableLocally(context.personInfo);
+    TimeTable timetable = await Retrier.runAsyncWithRetry(() async =>
+        await TimeTableRepository.getInstance()
+            .loadTimeTableLocally(context.personInfo));
     _data = getNextCourse(timetable);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
