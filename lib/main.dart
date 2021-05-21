@@ -134,7 +134,8 @@ class DanxiApp extends StatelessWidget {
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
-          title: 'Danxi',
+          title: 'DanXi',
+          debugShowCheckedModeBanner: false,
           cupertino: (_, __) => CupertinoAppData(
               theme: CupertinoThemeData(
                   textTheme: CupertinoTextThemeData(
