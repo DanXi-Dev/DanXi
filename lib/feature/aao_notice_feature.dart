@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 class FudanAAONoticesFeature extends Feature {
   List<Notice> _initialData;
@@ -32,8 +33,8 @@ class FudanAAONoticesFeature extends Feature {
 
   Future<void> _loadNotices() async {
     _status = ConnectionStatus.CONNECTING;
-    _initialData = await FudanAAORepository.getInstance()
-        .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, 1);
+    _initialData = await FudanAAORepository.getInstance().getNotices(
+        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, 1, context.personInfo);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
@@ -87,8 +88,10 @@ class FudanAAONoticesFeature extends Feature {
   @override
   void onTap() {
     if (_initialData != null) {
-      Navigator.of(context).pushNamed("/notice/aao/list",
-          arguments: {"initialData": _initialData});
+      Navigator.of(context).pushNamed("/notice/aao/list", arguments: {
+        "initialData": _initialData,
+        "personInfo": context.personInfo
+      });
     } else {
       refreshData();
     }

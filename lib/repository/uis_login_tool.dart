@@ -26,13 +26,21 @@ class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
   static const String CREDENTIALS_INVALID = "用户名或者密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
-
+  /// Warning: if having logged in, return null.
   static Future<Response> loginUIS(Dio dio, String serviceUrl,
       NonpersistentCookieJar jar, PersonInfo info) async {
     ArgumentError.checkNotNull(info);
     ArgumentError.checkNotNull(jar);
     ArgumentError.checkNotNull(dio);
     ArgumentError.checkNotNull(serviceUrl);
+    if ((await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
+      Response res = await dio.get(serviceUrl,
+          options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+      print(res.statusCode);
+      if (res.statusCode == 302) {
+        return null;
+      }
+    }
     jar.deleteAll();
     Map<String, String> data = {};
     Response res = await dio.get(serviceUrl);

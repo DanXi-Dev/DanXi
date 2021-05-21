@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -45,11 +46,13 @@ class _AAONoticesListState extends State<AAONoticesList> {
   int _page = 1;
   ScrollController _controller;
   ConnectionStatus _status = ConnectionStatus.NONE;
+  PersonInfo _info;
 
   @override
   void initState() {
     super.initState();
     _data = widget.arguments['initialData'];
+    _info = widget.arguments['personInfo'];
   }
 
   @override
@@ -68,8 +71,8 @@ class _AAONoticesListState extends State<AAONoticesList> {
 
   Future<void> _loadNextPage() async {
     _status = ConnectionStatus.CONNECTING;
-    List<Notice> newPage = await FudanAAORepository.getInstance()
-        .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, _page + 1);
+    List<Notice> newPage = await FudanAAORepository.getInstance().getNotices(
+        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, _page + 1, _info);
     if (newPage != null) {
       setState(() {
         _page++;
@@ -112,13 +115,13 @@ class _AAONoticesListState extends State<AAONoticesList> {
     _data.forEach((Notice value) {
       widgets.add(ThemedMaterial(
           child: ListTile(
-        leading: PlatformX.isAndroid
+            leading: PlatformX.isAndroid
             ? Icon(Icons.info)
             : Icon(SFSymbols.info_circle_fill),
         title: Text(value.title),
         subtitle: Text(value.time),
         onTap: () => BrowserUtil.openUrl(
-            value.url, CardRepository.getInstance().cookieJar),
+            value.url, FudanAAORepository.getInstance().cookieJar),
       )));
     });
 

@@ -15,11 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
 class FudanAAORepository extends BaseRepositoryWithDio {
+  static const String _LOGIN_URL =
+      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Fa7%2F97%2Fc9397a305047%2Fpage.psp";
+
   FudanAAORepository._() {
     initRepository();
   }
@@ -34,7 +39,9 @@ class FudanAAORepository extends BaseRepositoryWithDio {
 
   factory FudanAAORepository.getInstance() => _instance;
 
-  Future<List<Notice>> getNotices(String type, int page) async {
+  Future<List<Notice>> getNotices(
+      String type, int page, PersonInfo info) async {
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info);
     List<Notice> notices = [];
     Response response = await dio.get(_listUrl(type, page));
     Beautifulsoup soup = Beautifulsoup(response.data.toString());
