@@ -195,10 +195,10 @@ class S {
     );
   }
 
-  /// `COVID-19 Safety Check-In`
+  /// `Safety Fudan Check-In`
   String get fudan_daily {
     return Intl.message(
-      'COVID-19 Safety Check-In',
+      'Safety Fudan Check-In',
       name: 'fudan_daily',
       desc: '',
       args: [],

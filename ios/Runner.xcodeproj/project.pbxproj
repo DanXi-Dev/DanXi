@@ -759,8 +759,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -768,13 +768,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Profile;
@@ -791,15 +791,15 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IBSC_MODULE = watchExtension_Extension;
 				INFOPLIST_FILE = watchExtension/Info.plist;
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -824,14 +824,14 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IBSC_MODULE = watchExtension_Extension;
 				INFOPLIST_FILE = watchExtension/Info.plist;
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -854,14 +854,14 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				IBSC_MODULE = watchExtension_Extension;
 				INFOPLIST_FILE = watchExtension/Info.plist;
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -882,8 +882,8 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "watchExtension Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -891,10 +891,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios.watchkitapp.watchExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp.watchExtension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -916,8 +916,8 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "watchExtension Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -925,9 +925,9 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios.watchkitapp.watchExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp.watchExtension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -948,8 +948,8 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "watchExtension Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -957,9 +957,9 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios.watchkitapp.watchExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp.watchExtension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1090,9 +1090,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1100,14 +1100,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1119,8 +1119,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = 498KM7R3U5;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = QZ9KCS2T78;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1128,13 +1128,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.danxi-ios";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

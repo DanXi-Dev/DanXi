@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>为平安复旦打卡提供位置信息</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -15,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>dan_xi</string>
+	<string>dan-xi</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -40,6 +38,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>为上传图片至树洞</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>为平安复旦打卡提供位置信息</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>为上传图片至树洞</string>
 	<key>UILaunchStoryboardName</key>

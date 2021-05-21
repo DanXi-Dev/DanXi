@@ -120,7 +120,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
     "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
     "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
-    "fudan_daily" : MessageLookupByLibrary.simpleMessage("COVID-19 Safety Check-In"),
+    "fudan_daily" : MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
     "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("In response to request from the University, Auto-CheckIn is no longer available."),
     "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Tap to check in"),
     "fudan_daily_tick_countdown" : m3,
