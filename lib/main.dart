@@ -510,6 +510,50 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     _lastRefreshTime = DateTime.now();
+    // Build action buttons.
+    PlatformIconButton leadingButton;
+    List<PlatformIconButton> trailingButtons = [];
+    if (_subpageLeadingActionButtonIconBuilders[_pageIndex.value](context) !=
+        null) {
+      leadingButton = PlatformIconButton(
+        material: (_, __) => MaterialIconButtonData(
+            tooltip: _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
+                context)),
+        padding: EdgeInsets.zero,
+        icon: Icon(
+            _subpageLeadingActionButtonIconBuilders[_pageIndex.value](context)),
+        onPressed: _onPressLeadingActionButton,
+      );
+    }
+    if (_subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
+            context) !=
+        null) {
+      trailingButtons.add(PlatformIconButton(
+        material: (_, __) => MaterialIconButtonData(
+            tooltip:
+                _subpageRightsecondActionButtonTextBuilders[_pageIndex.value](
+                    context)),
+        padding: EdgeInsets.zero,
+        icon: Icon(
+            _subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
+                context)),
+        onPressed: _onPressRightsecondActionButton,
+      ));
+    }
+    if (_subpageRightmostActionButtonIconBuilders[_pageIndex.value](context) !=
+        null) {
+      trailingButtons.add(PlatformIconButton(
+        material: (_, __) => MaterialIconButtonData(
+            tooltip:
+                _subpageRightmostActionButtonTextBuilders[_pageIndex.value](
+                    context)),
+        padding: EdgeInsets.zero,
+        icon: Icon(_subpageRightmostActionButtonIconBuilders[_pageIndex.value](
+            context)),
+        onPressed: _onPressRightmostActionButton,
+      ));
+    }
+
     if (_personInfo.value == null) {
       // Show an empty container if no person info is set
       return PlatformScaffold(
@@ -517,15 +561,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         iosContentPadding: true,
         appBar: PlatformAppBar(
           title: Text(S.of(context).app_name),
-          trailingActions: [
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                  _subpageRightmostActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-              onPressed: _onPressRightmostActionButton,
-            )
-          ],
+          trailingActions: trailingButtons,
         ),
         body: Container(),
       );
@@ -562,38 +598,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 onDoubleTap: () => ScrollToTopEvent().fire(),
               ),
             ),
-            leading: PlatformIconButton(
-              material: (_, __) => MaterialIconButtonData(
-                  tooltip:
-                      _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
-                          context)),
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                  _subpageLeadingActionButtonIconBuilders[_pageIndex.value](
-                      context)),
-              onPressed: _onPressLeadingActionButton,
-            ),
-            trailingActions: [
-              PlatformIconButton(
-                material: (_, __) => MaterialIconButtonData(
-                    tooltip: _subpageRightsecondActionButtonTextBuilders[
-                        _pageIndex.value](context)),
-                padding: EdgeInsets.zero,
-                icon: Icon(_subpageRightsecondActionButtonIconBuilders[
-                    _pageIndex.value](context)),
-                onPressed: _onPressRightsecondActionButton,
-              ),
-              PlatformIconButton(
-                material: (_, __) => MaterialIconButtonData(
-                    tooltip: _subpageRightmostActionButtonTextBuilders[
-                        _pageIndex.value](context)),
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                    _subpageRightmostActionButtonIconBuilders[_pageIndex.value](
-                        context)),
-                onPressed: _onPressRightmostActionButton,
-              ),
-            ],
+            leading: leadingButton,
+            trailingActions: trailingButtons,
           ),
           body: IndexedStack(
             index: _pageIndex.value,
