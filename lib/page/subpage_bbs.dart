@@ -223,7 +223,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         .loadTagFilteredPosts(_tagFilter, _sortOrder),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
-                  if (_lastSnapshotData.data.isEmpty ||
+                  if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
                       snapshot.data.isEmpty ||
                       _lastSnapshotData.data.last.id != snapshot.data.last.id)
                     snapshot.data.forEach((element) {
