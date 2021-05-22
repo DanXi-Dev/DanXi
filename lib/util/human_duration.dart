@@ -33,7 +33,7 @@ class HumanDuration {
     } else if (duration.inDays <= 30) {
       return S.of(context).day_ago(duration.inDays);
     } else {
-      return DateFormat("yyyy/mm/dd").format(dateTime);
+      return DateFormat("yyyy/MM/dd").format(dateTime);
     }
   }
 }

@@ -73,7 +73,7 @@ android {
             useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // Only used when building a released work.
-//             signingConfig signingConfigs.release
+             signingConfig signingConfigs.release
         }
     }
 }

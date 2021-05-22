@@ -223,9 +223,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                         .loadTagFilteredPosts(_tagFilter, _sortOrder),
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
-                  snapshot.data.forEach((element) {
-                    _lastPageItems.add(_getListItem(element));
-                  });
+                  if (_lastSnapshotData.data.isEmpty ||
+                      snapshot.data.isEmpty ||
+                      _lastSnapshotData.data.last.id != snapshot.data.last.id)
+                    snapshot.data.forEach((element) {
+                      _lastPageItems.add(_getListItem(element));
+                    });
                   _isRefreshing = false;
                   _lastSnapshotData = snapshot;
                   return _buildPage(snapshot.data, false);
