@@ -121,6 +121,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   static const POST_COUNT_PER_PAGE = 10;
 
   SharedPreferences _preferences;
+  FoldBehavior _foldBehavior;
 
   Future _content;
 
@@ -128,6 +129,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   void _setContent() {
     _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
         SortOrder.LAST_REPLIED;
+    _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
+        FoldBehavior.FOLD;
     _content = _tagFilter == null
         ? loginAndLoadPost(context.personInfo, _sortOrder)
         : PostRepository.getInstance()
@@ -347,6 +350,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _getListItem(BBSPost postElement) {
+    if (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded)
+      return Container();
     return ThemedMaterial(
       child: Card(
           child: Column(children: [
@@ -375,7 +380,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 const SizedBox(
                   height: 10,
                 ),
-                postElement.is_folded
+                (postElement.is_folded && _foldBehavior == FoldBehavior.FOLD)
                     ? Theme(
                         data: Theme.of(context)
                             .copyWith(dividerColor: Colors.transparent),
@@ -449,12 +454,12 @@ class _BBSSubpageState extends State<BBSSubpage>
               Navigator.of(context).pushNamed("/bbs/postDetail",
                   arguments: {"post": postElement});
             }),
-        if (!postElement.is_folded &&
+        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.last_post.id != postElement.first_post.id)
           Divider(
             height: 4,
           ),
-        if (!postElement.is_folded &&
+        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.last_post.id != postElement.first_post.id)
           ListTile(
             dense: true,

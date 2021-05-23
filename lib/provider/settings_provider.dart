@@ -16,6 +16,8 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider {
@@ -27,6 +29,7 @@ class SettingsProvider {
   //static const String KEY_PREFERRED_THEME = "theme";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
+  static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
 
   SettingsProvider._(this._preferences);
 
@@ -107,4 +110,69 @@ class SettingsProvider {
 
   set fduholeSortOrder(SortOrder value) =>
       _preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
+
+  //FDUHOLE Folded Post Behavior
+
+  //NOTE: This getter defaults to a FOLD and won't return [null]
+  FoldBehavior get fduholeFoldBehavior {
+    if (_preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
+      int savedPref = _preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
+      return FoldBehavior.values.firstWhere(
+        (element) => element.index == savedPref,
+        orElse: () => FoldBehavior.FOLD,
+      );
+    }
+    return FoldBehavior.FOLD;
+  }
+
+  set fduholeFoldBehavior(FoldBehavior value) =>
+      _preferences.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+}
+
+enum SortOrder { LAST_REPLIED, LAST_CREATED }
+
+extension SortOrderEx on SortOrder {
+  String displayTitle(BuildContext context) {
+    switch (this) {
+      case SortOrder.LAST_REPLIED:
+        return S.of(context).last_replied;
+        break;
+      case SortOrder.LAST_CREATED:
+        return S.of(context).last_created;
+        break;
+    }
+    return null;
+  }
+
+  String getInternalString() {
+    switch (this) {
+      case SortOrder.LAST_REPLIED:
+        return "last_updated";
+        break;
+      case SortOrder.LAST_CREATED:
+        return "last_created";
+        break;
+    }
+    return null;
+  }
+}
+
+//FDUHOLE Folded Post Behavior
+enum FoldBehavior { SHOW, FOLD, HIDE }
+
+extension FoldBehaviorEx on FoldBehavior {
+  String displayTitle(BuildContext context) {
+    switch (this) {
+      case FoldBehavior.FOLD:
+        return S.of(context).fold;
+        break;
+      case FoldBehavior.HIDE:
+        return S.of(context).hide;
+        break;
+      case FoldBehavior.SHOW:
+        return S.of(context).show;
+        break;
+    }
+    return null;
+  }
 }

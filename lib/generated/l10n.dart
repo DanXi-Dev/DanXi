@@ -1245,6 +1245,46 @@ class S {
     );
   }
 
+  /// `FDUHOLE: NSFW content`
+  String get fduhole_nsfw_behavior {
+    return Intl.message(
+      'FDUHOLE: NSFW content',
+      name: 'fduhole_nsfw_behavior',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fold`
+  String get fold {
+    return Intl.message(
+      'Fold',
+      name: 'fold',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hide`
+  String get hide {
+    return Intl.message(
+      'Hide',
+      name: 'hide',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show`
+  String get show {
+    return Intl.message(
+      'Show',
+      name: 'show',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
