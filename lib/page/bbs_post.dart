@@ -352,6 +352,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           child: Text(
                             "OP",
                             style: TextStyle(
+                                fontWeight: FontWeight.bold,
                                 color: Constant.getColorFromString(
                                                 _post.tag.first.color)
                                             .withOpacity(0.8)
@@ -364,9 +365,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         ),
                       Padding(
                         padding:
-                            EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                         child: Text(
                           "[${e.username}]",
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -387,7 +389,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Text(
                             renderText(e.content, S.of(context).image_tag),
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           )
                         : HtmlWidget(
@@ -398,35 +400,39 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ),
                 ],
               ),
-              subtitle: Column(children: [
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "#${e.id}",
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
+              subtitle: isNested
+                  ? null
+                  : Column(children: [
+                      const SizedBox(
+                        height: 8,
                       ),
-                      Text(
-                        HumanDuration.format(
-                            context, DateTime.parse(e.date_created)),
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
-                      ),
-                      GestureDetector(
-                        child: Text(S.of(context).report,
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12)),
-                        onTap: () {
-                          BBSEditor.reportPost(context, e.id);
-                        },
-                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "#${e.id}",
+                              style: TextStyle(
+                                  color: Theme.of(context).hintColor,
+                                  fontSize: 12),
+                            ),
+                            Text(
+                              HumanDuration.format(
+                                  context, DateTime.parse(e.date_created)),
+                              style: TextStyle(
+                                  color: Theme.of(context).hintColor,
+                                  fontSize: 12),
+                            ),
+                            GestureDetector(
+                              child: Text(S.of(context).report,
+                                  style: TextStyle(
+                                      color: Theme.of(context).hintColor,
+                                      fontSize: 12)),
+                              onTap: () {
+                                BBSEditor.reportPost(context, e.id);
+                              },
+                            ),
+                          ]),
                     ]),
-              ]),
               onTap: () async {
                 if (_searchResult == null)
                   BBSEditor.createNewReply(context, _post.id, e.id)
