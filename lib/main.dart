@@ -63,7 +63,6 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'generated/l10n.dart';
-
 final QuickActions quickActions = QuickActions();
 
 void main() {

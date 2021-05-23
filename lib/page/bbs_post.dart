@@ -27,6 +27,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -51,11 +52,11 @@ class BBSPostDetail extends StatefulWidget {
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
   BBSPost _post;
-  int _currentBBSPage;
-  List<Reply> _lastReplies;
+  int _currentBBSPage = 1;
+  List<Reply> _lastReplies = [];
   AsyncSnapshot _lastSnapshotData;
-  bool _isRefreshing;
-  bool _isEndIndicatorShown;
+  bool _isRefreshing = true;
+  bool _isEndIndicatorShown = false;
   static const POST_COUNT_PER_PAGE = 10;
 
   Future<List<Reply>> _searchResult;
@@ -72,12 +73,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       _post = new BBSPost(-1, new Reply(-1, "", "", null, "", -1), -1, null,
           null, false, "", "");
     }
-
-    _currentBBSPage = 1;
-    _lastReplies = [];
-    _lastSnapshotData = null;
-    _isRefreshing = true;
-    _isEndIndicatorShown = false;
   }
 
   void refreshSelf() {
@@ -124,73 +119,66 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: MediaQuery.removePadding(
             context: context,
             removeTop: true,
-            child: FutureBuilder(
-                builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      _isRefreshing = true;
-                      if (_lastSnapshotData == null)
-                        return Container(
-                          padding: EdgeInsets.all(8),
-                          child: Center(
-                              child: PlatformCircularProgressIndicator()),
-                        );
-                      if (_searchResult != null)
-                        return _buildPage(_lastSnapshotData.data, true);
-                      // Only use scroll notification when data is paged
-                      return NotificationListener<ScrollNotification>(
-                          child: _buildPage(snapshot.data, true),
-                          onNotification: (ScrollNotification scrollInfo) {
-                            if (scrollInfo.metrics.extentAfter < 500 &&
-                                !_isRefreshing &&
-                                !_isEndIndicatorShown) {
-                              _isRefreshing = true;
-                              setState(() {
-                                _currentBBSPage++;
-                              });
-                            }
-                            return false;
-                          });
-                      break;
-                    case ConnectionState.done:
-                      // Prevent refreshing repeatedly
-                      if (_lastReplies.isEmpty ||
-                          snapshot.data.isEmpty ||
-                          _lastReplies.last.id != snapshot.data.last.id)
-                        _lastReplies.addAll(snapshot.data);
-                      _isRefreshing = false;
-                      if (snapshot.hasError) {
-                        return _buildErrorWidget();
-                      } else {
-                        _lastSnapshotData = snapshot;
-                        if (_searchResult != null)
-                          return _buildPage(snapshot.data, false);
-                        // Only use scroll notification when data is paged
-                        return NotificationListener<ScrollNotification>(
-                            child: _buildPage(snapshot.data, false),
-                            onNotification: (ScrollNotification scrollInfo) {
-                              if (scrollInfo.metrics.extentAfter < 500 &&
-                                  !_isRefreshing &&
-                                  !_isEndIndicatorShown) {
-                                _isRefreshing = true;
-                                setState(() {
-                                  _currentBBSPage++;
-                                });
-                              }
-                              return false;
-                            });
-                      }
-                      break;
-                  }
-                  return null;
-                },
-                // Display search result instead, when it is available
+            child: FutureWidget<List<Reply>>(
                 future: _searchResult == null
                     ? PostRepository.getInstance()
                         .loadReplies(_post, _currentBBSPage)
-                    : _searchResult),
+                    : _searchResult,
+                errorBuilder: _buildErrorWidget(),
+                loadingBuilder: (BuildContext context,
+                    AsyncSnapshot<List<Reply>> snapshot) {
+                  _isRefreshing = true;
+                  if (_lastSnapshotData == null)
+                    return Container(
+                      padding: EdgeInsets.all(8),
+                      child: Center(child: PlatformCircularProgressIndicator()),
+                    );
+                  if (_searchResult != null)
+                    return _buildPage(_lastSnapshotData.data, true);
+                  // Only use scroll notification when data is paged
+                  return NotificationListener<ScrollNotification>(
+                      child: _buildPage(snapshot.data, true),
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (scrollInfo.metrics.extentAfter < 500 &&
+                            !_isRefreshing &&
+                            !_isEndIndicatorShown) {
+                          _isRefreshing = true;
+                          setState(() {
+                            _currentBBSPage++;
+                          });
+                        }
+                        return false;
+                      });
+                },
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<Reply>> snapshot) {
+                  if (_lastReplies.isEmpty ||
+                      snapshot.data.isEmpty ||
+                      _lastReplies.last.id != snapshot.data.last.id)
+                    _lastReplies.addAll(snapshot.data);
+                  _isRefreshing = false;
+                  if (snapshot.hasError) {
+                    return _buildErrorWidget();
+                  } else {
+                    _lastSnapshotData = snapshot;
+                    if (_searchResult != null)
+                      return _buildPage(snapshot.data, false);
+                    // Only use scroll notification when data is paged
+                    return NotificationListener<ScrollNotification>(
+                        child: _buildPage(snapshot.data, false),
+                        onNotification: (ScrollNotification scrollInfo) {
+                          if (scrollInfo.metrics.extentAfter < 500 &&
+                              !_isRefreshing &&
+                              !_isEndIndicatorShown) {
+                            _isRefreshing = true;
+                            setState(() {
+                              _currentBBSPage++;
+                            });
+                          }
+                          return false;
+                        });
+                  }
+                }),
           )),
     );
   }
