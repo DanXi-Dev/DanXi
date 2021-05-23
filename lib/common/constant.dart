@@ -244,4 +244,16 @@ extension SortOrderEx on SortOrder {
     }
     return null;
   }
+
+  String getInternalString() {
+    switch (this) {
+      case SortOrder.LAST_REPLIED:
+        return "last_updated";
+        break;
+      case SortOrder.LAST_CREATED:
+        return "last_created";
+        break;
+    }
+    return null;
+  }
 }

@@ -638,20 +638,15 @@ class PostRepository extends BaseRepositoryWithDio {
   bool get isUserInitialized => _token != null;
 
   Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
-    Map<String, dynamic> qp;
-    switch (sortBy) {
-      case SortOrder.LAST_CREATED:
-        qp = {"page": page, "order": "last_created"};
-        break;
-      case SortOrder.LAST_REPLIED:
-        qp = {"page": page, "order": "last_updated"};
-        break;
-    }
     Response response = await dio
         .get(_BASE_URL + "/discussions/",
-            queryParameters: qp, options: Options(headers: _tokenHeader))
+            queryParameters: {
+              "page": page,
+              "order": sortBy.getInternalString()
+            },
+            options: Options(headers: _tokenHeader))
         .onError((error, stackTrace) {
-      if (error.response.statusCode == 401) {
+      if (error.response?.statusCode == 401) {
         _token = null;
         throw LoginExpiredError;
       }
@@ -670,20 +665,15 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Future<List<BBSPost>> loadTagFilteredPosts(
       String tag, SortOrder sortBy) async {
-    Map<String, dynamic> qp;
-    switch (sortBy) {
-      case SortOrder.LAST_CREATED:
-        qp = {"order": "last_created", "tag_name": tag};
-        break;
-      case SortOrder.LAST_REPLIED:
-        qp = {"order": "last_updated", "tag_name": tag};
-        break;
-    }
     Response response = await dio
         .get(_BASE_URL + "/discussions/",
-            queryParameters: qp, options: Options(headers: _tokenHeader))
+            queryParameters: {
+              "order": sortBy.getInternalString(),
+              "tag_name": tag
+            },
+            options: Options(headers: _tokenHeader))
         .onError((error, stackTrace) {
-      if (error.response.statusCode == 401) {
+      if (error.response?.statusCode == 401) {
         _token = null;
         throw LoginExpiredError;
       }

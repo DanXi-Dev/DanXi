@@ -109,7 +109,9 @@ class _BBSSubpageState extends State<BBSSubpage>
       StateStreamListener();
 
   int _currentBBSPage;
-  SortOrder _sortOrder = SortOrder.LAST_REPLIED;
+
+  SortOrder _sortOrder;
+
   String _tagFilter;
 
   List<Widget> _lastPageItems;
@@ -124,6 +126,8 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   void _setContent() {
+    _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
+        SortOrder.LAST_REPLIED;
     _content = _tagFilter == null
         ? loginAndLoadPost(context.personInfo, _sortOrder)
         : PostRepository.getInstance()
@@ -186,6 +190,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
           _sortOrder = event.newOrder;
+          SettingsProvider.of(_preferences).fduholeSortOrder = _sortOrder;
           refreshSelf();
         }),
         hashCode);
@@ -364,6 +369,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     _lastSnapshotData = null;
                     _isRefreshing = true;
                     _isEndIndicatorShown = false;
+                    _setContent();
                   });
                 }),
                 const SizedBox(

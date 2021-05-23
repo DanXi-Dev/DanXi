@@ -26,6 +26,7 @@ class SettingsProvider {
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
+  static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
 
   SettingsProvider._(this._preferences);
 
@@ -84,11 +85,26 @@ class SettingsProvider {
     return null;
   }
 
-  set fduholeToken(String value) {
-    _preferences.setString(KEY_FDUHOLE_TOKEN, value);
-  }
+  set fduholeToken(String value) =>
+      _preferences.setString(KEY_FDUHOLE_TOKEN, value);
 
   void deleteSavedFduholeToken() => _preferences.remove(KEY_FDUHOLE_TOKEN);
 
+  //Debug Mode
   bool get debugMode => _preferences.containsKey("DEBUG");
+
+  //FDUHOLE Default Sorting Order
+  SortOrder get fduholeSortOrder {
+    if (_preferences.containsKey(KEY_FDUHOLE_SORTORDER)) {
+      String str = _preferences.getString(KEY_FDUHOLE_SORTORDER);
+      if (str == SortOrder.LAST_CREATED.getInternalString())
+        return SortOrder.LAST_CREATED;
+      else if (str == SortOrder.LAST_REPLIED.getInternalString())
+        return SortOrder.LAST_REPLIED;
+    }
+    return null;
+  }
+
+  set fduholeSortOrder(SortOrder value) =>
+      _preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
 }

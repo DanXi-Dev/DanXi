@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
@@ -112,9 +113,9 @@ class DanxiApp extends StatelessWidget {
         AnnouncementList(arguments: arguments),
   };
 
-  changeSizeOnDesktop() async {
+  changeSizeOnDesktop(BuildContext context) async {
     if (PlatformX.isDesktop) {
-      await DesktopWindow.setWindowSize(Size(540, 960));
+      await DesktopWindow.setWindowSize(Size(400, 700));
     }
   }
 
@@ -127,7 +128,7 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    changeSizeOnDesktop();
+    changeSizeOnDesktop(context);
     return Phoenix(
         child: PlatformProvider(
       // initialPlatform: TargetPlatform.iOS,
@@ -346,7 +347,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
       // This callback gets invoked every time brightness changes
-      // TODO: What's wrong with this code? why does the app refresh on every launch?
+      // What's wrong with this code? why does the app refresh on every launch?
       // The timer below is a workaround to the issue.
       Timer(Duration(milliseconds: 500), () {
         if (WidgetsBinding.instance.platformDispatcher.platformBrightness !=
