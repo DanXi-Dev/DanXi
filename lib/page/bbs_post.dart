@@ -60,6 +60,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<List<Reply>> _searchResult;
 
+  Future<List<Reply>> _content;
+
+  void _setContent() {
+    _content = _searchResult == null
+        ? PostRepository.getInstance().loadReplies(_post, _currentBBSPage)
+        : _searchResult;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -80,6 +88,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _isEndIndicatorShown = false;
   }
 
+  @override
+  void didChangeDependencies() {
+    _setContent();
+    super.didChangeDependencies();
+  }
+
   void refreshSelf() {
     if (mounted) {
       setState(() {
@@ -88,8 +102,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _lastSnapshotData = null;
         _isRefreshing = true;
         _isEndIndicatorShown = false;
+        _setContent();
       });
     }
+  }
+
+  @override
+  void didUpdateWidget(covariant BBSPostDetail oldWidget) {
+    _setContent();
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -122,9 +143,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             refreshSelf();
           },
           child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: FutureBuilder(
+              context: context,
+              removeTop: true,
+              child: FutureBuilder(
                 builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
@@ -149,6 +170,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               _isRefreshing = true;
                               setState(() {
                                 _currentBBSPage++;
+                                _setContent();
                               });
                             }
                             return false;
@@ -177,6 +199,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 _isRefreshing = true;
                                 setState(() {
                                   _currentBBSPage++;
+                                  _setContent();
                                 });
                               }
                               return false;
@@ -187,11 +210,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   return null;
                 },
                 // Display search result instead, when it is available
-                future: _searchResult == null
-                    ? PostRepository.getInstance()
-                        .loadReplies(_post, _currentBBSPage)
-                    : _searchResult),
-          )),
+                future: _content,
+              ))),
     );
   }
 

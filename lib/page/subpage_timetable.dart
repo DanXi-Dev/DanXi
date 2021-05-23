@@ -64,7 +64,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   ///The week it's showing on the time table.
   TimeNow _showingTime;
-  AsyncSnapshot _lastSnapshot;
+
+  Future _content;
+
+  void _setContent() {
+    _content = Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
+        .loadTimeTableLocally(context.personInfo));
+  }
 
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
@@ -104,7 +110,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   void initState() {
     super.initState();
-    _lastSnapshot = null;
     converters = {S.current.share_as_ics: ICSConverter()};
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
@@ -130,6 +135,24 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         hashCode);
   }
 
+  void refreshSelf() {
+    setState(() {
+      _setContent();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    _setContent();
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant TimetableSubPage oldWidget) {
+    _setContent();
+    super.didUpdateWidget(oldWidget);
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -141,11 +164,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     super.build(context);
     return FutureWidget(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        _lastSnapshot = snapshot;
         return _buildPage(snapshot.data);
       },
-      future: Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
-          .loadTimeTableLocally(context.personInfo)),
+      future: _content,
       errorBuilder: GestureDetector(
         onTap: () {
           refreshSelf();
@@ -154,23 +175,22 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           child: Text(S.of(context).failed),
         ),
       ),
-      loadingBuilder: _lastSnapshot == null
-          ? Container(
-              child: Center(
-              child: Text(S.of(context).loading),
-            ))
-          : _buildPage(_lastSnapshot.data),
+      loadingBuilder: Center(
+        child: PlatformCircularProgressIndicator(),
+      ),
     );
   }
 
   goToPrev() {
-    _showingTime.week--;
-    refreshSelf();
+    setState(() {
+      _showingTime.week--;
+    });
   }
 
   goToNext() {
-    _showingTime.week++;
-    refreshSelf();
+    setState(() {
+      _showingTime.week++;
+    });
   }
 
   Widget _buildPage(TimeTable table) {
@@ -208,7 +228,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       ),
       Expanded(
           child: RefreshIndicator(
-            onRefresh: () async {
+        onRefresh: () async {
           HapticFeedback.mediumImpact();
           refreshSelf();
         },
