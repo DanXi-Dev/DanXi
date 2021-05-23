@@ -33,8 +33,8 @@ class BrowserUtil {
       ));
 
   static openUrl(String url, [NonpersistentCookieJar cookieJar]) {
-    if ((cookieJar == null && PlatformX.isIOS) || PlatformX.isDesktop) {
-      launch(url);
+    if (cookieJar == null || PlatformX.isDesktop) {
+      launch(url, forceWebView: true, enableJavaScript: true);
       return;
     }
     cookieJar.hostCookies.forEach((host, value) {
