@@ -16,7 +16,6 @@
  */
 
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
@@ -113,7 +112,7 @@ class DanxiApp extends StatelessWidget {
         AnnouncementList(arguments: arguments),
   };
 
-  changeSizeOnDesktop(BuildContext context) async {
+  changeSizeOnDesktop() async {
     if (PlatformX.isDesktop) {
       await DesktopWindow.setWindowSize(Size(400, 700));
     }
@@ -128,10 +127,9 @@ class DanxiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    changeSizeOnDesktop(context);
+    changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -186,7 +184,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Listener to the failure of logging in caused by necessary captcha.
   ///
   /// Request user to log in manually in the browser.
-  StateStreamListener<CaptchaNeededException> _captchaSubscription =
+  static StateStreamListener<CaptchaNeededException> _captchaSubscription =
       StateStreamListener();
 
   //Dark/Light Theme Control
@@ -230,7 +228,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
     (cxt) => null,
-    (cxt) => null, //SFSymbols.search,
+    (cxt) => null,
     (cxt) => null,
     (cxt) => null
   ];

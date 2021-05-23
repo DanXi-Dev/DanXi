@@ -352,12 +352,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           child: Text(
                             "OP",
                             style: TextStyle(
-                                color: Theme.of(context)
-                                            .hintColor
-                                            .computeLuminance() >=
+                                color: Constant.getColorFromString(
+                                                _post.tag.first.color)
+                                            .withOpacity(0.8)
+                                            .computeLuminance() <=
                                         0.5
-                                    ? Colors.black
-                                    : Colors.white,
+                                    ? Colors.white
+                                    : Colors.black,
                                 fontSize: 12),
                           ),
                         ),
