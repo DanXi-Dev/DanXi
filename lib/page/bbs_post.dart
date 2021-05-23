@@ -61,6 +61,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<List<Reply>> _searchResult;
 
+  Future<List<Reply>> _content;
+
+  void _setContent() {
+    _content = _searchResult == null
+        ? PostRepository.getInstance().loadReplies(_post, _currentBBSPage)
+        : _searchResult;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,6 +81,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       _post = new BBSPost(-1, new Reply(-1, "", "", null, "", -1), -1, null,
           null, false, "", "");
     }
+
+    _currentBBSPage = 1;
+    _lastReplies = [];
+    _lastSnapshotData = null;
+    _isRefreshing = true;
+    _isEndIndicatorShown = false;
   }
 
   void refreshSelf() {
@@ -117,69 +131,75 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             refreshSelf();
           },
           child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: FutureWidget<List<Reply>>(
-                future: _searchResult == null
-                    ? PostRepository.getInstance()
-                        .loadReplies(_post, _currentBBSPage)
-                    : _searchResult,
-                errorBuilder: _buildErrorWidget(),
-                loadingBuilder: (BuildContext context,
-                    AsyncSnapshot<List<Reply>> snapshot) {
-                  _isRefreshing = true;
-                  if (_lastSnapshotData == null)
-                    return Container(
-                      padding: EdgeInsets.all(8),
-                      child: Center(child: PlatformCircularProgressIndicator()),
-                    );
-                  if (_searchResult != null)
-                    return _buildPage(_lastSnapshotData.data, true);
-                  // Only use scroll notification when data is paged
-                  return NotificationListener<ScrollNotification>(
-                      child: _buildPage(snapshot.data, true),
-                      onNotification: (ScrollNotification scrollInfo) {
-                        if (scrollInfo.metrics.extentAfter < 500 &&
-                            !_isRefreshing &&
-                            !_isEndIndicatorShown) {
-                          _isRefreshing = true;
-                          setState(() {
-                            _currentBBSPage++;
+              context: context,
+              removeTop: true,
+              child: FutureBuilder(
+                builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      _isRefreshing = true;
+                      if (_lastSnapshotData == null)
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          child: Center(
+                              child: PlatformCircularProgressIndicator()),
+                        );
+                      if (_searchResult != null)
+                        return _buildPage(_lastSnapshotData.data, true);
+                      // Only use scroll notification when data is paged
+                      return NotificationListener<ScrollNotification>(
+                          child: _buildPage(snapshot.data, true),
+                          onNotification: (ScrollNotification scrollInfo) {
+                            if (scrollInfo.metrics.extentAfter < 500 &&
+                                !_isRefreshing &&
+                                !_isEndIndicatorShown) {
+                              _isRefreshing = true;
+                              setState(() {
+                                _currentBBSPage++;
+                                _setContent();
+                              });
+                            }
+                            return false;
                           });
-                        }
-                        return false;
-                      });
-                },
-                successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<Reply>> snapshot) {
-                  if (_lastReplies.isEmpty ||
-                      snapshot.data.isEmpty ||
-                      _lastReplies.last.id != snapshot.data.last.id)
-                    _lastReplies.addAll(snapshot.data);
-                  _isRefreshing = false;
-                  if (snapshot.hasError) {
-                    return _buildErrorWidget();
-                  } else {
-                    _lastSnapshotData = snapshot;
-                    if (_searchResult != null)
-                      return _buildPage(snapshot.data, false);
-                    // Only use scroll notification when data is paged
-                    return NotificationListener<ScrollNotification>(
-                        child: _buildPage(snapshot.data, false),
-                        onNotification: (ScrollNotification scrollInfo) {
-                          if (scrollInfo.metrics.extentAfter < 500 &&
-                              !_isRefreshing &&
-                              !_isEndIndicatorShown) {
-                            _isRefreshing = true;
-                            setState(() {
-                              _currentBBSPage++;
+                      break;
+                    case ConnectionState.done:
+                      // Prevent refreshing repeatedly
+                      if (_lastReplies.isEmpty ||
+                          snapshot.data.isEmpty ||
+                          _lastReplies.last.id != snapshot.data.last.id)
+                        _lastReplies.addAll(snapshot.data);
+                      _isRefreshing = false;
+                      if (snapshot.hasError) {
+                        return _buildErrorWidget();
+                      } else {
+                        _lastSnapshotData = snapshot;
+                        if (_searchResult != null)
+                          return _buildPage(snapshot.data, false);
+                        // Only use scroll notification when data is paged
+                        return NotificationListener<ScrollNotification>(
+                            child: _buildPage(snapshot.data, false),
+                            onNotification: (ScrollNotification scrollInfo) {
+                              if (scrollInfo.metrics.extentAfter < 500 &&
+                                  !_isRefreshing &&
+                                  !_isEndIndicatorShown) {
+                                _isRefreshing = true;
+                                setState(() {
+                                  _currentBBSPage++;
+                                  _setContent();
+                                });
+                              }
+                              return false;
                             });
-                          }
-                          return false;
-                        });
+                      }
+                      break;
                   }
-                }),
-          )),
+                  return null;
+                },
+                // Display search result instead, when it is available
+                future: _content,
+              ))),
     );
   }
 

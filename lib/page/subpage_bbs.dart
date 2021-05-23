@@ -102,13 +102,14 @@ class SortOrderChangedEvent {
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
-  StateStreamListener _postSubscription = StateStreamListener();
-  StateStreamListener _refreshSubscription = StateStreamListener();
-  StateStreamListener _searchSubscription = StateStreamListener();
-  StateStreamListener _sortOrderChangedSubscription = StateStreamListener();
+  static StateStreamListener _postSubscription = StateStreamListener();
+  static StateStreamListener _refreshSubscription = StateStreamListener();
+  static StateStreamListener _searchSubscription = StateStreamListener();
+  static StateStreamListener _sortOrderChangedSubscription =
+      StateStreamListener();
 
   int _currentBBSPage;
-  SortOrder _sortOrder;
+  SortOrder _sortOrder = SortOrder.LAST_REPLIED;
   String _tagFilter;
 
   List<Widget> _lastPageItems;
@@ -119,11 +120,22 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   SharedPreferences _preferences;
 
+  Future _content;
+
+  ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
+  void _setContent() {
+    _content = _tagFilter == null
+        ? loginAndLoadPost(context.personInfo, _sortOrder)
+        : PostRepository.getInstance()
+            .loadTagFilteredPosts(_tagFilter, _sortOrder);
+  }
+
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {
         _initialize();
+        _setContent();
       });
     }
   }
@@ -154,7 +166,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void initState() {
     super.initState();
-    _sortOrder = SortOrder.LAST_REPLIED;
     _initialize();
 
     _postSubscription.bindOnlyInvalid(
@@ -181,8 +192,15 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   @override
+  void didUpdateWidget(covariant BBSSubpage oldWidget) {
+    _setContent();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void didChangeDependencies() {
     _preferences = Provider.of<SharedPreferences>(context);
+    _setContent();
     super.didChangeDependencies();
   }
 
@@ -217,10 +235,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             context: context,
             removeTop: true,
             child: FutureWidget<List<BBSPost>>(
-                future: _tagFilter == null
-                    ? loginAndLoadPost(context.personInfo, _sortOrder)
-                    : PostRepository.getInstance()
-                        .loadTagFilteredPosts(_tagFilter, _sortOrder),
+                future: _content,
                 successBuilder: (BuildContext context,
                     AsyncSnapshot<List<BBSPost>> snapshot) {
                   if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
@@ -299,6 +314,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             _isRefreshing = true;
             setState(() {
               _currentBBSPage++;
+              _setContent();
             });
           }
           return false;

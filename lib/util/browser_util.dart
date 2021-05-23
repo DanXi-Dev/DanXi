@@ -33,36 +33,34 @@ class BrowserUtil {
       ));
 
   static openUrl(String url, [NonpersistentCookieJar cookieJar]) {
-    if (PlatformX.isDesktop) {
-      launch(url);
+    if (cookieJar == null || PlatformX.isDesktop) {
+      launch(url, forceWebView: true, enableJavaScript: true);
       return;
     }
-    if (cookieJar != null) {
-      cookieJar.hostCookies.forEach((host, value) {
-        value.forEach((path, value) {
-          value.forEach((name, cookie) {
-            CookieManager.instance().setCookie(
-                url: Uri.parse(url),
-                name: name,
-                value: cookie.cookie.value,
-                domain: cookie.cookie.domain,
-                isSecure: cookie.cookie.secure);
-          });
+    cookieJar.hostCookies.forEach((host, value) {
+      value.forEach((path, value) {
+        value.forEach((name, cookie) {
+          CookieManager.instance().setCookie(
+              url: Uri.parse(url),
+              name: name,
+              value: cookie.cookie.value,
+              domain: cookie.cookie.domain,
+              isSecure: cookie.cookie.secure);
         });
       });
-      cookieJar.domainCookies.forEach((host, value) {
-        value.forEach((path, value) {
-          value.forEach((name, cookie) {
-            CookieManager.instance().setCookie(
-                url: Uri.parse(url),
-                name: name,
-                value: cookie.cookie.value,
-                domain: cookie.cookie.domain,
-                isSecure: cookie.cookie.secure);
-          });
+    });
+    cookieJar.domainCookies.forEach((host, value) {
+      value.forEach((path, value) {
+        value.forEach((name, cookie) {
+          CookieManager.instance().setCookie(
+              url: Uri.parse(url),
+              name: name,
+              value: cookie.cookie.value,
+              domain: cookie.cookie.domain,
+              isSecure: cookie.cookie.secure);
         });
       });
-    }
+    });
     CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)), options: options);
   }
