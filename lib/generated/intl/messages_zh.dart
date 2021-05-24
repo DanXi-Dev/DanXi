@@ -193,6 +193,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "today_course" : MessageLookupByLibrary.simpleMessage("今日课程"),
     "uploading_image" : MessageLookupByLibrary.simpleMessage("正在上传图片..."),
     "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("上传图片失败，请检查网络连接"),
+    "version" : MessageLookupByLibrary.simpleMessage("版本"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
     "weak_password" : MessageLookupByLibrary.simpleMessage("登录失败，未知错误\n请注意：目前旦夕不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
     "week" : m15,
