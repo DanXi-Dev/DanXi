@@ -113,7 +113,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
-    "fduhole_nsfw_behavior" : MessageLookupByLibrary.simpleMessage("FDUHOLE: NSFW content"),
+    "fduhole_nsfw_behavior" : MessageLookupByLibrary.simpleMessage("FDUHole: NSFW content"),
     "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
     "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
     "filtering_by_tag" : m2,
