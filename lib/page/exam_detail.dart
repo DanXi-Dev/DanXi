@@ -16,10 +16,8 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/repository/announcement_repository.dart';
-import 'package:dan_xi/util/human_duration.dart';
-import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/repository/exam_repository.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -31,21 +29,25 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
-class AnnouncementList extends StatefulWidget {
+class ExamList extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
   @override
-  _AnnouncementListState createState() => _AnnouncementListState();
+  _ExamListState createState() => _ExamListState();
 
-  AnnouncementList({Key key, this.arguments});
+  ExamList({Key key, this.arguments});
 }
 
-class _AnnouncementListState extends State<AnnouncementList> {
-  List<Announcement> _data = [];
+class _ExamListState extends State<ExamList> {
+  List<Exam> _data = [];
+  PersonInfo _info;
+  Future _content;
 
   @override
   void initState() {
     super.initState();
+    _info = widget.arguments['personInfo'];
+    _content = ExamRepository.getInstance().loadExamListRemotely(_info);
   }
 
   @override
@@ -55,10 +57,10 @@ class _AnnouncementListState extends State<AnnouncementList> {
       iosContentPadding: true,
       appBar: PlatformAppBarX(
           title: Text(
-        S.of(context).developer_announcement(''),
+        S.of(context).exam_schedule,
       )),
       body: FutureWidget(
-        future: AnnouncementRepository.getInstance().getAnnouncements(),
+        future: _content,
         successBuilder: (_, snapShot) {
           _data = snapShot.data;
           return Column(
@@ -77,8 +79,9 @@ class _AnnouncementListState extends State<AnnouncementList> {
           );
         },
         loadingBuilder: Container(
-          child: Center(child: PlatformCircularProgressIndicator()),
-        ),
+            child: Center(
+          child: PlatformCircularProgressIndicator(),
+        )),
         errorBuilder: GestureDetector(
           onTap: () {
             refreshSelf();
@@ -94,31 +97,17 @@ class _AnnouncementListState extends State<AnnouncementList> {
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
     if (_data == null) return widgets;
-    _data.forEach((Announcement value) {
+    _data.forEach((Exam value) {
       widgets.add(ThemedMaterial(
           child: ListTile(
-        leading: PlatformX.isAndroid
-            ? Icon(Icons.info)
-            : Icon(SFSymbols.info_circle_fill),
+        leading: Icon(SFSymbols.doc_append),
         title: Text(
-          value.content,
+          "${value.name}(${value.id}) ${value.type}",
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-            HumanDuration.format(context, DateTime.tryParse(value.updatedAt))),
-        onTap: () => showPlatformDialog(
-            context: context,
-            builder: (BuildContext context) => PlatformAlertDialog(
-                  title: Text(
-                      S.of(context).developer_announcement(value.createdAt)),
-                  content: Text(value.content),
-                  actions: <Widget>[
-                    PlatformDialogAction(
-                        child: PlatformText(S.of(context).i_see),
-                        onPressed: () => Navigator.pop(context)),
-                  ],
-                )),
+            "${value.testCategory} ${value.location} ${value.date} ${value.time}\n${value.note}"),
       )));
     });
 

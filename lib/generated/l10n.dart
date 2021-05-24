@@ -335,6 +335,16 @@ class S {
     );
   }
 
+  /// `Exam Schedule`
+  String get exam_schedule {
+    return Intl.message(
+      'Exam Schedule',
+      name: 'exam_schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Empty Classrooms`
   String get empty_classrooms {
     return Intl.message(

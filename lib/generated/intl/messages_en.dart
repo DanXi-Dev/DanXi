@@ -103,42 +103,29 @@ class MessageLookup extends MessageLookupByLibrary {
     "dev_page_4" : MessageLookupByLibrary.simpleMessage("https://github.com/hasbai"),
     "developer_announcement" : m1,
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
-        "ecard_balance": MessageLookupByLibrary.simpleMessage("Card Balance"),
-        "ecard_balance_log":
-            MessageLookupByLibrary.simpleMessage("Transactions"),
-        "editor_hint": MessageLookupByLibrary.simpleMessage(
-            "Write something... (Hint: Swipe the toolbar to the right to see more styling options.)"),
-        "empty_classrooms":
-            MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
-        "end_reached":
-            MessageLookupByLibrary.simpleMessage("You have reached the end."),
-        "error_login_expired": MessageLookupByLibrary.simpleMessage(
-            "Login Expired. Tap to login again"),
-        "evening": MessageLookupByLibrary.simpleMessage("Evening"),
-        "fail_to_acquire_qr": MessageLookupByLibrary.simpleMessage(
-            "Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
-        "failed": MessageLookupByLibrary.simpleMessage(
-            "Unable to load content, tap to retry"),
-        "fatal_error": MessageLookupByLibrary.simpleMessage("Fatal Error"),
-        "fduhole_nsfw_behavior":
-            MessageLookupByLibrary.simpleMessage("FDUHole: NSFW content"),
-        "feedback_email":
-            MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
-        "fenglin_campus": MessageLookupByLibrary.simpleMessage("Fenglin"),
-        "filtering_by_tag": m2,
-        "fold": MessageLookupByLibrary.simpleMessage("Fold"),
-        "folded": MessageLookupByLibrary.simpleMessage(
-            "This content is hidden. Tap to view"),
-        "forum": MessageLookupByLibrary.simpleMessage("Tree Hole"),
-        "forum_post_enter_content":
-            MessageLookupByLibrary.simpleMessage("Post"),
-        "fudan_aao_notices":
-            MessageLookupByLibrary.simpleMessage("Academic Announcements"),
-        "fudan_daily":
-            MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
-        "fudan_daily_disabled_notice": MessageLookupByLibrary.simpleMessage(
-            "In response to request from the University, Auto-CheckIn is no longer available."),
-        "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Tap to check in"),
+    "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
+    "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
+    "editor_hint" : MessageLookupByLibrary.simpleMessage("Write something... (Hint: Swipe the toolbar to the right to see more styling options.)"),
+    "empty_classrooms" : MessageLookupByLibrary.simpleMessage("Empty Classrooms"),
+    "end_reached" : MessageLookupByLibrary.simpleMessage("You have reached the end."),
+    "error_login_expired" : MessageLookupByLibrary.simpleMessage("Login Expired. Tap to login again"),
+    "evening" : MessageLookupByLibrary.simpleMessage("Evening"),
+    "exam_schedule" : MessageLookupByLibrary.simpleMessage("Exam Schedule"),
+    "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
+    "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
+    "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
+    "fduhole_nsfw_behavior" : MessageLookupByLibrary.simpleMessage("FDUHole: NSFW content"),
+    "feedback_email" : MessageLookupByLibrary.simpleMessage("danxi_dev@protonmail.com"),
+    "fenglin_campus" : MessageLookupByLibrary.simpleMessage("Fenglin"),
+    "filtering_by_tag" : m2,
+    "fold" : MessageLookupByLibrary.simpleMessage("Fold"),
+    "folded" : MessageLookupByLibrary.simpleMessage("This content is hidden. Tap to view"),
+    "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
+    "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
+    "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
+    "fudan_daily" : MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
+    "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("In response to request from the University, Auto-CheckIn is no longer available."),
+    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Tap to check in"),
     "fudan_daily_tick_countdown" : m3,
     "fudan_daily_tick_link" : MessageLookupByLibrary.simpleMessage("Tap to open check-in webpage"),
     "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),

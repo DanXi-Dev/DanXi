@@ -21,6 +21,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,6 +53,27 @@ class WelcomeFeature extends Feature {
 
   @override
   String get subTitle => _helloQuote;
+
+  //TODO: Show this trailing only when exams are available.
+  @override
+  Widget get trailing => InkWell(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(SFSymbols.doc_append),
+            const SizedBox(
+              height: 2,
+            ),
+            Text(
+              S.of(context).exam_schedule,
+              textScaleFactor: 0.8,
+            ),
+          ],
+        ),
+        onTap: () => Navigator.of(context)
+            .pushNamed('/exam/detail', arguments: {'personInfo': _info}),
+      );
 
   @override
   Widget get customSubtitle {

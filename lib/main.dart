@@ -29,6 +29,7 @@ import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/empty_classroom_detail.dart';
+import 'package:dan_xi/page/exam_detail.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
@@ -64,6 +65,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'generated/l10n.dart';
+
 final QuickActions quickActions = QuickActions();
 
 void main() {
@@ -110,6 +112,7 @@ class DanxiApp extends StatelessWidget {
         OpenSourceLicenseList(arguments: arguments),
     '/announcement/list': (context, {arguments}) =>
         AnnouncementList(arguments: arguments),
+    '/exam/detail': (context, {arguments}) => ExamList(arguments: arguments),
   };
 
   changeSizeOnDesktop() async {
