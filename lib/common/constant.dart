@@ -45,7 +45,7 @@ class Constant {
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
           elevation: 2,
-          //color: Color.fromRGBO(199, 199, 204, 0.4),
+          //color: Color.fromRGBO(245, 245, 245, 1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -228,19 +228,3 @@ extension CampusEx on Campus {
 }
 
 enum ConnectionStatus { NONE, CONNECTING, DONE, FAILED, FATAL_ERROR }
-
-enum SortOrder { LAST_REPLIED, LAST_CREATED }
-
-extension SortOrderEx on SortOrder {
-  String displayTitle(BuildContext context) {
-    switch (this) {
-      case SortOrder.LAST_REPLIED:
-        return S.of(context).last_replied;
-        break;
-      case SortOrder.LAST_CREATED:
-        return S.of(context).last_created;
-        break;
-    }
-    return null;
-  }
-}

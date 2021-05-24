@@ -35,6 +35,7 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
@@ -113,7 +114,7 @@ class DanxiApp extends StatelessWidget {
 
   changeSizeOnDesktop() async {
     if (PlatformX.isDesktop) {
-      await DesktopWindow.setWindowSize(Size(540, 960));
+      await DesktopWindow.setWindowSize(Size(400, 700));
     }
   }
 
@@ -129,7 +130,6 @@ class DanxiApp extends StatelessWidget {
     changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Listener to the failure of logging in caused by necessary captcha.
   ///
   /// Request user to log in manually in the browser.
-  StateStreamListener<CaptchaNeededException> _captchaSubscription =
+  static StateStreamListener<CaptchaNeededException> _captchaSubscription =
       StateStreamListener();
 
   //Dark/Light Theme Control
@@ -228,7 +228,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
     (cxt) => null,
-    (cxt) => null, //SFSymbols.search,
+    (cxt) => null,
     (cxt) => null,
     (cxt) => null
   ];
@@ -345,7 +345,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
       // This callback gets invoked every time brightness changes
-      // TODO: What's wrong with this code? why does the app refresh on every launch?
+      // What's wrong with this code? why does the app refresh on every launch?
       // The timer below is a workaround to the issue.
       Timer(Duration(milliseconds: 500), () {
         if (WidgetsBinding.instance.platformDispatcher.platformBrightness !=

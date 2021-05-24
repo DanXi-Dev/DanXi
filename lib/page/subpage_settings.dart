@@ -22,6 +22,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -176,6 +177,29 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     return list;
   }
 
+  List<Widget> _buildFoldBehaviorList() {
+    List<Widget> list = [];
+    Function onTapListener = (FoldBehavior value) {
+      SettingsProvider.of(_preferences).fduholeFoldBehavior = value;
+      RetrieveNewPostEvent().fire();
+      Navigator.of(context).pop();
+      refreshSelf();
+    };
+    FoldBehavior.values.forEach((value) {
+      list.add(PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () => onTapListener(value),
+          child: Text(value.displayTitle(context)),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(value.displayTitle(context)),
+          onTap: () => onTapListener(value),
+        ),
+      ));
+    });
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
@@ -276,6 +300,44 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                 height: 300,
                                 child: Column(
                                   children: _buildCampusAreaList(),
+                                ),
+                              ),
+                            ));
+                  }
+                },
+              ),
+            ),
+
+            //Fold Behavior
+            Card(
+              child: ListTile(
+                title: Text(S.of(context).fduhole_nsfw_behavior),
+                leading: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.hide_image)
+                    : const Icon(SFSymbols.eye_slash),
+                subtitle: Text(SettingsProvider.of(_preferences)
+                    .fduholeFoldBehavior
+                    .displayTitle(context)),
+                onTap: () {
+                  if (_preferences != null) {
+                    showPlatformModalSheet(
+                        context: context,
+                        builder: (_) => PlatformWidget(
+                              cupertino: (_, __) => CupertinoActionSheet(
+                                title:
+                                    Text(S.of(context).fduhole_nsfw_behavior),
+                                actions: _buildFoldBehaviorList(),
+                                cancelButton: CupertinoActionSheetAction(
+                                  child: Text(S.of(context).cancel),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ),
+                              material: (_, __) => Container(
+                                height: 300,
+                                child: Column(
+                                  children: _buildFoldBehaviorList(),
                                 ),
                               ),
                             ));

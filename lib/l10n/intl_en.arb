@@ -124,6 +124,10 @@
     "search_result": "Search Result",
     "tag_count":"Popularity: {count}",
     "filtering_by_tag": "Filtering by \"{tag}\", pull down and refresh to return to timeline.",
+    "fduhole_nsfw_behavior": "FDUHOLE: NSFW content",
+    "fold": "Fold",
+    "hide": "Hide",
+    "show": "Show",
 
     "classroom": "Classroom",
     "morning": "Morning",
