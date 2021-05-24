@@ -42,7 +42,6 @@ class ExamRepository extends BaseRepositoryWithDio {
   Future<List<Exam>> loadExamListRemotely(PersonInfo info) async {
     await UISLoginTool.loginUIS(dio, EXAM_TABLE_LOGIN_URL, cookieJar, info);
     Response r = await dio.get(EXAM_TABLE_URL);
-    print(r);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
     if (tableBody == null) return null;
