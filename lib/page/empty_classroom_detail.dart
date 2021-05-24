@@ -272,7 +272,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                 children: _getListWidgets(snapshot.data),
                               ),
                             ))),
-            errorBuilder: _buildErrorWidget(),
+            errorBuilder: (_, snapShot) => _buildErrorWidget(),
             loadingBuilder: _buildLoadingWidget())
       ]),
     );

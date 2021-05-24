@@ -85,10 +85,10 @@ class S {
     );
   }
 
-  /// `Next course is {courseName}, you have {courseLeft} courses left today`
+  /// `Next course is {courseName}. You have {courseLeft} courses left today`
   String next_course_is(Object courseName, Object courseLeft) {
     return Intl.message(
-      'Next course is $courseName, you have $courseLeft courses left today',
+      'Next course is $courseName. You have $courseLeft courses left today',
       name: 'next_course_is',
       desc: '',
       args: [courseName, courseLeft],
@@ -340,6 +340,26 @@ class S {
     return Intl.message(
       'Exam Schedule',
       name: 'exam_schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `School Bus`
+  String get school_bus {
+    return Intl.message(
+      'School Bus',
+      name: 'school_bus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paper and Other`
+  String get other_types_exam {
+    return Intl.message(
+      'Paper and Other',
+      name: 'other_types_exam',
       desc: '',
       args: [],
     );

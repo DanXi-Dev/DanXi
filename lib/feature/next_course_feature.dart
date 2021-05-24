@@ -18,24 +18,23 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/exam_repository.dart';
-import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
-import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_timetable_view/src/models/table_event_time.dart';
 
 class NextCourseFeature extends Feature {
   LiveCourseModel _data;
   ConnectionStatus _status = ConnectionStatus.NONE;
+  PersonInfo _info;
 
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
@@ -85,6 +84,7 @@ class NextCourseFeature extends Feature {
 
   @override
   void buildFeature() {
+    _info = context.personInfo;
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -144,16 +144,26 @@ class NextCourseFeature extends Feature {
     }
   }
 
+  //TODO: Show this trailing only when exams are available.
   @override
-  Widget get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
-      return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
-        child: PlatformCircularProgressIndicator(),
+  Widget get trailing => InkWell(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(CupertinoIcons.calendar_circle_fill),
+            const SizedBox(
+              height: 2,
+            ),
+            Text(
+              S.of(context).exam_schedule,
+              textScaleFactor: 0.8,
+            ),
+          ],
+        ),
+        onTap: () => Navigator.of(context)
+            .pushNamed('/exam/detail', arguments: {'personInfo': _info}),
       );
-    }
-    return null;
-  }
 
   @override
   bool get clickable => false;

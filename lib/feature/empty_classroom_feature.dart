@@ -18,9 +18,12 @@
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
@@ -30,13 +33,6 @@ class EmptyClassroomFeature extends Feature {
   @override
   void buildFeature() {
     _info = context.personInfo;
-
-    // Only load data once.
-    // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
-    // not just FeatureContainer. So the feature will be recreated then.
-    /*if (_status == ConnectionStatus.NONE) {
-      _subTitle = S.of(context).loading;
-    }*/
   }
 
   @override
@@ -49,6 +45,26 @@ class EmptyClassroomFeature extends Feature {
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.room)
       : const Icon(SFSymbols.building_2_fill);
+
+  /*@override
+  Widget get trailing => InkWell(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(CupertinoIcons.bus),
+            const SizedBox(
+              height: 2,
+            ),
+            Text(
+              S.of(context).school_bus,
+              textScaleFactor: 0.8,
+            ),
+          ],
+        ),
+        onTap: () => BrowserUtil.openUrl(
+            "https://mp.weixin.qq.com/s/NZJKDz0j9FIXNImEQPquQw"),
+      );*/
 
   @override
   void onTap() async {

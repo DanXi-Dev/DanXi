@@ -19,6 +19,7 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
 
@@ -41,8 +42,10 @@ class ExamRepository extends BaseRepositoryWithDio {
   Future<List<Exam>> loadExamListRemotely(PersonInfo info) async {
     await UISLoginTool.loginUIS(dio, EXAM_TABLE_LOGIN_URL, cookieJar, info);
     Response r = await dio.get(EXAM_TABLE_URL);
+    print(r);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
+    if (tableBody == null) return null;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))

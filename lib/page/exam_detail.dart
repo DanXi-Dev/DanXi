@@ -82,12 +82,17 @@ class _ExamListState extends State<ExamList> {
             child: Center(
           child: PlatformCircularProgressIndicator(),
         )),
-        errorBuilder: GestureDetector(
+        errorBuilder: (_, snapShot) => GestureDetector(
           onTap: () {
-            refreshSelf();
+            setState(() {
+              _content =
+                  ExamRepository.getInstance().loadExamListRemotely(_info);
+            });
           },
           child: Center(
-            child: Text(S.of(context).failed),
+            child: Text(S.of(context).failed +
+                '\n\nThe error was:\n' +
+                snapShot.error.toString()),
           ),
         ),
       ),
@@ -96,21 +101,76 @@ class _ExamListState extends State<ExamList> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
+    List<Widget> secondaryWidgets = [
+      _buildDividerWithText(S.of(context).other_types_exam,
+          Theme.of(context).textTheme.bodyText1.color)
+    ]; //These widgets are displayed after the ones above
     if (_data == null) return widgets;
     _data.forEach((Exam value) {
-      widgets.add(ThemedMaterial(
-          child: ListTile(
-        leading: Icon(SFSymbols.doc_append),
-        title: Text(
-          "${value.name}(${value.id}) ${value.type}",
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-            "${value.testCategory} ${value.location} ${value.date} ${value.time}\n${value.note}"),
-      )));
+      if (value.testCategory.trim() == "论文" ||
+          value.testCategory.trim() == "其他")
+        secondaryWidgets.add(_buildCard(value, context));
+      else
+        widgets.add(_buildCard(value, context));
     });
 
-    return widgets;
+    return widgets + secondaryWidgets;
   }
 }
+
+Widget _buildDividerWithText(String text, Color color) => Padding(
+    padding: EdgeInsets.symmetric(horizontal: 8),
+    child: Row(children: <Widget>[
+      Expanded(child: Divider(color: color)),
+      Text(" $text ", style: TextStyle(color: color)),
+      Expanded(child: Divider(color: color)),
+    ]));
+
+Widget _buildCard(Exam value, BuildContext context) => ThemedMaterial(
+        child: Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "${value.testCategory} ${value.type}",
+              textScaleFactor: 0.8,
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
+            /*Text(
+                "${value.id}",
+                textScaleFactor: 0.8,
+                //style: TextStyle(color: Theme.of(context).hintColor),
+              ),*/
+            Text(
+              "${value.name}",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            if (value.date.trim() != "" ||
+                value.location.trim() != "" ||
+                value.time.trim() != "")
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${value.date} ${value.time}",
+                    textScaleFactor: 0.8,
+                  ),
+                  Text(
+                    "${value.location} ",
+                    textScaleFactor: 0.8,
+                  ),
+                ],
+              ),
+            if (value.note.trim() != "")
+              Text(
+                "${value.note}",
+                textScaleFactor: 0.8,
+                style: TextStyle(color: Theme.of(context).hintColor),
+              ),
+          ],
+        ),
+      ),
+    ));

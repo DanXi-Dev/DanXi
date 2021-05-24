@@ -167,7 +167,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         return _buildPage(snapshot.data);
       },
       future: _content,
-      errorBuilder: GestureDetector(
+      errorBuilder: (_, snapShot) => GestureDetector(
         onTap: () {
           refreshSelf();
         },

@@ -4,7 +4,7 @@
     "fudan_qr_code":"Fudan QR Code",
     "welcome":"Welcome, {name}",
     "today_course":"Courses Today",
-    "next_course_is":"Next course is {courseName}, you have {courseLeft} courses left today",
+    "next_course_is":"Next course is {courseName}. You have {courseLeft} courses left today",
     "next_course_none":"You have completed today's courses",
     "current_connection":"Current Connection",
     "ecard_balance":"Card Balance",
@@ -30,6 +30,8 @@
     "login_issue_1_action":"Open UIS Login Page",
     "location_permission_denied_promot": "Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.",
     "exam_schedule": "Exam Schedule",
+    "school_bus": "School Bus",
+    "other_types_exam": "Paper and Other",
 
     "empty_classrooms": "Empty Classrooms",
     "settings": "Settings",

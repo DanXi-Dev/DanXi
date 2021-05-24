@@ -35,7 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m7(mostCrowded, leastCrowded) => "[Most Crowded]${mostCrowded}餐厅 [Least Crowded]${leastCrowded}餐厅";
 
-  static m8(courseName, courseLeft) => "Next course is ${courseName}, you have ${courseLeft} courses left today";
+  static m8(courseName, courseLeft) => "Next course is ${courseName}. You have ${courseLeft} courses left today";
 
   static m9(id) => "Reason for reporting #${id}";
 
@@ -176,6 +176,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "next_course_none" : MessageLookupByLibrary.simpleMessage("You have completed today\'s courses"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
+    "other_types_exam" : MessageLookupByLibrary.simpleMessage("Paper and Other"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "post_failed" : MessageLookupByLibrary.simpleMessage("Failed to post. Please check your internet connection."),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
@@ -188,6 +189,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "report" : MessageLookupByLibrary.simpleMessage("Report"),
     "report_failed" : m12,
     "report_success" : MessageLookupByLibrary.simpleMessage("Report success. Thank you for your contribution to our community."),
+    "school_bus" : MessageLookupByLibrary.simpleMessage("School Bus"),
     "search_result" : MessageLookupByLibrary.simpleMessage("Search Result"),
     "second_ago" : m13,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),

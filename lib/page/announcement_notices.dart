@@ -79,7 +79,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
         loadingBuilder: Container(
           child: Center(child: PlatformCircularProgressIndicator()),
         ),
-        errorBuilder: GestureDetector(
+        errorBuilder: (_, snapShot) => GestureDetector(
           onTap: () {
             refreshSelf();
           },

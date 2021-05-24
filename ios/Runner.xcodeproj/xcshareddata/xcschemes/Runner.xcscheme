@@ -82,6 +82,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "DanXi"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

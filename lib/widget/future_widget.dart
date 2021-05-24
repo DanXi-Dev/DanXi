@@ -30,7 +30,7 @@ class FutureWidget<T> extends StatefulWidget {
       @required this.loadingBuilder})
       : assert(successBuilder != null),
         super(key: key);
-  final dynamic errorBuilder;
+  final AsyncWidgetBuilder<T> errorBuilder;
   final dynamic loadingBuilder;
   final Future<T> future;
   final AsyncWidgetBuilder<T> successBuilder;
