@@ -49,13 +49,10 @@ app.*.map.json
 lib/common/Secret.dart
 
 # VSCode
-.history
 .vscode
 
 # macOS
-.DS_Store
 ios/build
 
 #Private Key
-lib/common/Secret.dart
 macos/Podfile.lock
