@@ -20,6 +20,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/exam_repository.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
