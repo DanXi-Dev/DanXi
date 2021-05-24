@@ -49,8 +49,8 @@ import 'bbs_editor.dart';
 String renderText(String html, String imagePlaceholder) {
   var soup = Beautifulsoup(html);
   var images = soup.find_all("img");
-  if (images.length > 0) return soup.get_text() + imagePlaceholder;
-  return soup.get_text();
+  if (images.length > 0) return soup.get_text().trim() + imagePlaceholder;
+  return soup.get_text().trim();
 }
 
 const KEY_NO_TAG = "默认";

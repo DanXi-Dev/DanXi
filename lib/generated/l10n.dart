@@ -1255,10 +1255,10 @@ class S {
     );
   }
 
-  /// `FDUHOLE: NSFW content`
+  /// `FDUHole: NSFW content`
   String get fduhole_nsfw_behavior {
     return Intl.message(
-      'FDUHOLE: NSFW content',
+      'FDUHole: NSFW content',
       name: 'fduhole_nsfw_behavior',
       desc: '',
       args: [],
