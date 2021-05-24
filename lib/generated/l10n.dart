@@ -695,6 +695,16 @@ class S {
     );
   }
 
+  /// `Rate Us`
+  String get rate {
+    return Intl.message(
+      'Rate Us',
+      name: 'rate',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(

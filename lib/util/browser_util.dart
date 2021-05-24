@@ -15,9 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
@@ -76,5 +81,27 @@ class CustomInAppBrowser extends InAppBrowser {
     // Only give geolocation permission on PAFD site
     return Future.value(GeolocationPermissionShowPromptResponse(
         origin: origin, allow: false, retain: false));
+  }
+
+  // Prompts the user with a In-App Review UI, when certain conditions are met.
+  Future<void> requestStoreReviewWhenAppropriate() async {
+    final InAppReview inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      // Ensure requestReview is called only after the user used the app for a while
+      // And ensure that the API is not called too frequently.
+      // TODO: Any better ways to implement this?
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
+      if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
+          preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
+        if (Random().nextDouble() > 0.99) inAppReview.requestReview();
+      }
+    }
+  }
+
+  @override
+  void onExit() {
+    // Request App Store/Google Play review after user closes the broswer.
+    requestStoreReviewWhenAppropriate();
   }
 }

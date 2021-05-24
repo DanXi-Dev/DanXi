@@ -37,6 +37,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -102,6 +103,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/daohoangson/flutter_widget_from_html"),
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
     LicenseItem("ical", LICENSE_BSD, "https://github.com/dartclub/ical"),
+    LicenseItem("in_app_review", LICENSE_MIT,
+        "https://github.com/britannio/in_app_review"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
     LicenseItem("json_serializable", LICENSE_BSD,
         "https://github.com/google/json_serializable.dart/tree/master/json_serializable"),
@@ -689,6 +692,15 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
                                   TextButton(
+                                    child: Text(S.of(context).rate),
+                                    onPressed: () {
+                                      InAppReview.instance.openStoreListing(
+                                        appStoreId: Constant.APPSTORE_APPID,
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(width: 8),
+                                  TextButton(
                                     child: Text(S.of(context).contact_us),
                                     onPressed: () async {
                                       final Email email = Email(
@@ -699,7 +711,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                         ],
                                         isHTML: false,
                                       );
-
                                       await FlutterEmailSender.send(email);
                                     },
                                   ),

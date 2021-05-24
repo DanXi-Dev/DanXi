@@ -163,6 +163,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("隐私政策"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目页面"),
+    "rate" : MessageLookupByLibrary.simpleMessage("给我们评分"),
     "reason_report_post" : m9,
     "reply_failed" : m10,
     "reply_to" : m11,

@@ -26,6 +26,7 @@ import 'package:flutter/widgets.dart';
 class Constant {
   static const bool IS_PRODUCTION_ENVIRONMENT =
       bool.fromEnvironment('dart.vm.product');
+  static const String APPSTORE_APPID = '1568629997';
 
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
