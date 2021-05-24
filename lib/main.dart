@@ -198,8 +198,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// When notified [watchActivated], we should send it after [_personInfo] is loaded.
   bool _needSendToWatch = false;
 
+  /// Whether the error dialog is shown.
+  /// See [_dealWithCaptchaNeededException]
   bool _isDialogShown = false;
 
+  /// The tab page index.
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.

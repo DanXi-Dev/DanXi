@@ -89,6 +89,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _isEndIndicatorShown = false;
   }
 
+  @override
+  void didChangeDependencies() {
+    _setContent();
+    super.didChangeDependencies();
+  }
+
   void refreshSelf() {
     if (mounted) {
       setState(() {
@@ -97,8 +103,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _lastSnapshotData = null;
         _isRefreshing = true;
         _isEndIndicatorShown = false;
+        _setContent();
       });
     }
+  }
+
+  @override
+  void didUpdateWidget(covariant BBSPostDetail oldWidget) {
+    _setContent();
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
