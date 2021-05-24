@@ -213,6 +213,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "today_course" : MessageLookupByLibrary.simpleMessage("Courses Today"),
     "uploading_image" : MessageLookupByLibrary.simpleMessage("Uploading image..."),
     "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("Failed to upload image. Please check your internet connection."),
+    "version" : MessageLookupByLibrary.simpleMessage("Version"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
     "week" : m15,

@@ -37,6 +37,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
@@ -373,22 +374,23 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                     data: Theme.of(context)
                         .copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(
+                        maintainState: true,
                         leading: PlatformX.isMaterial(context)
                             ? const Icon(Icons.info)
                             : const Icon(SFSymbols.info_circle),
                         title: Text(S.of(context).about),
-                        //subtitle: Text("Click to view"),
                         children: <Widget>[
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
-                                padding: new EdgeInsets.fromLTRB(25, 5, 25, 0),
-                                child: new Column(
+                                padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+                                child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
+                                      //Description
                                       Text(
                                         S.of(context).app_description_title,
                                         textScaleFactor: 1.1,
@@ -634,7 +636,41 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 15),
+                                      const SizedBox(height: 16),
+                                      //Version
+                                      FutureBuilder<PackageInfo>(
+                                        future: PackageInfo.fromPlatform(),
+                                        builder: (context, snapshot) {
+                                          switch (snapshot.connectionState) {
+                                            case ConnectionState.done:
+                                              return Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                  S.of(context).version +
+                                                      ' ${snapshot?.data?.version} build ${snapshot?.data?.buildNumber}',
+                                                  textScaleFactor: 0.7,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              );
+                                            default:
+                                              return Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                  S.of(context).loading,
+                                                  textScaleFactor: 0.7,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              );
+                                          }
+                                        },
+                                      ),
+                                      const SizedBox(height: 4),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
@@ -643,7 +679,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                             S.of(context).author_descriptor,
                                             textScaleFactor: 0.7,
                                             textAlign: TextAlign.right,
-                                            //style: TextStyle(fontStyle: FontStyle.italic)),
                                           )
                                         ],
                                       ),
