@@ -28,6 +28,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -217,6 +218,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         .textTheme
         .bodyText2
         .copyWith(color: Theme.of(context).accentColor);
+    final inAppReview = InAppReview.instance;
 
     return RefreshIndicator(
         onRefresh: () async {
@@ -691,13 +693,25 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
-                                  TextButton(
-                                    child: Text(S.of(context).rate),
-                                    onPressed: () {
-                                      InAppReview.instance.openStoreListing(
-                                        appStoreId: Constant.APPSTORE_APPID,
-                                      );
+                                  FutureWidget<bool>(
+                                    successBuilder: (context, snapshot) {
+                                      if (snapshot?.data)
+                                        return TextButton(
+                                          child: Text(S.of(context).rate),
+                                          onPressed: () {
+                                            inAppReview.openStoreListing(
+                                              appStoreId:
+                                                  Constant.APPSTORE_APPID,
+                                            );
+                                          },
+                                        );
+                                      else
+                                        return Container();
                                     },
+                                    loadingBuilder:
+                                        PlatformCircularProgressIndicator(),
+                                    errorBuilder: Container(),
+                                    future: inAppReview.isAvailable(),
                                   ),
                                   const SizedBox(width: 8),
                                   TextButton(

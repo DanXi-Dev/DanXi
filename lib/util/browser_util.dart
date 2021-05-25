@@ -94,7 +94,7 @@ class CustomInAppBrowser extends InAppBrowser {
           await SharedPreferences.getInstance();
       if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
           preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
-        if (Random().nextDouble() > 0.99) inAppReview.requestReview();
+        if (Random().nextDouble() > 0.997) inAppReview.requestReview();
       }
     }
   }

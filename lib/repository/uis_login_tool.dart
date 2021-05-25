@@ -28,15 +28,17 @@ class UISLoginTool {
   static const String WEAK_PASSWORD = "弱密码提示";
 
   /// Warning: if having logged in, return null.
-  static Future<Response> loginUIS(Dio dio, String serviceUrl,
-      NonpersistentCookieJar jar, PersonInfo info) async {
+  static Future<Response> loginUIS(
+      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
+      [bool forceRelogin = false]) async {
     ArgumentError.checkNotNull(info);
     ArgumentError.checkNotNull(jar);
     ArgumentError.checkNotNull(dio);
     ArgumentError.checkNotNull(serviceUrl);
 
     // If it has logged in, return null.
-    if ((await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
+    if (!forceRelogin &&
+        (await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
       Response res = await dio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
       if (res.statusCode == 302 && !res.headers.map.containsKey('set-cookie')) {
