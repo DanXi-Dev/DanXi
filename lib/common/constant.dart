@@ -43,6 +43,7 @@ class Constant {
         brightness: Brightness.light,
         accentColor: Color(0xFF007AFF),
         toggleableActiveColor: Color(0xFF007AFF),
+        canvasColor: Colors.white,
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
           elevation: 2,
