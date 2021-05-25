@@ -19,9 +19,11 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_quill/widgets/controller.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 
 class BBSEditor {
   static Future<void> createNewReply(
@@ -58,19 +60,48 @@ class BBSEditor {
   }
 
   static Future<String> _showEditor(BuildContext context, String title) async {
+    if (PlatformX.isMobile) {
+      //Build Mobile
+      HtmlEditorController _htmlController = HtmlEditorController();
+      return await showPlatformDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+                title: Text(title),
+                content: Container(
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: BBSMobileEditorWidget(
+                      htmlEditorController: _htmlController,
+                    )),
+                actions: [
+                  PlatformDialogAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () {
+                        Navigator.of(context).pop<String>(null);
+                      }),
+                  PlatformDialogAction(
+                      child: Text(S.of(context).submit),
+                      onPressed: () async {
+                        Navigator.of(context).pop<String>(
+                            await BBSMobileEditorWidget.getText(
+                                _htmlController));
+                      }),
+                ],
+              ));
+    }
+
+    // Build Desktop
     QuillController _controller = QuillController.basic();
     return await showPlatformDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
               title: Text(title),
               content: Container(
-                height: MediaQuery.of(context).size.height * 0.4,
-                width: MediaQuery.of(context).size.width * 0.9,
-                child:
-                BBSEditorWidget(
-                  controller: _controller,
-                )
-              ),
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: BBSDesktopEditorWidget(
+                    quillController: _controller,
+                  )),
               actions: [
                 PlatformDialogAction(
                     child: Text(S.of(context).cancel),
@@ -80,8 +111,8 @@ class BBSEditor {
                 PlatformDialogAction(
                     child: Text(S.of(context).submit),
                     onPressed: () {
-                      Navigator.of(context)
-                          .pop<String>(BBSEditorWidget.getText(_controller));
+                      Navigator.of(context).pop<String>(
+                          BBSDesktopEditorWidget.getText(_controller));
                     }),
               ],
             ));

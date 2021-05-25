@@ -71,6 +71,7 @@ dependencies:
   flutter_inappwebview: ^5.3.2
   permission_handler: ^7.1.0
   in_app_review: ^2.0.2
+  html_editor_enhanced: ^2.1.1
 
 dependency_overrides:
   flutter_quill:

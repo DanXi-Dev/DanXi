@@ -29,6 +29,7 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:delta_markdown/delta_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
@@ -38,6 +39,7 @@ import 'package:flutter_quill/widgets/editor.dart';
 import 'package:flutter_quill/widgets/toolbar.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:markdown/markdown.dart' as markdown;
 
 class BBSEditorPage extends StatefulWidget {
@@ -50,7 +52,8 @@ class BBSEditorPage extends StatefulWidget {
 }
 
 class BBSEditorPageState extends State<BBSEditorPage> {
-  QuillController _controller = QuillController.basic();
+  var _controller =
+      PlatformX.isMobile ? HtmlEditorController() : QuillController.basic();
 
   /// Whether the send button is enabled
   bool _canSend = true;
@@ -164,30 +167,89 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                       onChanged: () {}),
                 ),
                 Expanded(
-                  child: BBSEditorWidget(
-                    controller: _controller,
-                  ),
+                  child: PlatformX.isMobile
+                      ? BBSMobileEditorWidget(
+                          htmlEditorController: _controller,
+                        )
+                      : BBSDesktopEditorWidget(
+                          quillController: _controller,
+                        ),
                 )
               ],
             )));
   }
 
   Future<void> _sendDocument() async {
-    if (BBSEditorWidget.isEmpty(_controller)) {
+    if (_controller is HtmlEditorController) {
+      //Handle Mobile
+      String text = await BBSMobileEditorWidget.getText(_controller);
+      if (BBSMobileEditorWidget.isEmpty(text)) return;
+      Navigator.pop<PostEditorText>(context, PostEditorText(text, _tags));
     } else {
-      Navigator.pop<PostEditorText>(
-          context, PostEditorText(BBSEditorWidget.getText(_controller), _tags));
+      //Handle Desktop
+      if (BBSDesktopEditorWidget.isEmpty(_controller)) {
+      } else {
+        Navigator.pop<PostEditorText>(context,
+            PostEditorText(BBSDesktopEditorWidget.getText(_controller), _tags));
+      }
     }
   }
 }
 
-class BBSEditorWidget extends StatefulWidget {
-  final QuillController controller;
+// Use HTML_EDITOR_ENHANCED for mobile
+class BBSMobileEditorWidget extends StatelessWidget {
+  final HtmlEditorController htmlEditorController;
 
-  const BBSEditorWidget({Key key, this.controller}) : super(key: key);
+  const BBSMobileEditorWidget({Key key, this.htmlEditorController})
+      : super(key: key);
+
+  ///Note: this returns a Future<String>
+  static Future<String> getText(HtmlEditorController controller) {
+    return controller.getText();
+  }
+
+  static bool isEmpty(String text) {
+    return text == null || text.trim().isEmpty;
+  }
 
   @override
-  _BBSEditorWidgetState createState() => _BBSEditorWidgetState();
+  Widget build(BuildContext context) {
+    return Material(
+        child: HtmlEditor(
+      controller: htmlEditorController,
+      htmlToolbarOptions: HtmlToolbarOptions(defaultToolbarButtons: [
+        //add constructors here and set buttons to false, e.g.
+        FontButtons(),
+        InsertButtons(audio: false, video: false, table: false, hr: false),
+        ColorButtons(),
+        ParagraphButtons(
+            alignJustify: false,
+            increaseIndent: false,
+            decreaseIndent: false,
+            textDirection: false,
+            lineHeight: false,
+            caseConverter: false),
+      ]),
+      htmlEditorOptions: HtmlEditorOptions(
+        hint: S.of(context).editor_hint,
+        //initalText: "text content initial, if any",
+      ),
+      otherOptions: OtherOptions(
+        height: 400,
+      ),
+    ));
+  }
+}
+
+// Use Quill for Desktop
+class BBSDesktopEditorWidget extends StatefulWidget {
+  final QuillController quillController;
+
+  const BBSDesktopEditorWidget({Key key, this.quillController})
+      : super(key: key);
+
+  @override
+  _BBSDesktopEditorWidgetState createState() => _BBSDesktopEditorWidgetState();
 
   static getText(QuillController controller) {
     String html = markdown.markdownToHtml(
@@ -200,7 +262,7 @@ class BBSEditorWidget extends StatefulWidget {
   }
 }
 
-class _BBSEditorWidgetState extends State<BBSEditorWidget> {
+class _BBSDesktopEditorWidgetState extends State<BBSDesktopEditorWidget> {
   final _focusNode = FocusNode();
 
   @override
@@ -210,7 +272,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           PlatformX.isDarkMode ? Brightness.dark : Brightness.light,
       focusNode: _focusNode,
       autoFocus: true,
-      controller: widget.controller,
+      controller: widget.quillController,
       scrollController: ScrollController(),
       expands: false,
       padding: EdgeInsets.zero,
@@ -228,7 +290,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
             ),
           ),
           child: QuillToolbar.basic(
-            controller: widget.controller,
+            controller: widget.quillController,
             showBackgroundColorButton: false,
             showColorButton: false,
             showStrikeThrough: false,
