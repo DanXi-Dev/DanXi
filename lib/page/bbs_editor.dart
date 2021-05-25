@@ -27,6 +27,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:delta_markdown/delta_markdown.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -217,19 +218,53 @@ class BBSMobileEditorWidget extends StatelessWidget {
     return Material(
         child: HtmlEditor(
       controller: htmlEditorController,
-      htmlToolbarOptions: HtmlToolbarOptions(defaultToolbarButtons: [
-        //add constructors here and set buttons to false, e.g.
-        FontButtons(),
-        InsertButtons(audio: false, video: false, table: false, hr: false),
-        ColorButtons(),
-        ParagraphButtons(
-            alignJustify: false,
-            increaseIndent: false,
-            decreaseIndent: false,
-            textDirection: false,
-            lineHeight: false,
-            caseConverter: false),
-      ]),
+      htmlToolbarOptions: HtmlToolbarOptions(
+          mediaUploadInterceptor:
+              (PlatformFile file, InsertFileType type) async {
+            switch (type) {
+              case InsertFileType.image:
+                ProgressFuture progressDialog = showProgressDialog(
+                    loadingText: S.of(context).uploading_image,
+                    context: context);
+                try {
+                  htmlEditorController.insertNetworkImage(
+                      await PostRepository.getInstance()
+                          .uploadImage(File(file.path))
+                          .then((value) {
+                    //"showAnim: true" makes it crash. Don't know the reason.
+                    progressDialog.dismiss(showAnim: false);
+                    return value;
+                  }, onError: (e) {
+                    progressDialog.dismiss(showAnim: false);
+                    Noticing.showNotice(
+                        context, S.of(context).uploading_image_failed);
+                    throw e;
+                  }));
+                } catch (ignored) {}
+                return false;
+
+              case InsertFileType.audio:
+                // Ignored
+                break;
+              case InsertFileType.video:
+                // Ignored
+                break;
+            }
+            return false;
+          },
+          defaultToolbarButtons: [
+            //add constructors here and set buttons to false, e.g.
+            FontButtons(),
+            InsertButtons(audio: false, video: false, table: false, hr: false),
+            ColorButtons(),
+            ParagraphButtons(
+                alignJustify: false,
+                increaseIndent: false,
+                decreaseIndent: false,
+                textDirection: false,
+                lineHeight: false,
+                caseConverter: false),
+          ]),
       htmlEditorOptions: HtmlEditorOptions(
         hint: S.of(context).editor_hint,
         //initalText: "text content initial, if any",

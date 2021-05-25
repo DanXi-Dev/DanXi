@@ -722,11 +722,14 @@ class PostRepository extends BaseRepositoryWithDio {
   Future<String> uploadImage(File file) async {
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
-    Response response = await dio.post(_BASE_URL + "/images/",
-        data: FormData.fromMap(
-            {"img": await MultipartFile.fromFile(path, filename: fileName)}),
-        options: Options(headers: _tokenHeader));
-    return response.data['url'];
+    Response response = await dio
+        .post(_BASE_URL + "/images/",
+            data: FormData.fromMap({
+              "img": await MultipartFile.fromFile(path, filename: fileName)
+            }),
+            options: Options(headers: _tokenHeader))
+        .onError((error, stackTrace) => throw ImageUploadError());
+    return response?.data['url'];
   }
 
   Future<int> newReply(int discussionId, int postId, String content) async {
@@ -756,3 +759,5 @@ class NotLoginError implements Exception {
 }
 
 class LoginExpiredError implements Exception {}
+
+class ImageUploadError implements Exception {}
