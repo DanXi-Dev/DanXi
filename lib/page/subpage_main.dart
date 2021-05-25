@@ -20,24 +20,19 @@ import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
-import 'package:dan_xi/feature/exam_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
-import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
-import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -123,12 +118,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
     ),
   };
 
-  List<Widget> _buildCards() {
+  List<Widget> _buildCards(List<String> widgetSequence) {
     List<Widget> _widgets = [];
     List<Widget> _currentCardChildren = [];
-    SettingsProvider.of(_preferences)
-        .dashboardWidgetsSequence
-        .forEach((element) {
+    widgetSequence.forEach((element) {
       if (element == 'seperate_card') {
         _widgets.add(Card(
           child: Column(
@@ -151,6 +144,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> widgetList =
+        SettingsProvider.of(_preferences).dashboardWidgetsSequence;
     return RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.mediumImpact();
@@ -161,7 +156,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
             removeTop: true,
             child: ListView(
               padding: EdgeInsets.all(4),
-              children: _buildCards(),
+              children: _buildCards(widgetList),
             )));
   }
 }

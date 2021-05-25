@@ -28,6 +28,7 @@ import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
+import 'package:dan_xi/page/dashboard_reorder.dart';
 import 'package:dan_xi/page/empty_classroom_detail.dart';
 import 'package:dan_xi/page/exam_detail.dart';
 import 'package:dan_xi/page/open_source_license.dart';
@@ -113,6 +114,8 @@ class DanxiApp extends StatelessWidget {
     '/announcement/list': (context, {arguments}) =>
         AnnouncementList(arguments: arguments),
     '/exam/detail': (context, {arguments}) => ExamList(arguments: arguments),
+    '/dashboard/reorder': (context, {arguments}) =>
+        DashboardReorderPage(arguments: arguments),
   };
 
   changeSizeOnDesktop() async {
@@ -225,7 +228,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonIconBuilders = [
-    (cxt) => PlatformX.isAndroid ? Icons.notifications : SFSymbols.bell_circle,
+    (cxt) => SFSymbols.pencil_circle,
     (cxt) =>
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
     (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
@@ -240,7 +243,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ];
 
   final List<Function> _subpageLeadingActionButtonIconBuilders = [
-    (cxt) => null,
+    (cxt) => PlatformX.isAndroid ? Icons.notifications : SFSymbols.bell_circle,
     (cxt) => SFSymbols.sort_down_circle,
     (cxt) => null,
     (cxt) => null
@@ -248,7 +251,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonTextBuilders = [
-    (cxt) => S.of(cxt).developer_announcement(''),
+    (cxt) => Text("tmp:edit"),
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
     (cxt) => null,
@@ -262,7 +265,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ];
 
   final List<Function> _subpageLeadingActionButtonTextBuilders = [
-    (cxt) => null,
+    (cxt) => S.of(cxt).developer_announcement(''),
     (cxt) => S.of(cxt).sort_order,
     (cxt) => null,
     (cxt) => null,
@@ -443,7 +446,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _onPressRightmostActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        Navigator.of(context).pushNamed('/announcement/list');
+        Navigator.of(context).pushNamed('/dashboard/reorder', arguments: {
+          'preferences': _preferences
+        }).then((value) => RefreshHomepageEvent().fire());
         break;
       case 1:
         AddNewPostEvent().fire();
@@ -466,6 +471,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _onPressLeadingActionButton() async {
     switch (_pageIndex.value) {
       //Entries omitted
+      case 0:
+        Navigator.of(context).pushNamed('/announcement/list');
+        break;
       case 1:
         showPlatformModalSheet(
             context: context,
