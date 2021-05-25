@@ -1495,10 +1495,10 @@ class S {
     );
   }
 
-  /// `https://github.com/w568w/DanXi`
+  /// `https://danxi-dev.github.io`
   String get project_url {
     return Intl.message(
-      'https://github.com/w568w/DanXi',
+      'https://danxi-dev.github.io',
       name: 'project_url',
       desc: '',
       args: [],

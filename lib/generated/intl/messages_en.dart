@@ -182,7 +182,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
-    "project_url" : MessageLookupByLibrary.simpleMessage("https://github.com/w568w/DanXi"),
+    "project_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io"),
     "rate" : MessageLookupByLibrary.simpleMessage("Rate Us"),
     "reason_report_post" : m9,
     "reply_failed" : m10,
