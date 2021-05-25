@@ -16,7 +16,10 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/feature/base_feature.dart';
+import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,11 +33,37 @@ class SettingsProvider {
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
+  static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets";
 
   SettingsProvider._(this._preferences);
 
   factory SettingsProvider.of(SharedPreferences preferences) {
     return SettingsProvider._(preferences);
+  }
+
+  /// User's preferences of Dashboard Widgets
+  /// This getter always return a non-null value, defaults to default setting
+  List<String> get dashboardWidgetsSequence {
+    if (_preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
+      return _preferences.getStringList(KEY_DASHBOARD_WIDGETS);
+    }
+    return [
+      'welcome_feature',
+      'next_course_feature',
+      'divider',
+      'ecard_balance_feature',
+      'dining_hall_crowdedness_feature',
+      'aao_notice_feature',
+      'empty_classroom_feature',
+      'seperate_card',
+      'fudan_daily_feature',
+      'seperate_card',
+      'qr_feature'
+    ];
+  }
+
+  set dashboardWidgetsSequence(List<String> value) {
+    _preferences.setStringList(KEY_DASHBOARD_WIDGETS, value);
   }
 
   Campus get campus {
