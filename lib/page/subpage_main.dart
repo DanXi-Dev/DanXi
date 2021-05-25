@@ -112,7 +112,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
     'fudan_daily_feature': FeatureListItem(
       feature: FudanDailyFeature(),
     ),
-    'seperate_card': Container(),
+    'new_card': Container(),
     'qr_feature': FeatureListItem(
       feature: QRFeature(),
     ),
@@ -122,7 +122,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
     List<Widget> _widgets = [];
     List<Widget> _currentCardChildren = [];
     widgetSequence.forEach((element) {
-      if (element == 'seperate_card') {
+      if (element == 'new_card') {
         _widgets.add(Card(
           child: Column(
             children: _currentCardChildren,

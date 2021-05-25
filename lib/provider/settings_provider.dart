@@ -55,9 +55,9 @@ class SettingsProvider {
       'dining_hall_crowdedness_feature',
       'aao_notice_feature',
       'empty_classroom_feature',
-      'seperate_card',
+      'new_card',
       'fudan_daily_feature',
-      'seperate_card',
+      'new_card',
       'qr_feature'
     ];
   }

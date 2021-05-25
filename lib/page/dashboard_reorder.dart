@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ffi';
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -23,7 +25,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardReorderPage extends StatefulWidget {
@@ -38,52 +39,92 @@ class DashboardReorderPage extends StatefulWidget {
 
 class _DashboardReorderPage extends State<DashboardReorderPage> {
   SharedPreferences _preferences;
+  List<String> sequence;
 
   @override
   Widget build(BuildContext context) {
-    List<String> sequence =
-        SettingsProvider.of(_preferences).dashboardWidgetsSequence;
+    sequence = SettingsProvider.of(_preferences).dashboardWidgetsSequence;
+    print(sequence);
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBarX(title: Text("title")),
-      body: Column(children: [
-        Expanded(
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: WithScrollbar(
-                  child: ReorderableListView(
-                    scrollController: PrimaryScrollController.of(context),
-                    children: _getListWidgets(sequence),
-                    onReorder: (oldIndex, newIndex) {
-                      String tmp = sequence[oldIndex];
-                      sequence[oldIndex] = sequence[newIndex];
-                      sequence[newIndex] = tmp;
-                      SettingsProvider.of(_preferences)
-                          .dashboardWidgetsSequence = sequence;
-
-                      setState(() {});
-                    },
-                  ),
-                  controller: PrimaryScrollController.of(context),
-                ))),
-      ]),
+      body: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: WithScrollbar(
+          child: Material(
+            child: Expanded(
+              child: ReorderableListView(
+                primary: true,
+                children: _getListWidgets() +
+                    [
+                      Padding(
+                        key: UniqueKey(),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                        child: ListTile(
+                          leading: Icon(PlatformIcons(context).addCircled),
+                          title: Text("Add new_card"),
+                          onTap: () {
+                            sequence.add("new_card");
+                            SettingsProvider.of(_preferences)
+                                .dashboardWidgetsSequence = sequence;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      Padding(
+                        key: UniqueKey(),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                        child: ListTile(
+                          leading: Icon(PlatformIcons(context).addCircled),
+                          title: Text("Add divider"),
+                          onTap: () {
+                            sequence.add("divider");
+                            SettingsProvider.of(_preferences)
+                                .dashboardWidgetsSequence = sequence;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                onReorder: (oldIndex, newIndex) {
+                  if (newIndex > oldIndex) --newIndex;
+                  String tmp = sequence[oldIndex];
+                  sequence.removeAt(oldIndex);
+                  sequence.insert(newIndex, tmp);
+                  SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                      sequence;
+                  setState(() {});
+                },
+              ),
+            ),
+          ),
+          controller: PrimaryScrollController.of(context),
+        ),
+      ),
     );
   }
 
-  List<Widget> _getListWidgets(List<String> widgetSequence) {
+  List<Widget> _getListWidgets() {
     List<Widget> _widgets = [];
-    widgetSequence.forEach((element) {
-      _widgets.add(Material(
+    int currentIndex = 0;
+    sequence.forEach((element) {
+      _widgets.add(Dismissible(
         key: UniqueKey(),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           child: ListTile(
-            title: Text((element == 'seperate_card' ? '' : '  ') + element),
+            title: Text((element == 'new_card' ? '' : '\t\t') + element),
           ),
         ),
+        onDismissed: (direction) {
+          sequence.removeAt(currentIndex);
+        },
       ));
+      ++currentIndex;
     });
     return _widgets;
   }
