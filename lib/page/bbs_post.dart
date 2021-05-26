@@ -39,6 +39,8 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -59,6 +61,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   static const POST_COUNT_PER_PAGE = 10;
 
   Future<List<Reply>> _searchResult;
+  SharedPreferences _preferences;
 
   Future<List<Reply>> _content;
 
@@ -89,9 +92,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     _setContent();
     super.didChangeDependencies();
+    _getSharedPreferences();
+  }
+
+  _getSharedPreferences() async {
+    _preferences = await SharedPreferences.getInstance();
   }
 
   void refreshSelf() {
@@ -334,9 +342,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 children: [
                   if (generateTags)
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(_post, null),
-                    ),
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: generateTagWidgets(_post, (String tagname) {
+                          Navigator.of(context)
+                              .pushNamed('/bbs/discussions', arguments: {
+                            "tagFilter": tagname,
+                            'preferences': _preferences,
+                          });
+                        })),
                   Row(
                     children: [
                       if (e.username == _post.first_post.username)
