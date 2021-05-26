@@ -116,6 +116,8 @@ class DanxiApp extends StatelessWidget {
     '/exam/detail': (context, {arguments}) => ExamList(arguments: arguments),
     '/dashboard/reorder': (context, {arguments}) =>
         DashboardReorderPage(arguments: arguments),
+    '/bbs/discussions': (context, {arguments}) =>
+        BBSSubpage(arguments: arguments),
   };
 
   changeSizeOnDesktop() async {

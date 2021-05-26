@@ -84,10 +84,12 @@ class BBSSubpage extends PlatformSubpage {
   @override
   bool get needPadding => true;
 
+  final Map<String, dynamic> arguments;
+
   @override
   _BBSSubpageState createState() => _BBSSubpageState();
 
-  BBSSubpage({Key key});
+  BBSSubpage({Key key, this.arguments});
 }
 
 class AddNewPostEvent {}
@@ -174,6 +176,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   void initState() {
     super.initState();
     _initialize();
+    if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
+      _tagFilter = widget.arguments['tagFilter'];
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -207,7 +211,10 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void didChangeDependencies() {
-    _preferences = Provider.of<SharedPreferences>(context);
+    if (widget.arguments != null && widget.arguments.containsKey('preferences'))
+      _preferences = widget.arguments['preferences'];
+    else
+      _preferences = Provider.of<SharedPreferences>(context);
     _setContent();
     super.didChangeDependencies();
   }
@@ -362,7 +369,12 @@ class _BBSSubpageState extends State<BBSSubpage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 generateTagWidgets(postElement, (String tagname) {
-                  setState(() {
+                  Navigator.of(context)
+                      .pushNamed('/bbs/discussions', arguments: {
+                    "tagFilter": tagname,
+                    'preferences': _preferences,
+                  });
+                  /*setState(() {
                     _tagFilter = tagname;
                     _currentBBSPage = 1;
                     _lastPageItems = [
@@ -375,7 +387,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     _isRefreshing = true;
                     _isEndIndicatorShown = false;
                     _setContent();
-                  });
+                  });*/
                 }),
                 const SizedBox(
                   height: 10,
