@@ -389,8 +389,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     child: isNested
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Text(
-                            renderText(e.content, S.of(context).image_tag),
-                            maxLines: 1,
+                            renderText(e.content, S.of(context).image_tag)
+                                .trim(),
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           )
                         : HtmlWidget(
