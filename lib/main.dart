@@ -450,9 +450,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _onPressRightmostActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        Navigator.of(context).pushNamed('/dashboard/reorder', arguments: {
-          'preferences': _preferences
-        }).then((value) => RefreshHomepageEvent().fire());
+        Navigator.of(context).pushNamed('/dashboard/reorder',
+            arguments: {'preferences': _preferences});
         break;
       case 1:
         AddNewPostEvent().fire();

@@ -775,6 +775,36 @@ class S {
     );
   }
 
+  /// `Divider`
+  String get divider {
+    return Intl.message(
+      'Divider',
+      name: 'divider',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Welcome`
+  String get welcome_feature {
+    return Intl.message(
+      'Welcome',
+      name: 'welcome_feature',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the "Reset Layout" button to restore removed cards.`
+  String get reorder_hint {
+    return Intl.message(
+      'To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the "Reset Layout" button to restore removed cards.',
+      name: 'reorder_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(

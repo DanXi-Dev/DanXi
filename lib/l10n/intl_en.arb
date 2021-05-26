@@ -74,6 +74,9 @@
     "reset_layout": "Reset Layout",
     "hidden_widgets": "Hidden",
     "unmovable_widget": "This object cannot be moved",
+    "divider": "Divider",
+    "welcome_feature": "Welcome",
+    "reorder_hint": "To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the \"Reset Layout\" button to restore removed cards.",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",

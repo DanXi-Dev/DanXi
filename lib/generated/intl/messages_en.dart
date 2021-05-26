@@ -106,6 +106,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dev_page_4" : MessageLookupByLibrary.simpleMessage("https://github.com/hasbai"),
     "developer_announcement" : m1,
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("Canteen Popularity"),
+    "divider" : MessageLookupByLibrary.simpleMessage("Divider"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("Card Balance"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("Transactions"),
     "edit" : MessageLookupByLibrary.simpleMessage("Edit"),
@@ -190,6 +191,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "project_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io"),
     "rate" : MessageLookupByLibrary.simpleMessage("Rate Us"),
     "reason_report_post" : m9,
+    "reorder_hint" : MessageLookupByLibrary.simpleMessage("To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the \"Reset Layout\" button to restore removed cards."),
     "reply_failed" : m10,
     "reply_to" : m11,
     "report" : MessageLookupByLibrary.simpleMessage("Report"),
@@ -229,6 +231,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
     "week" : m15,
     "welcome" : m16,
+    "welcome_feature" : MessageLookupByLibrary.simpleMessage("Welcome"),
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

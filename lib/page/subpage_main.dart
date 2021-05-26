@@ -24,6 +24,7 @@ import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -54,6 +55,7 @@ class RefreshHomepageEvent {}
 class _HomeSubpageState extends State<HomeSubpage> {
   static final StateStreamListener _refreshSubscription = StateStreamListener();
   SharedPreferences _preferences;
+  Map<String, Widget> widgetMap;
 
   @override
   void initState() {
@@ -69,6 +71,34 @@ class _HomeSubpageState extends State<HomeSubpage> {
   @override
   void didChangeDependencies() {
     _preferences = Provider.of<SharedPreferences>(context);
+    widgetMap = {
+      'welcome_feature': FeatureListItem(
+        feature: WelcomeFeature(),
+      ),
+      'next_course_feature': FeatureListItem(
+        feature: NextCourseFeature(),
+      ),
+      'divider': Divider(),
+      'ecard_balance_feature': FeatureListItem(
+        feature: EcardBalanceFeature(),
+      ),
+      'dining_hall_crowdedness_feature': FeatureListItem(
+        feature: DiningHallCrowdednessFeature(),
+      ),
+      'aao_notice_feature': FeatureListItem(
+        feature: FudanAAONoticesFeature(),
+      ),
+      'empty_classroom_feature': FeatureListItem(
+        feature: EmptyClassroomFeature(),
+      ),
+      'fudan_daily_feature': FeatureListItem(
+        feature: FudanDailyFeature(),
+      ),
+      'new_card': Container(),
+      'qr_feature': FeatureListItem(
+        feature: QRFeature(),
+      ),
+    };
     super.didChangeDependencies();
   }
 
@@ -86,37 +116,6 @@ class _HomeSubpageState extends State<HomeSubpage> {
   initPlatformState() async {
     _brightness = await ScreenProxy.brightness;
   }
-
-  // TODO: Looks like all widgets are built when creating this map
-  // Is there a way to create them only when needed?
-  static Map<String, Widget> widgetMap = {
-    'welcome_feature': FeatureListItem(
-      feature: WelcomeFeature(),
-    ),
-    'next_course_feature': FeatureListItem(
-      feature: NextCourseFeature(),
-    ),
-    'divider': Divider(),
-    'ecard_balance_feature': FeatureListItem(
-      feature: EcardBalanceFeature(),
-    ),
-    'dining_hall_crowdedness_feature': FeatureListItem(
-      feature: DiningHallCrowdednessFeature(),
-    ),
-    'aao_notice_feature': FeatureListItem(
-      feature: FudanAAONoticesFeature(),
-    ),
-    'empty_classroom_feature': FeatureListItem(
-      feature: EmptyClassroomFeature(),
-    ),
-    'fudan_daily_feature': FeatureListItem(
-      feature: FudanDailyFeature(),
-    ),
-    'new_card': Container(),
-    'qr_feature': FeatureListItem(
-      feature: QRFeature(),
-    ),
-  };
 
   List<Widget> _buildCards(List<String> widgetSequence) {
     List<Widget> _widgets = [];

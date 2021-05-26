@@ -90,6 +90,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "default_campus" : MessageLookupByLibrary.simpleMessage("当前校区"),
     "developer_announcement" : m1,
     "dining_hall_crowdedness" : MessageLookupByLibrary.simpleMessage("食堂排队消费状况"),
+    "divider" : MessageLookupByLibrary.simpleMessage("分割线"),
     "ecard_balance" : MessageLookupByLibrary.simpleMessage("校园卡余额"),
     "ecard_balance_log" : MessageLookupByLibrary.simpleMessage("消费记录"),
     "edit" : MessageLookupByLibrary.simpleMessage("编辑"),
@@ -170,6 +171,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "project_page" : MessageLookupByLibrary.simpleMessage("项目网页"),
     "rate" : MessageLookupByLibrary.simpleMessage("给我们评分"),
     "reason_report_post" : m9,
+    "reorder_hint" : MessageLookupByLibrary.simpleMessage("若要重新排列主页卡片，长按并拖动以下条目。\n滑动以删除卡片。用“重置布局”按钮来恢复已删除的卡片。"),
     "reply_failed" : m10,
     "reply_to" : m11,
     "report" : MessageLookupByLibrary.simpleMessage("举报"),
@@ -209,6 +211,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "weak_password" : MessageLookupByLibrary.simpleMessage("登录失败，未知错误\n请注意：目前旦夕不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
     "week" : m15,
     "welcome" : m16,
+    "welcome_feature" : MessageLookupByLibrary.simpleMessage("欢迎"),
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }
