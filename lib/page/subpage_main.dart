@@ -50,20 +50,34 @@ class HomeSubpage extends PlatformSubpage {
   HomeSubpage({Key key});
 }
 
-class RefreshHomepageEvent {}
+class RefreshHomepageEvent {
+  final bool queueRefresh;
+  final bool onlyIfQueued;
+  RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
+}
 
 class _HomeSubpageState extends State<HomeSubpage> {
   static final StateStreamListener _refreshSubscription = StateStreamListener();
   SharedPreferences _preferences;
   Map<String, Widget> widgetMap;
 
+  bool isRefreshQueued = false;
+
   @override
   void initState() {
     super.initState();
     initPlatformState();
     _refreshSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<RefreshHomepageEvent>().listen((_) {
-          refreshSelf();
+        Constant.eventBus.on<RefreshHomepageEvent>().listen((event) {
+          if (event.queueRefresh)
+            isRefreshQueued = true;
+          else if (event.onlyIfQueued) {
+            isRefreshQueued = false;
+            refreshSelf();
+          } else {
+            _rebuild();
+            refreshSelf();
+          }
         }),
         hashCode);
   }
@@ -71,6 +85,13 @@ class _HomeSubpageState extends State<HomeSubpage> {
   @override
   void didChangeDependencies() {
     _preferences = Provider.of<SharedPreferences>(context);
+    _rebuild();
+    super.didChangeDependencies();
+  }
+
+  /// This function refreshes the content of Dashboard
+  /// Call this when new (online) data should be loaded.
+  void _rebuild() {
     widgetMap = {
       'welcome_feature': FeatureListItem(
         feature: WelcomeFeature(),
@@ -99,7 +120,6 @@ class _HomeSubpageState extends State<HomeSubpage> {
         feature: QRFeature(),
       ),
     };
-    super.didChangeDependencies();
   }
 
   @override
@@ -149,6 +169,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
     return RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.mediumImpact();
+          _rebuild();
           refreshSelf();
         },
         child: MediaQuery.removePadding(

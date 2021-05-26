@@ -228,10 +228,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonWidgetBuilders = [
-    (cxt) => Text(
-          S.of(cxt).edit,
-          style: TextStyle(fontSize: 16),
-        ),
+    (cxt) => Text(S.of(cxt).edit),
     (cxt) => Icon(
         PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle),
     (cxt) =>
@@ -450,8 +447,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _onPressRightmostActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        Navigator.of(context).pushNamed('/dashboard/reorder',
-            arguments: {'preferences': _preferences});
+        Navigator.of(context).pushNamed('/dashboard/reorder', arguments: {
+          'preferences': _preferences
+        }).then((value) => RefreshHomepageEvent(onlyIfQueued: true).fire());
         break;
       case 1:
         AddNewPostEvent().fire();
