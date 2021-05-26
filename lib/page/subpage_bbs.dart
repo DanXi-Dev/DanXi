@@ -31,6 +31,7 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -159,6 +160,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildSearchTextField() {
+    // If user is filtering by tag, do not build search text field.
+    if (widget.arguments != null) return Container();
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
@@ -240,6 +244,18 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if (widget.arguments == null) return _buildBody(context);
+    return PlatformScaffold(
+      iosContentPadding: true,
+      iosContentBottomPadding: true,
+      appBar: PlatformAppBarX(
+        title: Text(S.of(context).filtering_by_tag(_tagFilter)),
+      ),
+      body: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     return RefreshIndicator(
         color: Theme.of(context).accentColor,
         onRefresh: () async {

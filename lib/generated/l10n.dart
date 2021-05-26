@@ -1385,10 +1385,10 @@ class S {
     );
   }
 
-  /// `Filtering by "{tag}", pull down and refresh to return to timeline.`
+  /// `Filtering by "{tag}"`
   String filtering_by_tag(Object tag) {
     return Intl.message(
-      'Filtering by "$tag", pull down and refresh to return to timeline.',
+      'Filtering by "$tag"',
       name: 'filtering_by_tag',
       desc: '',
       args: [tag],

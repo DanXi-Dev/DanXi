@@ -23,7 +23,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(date) => "开发组公告 ${date}";
 
-  static m2(tag) => "已按照标签\"${tag}\"筛选，下拉刷新以回到时间线";
+  static m2(tag) => "按照\"${tag}\"筛选";
 
   static m3(time) => "将在${time}秒后自动打卡，点击以取消";
 

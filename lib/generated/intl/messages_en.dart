@@ -23,7 +23,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(date) => "DevTeam Announcement ${date}";
 
-  static m2(tag) => "Filtering by \"${tag}\", pull down and refresh to return to timeline.";
+  static m2(tag) => "Filtering by \"${tag}\"";
 
   static m3(time) => "Automatic check-in in ${time} seconds. Tap to cancel.";
 
