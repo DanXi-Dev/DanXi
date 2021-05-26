@@ -48,6 +48,7 @@ class SettingsProvider {
       return _preferences.getStringList(KEY_DASHBOARD_WIDGETS);
     }
     return [
+      'new_card',
       'welcome_feature',
       'next_course_feature',
       'divider',

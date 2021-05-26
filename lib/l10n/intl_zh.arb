@@ -66,6 +66,13 @@
     "acknowledgements_2": " 为本app设计图标",
     "version": "版本",
     "rate": "给我们评分",
+    "dashboard_layout": "首页布局",
+    "edit": "编辑",
+    "add_new_card": "新建卡片",
+    "add_new_divider": "新建分割线",
+    "reset_layout": "重置布局",
+    "hidden_widgets": "隐藏",
+    "unmovable_widget": "该项目不可移动",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",

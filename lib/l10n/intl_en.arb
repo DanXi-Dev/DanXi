@@ -67,6 +67,13 @@
     "acknowledgements_2": " for designing the icon of this app.",
     "version": "Version",
     "rate": "Rate Us",
+    "dashboard_layout": "Dashboard Layout",
+    "edit": "Edit",
+    "add_new_card": "New Card",
+    "add_new_divider": "New Divider",
+    "reset_layout": "Reset Layout",
+    "hidden_widgets": "Hidden",
+    "unmovable_widget": "This object cannot be moved",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",

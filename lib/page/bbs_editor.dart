@@ -253,8 +253,7 @@ class BBSMobileEditorWidget extends StatelessWidget {
             return false;
           },
           defaultToolbarButtons: [
-            //add constructors here and set buttons to false, e.g.
-            FontButtons(),
+            FontButtons(clearAll: false),
             InsertButtons(audio: false, video: false, table: false, hr: false),
             ColorButtons(),
             ParagraphButtons(
@@ -267,10 +266,9 @@ class BBSMobileEditorWidget extends StatelessWidget {
           ]),
       htmlEditorOptions: HtmlEditorOptions(
         hint: S.of(context).editor_hint,
-        //initalText: "text content initial, if any",
       ),
       otherOptions: OtherOptions(
-        height: 400,
+        height: MediaQuery.of(context).size.height,
       ),
     ));
   }

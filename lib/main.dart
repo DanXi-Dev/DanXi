@@ -227,11 +227,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
-  final List<Function> _subpageRightmostActionButtonIconBuilders = [
-    (cxt) => SFSymbols.pencil_circle,
+  final List<Function> _subpageRightmostActionButtonWidgetBuilders = [
+    (cxt) => Text(
+          S.of(cxt).edit,
+          style: TextStyle(fontSize: 16),
+        ),
+    (cxt) => Icon(
+        PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle),
     (cxt) =>
-        PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle,
-    (cxt) => PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up,
+        Icon(PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up),
     (cxt) => null
   ];
 
@@ -251,7 +255,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonTextBuilders = [
-    (cxt) => Text("tmp:edit"),
+    (cxt) => S.of(cxt).dashboard_layout,
     (cxt) => S.of(cxt).new_post,
     (cxt) => S.of(cxt).share,
     (cxt) => null,
@@ -553,7 +557,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         onPressed: _onPressRightsecondActionButton,
       ));
     }
-    if (_subpageRightmostActionButtonIconBuilders[_pageIndex.value](context) !=
+    if (_subpageRightmostActionButtonWidgetBuilders[_pageIndex.value](
+            context) !=
         null) {
       trailingButtons.add(PlatformIconButton(
         material: (_, __) => MaterialIconButtonData(
@@ -561,8 +566,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 _subpageRightmostActionButtonTextBuilders[_pageIndex.value](
                     context)),
         padding: EdgeInsets.zero,
-        icon: Icon(_subpageRightmostActionButtonIconBuilders[_pageIndex.value](
-            context)),
+        icon: _subpageRightmostActionButtonWidgetBuilders[_pageIndex.value](
+            context),
         onPressed: _onPressRightmostActionButton,
       ));
     }

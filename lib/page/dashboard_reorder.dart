@@ -15,10 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ffi';
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -48,58 +47,74 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
-      appBar: PlatformAppBarX(title: Text("title")),
+      appBar: PlatformAppBarX(title: Text(S.of(context).dashboard_layout)),
       body: MediaQuery.removePadding(
         context: context,
         removeTop: true,
         child: WithScrollbar(
           child: Material(
-            child: Expanded(
-              child: ReorderableListView(
-                primary: true,
-                children: _getListWidgets() +
-                    [
-                      Padding(
-                        key: UniqueKey(),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                        child: ListTile(
-                          leading: Icon(PlatformIcons(context).addCircled),
-                          title: Text("Add new_card"),
-                          onTap: () {
-                            sequence.add("new_card");
-                            SettingsProvider.of(_preferences)
-                                .dashboardWidgetsSequence = sequence;
-                            setState(() {});
-                          },
-                        ),
+            child: ReorderableListView(
+              primary: true,
+              children: _getListWidgets() +
+                  [
+                    Padding(
+                      key: UniqueKey(),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).addCircled),
+                        title: Text(S.of(context).add_new_card),
+                        onTap: () {
+                          sequence.add("new_card");
+                          SettingsProvider.of(_preferences)
+                              .dashboardWidgetsSequence = sequence;
+                          setState(() {});
+                        },
                       ),
-                      Padding(
-                        key: UniqueKey(),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                        child: ListTile(
-                          leading: Icon(PlatformIcons(context).addCircled),
-                          title: Text("Add divider"),
-                          onTap: () {
-                            sequence.add("divider");
-                            SettingsProvider.of(_preferences)
-                                .dashboardWidgetsSequence = sequence;
-                            setState(() {});
-                          },
-                        ),
+                    ),
+                    Padding(
+                      key: UniqueKey(),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).addCircled),
+                        title: Text(S.of(context).add_new_divider),
+                        onTap: () {
+                          sequence.add("divider");
+                          SettingsProvider.of(_preferences)
+                              .dashboardWidgetsSequence = sequence;
+                          setState(() {});
+                        },
                       ),
-                    ],
-                onReorder: (oldIndex, newIndex) {
-                  if (newIndex > oldIndex) --newIndex;
-                  String tmp = sequence[oldIndex];
-                  sequence.removeAt(oldIndex);
-                  sequence.insert(newIndex, tmp);
-                  SettingsProvider.of(_preferences).dashboardWidgetsSequence =
-                      sequence;
-                  setState(() {});
-                },
-              ),
+                    ),
+                    Padding(
+                      key: UniqueKey(),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).removeCircled),
+                        title: Text(S.of(context).reset_layout),
+                        onTap: () async {
+                          await _preferences
+                              .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex >= sequence.length) {
+                  Noticing.showNotice(context, S.of(context).unmovable_widget);
+                  return;
+                }
+                if (newIndex > oldIndex) --newIndex;
+                String tmp = sequence[oldIndex];
+                sequence.removeAt(oldIndex);
+                sequence.insert(newIndex, tmp);
+                SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                    sequence;
+                setState(() {});
+              },
             ),
           ),
           controller: PrimaryScrollController.of(context),
@@ -110,22 +125,23 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
 
   List<Widget> _getListWidgets() {
     List<Widget> _widgets = [];
-    int currentIndex = 0;
-    sequence.forEach((element) {
+    for (int index = 0; index < sequence.length; ++index) {
       _widgets.add(Dismissible(
-        key: UniqueKey(),
+        key: ValueKey(index),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 1, horizontal: 16),
           child: ListTile(
-            title: Text((element == 'new_card' ? '' : '\t\t') + element),
+            title: Text((sequence[index] == 'new_card' ? '' : '\t\t') +
+                sequence[index]),
           ),
         ),
         onDismissed: (direction) {
-          sequence.removeAt(currentIndex);
+          print(index);
+          sequence.removeAt(index);
+          SettingsProvider.of(_preferences).dashboardWidgetsSequence = sequence;
         },
       ));
-      ++currentIndex;
-    });
+    }
     return _widgets;
   }
 

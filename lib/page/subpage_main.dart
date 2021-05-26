@@ -123,6 +123,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
     List<Widget> _currentCardChildren = [];
     widgetSequence.forEach((element) {
       if (element == 'new_card') {
+        if (_currentCardChildren.isEmpty) return;
         _widgets.add(Card(
           child: Column(
             children: _currentCardChildren,

@@ -705,6 +705,76 @@ class S {
     );
   }
 
+  /// `Dashboard Layout`
+  String get dashboard_layout {
+    return Intl.message(
+      'Dashboard Layout',
+      name: 'dashboard_layout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit`
+  String get edit {
+    return Intl.message(
+      'Edit',
+      name: 'edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Card`
+  String get add_new_card {
+    return Intl.message(
+      'New Card',
+      name: 'add_new_card',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Divider`
+  String get add_new_divider {
+    return Intl.message(
+      'New Divider',
+      name: 'add_new_divider',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset Layout`
+  String get reset_layout {
+    return Intl.message(
+      'Reset Layout',
+      name: 'reset_layout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hidden`
+  String get hidden_widgets {
+    return Intl.message(
+      'Hidden',
+      name: 'hidden_widgets',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This object cannot be moved`
+  String get unmovable_widget {
+    return Intl.message(
+      'This object cannot be moved',
+      name: 'unmovable_widget',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(
