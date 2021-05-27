@@ -48,18 +48,18 @@ class SettingsProvider {
       return _preferences.getStringList(KEY_DASHBOARD_WIDGETS);
     }
     return [
-      'new_card',
-      'welcome_feature',
-      'next_course_feature',
-      'divider',
-      'ecard_balance_feature',
-      'dining_hall_crowdedness_feature',
-      'aao_notice_feature',
-      'empty_classroom_feature',
-      'new_card',
-      'fudan_daily_feature',
-      'new_card',
-      'qr_feature'
+      'n:new_card',
+      'n:welcome_feature',
+      'n:next_course_feature',
+      'n:divider',
+      'n:ecard_balance_feature',
+      'n:dining_hall_crowdedness_feature',
+      'n:aao_notice_feature',
+      'n:empty_classroom_feature',
+      'n:new_card',
+      'n:fudan_daily_feature',
+      'n:new_card',
+      'n:qr_feature'
     ];
   }
 

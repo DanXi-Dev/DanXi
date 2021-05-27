@@ -25,6 +25,7 @@ import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/dashboard_reorder.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -141,7 +142,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
     List<Widget> _widgets = [];
     List<Widget> _currentCardChildren = [];
     widgetSequence.forEach((element) {
-      if (element == 'new_card') {
+      if (!getWidgetEnabledStatusFromSettings(element)) return;
+      if (getWidgetStringFromSettings(element) == 'new_card') {
         if (_currentCardChildren.isEmpty) return;
         _widgets.add(Card(
           child: Column(
@@ -150,7 +152,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
         ));
         _currentCardChildren = [];
       }
-      _currentCardChildren.add(widgetMap[element]);
+      _currentCardChildren.add(widgetMap[getWidgetStringFromSettings(element)]);
     });
     if (_currentCardChildren.isNotEmpty) {
       _widgets.add(Card(

@@ -38,6 +38,14 @@ class DashboardReorderPage extends StatefulWidget {
   _DashboardReorderPage createState() => _DashboardReorderPage();
 }
 
+String getWidgetStringFromSettings(String value) {
+  return RegExp(r'n:[a-z_]+').firstMatch(value).group(0).substring(2);
+}
+
+bool getWidgetEnabledStatusFromSettings(String value) {
+  return !value.contains('s:disabled');
+}
+
 class _DashboardReorderPage extends State<DashboardReorderPage> {
   SharedPreferences _preferences;
   List<String> sequence;
@@ -76,7 +84,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                               leading: Icon(PlatformIcons(context).addCircled),
                               title: Text(S.of(context).add_new_card),
                               onTap: () {
-                                sequence.add("new_card");
+                                sequence.add("n:new_card");
                                 SettingsProvider.of(_preferences)
                                     .dashboardWidgetsSequence = sequence;
                                 RefreshHomepageEvent(queueRefresh: true).fire();
@@ -92,7 +100,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                               leading: Icon(PlatformIcons(context).addCircled),
                               title: Text(S.of(context).add_new_divider),
                               onTap: () {
-                                sequence.add("divider");
+                                sequence.add("n:divider");
                                 SettingsProvider.of(_preferences)
                                     .dashboardWidgetsSequence = sequence;
                                 RefreshHomepageEvent(queueRefresh: true).fire();
@@ -159,23 +167,39 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
     List<Widget> _widgets = [];
 
     for (int index = 0; index < sequence.length; ++index) {
-      _widgets.add(Dismissible(
-        key: ValueKey(index),
-        child: Padding(
+      _widgets.add(
+        Padding(
+          key: ValueKey(index),
           padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-          child: ListTile(
-            title: Text((sequence[index] == 'new_card' ? '' : '    ') +
-                widgetName[sequence[index]]),
+          child: CheckboxListTile(
+            title:
+                Text(widgetName[getWidgetStringFromSettings(sequence[index])]),
+            controlAffinity: ListTileControlAffinity.leading,
+            onChanged: (bool value) {
+              sequence[index] =
+                  _generateWidgetStatusSettingsString(sequence[index], value);
+              SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                  sequence;
+              RefreshHomepageEvent(queueRefresh: true).fire();
+              setState(() {});
+            },
+            value: getWidgetEnabledStatusFromSettings(sequence[index]),
           ),
         ),
-        onDismissed: (direction) {
-          sequence.removeAt(index);
-          SettingsProvider.of(_preferences).dashboardWidgetsSequence = sequence;
-          RefreshHomepageEvent(queueRefresh: true).fire();
-        },
-      ));
+      );
     }
     return _widgets;
+  }
+
+  String _generateWidgetStatusSettingsString(String original, bool newStatus) {
+    if (newStatus) {
+      if (original.contains('s:disabled'))
+        return original.replaceAll('s:disabled', '').trim();
+    } else {
+      if (!original.contains('s:disabled'))
+        return (original + ' s:disabled').trim();
+    }
+    return original;
   }
 
   @override
