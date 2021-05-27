@@ -27,6 +27,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
@@ -40,6 +41,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -166,22 +169,40 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
+        placeholder: S.of(context).search_hint,
         onSubmitted: (value) {
-          if (value.trim().isEmpty) return;
-          Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
-            "post": PostRepository.getInstance().loadSearchResults(value)
-          });
+          value = value.trim();
+          if (value.isEmpty) return;
+          // Determine if user is using #PID pattern to reach a specific post
+          RegExp regExp = new RegExp(r"#[0-9]+");
+          if (value.startsWith(regExp)) {
+            try {
+              _pushToPIDResultPage(
+                  int.parse(regExp.firstMatch(value)[0].substring(1)));
+            } catch (ignored) {
+              Noticing.showNotice(context, S.of(context).invalid_format);
+            }
+          } else
+            Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+              "post": PostRepository.getInstance().loadSearchResults(value)
+            });
         },
       ),
     );
   }
 
+  _pushToPIDResultPage(int pid) async {
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+      "post": await PostRepository.getInstance().loadSpecificPost(pid)
+    });
+    progressDialog.dismiss();
+  }
+
   @override
   void initState() {
     super.initState();
-    _initialize();
-    if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
-      _tagFilter = widget.arguments['tagFilter'];
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -215,6 +236,9 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void didChangeDependencies() {
+    _initialize();
+    if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
+      _tagFilter = widget.arguments['tagFilter'];
     if (widget.arguments != null && widget.arguments.containsKey('preferences'))
       _preferences = widget.arguments['preferences'];
     else

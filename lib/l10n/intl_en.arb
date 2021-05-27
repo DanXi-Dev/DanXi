@@ -143,6 +143,8 @@
     "fold": "Fold",
     "hide": "Hide",
     "show": "Show",
+    "search_hint": "Search or #PID",
+    "invalid_format": "Invalid format",
 
     "classroom": "Classroom",
     "morning": "Morning",

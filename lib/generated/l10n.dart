@@ -1435,6 +1435,26 @@ class S {
     );
   }
 
+  /// `Search or #PID`
+  String get search_hint {
+    return Intl.message(
+      'Search or #PID',
+      name: 'search_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid format`
+  String get invalid_format {
+    return Intl.message(
+      'Invalid format',
+      name: 'invalid_format',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
