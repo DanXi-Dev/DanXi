@@ -37,8 +37,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -406,10 +406,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           )
-                        : HtmlWidget(
-                            e.content,
-                            textStyle: TextStyle(fontSize: 16),
-                            onTapUrl: (url) => BrowserUtil.openUrl(url),
+                        : Html(
+                            data: e.content,
+                            style: {
+                              "p": Style(
+                                  //backgroundColor: Colors.white,
+                                  ),
+                            },
+                            //textStyle: TextStyle(fontSize: 16),
+                            onLinkTap: (url, context, attributes, element) =>
+                                BrowserUtil.openUrl(url),
+                            onImageTap: (url, context, attributes, element) {
+                              BrowserUtil.openUrl(url);
+                            },
                           ),
                   ),
                 ],
