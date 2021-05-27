@@ -37,6 +37,7 @@ import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -155,7 +156,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   void _initialize() {
     _currentBBSPage = 1;
-    _lastPageItems = [_buildSearchTextField()];
+    _lastPageItems = [];
     _lastSnapshotData = null;
     _isRefreshing = true;
     _isEndIndicatorShown = false;
@@ -203,6 +204,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void initState() {
     super.initState();
+    _initialize();
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
@@ -229,14 +231,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   @override
-  void didUpdateWidget(covariant BBSSubpage oldWidget) {
-    _setContent();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void didChangeDependencies() {
-    _initialize();
+    if (_lastPageItems.isEmpty) _lastPageItems = [_buildSearchTextField()];
     if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
       _tagFilter = widget.arguments['tagFilter'];
     if (widget.arguments != null && widget.arguments.containsKey('preferences'))
@@ -268,63 +264,73 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (widget.arguments == null) return _buildBody(context);
+    if (widget.arguments == null) return _buildBody();
     return PlatformScaffold(
       iosContentPadding: true,
       iosContentBottomPadding: true,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).filtering_by_tag(_tagFilter)),
       ),
-      body: _buildBody(context),
+      body: _buildBody(),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    return RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          refreshSelf();
+  Widget _buildBody() {
+    return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTapDown: (_) {
+          //SystemChannels.textInput.invokeMethod('TextInput.hide');
+          FocusScope.of(context)?.focusedChild?.unfocus();
+          //FocusScope.of(context)?.unfocus();
         },
-        child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: FutureWidget<List<BBSPost>>(
-                future: _content,
-                successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<BBSPost>> snapshot) {
-                  if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
-                      snapshot.data.isEmpty ||
-                      _lastSnapshotData.data.last.id != snapshot.data.last.id)
-                    snapshot.data.forEach((element) {
-                      _lastPageItems.add(_getListItem(element));
-                    });
-                  _isRefreshing = false;
-                  _lastSnapshotData = snapshot;
-                  return _buildPage(snapshot.data, false);
-                },
-                errorBuilder: (BuildContext context,
-                    AsyncSnapshot<List<BBSPost>> snapshot) {
-                  if (snapshot.error == LoginExpiredError) {
-                    SettingsProvider.of(_preferences).deleteSavedFduholeToken();
-                    return _buildErrorPage(
-                        error: S.of(context).error_login_expired);
-                  } else if (snapshot.error is NotLoginError)
-                    return _buildErrorPage(
-                        error: (snapshot.error as NotLoginError).errorMessage);
-                  return _buildErrorPage(error: snapshot.error.toString());
-                },
-                loadingBuilder: () {
-                  _isRefreshing = true;
-                  if (_lastSnapshotData == null)
-                    return Container(
-                      padding: EdgeInsets.all(8),
-                      child: Center(
-                        child: PlatformCircularProgressIndicator(),
-                      ),
-                    );
-                  return _buildPage(_lastSnapshotData.data, true);
-                })));
+        child: RefreshIndicator(
+            color: Theme.of(context).accentColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              refreshSelf();
+            },
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: FutureWidget<List<BBSPost>>(
+                    future: _content,
+                    successBuilder: (BuildContext context,
+                        AsyncSnapshot<List<BBSPost>> snapshot) {
+                      if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
+                          snapshot.data.isEmpty ||
+                          _lastSnapshotData.data.last.id !=
+                              snapshot.data.last.id)
+                        snapshot.data.forEach((element) {
+                          _lastPageItems.add(_getListItem(element));
+                        });
+                      _isRefreshing = false;
+                      _lastSnapshotData = snapshot;
+                      return _buildPage(snapshot.data, false);
+                    },
+                    errorBuilder: (BuildContext context,
+                        AsyncSnapshot<List<BBSPost>> snapshot) {
+                      if (snapshot.error == LoginExpiredError) {
+                        SettingsProvider.of(_preferences)
+                            .deleteSavedFduholeToken();
+                        return _buildErrorPage(
+                            error: S.of(context).error_login_expired);
+                      } else if (snapshot.error is NotLoginError)
+                        return _buildErrorPage(
+                            error:
+                                (snapshot.error as NotLoginError).errorMessage);
+                      return _buildErrorPage(error: snapshot.error.toString());
+                    },
+                    loadingBuilder: () {
+                      _isRefreshing = true;
+                      if (_lastSnapshotData == null)
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          child: Center(
+                            child: PlatformCircularProgressIndicator(),
+                          ),
+                        );
+                      return _buildPage(_lastSnapshotData.data, true);
+                    }))));
   }
 
   Widget _buildLoadingPage() => Container(

@@ -185,15 +185,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           });
                       break;
                     case ConnectionState.done:
-                      // Prevent refreshing repeatedly
-                      if (_lastReplies.isEmpty ||
-                          snapshot.data.isEmpty ||
-                          _lastReplies.last.id != snapshot.data.last.id)
-                        _lastReplies.addAll(snapshot.data);
                       _isRefreshing = false;
                       if (snapshot.hasError) {
                         return _buildErrorWidget();
                       } else {
+                        // Prevent refreshing repeatedly
+                        if (_lastReplies.isEmpty ||
+                            snapshot.data.isEmpty ||
+                            _lastReplies.last.id != snapshot.data.last.id)
+                          _lastReplies.addAll(snapshot.data);
                         _lastSnapshotData = snapshot;
                         if (_searchResult != null)
                           return _buildPage(snapshot.data, false);
