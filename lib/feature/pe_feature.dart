@@ -47,6 +47,7 @@ class PEFeature extends Feature {
       return null;
     });
     if (_exercises != null) _status = ConnectionStatus.DONE;
+    notifyUpdate();
   }
 
   @override

@@ -173,7 +173,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     _isFavored = true;
                     return null;
                   });
-                  refreshSelf();
+                  setState(() {});
                 } else {
                   _isFavored = true;
                   await PostRepository.getInstance()
@@ -185,7 +185,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     _isFavored = false;
                     return null;
                   });
-                  refreshSelf();
+                  setState(() {});
                 }
               },
             ),
