@@ -253,9 +253,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (index >= _lastReplies.length)
       return _isEndIndicatorShown
           ? Container()
-          : GestureDetector(
-              child: Center(child: PlatformCircularProgressIndicator()),
-            );
+          : Center(child: PlatformCircularProgressIndicator());
     return _wrapListItemInCanvas(_lastReplies[index], index == 0);
   }
 
@@ -309,6 +307,26 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _wrapListItemInCanvas(Reply e, bool generateTags) =>
       Material(child: _getListItems(e, generateTags, false));
 
+  Widget _OPLeadingTag() => Container(
+        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+        decoration: BoxDecoration(
+            color: Constant.getColorFromString(_post.tag.first.color)
+                .withOpacity(0.8),
+            borderRadius: BorderRadius.all(Radius.circular(4.0))),
+        child: Text(
+          "OP",
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Constant.getColorFromString(_post.tag.first.color)
+                          .withOpacity(0.8)
+                          .computeLuminance() <=
+                      0.5
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 12),
+        ),
+      );
+
   Widget _getListItems(Reply e, bool generateTags, bool isNested) =>
       GestureDetector(
         onLongPress: () {
@@ -353,29 +371,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   Row(
                     children: [
                       if (e.username == _post.first_post.username)
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                          decoration: BoxDecoration(
-                              color: Constant.getColorFromString(
-                                      _post.tag.first.color)
-                                  .withOpacity(0.8),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(4.0))),
-                          child: Text(
-                            "OP",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Constant.getColorFromString(
-                                                _post.tag.first.color)
-                                            .withOpacity(0.8)
-                                            .computeLuminance() <=
-                                        0.5
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontSize: 12),
-                          ),
-                        ),
+                        _OPLeadingTag(),
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 4, horizontal: 2),
@@ -407,18 +403,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             overflow: TextOverflow.ellipsis,
                           )
                         : Html(
+                      shrinkWrap: true,
                             data: e.content,
                             style: {
+                              "body": Style(
+                                  margin: EdgeInsets.zero,
+                                  padding: EdgeInsets.zero),
                               "p": Style(
                                   //backgroundColor: Colors.white,
                                   ),
                             },
                             //textStyle: TextStyle(fontSize: 16),
                             onLinkTap: (url, context, attributes, element) =>
-                                BrowserUtil.openUrl(url),
-                            onImageTap: (url, context, attributes, element) {
-                              BrowserUtil.openUrl(url);
-                            },
+                          BrowserUtil.openUrl(url),
+                      onImageTap: (url, context, attributes, element) {
+                        BrowserUtil.openUrl(url);
+                      },
                           ),
                   ),
                 ],
