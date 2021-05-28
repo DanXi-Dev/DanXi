@@ -1,4 +1,5 @@
-中文版 [English Version](README_EN.md)
+中文版 [English Version](README_EN.md)  
+[官方网站](https://danxi-dev.github.io)
 # 旦夕
 ![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)  
   
@@ -10,32 +11,31 @@
 
 - 校园卡余额和消费记录
 - 食堂消费人数
-- 自动平安复旦打卡
-- 快速显示复活码（支持Apple Watch显示）
+- 提示并快速平安复旦打卡
+- 快速显示复活码（支持 Apple Watch 显示）
 - 空教室查询
-- 树洞
-- 课表查阅和导出为.ICS
+- FDU Hole 树洞
+- 课表查阅与导出至系统日历等
 - 显示教务处通知
-  
-(复旦于2021年元旦前后大批量修改了API接口，导致某些功能失效，正在逐个修复中)  
-目前这款应用仍处于最初的开发阶段,欢迎各位大佬加入开发~
+
+欢迎各位大佬加入开发~
 
 # 安装
-注意：本应用仍处于早期开发阶段，也许会有不可预料的 Bug 发生。  
 如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/w568w/DanXi/compare)。
-## Windows
-打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 zip 压缩包，解压运行即可。  
-
-## Android
-打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 apk 安装包，安装即可。  
-（依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
 
 ## iOS(watchOS)/iPadOS
-  
+
 从 [App Store](https://apps.apple.com/us/app/旦夕/id1568629997) 下载
 
+## Android
+打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 apk 安装包，安装即可。  
+（依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
+
+## Windows
+打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。  
+
 ## macOS
-打开 [release 页面](https://github.com/w568w/DanXi/releases) 下载 dmg 磁盘映像，挂载后将旦兮拖入 Applications 文件夹即可。  
+打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 dmg 磁盘映像，挂载后将旦兮拖入 Applications 文件夹即可。
 
 # 构建
 ## 我们当前使用的 Flutter 编译版本

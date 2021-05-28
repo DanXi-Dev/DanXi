@@ -19,7 +19,7 @@ jobs:
     - run: flutter pub get
       #Testing is still useless at the moment.
       #- run: flutter test
-    - run: ./build_ios pre
+    - run: flutter build ios
       # Use debug profile to sign with no specific keystore
     - run: flutter build apk --debug
 
