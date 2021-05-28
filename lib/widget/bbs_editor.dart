@@ -28,20 +28,29 @@ import 'package:html_editor_enhanced/html_editor.dart';
 class BBSEditor {
   static Future<void> createNewReply(
       BuildContext context, int discussionId, int postId) async {
-    String content = await _showEditor(
+    String content;
+    /* = await _showEditor(
         context,
         postId == null
             ? S.of(context).reply_to(discussionId)
-            : S.of(context).reply_to(postId));
+            : S.of(context).reply_to(postId));*/
+
+    Navigator.pushNamed(context, "/bbs/newPost", arguments: {
+      "tags": false,
+      'title': postId == null
+          ? S.of(context).reply_to(discussionId)
+          : S.of(context).reply_to(postId)
+    }).then<int>(
+        (value) => value is PostEditorText ? content = value.content : 0);
     if (content == null || content.trim() == "") return;
 
-    int responseCode = await PostRepository.getInstance()
-        .newReply(discussionId, postId, content);
+    final int responseCode = await PostRepository.getInstance()
+        .newReply(discussionId, postId, content)
+        .onError((error, stackTrace) =>
+            Noticing.showNotice(context, S.of(context).reply_failed(error)));
     // Note: postId refers to the specific post the user is replying to, can be NULL
     if (responseCode != 200) {
       Noticing.showNotice(context, S.of(context).reply_failed(responseCode));
-    } else {
-      //TODO: Refresh Page to load new reply
     }
   }
 
@@ -60,48 +69,16 @@ class BBSEditor {
   }
 
   static Future<String> _showEditor(BuildContext context, String title) async {
-    if (PlatformX.isMobile) {
-      //Build Mobile
-      HtmlEditorController _htmlController = HtmlEditorController();
-      return await showPlatformDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-                title: Text(title),
-                content: Container(
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: BBSMobileEditorWidget(
-                      htmlEditorController: _htmlController,
-                    )),
-                actions: [
-                  PlatformDialogAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () {
-                        Navigator.of(context).pop<String>(null);
-                      }),
-                  PlatformDialogAction(
-                      child: Text(S.of(context).submit),
-                      onPressed: () async {
-                        Navigator.of(context).pop<String>(
-                            await BBSMobileEditorWidget.getText(
-                                _htmlController));
-                      }),
-                ],
-              ));
-    }
-
-    // Build Desktop
-    QuillController _controller = QuillController.basic();
+    final textController = TextEditingController();
     return await showPlatformDialog<String>(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
+        builder: (BuildContext context) => PlatformAlertDialog(
               title: Text(title),
-              content: Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: BBSDesktopEditorWidget(
-                    quillController: _controller,
-                  )),
+              content: PlatformTextField(
+                controller: textController,
+                keyboardType: TextInputType.text,
+                autofocus: true,
+              ),
               actions: [
                 PlatformDialogAction(
                     child: Text(S.of(context).cancel),
@@ -110,9 +87,8 @@ class BBSEditor {
                     }),
                 PlatformDialogAction(
                     child: Text(S.of(context).submit),
-                    onPressed: () {
-                      Navigator.of(context).pop<String>(
-                          BBSDesktopEditorWidget.getText(_controller));
+                    onPressed: () async {
+                      Navigator.of(context).pop<String>(textController.text);
                     }),
               ],
             ));

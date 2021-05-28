@@ -114,6 +114,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
           PlatformTextField(
               controller: _linkTextFieldController,
               keyboardType: TextInputType.url,
+              autocorrect: false,
               material: (_, __) => MaterialTextFieldData(
                     decoration: InputDecoration(
                       labelText: S.of(context).link,

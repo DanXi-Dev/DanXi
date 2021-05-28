@@ -208,7 +208,8 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-          Navigator.pushNamed(context, "/bbs/newPost")
+          Navigator.pushNamed(context, "/bbs/newPost",
+                  arguments: {"tags": true})
               .then<int>((value) => value is PostEditorText
                   ? PostRepository.getInstance()
                       .newPost(value?.content, tags: value?.tags)

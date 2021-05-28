@@ -58,12 +58,18 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   /// Whether the send button is enabled
   bool _canSend = true;
+  bool _supportTags;
   List<PostTag> _tags = [];
   List<PostTag> _allTags;
 
+  String _title;
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    _supportTags = widget.arguments['tags'] ?? false;
+    _title =
+        widget.arguments['title'] ?? S.of(context).forum_post_enter_content;
+    super.didChangeDependencies();
   }
 
   @override
@@ -72,7 +78,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
         iosContentBottomPadding: true,
         iosContentPadding: true,
         appBar: PlatformAppBarX(
-          title: Text(S.of(context).forum_post_enter_content),
+          title: Text(_title),
           trailingActions: [
             PlatformIconButton(
                 padding: EdgeInsets.zero,
@@ -86,87 +92,89 @@ class BBSEditorPageState extends State<BBSEditorPage> {
             padding: EdgeInsets.all(4),
             child: Column(
               children: [
-                ThemedMaterial(
-                  child: FlutterTagging<PostTag>(
-                      initialItems: _tags,
-                      textFieldConfiguration: TextFieldConfiguration(
-                        decoration: InputDecoration(
-                          hintText: '',
-                          labelText: S.of(context).select_tags,
+                if (_supportTags)
+                  ThemedMaterial(
+                    child: FlutterTagging<PostTag>(
+                        initialItems: _tags,
+                        textFieldConfiguration: TextFieldConfiguration(
+                          decoration: InputDecoration(
+                            hintText: '',
+                            labelText: S.of(context).select_tags,
+                          ),
                         ),
-                      ),
-                      findSuggestions: (String filter) async {
-                        if (_allTags == null)
-                          _allTags =
-                              await PostRepository.getInstance().loadTags();
-                        return _allTags
-                            .where((value) => value.name
-                                .toLowerCase()
-                                .contains(filter.toLowerCase()))
-                            .toList();
-                      },
-                      additionCallback: (value) =>
-                          PostTag(value, Constant.randomColor, 0),
-                      onAdded: (tag) => tag,
-                      configureSuggestion: (tag) => SuggestionConfiguration(
-                            title: Text(
-                              tag.name,
-                              style: TextStyle(
-                                  color:
-                                      Constant.getColorFromString(tag.color)),
-                            ),
-                            subtitle: Row(
-                              children: [
-                                Icon(
-                                  SFSymbols.flame,
-                                  color: Constant.getColorFromString(tag.color),
-                                  size: 12,
-                                ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
-                                Text(
-                                  tag.count.toString(),
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Constant.getColorFromString(
-                                          tag.color)),
-                                ),
-                              ],
-                            ),
-                            additionWidget: Chip(
-                              avatar: Icon(
-                                Icons.add_circle,
-                                color: Colors.white,
+                        findSuggestions: (String filter) async {
+                          if (_allTags == null)
+                            _allTags =
+                                await PostRepository.getInstance().loadTags();
+                          return _allTags
+                              .where((value) => value.name
+                                  .toLowerCase()
+                                  .contains(filter.toLowerCase()))
+                              .toList();
+                        },
+                        additionCallback: (value) =>
+                            PostTag(value, Constant.randomColor, 0),
+                        onAdded: (tag) => tag,
+                        configureSuggestion: (tag) => SuggestionConfiguration(
+                              title: Text(
+                                tag.name,
+                                style: TextStyle(
+                                    color:
+                                        Constant.getColorFromString(tag.color)),
                               ),
-                              label: Text(S.of(context).add_new_tag),
+                              subtitle: Row(
+                                children: [
+                                  Icon(
+                                    SFSymbols.flame,
+                                    color:
+                                        Constant.getColorFromString(tag.color),
+                                    size: 12,
+                                  ),
+                                  const SizedBox(
+                                    width: 2,
+                                  ),
+                                  Text(
+                                    tag.count.toString(),
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        color: Constant.getColorFromString(
+                                            tag.color)),
+                                  ),
+                                ],
+                              ),
+                              additionWidget: Chip(
+                                avatar: Icon(
+                                  Icons.add_circle,
+                                  color: Colors.white,
+                                ),
+                                label: Text(S.of(context).add_new_tag),
+                                labelStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                backgroundColor: Theme.of(context).accentColor,
+                              ),
+                            ),
+                        configureChip: (lang) => ChipConfiguration(
+                              label: Text(lang.name),
+                              backgroundColor:
+                                  Constant.getColorFromString(lang.color),
                               labelStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w300,
-                              ),
-                              backgroundColor: Theme.of(context).accentColor,
+                                  color: Constant.getColorFromString(lang.color)
+                                              .computeLuminance() >=
+                                          0.5
+                                      ? Colors.black
+                                      : Colors.white),
+                              deleteIconColor:
+                                  Constant.getColorFromString(lang.color)
+                                              .computeLuminance() >=
+                                          0.5
+                                      ? Colors.black
+                                      : Colors.white,
                             ),
-                          ),
-                      configureChip: (lang) => ChipConfiguration(
-                            label: Text(lang.name),
-                            backgroundColor:
-                                Constant.getColorFromString(lang.color),
-                            labelStyle: TextStyle(
-                                color: Constant.getColorFromString(lang.color)
-                                            .computeLuminance() >=
-                                        0.5
-                                    ? Colors.black
-                                    : Colors.white),
-                            deleteIconColor:
-                                Constant.getColorFromString(lang.color)
-                                            .computeLuminance() >=
-                                        0.5
-                                    ? Colors.black
-                                    : Colors.white,
-                          ),
-                      onChanged: () {}),
-                ),
+                        onChanged: () {}),
+                  ),
                 Expanded(
                   child: PlatformX.isMobile
                       ? BBSMobileEditorWidget(
