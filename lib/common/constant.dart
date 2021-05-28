@@ -47,7 +47,6 @@ class Constant {
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
           elevation: 2,
-          //color: Color.fromRGBO(245, 245, 245, 1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -76,7 +75,7 @@ class Constant {
         backgroundColor: Colors.black,
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(7, 8, 7, 8),
-          color: Color.fromRGBO(72, 72, 74, 0.5),
+          color: Color.fromRGBO(72, 72, 74, 0.55),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),

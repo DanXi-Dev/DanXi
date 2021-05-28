@@ -190,6 +190,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
     "other_types_exam" : MessageLookupByLibrary.simpleMessage("Paper and Other"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
+    "pe_exercises" : MessageLookupByLibrary.simpleMessage("PE Exercises"),
     "post_failed" : MessageLookupByLibrary.simpleMessage("Failed to post. Please check your internet connection."),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
