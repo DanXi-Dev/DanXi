@@ -35,13 +35,13 @@ class BBSEditor {
             ? S.of(context).reply_to(discussionId)
             : S.of(context).reply_to(postId));*/
 
-    Navigator.pushNamed(context, "/bbs/newPost", arguments: {
+    content = (await Navigator.pushNamed(context, "/bbs/newPost", arguments: {
       "tags": false,
       'title': postId == null
           ? S.of(context).reply_to(discussionId)
           : S.of(context).reply_to(postId)
-    }).then<int>(
-        (value) => value is PostEditorText ? content = value.content : 0);
+    }) as PostEditorText)
+        .content;
     if (content == null || content.trim() == "") return;
 
     final int responseCode = await PostRepository.getInstance()

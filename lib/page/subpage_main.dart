@@ -23,6 +23,7 @@ import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
+import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -121,6 +122,9 @@ class _HomeSubpageState extends State<HomeSubpage> {
       'new_card': Container(),
       'qr_feature': FeatureListItem(
         feature: QRFeature(),
+      ),
+      'pe_feature': FeatureListItem(
+        feature: PEFeature(),
       ),
     };
   }

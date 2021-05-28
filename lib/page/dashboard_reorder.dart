@@ -168,6 +168,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       'fudan_daily_feature': S.of(context).fudan_daily,
       'new_card': S.of(context).add_new_card,
       'qr_feature': S.of(context).fudan_qr_code,
+      'pe_feature': S.of(context).pe_exercises,
     };
     List<Widget> _widgets = [];
 

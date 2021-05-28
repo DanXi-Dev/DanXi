@@ -23,7 +23,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Simple helper class to show a [SnackBar] on Android or a [CupertinoAlertDialog] on iOS.
 class Noticing {
   static showNotice(BuildContext context, String message,
-      {String confirmText}) {
+      {String confirmText, String title}) {
     if (PlatformX.isMaterial(context)) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
@@ -31,6 +31,7 @@ class Noticing {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
+                title: Text(title),
                 content: Text(message),
                 actions: <Widget>[
                   PlatformDialogAction(

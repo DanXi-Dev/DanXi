@@ -368,23 +368,26 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             'preferences': _preferences,
                           });
                         })),
-                  Row(
-                    children: [
-                      if (e.username == _post.first_post.username)
-                        _OPLeadingTag(),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-                        child: Text(
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
+                    child: Row(
+                      children: [
+                        if (e.username == _post.first_post.username)
+                          _OPLeadingTag(),
+                        if (e.username == _post.first_post.username)
+                          const SizedBox(
+                            width: 2,
+                          ),
+                        Text(
                           "[${e.username}]",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   if (e.reply_to != null && !isNested && _searchResult == null)
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4),
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
                       child: _getListItems(
                           _lastReplies.firstWhere(
                             (element) => element.id == e.reply_to,
@@ -403,22 +406,26 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             overflow: TextOverflow.ellipsis,
                           )
                         : Html(
-                      shrinkWrap: true,
+                            shrinkWrap: true,
                             data: e.content,
                             style: {
                               "body": Style(
-                                  margin: EdgeInsets.zero,
-                                  padding: EdgeInsets.zero),
+                                margin: EdgeInsets.zero,
+                                padding: EdgeInsets.zero,
+                                fontSize: FontSize(16),
+                              ),
                               "p": Style(
-                                  //backgroundColor: Colors.white,
-                                  ),
+                                margin: EdgeInsets.zero,
+                                padding: EdgeInsets.zero,
+                                fontSize: FontSize(16),
+                              ),
                             },
                             //textStyle: TextStyle(fontSize: 16),
                             onLinkTap: (url, context, attributes, element) =>
-                          BrowserUtil.openUrl(url),
-                      onImageTap: (url, context, attributes, element) {
-                        BrowserUtil.openUrl(url);
-                      },
+                                BrowserUtil.openUrl(url),
+                            onImageTap: (url, context, attributes, element) {
+                              BrowserUtil.openUrl(url);
+                            },
                           ),
                   ),
                 ],

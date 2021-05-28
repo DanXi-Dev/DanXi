@@ -1075,6 +1075,16 @@ class S {
     );
   }
 
+  /// `PE Exercises`
+  String get pe_exercises {
+    return Intl.message(
+      'PE Exercises',
+      name: 'pe_exercises',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Last 7 days`
   String get last_7_days {
     return Intl.message(
