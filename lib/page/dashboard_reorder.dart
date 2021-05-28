@@ -28,7 +28,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:html_editor_enhanced/utils/utils.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardReorderPage extends StatefulWidget {
@@ -58,116 +58,99 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       body: MediaQuery.removePadding(
         context: context,
         removeTop: true,
-        child: WithScrollbar(
-          child: Material(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
+        child: Material(
+          child: WithScrollbar(
+            child: ReorderableListView(
+              buildDefaultDragHandles: false,
+              primary: true,
+              children: _getListWidgets() +
+                  [
+                    Padding(
+                      key: UniqueKey(),
                       padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                      child: Text(S.of(context).reorder_hint)),
-                ),
-                Divider(
-                  height: 2,
-                ),
-                Expanded(
-                  child: ReorderableListView(
-                    primary: true,
-                    children: _getListWidgets() +
-                        [
-                          Padding(
-                            key: UniqueKey(),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 16),
-                            child: ListTile(
-                              leading: Icon(PlatformIcons(context).addCircled),
-                              title: Text(S.of(context).new_shortcut_card),
-                              onTap: () {
-                                showPlatformDialog(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (BuildContext context) =>
-                                        NewShortcutDialog(
-                                          sharedPreferences: _preferences,
-                                        )).then((value) => refreshSelf());
-                              },
-                            ),
-                          ),
-                          Padding(
-                            key: UniqueKey(),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 16),
-                            child: ListTile(
-                              leading: Icon(PlatformIcons(context).addCircled),
-                              title: Text(S.of(context).add_new_card),
-                              onTap: () {
-                                sequence.add(DashboardCard(
-                                    "new_card", null, null, true));
-                                SettingsProvider.of(_preferences)
-                                    .dashboardWidgetsSequence = sequence;
-                                RefreshHomepageEvent(queueRefresh: true).fire();
-                                refreshSelf();
-                              },
-                            ),
-                          ),
-                          Padding(
-                            key: UniqueKey(),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 16),
-                            child: ListTile(
-                              leading: Icon(PlatformIcons(context).addCircled),
-                              title: Text(S.of(context).add_new_divider),
-                              onTap: () {
-                                sequence.add(
-                                  DashboardCard("divider", null, null, true),
-                                );
-                                SettingsProvider.of(_preferences)
-                                    .dashboardWidgetsSequence = sequence;
-                                RefreshHomepageEvent(queueRefresh: true).fire();
-                                refreshSelf();
-                              },
-                            ),
-                          ),
-                          Padding(
-                            key: UniqueKey(),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 16),
-                            child: ListTile(
-                              leading:
-                                  Icon(PlatformIcons(context).removeCircled),
-                              title: Text(S.of(context).reset_layout),
-                              onTap: () async {
-                                await _preferences.remove(
-                                    SettingsProvider.KEY_DASHBOARD_WIDGETS);
-                                RefreshHomepageEvent(queueRefresh: true).fire();
-                                refreshSelf();
-                              },
-                            ),
-                          ),
-                        ],
-                    onReorder: (oldIndex, newIndex) {
-                      if (oldIndex >= sequence.length) {
-                        Noticing.showNotice(
-                            context, S.of(context).unmovable_widget);
-                        return;
-                      }
-                      if (newIndex > oldIndex) --newIndex;
-                      DashboardCard tmp = sequence[oldIndex];
-                      sequence.removeAt(oldIndex);
-                      sequence.insert(newIndex, tmp);
-                      SettingsProvider.of(_preferences)
-                          .dashboardWidgetsSequence = sequence;
-                      RefreshHomepageEvent(queueRefresh: true).fire();
-                      refreshSelf();
-                    },
-                  ),
-                )
-              ],
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).addCircled),
+                        title: Text(S.of(context).add_new_card),
+                        onTap: () {
+                          sequence
+                              .add(DashboardCard("new_card", null, null, true));
+                          SettingsProvider.of(_preferences)
+                              .dashboardWidgetsSequence = sequence;
+                          RefreshHomepageEvent(queueRefresh: true).fire();
+                          refreshSelf();
+                        },
+                      ),
+                    ),
+                    Padding(
+                      key: UniqueKey(),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).addCircled),
+                        title: Text(S.of(context).add_new_divider),
+                        onTap: () {
+                          sequence.add(
+                            DashboardCard("divider", null, null, true),
+                          );
+                          SettingsProvider.of(_preferences)
+                              .dashboardWidgetsSequence = sequence;
+                          RefreshHomepageEvent(queueRefresh: true).fire();
+                          refreshSelf();
+                        },
+                      ),
+                    ),
+                    Padding(
+                      key: UniqueKey(),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).addCircled),
+                        title: Text(S.of(context).new_shortcut_card),
+                        onTap: () {
+                          showPlatformDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (BuildContext context) =>
+                                  NewShortcutDialog(
+                                    sharedPreferences: _preferences,
+                                  )).then((value) => refreshSelf());
+                        },
+                      ),
+                    ),
+                    Padding(
+                      key: UniqueKey(),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      child: ListTile(
+                        leading: Icon(PlatformIcons(context).removeCircled),
+                        title: Text(S.of(context).reset_layout),
+                        onTap: () async {
+                          await _preferences
+                              .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
+                          RefreshHomepageEvent(queueRefresh: true).fire();
+                          refreshSelf();
+                        },
+                      ),
+                    ),
+                  ],
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex >= sequence.length) {
+                  Noticing.showNotice(context, S.of(context).unmovable_widget);
+                  return;
+                }
+                if (newIndex > oldIndex) --newIndex;
+                DashboardCard tmp = sequence[oldIndex];
+                sequence.removeAt(oldIndex);
+                sequence.insert(newIndex, tmp);
+                SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                    sequence;
+                RefreshHomepageEvent(queueRefresh: true).fire();
+                refreshSelf();
+              },
             ),
+            controller: PrimaryScrollController.of(context),
           ),
-          controller: PrimaryScrollController.of(context),
         ),
       ),
     );
@@ -192,22 +175,24 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       // Nonfunctional Widgets
       if (NONFUNCTIONAL_WIDGET_LIST.contains(sequence[index].internalString)) {
         _widgets.add(Dismissible(
-          key: ValueKey(index),
+          key: UniqueKey(),
+          // Show a red background as the item is swiped away.
+          background: Container(color: Colors.red),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
             child: ListTile(
-              title: Text((sequence[index].internalString == 'divider'
-                      ? '            '
-                      : '') +
-                  widgetName[sequence[index].internalString]),
+              title: Text(widgetName[sequence[index].internalString]),
+              trailing: Icon(Icons.drag_handle_rounded),
+              //leading: Icon(SFSymbols.arrow_left_right_circle),
             ),
           ),
           onDismissed: (direction) {
+            print(sequence[index].internalString);
             sequence.removeAt(index);
             SettingsProvider.of(_preferences).dashboardWidgetsSequence =
                 sequence;
             RefreshHomepageEvent(queueRefresh: true).fire();
-            refreshSelf();
+            setState(() {});
           },
         ));
       }
@@ -216,13 +201,50 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       else if (sequence[index].internalString == 'custom_card') {
         _widgets.add(
           Dismissible(
-            key: ValueKey(index),
+            key: UniqueKey(),
+            // Show a red background as the item is swiped away.
+            background: Container(color: Colors.red),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(
                 title: Text(sequence[index].title),
                 subtitle: Text(sequence[index].link),
+                secondary: Icon(Icons.drag_handle_rounded),
                 controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool value) {
+                  sequence[index].enabled = value;
+                  SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                      sequence;
+                  RefreshHomepageEvent(queueRefresh: true).fire();
+                  setState(() {});
+                },
+                value: sequence[index].enabled,
+              ),
+            ),
+            onDismissed: (direction) {
+              sequence.removeAt(index);
+              SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                  sequence;
+              RefreshHomepageEvent(queueRefresh: true).fire();
+              setState(() {});
+            },
+          ),
+        );
+      }
+
+      // Default widgets
+      else {
+        _widgets.add(
+          Dismissible(
+            key: UniqueKey(),
+            confirmDismiss: (_) => Future.value(false),
+            background: Center(child: Text(S.of(context).unmovable_widget)),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              child: CheckboxListTile(
+                title: Text(widgetName[sequence[index].internalString]),
+                controlAffinity: ListTileControlAffinity.leading,
+                secondary: Icon(Icons.drag_handle_rounded),
                 onChanged: (bool value) {
                   sequence[index].enabled = value;
                   SettingsProvider.of(_preferences).dashboardWidgetsSequence =
@@ -232,28 +254,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                 },
                 value: sequence[index].enabled,
               ),
-            ),
-          ),
-        );
-      }
-
-      // Default widgets
-      else {
-        _widgets.add(
-          Padding(
-            key: ValueKey(index),
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            child: CheckboxListTile(
-              title: Text(widgetName[sequence[index].internalString]),
-              controlAffinity: ListTileControlAffinity.leading,
-              onChanged: (bool value) {
-                sequence[index].enabled = value;
-                SettingsProvider.of(_preferences).dashboardWidgetsSequence =
-                    sequence;
-                RefreshHomepageEvent(queueRefresh: true).fire();
-                refreshSelf();
-              },
-              value: sequence[index].enabled,
             ),
           ),
         );

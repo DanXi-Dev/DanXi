@@ -84,7 +84,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      iosContentBottomPadding: true,
+      iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
           title: TopController(
@@ -114,7 +114,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
     _data.forEach((Notice value) {
       widgets.add(ThemedMaterial(
           child: ListTile(
-            leading: PlatformX.isAndroid
+        leading: PlatformX.isAndroid
             ? Icon(Icons.info)
             : Icon(SFSymbols.info_circle_fill),
         title: Text(value.title),
