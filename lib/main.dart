@@ -161,7 +161,7 @@ class DanxiApp extends StatelessWidget {
 
   changeSizeOnDesktop() async {
     if (PlatformX.isDesktop) {
-      await DesktopWindow.setWindowSize(Size(400, 700));
+      await DesktopWindow.setWindowSize(Size(480, 960));
     }
   }
 
@@ -644,7 +644,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   child: Text(
                     S.of(context).app_name,
                   ),
-                  onDoubleTap: () => ScrollToTopEvent().fire(),
+                  controller: PrimaryScrollController.of(context),
                 ),
               ),
             ),
@@ -654,7 +654,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   S.of(context).app_name,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                onDoubleTap: () => ScrollToTopEvent().fire(),
+                controller: PrimaryScrollController.of(context),
               ),
             ),
             leading: leadingButton,
@@ -710,6 +710,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             itemChanged: (index) {
               if (index != _pageIndex.value) {
+                // List<ScrollPosition> positions =
+                //     PrimaryScrollController.of(context).positions.toList();
+                // for (var p in positions.skip(1)) {
+                //   PrimaryScrollController.of(context).detach(p);
+                // }
                 setState(() => _pageIndex.value = index);
               }
             },
