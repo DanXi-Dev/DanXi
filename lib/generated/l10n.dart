@@ -1505,6 +1505,26 @@ class S {
     );
   }
 
+  /// `Favorites`
+  String get favorites {
+    return Intl.message(
+      'Favorites',
+      name: 'favorites',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operaion Failed`
+  String get operation_failed {
+    return Intl.message(
+      'Operaion Failed',
+      name: 'operation_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Invalid format`
   String get invalid_format {
     return Intl.message(

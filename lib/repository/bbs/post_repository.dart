@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/fduhole_profile.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
@@ -750,6 +751,41 @@ class PostRepository extends BaseRepositoryWithDio {
         data: {"post_id": postId, "reason": reason},
         options: Options(headers: _tokenHeader));
     return response.statusCode;
+  }
+
+  Future<FduholeProfile> getUserProfile() async {
+    Response response = await dio.get(_BASE_URL + "/profile/",
+        options: Options(headers: _tokenHeader));
+    return FduholeProfile.fromJson(response.data);
+  }
+
+  Future<List<BBSPost>> getFavoredDiscussions() async {
+    return (await getUserProfile()).favored_discussion;
+  }
+
+  Future<FduholeProfile> setFavoredDiscussion(
+      SetFavoredDiscussionMode mode, int discussionId) async {
+    Response response = await dio.put(_BASE_URL + "/profile/",
+        data: {
+          'mode': mode.getInternalString(),
+          'favoredDiscussion': discussionId
+        },
+        options: Options(headers: _tokenHeader));
+    return FduholeProfile.fromJson(response.data);
+  }
+}
+
+enum SetFavoredDiscussionMode { ADD, DELETE }
+
+extension FavoredDiscussionEx on SetFavoredDiscussionMode {
+  String getInternalString() {
+    switch (this) {
+      case SetFavoredDiscussionMode.ADD:
+        return "addFavoredDiscussion";
+      case SetFavoredDiscussionMode.DELETE:
+        return "deleteFavoredDiscussion";
+    }
+    return null;
   }
 }
 

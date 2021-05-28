@@ -58,6 +58,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing = true;
   bool _isEndIndicatorShown = false;
+  bool _isFavored = false;
   static const POST_COUNT_PER_PAGE = 10;
 
   Future<List<Reply>> _searchResult;
@@ -80,8 +81,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     else {
       _searchResult = widget.arguments['post'];
       // Create a dummy post for displaying search result
-      _post = new BBSPost(-1, new Reply(-1, "", "", null, "", -1), -1, null,
-          null, false, "", "");
+      _post = new BBSPost(-1, new Reply(-1, "", "", null, "", -1, false), -1,
+          null, null, false, "", "");
     }
 
     _currentBBSPage = 1;
@@ -134,6 +135,38 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           if (_searchResult == null)
             PlatformIconButton(
               padding: EdgeInsets.zero,
+              icon: Icon(_isFavored ? SFSymbols.star_fill : SFSymbols.star),
+              onPressed: () async {
+                if (_isFavored) {
+                  _isFavored = false;
+                  await PostRepository.getInstance()
+                      .setFavoredDiscussion(
+                          SetFavoredDiscussionMode.DELETE, _post.id)
+                      .onError((error, stackTrace) {
+                    Noticing.showNotice(
+                        context, S.of(context).operation_failed);
+                    _isFavored = true;
+                    return null;
+                  });
+                  refreshSelf();
+                } else {
+                  _isFavored = true;
+                  await PostRepository.getInstance()
+                      .setFavoredDiscussion(
+                          SetFavoredDiscussionMode.ADD, _post.id)
+                      .onError((error, stackTrace) {
+                    Noticing.showNotice(
+                        context, S.of(context).operation_failed);
+                    _isFavored = false;
+                    return null;
+                  });
+                  refreshSelf();
+                }
+              },
+            ),
+          if (_searchResult == null)
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
               icon: PlatformX.isAndroid
                   ? const Icon(Icons.reply)
                   : const Icon(SFSymbols.arrowshape_turn_up_left),
@@ -141,7 +174,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 BBSEditor.createNewReply(context, _post.id, null)
                     .then((value) => refreshSelf());
               },
-            )
+            ),
         ],
       ),
       body: RefreshIndicator(
@@ -420,7 +453,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 fontSize: FontSize(16),
                               ),
                             },
-                            //textStyle: TextStyle(fontSize: 16),
                             onLinkTap: (url, context, attributes, element) =>
                                 BrowserUtil.openUrl(url),
                             onImageTap: (url, context, attributes, element) {

@@ -14,24 +14,30 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import 'package:dan_xi/model/fduhole_user.dart';
+import 'package:dan_xi/model/post.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'reply.g.dart';
+part 'fduhole_profile.g.dart';
 
 @JsonSerializable()
-class Reply {
+class FduholeProfile {
   final int id;
-  final String content;
-  final String username;
-  final int reply_to;
-  final String date_created;
-  final int discussion;
-  final bool is_me;
 
-  Reply(this.id, this.content, this.username, this.reply_to, this.date_created,
-      this.discussion, this.is_me);
+  final FduholeUser user;
 
-  factory Reply.fromJson(Map<String, dynamic> json) => _$ReplyFromJson(json);
+  // ignore: non_constant_identifier_names
+  final List<BBSPost> favored_discussion;
 
-  Map<String, dynamic> toJson() => _$ReplyToJson(this);
+  // ignore: non_constant_identifier_names
+  final String encrypted_email;
+
+  factory FduholeProfile.fromJson(Map<String, dynamic> json) =>
+      _$FduholeProfileFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FduholeProfileToJson(this);
+
+  FduholeProfile(
+      this.id, this.user, this.favored_discussion, this.encrypted_email);
 }

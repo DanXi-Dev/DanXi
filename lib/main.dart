@@ -282,7 +282,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
     (cxt) => null,
-    (cxt) => null,
+    (cxt) => SFSymbols.star,
     (cxt) => null,
     (cxt) => null
   ];
@@ -304,7 +304,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final List<Function> _subpageRightsecondActionButtonTextBuilders = [
     (cxt) => null,
-    (cxt) => null, //S.of(cxt).new_post,
+    (cxt) => S.of(cxt).favorites,
     (cxt) => null,
     (cxt) => null,
   ];
@@ -505,12 +505,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _onPressRightsecondActionButton() async {
-    /*switch (_pageIndex.value) {
+    switch (_pageIndex.value) {
       //Entries omitted
       case 1:
-        AddNewPostEvent().fire();
+        Navigator.of(context).pushNamed('/bbs/discussions', arguments: {
+          'showFavoredDiscussion': true,
+          'preferences': _preferences,
+        });
         break;
-    }*/
+    }
   }
 
   void _onPressLeadingActionButton() async {

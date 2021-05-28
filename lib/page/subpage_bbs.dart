@@ -138,10 +138,14 @@ class _BBSSubpageState extends State<BBSSubpage>
         SortOrder.LAST_REPLIED;
     _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
         FoldBehavior.FOLD;
-    _content = _tagFilter == null
-        ? loginAndLoadPost(context.personInfo, _sortOrder)
-        : PostRepository.getInstance()
-            .loadTagFilteredPosts(_tagFilter, _sortOrder);
+    if (_tagFilter != null)
+      _content = PostRepository.getInstance()
+          .loadTagFilteredPosts(_tagFilter, _sortOrder);
+    else if (widget.arguments != null &&
+        widget.arguments.containsKey('showFavoredDiscussion'))
+      _content = PostRepository.getInstance().getFavoredDiscussions();
+    else
+      _content = loginAndLoadPost(context.personInfo, _sortOrder);
   }
 
   void refreshSelf() {
@@ -233,7 +237,6 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void didChangeDependencies() {
-    if (_lastPageItems.isEmpty) _lastPageItems = [_buildSearchTextField()];
     if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
       _tagFilter = widget.arguments['tagFilter'];
     if (widget.arguments != null && widget.arguments.containsKey('preferences'))
@@ -265,10 +268,22 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (widget.arguments == null) return _buildBody();
+    if (_lastPageItems.isEmpty) _lastPageItems = [_buildSearchTextField()];
+    if (widget.arguments == null)
+      return _buildBody();
+    else if (widget.arguments.containsKey('showFavoredDiscussion')) {
+      return PlatformScaffold(
+        iosContentPadding: true,
+        iosContentBottomPadding: false,
+        appBar: PlatformAppBarX(
+          title: Text(S.of(context).favorites),
+        ),
+        body: _buildBody(),
+      );
+    }
     return PlatformScaffold(
       iosContentPadding: true,
-      iosContentBottomPadding: true,
+      iosContentBottomPadding: false,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).filtering_by_tag(_tagFilter)),
       ),

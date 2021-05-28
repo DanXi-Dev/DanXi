@@ -150,6 +150,8 @@
     "hide": "Hide",
     "show": "Show",
     "search_hint": "Search or #PID",
+    "favorites": "Favorites",
+    "operation_failed": "Operaion Failed",
     "invalid_format": "Invalid format",
     "unable_to_access_url": "Test connection failed\nCan't to connect to this website, please check your URL.",
 

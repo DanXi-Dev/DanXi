@@ -14,6 +14,7 @@ Reply _$ReplyFromJson(Map<String, dynamic> json) {
     json['reply_to'] as int,
     json['date_created'] as String,
     json['discussion'] as int,
+    json['is_me'] as bool,
   );
 }
 
@@ -24,4 +25,5 @@ Map<String, dynamic> _$ReplyToJson(Reply instance) => <String, dynamic>{
       'reply_to': instance.reply_to,
       'date_created': instance.date_created,
       'discussion': instance.discussion,
+      'is_me': instance.is_me,
     };
