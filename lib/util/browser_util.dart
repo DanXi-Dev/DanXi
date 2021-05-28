@@ -34,7 +34,8 @@ class BrowserUtil {
         presentationStyle: IOSUIModalPresentationStyle.POPOVER,
       ),
       inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(javaScriptEnabled: true),
+        crossPlatform: InAppWebViewOptions(
+            javaScriptEnabled: true, useOnDownloadStart: true),
       ));
 
   static openUrl(String url, [NonpersistentCookieJar cookieJar]) {
@@ -97,6 +98,11 @@ class CustomInAppBrowser extends InAppBrowser {
         if (Random().nextDouble() > 0.997) inAppReview.requestReview();
       }
     }
+  }
+
+  @override
+  void onDownloadStart(Uri uri) {
+    launch(uri.toString());
   }
 
   @override

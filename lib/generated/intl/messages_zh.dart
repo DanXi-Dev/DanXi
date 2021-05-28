@@ -165,7 +165,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "name" : MessageLookupByLibrary.simpleMessage("名称"),
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
     "new_shortcut_card" : MessageLookupByLibrary.simpleMessage("添加快捷卡片"),
-    "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("点击该卡片可以打开制定网页"),
+    "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("点击该卡片可以打开指定网页"),
     "next_course_is" : m8,
     "next_course_none" : MessageLookupByLibrary.simpleMessage("今日的课程已全部结束"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[无法显示此类型的消息]"),
