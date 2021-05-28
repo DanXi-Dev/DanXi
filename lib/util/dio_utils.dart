@@ -45,10 +45,13 @@ class DioUtils {
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&
         response.headers['location'].length > 0) {
-      return processRedirect(
-          dio,
-          await dio.get(response.headers['location'][0],
-              options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));
+      String location = response.headers['location'][0];
+      if (location == null || location.isEmpty) return response;
+      if (!Uri.parse(location).isAbsolute) {
+        location = response.requestOptions.uri.origin + '/' + location;
+      }
+      return processRedirect(dio,
+          await dio.get(location, options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));
     } else {
       return response;
     }
