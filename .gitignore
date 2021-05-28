@@ -56,3 +56,7 @@ ios/build
 
 #Private Key
 macos/Podfile.lock
+
+# Visual Studio
+windows/.vs
+windows/out
