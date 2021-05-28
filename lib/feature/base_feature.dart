@@ -39,7 +39,7 @@ abstract class Feature {
 
   BuildContext context;
 
-  void buildFeature() {}
+  void buildFeature([Map<String, dynamic> arguments]) {}
 
   /// Called when FeatureContainer invokes [initState].
   void initFeature() {}

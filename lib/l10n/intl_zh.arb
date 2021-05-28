@@ -75,7 +75,12 @@
     "unmovable_widget": "该项目不可移动",
     "divider": "分割线",
     "welcome_feature": "欢迎",
-    "reorder_hint": "若要重新排列主页卡片，长按并拖动以下条目。\n滑动以删除卡片。用“重置布局”按钮来恢复已删除的卡片。",
+    "new_shortcut_card": "添加快捷卡片",
+    "reorder_hint": "长按并拖动下列条目以重新排列主页卡片。\n滑动以删除辅助卡片。",
+    "new_shortcut_description": "点击该卡片可以打开制定网页",
+    "name": "名称",
+    "link": "链接",
+    "add": "添加",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",

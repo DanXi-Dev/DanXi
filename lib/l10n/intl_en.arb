@@ -76,7 +76,12 @@
     "unmovable_widget": "This object cannot be moved",
     "divider": "Divider",
     "welcome_feature": "Welcome",
-    "reorder_hint": "To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the \"Reset Layout\" button to restore removed cards.",
+    "new_shortcut_card": "New Shortcut Card",
+    "reorder_hint": "To reorder cards, press and hold a tile and drag it.\nSwipe to remove an auxiliary card.",
+    "new_shortcut_description": "Create a card that opens a webpage when tapped.",
+    "name": "Name",
+    "link": "Link",
+    "add": "Add",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",

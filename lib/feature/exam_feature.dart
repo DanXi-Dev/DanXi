@@ -28,7 +28,7 @@ class ExamFeature extends Feature {
   PersonInfo _info;
 
   @override
-  void buildFeature() {
+  void buildFeature([Map<String, dynamic> arguments]) {
     _info = context.personInfo;
 
     // Only load data once.

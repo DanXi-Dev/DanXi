@@ -165,7 +165,7 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  void buildFeature() {
+  void buildFeature([Map<String, dynamic> arguments]) {
     _info = context.personInfo;
     _preferences = Provider.of<SharedPreferences>(context);
     // Only load data once.

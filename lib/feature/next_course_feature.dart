@@ -83,7 +83,7 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  void buildFeature() {
+  void buildFeature([Map<String, dynamic> arguments]) {
     _info = context.personInfo;
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,

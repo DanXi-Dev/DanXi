@@ -97,7 +97,7 @@ class FudanDailyFeature extends Feature {
   }*/
 
   @override
-  void buildFeature() {
+  void buildFeature([Map<String, dynamic> arguments]) {
     _info = Provider.of<ValueNotifier<PersonInfo>>(context)?.value;
     _preferences = Provider.of<SharedPreferences>(context);
 

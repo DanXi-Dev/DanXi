@@ -795,11 +795,61 @@ class S {
     );
   }
 
-  /// `To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the "Reset Layout" button to restore removed cards.`
+  /// `New Shortcut Card`
+  String get new_shortcut_card {
+    return Intl.message(
+      'New Shortcut Card',
+      name: 'new_shortcut_card',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To reorder cards, press and hold a tile and drag it.\nSwipe to remove an auxiliary card.`
   String get reorder_hint {
     return Intl.message(
-      'To reorder these cards, press and hold a tile and drag it.\nSwipe to remove a card. Use the "Reset Layout" button to restore removed cards.',
+      'To reorder cards, press and hold a tile and drag it.\nSwipe to remove an auxiliary card.',
       name: 'reorder_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create a card that opens a webpage when tapped.`
+  String get new_shortcut_description {
+    return Intl.message(
+      'Create a card that opens a webpage when tapped.',
+      name: 'new_shortcut_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get name {
+    return Intl.message(
+      'Name',
+      name: 'name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Link`
+  String get link {
+    return Intl.message(
+      'Link',
+      name: 'link',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add`
+  String get add {
+    return Intl.message(
+      'Add',
+      name: 'add',
       desc: '',
       args: [],
     );

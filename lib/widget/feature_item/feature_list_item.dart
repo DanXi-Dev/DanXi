@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ffi';
+
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +25,12 @@ import 'package:flutter/widgets.dart';
 /// A simple implementation of [FeatureContainer] to show the feature as a [ListTile].
 class FeatureListItem extends StatefulWidget {
   final Feature feature;
+  final Map<String, dynamic> arguments;
 
   @override
   _FeatureListItemState createState() => _FeatureListItemState();
 
-  FeatureListItem({this.feature});
+  FeatureListItem({@required this.feature, this.arguments});
 }
 
 class _FeatureListItemState extends State<FeatureListItem>
@@ -37,7 +40,7 @@ class _FeatureListItemState extends State<FeatureListItem>
     widget.feature
       ..context = context
       ..container = this
-      ..buildFeature();
+      ..buildFeature(widget.arguments);
 
     List<String> summary = [];
     summary.add(widget.feature.subTitle ?? "");
@@ -49,7 +52,9 @@ class _FeatureListItemState extends State<FeatureListItem>
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
       title: Text(widget.feature.mainTitle),
-      subtitle: widget.feature.customSubtitle == null ? Text(summary.join("\n")) : widget.feature.customSubtitle,
+      subtitle: widget.feature.customSubtitle == null
+          ? Text(summary.join("\n"))
+          : widget.feature.customSubtitle,
       onTap: widget.feature.clickable ? widget.feature.onTap : null,
     );
   }

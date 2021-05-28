@@ -52,7 +52,7 @@ class EcardBalanceFeature extends Feature {
   }
 
   @override
-  void buildFeature() {
+  void buildFeature([Map<String, dynamic> arguments]) {
     _info = context.personInfo;
 
     // Only load card data once.

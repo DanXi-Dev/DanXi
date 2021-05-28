@@ -27,9 +27,6 @@ import 'package:dan_xi/public_extension_methods.dart';
 
 class QRFeature extends Feature {
   @override
-  void buildFeature() {}
-
-  @override
   String get mainTitle => S.of(context).fudan_qr_code;
 
   @override

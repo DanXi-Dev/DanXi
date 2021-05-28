@@ -31,7 +31,7 @@ class WelcomeFeature extends Feature {
   String _helloQuote = "";
 
   @override
-  void buildFeature() {
+  void buildFeature([Map<String, dynamic> arguments]) {
     _info = context.personInfo;
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {

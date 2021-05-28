@@ -27,49 +27,23 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
-class EmptyClassroomFeature extends Feature {
-  PersonInfo _info;
+class CustomShortcutFeature extends Feature {
+  final String title;
+  final String link;
+  CustomShortcutFeature({this.title, this.link});
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
-    _info = context.personInfo;
-  }
-
-  @override
-  String get mainTitle => S.of(context).empty_classrooms;
+  String get mainTitle => title;
 
   @override
   String get subTitle => S.of(context).tap_to_view;
 
   @override
-  Widget get icon => PlatformX.isAndroid
-      ? const Icon(Icons.room)
-      : const Icon(SFSymbols.building_2_fill);
-
-  /*@override
-  Widget get trailing => InkWell(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(CupertinoIcons.bus),
-            const SizedBox(
-              height: 2,
-            ),
-            Text(
-              S.of(context).school_bus,
-              textScaleFactor: 0.8,
-            ),
-          ],
-        ),
-        onTap: () => BrowserUtil.openUrl(
-            "https://mp.weixin.qq.com/s/NZJKDz0j9FIXNImEQPquQw"),
-      );*/
+  Widget get icon => Icon(PlatformIcons(context).bookmark);
 
   @override
-  void onTap() async {
-    Navigator.of(context)
-        .pushNamed('/room/detail', arguments: {'personInfo': _info});
+  void onTap() {
+    BrowserUtil.openUrl(link);
   }
 
   @override

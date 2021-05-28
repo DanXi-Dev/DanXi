@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
+import 'package:dan_xi/feature/custom_shortcut.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
@@ -151,8 +152,16 @@ class _HomeSubpageState extends State<HomeSubpage> {
           ),
         ));
         _currentCardChildren = [];
+      } else if (getWidgetStringFromSettings(element) == 'custom_card') {
+        _currentCardChildren.add(FeatureListItem(
+          feature: CustomShortcutFeature(
+              title: getCustomWidgetTitleFromSettings(element),
+              link: getCustomWidgetLinkFromSettings(element)),
+        ));
+      } else {
+        _currentCardChildren
+            .add(widgetMap[getWidgetStringFromSettings(element)]);
       }
-      _currentCardChildren.add(widgetMap[getWidgetStringFromSettings(element)]);
     });
     if (_currentCardChildren.isNotEmpty) {
       _widgets.add(Card(
