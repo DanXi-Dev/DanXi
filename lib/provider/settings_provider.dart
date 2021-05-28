@@ -15,11 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
+import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,7 +33,7 @@ class SettingsProvider {
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
-  static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets";
+  static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
 
   SettingsProvider._(this._preferences);
 
@@ -43,28 +43,31 @@ class SettingsProvider {
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting
-  List<String> get dashboardWidgetsSequence {
+  List<DashboardCard> get dashboardWidgetsSequence {
     if (_preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
-      return _preferences.getStringList(KEY_DASHBOARD_WIDGETS);
+      return (json.decode(_preferences.getString(KEY_DASHBOARD_WIDGETS))
+              as List)
+          .map((i) => DashboardCard.fromJson(i))
+          .toList();
     }
     return [
-      'n:new_card',
-      'n:welcome_feature',
-      'n:next_course_feature',
-      'n:divider',
-      'n:ecard_balance_feature',
-      'n:dining_hall_crowdedness_feature',
-      'n:aao_notice_feature',
-      'n:empty_classroom_feature',
-      'n:new_card',
-      'n:fudan_daily_feature',
-      'n:new_card',
-      'n:qr_feature'
+      DashboardCard("new_card", null, null, true),
+      DashboardCard("welcome_feature", null, null, true),
+      DashboardCard("next_course_feature", null, null, true),
+      DashboardCard("divider", null, null, true),
+      DashboardCard("ecard_balance_feature", null, null, true),
+      DashboardCard("dining_hall_crowdedness_feature", null, null, true),
+      DashboardCard("aao_notice_feature", null, null, true),
+      DashboardCard("empty_classroom_feature", null, null, true),
+      DashboardCard("new_card", null, null, true),
+      DashboardCard("fudan_daily_feature", null, null, true),
+      DashboardCard("new_card", null, null, true),
+      DashboardCard("qr_feature", null, null, true),
     ];
   }
 
-  set dashboardWidgetsSequence(List<String> value) {
-    _preferences.setStringList(KEY_DASHBOARD_WIDGETS, value);
+  set dashboardWidgetsSequence(List<DashboardCard> value) {
+    _preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
   }
 
   Campus get campus {

@@ -1505,6 +1505,16 @@ class S {
     );
   }
 
+  /// `Test connection failed\nCan't to connect to this website, please check your URL.`
+  String get unable_to_access_url {
+    return Intl.message(
+      'Test connection failed\nCan\'t to connect to this website, please check your URL.',
+      name: 'unable_to_access_url',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

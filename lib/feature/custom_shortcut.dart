@@ -19,6 +19,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,11 +40,15 @@ class CustomShortcutFeature extends Feature {
   String get subTitle => S.of(context).tap_to_view;
 
   @override
-  Widget get icon => Icon(PlatformIcons(context).bookmark);
+  Widget get icon => Icon(SFSymbols.bookmark);
 
   @override
   void onTap() {
-    BrowserUtil.openUrl(link);
+    try {
+      BrowserUtil.openUrl(link);
+    } catch (e) {
+      Noticing.showNotice(context, S.of(context).unable_to_access_url);
+    }
   }
 
   @override

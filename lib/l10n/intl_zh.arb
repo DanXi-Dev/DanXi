@@ -147,6 +147,7 @@
     "show": "显示",
     "search_hint": "搜索 或 #PID",
     "invalid_format": "格式错误",
+    "unable_to_access_url": "测试连接失败\n无法访问此网页，请检查URL",
 
     "classroom": "教室",
     "morning": "上午",

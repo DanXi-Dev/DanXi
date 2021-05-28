@@ -150,6 +150,7 @@
     "show": "Show",
     "search_hint": "Search or #PID",
     "invalid_format": "Invalid format",
+    "unable_to_access_url": "Test connection failed\nCan't to connect to this website, please check your URL.",
 
     "classroom": "Classroom",
     "morning": "Morning",

@@ -16,10 +16,12 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -45,22 +47,26 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
   TextEditingController _linkTextFieldController = new TextEditingController();
   String _errorText = "";
 
-  void _save() {
-    if (Uri.tryParse(_linkTextFieldController.text) != null) {
-      print(
-          "writing ${Uri.tryParse(_linkTextFieldController.text).toString()}");
+  void _save() async {
+    // Validate URL
+    final response = await Dio()
+        .head(_linkTextFieldController.text)
+        .onError((error, stackTrace) {
+      _errorText = S.of(context).unable_to_access_url;
+      refreshSelf();
+      return null;
+    });
+    if (response?.statusCode != null) {
       SettingsProvider.of(widget.sharedPreferences).dashboardWidgetsSequence =
           SettingsProvider.of(widget.sharedPreferences)
               .dashboardWidgetsSequence
               .followedBy([
-        "n:custom_card l:${Uri.tryParse(_linkTextFieldController.text).toString()} t:${_nameTextFieldController.text}"
+        DashboardCard("custom_card", _nameTextFieldController.text,
+            _linkTextFieldController.text, true)
       ]).toList();
       RefreshHomepageEvent(queueRefresh: true).fire();
       Navigator.of(context).pop();
-    } else {
-      _errorText = "invalidurl";
-      refreshSelf();
-    }
+    } else {}
   }
 
   @override

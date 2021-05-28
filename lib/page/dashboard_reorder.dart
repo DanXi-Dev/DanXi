@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -41,40 +42,17 @@ class DashboardReorderPage extends StatefulWidget {
 }
 
 const List<String> NONFUNCTIONAL_WIDGET_LIST = ['divider', 'new_card'];
-String getWidgetStringFromSettings(String value) {
-  RegExpMatch match = RegExp(r'n:[a-z_]+').firstMatch(value);
-  if (match == null) return value;
-  return value.substring(match.start + 2, match.end);
-}
-
-bool getWidgetEnabledStatusFromSettings(String value) {
-  return !value.contains('s:disabled');
-}
-
-String getCustomWidgetTitleFromSettings(String value) {
-  // TODO: Potential bug in getting title
-  RegExpMatch match = RegExp(r't:[^(s:)]+').firstMatch(value);
-  if (match == null) return value;
-  return value.substring(match.start + 2, match.end);
-}
-
-String getCustomWidgetLinkFromSettings(String value) {
-  RegExpMatch match = RegExp(r'l:[^ ]+').firstMatch(value);
-  if (match == null) return value;
-  print("saved url: ${value.substring(match.start + 2, match.end)}");
-  return value.substring(match.start + 2, match.end);
-}
 
 class _DashboardReorderPage extends State<DashboardReorderPage> {
   SharedPreferences _preferences;
-  List<String> sequence;
+  List<DashboardCard> sequence;
 
   @override
   Widget build(BuildContext context) {
     sequence = SettingsProvider.of(_preferences).dashboardWidgetsSequence;
 
     return PlatformScaffold(
-      iosContentBottomPadding: true,
+      iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(title: Text(S.of(context).dashboard_layout)),
       body: MediaQuery.removePadding(
@@ -84,9 +62,13 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
           child: Material(
             child: Column(
               children: [
-                Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    child: Text(S.of(context).reorder_hint)),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                      child: Text(S.of(context).reorder_hint)),
+                ),
                 Divider(
                   height: 2,
                 ),
@@ -121,7 +103,8 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                               leading: Icon(PlatformIcons(context).addCircled),
                               title: Text(S.of(context).add_new_card),
                               onTap: () {
-                                sequence.add("n:new_card");
+                                sequence.add(DashboardCard(
+                                    "new_card", null, null, true));
                                 SettingsProvider.of(_preferences)
                                     .dashboardWidgetsSequence = sequence;
                                 RefreshHomepageEvent(queueRefresh: true).fire();
@@ -137,7 +120,9 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                               leading: Icon(PlatformIcons(context).addCircled),
                               title: Text(S.of(context).add_new_divider),
                               onTap: () {
-                                sequence.add("n:divider");
+                                sequence.add(
+                                  DashboardCard("divider", null, null, true),
+                                );
                                 SettingsProvider.of(_preferences)
                                     .dashboardWidgetsSequence = sequence;
                                 RefreshHomepageEvent(queueRefresh: true).fire();
@@ -169,7 +154,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                         return;
                       }
                       if (newIndex > oldIndex) --newIndex;
-                      String tmp = sequence[oldIndex];
+                      DashboardCard tmp = sequence[oldIndex];
                       sequence.removeAt(oldIndex);
                       sequence.insert(newIndex, tmp);
                       SettingsProvider.of(_preferences)
@@ -203,22 +188,18 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
     };
     List<Widget> _widgets = [];
 
-    print(sequence);
-
     for (int index = 0; index < sequence.length; ++index) {
       // Nonfunctional Widgets
-      if (NONFUNCTIONAL_WIDGET_LIST
-          .contains(getWidgetStringFromSettings(sequence[index]))) {
+      if (NONFUNCTIONAL_WIDGET_LIST.contains(sequence[index].internalString)) {
         _widgets.add(Dismissible(
           key: ValueKey(index),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
             child: ListTile(
-              title: Text(
-                  (getWidgetStringFromSettings(sequence[index]) == 'divider'
-                          ? '            '
-                          : '') +
-                      widgetName[getWidgetStringFromSettings(sequence[index])]),
+              title: Text((sequence[index].internalString == 'divider'
+                      ? '            '
+                      : '') +
+                  widgetName[sequence[index].internalString]),
             ),
           ),
           onDismissed: (direction) {
@@ -232,26 +213,24 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       }
 
       // Custom Widgets
-      else if (getWidgetStringFromSettings(sequence[index]) == 'custom_card') {
+      else if (sequence[index].internalString == 'custom_card') {
         _widgets.add(
           Dismissible(
             key: ValueKey(index),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(
-                title: Text(getCustomWidgetTitleFromSettings(sequence[index])),
-                subtitle:
-                    Text(getCustomWidgetLinkFromSettings(sequence[index])),
+                title: Text(sequence[index].title),
+                subtitle: Text(sequence[index].link),
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool value) {
-                  sequence[index] = _generateWidgetStatusSettingsString(
-                      sequence[index], value);
+                  sequence[index].enabled = value;
                   SettingsProvider.of(_preferences).dashboardWidgetsSequence =
                       sequence;
                   RefreshHomepageEvent(queueRefresh: true).fire();
                   refreshSelf();
                 },
-                value: getWidgetEnabledStatusFromSettings(sequence[index]),
+                value: sequence[index].enabled,
               ),
             ),
           ),
@@ -265,35 +244,22 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             key: ValueKey(index),
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
             child: CheckboxListTile(
-              title: Text(
-                  widgetName[getWidgetStringFromSettings(sequence[index])]),
+              title: Text(widgetName[sequence[index].internalString]),
               controlAffinity: ListTileControlAffinity.leading,
               onChanged: (bool value) {
-                sequence[index] =
-                    _generateWidgetStatusSettingsString(sequence[index], value);
+                sequence[index].enabled = value;
                 SettingsProvider.of(_preferences).dashboardWidgetsSequence =
                     sequence;
                 RefreshHomepageEvent(queueRefresh: true).fire();
                 refreshSelf();
               },
-              value: getWidgetEnabledStatusFromSettings(sequence[index]),
+              value: sequence[index].enabled,
             ),
           ),
         );
       }
     }
     return _widgets;
-  }
-
-  String _generateWidgetStatusSettingsString(String original, bool newStatus) {
-    if (newStatus) {
-      if (original.contains('s:disabled'))
-        return original.replaceAll('s:disabled', '').trim();
-    } else {
-      if (!original.contains('s:disabled'))
-        return (original + ' s:disabled').trim();
-    }
-    return original;
   }
 
   @override

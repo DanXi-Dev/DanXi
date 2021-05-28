@@ -210,6 +210,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
     "today_course" : MessageLookupByLibrary.simpleMessage("今日课程"),
+    "unable_to_access_url" : MessageLookupByLibrary.simpleMessage("测试连接失败\n无法访问此网页，请检查URL"),
     "unmovable_widget" : MessageLookupByLibrary.simpleMessage("该项目不可移动"),
     "uploading_image" : MessageLookupByLibrary.simpleMessage("正在上传图片..."),
     "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("上传图片失败，请检查网络连接"),

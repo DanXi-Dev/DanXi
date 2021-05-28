@@ -230,6 +230,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
     "today_course" : MessageLookupByLibrary.simpleMessage("Courses Today"),
+    "unable_to_access_url" : MessageLookupByLibrary.simpleMessage("Test connection failed\nCan\'t to connect to this website, please check your URL."),
     "unmovable_widget" : MessageLookupByLibrary.simpleMessage("This object cannot be moved"),
     "uploading_image" : MessageLookupByLibrary.simpleMessage("Uploading image..."),
     "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("Failed to upload image. Please check your internet connection."),
