@@ -312,6 +312,14 @@ class _BBSSubpageState extends State<BBSSubpage>
                     future: _content,
                     successBuilder: (BuildContext context,
                         AsyncSnapshot<List<BBSPost>> snapshot) {
+                      // Handle Empty Favorites
+                      if (widget.arguments != null &&
+                          widget.arguments
+                              .containsKey('showFavoredDiscussion') &&
+                          snapshot.data.isEmpty) {
+                        return _buildEmptyFavoritesPage();
+                      }
+
                       if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
                           snapshot.data.isEmpty ||
                           _lastSnapshotData.data.last.id !=
@@ -352,6 +360,11 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildLoadingPage() => Container(
         padding: EdgeInsets.all(8),
         child: Center(child: PlatformCircularProgressIndicator()),
+      );
+
+  Widget _buildEmptyFavoritesPage() => Container(
+        padding: EdgeInsets.all(8),
+        child: Center(child: Text(S.of(context).no_favorites)),
       );
 
   Widget _buildErrorPage({String error}) {

@@ -187,6 +187,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("Create a card that opens a webpage when tapped."),
     "next_course_is" : m8,
     "next_course_none" : MessageLookupByLibrary.simpleMessage("You have completed today\'s courses"),
+    "no_favorites" : MessageLookupByLibrary.simpleMessage("You have no favorites"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
     "operation_failed" : MessageLookupByLibrary.simpleMessage("Operaion Failed"),

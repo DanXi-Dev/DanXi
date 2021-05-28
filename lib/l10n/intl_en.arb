@@ -151,6 +151,7 @@
     "show": "Show",
     "search_hint": "Search or #PID",
     "favorites": "Favorites",
+    "no_favorites": "You have no favorites",
     "operation_failed": "Operaion Failed",
     "invalid_format": "Invalid format",
     "unable_to_access_url": "Test connection failed\nCan't to connect to this website, please check your URL.",

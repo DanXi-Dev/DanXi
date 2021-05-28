@@ -1515,6 +1515,16 @@ class S {
     );
   }
 
+  /// `You have no favorites`
+  String get no_favorites {
+    return Intl.message(
+      'You have no favorites',
+      name: 'no_favorites',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Operaion Failed`
   String get operation_failed {
     return Intl.message(

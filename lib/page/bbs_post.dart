@@ -27,6 +27,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -58,7 +59,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing = true;
   bool _isEndIndicatorShown = false;
-  bool _isFavored = false;
+  bool _isFavored;
   static const POST_COUNT_PER_PAGE = 10;
 
   Future<List<Reply>> _searchResult;
@@ -70,6 +71,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _content = _searchResult == null
         ? PostRepository.getInstance().loadReplies(_post, _currentBBSPage)
         : _searchResult;
+  }
+
+  Future<bool> _isDiscussionFavorited() async {
+    final List<BBSPost> favorites =
+        await PostRepository.getInstance().getFavoredDiscussions();
+    bool result = false;
+    favorites.forEach((element) {
+      if (result) return;
+      if (element.id == _post.id) result = true;
+    });
+    return result;
   }
 
   @override
@@ -135,8 +147,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           if (_searchResult == null)
             PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: Icon(_isFavored ? SFSymbols.star_fill : SFSymbols.star),
+              icon: FutureWidget(
+                  future: _isDiscussionFavorited(),
+                  successBuilder: (context, snapshot) {
+                    if (snapshot.data) {
+                      _isFavored = true;
+                      return Icon(SFSymbols.star_fill);
+                    } else {
+                      _isFavored = false;
+                      return Icon(SFSymbols.star);
+                    }
+                  },
+                  errorBuilder: () => Container(),
+                  loadingBuilder: PlatformCircularProgressIndicator()),
               onPressed: () async {
+                if (_isFavored == null) return;
                 if (_isFavored) {
                   _isFavored = false;
                   await PostRepository.getInstance()
