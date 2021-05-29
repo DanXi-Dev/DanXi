@@ -45,7 +45,7 @@
     "authors": "开发者",
     "app_description_title": "简介",
     "app_description": "由几位复旦本科学生用爱发电打造的微型复旦综合服务App，希望能为你的生活提供便利~",
-    "account": "切换账户",
+    "account": "账户",
     "logout": "退出登录",
     "logout_subtitle": "并删除此设备上的所有数据",
     "logout_question_prompt_title": "确定要退出登录吗？",

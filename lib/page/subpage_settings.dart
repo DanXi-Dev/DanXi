@@ -245,7 +245,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                       ' (' +
                       context.personInfo.id +
                       ')'),
-                  onTap: () => initLogin(forceLogin: true),
                 ),
                 ListTile(
                   title: Text(S.of(context).logout),

@@ -56,7 +56,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("关于本应用"),
-    "account" : MessageLookupByLibrary.simpleMessage("切换账户"),
+    "account" : MessageLookupByLibrary.simpleMessage("账户"),
     "acknowledgements" : MessageLookupByLibrary.simpleMessage("致谢"),
     "acknowledgements_1" : MessageLookupByLibrary.simpleMessage("我们感谢 "),
     "acknowledgements_2" : MessageLookupByLibrary.simpleMessage(" 为本app设计图标"),

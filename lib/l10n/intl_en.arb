@@ -44,7 +44,7 @@
     "author_descriptor": "Passionate developers\nfrom Engineering & Economics\nat Fudan University",
     "app_description_title": "Description",
     "app_description": "A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~",
-    "account": "Switch Account",
+    "account": "Account",
     "logout": "Logout",
     "logout_subtitle": "And delete all data from this device",
     "logout_question_prompt_title": "Are you sure?",
