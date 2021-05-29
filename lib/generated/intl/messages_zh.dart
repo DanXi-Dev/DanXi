@@ -173,6 +173,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("点击该卡片可以打开指定网页"),
     "next_course_is" : m9,
     "next_course_none" : MessageLookupByLibrary.simpleMessage("今日的课程已全部结束"),
+    "no_data" : MessageLookupByLibrary.simpleMessage("数据为空"),
     "no_favorites" : MessageLookupByLibrary.simpleMessage("收藏列表为空"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[无法显示此类型的消息]"),
     "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("开源软件许可协议"),

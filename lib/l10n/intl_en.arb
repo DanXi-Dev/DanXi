@@ -157,6 +157,7 @@
     "unable_to_access_url": "Test connection failed\nCan't to connect to this website, please check your URL.",
     "cannot_launch_url": "Unable to open this URL",
     "error_adding_exam": "There was an error adding exam \"{name}\".",
+    "no_data": "Data is empty",
 
     "classroom": "Classroom",
     "morning": "Morning",

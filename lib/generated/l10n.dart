@@ -1575,6 +1575,16 @@ class S {
     );
   }
 
+  /// `Data is empty`
+  String get no_data {
+    return Intl.message(
+      'Data is empty',
+      name: 'no_data',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

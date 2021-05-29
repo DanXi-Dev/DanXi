@@ -47,18 +47,25 @@ import 'package:url_launcher/url_launcher.dart';
 String wrapContentLinksInHref(String content) {
   String result = "";
   int hrefCount = 0;
-  linkify(content).forEach((element) {
+  //print("CONTENT IS $content");
+  linkify(content, options: LinkifyOptions(humanize: false)).forEach((element) {
+    //print("element is $element, hrefCount $hrefCount, result is $result");
     if (element is UrlElement) {
       // Only add tag if tag has not yet been added.
       if (hrefCount == 0) {
         result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
-      } else
+      } else {
+        result += element.text;
         hrefCount--;
+      }
     } else {
-      if (element.text.contains('<a href=')) hrefCount++;
+      if (element.text.contains('<a href='))
+        hrefCount++;
+      else if (element.text.contains('<img src="')) hrefCount++;
       result += element.text;
     }
   });
+  //print("FINAL RESULT $result\n\nMATCH: ${result == content}");
   return result;
 }
 

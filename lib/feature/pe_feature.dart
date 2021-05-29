@@ -74,7 +74,7 @@ class PEFeature extends Feature {
         return S.of(context).loading;
       case ConnectionStatus.DONE:
         if (_exercises.isEmpty)
-          return "";
+          return S.of(context).no_data;
         else {
           // 1 Morning, 2 Must-do, 3 Select-do
           List<int> exerciseCategory = [0, 0, 0];
@@ -148,7 +148,7 @@ class PEFeature extends Feature {
 
   @override
   void onTap() {
-    if (_exercises != null) {
+    if (_exercises != null && _exercises.isNotEmpty) {
       String body = "";
       _exercises.forEach((element) {
         body += "\n${element.title}: ${element.times}";

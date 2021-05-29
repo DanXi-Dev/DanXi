@@ -489,6 +489,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             Linkify(
                               text: renderText(postElement.first_post.content,
                                   S.of(context).image_tag),
+                              style: TextStyle(fontSize: 16),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               onOpen: (link) async {
@@ -506,6 +507,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     : Linkify(
                         text: renderText(postElement.first_post.content,
                             S.of(context).image_tag),
+                        style: TextStyle(fontSize: 16),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         onOpen: (link) async {
@@ -602,6 +604,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                           ? S.of(context).no_summary
                           : renderText(postElement.last_post.content,
                               S.of(context).image_tag),
+                      style: TextStyle(fontSize: 14),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       onOpen: (link) async {
