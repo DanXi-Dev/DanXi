@@ -499,8 +499,8 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "48eb2ee396c6a6f3bec70909d80e40f547765119"
-      url: "git://github.com/w568w/flutter_progress_dialog.git"
+      resolved-ref: "0857007205e0386fdaa418044640cdd773f6c2d2"
+      url: "git://github.com/kavinzhao/flutter_progress_dialog.git"
     source: git
     version: "0.1.0"
   flutter_quill:
