@@ -88,6 +88,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/Sub6Resources/flutter_html"),
     LicenseItem("flutter_inappwebview", LICENSE_APACHE_2_0,
         "https://github.com/pichillilorenzo/flutter_inappwebview"),
+    LicenseItem("flutter_linkify", LICENSE_MIT,
+        "https://github.com/Cretezy/flutter_linkify"),
     LicenseItem("flutter_localizations", LICENSE_BSD_3_0_CLAUSE,
         "https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html"),
     LicenseItem("flutter_phoenix", LICENSE_MIT,

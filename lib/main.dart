@@ -52,7 +52,6 @@ import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 
 import 'package:desktop_window/desktop_window.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -89,48 +88,10 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
-  _initializeFirebaseMessaging(requestProvisionalPermission: true);
-  /*FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    // This is called when the app receives a message in the foreground
-    // for handling background messages, see https://firebase.flutter.dev/docs/messaging/usage
-
-    /*if (message.notification != null) {
-    //Message also contained a notification: ${message.notification}'
-  }*/
-  });*/
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
       releaseConfig: releaseOptions);
-}
-
-void _initializeFirebaseMessaging(
-    {@required bool requestProvisionalPermission}) async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  AuthorizationStatus status =
-      (await messaging.getNotificationSettings()).authorizationStatus;
-  if (requestProvisionalPermission &&
-      status == AuthorizationStatus.notDetermined)
-    await messaging.requestPermission(provisional: true);
-  else if (status == AuthorizationStatus.authorized ||
-      status == AuthorizationStatus.denied)
-    return;
-  else {
-    await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-  }
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true, // Required to display a heads up notification
-    badge: true,
-    sound: false,
-  );
 }
 
 class DanxiApp extends StatelessWidget {

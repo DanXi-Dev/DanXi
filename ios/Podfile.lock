@@ -42,18 +42,11 @@ PODS:
   - Firebase/Crashlytics (8.0.0):
     - Firebase/CoreOnly
     - FirebaseCrashlytics (~> 8.0.0)
-  - Firebase/Messaging (8.0.0):
-    - Firebase/CoreOnly
-    - FirebaseMessaging (~> 8.0.0)
   - firebase_core (1.2.0):
     - Firebase/CoreOnly (= 8.0.0)
     - Flutter
   - firebase_crashlytics (2.0.4):
     - Firebase/Crashlytics (= 8.0.0)
-    - firebase_core
-    - Flutter
-  - firebase_messaging (10.0.0):
-    - Firebase/Messaging (= 8.0.0)
     - firebase_core
     - Flutter
   - FirebaseCore (8.0.0):
@@ -77,13 +70,6 @@ PODS:
     - GoogleUtilities/Environment (~> 7.4)
     - GoogleUtilities/UserDefaults (~> 7.4)
     - PromisesObjC (~> 1.2)
-  - FirebaseMessaging (8.0.0):
-    - FirebaseCore (~> 8.0)
-    - FirebaseInstallations (~> 8.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 7.4)
-    - GoogleUtilities/Environment (~> 7.4)
-    - GoogleUtilities/Reachability (~> 7.4)
-    - GoogleUtilities/UserDefaults (~> 7.4)
   - Flutter (1.0.0)
   - flutter_email_sender (0.0.1):
     - Flutter
@@ -105,21 +91,10 @@ PODS:
     - GoogleUtilities/Environment (~> 7.2)
     - nanopb (~> 2.30908.0)
     - PromisesObjC (~> 1.2)
-  - GoogleUtilities/AppDelegateSwizzler (7.4.1):
-    - GoogleUtilities/Environment
-    - GoogleUtilities/Logger
-    - GoogleUtilities/Network
   - GoogleUtilities/Environment (7.4.1):
     - PromisesObjC (~> 1.2)
   - GoogleUtilities/Logger (7.4.1):
     - GoogleUtilities/Environment
-  - GoogleUtilities/Network (7.4.1):
-    - GoogleUtilities/Logger
-    - "GoogleUtilities/NSData+zlib"
-    - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (7.4.1)"
-  - GoogleUtilities/Reachability (7.4.1):
-    - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (7.4.1):
     - GoogleUtilities/Logger
   - image_picker (0.0.1):
@@ -167,7 +142,6 @@ DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_crashlytics (from `.symlinks/plugins/firebase_crashlytics/ios`)
-  - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `6.26.0`)
   - Flutter (from `Flutter`)
   - flutter_email_sender (from `.symlinks/plugins/flutter_email_sender/ios`)
@@ -198,7 +172,6 @@ SPEC REPOS:
     - FirebaseCoreDiagnostics
     - FirebaseCrashlytics
     - FirebaseInstallations
-    - FirebaseMessaging
     - GoogleDataTransport
     - GoogleUtilities
     - nanopb
@@ -219,8 +192,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_crashlytics:
     :path: ".symlinks/plugins/firebase_crashlytics/ios"
-  firebase_messaging:
-    :path: ".symlinks/plugins/firebase_messaging/ios"
   FirebaseFirestore:
     :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
     :tag: 6.26.0
@@ -277,13 +248,11 @@ SPEC CHECKSUMS:
   Firebase: 73c3e3b216ec1ecbc54d2ffdd4670c65c749edb1
   firebase_core: e4d3efb030a2b2021819f8faa538bb23deb46695
   firebase_crashlytics: 4f3ce855ce6116de954cde34f88003df8ed9de4a
-  firebase_messaging: 3b6e0657b21261a57a1cd041fafa713f2aa6923f
   FirebaseCore: 3f09591d51292843e2a46f18358d60bf4e996255
   FirebaseCoreDiagnostics: a31d987ba0fe16d59886a5dbadc2f1de871f88c8
   FirebaseCrashlytics: 69cddb6bfa7656c5346e603bc85b029392252ee6
   FirebaseFirestore: 2cf6944bc538e57c94d8332bae501178edb70727
   FirebaseInstallations: c4aab1005d6547b00a7529777fe52f5d4d45165b
-  FirebaseMessaging: 1a33b4af3c8042ed6ddacb6c031894af2064bfab
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_email_sender: 02d7443217d8c41483223627972bfdc09f74276b
   flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
