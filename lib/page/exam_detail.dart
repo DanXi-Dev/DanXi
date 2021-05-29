@@ -17,7 +17,6 @@
 
 import 'dart:io';
 
-import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/exam_repository.dart';
