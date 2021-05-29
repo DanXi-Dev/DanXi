@@ -15,9 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
+import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/exam_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -28,6 +33,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:ical/serializer.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
 
 class ExamList extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -50,15 +58,60 @@ class _ExamListState extends State<ExamList> {
     _content = ExamRepository.getInstance().loadExamListRemotely(_info);
   }
 
+  void _exportICal() async {
+    ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
+    _data?.forEach((element) {
+      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty)
+        try {
+          cal.addElement(IEvent(
+            summary: element.name,
+            location: element.location,
+            status: IEventStatus.CONFIRMED,
+            description:
+                "${element.testCategory} ${element.type}\n${element.note}",
+            start:
+                DateTime.parse(element.date + ' ' + element.time.split('~')[0]),
+            end:
+                DateTime.parse(element.date + ' ' + element.time.split('~')[1]),
+          ));
+        } catch (ignored) {
+          Noticing.showNotice(
+              context, S.of(context).error_adding_exam(element.name),
+              title: S.of(context).fatal_error);
+        }
+    });
+    Directory documentDir = await getApplicationDocumentsDirectory();
+    File outputFile =
+        File("${documentDir.absolute.path}/output_timetable/${"exam.ics"}");
+    outputFile.createSync(recursive: true);
+    await outputFile.writeAsString(cal.serialize(), flush: true);
+    if (PlatformX.isMobile)
+      Share.shareFiles([outputFile.absolute.path],
+          mimeTypes: ["text/calendar"]);
+    else {
+      Noticing.showNotice(context, outputFile.absolute.path);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-          title: Text(
-        S.of(context).exam_schedule,
-      )),
+        title: Text(
+          S.of(context).exam_schedule,
+        ),
+        trailingActions: [
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(PlatformX.isMaterial(context)
+                ? Icons.share
+                : SFSymbols.square_arrow_up),
+            onPressed: () => _exportICal(),
+          ),
+        ],
+      ),
       body: FutureWidget(
         future: _content,
         successBuilder: (_, snapShot) {

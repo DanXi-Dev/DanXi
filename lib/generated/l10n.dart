@@ -1565,6 +1565,16 @@ class S {
     );
   }
 
+  /// `There was an error adding exam "{name}".`
+  String error_adding_exam(Object name) {
+    return Intl.message(
+      'There was an error adding exam "$name".',
+      name: 'error_adding_exam',
+      desc: '',
+      args: [name],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(
