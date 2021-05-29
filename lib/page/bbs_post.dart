@@ -27,7 +27,6 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,7 +39,6 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BBSPostDetail extends StatefulWidget {
@@ -59,7 +57,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing = true;
   bool _isEndIndicatorShown = false;
-  bool _isFavored;
+  bool _isFavorited;
   static const POST_COUNT_PER_PAGE = 10;
 
   Future<List<Reply>> _searchResult;
@@ -74,6 +72,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Future<bool> _isDiscussionFavorited() async {
+    if (_isFavorited != null) return _isFavorited;
     final List<BBSPost> favorites =
         await PostRepository.getInstance().getFavoredDiscussions();
     bool result = false;
@@ -147,42 +146,62 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           if (_searchResult == null)
             PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: FutureWidget(
-                  future: _isDiscussionFavorited(),
-                  successBuilder: (context, snapshot) {
-                    if (snapshot.data) {
-                      _isFavored = true;
-                      return Icon(SFSymbols.star_fill);
-                    } else {
-                      _isFavored = false;
-                      return Icon(SFSymbols.star);
-                    }
-                  },
-                  errorBuilder: () => Container(),
-                  loadingBuilder: PlatformCircularProgressIndicator()),
+              icon: FutureBuilder(
+                future: _isDiscussionFavorited(),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      if (_isFavorited != null)
+                        return _isFavorited
+                            ? Icon(SFSymbols.star_fill)
+                            : Icon(SFSymbols.star);
+                      else {
+                        return PlatformCircularProgressIndicator();
+                      }
+                      break;
+                    case ConnectionState.done:
+                      if (snapshot.hasData) {
+                        if (snapshot.data) {
+                          _isFavorited = true;
+                          return Icon(SFSymbols.star_fill);
+                        } else {
+                          _isFavorited = false;
+                          return Icon(SFSymbols.star);
+                        }
+                      }
+                      break;
+                  }
+                  return Icon(SFSymbols.star);
+                },
+              ),
               onPressed: () async {
-                if (_isFavored == null) return;
-                if (_isFavored) {
-                  _isFavored = false;
+                if (_isFavorited == null) return;
+                if (_isFavorited) {
+                  _isFavorited = false;
+                  setState(() {});
                   await PostRepository.getInstance()
                       .setFavoredDiscussion(
                           SetFavoredDiscussionMode.DELETE, _post.id)
                       .onError((error, stackTrace) {
                     Noticing.showNotice(
                         context, S.of(context).operation_failed);
-                    _isFavored = true;
+                    _isFavorited = true;
+                    setState(() {});
                     return null;
                   });
-                  setState(() {});
                 } else {
-                  _isFavored = true;
+                  _isFavorited = true;
+                  setState(() {});
                   await PostRepository.getInstance()
                       .setFavoredDiscussion(
                           SetFavoredDiscussionMode.ADD, _post.id)
                       .onError((error, stackTrace) {
                     Noticing.showNotice(
                         context, S.of(context).operation_failed);
-                    _isFavored = false;
+                    _isFavorited = false;
+                    setState(() {});
                     return null;
                   });
                   setState(() {});

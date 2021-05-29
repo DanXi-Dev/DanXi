@@ -109,10 +109,10 @@ class SortOrderChangedEvent {
 
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
-  static StateStreamListener _postSubscription = StateStreamListener();
-  static StateStreamListener _refreshSubscription = StateStreamListener();
-  static StateStreamListener _searchSubscription = StateStreamListener();
-  static StateStreamListener _sortOrderChangedSubscription =
+  final StateStreamListener _postSubscription = StateStreamListener();
+  final StateStreamListener _refreshSubscription = StateStreamListener();
+  final StateStreamListener _searchSubscription = StateStreamListener();
+  final StateStreamListener _sortOrderChangedSubscription =
       StateStreamListener();
 
   int _currentBBSPage;

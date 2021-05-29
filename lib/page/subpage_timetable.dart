@@ -52,7 +52,7 @@ class ShareTimetableEvent {}
 
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
-  StateStreamListener _shareSubscription = StateStreamListener();
+  final StateStreamListener _shareSubscription = StateStreamListener();
 
   /// A map of all converters.
   ///
