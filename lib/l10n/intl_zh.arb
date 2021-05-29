@@ -152,6 +152,7 @@
     "operation_failed": "操作失败",
     "invalid_format": "格式错误",
     "unable_to_access_url": "测试连接失败\n无法访问此网页，请检查URL",
+    "cannot_launch_url": "无法打开此链接",
 
     "classroom": "教室",
     "morning": "上午",

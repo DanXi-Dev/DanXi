@@ -23,6 +23,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomShortcutFeature extends Feature {
   final String title;
@@ -39,11 +40,11 @@ class CustomShortcutFeature extends Feature {
   Widget get icon => Icon(SFSymbols.bookmark);
 
   @override
-  void onTap() {
-    try {
+  void onTap() async {
+    if (await canLaunch(link)) {
       BrowserUtil.openUrl(link);
-    } catch (e) {
-      Noticing.showNotice(context, S.of(context).unable_to_access_url);
+    } else {
+      Noticing.showNotice(context, S.of(context).cannot_launch_url);
     }
   }
 

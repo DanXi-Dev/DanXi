@@ -72,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "app_name" : MessageLookupByLibrary.simpleMessage("旦夕"),
     "authors" : MessageLookupByLibrary.simpleMessage("开发者"),
     "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
+    "cannot_launch_url" : MessageLookupByLibrary.simpleMessage("无法打开此链接"),
     "captcha_needed" : MessageLookupByLibrary.simpleMessage("需要输入验证码，请遵循屏幕上的提示。"),
     "change_account" : MessageLookupByLibrary.simpleMessage("切换账号"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("选择校区"),

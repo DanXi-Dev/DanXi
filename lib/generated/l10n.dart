@@ -1555,6 +1555,16 @@ class S {
     );
   }
 
+  /// `Unable to open this URL`
+  String get cannot_launch_url {
+    return Intl.message(
+      'Unable to open this URL',
+      name: 'cannot_launch_url',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

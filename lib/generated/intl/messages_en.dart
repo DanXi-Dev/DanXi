@@ -75,6 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "author_descriptor" : MessageLookupByLibrary.simpleMessage("Passionate developers\nfrom Engineering & Economics\nat Fudan University"),
     "authors" : MessageLookupByLibrary.simpleMessage("Developers"),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
+    "cannot_launch_url" : MessageLookupByLibrary.simpleMessage("Unable to open this URL"),
     "captcha_needed" : MessageLookupByLibrary.simpleMessage("Captcha needed, please following the on-screen instructions."),
     "change_account" : MessageLookupByLibrary.simpleMessage("Switch Account"),
     "choose_area" : MessageLookupByLibrary.simpleMessage("Select Campus"),

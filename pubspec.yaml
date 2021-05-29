@@ -73,6 +73,8 @@ dependencies:
   in_app_review: ^2.0.2
   html_editor_enhanced: ^2.1.1
   firebase_messaging: ^10.0.0
+  flutter_linkify: ^5.0.2
+  linkify: ^4.0.0
 
 dependency_overrides:
   flutter_quill:
@@ -83,6 +85,11 @@ dependency_overrides:
     git:
       url: https://github.com/ponnamkarthik/FlutterToast.git
       ref: master
+  linkify:
+    git:
+        url: git://github.com/kavinzhao/linkify.git
+        ref: master
+        commit: 6e0d7d7
   html: ^0.15.0
 
 dev_dependencies:

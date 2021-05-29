@@ -155,6 +155,7 @@
     "operation_failed": "Operaion Failed",
     "invalid_format": "Invalid format",
     "unable_to_access_url": "Test connection failed\nCan't to connect to this website, please check your URL.",
+    "cannot_launch_url": "Unable to open this URL",
 
     "classroom": "Classroom",
     "morning": "Morning",

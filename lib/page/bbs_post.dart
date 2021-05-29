@@ -34,12 +34,33 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:linkify/linkify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+String wrapContentLinksInHref(String content) {
+  String result = "";
+  int hrefCount = 0;
+  linkify(content).forEach((element) {
+    if (element is UrlElement) {
+      // Only add tag if tag has not yet been added.
+      if (hrefCount == 0) {
+        result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
+      } else
+        hrefCount--;
+    } else {
+      if (element.text.contains('<a href=')) hrefCount++;
+      result += element.text;
+    }
+  });
+  return result;
+}
 
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -344,41 +365,41 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(Reply e) {
-    List<Widget> list = [];
-    list.add(PlatformWidget(
-      cupertino: (_, __) => CupertinoActionSheetAction(
-        onPressed: () {
-          Navigator.of(context).pop();
-          BBSEditor.reportPost(context, e.id);
-        },
-        child: Text(S.of(context).report),
+    return [
+      PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(context).pop();
+            FlutterClipboard.copy(renderText(e.content, ''));
+          },
+          child: Text(S.of(context).copy),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(S.of(context).copy),
+          onTap: () {
+            Navigator.of(context).pop();
+            FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
+                Noticing.showNotice(context, S.of(context).copy_success));
+          },
+        ),
       ),
-      material: (_, __) => ListTile(
-        title: Text(S.of(context).report),
-        onTap: () {
-          Navigator.of(context).pop();
-          BBSEditor.reportPost(context, e.id);
-        },
+      PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(context).pop();
+            BBSEditor.reportPost(context, e.id);
+          },
+          child: Text(S.of(context).report),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(S.of(context).report),
+          onTap: () {
+            Navigator.of(context).pop();
+            BBSEditor.reportPost(context, e.id);
+          },
+        ),
       ),
-    ));
-    list.add(PlatformWidget(
-      cupertino: (_, __) => CupertinoActionSheetAction(
-        onPressed: () {
-          Navigator.of(context).pop();
-          FlutterClipboard.copy(renderText(e.content, ''));
-        },
-        child: Text(S.of(context).copy),
-      ),
-      material: (_, __) => ListTile(
-        title: Text(S.of(context).copy),
-        onTap: () {
-          Navigator.of(context).pop();
-          FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
-              Noticing.showNotice(context, S.of(context).copy_success));
-        },
-      ),
-    ));
-    return list;
+    ];
   }
 
   Widget _wrapListItemInCanvas(Reply e, bool generateTags) =>
@@ -476,15 +497,23 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     alignment: Alignment.topLeft,
                     child: isNested
                         // If content is being quoted, limit its height so that the view won't be too long.
-                        ? Text(
-                            renderText(e.content, S.of(context).image_tag)
+                        ? Linkify(
+                            text: renderText(e.content, S.of(context).image_tag)
                                 .trim(),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
+                            onOpen: (link) async {
+                              if (await canLaunch(link.url)) {
+                                BrowserUtil.openUrl(link.url);
+                              } else {
+                                Noticing.showNotice(
+                                    context, S.of(context).cannot_launch_url);
+                              }
+                            },
                           )
                         : Html(
                             shrinkWrap: true,
-                            data: e.content,
+                            data: wrapContentLinksInHref(e.content),
                             style: {
                               "body": Style(
                                 margin: EdgeInsets.zero,

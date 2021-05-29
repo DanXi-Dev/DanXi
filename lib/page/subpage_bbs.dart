@@ -26,6 +26,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/stream_listener.dart';
@@ -47,6 +48,8 @@ import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'bbs_editor.dart';
 
@@ -483,20 +486,36 @@ class _BBSSubpageState extends State<BBSSubpage>
                                 fontSize: 12),
                           ),
                           children: [
-                            Text(
-                              renderText(postElement.first_post.content,
+                            Linkify(
+                              text: renderText(postElement.first_post.content,
                                   S.of(context).image_tag),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
+                              onOpen: (link) async {
+                                if (await canLaunch(link.url)) {
+                                  BrowserUtil.openUrl(link.url);
+                                } else {
+                                  Noticing.showNotice(
+                                      context, S.of(context).cannot_launch_url);
+                                }
+                              },
                             ),
                           ],
                         ),
                       )
-                    : Text(
-                        renderText(postElement.first_post.content,
+                    : Linkify(
+                        text: renderText(postElement.first_post.content,
                             S.of(context).image_tag),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            BrowserUtil.openUrl(link.url);
+                          } else {
+                            Noticing.showNotice(
+                                context, S.of(context).cannot_launch_url);
+                          }
+                        },
                       ),
               ],
             ),
@@ -575,8 +594,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                 ),
                 Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                    child: Text(
-                      renderText(postElement.last_post.content,
+                    child: Linkify(
+                      text: renderText(postElement.last_post.content,
                                   S.of(context).image_tag)
                               .trim()
                               .isEmpty
@@ -585,7 +604,14 @@ class _BBSSubpageState extends State<BBSSubpage>
                               S.of(context).image_tag),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      //style: TextStyle(color: Theme.of(context).hintColor),
+                      onOpen: (link) async {
+                        if (await canLaunch(link.url)) {
+                          BrowserUtil.openUrl(link.url);
+                        } else {
+                          Noticing.showNotice(
+                              context, S.of(context).cannot_launch_url);
+                        }
+                      },
                     )),
               ],
             ),
