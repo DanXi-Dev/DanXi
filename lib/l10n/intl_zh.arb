@@ -155,6 +155,7 @@
     "cannot_launch_url": "无法打开此链接",
     "error_adding_exam": "添加考试“{name}”时出错",
     "no_data": "数据为空",
+    "post_does_not_exist": "没有这条树洞",
 
     "classroom": "教室",
     "morning": "上午",

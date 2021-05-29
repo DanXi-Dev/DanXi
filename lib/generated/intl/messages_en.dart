@@ -199,6 +199,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "other_types_exam" : MessageLookupByLibrary.simpleMessage("Paper and Other"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
     "pe_exercises" : MessageLookupByLibrary.simpleMessage("PE Exercises"),
+    "post_does_not_exist" : MessageLookupByLibrary.simpleMessage("The requested post does not exist."),
     "post_failed" : MessageLookupByLibrary.simpleMessage("Failed to post. Please check your internet connection."),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),

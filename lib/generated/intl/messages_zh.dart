@@ -181,6 +181,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "other_types_exam" : MessageLookupByLibrary.simpleMessage("论文和其他考试"),
     "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("现在不是用餐时间"),
     "pe_exercises" : MessageLookupByLibrary.simpleMessage("体育锻炼"),
+    "post_does_not_exist" : MessageLookupByLibrary.simpleMessage("没有这条树洞"),
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("隐私政策"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目网页"),

@@ -1585,6 +1585,16 @@ class S {
     );
   }
 
+  /// `The requested post does not exist.`
+  String get post_does_not_exist {
+    return Intl.message(
+      'The requested post does not exist.',
+      name: 'post_does_not_exist',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Classroom`
   String get classroom {
     return Intl.message(

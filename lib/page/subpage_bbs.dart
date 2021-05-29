@@ -36,6 +36,7 @@ import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -202,9 +203,22 @@ class _BBSSubpageState extends State<BBSSubpage>
   _pushToPIDResultPage(int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
-    Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
-      "post": await PostRepository.getInstance().loadSpecificPost(pid)
+    final BBSPost post = await PostRepository.getInstance()
+        .loadSpecificPost(pid)
+        .onError((error, stackTrace) {
+      if (error is DioError && error.response?.statusCode == 404)
+        Noticing.showNotice(context, S.of(context).post_does_not_exist,
+            title: S.of(context).fatal_error);
+      else
+        Noticing.showNotice(context, error.toString(),
+            title: S.of(context).fatal_error);
+      progressDialog.dismiss();
+      return null;
     });
+    if (post != null)
+      Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+        "post": post,
+      });
     progressDialog.dismiss();
   }
 
