@@ -39,6 +39,9 @@ class BrowserUtil {
       ));
 
   static openUrl(String url, [NonpersistentCookieJar cookieJar]) {
+    // Sanitize URL
+    url = Uri.encodeFull(url);
+
     if (cookieJar == null || PlatformX.isDesktop) {
       launch(url, forceWebView: true, enableJavaScript: true);
       return;
