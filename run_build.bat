@@ -10,15 +10,18 @@ echo Start building...
 :build_android
 echo Build for Android...
 echo.
-flutter build android
+start /WAIT cmd /C flutter build apk
 move build\app\outputs\flutter-apk\app-release.apk build\app\DanXi-%version_code%-release.android.apk
 echo.
 
 :build_windows
 echo Build for Windows...
 echo.
-flutter build windows
-7z a -r -sse build\app\DanXi-%version_code%-release.windows-x64.zip build\windows\runner\Release
+REM start /WAIT cmd /C flutter build windows
+del /Q build\app\DanXi-%version_code%-release.windows-x64.zip
+cd build\windows\runner\Release\
+7z a -r -sse ..\..\..\..\build\app\DanXi-%version_code%-release.windows-x64.zip *
+cd ..\..\..\..\
 echo.
 
 :build_app_bundle
@@ -28,8 +31,8 @@ echo Ensure that you have choose your signing key in android/key.properties.
 echo.
 echo Press any key to continue.
 pause
-flutter build appbundle
-move build\app\outputs\bundle\release\app-release.apk build\app\DanXi-%version_code%-release.android.aab
+start /WAIT cmd /C flutter build appbundle
+move build\app\outputs\bundle\release\app-release.aab build\app\DanXi-%version_code%-release.android.aab
 
 :end_success
 echo Build success.
