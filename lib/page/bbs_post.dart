@@ -533,17 +533,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 fontSize: FontSize(16),
                               ),
                             },
-
-                            // Workaround https://github.com/Sub6Resources/flutter_html/issues/709#issuecomment-850996387
                             customImageRenders: {
-                              networkSourceMatcher():
-                                  networkImageRender(loadingWidget: () {
-                                if (PlatformX.isCupertino(context))
-                                  return CupertinoActivityIndicator();
-                                return CircularProgressIndicator();
-                              }),
+                              networkSourceMatcher(): networkImageRender(
+                                  loadingWidget: () => Container(
+                                        foregroundDecoration: BoxDecoration(
+                                            color: Colors.black12),
+                                        width: double.infinity,
+                                        height: 60,
+                                        child: Center(
+                                          child:
+                                              PlatformCircularProgressIndicator(),
+                                        ),
+                                      )),
                             },
-
                             onLinkTap: (url, context, attributes, element) =>
                                 BrowserUtil.openUrl(url),
                             onImageTap: (url, context, attributes, element) {
