@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
     - uses: actions/setup-java@v1
       with:
         java-version: '12.x'
@@ -19,7 +19,7 @@ jobs:
     - run: flutter pub get
       #Testing is still useless at the moment.
       #- run: flutter test
-    - run: flutter build ios
+    - run: flutter build ios --no-codesign
       # Use debug profile to sign with no specific keystore
     - run: flutter build apk --debug
 
