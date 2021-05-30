@@ -121,7 +121,7 @@ class DanxiApp extends StatelessWidget {
   };
 
   changeSizeOnDesktop() async {
-    if (PlatformX.isDesktop) {
+    if (PlatformX.isWindows) {
       await DesktopWindow.setWindowSize(Size(480, 960));
     }
   }
@@ -141,7 +141,7 @@ class DanxiApp extends StatelessWidget {
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
-          title: 'DanXi',
+          title: '旦夕',
           debugShowCheckedModeBanner: false,
           cupertino: (_, __) => CupertinoAppData(
               theme: CupertinoThemeData(

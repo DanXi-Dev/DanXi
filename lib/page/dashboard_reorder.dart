@@ -20,6 +20,7 @@ import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/new_shortcut_widget_dialog.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
@@ -210,7 +211,9 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
               child: CheckboxListTile(
                 title: Text(sequence[index].title),
                 subtitle: Text(sequence[index].link),
-                secondary: Icon(Icons.drag_handle_rounded),
+                secondary: PlatformX.isDesktop
+                    ? null
+                    : Icon(Icons.drag_handle_rounded),
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool value) {
                   sequence[index].enabled = value;
