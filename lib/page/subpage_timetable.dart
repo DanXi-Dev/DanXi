@@ -37,6 +37,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
@@ -82,7 +83,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(converted, flush: true);
-    if (PlatformX.isMobile)
+    if (PlatformX.isIOS)
+      OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
+    else if (PlatformX.isAndroid)
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: [converter.mimeType]);
     else {

@@ -33,6 +33,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:ical/serializer.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
@@ -84,7 +85,9 @@ class _ExamListState extends State<ExamList> {
         File("${documentDir.absolute.path}/output_timetable/${"exam.ics"}");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(cal.serialize(), flush: true);
-    if (PlatformX.isMobile)
+    if (PlatformX.isIOS)
+      OpenFile.open(outputFile.absolute.path, type: "text/calendar");
+    else if (PlatformX.isAndroid)
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: ["text/calendar"]);
     else {
