@@ -19,11 +19,8 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_quill/widgets/controller.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
 
 class BBSEditor {
   static Future<void> createNewReply(

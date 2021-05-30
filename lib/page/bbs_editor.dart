@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
@@ -26,7 +25,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:delta_markdown/delta_markdown.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,13 +33,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_quill/widgets/controller.dart';
-import 'package:flutter_quill/widgets/editor.dart';
-import 'package:flutter_quill/widgets/toolbar.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
-import 'package:markdown/markdown.dart' as markdown;
 
 class BBSEditorPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -53,8 +47,9 @@ class BBSEditorPage extends StatefulWidget {
 }
 
 class BBSEditorPageState extends State<BBSEditorPage> {
-  var _controller =
-      PlatformX.isMobile ? HtmlEditorController() : QuillController.basic();
+  //var _controller =
+  //    PlatformX.isMobile ? HtmlEditorController() : QuillController.basic();
+  var _controller = HtmlEditorController();
 
   /// Whether the send button is enabled
   bool _canSend = true;
@@ -176,32 +171,32 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                         onChanged: () {}),
                   ),
                 Expanded(
-                  child: PlatformX.isMobile
-                      ? BBSMobileEditorWidget(
-                          htmlEditorController: _controller,
-                        )
-                      : BBSDesktopEditorWidget(
-                          quillController: _controller,
-                        ),
+                    child: // PlatformX.isMobile ?
+                        BBSMobileEditorWidget(
+                  htmlEditorController: _controller,
                 )
+                    /*: BBSDesktopEditorWidget(
+                          quillController: _controller,
+                        ),*/
+                    )
               ],
             )));
   }
 
   Future<void> _sendDocument() async {
-    if (_controller is HtmlEditorController) {
-      //Handle Mobile
-      String text = await BBSMobileEditorWidget.getText(_controller);
-      if (BBSMobileEditorWidget.isEmpty(text)) return;
-      Navigator.pop<PostEditorText>(context, PostEditorText(text, _tags));
-    } else {
+    //if (_controller is HtmlEditorController) {
+    //Handle Mobile
+    String text = await BBSMobileEditorWidget.getText(_controller);
+    if (BBSMobileEditorWidget.isEmpty(text)) return;
+    Navigator.pop<PostEditorText>(context, PostEditorText(text, _tags));
+    /*} else {
       //Handle Desktop
       if (BBSDesktopEditorWidget.isEmpty(_controller)) {
       } else {
         Navigator.pop<PostEditorText>(context,
             PostEditorText(BBSDesktopEditorWidget.getText(_controller), _tags));
       }
-    }
+    }*/
   }
 }
 
@@ -282,6 +277,7 @@ class BBSMobileEditorWidget extends StatelessWidget {
   }
 }
 
+/*
 // Use Quill for Desktop
 class BBSDesktopEditorWidget extends StatefulWidget {
   final QuillController quillController;
@@ -363,7 +359,7 @@ class _BBSDesktopEditorWidgetState extends State<BBSDesktopEditorWidget> {
       ],
     );
   }
-}
+}*/
 
 class PostEditorText {
   final String content;
