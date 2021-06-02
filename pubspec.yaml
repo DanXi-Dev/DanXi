@@ -73,6 +73,7 @@ dependencies:
   flutter_linkify: ^5.0.2
   linkify: ^4.0.0
   open_file: ^3.2.1
+  dio_log: ^2.0.0
 
 dependency_overrides:
   fluttertoast:

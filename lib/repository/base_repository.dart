@@ -18,6 +18,7 @@
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:dio_log/interceptor/dio_log_interceptor.dart';
 import 'package:flutter/foundation.dart';
 
 class BaseRepositoryWithDio {
@@ -29,5 +30,6 @@ class BaseRepositoryWithDio {
   @protected
   void initRepository() {
     dio.interceptors.add(CookieManager(cookieJar));
+    dio.interceptors.add(DioLogInterceptor());
   }
 }

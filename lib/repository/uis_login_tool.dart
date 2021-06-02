@@ -64,7 +64,7 @@ class UISLoginTool {
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       throw CredentialsInvalidException();
     } else if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
-      // Notify [main.dart] to show up a dialog to guide users to log in mannually.
+      // Notify [main.dart] to show up a dialog to guide users to log in manually.
       CaptchaNeededException().fire();
       throw CaptchaNeededException();
     } else if (response.data.toString().contains(WEAK_PASSWORD)) {

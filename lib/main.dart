@@ -52,6 +52,7 @@ import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 
 import 'package:desktop_window/desktop_window.dart';
+import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -589,6 +590,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         body: Container(),
       );
     } else {
+      // Show debug button for [Dio].
+      if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
       return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: _pageIndex),
@@ -668,9 +671,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             material: (_, __) => MaterialNavBarData(
               type: BottomNavigationBarType.fixed,
               selectedIconTheme:
-                  BottomNavigationBarTheme.of(context).selectedIconTheme,
+              BottomNavigationBarTheme.of(context).selectedIconTheme,
               unselectedIconTheme:
-                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
+              BottomNavigationBarTheme.of(context).unselectedIconTheme,
             ),
             itemChanged: (index) {
               if (index != _pageIndex.value) {
