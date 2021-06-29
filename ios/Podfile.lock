@@ -42,10 +42,10 @@ PODS:
   - Firebase/Crashlytics (8.0.0):
     - Firebase/CoreOnly
     - FirebaseCrashlytics (~> 8.0.0)
-  - firebase_core (1.2.0):
+  - firebase_core (1.3.0):
     - Firebase/CoreOnly (= 8.0.0)
     - Flutter
-  - firebase_crashlytics (2.0.4):
+  - firebase_crashlytics (2.0.6):
     - Firebase/Crashlytics (= 8.0.0)
     - firebase_core
     - Flutter
@@ -246,8 +246,8 @@ SPEC CHECKSUMS:
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   Firebase: 73c3e3b216ec1ecbc54d2ffdd4670c65c749edb1
-  firebase_core: e4d3efb030a2b2021819f8faa538bb23deb46695
-  firebase_crashlytics: 4f3ce855ce6116de954cde34f88003df8ed9de4a
+  firebase_core: cda81ae37eda6df2bc2d16027fda527987c4bd33
+  firebase_crashlytics: 1dad18971e1bac07bbd560c7a344df391a3a833c
   FirebaseCore: 3f09591d51292843e2a46f18358d60bf4e996255
   FirebaseCoreDiagnostics: a31d987ba0fe16d59886a5dbadc2f1de871f88c8
   FirebaseCrashlytics: 69cddb6bfa7656c5346e603bc85b029392252ee6
@@ -279,7 +279,7 @@ SPEC CHECKSUMS:
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
   wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
-  webview_flutter: 9f491a9b5a66f2573946a389b2677987b0ff8c0b
+  webview_flutter: 3603125dfd3bcbc9d8d418c3f80aeecf331c068b
 
 PODFILE CHECKSUM: e94a9a13db24ffc167eee9df3887edd33dc4bc5c
 
