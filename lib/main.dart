@@ -466,7 +466,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void _onPressRightsecondActionButton() async {
+  void _onPressRightSecondActionButton() async {
     switch (_pageIndex.value) {
       //Entries omitted
       case 1:
@@ -560,7 +560,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         icon: Icon(
             _subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
                 context)),
-        onPressed: _onPressRightsecondActionButton,
+        onPressed: _onPressRightSecondActionButton,
       ));
     }
     if (_subpageRightmostActionButtonWidgetBuilders[_pageIndex.value](

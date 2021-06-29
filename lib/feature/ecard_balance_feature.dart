@@ -22,6 +22,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -39,8 +40,9 @@ class EcardBalanceFeature extends Feature {
 
   Future<void> _loadCard(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
-    await CardRepository.getInstance().login(info);
-    _cardInfo = await CardRepository.getInstance().loadCardInfo(0);
+    _cardInfo = await Retrier.tryAsyncWithFix(
+        () => CardRepository.getInstance().loadCardInfo(0),
+        (exception) => CardRepository.getInstance().init(info));
 
     _balance = _cardInfo.cash;
 

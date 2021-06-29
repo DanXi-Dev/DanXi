@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/empty_classroom_repository.dart';
@@ -342,9 +343,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   List<Widget> _buildBusinessViewForRoom(RoomInfo roomInfo) {
     var _list = <Widget>[];
     var _time = 1;
+    var _slot = TimeTable.defaultNow().slot + 1;
     roomInfo.busy.forEach((element) {
       _list.add(Container(
         decoration: BoxDecoration(
+            border: _slot == _time ? Border.all() : null,
             color: element ? Colors.red : Colors.green,
             borderRadius: BorderRadius.all(Radius.circular(5.0))),
         width: MediaQuery.of(context).size.width / 32,

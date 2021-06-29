@@ -18,6 +18,7 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
 
@@ -35,14 +36,17 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<ExerciseItem>> loadExerciseRecords(PersonInfo info) async {
+  Future<List<ExerciseItem>> loadExerciseRecords(PersonInfo info) {
+    return Retrier.tryAsyncWithFix(() => _loadExerciseRecords(info),
+        (exception) => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info));
+  }
+
+  Future<List<ExerciseItem>> _loadExerciseRecords(PersonInfo info) async {
     List<ExerciseItem> items = [];
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info);
     Response r = await dio.get(_INFO_URL);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     List<DOM.Element> tableLines = soup.find_all(
         "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr");
-
     if (tableLines == null) return null;
     tableLines.forEach((line) {
       items.addAll(ExerciseItem.fromHtml(line));

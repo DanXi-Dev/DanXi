@@ -92,8 +92,37 @@ class TimeTable {
   Map<String, dynamic> toJson() => _$TimeTableToJson(this);
 
   TimeNow now() {
-    var diff = DateTime.now().difference(startTime);
-    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7);
+    DateTime now = DateTime.now();
+    Duration diff = now.difference(startTime);
+    int slot = -1;
+    for (int i = 0; i < kCourseSlotStartTime.length; i++) {
+      // Considering that user might open the app near the midnight,
+      // the date in kCourseSlotStartTime may not be exactly today.
+      // We should build the [todaySlot] again, with today's date.
+      DateTime todaySlot = DateTime(now.year, now.month, now.day,
+          kCourseSlotStartTime[i].hour, kCourseSlotStartTime[i].minute);
+      if (now.isAfter(todaySlot)) {
+        slot = i;
+      }
+    }
+    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+  }
+
+  static TimeNow defaultNow() {
+    DateTime now = DateTime.now();
+    Duration diff = now.difference(START_TIME);
+    int slot = -1;
+    for (int i = 0; i < kCourseSlotStartTime.length; i++) {
+      // Considering that user might open the app near the midnight,
+      // the date in kCourseSlotStartTime may not be exactly today.
+      // We should build the [todaySlot] again, with today's date.
+      DateTime todaySlot = DateTime(now.year, now.month, now.day,
+          kCourseSlotStartTime[i].hour, kCourseSlotStartTime[i].minute);
+      if (now.isAfter(todaySlot)) {
+        slot = i;
+      }
+    }
+    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
   }
 
   Map<int, List<Event>> toWeekCourses(int week) {
@@ -211,7 +240,7 @@ class CourseTime {
 
 class TimeNow {
   //First week is 1, Monday is 0
-  int week, weekday;
+  int week, weekday, slot;
 
-  TimeNow(this.week, this.weekday);
+  TimeNow(this.week, this.weekday, this.slot);
 }

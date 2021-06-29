@@ -66,7 +66,7 @@ class _LoginDialogState extends State<LoginDialog> {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
     PersonInfo newInfo = PersonInfo.createNewInfo(id, password);
-    await CardRepository.getInstance().login(newInfo).then((_) async {
+    await CardRepository.getInstance().init(newInfo).then((_) async {
       newInfo.name = await CardRepository.getInstance().getName();
       _deleteAllData();
       await newInfo.saveAsSharedPreferences(widget.sharedPreferences);

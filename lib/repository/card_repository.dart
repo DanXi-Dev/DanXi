@@ -62,7 +62,8 @@ class CardRepository extends BaseRepositoryWithDio {
         .any((element) => element.name == "iPlanetDirectoryPro");
   }
 
-  Future<void> login(PersonInfo info) async {
+  // Log in before calling any method in the repository.
+  Future<void> init(PersonInfo info) async {
     _info = info;
     await Retrier.runAsyncWithRetry(() async {
       try {
@@ -78,7 +79,7 @@ class CardRepository extends BaseRepositoryWithDio {
   }
 
   Future<String> getName() async {
-    if (_info != null && _info.name.length > 0) return _info.name;
+    if (_info != null && _info.name.isNotEmpty) return _info.name;
     return (await loadCardInfo(-1)).name;
   }
 
