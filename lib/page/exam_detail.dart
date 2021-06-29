@@ -31,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 import 'package:ical/serializer.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -49,13 +48,16 @@ class ExamList extends StatefulWidget {
 class _ExamListState extends State<ExamList> {
   List<Exam> _data = [];
   PersonInfo _info;
-  Future _content;
+  Future _examList;
+  Future _scoreList;
 
   @override
   void initState() {
     super.initState();
     _info = widget.arguments['personInfo'];
-    _content = EduServiceRepository.getInstance().loadExamListRemotely(_info);
+    _examList = EduServiceRepository.getInstance().loadExamListRemotely(_info);
+    _scoreList =
+        EduServiceRepository.getInstance().loadExamScoreRemotely(_info);
   }
 
   void _exportICal() async {
@@ -115,7 +117,7 @@ class _ExamListState extends State<ExamList> {
         ],
       ),
       body: FutureWidget<List<Exam>>(
-        future: _content,
+        future: _examList,
         successBuilder: (_, snapShot) {
           _data = snapShot.data;
           return Column(
@@ -142,7 +144,7 @@ class _ExamListState extends State<ExamList> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                _content = EduServiceRepository.getInstance()
+                _examList = EduServiceRepository.getInstance()
                     .loadExamListRemotely(_info);
               });
             },
@@ -174,61 +176,103 @@ class _ExamListState extends State<ExamList> {
 
     return widgets + secondaryWidgets;
   }
-}
 
-Widget _buildDividerWithText(String text, Color color) => Padding(
-    padding: EdgeInsets.symmetric(horizontal: 8),
-    child: Row(children: <Widget>[
-      Expanded(child: Divider(color: color)),
-      Text(" $text ", style: TextStyle(color: color)),
-      Expanded(child: Divider(color: color)),
-    ]));
+  Widget _buildDividerWithText(String text, Color color) => Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      child: Row(children: <Widget>[
+        Expanded(child: Divider(color: color)),
+        Text(" $text ", style: TextStyle(color: color)),
+        Expanded(child: Divider(color: color)),
+      ]));
 
-Widget _buildCard(Exam value, BuildContext context) => ThemedMaterial(
-        child: Card(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${value.testCategory} ${value.type}",
-              textScaleFactor: 0.8,
-              style: TextStyle(color: Theme.of(context).hintColor),
-            ),
-            /*Text(
+  Widget _buildCard(Exam value, BuildContext context) => ThemedMaterial(
+          child: Card(
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${value.testCategory} ${value.type}",
+                      textScaleFactor: 0.8,
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                    ),
+                    /*Text(
                 "${value.id}",
                 textScaleFactor: 0.8,
                 //style: TextStyle(color: Theme.of(context).hintColor),
               ),*/
-            Text(
-              "${value.name}",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            if (value.date.trim() != "" ||
-                value.location.trim() != "" ||
-                value.time.trim() != "")
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "${value.date} ${value.time}",
-                    textScaleFactor: 0.8,
+                    Text(
+                      "${value.name}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    if (value.date.trim() != "" ||
+                        value.location.trim() != "" ||
+                        value.time.trim() != "")
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "${value.date} ${value.time}",
+                            textScaleFactor: 0.8,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "${value.location} ",
+                            textScaleFactor: 0.8,
+                          ),
+                        ],
+                      ),
+                    if (value.note.trim() != "")
+                      Text(
+                        "${value.note}",
+                        textScaleFactor: 0.8,
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      ),
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FutureWidget<List<ExamScore>>(
+                    future: _scoreList,
+                    loadingBuilder: PlatformCircularProgressIndicator(),
+                    errorBuilder: Container(),
+                    successBuilder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        try {
+                          return Container(
+                              height: 28,
+                              width: 28,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1,
+                                ),
+                                //borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  snapshot.data
+                                      .firstWhere((element) =>
+                                          element.name == value.name)
+                                      .level,
+                                  textScaleFactor: 1.2,
+                                  //style: TextStyle(color: Colors.red),
+                                ),
+                              ));
+                        } catch (ignored) {}
+                      }
+                      return Container();
+                    },
                   ),
-                  Text(
-                    "${value.location} ",
-                    textScaleFactor: 0.8,
-                  ),
-                ],
-              ),
-            if (value.note.trim() != "")
-              Text(
-                "${value.note}",
-                textScaleFactor: 0.8,
-                style: TextStyle(color: Theme.of(context).hintColor),
-              ),
-          ],
-        ),
-      ),
-    ));
+                )
+              ],
+            )),
+      ));
+}

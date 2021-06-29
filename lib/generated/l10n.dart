@@ -335,10 +335,10 @@ class S {
     );
   }
 
-  /// `Exam Schedule`
+  /// `Exam`
   String get exam_schedule {
     return Intl.message(
-      'Exam Schedule',
+      'Exam',
       name: 'exam_schedule',
       desc: '',
       args: [],

@@ -31,7 +31,7 @@
     "login_issue_1":"登录失败，旦夕无法完成 UIS 登录。\n出现此错误，很可能是由于您连续多次登录失败所致。\n您需要使用浏览器手动完成一次登录，从下一次登录开始，旦夕即可妥善处理此情况。",
     "login_issue_1_action":"打开UIS登录页面",
     "location_permission_denied_promot": "位置信息不可用，您将无法在app中打卡平安复旦。如果希望重新授予定位权限，请在设置中更改定位服务授权。",
-    "exam_schedule": "考试日程",
+    "exam_schedule": "考试",
     "school_bus": "校车时刻",
     "other_types_exam": "论文和其他考试",
 
