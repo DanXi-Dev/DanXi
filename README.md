@@ -1,5 +1,6 @@
 中文版 [English Version](README_EN.md)  
-[官方网站](https://danxi-dev.github.io)
+[官方网站](https://danxi-dev.github.io)  
+
 # 旦夕
 ![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)  
   
@@ -17,6 +18,7 @@
 - FDU Hole 树洞
 - 课表查阅与导出至系统日历等
 - 显示教务处通知
+- 查询期中/期末考试日程与导出至系统日历等
 
 欢迎各位大佬加入开发~
 
@@ -60,6 +62,6 @@ Tools • Dart 2.13.0
 确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。
 
 ## 赞助
-由于 Apple Developer Program 费用（发布应用至App Store和TestFlight所必需）费用较高，如果您希望赞助我们，您可以通过爱发电平台赞助我们 https://afdian.net/@danxi-dev  
+由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，您可以通过爱发电平台赞助我们 https://afdian.net/@danxi-dev  
 然而爱发电平台会抽成，所以有赞助希望能直接通过邮件联系我们！
 我们的邮箱：[danxi_dev@protonmail.com](mailto:danxi_dev@protonmail.com)

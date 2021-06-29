@@ -1,4 +1,5 @@
-[中文版](README.md) English Version
+[中文版](README.md) English Version  
+[Official Website(Chinese Only)](https://danxi-dev.github.io)  
 # DanXi
 ![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)    
   
@@ -19,6 +20,7 @@ Maybe the best all-rounded service app for Fudan University students!
 - Tree Hole
 - View timetable and export as .ics file
 - Show Notices from Academic Affairs Office
+- View exam schedule and export as .ics file
 
 (Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
 This application is still at the very initial development stage, welcome to join the development and donation~
