@@ -124,7 +124,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   SortOrder _sortOrder;
 
   String _tagFilter;
-
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing;
@@ -135,6 +134,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   FoldBehavior _foldBehavior;
 
   Future _content;
+  FocusNode _searchFocus = FocusNode();
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   void _setContent() {
@@ -178,6 +178,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
+        focusNode: _searchFocus,
         placeholder: S.of(context).search_hint,
         onSubmitted: (value) {
           value = value.trim();
@@ -312,8 +313,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTapDown: (_) {
-          //SystemChannels.textInput.invokeMethod('TextInput.hide');
-          FocusScope.of(context)?.focusedChild?.unfocus();
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+          if (_searchFocus.hasFocus) _searchFocus.unfocus();
+          // FocusScope.of(context)?.focusedChild?.unfocus();
           //FocusScope.of(context)?.unfocus();
         },
         child: RefreshIndicator(
