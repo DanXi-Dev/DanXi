@@ -55,7 +55,7 @@ class _ExamListState extends State<ExamList> {
   void initState() {
     super.initState();
     _info = widget.arguments['personInfo'];
-    _content = ExamRepository.getInstance().loadExamListRemotely(_info);
+    _content = EduServiceRepository.getInstance().loadExamListRemotely(_info);
   }
 
   void _exportICal() async {
@@ -114,7 +114,7 @@ class _ExamListState extends State<ExamList> {
           ),
         ],
       ),
-      body: FutureWidget(
+      body: FutureWidget<List<Exam>>(
         future: _content,
         successBuilder: (_, snapShot) {
           _data = snapShot.data;
@@ -137,19 +137,22 @@ class _ExamListState extends State<ExamList> {
             child: Center(
           child: PlatformCircularProgressIndicator(),
         )),
-        errorBuilder: (_, snapShot) => GestureDetector(
-          onTap: () {
-            setState(() {
-              _content =
-                  ExamRepository.getInstance().loadExamListRemotely(_info);
-            });
-          },
-          child: Center(
-            child: Text(S.of(context).failed +
-                '\n\nThe error was:\n' +
-                snapShot.error.toString()),
-          ),
-        ),
+        errorBuilder:
+            (BuildContext context, AsyncSnapshot<List<Exam>> snapShot) {
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _content = EduServiceRepository.getInstance()
+                    .loadExamListRemotely(_info);
+              });
+            },
+            child: Center(
+              child: Text(S.of(context).failed +
+                  '\n\nThe error was:\n' +
+                  snapShot.error.toString()),
+            ),
+          );
+        },
       ),
     );
   }

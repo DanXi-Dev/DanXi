@@ -27,9 +27,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
   static InAppBrowserClassOptions options = InAppBrowserClassOptions(
-      crossPlatform: InAppBrowserOptions(
-          hideUrlBar:
-              PlatformX.isAndroid), // No context here so can't use isMaterial
+      // crossPlatform: InAppBrowserOptions(
+      //     hideUrlBar:
+      //         PlatformX.isAndroid), // No context here so can't use isMaterial
       ios: IOSInAppBrowserOptions(
         presentationStyle: IOSUIModalPresentationStyle.POPOVER,
       ),

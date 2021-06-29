@@ -23,7 +23,7 @@ import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
 
-class ExamRepository extends BaseRepositoryWithDio {
+class EduServiceRepository extends BaseRepositoryWithDio {
   static const String EXAM_TABLE_LOGIN_URL =
       'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2FstdExamTable%21examTable.action';
   static const String EXAM_TABLE_URL =
@@ -31,13 +31,13 @@ class ExamRepository extends BaseRepositoryWithDio {
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
-  ExamRepository._() {
+  EduServiceRepository._() {
     initRepository();
   }
 
-  static final _instance = ExamRepository._();
+  static final _instance = EduServiceRepository._();
 
-  factory ExamRepository.getInstance() => _instance;
+  factory EduServiceRepository.getInstance() => _instance;
 
   Future<List<Exam>> loadExamListRemotely(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
@@ -49,7 +49,6 @@ class ExamRepository extends BaseRepositoryWithDio {
     Response r = await dio.get(EXAM_TABLE_URL);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
-    if (tableBody == null) return null;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
