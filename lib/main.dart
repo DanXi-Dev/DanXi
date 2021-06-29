@@ -144,6 +144,7 @@ class DanxiApp extends StatelessWidget {
         child: PlatformApp(
           title: '旦夕',
           debugShowCheckedModeBanner: false,
+          // Fix cupertino UI text color issues
           cupertino: (_, __) => CupertinoAppData(
               theme: CupertinoThemeData(
                   textTheme: CupertinoTextThemeData(
@@ -671,9 +672,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             material: (_, __) => MaterialNavBarData(
               type: BottomNavigationBarType.fixed,
               selectedIconTheme:
-              BottomNavigationBarTheme.of(context).selectedIconTheme,
+                  BottomNavigationBarTheme.of(context).selectedIconTheme,
               unselectedIconTheme:
-              BottomNavigationBarTheme.of(context).unselectedIconTheme,
+                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
             ),
             itemChanged: (index) {
               if (index != _pageIndex.value) {

@@ -55,6 +55,11 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   List<Widget> _buildTable() {
+    widget.laneEventsList.forEach((element) {
+      element.events.forEach((element) {
+        _maxSlot = max(_maxSlot, element.time.slot);
+      });
+    });
     int cols = widget.laneEventsList.length + 1, rows = _maxSlot + 2;
     List<Widget> result = List.filled(
         cols * rows,
@@ -79,7 +84,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     // Build time indicator
     for (int slot = 0; slot <= _maxSlot; slot++) {
       String startTime =
-          DateFormat("HH:mm").format(TimeTable.kCourseSlotStartTime[slot]);
+      DateFormat("HH:mm").format(TimeTable.kCourseSlotStartTime[slot]);
       String endTime = DateFormat("HH:mm").format(TimeTable
           .kCourseSlotStartTime[slot]
           .addMin(TimeTable.MINUTES_OF_COURSE));
@@ -88,21 +93,23 @@ class _ScheduleViewState extends State<ScheduleView> {
         height: widget.timetableStyle.timeItemHeight,
         child: Center(
             child: Column(
-          children: [
-            Text((slot + 1).toString()),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 5),
-              child: Text(
-                startTime,
-                style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+              children: [
+                Text((slot + 1).toString()),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: Text(
+                    startTime,
+                style:
+                    TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
               ),
-            ),
-            Text(
-              endTime,
-              style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+                ),
+                Text(
+                  endTime,
+              style:
+                  TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
             )
-          ],
-        )),
+              ],
+            )),
       );
     }
 
@@ -113,7 +120,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
       TextStyle highlightStyle =
-          TextStyle(color: Theme.of(context).accentColor);
+      TextStyle(color: Theme.of(context).accentColor);
       result[1 + day] = SizedBox(
         width: widget.timetableStyle.laneWidth,
         height: widget.timetableStyle.laneHeight,
@@ -123,17 +130,17 @@ class _ScheduleViewState extends State<ScheduleView> {
             children: [
               deltaDay == 0
                   ? Text(
-                      widget.laneEventsList[day].day,
-                      style: highlightStyle,
-                    )
+                widget.laneEventsList[day].day,
+                style: highlightStyle,
+              )
                   : Text(
-                      widget.laneEventsList[day].day,
-                    ),
+                widget.laneEventsList[day].day,
+              ),
               deltaDay == 0
                   ? Text(
-                      DateFormat.Md().format(date),
-                      style: highlightStyle,
-                    )
+                DateFormat.Md().format(date),
+                style: highlightStyle,
+              )
                   : Text(DateFormat.Md().format(date))
             ],
           ),
@@ -155,7 +162,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                 minFontSize: 8,
                 style: Theme.of(context).textTheme.overline.copyWith(
                     color: Theme.of(context).accentColorBrightness ==
-                            Brightness.light
+                        Brightness.light
                         ? Colors.black
                         : Colors.white)),
           ),
@@ -164,15 +171,5 @@ class _ScheduleViewState extends State<ScheduleView> {
     }
 
     return result;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.laneEventsList.forEach((element) {
-      element.events.forEach((element) {
-        _maxSlot = max(_maxSlot, element.time.slot);
-      });
-    });
   }
 }
