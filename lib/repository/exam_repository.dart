@@ -28,6 +28,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2FstdExamTable%21examTable.action';
   static const String EXAM_TABLE_URL =
       'https://jwfw.fudan.edu.cn/eams/stdExamTable!examTable.action';
+
+  static String kExamScoreUrl(semesterId) =>
+      'https://jwfw.fudan.edu.cn/eams/teach/grade/course/person!search.action?semesterId=$semesterId';
+
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
@@ -41,17 +45,36 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<Exam>> loadExamListRemotely(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
-          () => _loadExamListRemotely(),
+              () => _loadExamList(),
           (exception) => UISLoginTool.loginUIS(
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
 
-  Future<List<Exam>> _loadExamListRemotely() async {
+  Future<List<Exam>> _loadExamList() async {
     Response r = await dio.get(EXAM_TABLE_URL);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
+        .toList();
+  }
+
+  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo info) =>
+      Retrier.tryAsyncWithFix(
+          () => _loadExamScore(),
+          (exception) => UISLoginTool.loginUIS(
+              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
+
+  Future<List<ExamScore>> _loadExamScore() async {
+    String semesterId = (await cookieJar.loadForRequest(Uri.parse(HOST)))
+        .firstWhere((element) => element.name == "semester.id")
+        .value;
+    Response r = await dio.get(kExamScoreUrl(semesterId));
+    Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    DOM.Element tableBody = soup.find(id: "tbody");
+    return tableBody
+        .getElementsByTagName("tr")
+        .map((e) => ExamScore.fromHtml(e))
         .toList();
   }
 }
@@ -80,5 +103,27 @@ class Exam {
         elements[6].text.trim(),
         elements[7].text.trim(),
         elements[8].text.trim());
+  }
+}
+
+class ExamScore {
+  final String id;
+  final String name;
+  final String type;
+  final String credit;
+  final String level;
+  final String score;
+
+  ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
+
+  factory ExamScore.fromHtml(DOM.Element html) {
+    List<DOM.Element> elements = html.getElementsByTagName("td");
+    return ExamScore(
+        elements[2].text.trim(),
+        elements[3].text.trim(),
+        elements[4].text.trim(),
+        elements[5].text.trim(),
+        elements[6].text.trim(),
+        elements[7].text.trim());
   }
 }

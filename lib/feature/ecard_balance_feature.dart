@@ -21,6 +21,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
+import 'package:dan_xi/repository/exam_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
@@ -43,7 +44,6 @@ class EcardBalanceFeature extends Feature {
     _cardInfo = await Retrier.tryAsyncWithFix(
         () => CardRepository.getInstance().loadCardInfo(0),
         (exception) => CardRepository.getInstance().init(info));
-
     _balance = _cardInfo.cash;
 
     // If there's any transaction, we'll show it in the subtitle
