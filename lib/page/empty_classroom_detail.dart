@@ -347,7 +347,12 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     roomInfo.busy.forEach((element) {
       _list.add(Container(
         decoration: BoxDecoration(
-            border: _slot == _time ? Border.all() : null,
+            border: _slot == _time
+                ? Border.all(
+                    color: Theme.of(context).textTheme.bodyText1.color,
+                    width: PlatformX.isDarkMode ? 1.5 : 2,
+                  )
+                : null,
             color: element ? Colors.red : Colors.green,
             borderRadius: BorderRadius.all(Radius.circular(5.0))),
         width: MediaQuery.of(context).size.width / 32,
