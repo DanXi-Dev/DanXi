@@ -530,6 +530,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ? Linkify(
                           text: renderText(e.content, S.of(context).image_tag)
                               .trim(),
+                          textScaleFactor: 0.8,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           onOpen: (link) async {
