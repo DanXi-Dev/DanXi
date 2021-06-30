@@ -14,25 +14,27 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// Simple helper class to show a [SnackBar] on Android or a [CupertinoAlertDialog] on iOS.
 class Noticing {
   static showNotice(BuildContext context, String message,
-      {String confirmText, String title}) {
-    if (PlatformX.isMaterial(context)) {
+      {String confirmText, String title, bool androidUseSnackbar = true}) {
+    if (PlatformX.isMaterial(context) && androidUseSnackbar) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
+          .showSnackBar(SnackBar(content: Linkify(text: message)));
     } else {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
-                title: Text(title),
-                content: Text(message),
+                title: Linkify(text: title),
+                content: Linkify(text: message),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(confirmText ?? S.of(context).i_see),

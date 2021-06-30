@@ -59,6 +59,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -702,10 +703,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
-                title: Text(S
-                    .of(context)
-                    .developer_announcement(announcement.createdAt)),
-                content: Text(announcement.content),
+                title: Linkify(
+                  text: S
+                      .of(context)
+                      .developer_announcement(announcement.createdAt),
+                ),
+                content: Linkify(text: announcement.content),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(S.of(context).i_see),

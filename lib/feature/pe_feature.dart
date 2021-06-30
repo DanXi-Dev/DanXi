@@ -20,7 +20,6 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_pe_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -153,7 +152,8 @@ class PEFeature extends Feature {
       _exercises.forEach((element) {
         body += "\n${element.title}: ${element.times}";
       });
-      Noticing.showNotice(context, body, title: S.of(context).pe_exercises);
+      Noticing.showNotice(context, body,
+          title: S.of(context).pe_exercises, androidUseSnackbar: false);
     } else {
       refreshData();
     }
