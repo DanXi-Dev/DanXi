@@ -20,6 +20,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -432,177 +433,182 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       );
 
-  Widget _getListItems(Reply e, bool generateTags, bool isNested) =>
-      GestureDetector(
-        onLongPress: () {
-          showPlatformModalSheet(
-              context: context,
-              builder: (_) => PlatformWidget(
-                    cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildContextMenu(e),
-                      cancelButton: CupertinoActionSheetAction(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
+  Widget _getListItems(Reply e, bool generateTags, bool isNested) {
+    OnTap onLinkTap = (url, _, __, ___) {
+      if (ImageViewerPage.isImage(url)) {
+        Navigator.of(context)
+            .pushNamed('/image/detail', arguments: {'url': url});
+      } else {
+        BrowserUtil.openUrl(url);
+      }
+    };
+    return GestureDetector(
+      onLongPress: () {
+        showPlatformModalSheet(
+            context: context,
+            builder: (_) => PlatformWidget(
+                  cupertino: (_, __) => CupertinoActionSheet(
+                    actions: _buildContextMenu(e),
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                    material: (_, __) => Container(
-                      height: 300,
-                      child: Column(
-                        children: _buildContextMenu(e),
-                      ),
+                  ),
+                  material: (_, __) => Container(
+                    height: 300,
+                    child: Column(
+                      children: _buildContextMenu(e),
                     ),
-                  ));
-        },
-        child: Card(
-            color:
-                isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
-            child: ListTile(
-              dense: true,
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (generateTags)
-                    Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4),
-                        child: generateTagWidgets(_post, (String tagname) {
-                          Navigator.of(context)
-                              .pushNamed('/bbs/discussions', arguments: {
-                            "tagFilter": tagname,
-                            'preferences': _preferences,
-                          });
-                        })),
+                  ),
+                ));
+      },
+      child: Card(
+          color:
+              isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
+          child: ListTile(
+            dense: true,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (generateTags)
                   Padding(
-                    padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
-                    child: Row(
-                      children: [
-                        if (e.username == _post.first_post.username)
-                          _OPLeadingTag(),
-                        if (e.username == _post.first_post.username)
-                          const SizedBox(
-                            width: 2,
-                          ),
-                        Text(
-                          "[${e.username}]",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: generateTagWidgets(_post, (String tagname) {
+                        Navigator.of(context)
+                            .pushNamed('/bbs/discussions', arguments: {
+                          "tagFilter": tagname,
+                          'preferences': _preferences,
+                        });
+                      })),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
+                  child: Row(
+                    children: [
+                      if (e.username == _post.first_post.username)
+                        _OPLeadingTag(),
+                      if (e.username == _post.first_post.username)
+                        const SizedBox(
+                          width: 2,
                         ),
-                      ],
-                    ),
-                  ),
-                  if (e.reply_to != null && !isNested && _searchResult == null)
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                      child: _getListItems(
-                          _lastReplies.firstWhere(
-                            (element) => element.id == e.reply_to,
-                          ),
-                          false,
-                          true),
-                    ),
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: isNested
-                        // If content is being quoted, limit its height so that the view won't be too long.
-                        ? Linkify(
-                            text: renderText(e.content, S.of(context).image_tag)
-                                .trim(),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            onOpen: (link) async {
-                              if (await canLaunch(link.url)) {
-                                BrowserUtil.openUrl(link.url);
-                              } else {
-                                Noticing.showNotice(
-                                    context, S.of(context).cannot_launch_url);
-                              }
-                            },
-                          )
-                        : Html(
-                            shrinkWrap: true,
-                            data: wrapContentLinksInHref(e.content),
-                            style: {
-                              "body": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                              "p": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                            },
-                            customImageRenders: {
-                              networkSourceMatcher(): networkImageRender(
-                                  loadingWidget: () => Container(
-                                        foregroundDecoration: BoxDecoration(
-                                            color: Colors.black12),
-                                        width: double.infinity,
-                                        height: 60,
-                                        child: Center(
-                                          child:
-                                              PlatformCircularProgressIndicator(),
-                                        ),
-                                      )),
-                            },
-                            onLinkTap: (url, context, attributes, element) =>
-                                BrowserUtil.openUrl(url),
-                            onImageTap: (url, context, attributes, element) {
-                              BrowserUtil.openUrl(url);
-                            },
-                          ),
-                  ),
-                ],
-              ),
-              subtitle: isNested
-                  ? null
-                  : Column(children: [
-                      const SizedBox(
-                        height: 8,
+                      Text(
+                        "[${e.username}]",
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "#${e.id}",
-                              style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 12),
+                    ],
+                  ),
+                ),
+                if (e.reply_to != null && !isNested && _searchResult == null)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                    child: _getListItems(
+                        _lastReplies.firstWhere(
+                          (element) => element.id == e.reply_to,
+                        ),
+                        false,
+                        true),
+                  ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: isNested
+                      // If content is being quoted, limit its height so that the view won't be too long.
+                      ? Linkify(
+                          text: renderText(e.content, S.of(context).image_tag)
+                              .trim(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          onOpen: (link) async {
+                            if (await canLaunch(link.url)) {
+                              BrowserUtil.openUrl(link.url);
+                            } else {
+                              Noticing.showNotice(
+                                  context, S.of(context).cannot_launch_url);
+                            }
+                          },
+                        )
+                      : Html(
+                          shrinkWrap: true,
+                          data: wrapContentLinksInHref(e.content),
+                          style: {
+                            "body": Style(
+                              margin: EdgeInsets.zero,
+                              padding: EdgeInsets.zero,
+                              fontSize: FontSize(16),
                             ),
-                            Text(
-                              HumanDuration.format(
-                                  context, DateTime.parse(e.date_created)),
-                              style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 12),
+                            "p": Style(
+                              margin: EdgeInsets.zero,
+                              padding: EdgeInsets.zero,
+                              fontSize: FontSize(16),
                             ),
-                            GestureDetector(
-                              child: Text(S.of(context).report,
-                                  style: TextStyle(
-                                      color: Theme.of(context).hintColor,
-                                      fontSize: 12)),
-                              onTap: () {
-                                BBSEditor.reportPost(context, e.id);
-                              },
-                            ),
-                          ]),
-                    ]),
-              onTap: () async {
-                if (_searchResult == null)
-                  BBSEditor.createNewReply(context, _post.id, e.id)
-                      .then((value) => refreshSelf());
-                else {
-                  ProgressFuture progressDialog = showProgressDialog(
-                      loadingText: S.of(context).loading, context: context);
-                  Navigator.of(context).pushNamed("/bbs/postDetail",
-                      arguments: {
-                        "post": await PostRepository.getInstance()
-                            .loadSpecificPost(e.discussion)
-                      });
-                  progressDialog.dismiss();
-                }
-              },
-            )),
-      );
+                          },
+                          customImageRenders: {
+                            networkSourceMatcher(): networkImageRender(
+                                loadingWidget: () => Container(
+                                      foregroundDecoration:
+                                          BoxDecoration(color: Colors.black12),
+                                      width: double.infinity,
+                                      height: 60,
+                                      child: Center(
+                                        child:
+                                            PlatformCircularProgressIndicator(),
+                                      ),
+                                    )),
+                          },
+                          onLinkTap: onLinkTap,
+                          onImageTap: onLinkTap,
+                        ),
+                ),
+              ],
+            ),
+            subtitle: isNested
+                ? null
+                : Column(children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "#${e.id}",
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12),
+                          ),
+                          Text(
+                            HumanDuration.format(
+                                context, DateTime.parse(e.date_created)),
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12),
+                          ),
+                          GestureDetector(
+                            child: Text(S.of(context).report,
+                                style: TextStyle(
+                                    color: Theme.of(context).hintColor,
+                                    fontSize: 12)),
+                            onTap: () {
+                              BBSEditor.reportPost(context, e.id);
+                            },
+                          ),
+                        ]),
+                  ]),
+            onTap: () async {
+              if (_searchResult == null)
+                BBSEditor.createNewReply(context, _post.id, e.id)
+                    .then((value) => refreshSelf());
+              else {
+                ProgressFuture progressDialog = showProgressDialog(
+                    loadingText: S.of(context).loading, context: context);
+                Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+                  "post": await PostRepository.getInstance()
+                      .loadSpecificPost(e.discussion)
+                });
+                progressDialog.dismiss();
+              }
+            },
+          )),
+    );
+  }
 }

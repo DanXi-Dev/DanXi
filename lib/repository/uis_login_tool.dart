@@ -16,6 +16,7 @@
  */
 
 import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
@@ -41,7 +42,9 @@ class UISLoginTool {
         (await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
       Response res = await dio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-      if (res.statusCode == 302 && !res.headers.map.containsKey('set-cookie')) {
+      if (res.statusCode == 302 &&
+          !res.headers.map.containsKey('set-cookie') &&
+          !res.headers.value("location").startsWith(Constant.UIS_URL)) {
         return null;
       }
     }

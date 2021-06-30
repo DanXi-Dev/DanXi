@@ -31,6 +31,7 @@ import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/dashboard_reorder.dart';
 import 'package:dan_xi/page/empty_classroom_detail.dart';
 import 'package:dan_xi/page/exam_detail.dart';
+import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
@@ -119,6 +120,8 @@ class DanxiApp extends StatelessWidget {
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
         BBSSubpage(arguments: arguments),
+    '/image/detail': (context, {arguments}) =>
+        ImageViewerPage(arguments: arguments),
   };
 
   changeSizeOnDesktop() async {
