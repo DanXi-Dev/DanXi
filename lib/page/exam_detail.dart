@@ -150,7 +150,7 @@ class _ExamListState extends State<ExamList> {
             },
             child: Center(
               child: Text(S.of(context).failed +
-                  '\n\nThe error was:\n' +
+                  '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
                   snapShot.error.toString()),
             ),
           );

@@ -186,6 +186,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "morning" : MessageLookupByLibrary.simpleMessage("Morning"),
     "most_least_crowded_canteen" : m8,
     "name" : MessageLookupByLibrary.simpleMessage("Name"),
+    "need_campus_network" : MessageLookupByLibrary.simpleMessage("Note: You might need to connect to the campus intranet to load these data."),
     "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
     "new_shortcut_card" : MessageLookupByLibrary.simpleMessage("New Shortcut Card"),
     "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("Create a card that opens a webpage when tapped."),

@@ -168,6 +168,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "morning" : MessageLookupByLibrary.simpleMessage("上午"),
     "most_least_crowded_canteen" : m8,
     "name" : MessageLookupByLibrary.simpleMessage("名称"),
+    "need_campus_network" : MessageLookupByLibrary.simpleMessage("注意：你可能需要连接到校园内网才能访问这些数据。"),
     "new_post" : MessageLookupByLibrary.simpleMessage("发布新帖子"),
     "new_shortcut_card" : MessageLookupByLibrary.simpleMessage("添加快捷卡片"),
     "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("点击该卡片可以打开指定网页"),

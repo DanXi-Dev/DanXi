@@ -345,6 +345,16 @@ class S {
     );
   }
 
+  /// `Note: You might need to connect to the campus intranet to load these data.`
+  String get need_campus_network {
+    return Intl.message(
+      'Note: You might need to connect to the campus intranet to load these data.',
+      name: 'need_campus_network',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `School Bus`
   String get school_bus {
     return Intl.message(
