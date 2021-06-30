@@ -104,7 +104,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "error_adding_exam" : m2,
     "error_login_expired" : MessageLookupByLibrary.simpleMessage("登录已过期，点击以重新登录"),
     "evening" : MessageLookupByLibrary.simpleMessage("晚上"),
-    "exam_schedule" : MessageLookupByLibrary.simpleMessage("考试"),
+    "exam_schedule" : MessageLookupByLibrary.simpleMessage("考试和成绩"),
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("无法获取复活码，请确保您已在eHall中开通复活码。"),
     "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("错误"),

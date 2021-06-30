@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -95,9 +97,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Future<List<Reply>> _content;
 
   void _setContent() {
-    _content = _searchResult == null
-        ? PostRepository.getInstance().loadReplies(_post, _currentBBSPage)
-        : _searchResult;
+    if (_searchResult != null)
+      _content = _searchResult;
+    else if (_currentBBSPage == 1)
+      _content = Future.value((widget.arguments['post'] as BBSPost).posts);
+    else
+      _content =
+          PostRepository.getInstance().loadReplies(_post, _currentBBSPage);
   }
 
   Future<bool> _isDiscussionFavorited() async {
@@ -116,13 +122,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   void initState() {
     super.initState();
 
-    if (widget.arguments['post'] is BBSPost)
+    if (widget.arguments['post'] is BBSPost) {
       _post = widget.arguments['post'];
-    else {
+    } else {
       _searchResult = widget.arguments['post'];
       // Create a dummy post for displaying search result
-      _post = new BBSPost(-1, new Reply(-1, "", "", null, "", -1, false), -1,
-          null, null, false, "", "");
+      _post = new BBSPost(
+          -1,
+          new Reply(-1, "", "", null, "", -1, false),
+          -1,
+          null,
+          null,
+          false,
+          "",
+          "",
+          [new Reply(-1, "", "", null, "", -1, false)]);
     }
 
     _currentBBSPage = 1;

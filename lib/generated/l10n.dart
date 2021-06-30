@@ -335,10 +335,10 @@ class S {
     );
   }
 
-  /// `Exam`
+  /// `Exams and Grades`
   String get exam_schedule {
     return Intl.message(
-      'Exam',
+      'Exams and Grades',
       name: 'exam_schedule',
       desc: '',
       args: [],

@@ -575,8 +575,9 @@ class _BBSSubpageState extends State<BBSSubpage>
               ],
             ),
             onTap: () {
-              Navigator.of(context).pushNamed("/bbs/postDetail",
-                  arguments: {"post": postElement});
+              Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+                "post": postElement,
+              });
             }),
         if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.last_post.id != postElement.first_post.id)

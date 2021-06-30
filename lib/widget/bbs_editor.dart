@@ -25,7 +25,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class BBSEditor {
   static Future<void> createNewReply(
       BuildContext context, int discussionId, int postId) async {
-    String content;
+    PostEditorText content;
     /* = await _showEditor(
         context,
         postId == null
@@ -37,12 +37,13 @@ class BBSEditor {
       'title': postId == null
           ? S.of(context).reply_to(discussionId)
           : S.of(context).reply_to(postId)
-    }) as PostEditorText)
-        .content;
-    if (content == null || content.trim() == "") return;
+    }) as PostEditorText);
+    if (content == null ||
+        content.content == null ||
+        content.content.trim() == "") return;
 
     final int responseCode = await PostRepository.getInstance()
-        .newReply(discussionId, postId, content)
+        .newReply(discussionId, postId, content.content)
         .onError((error, stackTrace) =>
             Noticing.showNotice(context, S.of(context).reply_failed(error)));
     // Note: postId refers to the specific post the user is replying to, can be NULL

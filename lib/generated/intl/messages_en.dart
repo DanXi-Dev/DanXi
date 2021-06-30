@@ -120,7 +120,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "error_adding_exam" : m2,
     "error_login_expired" : MessageLookupByLibrary.simpleMessage("Login Expired. Tap to login again"),
     "evening" : MessageLookupByLibrary.simpleMessage("Evening"),
-    "exam_schedule" : MessageLookupByLibrary.simpleMessage("Exam"),
+    "exam_schedule" : MessageLookupByLibrary.simpleMessage("Exams and Grades"),
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
     "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),

@@ -43,11 +43,13 @@ class BBSPost {
   // ignore: non_constant_identifier_names
   Reply last_post;
 
+  List<Reply> posts;
+
   factory BBSPost.fromJson(Map<String, dynamic> json) =>
       _$BBSPostFromJson(json);
 
   Map<String, dynamic> toJson() => _$BBSPostToJson(this);
 
   BBSPost(this.id, this.first_post, this.count, this.tag, this.mapping,
-      this.is_folded, this.date_created, this.date_updated);
+      this.is_folded, this.date_created, this.date_updated, this.posts);
 }
