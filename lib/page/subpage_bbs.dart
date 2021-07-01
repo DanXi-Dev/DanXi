@@ -22,6 +22,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -468,20 +469,6 @@ class _BBSSubpageState extends State<BBSSubpage>
                     "tagFilter": tagname,
                     'preferences': _preferences,
                   });
-                  /*setState(() {
-                    _tagFilter = tagname;
-                    _currentBBSPage = 1;
-                    _lastPageItems = [
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text(S.of(context).filtering_by_tag(_tagFilter)),
-                      )
-                    ];
-                    _lastSnapshotData = null;
-                    _isRefreshing = true;
-                    _isEndIndicatorShown = false;
-                    _setContent();
-                  });*/
                 }),
                 const SizedBox(
                   height: 10,
@@ -586,7 +573,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           ),
         if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.last_post.id != postElement.first_post.id)
-          ListTile(
+          _buildCommentView(postElement),
+        /*ListTile(
             dense: true,
             minLeadingWidth: 16,
             leading: Padding(
@@ -637,8 +625,55 @@ class _BBSSubpageState extends State<BBSSubpage>
             ),
             onTap: () => BBSEditor.createNewReply(
                 context, postElement.id, postElement.last_post.id),
-          )
+          )*/
       ])),
+    );
+  }
+
+  Widget _buildCommentView(BBSPost post) {
+    return Container(
+      height: 60,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        physics: AlwaysScrollableScrollPhysics(),
+        itemBuilder: (context, id) {
+          if (id ~/ 2 + 1 >= post.posts.length) return Container();
+          if (id % 2 == 1) return VerticalDivider();
+          return _buildCommentBlock(post.posts[id ~/ 2 + 1]);
+        },
+        itemCount: post.posts.length * 2 + 1,
+      ),
+    );
+  }
+
+  Widget _buildCommentBlock(Reply reply) {
+    return Container(
+      width: 150,
+      height: 80,
+      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white, //TODO: Hardcoded Color
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "[${reply.username}]",
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Theme.of(context).hintColor),
+            textScaleFactor: 0.8,
+            maxLines: 1,
+          ),
+          Linkify(
+            text: renderText(reply.content, S.of(context).image_tag) + '\n\n',
+            overflow: TextOverflow.ellipsis,
+            textScaleFactor: 0.9,
+            maxLines: 2,
+          )
+        ],
+      ),
     );
   }
 
