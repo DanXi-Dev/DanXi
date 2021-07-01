@@ -133,6 +133,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "hide" : MessageLookupByLibrary.simpleMessage("隐藏"),
     "hour_ago" : m5,
     "i_see" : MessageLookupByLibrary.simpleMessage("好"),
+    "image" : MessageLookupByLibrary.simpleMessage("图片"),
     "image_tag" : MessageLookupByLibrary.simpleMessage("[图片]"),
     "invalid_format" : MessageLookupByLibrary.simpleMessage("格式错误"),
     "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("江湾校区"),

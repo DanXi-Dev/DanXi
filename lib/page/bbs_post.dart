@@ -542,36 +542,39 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             }
                           },
                         )
-                      : Html(
-                          shrinkWrap: true,
-                          data: wrapContentLinksInHref(e.content),
-                          style: {
-                            "body": Style(
-                              margin: EdgeInsets.zero,
-                              padding: EdgeInsets.zero,
-                              fontSize: FontSize(16),
-                            ),
-                            "p": Style(
-                              margin: EdgeInsets.zero,
-                              padding: EdgeInsets.zero,
-                              fontSize: FontSize(16),
-                            ),
-                          },
-                          customImageRenders: {
-                            networkSourceMatcher(): networkImageRender(
+                      : Container(
+                          constraints: BoxConstraints(maxHeight: 400),
+                          child: Html(
+                            shrinkWrap: true,
+                            data: wrapContentLinksInHref(e.content),
+                            style: {
+                              "body": Style(
+                                margin: EdgeInsets.zero,
+                                padding: EdgeInsets.zero,
+                                fontSize: FontSize(16),
+                              ),
+                              "p": Style(
+                                margin: EdgeInsets.zero,
+                                padding: EdgeInsets.zero,
+                                fontSize: FontSize(16),
+                              ),
+                            },
+                            customImageRenders: {
+                              networkSourceMatcher(): networkImageRender(
                                 loadingWidget: () => Container(
-                                      foregroundDecoration:
-                                          BoxDecoration(color: Colors.black12),
-                                      width: double.infinity,
-                                      height: 60,
-                                      child: Center(
-                                        child:
-                                            PlatformCircularProgressIndicator(),
-                                      ),
-                                    )),
-                          },
-                          onLinkTap: onLinkTap,
-                          onImageTap: onLinkTap,
+                                  foregroundDecoration:
+                                      BoxDecoration(color: Colors.black12),
+                                  width: double.infinity,
+                                  height: 60,
+                                  child: Center(
+                                    child: PlatformCircularProgressIndicator(),
+                                  ),
+                                ),
+                              ),
+                            },
+                            onLinkTap: onLinkTap,
+                            onImageTap: onLinkTap,
+                          ),
                         ),
                 ),
               ],

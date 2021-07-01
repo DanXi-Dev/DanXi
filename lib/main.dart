@@ -703,10 +703,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
-                title: Linkify(
-                  text: S
-                      .of(context)
-                      .developer_announcement(announcement.createdAt),
+                title: Text(
+                  S.of(context).developer_announcement(announcement.createdAt),
                 ),
                 content: Linkify(text: announcement.content),
                 actions: <Widget>[

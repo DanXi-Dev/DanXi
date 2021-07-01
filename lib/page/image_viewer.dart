@@ -14,7 +14,14 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:photo_view/photo_view.dart';
 
 class ImageViewerPage extends StatefulWidget {
@@ -44,7 +51,17 @@ class ImageViewerPage extends StatefulWidget {
 class _ImageViewerPageState extends State<ImageViewerPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: PhotoView(imageProvider: NetworkImage(widget.arguments['url'])));
+    return PlatformScaffold(
+        iosContentBottomPadding: false,
+        iosContentPadding: true,
+        appBar: PlatformAppBarX(
+          title: Text(S.of(context).image),
+        ),
+        body: Container(
+            child: PhotoView(
+          imageProvider: NetworkImage(widget.arguments['url']),
+          backgroundDecoration:
+              BoxDecoration(color: Theme.of(context).canvasColor),
+        )));
   }
 }
