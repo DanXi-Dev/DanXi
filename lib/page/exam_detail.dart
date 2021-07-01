@@ -142,18 +142,20 @@ class _ExamListState extends State<ExamList> {
         errorBuilder:
             (BuildContext context, AsyncSnapshot<List<Exam>> snapShot) {
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                _examList = EduServiceRepository.getInstance()
-                    .loadExamListRemotely(_info);
-              });
-            },
-            child: Center(
-              child: Text(S.of(context).failed +
-                  '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
-                  snapShot.error.toString()),
-            ),
-          );
+              onTap: () {
+                setState(() {
+                  _examList = EduServiceRepository.getInstance()
+                      .loadExamListRemotely(_info);
+                });
+              },
+              child: Padding(
+                child: Center(
+                  child: Text(S.of(context).failed +
+                      '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
+                      snapShot.error.toString()),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 32),
+              ));
         },
       ),
     );

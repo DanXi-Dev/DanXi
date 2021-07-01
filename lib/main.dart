@@ -234,6 +234,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     ];
   }
 
+  final List<Function> _appTitleWidgetBuilder = [
+    (cxt) => Text(S.of(cxt).app_name),
+    (cxt) => Text(S.of(cxt).forum),
+    (cxt) => Text(S.of(cxt).timetable),
+    (cxt) => Text(S.of(cxt).settings)
+  ];
+
   /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
   final List<Function> _subpageRightmostActionButtonWidgetBuilders = [
     (cxt) => Text(
@@ -589,7 +596,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         iosContentBottomPadding: false,
         iosContentPadding: true,
         appBar: PlatformAppBar(
-          title: Text(S.of(context).app_name),
+          title: _appTitleWidgetBuilder[_pageIndex.value](context),
           trailingActions: trailingButtons,
         ),
         body: Container(),
@@ -613,9 +620,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 data: MediaQueryData(
                     textScaleFactor: MediaQuery.textScaleFactorOf(context)),
                 child: TopController(
-                  child: Text(
-                    S.of(context).app_name,
-                  ),
+                  child: _appTitleWidgetBuilder[_pageIndex.value](context),
                   controller: PrimaryScrollController.of(context),
                 ),
               ),
