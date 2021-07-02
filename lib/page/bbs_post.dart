@@ -30,6 +30,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -561,17 +562,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               ),
                             },
                             customImageRenders: {
-                              networkSourceMatcher(): networkImageRender(
-                                loadingWidget: () => Container(
-                                  foregroundDecoration:
-                                      BoxDecoration(color: Colors.black12),
-                                  width: double.infinity,
-                                  height: 60,
-                                  child: Center(
-                                    child: PlatformCircularProgressIndicator(),
-                                  ),
-                                ),
-                              ),
+                              networkSourceMatcher(): networkImageClipRender(
+                                  loadingWidget: () => Container(
+                                        foregroundDecoration: BoxDecoration(
+                                            color: Colors.black12),
+                                        width: double.infinity,
+                                        height: 60,
+                                        child: Center(
+                                          child:
+                                              PlatformCircularProgressIndicator(),
+                                        ),
+                                      ),
+                                  maxHeight: 256),
                             },
                             onLinkTap: onLinkTap,
                             onImageTap: onLinkTap,
