@@ -48,12 +48,18 @@ import 'package:linkify/linkify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-String wrapContentLinksInHref(String content) {
+/// This function preprocesses content downloaded from FDUHOLE so that
+/// (1) HTML href is added to raw links
+/// (2) Markdown Images are converted to HTML images.
+String preprocessContentForDisplay(String content) {
   String result = "";
   int hrefCount = 0;
-  //print("CONTENT IS $content");
+
+  // Workaround Markdown images
+  content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*)\)"),
+      (match) => "<img src=\"${match.group(1)}\"></img>");
+
   linkify(content, options: LinkifyOptions(humanize: false)).forEach((element) {
-    //print("element is $element, hrefCount $hrefCount, result is $result");
     if (element is UrlElement) {
       // Only add tag if tag has not yet been added.
       if (hrefCount == 0) {
@@ -69,7 +75,6 @@ String wrapContentLinksInHref(String content) {
       result += element.text;
     }
   });
-  //print("FINAL RESULT $result\n\nMATCH: ${result == content}");
   return result;
 }
 
@@ -548,7 +553,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           //constraints: BoxConstraints(maxHeight: 400),
                           child: Html(
                             shrinkWrap: true,
-                            data: wrapContentLinksInHref(e.content),
+                            data: preprocessContentForDisplay(e.content),
                             style: {
                               "body": Style(
                                 margin: EdgeInsets.zero,
