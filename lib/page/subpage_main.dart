@@ -158,6 +158,12 @@ class _HomeSubpageState extends State<HomeSubpage> {
     refreshSelf();
   }
 
+  void removeNotification(Feature feature) {
+    _notifications.removeWhere((element) =>
+        feature.runtimeType.toString() == element.runtimeType.toString());
+    refreshSelf();
+  }
+
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
     List<Widget> _widgets = [];
     List<Widget> _currentCardChildren = [];
@@ -200,8 +206,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
         SettingsProvider.of(_preferences).dashboardWidgetsSequence;
     FudanAAORepository.getInstance()
         .checkConnection(context.personInfo)
-        .then((value) {
-      if (!value) {
+        .then((connected) {
+      if (connected) {
+        removeNotification(LanConnectionNotification());
+      } else {
         addNotification(LanConnectionNotification());
       }
     });
