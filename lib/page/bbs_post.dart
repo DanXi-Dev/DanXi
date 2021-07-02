@@ -545,7 +545,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           },
                         )
                       : Container(
-                          constraints: BoxConstraints(maxHeight: 400),
+                          //constraints: BoxConstraints(maxHeight: 400),
                           child: Html(
                             shrinkWrap: true,
                             data: wrapContentLinksInHref(e.content),
