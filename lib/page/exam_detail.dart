@@ -50,6 +50,7 @@ class _ExamListState extends State<ExamList> {
   PersonInfo _info;
   Future _examList;
   Future _scoreList;
+  Future _gpaList;
 
   @override
   void initState() {
@@ -58,6 +59,7 @@ class _ExamListState extends State<ExamList> {
     _examList = EduServiceRepository.getInstance().loadExamListRemotely(_info);
     _scoreList =
         EduServiceRepository.getInstance().loadExamScoreRemotely(_info);
+    _gpaList = EduServiceRepository.getInstance().loadGPARemotely(_info);
   }
 
   void _exportICal() async {
@@ -197,15 +199,55 @@ class _ExamListState extends State<ExamList> {
       ));
 
   List<Widget> _getListWidgetsGrade(List<ExamScore> scores) {
-    List<Widget> widgets = [];
+    List<Widget> widgets = [_buildGPACard()];
     scores.forEach((value) {
       widgets.add(_buildCardGrade(value, context));
     });
     return widgets;
   }
 
+  Widget _buildGPACard() => Card(
+        color: Theme.of(context).accentColor,
+        child: ListTile(
+          visualDensity: VisualDensity.comfortable,
+          title: Text(S.of(context).your_gpa),
+          trailing: FutureWidget<List<GPAListItem>>(
+            future: _gpaList,
+            successBuilder: (BuildContext context,
+                AsyncSnapshot<List<GPAListItem>> snapShot) {
+              return Text(
+                snapShot.data
+                    .firstWhere((element) => element.id == _info.id)
+                    .gpa,
+                textScaleFactor: 1.25,
+              );
+            },
+            errorBuilder: (BuildContext context,
+                AsyncSnapshot<List<GPAListItem>> snapShot) {
+              return Container();
+            },
+            loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
+          ),
+          subtitle: FutureWidget<List<GPAListItem>>(
+            future: _gpaList,
+            successBuilder: (BuildContext context,
+                AsyncSnapshot<List<GPAListItem>> snapShot) {
+              GPAListItem myGPA =
+                  snapShot.data.firstWhere((element) => element.id == _info.id);
+              return Text(
+                  S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits));
+            },
+            errorBuilder: (BuildContext context,
+                AsyncSnapshot<List<GPAListItem>> snapShot) {
+              return Text(S.of(context).failed);
+            },
+            loadingBuilder: (_, __) => Text(S.of(context).loading),
+          ),
+        ),
+      );
+
   List<Widget> _getListWidgetsHybrid() {
-    List<Widget> widgets = [];
+    List<Widget> widgets = [_buildGPACard()];
     List<Widget> secondaryWidgets = [
       _buildDividerWithText(S.of(context).other_types_exam,
           Theme.of(context).textTheme.bodyText1.color)

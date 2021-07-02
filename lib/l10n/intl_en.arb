@@ -23,7 +23,7 @@
     "fudan_daily_tick_countdown":"Automatic check-in in {time} seconds. Tap to cancel.",
     "fudan_aao_notices":"Academic Announcements",
     "loading":"Loading...",
-    "failed":"Unable to load content, tap to retry",
+    "failed":"Unable to load content.",
     "fatal_error":"Fatal Error",
     "tick_issue_1":"Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually.",
     "login_issue_1":"Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually.",
@@ -39,6 +39,8 @@
     "need_campus_network": "Note: You might need to connect to the campus intranet to load these data.",
     "school_bus": "School Bus",
     "other_types_exam": "Paper and Other",
+    "your_gpa": "Your GPA",
+    "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}",
 
     "empty_classrooms": "Empty Classrooms",
     "settings": "Settings",

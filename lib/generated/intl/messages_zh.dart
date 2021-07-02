@@ -55,6 +55,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m17(name) => "欢迎你，${name}";
 
+  static m18(rank, credits) => "总学分数${credits}，绩点排名第${rank}名";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("关于本应用"),
@@ -106,7 +108,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "evening" : MessageLookupByLibrary.simpleMessage("晚上"),
     "exam_schedule" : MessageLookupByLibrary.simpleMessage("考试和成绩"),
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("无法获取复活码，请确保您已在eHall中开通复活码。"),
-    "failed" : MessageLookupByLibrary.simpleMessage("加载失败，点击重试"),
+    "failed" : MessageLookupByLibrary.simpleMessage("加载失败"),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("错误"),
     "favorites" : MessageLookupByLibrary.simpleMessage("收藏"),
     "fduhole_nsfw_behavior" : MessageLookupByLibrary.simpleMessage("树洞：NSFW内容"),
@@ -238,6 +240,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "week" : m16,
     "welcome" : m17,
     "welcome_feature" : MessageLookupByLibrary.simpleMessage("欢迎"),
+    "your_gpa" : MessageLookupByLibrary.simpleMessage("你的绩点"),
+    "your_gpa_subtitle" : m18,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }

@@ -275,10 +275,10 @@ class S {
     );
   }
 
-  /// `Unable to load content, tap to retry`
+  /// `Unable to load content.`
   String get failed {
     return Intl.message(
-      'Unable to load content, tap to retry',
+      'Unable to load content.',
       name: 'failed',
       desc: '',
       args: [],
@@ -432,6 +432,26 @@ class S {
       name: 'other_types_exam',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Your GPA`
+  String get your_gpa {
+    return Intl.message(
+      'Your GPA',
+      name: 'your_gpa',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rank: {rank}, Credits: {credits}`
+  String your_gpa_subtitle(Object rank, Object credits) {
+    return Intl.message(
+      'Rank: $rank, Credits: $credits',
+      name: 'your_gpa_subtitle',
+      desc: '',
+      args: [rank, credits],
     );
   }
 

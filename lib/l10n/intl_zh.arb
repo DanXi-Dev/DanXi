@@ -23,7 +23,7 @@
     "fudan_daily_tick_countdown":"将在{time}秒后自动打卡，点击以取消",
     "fudan_aao_notices":"教务处通知",
     "loading":"加载中...",
-    "failed":"加载失败，点击重试",
+    "failed":"加载失败",
     "fatal_error":"错误",
     "ticking":"正在打卡...",
     "tick_failed":"打卡失败，请检查网络连接",
@@ -41,6 +41,8 @@
     "need_campus_network": "注意：你可能需要连接到校园内网才能访问这些数据。",
     "school_bus": "校车时刻",
     "other_types_exam": "论文和其他考试",
+    "your_gpa": "你的绩点",
+    "your_gpa_subtitle": "总学分数{credits}，绩点排名第{rank}名",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

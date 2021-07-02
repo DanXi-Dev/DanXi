@@ -55,6 +55,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m17(name) => "Welcome, ${name}";
 
+  static m18(rank, credits) => "Rank: ${rank}, Credits: ${credits}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About This App"),
@@ -122,7 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "evening" : MessageLookupByLibrary.simpleMessage("Evening"),
     "exam_schedule" : MessageLookupByLibrary.simpleMessage("Exams and Grades"),
     "fail_to_acquire_qr" : MessageLookupByLibrary.simpleMessage("Failed to obtain QR code. Please make sure you have activated the QR code in eHall."),
-    "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content, tap to retry"),
+    "failed" : MessageLookupByLibrary.simpleMessage("Unable to load content."),
     "fatal_error" : MessageLookupByLibrary.simpleMessage("Fatal Error"),
     "favorites" : MessageLookupByLibrary.simpleMessage("Favorites"),
     "fduhole_nsfw_behavior" : MessageLookupByLibrary.simpleMessage("FDUHole: NSFW content"),
@@ -258,6 +260,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "week" : m16,
     "welcome" : m17,
     "welcome_feature" : MessageLookupByLibrary.simpleMessage("Welcome"),
+    "your_gpa" : MessageLookupByLibrary.simpleMessage("Your GPA"),
+    "your_gpa_subtitle" : m18,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

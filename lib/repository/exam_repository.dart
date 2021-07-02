@@ -32,6 +32,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   static String kExamScoreUrl(semesterId) =>
       'https://jwfw.fudan.edu.cn/eams/teach/grade/course/person!search.action?semesterId=$semesterId';
 
+  static const String kGPAUrl =
+      "https://jwfw.fudan.edu.cn/eams/myActualGpa!search.action";
+
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
@@ -75,6 +78,22 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromHtml(e))
+        .toList();
+  }
+
+  Future<List<GPAListItem>> loadGPARemotely(PersonInfo info) =>
+      Retrier.tryAsyncWithFix(
+          () => _loadGPA(),
+          (exception) => UISLoginTool.loginUIS(
+              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
+
+  Future<List<GPAListItem>> _loadGPA() async {
+    Response r = await dio.get(kGPAUrl);
+    Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    DOM.Element tableBody = soup.find(id: "tbody");
+    return tableBody
+        .getElementsByTagName("tr")
+        .map((e) => GPAListItem.fromHtml(e))
         .toList();
   }
 }
@@ -125,5 +144,21 @@ class ExamScore {
         elements[5].text.trim(),
         elements[6].text.trim(),
         elements[7].text.trim());
+  }
+}
+
+class GPAListItem {
+  final String name;
+  final String id;
+  final String gpa;
+  final String credits;
+  final String rank;
+
+  GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank);
+
+  factory GPAListItem.fromHtml(DOM.Element html) {
+    List<DOM.Element> elements = html.getElementsByTagName("td");
+    return GPAListItem(elements[1].text, elements[0].text, elements[5].text,
+        elements[6].text, elements[7].text);
   }
 }
