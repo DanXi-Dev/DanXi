@@ -100,23 +100,28 @@ class _ExamListState extends State<ExamList> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      iosContentBottomPadding: true,
-      iosContentPadding: true,
-      appBar: PlatformAppBarX(
-        title: Text(
-          S.of(context).exam_schedule,
-        ),
-        trailingActions: [
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: Icon(PlatformX.isMaterial(context)
-                ? Icons.share
-                : SFSymbols.square_arrow_up),
-            onPressed: () => _exportICal(),
+        iosContentBottomPadding: true,
+        iosContentPadding: true,
+        appBar: PlatformAppBarX(
+          title: Text(
+            S.of(context).exam_schedule,
           ),
-        ],
-      ),
-      body: FutureWidget<List<Exam>>(
+          trailingActions: [
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(PlatformX.isMaterial(context)
+                  ? Icons.share
+                  : SFSymbols.square_arrow_up),
+              onPressed: () => _exportICal(),
+            ),
+          ],
+        ),
+        body:
+            _loadExamGradeHybridView() // First attempt to load hybrid view. If it fails, fall back to grade-only view (with errorBuilder)
+        );
+  }
+
+  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
         future: _examList,
         successBuilder: (_, snapShot) {
           _data = snapShot.data;
@@ -130,7 +135,7 @@ class _ExamListState extends State<ExamList> {
                           controller: PrimaryScrollController.of(context),
                           child: ListView(
                             primary: true,
-                            children: _getListWidgets(),
+                            children: _getListWidgetsHybrid(),
                           ))))
             ],
           );
@@ -139,8 +144,40 @@ class _ExamListState extends State<ExamList> {
             child: Center(
           child: PlatformCircularProgressIndicator(),
         )),
+        errorBuilder: _loadGradeView,
+      );
+
+  Widget _loadGradeView() => GestureDetector(
+          child: FutureWidget<List<ExamScore>>(
+        future: _scoreList,
+        successBuilder: (_, snapShot) {
+          return Column(
+            children: [
+              Expanded(
+                  child: MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: WithScrollbar(
+                          controller: PrimaryScrollController.of(context),
+                          child: ListView(
+                            primary: true,
+                            children: _getListWidgetsGrade(snapShot.data),
+                          ))))
+            ],
+          );
+        },
+        loadingBuilder: Container(
+            child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PlatformCircularProgressIndicator(),
+              Text("Error loading exam list, falling back to grade list."),
+            ],
+          ),
+        )),
         errorBuilder:
-            (BuildContext context, AsyncSnapshot<List<Exam>> snapShot) {
+            (BuildContext context, AsyncSnapshot<List<ExamScore>> snapShot) {
           return GestureDetector(
               onTap: () {
                 setState(() {
@@ -157,11 +194,17 @@ class _ExamListState extends State<ExamList> {
                 padding: EdgeInsets.symmetric(horizontal: 32),
               ));
         },
-      ),
-    );
+      ));
+
+  List<Widget> _getListWidgetsGrade(List<ExamScore> scores) {
+    List<Widget> widgets = [];
+    scores.forEach((value) {
+      widgets.add(_buildCardGrade(value, context));
+    });
+    return widgets;
   }
 
-  List<Widget> _getListWidgets() {
+  List<Widget> _getListWidgetsHybrid() {
     List<Widget> widgets = [];
     List<Widget> secondaryWidgets = [
       _buildDividerWithText(S.of(context).other_types_exam,
@@ -171,9 +214,9 @@ class _ExamListState extends State<ExamList> {
     _data.forEach((Exam value) {
       if (value.testCategory.trim() == "论文" ||
           value.testCategory.trim() == "其他")
-        secondaryWidgets.add(_buildCard(value, context));
+        secondaryWidgets.add(_buildCardHybrid(value, context));
       else
-        widgets.add(_buildCard(value, context));
+        widgets.add(_buildCardHybrid(value, context));
     });
 
     return widgets + secondaryWidgets;
@@ -187,7 +230,7 @@ class _ExamListState extends State<ExamList> {
         Expanded(child: Divider(color: color)),
       ]));
 
-  Widget _buildCard(Exam value, BuildContext context) => ThemedMaterial(
+  Widget _buildCardHybrid(Exam value, BuildContext context) => ThemedMaterial(
           child: Card(
         child: Padding(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -203,11 +246,6 @@ class _ExamListState extends State<ExamList> {
                       textScaleFactor: 0.8,
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
-                    /*Text(
-                "${value.id}",
-                textScaleFactor: 0.8,
-                //style: TextStyle(color: Theme.of(context).hintColor),
-              ),*/
                     Text(
                       "${value.name}",
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -274,6 +312,52 @@ class _ExamListState extends State<ExamList> {
                     },
                   ),
                 )
+              ],
+            )),
+      ));
+
+  Widget _buildCardGrade(ExamScore value, BuildContext context) =>
+      ThemedMaterial(
+          child: Card(
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${value.type}",
+                      textScaleFactor: 0.8,
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                    ),
+                    Text(
+                      "${value.name}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    height: 28,
+                    width: 28,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        value.level,
+                        textScaleFactor: 1.2,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             )),
       ));

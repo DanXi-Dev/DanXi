@@ -45,7 +45,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<Exam>> loadExamListRemotely(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
-              () => _loadExamList(),
+          () => _loadExamList(),
           (exception) => UISLoginTool.loginUIS(
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
 
