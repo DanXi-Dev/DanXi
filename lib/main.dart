@@ -22,6 +22,7 @@ import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
@@ -350,10 +351,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         // Ignored
         break;
       case AppLifecycleState.paused:
-        // Ignored
+      // Ignored
         break;
       case AppLifecycleState.detached:
-        // Ignored
+      // Ignored
         break;
     }
   }
@@ -387,8 +388,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .listen((_) => _dealWithCaptchaNeededException()),
         hashCode);
 
-    // Load the latest announcement. Just ignore the network error.
+    // Load the latest announcement & the start date of the following term.
+    // Just ignore the network error.
     _loadAnnouncement().catchError((ignored) {});
+    _loadStartDate().catchError((ignored) {});
+
     _loadOrInitSharedPreference().then((_) {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)
@@ -480,7 +484,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onPressRightSecondActionButton() async {
     switch (_pageIndex.value) {
-      //Entries omitted
+    //Entries omitted
       case 1:
         Navigator.of(context).pushNamed('/bbs/discussions', arguments: {
           'showFavoredDiscussion': true,
@@ -492,7 +496,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onPressLeadingActionButton() async {
     switch (_pageIndex.value) {
-      //Entries omitted
+    //Entries omitted
       case 0:
         Navigator.of(context).pushNamed('/announcement/list');
         break;
@@ -719,5 +723,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ));
     }
+  }
+
+  Future<void> _loadStartDate() async {
+    TimeTable.START_TIME = await AnnouncementRepository.getInstance()
+        .getStartDate()
+        .catchError((e) {
+      showPlatformDialog(
+          context: context,
+          builder: (BuildContext context) => PlatformAlertDialog(
+                title: Text(
+                  S.of(context).fatal_error,
+                ),
+                content: Text(S.of(context).login_issue_2),
+                actions: <Widget>[
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).retry),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _loadStartDate();
+                      }),
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).skip),
+                      onPressed: () => Navigator.pop(context)),
+                ],
+              ));
+    });
+    print("Fetch start date -> ${TimeTable.START_TIME.toIso8601String()}");
   }
 }

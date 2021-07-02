@@ -325,6 +325,36 @@ class S {
     );
   }
 
+  /// `Failed to fetch information related to the semester from the server, please retry. \nIf you skip directly, there may be problems with date calculation for course schedules.`
+  String get login_issue_2 {
+    return Intl.message(
+      'Failed to fetch information related to the semester from the server, please retry. \nIf you skip directly, there may be problems with date calculation for course schedules.',
+      name: 'login_issue_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Retry`
+  String get retry {
+    return Intl.message(
+      'Retry',
+      name: 'retry',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Skip`
+  String get skip {
+    return Intl.message(
+      'Skip',
+      name: 'skip',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.`
   String get location_permission_denied_promot {
     return Intl.message(

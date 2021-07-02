@@ -65,4 +65,11 @@ class AnnouncementRepository {
         .map<Announcement>((e) => Announcement.fromJson(e))
         .toList();
   }
+
+  Future<DateTime> getStartDate() async {
+    BmobQuery<Announcement> query =
+        BmobQuery<Announcement>().addWhereEqualTo("maxVersion", -1);
+    return DateTime.parse(
+        Announcement.fromJson((await query.queryObjects()).single).content);
+  }
 }
