@@ -56,7 +56,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'bbs_editor.dart';
 
 /// Render the text from a clip of [html].
+/// Also supports adding image tag to markdown posts
 String renderText(String html, String imagePlaceholder) {
+  // Deal with Markdown
+  html = html.replaceAll(RegExp(r"!\[\]\((https://.*)\)"), imagePlaceholder);
+
   var soup = Beautifulsoup(html);
   var images = soup.find_all("img");
   if (images.length > 0) return soup.get_text().trim() + imagePlaceholder;
