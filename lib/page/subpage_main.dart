@@ -17,11 +17,13 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
+import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/feature/custom_shortcut.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
+import 'package:dan_xi/feature/lan_connection_notification.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
@@ -32,9 +34,12 @@ import 'package:dan_xi/page/dashboard_reorder.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
+import 'package:dio_log/dio_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -57,6 +62,7 @@ class HomeSubpage extends PlatformSubpage {
 class RefreshHomepageEvent {
   final bool queueRefresh;
   final bool onlyIfQueued;
+
   RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
 }
 
@@ -64,8 +70,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
   static final StateStreamListener _refreshSubscription = StateStreamListener();
   SharedPreferences _preferences;
   Map<String, Widget> widgetMap;
-
   bool isRefreshQueued = false;
+  List<Feature> _notifications = [];
 
   @override
   void initState() {
@@ -144,6 +150,14 @@ class _HomeSubpageState extends State<HomeSubpage> {
     _brightness = await ScreenProxy.brightness;
   }
 
+  void addNotification(Feature feature) {
+    if (_notifications.any((element) =>
+        element.runtimeType.toString() == feature.runtimeType.toString()))
+      return;
+    _notifications.add(feature);
+    refreshSelf();
+  }
+
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
     List<Widget> _widgets = [];
     List<Widget> _currentCardChildren = [];
@@ -173,6 +187,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
         ),
       ));
     }
+    _widgets.addAll(_notifications.map((e) => FeatureCardItem(
+          feature: e,
+          onDismissed: () => _notifications.remove(e),
+        )));
     return _widgets;
   }
 
@@ -180,6 +198,13 @@ class _HomeSubpageState extends State<HomeSubpage> {
   Widget build(BuildContext context) {
     List<DashboardCard> widgetList =
         SettingsProvider.of(_preferences).dashboardWidgetsSequence;
+    FudanAAORepository.getInstance()
+        .checkConnection(context.personInfo)
+        .then((value) {
+      if (!value) {
+        addNotification(LanConnectionNotification());
+      }
+    });
     return RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.mediumImpact();

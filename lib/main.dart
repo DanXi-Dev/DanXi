@@ -73,6 +73,12 @@ import 'generated/l10n.dart';
 
 final QuickActions quickActions = QuickActions();
 
+ThemeData getTheme(BuildContext context) {
+  return PlatformX.isDarkMode
+      ? Constant.darkTheme(PlatformX.isCupertino(context))
+      : Constant.lightTheme(PlatformX.isCupertino(context));
+}
+
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
   CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
@@ -130,12 +136,6 @@ class DanxiApp extends StatelessWidget {
     if (PlatformX.isWindows) {
       await DesktopWindow.setWindowSize(Size(480, 960));
     }
-  }
-
-  ThemeData getTheme(BuildContext context) {
-    return PlatformX.isDarkMode
-        ? Constant.darkTheme(PlatformX.isCupertino(context))
-        : Constant.lightTheme(PlatformX.isCupertino(context));
   }
 
   // This widget is the root of your application.

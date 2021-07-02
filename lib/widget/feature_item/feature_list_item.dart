@@ -47,7 +47,7 @@ class _FeatureListItemState extends State<FeatureListItem>
     if (widget.feature.tertiaryTitle != null)
       summary.add(widget.feature.tertiaryTitle);
 
-    return ListTile(
+    var tile = ListTile(
       trailing: widget.feature.trailing,
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
@@ -57,6 +57,8 @@ class _FeatureListItemState extends State<FeatureListItem>
           : widget.feature.customSubtitle,
       onTap: widget.feature.clickable ? widget.feature.onTap : null,
     );
+    widget.feature.onEvent(FeatureEvent.CREATE);
+    return tile;
   }
 
   @override

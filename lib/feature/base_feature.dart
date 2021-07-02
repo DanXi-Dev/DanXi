@@ -35,6 +35,9 @@ abstract class Feature {
   Widget get customSubtitle => null;
 
   Widget get trailing => null;
+
+  bool get removable => false;
+
   FeatureContainer container;
 
   BuildContext context;
@@ -46,6 +49,8 @@ abstract class Feature {
 
   /// Called when Feature is clicked.
   void onTap() {}
+
+  void onEvent(FeatureEvent event) {}
 }
 
 /// FeatureContainer is a container to render the feature as a list item.
@@ -53,3 +58,4 @@ abstract class Feature {
 mixin FeatureContainer {
   void doUpdate();
 }
+enum FeatureEvent { CREATE, REMOVE }

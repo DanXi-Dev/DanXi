@@ -144,22 +144,30 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_afternoon" : MessageLookupByLibrary.simpleMessage("The afternoon knows what the morning never suspected."),
     "good_morning" : MessageLookupByLibrary.simpleMessage("Every dawn is a new sunrise."),
     "good_night" : MessageLookupByLibrary.simpleMessage("Goodnight stars, goodnight air, goodnight noises everywhere."),
-    "good_noon" : MessageLookupByLibrary.simpleMessage("Rise and shine."),
-    "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan"),
-    "hidden_widgets" : MessageLookupByLibrary.simpleMessage("Hidden"),
-    "hide" : MessageLookupByLibrary.simpleMessage("Hide"),
-    "hour_ago" : m5,
-    "i_see" : MessageLookupByLibrary.simpleMessage("OK"),
-    "image" : MessageLookupByLibrary.simpleMessage("Image"),
-    "image_tag" : MessageLookupByLibrary.simpleMessage("[Image]"),
-    "invalid_format" : MessageLookupByLibrary.simpleMessage("Invalid format"),
-    "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("Jiangwan"),
-    "last_15_days" : MessageLookupByLibrary.simpleMessage("Last 15 days"),
-    "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
-    "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
-    "last_created" : MessageLookupByLibrary.simpleMessage("Last created"),
-    "last_replied" : MessageLookupByLibrary.simpleMessage("Last replied"),
-    "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction"),
+        "good_noon": MessageLookupByLibrary.simpleMessage("Rise and shine."),
+        "handan_campus": MessageLookupByLibrary.simpleMessage("Handan"),
+        "hidden_widgets": MessageLookupByLibrary.simpleMessage("Hidden"),
+        "hide": MessageLookupByLibrary.simpleMessage("Hide"),
+        "hour_ago": m5,
+        "i_see": MessageLookupByLibrary.simpleMessage("OK"),
+        "image": MessageLookupByLibrary.simpleMessage("Image"),
+        "image_tag": MessageLookupByLibrary.simpleMessage("[Image]"),
+        "invalid_format":
+            MessageLookupByLibrary.simpleMessage("Invalid format"),
+        "jiangwan_campus": MessageLookupByLibrary.simpleMessage("Jiangwan"),
+        "lan_connection_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Fail to connect to campus LAN"),
+        "lan_connection_issue_1_action":
+            MessageLookupByLibrary.simpleMessage("Campus VPN"),
+        "lan_connection_issue_1_description": MessageLookupByLibrary.simpleMessage(
+            "Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources."),
+        "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
+        "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
+        "last_created": MessageLookupByLibrary.simpleMessage("Last created"),
+        "last_replied": MessageLookupByLibrary.simpleMessage("Last replied"),
+        "last_transaction":
+            MessageLookupByLibrary.simpleMessage("Last Transaction"),
         "late_night": MessageLookupByLibrary.simpleMessage(
             "The dead of midnight is the noon of thought."),
         "latest_reply": m6,
@@ -193,32 +201,45 @@ class MessageLookup extends MessageLookupByLibrary {
             "All data stored locally will be deleted."),
         "logout_question_prompt_title":
             MessageLookupByLibrary.simpleMessage("Are you sure?"),
-        "logout_subtitle" : MessageLookupByLibrary.simpleMessage("And delete all data from this device"),
-    "material" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Material"),
-    "minute_ago" : m7,
-    "moment_ago" : MessageLookupByLibrary.simpleMessage("A moment ago"),
-    "morning" : MessageLookupByLibrary.simpleMessage("Morning"),
-    "most_least_crowded_canteen" : m8,
-    "name" : MessageLookupByLibrary.simpleMessage("Name"),
-    "need_campus_network" : MessageLookupByLibrary.simpleMessage("Note: You might need to connect to the campus intranet to load these data."),
-    "new_post" : MessageLookupByLibrary.simpleMessage("New Post"),
-    "new_shortcut_card" : MessageLookupByLibrary.simpleMessage("New Shortcut Card"),
-    "new_shortcut_description" : MessageLookupByLibrary.simpleMessage("Create a card that opens a webpage when tapped."),
-    "next_course_is" : m9,
+        "logout_subtitle": MessageLookupByLibrary.simpleMessage(
+            "And delete all data from this device"),
+        "material": MessageLookupByLibrary.simpleMessage(
+            "[WARNING: DEBUG FEATURE] Material"),
+        "minute_ago": m7,
+        "moment_ago": MessageLookupByLibrary.simpleMessage("A moment ago"),
+        "morning": MessageLookupByLibrary.simpleMessage("Morning"),
+        "most_least_crowded_canteen": m8,
+        "name": MessageLookupByLibrary.simpleMessage("Name"),
+        "need_campus_network": MessageLookupByLibrary.simpleMessage(
+            "Note: You might need to connect to the campus intranet to load these data."),
+        "new_post": MessageLookupByLibrary.simpleMessage("New Post"),
+        "new_shortcut_card":
+            MessageLookupByLibrary.simpleMessage("New Shortcut Card"),
+        "new_shortcut_description": MessageLookupByLibrary.simpleMessage(
+            "Create a card that opens a webpage when tapped."),
+        "next_course_is" : m9,
     "next_course_none" : MessageLookupByLibrary.simpleMessage("You have completed today\'s courses"),
     "no_data" : MessageLookupByLibrary.simpleMessage("Data is empty"),
     "no_favorites" : MessageLookupByLibrary.simpleMessage("You have no favorites"),
     "no_summary" : MessageLookupByLibrary.simpleMessage("[Unable to display content of this type.]"),
-    "open_source_software_licenses" : MessageLookupByLibrary.simpleMessage("Open Source Software Licenses"),
-    "operation_failed" : MessageLookupByLibrary.simpleMessage("Operaion Failed"),
-    "other_types_exam" : MessageLookupByLibrary.simpleMessage("Paper and Other"),
-    "out_of_dining_time" : MessageLookupByLibrary.simpleMessage("It\'s not dining time right now."),
-    "pe_exercises" : MessageLookupByLibrary.simpleMessage("PE Exercises"),
-    "post_does_not_exist" : MessageLookupByLibrary.simpleMessage("The requested post does not exist."),
-    "post_failed" : MessageLookupByLibrary.simpleMessage("Failed to post. Please check your internet connection."),
-    "privacy_policy" : MessageLookupByLibrary.simpleMessage("Privacy Policy"),
-    "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
-    "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
+        "open_source_software_licenses": MessageLookupByLibrary.simpleMessage(
+            "Open Source Software Licenses"),
+        "operation_failed":
+            MessageLookupByLibrary.simpleMessage("Operaion Failed"),
+        "other_types_exam":
+            MessageLookupByLibrary.simpleMessage("Paper and Other"),
+        "out_of_dining_time": MessageLookupByLibrary.simpleMessage(
+            "It\'s not dining time right now."),
+        "pe_exercises": MessageLookupByLibrary.simpleMessage("PE Exercises"),
+        "post_does_not_exist": MessageLookupByLibrary.simpleMessage(
+            "The requested post does not exist."),
+        "post_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to post. Please check your internet connection."),
+        "privacy_policy":
+            MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+        "privacy_policy_url": MessageLookupByLibrary.simpleMessage(
+            "https://danxi-dev.github.io/privacy"),
+        "project_page": MessageLookupByLibrary.simpleMessage("Project Page"),
         "project_url":
             MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io"),
         "rate": MessageLookupByLibrary.simpleMessage("Rate Us"),
@@ -260,18 +281,24 @@ class MessageLookup extends MessageLookupByLibrary {
             ". By logging in, you indicate that you have read and consent to these policies. "),
         "terms_and_conditions_title":
             MessageLookupByLibrary.simpleMessage("Legal"),
-        "theme" : MessageLookupByLibrary.simpleMessage("Theme"),
-    "tick_failed" : MessageLookupByLibrary.simpleMessage("Failed to check in. Check your internet connection."),
-    "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
-    "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
-    "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
-    "today_course" : MessageLookupByLibrary.simpleMessage("Courses Today"),
-    "unable_to_access_url" : MessageLookupByLibrary.simpleMessage("Test connection failed\nCan\'t to connect to this website, please check your URL."),
-    "unmovable_widget" : MessageLookupByLibrary.simpleMessage("This object cannot be moved"),
-    "uploading_image" : MessageLookupByLibrary.simpleMessage("Uploading image..."),
-    "uploading_image_failed" : MessageLookupByLibrary.simpleMessage("Failed to upload image. Please check your internet connection."),
-    "version" : MessageLookupByLibrary.simpleMessage("Version"),
-    "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
+        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+        "tick_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Check your internet connection."),
+        "tick_issue_1": MessageLookupByLibrary.simpleMessage(
+            "Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
+        "ticking": MessageLookupByLibrary.simpleMessage("Checking in..."),
+        "timetable": MessageLookupByLibrary.simpleMessage("Agenda"),
+        "today_course": MessageLookupByLibrary.simpleMessage("Courses Today"),
+        "unable_to_access_url": MessageLookupByLibrary.simpleMessage(
+            "Test connection failed\nCan\'t to connect to this website, please check your URL."),
+        "unmovable_widget":
+            MessageLookupByLibrary.simpleMessage("This object cannot be moved"),
+        "uploading_image":
+            MessageLookupByLibrary.simpleMessage("Uploading image..."),
+        "uploading_image_failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to upload image. Please check your internet connection."),
+        "version": MessageLookupByLibrary.simpleMessage("Version"),
+        "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
     "week" : m16,
     "welcome" : m17,

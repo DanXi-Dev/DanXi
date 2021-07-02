@@ -21,6 +21,7 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
+/// This repository is also designed to check whether the app is connected to the school LAN.
 class FudanAAORepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Fa7%2F97%2Fc9397a305047%2Fpage.psp";
@@ -44,6 +45,9 @@ class FudanAAORepository extends BaseRepositoryWithDio {
     await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info);
     List<Notice> notices = [];
     Response response = await dio.get(_listUrl(type, page));
+    if (response.data.toString().contains("Under Maintenance")) {
+      throw NotConnectedToLANError();
+    }
     Beautifulsoup soup = Beautifulsoup(response.data.toString());
     List<Element> noticeNodes = soup
         .find_all(".wp_article_list_table > tbody > tr > td > table > tbody");
@@ -57,7 +61,13 @@ class FudanAAORepository extends BaseRepositoryWithDio {
     }
     return notices;
   }
+
+  Future<bool> checkConnection(PersonInfo info) =>
+      getNotices(TYPE_NOTICE_ANNOUNCEMENT, 1, info)
+          .then((value) => true, onError: (e) => false);
 }
+
+class NotConnectedToLANError implements Exception {}
 
 class Notice {
   String title;

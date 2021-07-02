@@ -335,6 +335,36 @@ class S {
     );
   }
 
+  /// `Fail to connect to campus LAN`
+  String get lan_connection_issue_1 {
+    return Intl.message(
+      'Fail to connect to campus LAN',
+      name: 'lan_connection_issue_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources.`
+  String get lan_connection_issue_1_description {
+    return Intl.message(
+      'Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources.',
+      name: 'lan_connection_issue_1_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Campus VPN`
+  String get lan_connection_issue_1_action {
+    return Intl.message(
+      'Campus VPN',
+      name: 'lan_connection_issue_1_action',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Retry`
   String get retry {
     return Intl.message(
