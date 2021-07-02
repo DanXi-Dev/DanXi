@@ -632,10 +632,11 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildCommentView(BBSPost post) {
     return Container(
-      height: 60,
+      height: 72,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
         itemBuilder: (context, id) {
           if (id ~/ 2 + 1 >= post.posts.length) return Container();
           if (id % 2 == 1) return VerticalDivider();
@@ -648,13 +649,10 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildCommentBlock(Reply reply) {
     return Container(
-      width: 150,
-      height: 80,
-      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white, //TODO: Hardcoded Color
-      ),
+      width: 180,
+      height: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -663,8 +661,11 @@ class _BBSSubpageState extends State<BBSSubpage>
             "[${reply.username}]",
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: Theme.of(context).hintColor),
-            textScaleFactor: 0.8,
+            textScaleFactor: 0.75,
             maxLines: 1,
+          ),
+          SizedBox(
+            height: 2,
           ),
           Linkify(
             text: renderText(reply.content, S.of(context).image_tag) + '\n\n',
