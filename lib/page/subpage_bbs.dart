@@ -573,8 +573,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           ),
         if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.last_post.id != postElement.first_post.id)
-          _buildCommentView(postElement),
-        /*ListTile(
+          //_buildCommentView(postElement),
+          ListTile(
             dense: true,
             minLeadingWidth: 16,
             leading: Padding(
@@ -625,7 +625,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             ),
             onTap: () => BBSEditor.createNewReply(
                 context, postElement.id, postElement.last_post.id),
-          )*/
+          )
       ])),
     );
   }
