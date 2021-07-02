@@ -97,6 +97,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   bool _isFavorited;
   static const POST_COUNT_PER_PAGE = 10;
 
+  bool shouldUsePreloadedContent = true;
+
   Future<List<Reply>> _searchResult;
   SharedPreferences _preferences;
 
@@ -105,7 +107,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   void _setContent() {
     if (_searchResult != null)
       _content = _searchResult;
-    else if (_currentBBSPage == 1)
+    else if (_currentBBSPage == 1 && shouldUsePreloadedContent)
       _content = Future.value((widget.arguments['post'] as BBSPost).posts);
     else
       _content =
@@ -171,6 +173,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _lastSnapshotData = null;
         _isRefreshing = true;
         _isEndIndicatorShown = false;
+        shouldUsePreloadedContent = false;
         _setContent();
       });
     }
