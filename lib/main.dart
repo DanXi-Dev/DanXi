@@ -32,6 +32,7 @@ import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/dashboard_reorder.dart';
 import 'package:dan_xi/page/empty_classroom_detail.dart';
 import 'package:dan_xi/page/exam_detail.dart';
+import 'package:dan_xi/page/gpa_table.dart';
 import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -130,6 +131,7 @@ class DanxiApp extends StatelessWidget {
         BBSSubpage(arguments: arguments),
     '/image/detail': (context, {arguments}) =>
         ImageViewerPage(arguments: arguments),
+    '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
   };
 
   changeSizeOnDesktop() async {
@@ -351,10 +353,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         // Ignored
         break;
       case AppLifecycleState.paused:
-      // Ignored
+        // Ignored
         break;
       case AppLifecycleState.detached:
-      // Ignored
+        // Ignored
         break;
     }
   }
@@ -484,7 +486,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onPressRightSecondActionButton() async {
     switch (_pageIndex.value) {
-    //Entries omitted
+      //Entries omitted
       case 1:
         Navigator.of(context).pushNamed('/bbs/discussions', arguments: {
           'showFavoredDiscussion': true,
@@ -496,7 +498,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onPressLeadingActionButton() async {
     switch (_pageIndex.value) {
-    //Entries omitted
+      //Entries omitted
       case 0:
         Navigator.of(context).pushNamed('/announcement/list');
         break;

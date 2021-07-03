@@ -55,7 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m17(name) => "欢迎你，${name}";
 
-  static m18(rank, credits) => "总学分数${credits}，绩点排名第${rank}名";
+  static m18(rank, credits) => "总学分数${credits}，绩点排名第${rank}名，点击查看详情";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -86,6 +86,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copy" : MessageLookupByLibrary.simpleMessage("复制"),
     "copy_success" : MessageLookupByLibrary.simpleMessage("复制成功"),
     "credentials_invalid" : MessageLookupByLibrary.simpleMessage("用户名/密码错误"),
+    "credits" : MessageLookupByLibrary.simpleMessage("学分"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("当前连接"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("获取 WiFi 名称失败，请授予精确定位权限"),
     "current_connection_no_wifi" : MessageLookupByLibrary.simpleMessage("没有连接到WLAN"),
@@ -130,6 +131,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_morning" : MessageLookupByLibrary.simpleMessage("一日之计在于晨"),
     "good_night" : MessageLookupByLibrary.simpleMessage("晚上好~"),
     "good_noon" : MessageLookupByLibrary.simpleMessage("快到中午啦"),
+    "gpa" : MessageLookupByLibrary.simpleMessage("绩点"),
     "handan_campus" : MessageLookupByLibrary.simpleMessage("邯郸校区"),
     "hidden_widgets" : MessageLookupByLibrary.simpleMessage("隐藏"),
     "hide" : MessageLookupByLibrary.simpleMessage("隐藏"),
@@ -193,6 +195,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "post_failed" : MessageLookupByLibrary.simpleMessage("网络错误，帖子发布失败"),
     "privacy_policy" : MessageLookupByLibrary.simpleMessage("隐私政策"),
     "project_page" : MessageLookupByLibrary.simpleMessage("项目网页"),
+    "rank" : MessageLookupByLibrary.simpleMessage("排名"),
     "rate" : MessageLookupByLibrary.simpleMessage("给我们评分"),
     "reason_report_post" : m10,
     "reorder_hint" : MessageLookupByLibrary.simpleMessage("长按并拖动下列条目以重新排列主页卡片。\n滑动以删除辅助卡片。"),

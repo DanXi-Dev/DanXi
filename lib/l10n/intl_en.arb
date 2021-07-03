@@ -40,7 +40,10 @@
     "school_bus": "School Bus",
     "other_types_exam": "Paper and Other",
     "your_gpa": "Your GPA",
-    "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}",
+    "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}, Tap to View Details",
+    "gpa": "GPA",
+    "credits": "Credits",
+    "rank": "Rank",
 
     "empty_classrooms": "Empty Classrooms",
     "settings": "Settings",

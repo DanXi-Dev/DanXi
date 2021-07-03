@@ -445,13 +445,43 @@ class S {
     );
   }
 
-  /// `Rank: {rank}, Credits: {credits}`
+  /// `Rank: {rank}, Credits: {credits}, Tap to View Details`
   String your_gpa_subtitle(Object rank, Object credits) {
     return Intl.message(
-      'Rank: $rank, Credits: $credits',
+      'Rank: $rank, Credits: $credits, Tap to View Details',
       name: 'your_gpa_subtitle',
       desc: '',
       args: [rank, credits],
+    );
+  }
+
+  /// `GPA`
+  String get gpa {
+    return Intl.message(
+      'GPA',
+      name: 'gpa',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Credits`
+  String get credits {
+    return Intl.message(
+      'Credits',
+      name: 'credits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rank`
+  String get rank {
+    return Intl.message(
+      'Rank',
+      name: 'rank',
+      desc: '',
+      args: [],
     );
   }
 

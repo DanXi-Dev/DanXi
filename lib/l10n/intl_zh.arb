@@ -42,7 +42,10 @@
     "school_bus": "校车时刻",
     "other_types_exam": "论文和其他考试",
     "your_gpa": "你的绩点",
-    "your_gpa_subtitle": "总学分数{credits}，绩点排名第{rank}名",
+    "your_gpa_subtitle": "总学分数{credits}，绩点排名第{rank}名，点击查看详情",
+    "gpa": "绩点",
+    "credits": "学分",
+    "rank": "排名",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

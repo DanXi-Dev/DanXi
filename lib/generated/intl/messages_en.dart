@@ -55,7 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m17(name) => "Welcome, ${name}";
 
-  static m18(rank, credits) => "Rank: ${rank}, Credits: ${credits}";
+  static m18(rank, credits) => "Rank: ${rank}, Credits: ${credits}, Tap to View Details";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -89,6 +89,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copy" : MessageLookupByLibrary.simpleMessage("Copy"),
     "copy_success" : MessageLookupByLibrary.simpleMessage("Text copied"),
     "credentials_invalid" : MessageLookupByLibrary.simpleMessage("Invalid username or password"),
+    "credits" : MessageLookupByLibrary.simpleMessage("Credits"),
     "cupertino" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Cupertino"),
     "current_connection" : MessageLookupByLibrary.simpleMessage("Current Connection"),
     "current_connection_failed" : MessageLookupByLibrary.simpleMessage("Failed to obtain WLAN information, Precise Location permission required"),
@@ -147,6 +148,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "good_morning" : MessageLookupByLibrary.simpleMessage("Every dawn is a new sunrise."),
     "good_night" : MessageLookupByLibrary.simpleMessage("Goodnight stars, goodnight air, goodnight noises everywhere."),
     "good_noon" : MessageLookupByLibrary.simpleMessage("Rise and shine."),
+    "gpa" : MessageLookupByLibrary.simpleMessage("GPA"),
     "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan"),
     "hidden_widgets" : MessageLookupByLibrary.simpleMessage("Hidden"),
     "hide" : MessageLookupByLibrary.simpleMessage("Hide"),
@@ -213,6 +215,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacy_policy_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io/privacy"),
     "project_page" : MessageLookupByLibrary.simpleMessage("Project Page"),
     "project_url" : MessageLookupByLibrary.simpleMessage("https://danxi-dev.github.io"),
+    "rank" : MessageLookupByLibrary.simpleMessage("Rank"),
     "rate" : MessageLookupByLibrary.simpleMessage("Rate Us"),
     "reason_report_post" : m10,
     "reorder_hint" : MessageLookupByLibrary.simpleMessage("To reorder cards, press and hold a tile and drag it.\nSwipe to remove an auxiliary card."),

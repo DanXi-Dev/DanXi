@@ -51,6 +51,7 @@ class _ExamListState extends State<ExamList> {
   Future _examList;
   Future _scoreList;
   Future _gpaList;
+  List<GPAListItem> _gpa;
 
   @override
   void initState() {
@@ -210,16 +211,21 @@ class _ExamListState extends State<ExamList> {
         color: Theme.of(context).accentColor,
         child: ListTile(
           visualDensity: VisualDensity.comfortable,
-          title: Text(S.of(context).your_gpa),
+          title: Text(
+            S.of(context).your_gpa,
+            style: TextStyle(color: Colors.white),
+          ),
           trailing: FutureWidget<List<GPAListItem>>(
             future: _gpaList,
             successBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>> snapShot) {
+              _gpa = snapShot.data;
               return Text(
                 snapShot.data
                     .firstWhere((element) => element.id == _info.id)
                     .gpa,
                 textScaleFactor: 1.25,
+                style: TextStyle(color: Colors.white),
               );
             },
             errorBuilder: (BuildContext context,
@@ -235,7 +241,9 @@ class _ExamListState extends State<ExamList> {
               GPAListItem myGPA =
                   snapShot.data.firstWhere((element) => element.id == _info.id);
               return Text(
-                  S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits));
+                S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
+                style: TextStyle(color: Colors.white),
+              );
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>> snapShot) {
@@ -243,6 +251,9 @@ class _ExamListState extends State<ExamList> {
             },
             loadingBuilder: (_, __) => Text(S.of(context).loading),
           ),
+          onTap: () => Navigator.of(context).pushNamed("/exam/gpa", arguments: {
+            "gpalist": _gpa,
+          }),
         ),
       );
 
