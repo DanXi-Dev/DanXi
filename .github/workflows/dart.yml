@@ -19,7 +19,8 @@ jobs:
       - run: flutter pub get
         #Testing is still useless at the moment.
         #- run: flutter test
-      - run: flutter build ios --no-codesign
+        # iOS build is not implemented yet.
+        #      - run: flutter build ios --no-codesign
         # Use debug profile to sign with no specific keystore
       - run: flutter build apk --debug
 
