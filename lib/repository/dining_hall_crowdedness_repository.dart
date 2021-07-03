@@ -65,7 +65,7 @@ class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
   Future<Map<String, TrafficInfo>> getCrowdednessInfo(
       PersonInfo info, int areaCode) async {
     var result = Map<String, TrafficInfo>();
-    await UISLoginTool.getInstance().loginUIS(dio, LOGIN_URL, cookieJar, info);
+    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
     var response = await dio.get(DETAIL_URL);
 
     //If it's not time for a meal

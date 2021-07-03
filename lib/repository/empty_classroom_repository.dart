@@ -49,8 +49,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
     return Retrier.tryAsyncWithFix(
         () => _getBuildingRoomInfo(buildingName, date), (exception) async {
       print(exception);
-      await UISLoginTool.getInstance()
-          .loginUIS(dio, LOGIN_URL, cookieJar, info);
+      await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
     });
   }
 

@@ -37,10 +37,8 @@ class FudanPERepository extends BaseRepositoryWithDio {
   factory FudanPERepository.getInstance() => _instance;
 
   Future<List<ExerciseItem>> loadExerciseRecords(PersonInfo info) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadExerciseRecords(info),
-        (exception) => UISLoginTool.getInstance()
-            .loginUIS(dio, _LOGIN_URL, cookieJar, info));
+    return Retrier.tryAsyncWithFix(() => _loadExerciseRecords(info),
+        (exception) => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info));
   }
 
   Future<List<ExerciseItem>> _loadExerciseRecords(PersonInfo info) async {
