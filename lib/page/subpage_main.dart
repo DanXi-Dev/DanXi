@@ -92,11 +92,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
         hashCode);
   }
 
-  @override
-  void didChangeDependencies() {
-    _preferences = Provider.of<SharedPreferences>(context);
-    _rebuild();
-    super.didChangeDependencies();
+  void checkConnection() {
     FudanAAORepository.getInstance()
         .checkConnection(context.personInfo)
         .then((connected) {
@@ -108,9 +104,17 @@ class _HomeSubpageState extends State<HomeSubpage> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    _preferences = Provider.of<SharedPreferences>(context);
+    _rebuild();
+    super.didChangeDependencies();
+  }
+
   /// This function refreshes the content of Dashboard
   /// Call this when new (online) data should be loaded.
   void _rebuild() {
+    checkConnection();
     widgetMap = {
       'welcome_feature': FeatureListItem(
         feature: WelcomeFeature(),
