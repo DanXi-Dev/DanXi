@@ -667,7 +667,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: a226177dd4179d394f3b923f2eea6515cb31f6c0
+      resolved-ref: "9d3fedd079b8a513bbfa0b6248f5741a3ca38944"
       url: "git://github.com/kavinzhao/linkify.git"
     source: git
     version: "4.0.0"
