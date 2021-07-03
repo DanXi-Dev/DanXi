@@ -242,7 +242,6 @@ class _ExamListState extends State<ExamList> {
                   snapShot.data.firstWhere((element) => element.id == _info.id);
               return Text(
                 S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
-                style: TextStyle(color: Colors.white),
               );
             },
             errorBuilder: (BuildContext context,
