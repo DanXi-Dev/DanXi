@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TreeHolePage: View {
-    @EnvironmentObject var fduholeLoginInfo: fduholeTokenProvider
+    @EnvironmentObject var fduholeLoginInfo: wcDelegate
     @State private var discussions = [THDiscussion]()
     @State private var currentPage = 1
     @State private var endReached = false
