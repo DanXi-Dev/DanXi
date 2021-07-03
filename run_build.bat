@@ -18,7 +18,7 @@ echo.
 :build_windows
 echo Build for Windows...
 echo.
-REM start /WAIT cmd /C flutter build windows
+start /WAIT cmd /C flutter build windows
 del /Q build\app\DanXi-%version_code%-release.windows-x64.zip
 cd build\windows\runner\Release\
 7z a -r -sse ..\..\..\..\build\app\DanXi-%version_code%-release.windows-x64.zip *

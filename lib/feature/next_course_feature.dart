@@ -151,7 +151,7 @@ class NextCourseFeature extends Feature {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(IconData(0x24b6)),
+            const Icon(IconData(0x24b6)),
             const SizedBox(
               height: 2,
             ),
