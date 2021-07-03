@@ -44,15 +44,17 @@ class fduholeTokenProvider: NSObject, WCSessionDelegate, ObservableObject {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
     }
     
-    func sendString(text: String){
+    func sendString(text: String) -> Bool  {
         let session = WCSession.default;
         if(session.isReachable){
             DispatchQueue.main.async {
-                session.sendMessage(["fduhole": text], replyHandler: nil)
+                session.sendMessage(["fduhole": text], replyHandler: nil, errorHandler: {error -> Void in
+                    
+                })
             }
-        }else{
-            //label.setText(NSLocalizedString("iPhone Unreachable.", comment: "iPhone Unreachable"))
+            return true
         }
+        return false
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {

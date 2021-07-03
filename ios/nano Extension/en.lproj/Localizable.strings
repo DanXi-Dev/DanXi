@@ -24,3 +24,4 @@
 "report" = "Report";
 "gettingtoken" = "Waiting for account information from iPhone...";
 "image_tag" = "[Image]";
+"iphoneunreachable" = "iPhone Unreachable. Tap to retry";

@@ -9,13 +9,25 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var fduholeLoginInfo: fduholeTokenProvider
+    @State var connectionReachable = true;
     
     var body: some View {
         
         if (fduholeLoginInfo.token == "") {
             VStack {
-                ProgressView()
-                Text("gettingtoken")
+                if (connectionReachable) {
+                    ProgressView()
+                    Text("gettingtoken")
+                }
+                else {
+                    Text("iphoneunreachable")
+                        .onTapGesture {
+                            connectionReachable = fduholeTokenProvider().sendString(text: "get_token")
+                        }
+                }
+            }
+            .onAppear() {
+                connectionReachable = fduholeTokenProvider().sendString(text: "get_token")
             }
         }
         else {

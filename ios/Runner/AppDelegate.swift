@@ -13,6 +13,7 @@ import WatchConnectivity
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        print("received request from watch")
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole",
                                            binaryMessenger: controller.binaryMessenger)
@@ -20,11 +21,9 @@ import WatchConnectivity
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
-        
     }
     
     func sessionDidDeactivate(_ session: WCSession) {
-        
     }
     
     func sendString(text: String){
@@ -57,6 +56,7 @@ import WatchConnectivity
         channel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             if(call.method == "send_token"){
+                print("received token from flutter")
                 // We will call a method called "sendStringToNative" in flutter.
                 self.sendString(text: call.arguments as! String)
             }

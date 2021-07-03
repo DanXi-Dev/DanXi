@@ -97,6 +97,15 @@ class _HomeSubpageState extends State<HomeSubpage> {
     _preferences = Provider.of<SharedPreferences>(context);
     _rebuild();
     super.didChangeDependencies();
+    FudanAAORepository.getInstance()
+        .checkConnection(context.personInfo)
+        .then((connected) {
+      if (connected) {
+        removeNotification(LanConnectionNotification());
+      } else {
+        addNotification(LanConnectionNotification());
+      }
+    });
   }
 
   /// This function refreshes the content of Dashboard
@@ -166,6 +175,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
     List<Widget> _widgets = [];
+    _widgets.addAll(_notifications.map((e) => FeatureCardItem(
+          feature: e,
+          onDismissed: () => _notifications.remove(e),
+        )));
     List<Widget> _currentCardChildren = [];
     widgetSequence.forEach((element) {
       if (!element.enabled) return;
@@ -193,10 +206,6 @@ class _HomeSubpageState extends State<HomeSubpage> {
         ),
       ));
     }
-    _widgets.addAll(_notifications.map((e) => FeatureCardItem(
-          feature: e,
-          onDismissed: () => _notifications.remove(e),
-        )));
     return _widgets;
   }
 
@@ -204,15 +213,6 @@ class _HomeSubpageState extends State<HomeSubpage> {
   Widget build(BuildContext context) {
     List<DashboardCard> widgetList =
         SettingsProvider.of(_preferences).dashboardWidgetsSequence;
-    FudanAAORepository.getInstance()
-        .checkConnection(context.personInfo)
-        .then((connected) {
-      if (connected) {
-        removeNotification(LanConnectionNotification());
-      } else {
-        addNotification(LanConnectionNotification());
-      }
-    });
     return RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.mediumImpact();
