@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct RunnerApp: App {
-    @StateObject var fduholeLoginInfo = fduholeTokenProvider()
+    @StateObject var fduholeLoginInfo = wcDelegate()
     
     var body: some Scene {
         WindowGroup {
@@ -19,58 +19,4 @@ struct RunnerApp: App {
             .environmentObject(fduholeLoginInfo)
         }
     }
-}
-
-
-// WCSession
-import WatchKit
-import Foundation
-import WatchConnectivity
-
-
-class fduholeTokenProvider: NSObject, WCSessionDelegate, ObservableObject {
-    @Published var token = ""
-    var session: WCSession
-    
-    init(session: WCSession = .default) {
-        self.session = session
-        super.init()
-        self.session.delegate = self
-        session.activate()
-        token = getFduholeToken()
-    }
-    
-    
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-    }
-    
-    func sendString(text: String) -> Bool  {
-        let session = WCSession.default;
-        if(session.isReachable){
-            DispatchQueue.main.async {
-                session.sendMessage(["fduhole": text], replyHandler: nil, errorHandler: {error -> Void in
-                    
-                })
-            }
-            return true
-        }
-        return false
-    }
-    
-    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        DispatchQueue.main.async {
-            self.token = message["fduhole_token"] as! String
-        }
-        setFduholeToken(token: message["fduhole_token"] as! String)
-    }
-    
-    let defaults = UserDefaults.standard
-    func setFduholeToken(token: String) -> Void {
-        defaults.set(token, forKey: "fduhole_token")
-    }
-    
-    func getFduholeToken() -> String {
-        return defaults.string(forKey: "fduhole_token") ?? ""
-    }
-    
 }

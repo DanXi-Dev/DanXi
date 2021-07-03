@@ -55,10 +55,10 @@ struct THPostView: View {
                 Label("\(discussion.count)", systemImage: "ellipsis.bubble")
                     .font(.footnote)
                     .imageScale(.small)
-                Label(discussion.date_created, systemImage: "clock")
+                /*Label(humanReadableDateString(dateString: discussion.date_created) , systemImage: "clock")
                     .lineLimit(1)
                     .font(.footnote)
-                    .imageScale(.small)
+                    .imageScale(.small)*/
             }
             .padding(.bottom)
         }

@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import WatchKit
 
 struct ContentView: View {
-    @EnvironmentObject var fduholeLoginInfo: fduholeTokenProvider
+    @EnvironmentObject var fduholeLoginInfo: wcDelegate
     @State var connectionReachable = true;
+    @State private var capturedText = ""
+    
     
     var body: some View {
         
@@ -18,16 +21,28 @@ struct ContentView: View {
                 if (connectionReachable) {
                     ProgressView()
                     Text("gettingtoken")
+                        .onTapGesture {
+                            connectionReachable = wcDelegate().sendString(text: "get_token")
+                        }
                 }
                 else {
                     Text("iphoneunreachable")
                         .onTapGesture {
-                            connectionReachable = fduholeTokenProvider().sendString(text: "get_token")
+                            connectionReachable = wcDelegate().sendString(text: "get_token")
                         }
                 }
+                
+                TextField("test", text: $capturedText)
+                { isEditing in
+                    
+                } onCommit: {
+                    UserDefaults.standard.set(capturedText, forKey: "fduhole_token")
+                    fduholeLoginInfo.token = capturedText
+                }
+                .textContentType(.oneTimeCode)
             }
             .onAppear() {
-                connectionReachable = fduholeTokenProvider().sendString(text: "get_token")
+                connectionReachable = wcDelegate().sendString(text: "get_token")
             }
         }
         else {

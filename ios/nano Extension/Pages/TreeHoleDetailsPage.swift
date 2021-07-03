@@ -12,7 +12,7 @@ struct TreeHoleDetailsPage: View {
     @State var currentPage: Int = 1
     @State var isLoading = false
     @State var endReached = false
-    @EnvironmentObject var fduholeLoginInfo: fduholeTokenProvider
+    @EnvironmentObject var fduholeLoginInfo: wcDelegate
     
     init(replies: [THReply]) {
         replyList = replies

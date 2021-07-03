@@ -25,3 +25,4 @@
 "gettingtoken" = "正在从iPhone获取账户信息...";
 "image_tag" = "[图片]";
 "iphoneunreachable" = "无法连接到iPhone，点击重试";
+"manualInputToken" = "手动导入Token";

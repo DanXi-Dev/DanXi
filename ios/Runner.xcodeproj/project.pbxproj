@@ -26,6 +26,7 @@
 		8A3543292690371D00A6B16E /* TreeHoleDetailsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542EB268FFF1F00A6B16E /* TreeHoleDetailsPage.swift */; };
 		8A35432A2690372000A6B16E /* TreeHoleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542E0268FFE4B00A6B16E /* TreeHoleModels.swift */; };
 		8A35432B2690372400A6B16E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A3542F62690043A00A6B16E /* Localizable.strings */; };
+		8A35433026908A7E00A6B16E /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A35432F26908A7E00A6B16E /* WatchConnectivity.swift */; };
 		8AAA75822657A6230053E836 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AAA75812657A6230053E836 /* GoogleService-Info.plist */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -113,6 +114,7 @@
 		8A35430E269035F000A6B16E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A354311269035F000A6B16E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8A354313269035F000A6B16E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8A35432F26908A7E00A6B16E /* WatchConnectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivity.swift; sourceTree = "<group>"; };
 		8AAA75812657A6230053E836 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8AD96B9F261DAD0C0081F6F4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		8AD96BA0261DAD0C0081F6F4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -127,6 +129,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		07E95D3B874EE14A1B8C8798 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8A354300269035EF00A6B16E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -193,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				8A3542C6268FFDF200A6B16E /* RunnerApp.swift */,
+				8A35432F26908A7E00A6B16E /* WatchConnectivity.swift */,
 				8A35430C269035EF00A6B16E /* ComplicationController.swift */,
 				8A3542C4268FFDF200A6B16E /* ContentView.swift */,
 				8A3542E8268FFF1300A6B16E /* TreeHoleRepository.swift */,
@@ -284,6 +294,7 @@
 			buildPhases = (
 				8A3542F8269035EE00A6B16E /* Resources */,
 				8A35431A269035F000A6B16E /* Embed App Extensions */,
+				07E95D3B874EE14A1B8C8798 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -524,6 +535,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A35433026908A7E00A6B16E /* WatchConnectivity.swift in Sources */,
 				8A3543202690360600A6B16E /* RunnerApp.swift in Sources */,
 				8A3543222690360600A6B16E /* ContentView.swift in Sources */,
 				8A3543282690371B00A6B16E /* THPostView.swift in Sources */,
