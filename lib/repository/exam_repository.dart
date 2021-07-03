@@ -49,8 +49,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<Exam>> loadExamListRemotely(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamList(),
-          (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
+          (exception) => UISLoginTool.getInstance()
+              .loginUIS(dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
 
   Future<List<Exam>> _loadExamList() async {
     Response r = await dio.get(EXAM_TABLE_URL);
@@ -65,8 +65,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamScore(),
-          (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
+          (exception) => UISLoginTool.getInstance()
+              .loginUIS(dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
 
   Future<List<ExamScore>> _loadExamScore() async {
     String semesterId = (await cookieJar.loadForRequest(Uri.parse(HOST)))
@@ -84,8 +84,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<GPAListItem>> loadGPARemotely(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
           () => _loadGPA(),
-          (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
+          (exception) => UISLoginTool.getInstance()
+              .loginUIS(dio, EXAM_TABLE_LOGIN_URL, cookieJar, info));
 
   Future<List<GPAListItem>> _loadGPA() async {
     Response r = await dio.get(kGPAUrl);

@@ -42,7 +42,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
 
   Future<List<Notice>> getNotices(
       String type, int page, PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info);
+    await UISLoginTool.getInstance().loginUIS(dio, _LOGIN_URL, cookieJar, info);
     List<Notice> notices = [];
     Response response = await dio.get(_listUrl(type, page));
     if (response.data.toString().contains("Under Maintenance")) {

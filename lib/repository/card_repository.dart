@@ -66,7 +66,8 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<void> init(PersonInfo info) async {
     _info = info;
     await Retrier.runAsyncWithRetry(() async {
-      await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info, true);
+      await UISLoginTool.getInstance()
+          .loginUIS(dio, LOGIN_URL, cookieJar, _info, true);
       if (!await _testLoginSuccess()) {
         throw new LoginException();
       }

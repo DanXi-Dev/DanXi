@@ -28,14 +28,27 @@ class UISLoginTool {
   static const String CREDENTIALS_INVALID = "用户名或者密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
 
+  UISLoginTool._();
+
+  static final _instance = UISLoginTool._();
+
+  factory UISLoginTool.getInstance() => _instance;
+
+  // Force relogin after 30 mins of last login
+  // TODO: This is a workaround
+  DateTime _lastLoginTime;
+
   /// Warning: if having logged in, return null.
-  static Future<Response> loginUIS(
+  Future<Response> loginUIS(
       Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
       [bool forceRelogin = false]) async {
     ArgumentError.checkNotNull(info);
     ArgumentError.checkNotNull(jar);
     ArgumentError.checkNotNull(dio);
     ArgumentError.checkNotNull(serviceUrl);
+
+    if (DateTime.now().difference(_lastLoginTime) > Duration(minutes: 30))
+      forceRelogin = true;
 
     // If it has logged in, return null.
     if (!forceRelogin &&
@@ -51,6 +64,7 @@ class UISLoginTool {
 
     // Remove old cookies.
     jar.deleteAll();
+    _lastLoginTime = DateTime.now();
     Map<String, String> data = {};
     Response res = await dio.get(serviceUrl);
     Beautifulsoup(res.data.toString()).find_all("input").forEach((element) {

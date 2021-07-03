@@ -57,7 +57,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   Future<TimeTable> loadTimeTableRemotely(PersonInfo info,
       {DateTime startTime}) async {
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
+    await UISLoginTool.getInstance().loginUIS(dio, LOGIN_URL, cookieJar, info);
     Response idPage = await dio.get(ID_URL);
     String termId = _getIds(idPage.data.toString());
     Response tablePage = await dio.post(TIME_TABLE_URL,
