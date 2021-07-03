@@ -404,8 +404,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
         });
       // Configure watch listeners on iOS.
-      if (_needSendToWatch && _personInfo.value != null) {
-        QRHelper.sendQRtoWatch(_personInfo.value);
+      if (_needSendToWatch &&
+          _preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+        const channel = const MethodChannel('fduhole');
+        channel.invokeMethod("send_token",
+            _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         // Only send once.
         _needSendToWatch = false;
       }
@@ -422,15 +425,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _initPlatformState(); //Init brightness control
 
     // Init watchOS support
-    const channel_a = const MethodChannel('watchAppActivated');
+    const channel_a = const MethodChannel('fduhole');
     channel_a.setMethodCallHandler((MethodCall call) async {
-      if (call.method == 'watchActivated') {
+      if (call.method == 'get_token') {
         // If we haven't loaded [_personInfo]
-        if (_personInfo.value == null) {
-          // Notify that we should send the qr code to watch later
-          _needSendToWatch = true;
+        if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+          const channel = const MethodChannel('fduhole');
+          channel.invokeMethod("send_token",
+              _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         } else {
-          QRHelper.sendQRtoWatch(_personInfo.value);
+          // Notify that we should send the token to watch later
+          _needSendToWatch = true;
         }
       }
     });

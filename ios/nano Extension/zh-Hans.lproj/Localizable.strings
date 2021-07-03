@@ -1,0 +1,26 @@
+/*
+  Localizable.strings
+  DanXi-native
+
+  Created by Kavin Zhao on 2021/6/29.
+  
+*/
+
+// Content View
+"dashboard" = "Dashboard";
+"treehole" = "树洞";
+
+// Login Page
+"login" = "Login";
+"uisLogin" = "UIS Login";
+"studentId" = "Student ID";
+"pwd" = "Password";
+"fduholeLogin" = "FDUHOLE Login";
+"loginWithFduhole" = "Login with FDUHOLE";
+"fduholeLogin_footer" = "You will be able to use only FDUHOLE features if you login with this option.";
+
+// Tree Hole
+"selectAPost" = "Select a post to view";
+"report" = "Report";
+"gettingtoken" = "正在从iPhone获取账户信息...";
+"image_tag" = "[图片]";

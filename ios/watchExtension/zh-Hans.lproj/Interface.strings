@@ -1,8 +1,0 @@
-
-/* Class = "WKInterfaceLabel"; text = "Label"; ObjectID = "4Td-to-NdO"; */
-"4Td-to-NdO.text" = "Label";
-
-"Updating...\nThis may take some time depending on Fudan servers.\nNote: Your watch must be connected to your iPhone." = "正在更新二维码……\n这可能需要一些时间，取决于复旦服务器。\n请注意：您的手表必须已连接到手机。";
-"iPhone Unreachable." = "无法连接到iPhone";
-"Connecting..." = "正在连接……";
-"Failed to generate QR. Please file bug report." = "二维码生成失败，请将情况报告给开发者。";

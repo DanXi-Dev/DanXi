@@ -56,7 +56,7 @@ String preprocessContentForDisplay(String content) {
   int hrefCount = 0;
 
   // Workaround Markdown images
-  content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*)\)"),
+  content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
       (match) => "<img src=\"${match.group(1)}\"></img>");
 
   linkify(content, options: LinkifyOptions(humanize: false)).forEach((element) {
