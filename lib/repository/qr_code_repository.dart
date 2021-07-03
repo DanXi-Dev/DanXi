@@ -19,6 +19,7 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/src/response.dart';
 
 class QRCodeRepository extends BaseRepositoryWithDio {
@@ -35,8 +36,12 @@ class QRCodeRepository extends BaseRepositoryWithDio {
 
   factory QRCodeRepository.getInstance() => _instance;
 
-  Future<String> getQRCode(PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
+  Future<String> getQRCode(PersonInfo info) async => Retrier.tryAsyncWithFix(
+      () => _getQRCode(),
+      (exception) async =>
+          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
+
+  Future<String> _getQRCode() async {
     Response res = await dio.get(QR_URL);
     Beautifulsoup soup = Beautifulsoup(res.data.toString());
     return soup.find(id: "#myText").attributes['value'];

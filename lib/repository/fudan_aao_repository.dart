@@ -18,6 +18,7 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
@@ -41,8 +42,13 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   factory FudanAAORepository.getInstance() => _instance;
 
   Future<List<Notice>> getNotices(
-      String type, int page, PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info);
+          String type, int page, PersonInfo info) async =>
+      Retrier.tryAsyncWithFix(
+          () => _getNotices(type, page),
+          (exception) async => await UISLoginTool.loginUIS(
+              dio, _LOGIN_URL, cookieJar, info, true));
+
+  Future<List<Notice>> _getNotices(String type, int page) async {
     List<Notice> notices = [];
     Response response = await dio.get(_listUrl(type, page));
     if (response.data.toString().contains("Under Maintenance")) {

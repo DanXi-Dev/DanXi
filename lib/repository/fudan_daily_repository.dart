@@ -48,7 +48,7 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
 
   Future<dynamic> _getHistoryInfo(PersonInfo info) async {
     _info = info;
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info);
+    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info, true);
     var res = await dio.get(GET_INFO_URL);
     try {
       return res.data is Map

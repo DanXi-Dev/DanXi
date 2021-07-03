@@ -47,10 +47,9 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
     // To accelerate the retrieval of RoomInfo,
     // only execute logging in when necessary.
     return Retrier.tryAsyncWithFix(
-        () => _getBuildingRoomInfo(buildingName, date), (exception) async {
-      print(exception);
-      await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
-    });
+        () => _getBuildingRoomInfo(buildingName, date),
+        (exception) async =>
+            await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
   }
 
   Future<List<RoomInfo>> _getBuildingRoomInfo(

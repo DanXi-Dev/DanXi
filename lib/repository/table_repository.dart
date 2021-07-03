@@ -24,6 +24,7 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/cache.dart';
 import 'package:dan_xi/util/dio_utils.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:html/dom.dart' as DOM;
@@ -56,8 +57,14 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   Future<TimeTable> loadTimeTableRemotely(PersonInfo info,
-      {DateTime startTime}) async {
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
+      {DateTime startTime}) {
+    return Retrier.tryAsyncWithFix(
+        () => _loadTimeTableRemotely(startTime: startTime),
+        (exception) async =>
+            await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
+  }
+
+  Future<TimeTable> _loadTimeTableRemotely({DateTime startTime}) async {
     Response idPage = await dio.get(ID_URL);
     String termId = _getIds(idPage.data.toString());
     Response tablePage = await dio.post(TIME_TABLE_URL,

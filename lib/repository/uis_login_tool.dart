@@ -29,6 +29,8 @@ class UISLoginTool {
   static const String WEAK_PASSWORD = "弱密码提示";
 
   /// Warning: if having logged in, return null.
+  ///
+  /// TODO: Since [forceRelogin] is always true, we should remove the logic that decides whether logged in.
   static Future<Response> loginUIS(
       Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
       [bool forceRelogin = false]) async {

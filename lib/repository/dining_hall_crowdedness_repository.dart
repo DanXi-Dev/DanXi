@@ -21,6 +21,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/util/retryer.dart';
 
 class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
@@ -63,9 +64,16 @@ class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
   }
 
   Future<Map<String, TrafficInfo>> getCrowdednessInfo(
-      PersonInfo info, int areaCode) async {
+          PersonInfo info, int areaCode) async =>
+      Retrier.tryAsyncWithFix(() => _getCrowdednessInfo(areaCode),
+          (exception) async {
+        if (exception is! UnsuitableTimeException) {
+          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true);
+        }
+      });
+
+  Future<Map<String, TrafficInfo>> _getCrowdednessInfo(int areaCode) async {
     var result = Map<String, TrafficInfo>();
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info);
     var response = await dio.get(DETAIL_URL);
 
     //If it's not time for a meal
