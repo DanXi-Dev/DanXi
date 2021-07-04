@@ -15,13 +15,19 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as DOM;
+import 'package:dan_xi/public_extension_methods.dart';
 
 class EduServiceRepository extends BaseRepositoryWithDio {
   static const String EXAM_TABLE_LOGIN_URL =
@@ -32,8 +38,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   static String kExamScoreUrl(semesterId) =>
       'https://jwfw.fudan.edu.cn/eams/teach/grade/course/person!search.action?semesterId=$semesterId';
 
-  static const String kGPAUrl =
+  static const String GPA_URL =
       "https://jwfw.fudan.edu.cn/eams/myActualGpa!search.action";
+
+  static const String SEMESTER_DATA_URL =
+      "https://jwfw.fudan.edu.cn/eams/dataQuery.action";
 
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
@@ -88,13 +97,93 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
   Future<List<GPAListItem>> _loadGPA() async {
-    Response r = await dio.get(kGPAUrl);
+    Response r = await dio.get(GPA_URL);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => GPAListItem.fromHtml(e))
         .toList();
+  }
+
+  /// Load the semesters id & name, etc.
+  ///
+  /// Return a map where key is [schoolYear](e.g. "2020-2021"),
+  /// and value is a list of [SemesterInfo].
+  Future<Map<String, List<SemesterInfo>>> loadSemesters(PersonInfo info) =>
+      Retrier.tryAsyncWithFix(
+          () => _loadSemesters(),
+          (exception) => UISLoginTool.loginUIS(
+              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
+
+  Future<Map<String, List<SemesterInfo>>> _loadSemesters() async {
+    Map<String, List<SemesterInfo>> result = {};
+    await dio.get(EXAM_TABLE_URL);
+    Response r = await dio.post(SEMESTER_DATA_URL,
+        data: "dataType=semesterCalendar&empty=false",
+        options: Options(contentType: 'application/x-www-form-urlencoded'));
+    ;
+    Beautifulsoup soup = Beautifulsoup(r.data.toString());
+
+    var jsonText = _normalizeJson(soup.get_text().trim());
+
+    var json = jsonDecode(jsonText);
+    Map semesters = json['semesters'];
+    semesters.values.forEach((element) {
+      if (element is List && element.isNotEmpty) {
+        var annualSemesters = element.map((e) => SemesterInfo.fromJson(e));
+        result[annualSemesters.first.schoolYear] = annualSemesters.toList();
+      }
+    });
+    return result;
+  }
+
+  /// JSON Like Text: {aaaa:"asdasd"}
+  /// Real JSON Text: {"aaaa":"asdasd"}
+  ///
+  /// Add a pair of quote on the both sides of every key.
+  String _normalizeJson(String jsonLikeText) {
+    var result = "";
+    bool inQuote = false;
+    bool inKey = false;
+    for (String char
+        in jsonLikeText.runes.map((rune) => String.fromCharCode(rune))) {
+      if (char == '"') {
+        inQuote = !inQuote;
+      } else if (char.isAlpha() || char.isNumber()) {
+        if (!inQuote && !inKey) {
+          result += '"';
+          inKey = true;
+        }
+      } else {
+        if (inKey) {
+          result += '"';
+          inKey = false;
+        }
+      }
+      result += char;
+    }
+    return result;
+  }
+}
+
+class SemesterInfo {
+  final String semesterId;
+  final String schoolYear;
+  final String name;
+
+  SemesterInfo(this.semesterId, this.schoolYear, this.name);
+
+  /// Example:
+  /// "name":"1" means this is the first semester of the year.
+  ///
+  ///   {
+  // 			"id": "163",
+  // 			"schoolYear": "1994-1995",
+  // 			"name": "1"
+  // 		}
+  factory SemesterInfo.fromJson(Map json) {
+    return SemesterInfo(json['id'], json['schoolYear'], json['name']);
   }
 }
 

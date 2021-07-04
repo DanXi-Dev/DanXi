@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:flutter/widgets.dart';
@@ -41,6 +43,20 @@ extension StringEx on String {
       return substring(
           lastIndexOf(a) + a.length, indexOf(b, lastIndexOf(a) + a.length));
     }
+  }
+
+  bool isAlpha() {
+    var regex = RegExp("[A-Za-z]");
+    return runes
+        .map((e) => String.fromCharCode(e))
+        .every((element) => regex.hasMatch(element));
+  }
+
+  bool isNumber() {
+    var regex = RegExp("[0-9]");
+    return runes
+        .map((e) => String.fromCharCode(e))
+        .every((element) => regex.hasMatch(element));
   }
 }
 
