@@ -49,13 +49,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m14(num) => "${num}秒前";
 
-  static m15(count) => "标签热度: ${count}";
+  static m15(schoolYear, semName) => "${schoolYear}学年 ${semName}学期";
 
-  static m16(week) => "第 ${week} 周";
+  static m16(count) => "标签热度: ${count}";
 
-  static m17(name) => "欢迎你，${name}";
+  static m17(week) => "第 ${week} 周";
 
-  static m18(rank, credits) => "总学分数${credits}，绩点排名第${rank}名，点击查看详情";
+  static m18(name) => "欢迎你，${name}";
+
+  static m19(rank, credits) => "总学分数${credits}，绩点排名第${rank}名，点击查看详情";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -212,6 +214,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "second_ago" : m14,
     "select_campus" : MessageLookupByLibrary.simpleMessage("选择校区"),
     "select_tags" : MessageLookupByLibrary.simpleMessage("选择标签"),
+    "semester" : m15,
     "settings" : MessageLookupByLibrary.simpleMessage("设置"),
     "share" : MessageLookupByLibrary.simpleMessage("分享"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("导出为ICS"),
@@ -219,7 +222,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "skip" : MessageLookupByLibrary.simpleMessage("跳过"),
     "sort_order" : MessageLookupByLibrary.simpleMessage("排序方式"),
     "submit" : MessageLookupByLibrary.simpleMessage("发送"),
-    "tag_count" : m15,
+    "tag_count" : m16,
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("最空闲"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("最拥挤"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("点击以查看"),
@@ -240,11 +243,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "version" : MessageLookupByLibrary.simpleMessage("版本"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("本应用的诞生离不开许多开源软件。查看"),
     "weak_password" : MessageLookupByLibrary.simpleMessage("登录失败，未知错误\n请注意：目前旦夕不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。"),
-    "week" : m16,
-    "welcome" : m17,
+    "week" : m17,
+    "welcome" : m18,
     "welcome_feature" : MessageLookupByLibrary.simpleMessage("欢迎"),
     "your_gpa" : MessageLookupByLibrary.simpleMessage("你的绩点"),
-    "your_gpa_subtitle" : m18,
+    "your_gpa_subtitle" : m19,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("张江校区")
   };
 }

@@ -71,17 +71,18 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo info) =>
+  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo info,
+          {String semesterId}) =>
       Retrier.tryAsyncWithFix(
-          () => _loadExamScore(),
+          () => _loadExamScore(semesterId),
           (exception) => UISLoginTool.loginUIS(
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
-  Future<List<ExamScore>> _loadExamScore() async {
-    String semesterId = (await cookieJar.loadForRequest(Uri.parse(HOST)))
-        .firstWhere((element) => element.name == "semester.id")
-        .value;
-    Response r = await dio.get(kExamScoreUrl(semesterId));
+  Future<List<ExamScore>> _loadExamScore([String semesterId]) async {
+    Response r = await dio.get(kExamScoreUrl(semesterId ??
+        (await cookieJar.loadForRequest(Uri.parse(HOST)))
+            .firstWhere((element) => element.name == "semester.id")
+            .value));
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
@@ -108,16 +109,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   /// Load the semesters id & name, etc.
   ///
-  /// Return a map where key is [schoolYear](e.g. "2020-2021"),
-  /// and value is a list of [SemesterInfo].
-  Future<Map<String, List<SemesterInfo>>> loadSemesters(PersonInfo info) =>
+  /// Returns an unpacked list of [SemesterInfo].
+  Future<List<SemesterInfo>> loadSemesters(PersonInfo info) =>
       Retrier.tryAsyncWithFix(
           () => _loadSemesters(),
           (exception) => UISLoginTool.loginUIS(
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
-  Future<Map<String, List<SemesterInfo>>> _loadSemesters() async {
-    Map<String, List<SemesterInfo>> result = {};
+  Future<List<SemesterInfo>> _loadSemesters() async {
     await dio.get(EXAM_TABLE_URL);
     Response r = await dio.post(SEMESTER_DATA_URL,
         data: "dataType=semesterCalendar&empty=false",
@@ -126,16 +125,16 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
 
     var jsonText = _normalizeJson(soup.get_text().trim());
-
     var json = jsonDecode(jsonText);
     Map semesters = json['semesters'];
+    List<SemesterInfo> sems = [];
     semesters.values.forEach((element) {
       if (element is List && element.isNotEmpty) {
         var annualSemesters = element.map((e) => SemesterInfo.fromJson(e));
-        result[annualSemesters.first.schoolYear] = annualSemesters.toList();
+        sems.addAll(annualSemesters);
       }
     });
-    return result;
+    return sems;
   }
 
   /// JSON Like Text: {aaaa:"asdasd"}

@@ -485,6 +485,16 @@ class S {
     );
   }
 
+  /// `{schoolYear}学年 {semName}学期`
+  String semester(Object schoolYear, Object semName) {
+    return Intl.message(
+      '$schoolYear学年 $semName学期',
+      name: 'semester',
+      desc: '',
+      args: [schoolYear, semName],
+    );
+  }
+
   /// `Empty Classrooms`
   String get empty_classrooms {
     return Intl.message(

@@ -46,6 +46,7 @@
     "gpa": "绩点",
     "credits": "学分",
     "rank": "排名",
+    "semester": "{schoolYear}学年 {semName}学期",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

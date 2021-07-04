@@ -55,6 +55,7 @@ class _GpaTablePageState extends State<GpaTablePage> {
             removeTop: true,
             context: context,
             child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                 controller: PrimaryScrollController.of(context),
                 child: Table(
                   children: _getGpaRow(),

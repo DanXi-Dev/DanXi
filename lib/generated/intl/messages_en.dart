@@ -49,13 +49,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m14(num) => "${num} sec ago";
 
-  static m15(count) => "Popularity: ${count}";
+  static m15(schoolYear, semName) => "${schoolYear}学年 ${semName}学期";
 
-  static m16(week) => "Week ${week}";
+  static m16(count) => "Popularity: ${count}";
 
-  static m17(name) => "Welcome, ${name}";
+  static m17(week) => "Week ${week}";
 
-  static m18(rank, credits) => "Rank: ${rank}, Credits: ${credits}, Tap to View Details";
+  static m18(name) => "Welcome, ${name}";
+
+  static m19(rank, credits) => "Rank: ${rank}, Credits: ${credits}, Tap to View Details";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -232,6 +234,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "second_ago" : m14,
     "select_campus" : MessageLookupByLibrary.simpleMessage("Select Campus"),
     "select_tags" : MessageLookupByLibrary.simpleMessage("Select Tags"),
+    "semester" : m15,
     "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "share" : MessageLookupByLibrary.simpleMessage("Share"),
     "share_as_ics" : MessageLookupByLibrary.simpleMessage("Export as ICS"),
@@ -239,7 +242,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "skip" : MessageLookupByLibrary.simpleMessage("Skip"),
     "sort_order" : MessageLookupByLibrary.simpleMessage("Sort order"),
     "submit" : MessageLookupByLibrary.simpleMessage("Submit"),
-    "tag_count" : m15,
+    "tag_count" : m16,
     "tag_least_crowded" : MessageLookupByLibrary.simpleMessage("Least Crowded"),
     "tag_most_crowded" : MessageLookupByLibrary.simpleMessage("Most Crowded"),
     "tap_to_view" : MessageLookupByLibrary.simpleMessage("Tap to view"),
@@ -260,11 +263,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "version" : MessageLookupByLibrary.simpleMessage("Version"),
     "view_ossl" : MessageLookupByLibrary.simpleMessage("This app is made possible thanks to various open-source software. View "),
     "weak_password" : MessageLookupByLibrary.simpleMessage("Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again."),
-    "week" : m16,
-    "welcome" : m17,
+    "week" : m17,
+    "welcome" : m18,
     "welcome_feature" : MessageLookupByLibrary.simpleMessage("Welcome"),
     "your_gpa" : MessageLookupByLibrary.simpleMessage("Your GPA"),
-    "your_gpa_subtitle" : m18,
+    "your_gpa_subtitle" : m19,
     "zhangjiang_campus" : MessageLookupByLibrary.simpleMessage("Zhangjiang")
   };
 }

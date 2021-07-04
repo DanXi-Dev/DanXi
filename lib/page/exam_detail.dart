@@ -28,6 +28,8 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -49,18 +51,20 @@ class _ExamListState extends State<ExamList> {
   List<Exam> _data = [];
   PersonInfo _info;
   Future _examList;
-  Future _scoreList;
   Future _gpaList;
   List<GPAListItem> _gpa;
+
+  Future<List<SemesterInfo>> _semester;
+  List<SemesterInfo> _unpackedSemester;
+  int _showingSemester;
 
   @override
   void initState() {
     super.initState();
     _info = widget.arguments['personInfo'];
     _examList = EduServiceRepository.getInstance().loadExamListRemotely(_info);
-    _scoreList =
-        EduServiceRepository.getInstance().loadExamScoreRemotely(_info);
     _gpaList = EduServiceRepository.getInstance().loadGPARemotely(_info);
+    _semester = EduServiceRepository.getInstance().loadSemesters(_info);
   }
 
   void _exportICal() async {
@@ -119,9 +123,54 @@ class _ExamListState extends State<ExamList> {
             ),
           ],
         ),
-        body:
-            _loadExamGradeHybridView() // First attempt to load hybrid view. If it fails, fall back to grade-only view (with errorBuilder)
-        );
+        body: FutureWidget<List<SemesterInfo>>(
+            future: _semester,
+            successBuilder: (BuildContext context,
+                AsyncSnapshot<List<SemesterInfo>> snapshot) {
+              _unpackedSemester = snapshot.data;
+              if (_showingSemester == null)
+                _showingSemester = _unpackedSemester.length -
+                    5; //TODO: Appropriate default value?
+
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      PlatformIconButton(
+                        icon: Icon(Icons.chevron_left),
+                        onPressed: _showingSemester > 0
+                            ? () {
+                                setState(() {
+                                  --_showingSemester;
+                                });
+                              }
+                            : null,
+                      ),
+                      Text(S.of(context).semester(
+                          _unpackedSemester[_showingSemester].schoolYear,
+                          _unpackedSemester[_showingSemester].name)),
+                      PlatformIconButton(
+                        icon: Icon(Icons.chevron_right),
+                        onPressed:
+                            _showingSemester < _unpackedSemester.length - 1
+                                ? () {
+                                    setState(() {
+                                      ++_showingSemester;
+                                    });
+                                  }
+                                : null,
+                      )
+                    ],
+                  ),
+                  Expanded(
+                    child: _loadExamGradeHybridView(),
+                  )
+                ],
+              );
+            },
+            loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
+            errorBuilder: _buildErrorPage));
   }
 
   Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
@@ -151,53 +200,60 @@ class _ExamListState extends State<ExamList> {
       );
 
   Widget _loadGradeView() => GestureDetector(
-          child: FutureWidget<List<ExamScore>>(
-        future: _scoreList,
-        successBuilder: (_, snapShot) {
-          return Column(
-            children: [
-              Expanded(
-                  child: MediaQuery.removePadding(
-                      context: context,
-                      removeTop: true,
-                      child: WithScrollbar(
-                          controller: PrimaryScrollController.of(context),
-                          child: ListView(
-                            primary: true,
-                            children: _getListWidgetsGrade(snapShot.data),
-                          ))))
-            ],
-          );
-        },
-        loadingBuilder: Container(
-            child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PlatformCircularProgressIndicator(),
-              Text("Error loading exam list, falling back to grade list."),
-            ],
+      child: FutureWidget<List<ExamScore>>(
+          future: EduServiceRepository.getInstance().loadExamScoreRemotely(
+              _info,
+              semesterId: _unpackedSemester[_showingSemester].semesterId),
+          successBuilder: (_, snapShot) {
+            return Column(
+              children: [
+                Expanded(
+                    child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: WithScrollbar(
+                            controller: PrimaryScrollController.of(context),
+                            child: ListView(
+                              primary: true,
+                              children: _getListWidgetsGrade(snapShot.data),
+                            ))))
+              ],
+            );
+          },
+          loadingBuilder: Container(
+              child: Center(
+            child: PlatformCircularProgressIndicator(),
+          )),
+          errorBuilder: _buildErrorPage));
+
+  Widget _buildErrorPage(BuildContext context, AsyncSnapshot snapshot) {
+    if (snapshot.error is RangeError)
+      return Padding(
+        child: Center(
+          child: Text(
+            S.of(context).no_data,
           ),
-        )),
-        errorBuilder:
-            (BuildContext context, AsyncSnapshot<List<ExamScore>> snapShot) {
-          return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _examList = EduServiceRepository.getInstance()
-                      .loadExamListRemotely(_info);
-                });
-              },
-              child: Padding(
-                child: Center(
-                  child: Text(S.of(context).failed +
-                      '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
-                      snapShot.error.toString()),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 32),
-              ));
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 32),
+      );
+
+    return GestureDetector(
+        onTap: () {
+          setState(() {
+            _semester = EduServiceRepository.getInstance().loadSemesters(_info);
+            _examList =
+                EduServiceRepository.getInstance().loadExamListRemotely(_info);
+          });
         },
-      ));
+        child: Padding(
+          child: Center(
+            child: Text(S.of(context).failed +
+                '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
+                snapshot.error.toString()),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 32),
+        ));
+  }
 
   List<Widget> _getListWidgetsGrade(List<ExamScore> scores) {
     List<Widget> widgets = [_buildGPACard()];
@@ -241,8 +297,8 @@ class _ExamListState extends State<ExamList> {
               GPAListItem myGPA =
                   snapShot.data.firstWhere((element) => element.id == _info.id);
               return Text(
-                S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
-              );
+                  S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
+                  style: TextStyle(color: ThemeData.dark().hintColor));
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>> snapShot) {
@@ -332,7 +388,10 @@ class _ExamListState extends State<ExamList> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: FutureWidget<List<ExamScore>>(
-                    future: _scoreList,
+                    future: EduServiceRepository.getInstance()
+                        .loadExamScoreRemotely(_info,
+                            semesterId:
+                                _unpackedSemester[_showingSemester].semesterId),
                     loadingBuilder: PlatformCircularProgressIndicator(),
                     errorBuilder: Container(),
                     successBuilder: (context, snapshot) {
