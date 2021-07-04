@@ -365,6 +365,26 @@ class S {
     );
   }
 
+  /// `How to use the VPN？`
+  String get lan_connection_issue_1_guide_title {
+    return Intl.message(
+      'How to use the VPN？',
+      name: 'lan_connection_issue_1_guide_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `3 simple steps:<br /><br />1. <a href="https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common">Click here</a> to the download page and select the corresponding platform to install.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn, click OK。<br />3. A login page pops up. Enter your UIS account & password.<br /><br />Then All the functions of DanXi will work normally!`
+  String get lan_connection_issue_1_guide_content {
+    return Intl.message(
+      '3 simple steps:<br /><br />1. <a href="https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common">Click here</a> to the download page and select the corresponding platform to install.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn, click OK。<br />3. A login page pops up. Enter your UIS account & password.<br /><br />Then All the functions of DanXi will work normally!',
+      name: 'lan_connection_issue_1_guide_content',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Retry`
   String get retry {
     return Intl.message(

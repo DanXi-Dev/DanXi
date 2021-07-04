@@ -32,6 +32,8 @@
     "lan_connection_issue_1":"Fail to connect to campus LAN",
     "lan_connection_issue_1_description":"Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources.",
     "lan_connection_issue_1_action":"Campus VPN",
+    "lan_connection_issue_1_guide_title":"How to use the VPN？",
+    "lan_connection_issue_1_guide_content":"3 simple steps:<br /><br />1. <a href=\"https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common\">Click here</a> to the download page and select the corresponding platform to install.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn, click OK。<br />3. A login page pops up. Enter your UIS account & password.<br /><br />Then All the functions of DanXi will work normally!",
     "retry":"Retry",
     "skip":"Skip",
     "location_permission_denied_promot": "Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.",
