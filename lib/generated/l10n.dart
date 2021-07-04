@@ -615,10 +615,10 @@ class S {
     );
   }
 
-  /// `A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~`
+  /// `A miniature Fudan integrated service app, created by several Fudan undergraduate students with love. We hope it can facilitate your life~`
   String get app_description {
     return Intl.message(
-      'A miniature Fudan Integrated Service App, created by several Fudan undergraduate students with love. We hope it can facilitate your life~',
+      'A miniature Fudan integrated service app, created by several Fudan undergraduate students with love. We hope it can facilitate your life~',
       name: 'app_description',
       desc: '',
       args: [],
