@@ -41,8 +41,11 @@ class LanConnectionNotification extends Feature {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        PlatformTextButton(
-          child: Text(S.of(context).lan_connection_issue_1_action),
+        TextButton(
+          child: Text(
+            S.of(context).lan_connection_issue_1_action,
+            textScaleFactor: 0.8,
+          ),
           // User needs to download the vpn software. Open an external browser.
           onPressed: () => launch(
               "https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common"),
