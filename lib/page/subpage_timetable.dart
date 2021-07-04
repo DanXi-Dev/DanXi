@@ -68,9 +68,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   Future _content;
 
+  bool _loadFromRemote = false;
+
   void _setContent() {
     _content = Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
-        .loadTimeTableLocally(context.personInfo));
+        .loadTimeTableLocally(context.personInfo,
+            forceLoadFromRemote: _loadFromRemote));
   }
 
   void _startShare(TimetableConverter converter) async {
@@ -172,6 +175,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       future: _content,
       errorBuilder: (_, snapShot) => GestureDetector(
         onTap: () {
+          _loadFromRemote = true;
           refreshSelf();
         },
         child: Center(
