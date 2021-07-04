@@ -68,7 +68,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
               ].takeWhile((value) => value != null).toList(),
             ),
             SizedBox(
-              height: 2,
+              height: 8,
             ),
             widget.feature.customSubtitle == null
                 ? Text(
