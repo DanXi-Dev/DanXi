@@ -30,6 +30,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
@@ -78,6 +79,12 @@ String preprocessContentForDisplay(String content) {
   return result;
 }
 
+/// A list page showing the content of a bbs post.
+///
+/// Arguments:
+/// [BBSPost] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
+/// Otherwise as a list of search result.
+///
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
@@ -118,12 +125,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_isFavorited != null) return _isFavorited;
     final List<BBSPost> favorites =
         await PostRepository.getInstance().getFavoredDiscussions();
-    bool result = false;
-    favorites.forEach((element) {
-      if (result) return;
-      if (element.id == _post.id) result = true;
-    });
-    return result;
+    return favorites.any((element) => element.id == _post.id);
   }
 
   @override
@@ -146,12 +148,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           "",
           [new Reply(-1, "", "", null, "", -1, false)]);
     }
-
-    _currentBBSPage = 1;
-    _lastReplies = [];
-    _lastSnapshotData = null;
-    _isRefreshing = true;
-    _isEndIndicatorShown = false;
   }
 
   @override
@@ -165,6 +161,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _preferences = await SharedPreferences.getInstance();
   }
 
+  /// Rebuild everything on refreshing.
   void refreshSelf() {
     if (mounted) {
       setState(() {
@@ -187,6 +184,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
+    // A listener to a scroll view, loading new content when scroll to the bottom.
+    NotificationListenerCallback<ScrollNotification> onScrollToBottom =
+        (ScrollNotification scrollInfo) {
+      if (scrollInfo.metrics.extentAfter < 500 &&
+          !_isRefreshing &&
+          !_isEndIndicatorShown) {
+        _isRefreshing = true;
+        setState(() {
+          _currentBBSPage++;
+          _setContent();
+        });
+      }
+      return false;
+    };
+
     return PlatformScaffold(
       iosContentPadding: true,
       iosContentBottomPadding: true,
@@ -198,77 +210,43 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           if (_searchResult == null)
             PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: FutureBuilder(
+              icon: FutureWidget<bool>(
                 future: _isDiscussionFavorited(),
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      if (_isFavorited != null)
-                        return _isFavorited
-                            ? Icon(SFSymbols.star_fill)
-                            : Icon(SFSymbols.star);
-                      else {
-                        return PlatformCircularProgressIndicator();
-                      }
-                      break;
-                    case ConnectionState.done:
-                      if (snapshot.hasData) {
-                        if (snapshot.data) {
-                          _isFavorited = true;
-                          return Icon(SFSymbols.star_fill);
-                        } else {
-                          _isFavorited = false;
-                          return Icon(SFSymbols.star);
-                        }
-                      }
-                      break;
-                  }
-                  return Icon(SFSymbols.star);
+                loadingBuilder: PlatformCircularProgressIndicator(),
+                successBuilder:
+                    (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  _isFavorited = snapshot.data;
+                  return _isFavorited
+                      ? Icon(SFSymbols.star_fill)
+                      : Icon(SFSymbols.star);
                 },
+                errorBuilder: () => null,
               ),
               onPressed: () async {
                 if (_isFavorited == null) return;
-                if (_isFavorited) {
-                  _isFavorited = false;
-                  setState(() {});
-                  await PostRepository.getInstance()
-                      .setFavoredDiscussion(
-                          SetFavoredDiscussionMode.DELETE, _post.id)
-                      .onError((error, stackTrace) {
-                    Noticing.showNotice(
-                        context, S.of(context).operation_failed);
-                    _isFavorited = true;
-                    setState(() {});
-                    return null;
-                  });
-                } else {
-                  _isFavorited = true;
-                  setState(() {});
-                  await PostRepository.getInstance()
-                      .setFavoredDiscussion(
-                          SetFavoredDiscussionMode.ADD, _post.id)
-                      .onError((error, stackTrace) {
-                    Noticing.showNotice(
-                        context, S.of(context).operation_failed);
-                    _isFavorited = false;
-                    setState(() {});
-                    return null;
-                  });
-                  setState(() {});
-                }
+                setState(() => _isFavorited = !_isFavorited);
+                await PostRepository.getInstance()
+                    .setFavoredDiscussion(
+                        _isFavorited
+                            ? SetFavoredDiscussionMode.ADD
+                            : SetFavoredDiscussionMode.DELETE,
+                        _post.id)
+                    .onError((error, stackTrace) {
+                  Noticing.showNotice(context, S.of(context).operation_failed);
+                  setState(() => _isFavorited = !_isFavorited);
+                  return null;
+                });
               },
             ),
           if (_searchResult == null)
             PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.reply)
                   : const Icon(SFSymbols.arrowshape_turn_up_left),
               onPressed: () {
                 BBSEditor.createNewReply(context, _post.id, null)
-                    .then((value) => refreshSelf());
+                    .then((_) => refreshSelf());
               },
             ),
         ],
@@ -280,75 +258,47 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             refreshSelf();
           },
           child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: FutureBuilder(
-                builder: (_, AsyncSnapshot<List<Reply>> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      _isRefreshing = true;
-                      if (_lastSnapshotData == null)
-                        return Container(
-                          padding: EdgeInsets.all(8),
-                          child: Center(
-                              child: PlatformCircularProgressIndicator()),
-                        );
-                      if (_searchResult != null)
-                        return _buildPage(_lastSnapshotData.data, true);
-                      // Only use scroll notification when data is paged
-                      return NotificationListener<ScrollNotification>(
-                          child: _buildPage(snapshot.data, true),
-                          onNotification: (ScrollNotification scrollInfo) {
-                            if (scrollInfo.metrics.extentAfter < 500 &&
-                                !_isRefreshing &&
-                                !_isEndIndicatorShown) {
-                              _isRefreshing = true;
-                              setState(() {
-                                _currentBBSPage++;
-                                _setContent();
-                              });
-                            }
-                            return false;
-                          });
-                      break;
-                    case ConnectionState.done:
-                      _isRefreshing = false;
-                      if (snapshot.hasError) {
-                        return _buildErrorWidget();
-                      } else {
-                        // Prevent refreshing repeatedly
-                        if (_lastReplies.isEmpty ||
-                            snapshot.data.isEmpty ||
-                            _lastReplies.last.id != snapshot.data.last.id)
-                          _lastReplies.addAll(snapshot.data);
-                        _lastSnapshotData = snapshot;
-                        if (_searchResult != null)
-                          return _buildPage(snapshot.data, false);
-                        // Only use scroll notification when data is paged
-                        return NotificationListener<ScrollNotification>(
-                            child: _buildPage(snapshot.data, false),
-                            onNotification: (ScrollNotification scrollInfo) {
-                              if (scrollInfo.metrics.extentAfter < 500 &&
-                                  !_isRefreshing &&
-                                  !_isEndIndicatorShown) {
-                                _isRefreshing = true;
-                                setState(() {
-                                  _currentBBSPage++;
-                                  _setContent();
-                                });
-                              }
-                              return false;
-                            });
-                      }
-                      break;
-                  }
-                  return null;
-                },
-                // Display search result instead, when it is available
-                future: _content,
-              ))),
+            context: context,
+            removeTop: true,
+            child: FutureWidget<List<Reply>>(
+              future: _content,
+              loadingBuilder:
+                  (BuildContext context, AsyncSnapshot<List<Reply>> snapshot) {
+                _isRefreshing = true;
+                // If there is no data at all, show a full-screen loading indicator.
+                if (_lastSnapshotData == null)
+                  return Container(
+                    padding: EdgeInsets.all(8),
+                    child: Center(child: PlatformCircularProgressIndicator()),
+                  );
+                // If the page is showing search results, just show it whatever.
+                if (_searchResult != null)
+                  return _buildPage(_lastSnapshotData.data, true);
+
+                // Otherwise, showing a list page with loading indicator at the bottom.
+                return NotificationListener<ScrollNotification>(
+                    child: _buildPage(snapshot.data, true),
+                    onNotification: onScrollToBottom);
+              },
+              successBuilder:
+                  (BuildContext context, AsyncSnapshot<List<Reply>> snapshot) {
+                _isRefreshing = false;
+                // Prevent showing duplicate replies caused by refreshing repeatedly
+                if (_lastReplies.isEmpty ||
+                    snapshot.data.isEmpty ||
+                    _lastReplies.last.id != snapshot.data.last.id)
+                  _lastReplies.addAll(snapshot.data);
+                _lastSnapshotData = snapshot;
+                if (_searchResult != null)
+                  return _buildPage(snapshot.data, false);
+                // Only use scroll notification when data is paged
+                return NotificationListener<ScrollNotification>(
+                    child: _buildPage(snapshot.data, false),
+                    onNotification: onScrollToBottom);
+              },
+              errorBuilder: () => _buildErrorWidget(),
+            ),
+          )),
     );
   }
 

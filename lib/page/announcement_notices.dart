@@ -30,7 +30,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-
+/// A list page showing announcement from developers.
 class AnnouncementList extends StatefulWidget {
   final Map<String, dynamic> arguments;
 

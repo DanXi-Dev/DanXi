@@ -31,6 +31,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
+/// A list page showing AAO notices.
+///
+/// Arguments:
+/// [List<Notice>] initialData: the initial data to be shown as soon as the page's displayed.
+/// [PersonInfo] personInfo: personal information
 class AAONoticesList extends StatefulWidget {
   final Map<String, dynamic> arguments;
 

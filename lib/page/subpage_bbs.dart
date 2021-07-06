@@ -67,7 +67,7 @@ String renderText(String html, String imagePlaceholder) {
   return soup.get_text().trim();
 }
 
-const KEY_NO_TAG = "默认";
+const String KEY_NO_TAG = "默认";
 
 /// Turn tags into Widgets
 Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {

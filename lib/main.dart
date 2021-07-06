@@ -80,6 +80,8 @@ ThemeData getTheme(BuildContext context) {
       : Constant.lightTheme(PlatformX.isCupertino(context));
 }
 
+/// The main entry of the whole app.
+/// Do some initiative work here.
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
   CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
@@ -134,6 +136,7 @@ class DanxiApp extends StatelessWidget {
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
   };
 
+  /// Change the size of window on desktop to fit the proper ratio.
   changeSizeOnDesktop() async {
     if (PlatformX.isWindows) {
       await DesktopWindow.setWindowSize(Size(480, 960));
@@ -158,6 +161,7 @@ class DanxiApp extends StatelessWidget {
                       textStyle: TextStyle(
                           color:
                               getTheme(context).textTheme.bodyText1.color)))),
+          // Configure i18n delegates
           localizationsDelegates: [
             S.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -166,6 +170,7 @@ class DanxiApp extends StatelessWidget {
           ],
           supportedLocales: S.delegate.supportedLocales,
           home: HomePage(),
+          // Configure the page route behaviour of the whole app
           onGenerateRoute: (settings) {
             final Function pageContentBuilder = this.routes[settings.name];
             if (pageContentBuilder != null) {
@@ -200,7 +205,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Listener to the failure of logging in caused by necessary captcha.
   ///
-  /// Request user to log in manually in the browser.
+  /// Open up a dialog to request user to log in manually in the browser.
   static StateStreamListener<CaptchaNeededException> _captchaSubscription =
       StateStreamListener();
 
@@ -210,12 +215,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangePlatformBrightness();
   }
 
-  /// If we need to send the qr code to iWatch now.
+  /// If we need to send the QR code to iWatch now.
   ///
   /// When notified [watchActivated], we should send it after [_personInfo] is loaded.
   bool _needSendToWatch = false;
 
   /// Whether the error dialog is shown.
+  /// If a dialog has been shown, we will not show a duplicated one.
   /// See [_dealWithCaptchaNeededException]
   bool _isDialogShown = false;
 
@@ -225,7 +231,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// List of all of the subpages. They will be displayed as tab pages.
   List<PlatformSubpage> _subpage = [];
 
-  /// Force app to refresh pages.
+  /// Force app to rebuild all of subpages.
   ///
   /// It's usually called when user changes his account.
   void _rebuildPage() {
@@ -256,14 +262,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         Icon(PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up),
     (cxt) => null
   ];
-
   final List<Function> _subpageRightsecondActionButtonIconBuilders = [
     (cxt) => null,
     (cxt) => SFSymbols.star,
     (cxt) => null,
     (cxt) => null
   ];
-
   final List<Function> _subpageLeadingActionButtonIconBuilders = [
     (cxt) => PlatformX.isAndroid ? Icons.notifications : SFSymbols.bell_circle,
     (cxt) => SFSymbols.sort_down_circle,
@@ -278,14 +282,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     (cxt) => S.of(cxt).share,
     (cxt) => null,
   ];
-
   final List<Function> _subpageRightsecondActionButtonTextBuilders = [
     (cxt) => null,
     (cxt) => S.of(cxt).favorites,
     (cxt) => null,
     (cxt) => null,
   ];
-
   final List<Function> _subpageLeadingActionButtonTextBuilders = [
     (cxt) => S.of(cxt).developer_announcement(''),
     (cxt) => S.of(cxt).sort_order,

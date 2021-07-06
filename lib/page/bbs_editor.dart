@@ -37,6 +37,14 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
+/// An full-screen editor page.
+///
+/// Arguments:
+/// [bool] tags: to show a tag selector, default false
+/// [String] title: the page's title, default "Post"
+///
+/// Callback:
+/// [PostEditorText] The editor text.
 class BBSEditorPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
