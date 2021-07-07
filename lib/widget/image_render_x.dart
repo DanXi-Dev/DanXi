@@ -116,20 +116,23 @@ ImageRender networkImageClipRender({
             return Container(
               constraints:
                   BoxConstraints(maxWidth: realWidth, maxHeight: realHeight),
-              child: Image.network(
-                src,
-                fit: BoxFit.fitWidth,
-                headers: headers,
-                width: realWidth,
-                height: realHeight,
-                frameBuilder: (ctx, child, frame, _) {
-                  if (frame == null) {
-                    return altWidget?.call(_alt(attributes)) ??
-                        Text(_alt(attributes) ?? "",
-                            style: context.style.generateTextStyle());
-                  }
-                  return child;
-                },
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.network(
+                  src,
+                  fit: BoxFit.fitWidth,
+                  headers: headers,
+                  width: realWidth,
+                  height: realHeight,
+                  frameBuilder: (ctx, child, frame, _) {
+                    if (frame == null) {
+                      return altWidget?.call(_alt(attributes)) ??
+                          Text(_alt(attributes) ?? "",
+                              style: context.style.generateTextStyle());
+                    }
+                    return child;
+                  },
+                ),
               ),
             );
           } else if (snapshot.hasError) {

@@ -23,6 +23,8 @@
 "selectAPost" = "Select a post to view";
 "report" = "Report";
 "gettingtoken" = "正在从iPhone获取账户信息...";
-"image_tag" = "[图片]";
+"image_tag" = " [图片] ";
 "iphoneunreachable" = "无法连接到iPhone，点击重试";
 "manualInputToken" = "手动导入Token";
+"error" = "错误";
+"discussionFolded" = "该内容已折叠，点击查看";

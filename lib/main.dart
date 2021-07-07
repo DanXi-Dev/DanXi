@@ -43,11 +43,14 @@ import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
+import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
@@ -78,6 +81,11 @@ ThemeData getTheme(BuildContext context) {
   return PlatformX.isDarkMode
       ? Constant.darkTheme(PlatformX.isCupertino(context))
       : Constant.lightTheme(PlatformX.isCupertino(context));
+}
+
+void sendFduholeTokenToWatch(String token) {
+  const channel = const MethodChannel('fduhole');
+  channel.invokeMethod("send_token", token);
 }
 
 /// The main entry of the whole app.
@@ -408,8 +416,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // Configure watch listeners on iOS.
       if (_needSendToWatch &&
           _preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-        const channel = const MethodChannel('fduhole');
-        channel.invokeMethod("send_token",
+        sendFduholeTokenToWatch(
             _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         // Only send once.
         _needSendToWatch = false;
@@ -432,8 +439,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (call.method == 'get_token') {
         // If we haven't loaded [_personInfo]
         if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-          const channel = const MethodChannel('fduhole');
-          channel.invokeMethod("send_token",
+          sendFduholeTokenToWatch(
               _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         } else {
           // Notify that we should send the token to watch later
@@ -758,6 +764,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ));
     });
-    print("Fetch start date -> ${TimeTable.START_TIME.toIso8601String()}");
+    // Determine if Timetable needs to be updated
+    if (SettingsProvider.of(_preferences).lastSemesterStartTime !=
+            TimeTable.START_TIME.toIso8601String() &&
+        _personInfo.value != null) {
+      // Update Timetable
+      Retrier.runAsyncWithRetry(
+              () => TimeTableRepository.getInstance().loadTimeTableLocally(
+                  _personInfo.value,
+                  forceLoadFromRemote: true),
+              retryTimes: 1)
+          .onError((error, stackTrace) => Noticing.showNotice(
+              context, S.of(context).timetable_refresh_error,
+              title: S.of(context).fatal_error, androidUseSnackbar: false));
+
+      SettingsProvider.of(_preferences).lastSemesterStartTime =
+          TimeTable.START_TIME.toIso8601String();
+    }
   }
 }

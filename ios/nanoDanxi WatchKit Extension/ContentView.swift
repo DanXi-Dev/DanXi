@@ -9,40 +9,35 @@ import SwiftUI
 import WatchKit
 
 struct ContentView: View {
-    @EnvironmentObject var fduholeLoginInfo: wcDelegate
-    @State var connectionReachable = true;
-    @State private var capturedText = ""
+    @EnvironmentObject var fduholeLoginInfo: WatchSessionDelegate
+    @State private var connectionReachable = true;
     
     
     var body: some View {
-        
         if (fduholeLoginInfo.token == "") {
             VStack {
                 if (connectionReachable) {
                     ProgressView()
                     Text("gettingtoken")
-                        .onTapGesture {
-                            connectionReachable = wcDelegate().sendString(text: "get_token")
-                        }
                 }
                 else {
                     Text("iphoneunreachable")
-                        .onTapGesture {
-                            connectionReachable = wcDelegate().sendString(text: "get_token")
-                        }
                 }
                 
-                TextField("test", text: $capturedText)
+                /*TextField("test", text: $capturedText)
                 { isEditing in
                     
                 } onCommit: {
                     UserDefaults.standard.set(capturedText, forKey: "fduhole_token")
                     fduholeLoginInfo.token = capturedText
                 }
-                .textContentType(.oneTimeCode)
+                .textContentType(.oneTimeCode)*/
             }
             .onAppear() {
-                connectionReachable = wcDelegate().sendString(text: "get_token")
+                connectionReachable = WatchSessionDelegate.shared.requestToken()
+            }
+            .onTapGesture() {
+                connectionReachable = WatchSessionDelegate.shared.requestToken()
             }
         }
         else {

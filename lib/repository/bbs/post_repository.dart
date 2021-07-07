@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/main.dart';
 import 'package:dan_xi/model/fduhole_profile.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';

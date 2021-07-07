@@ -7,13 +7,24 @@ import WatchConnectivity
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, WCSessionDelegate {
-    
+    let defaults = UserDefaults.standard
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        /*if (defaults.bool(forKey: "token_set")) {
+            let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+            let channel = FlutterMethodChannel(name: "fduhole",
+                                               binaryMessenger: controller.binaryMessenger)
+            channel.invokeMethod("get_token", arguments: nil)
+        }*/
+    }
+    
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+        if (userInfo["token_set"] != nil) {
+            defaults.set(true, forKey: "token_set")
+        }
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        print("received request from watch")
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole",
                                            binaryMessenger: controller.binaryMessenger)
@@ -26,14 +37,12 @@ import WatchConnectivity
     func sessionDidDeactivate(_ session: WCSession) {
     }
     
-    func sendString(text: String){
+    func sendString(text: String) {
         let session = WCSession.default;
-        if(session.isPaired && session.isReachable){
+        if(WCSession.isSupported()){
             DispatchQueue.main.async {
-                session.sendMessage(["fduhole_token": text], replyHandler: nil)
+                session.sendMessage(["token": text], replyHandler: nil)
             }
-        }else{
-            print("Watch not reachable...")
         }
     }
     
@@ -56,7 +65,6 @@ import WatchConnectivity
         channel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             if(call.method == "send_token"){
-                print("received token from flutter")
                 // We will call a method called "sendStringToNative" in flutter.
                 self.sendString(text: call.arguments as! String)
             }
