@@ -12,7 +12,9 @@ struct RunnerApp: App {
     @StateObject var fduholeLoginInfo = WatchSessionDelegate.shared
     
     init() {
-        WatchSessionDelegate.shared.activate()
+        if (UserDefaults.standard.string(forKey: KEY_FDUHOLE_TOKEN) == nil) {
+            WatchSessionDelegate.shared.activate()
+        }
     }
     
     var body: some Scene {

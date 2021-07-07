@@ -9,6 +9,8 @@ import Foundation
 import WatchConnectivity
 import SwiftUI
 
+let KEY_FDUHOLE_TOKEN = "fduhole_token"
+
 class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
     let session = WCSession.default;
     static var shared = WatchSessionDelegate()
@@ -52,10 +54,10 @@ class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
     
     let defaults = UserDefaults.standard
     func setFduholeToken(token: String) -> Void {
-        defaults.set(token, forKey: "fduhole_token")
+        defaults.set(token, forKey: KEY_FDUHOLE_TOKEN)
     }
     
     func getFduholeToken() -> String {
-        return defaults.string(forKey: "fduhole_token") ?? ""
+        return defaults.string(forKey: KEY_FDUHOLE_TOKEN) ?? ""
     }
 }
