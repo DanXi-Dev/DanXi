@@ -23,6 +23,8 @@
 "selectAPost" = "Select a post to view";
 "report" = "Report";
 "gettingtoken" = "Waiting for account information from iPhone...";
-"image_tag" = "[Image]";
+"image_tag" = " [Image] ";
 "iphoneunreachable" = "iPhone Unreachable. Tap to retry";
 "manualInputToken" = "Manually import Token";
+"error" = "Error";
+"discussionFolded" = "Content hidden. Tap to view";

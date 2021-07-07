@@ -9,12 +9,13 @@ import Foundation
 import WatchConnectivity
 import SwiftUI
 
-class wcDelegate: NSObject, WCSessionDelegate, ObservableObject {
+class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
     let session = WCSession.default;
+    static var shared = WatchSessionDelegate()
+    
     @Published var token = ""
     
-    override init() {
-        super.init()
+    func activate() {
         token = getFduholeToken()
         session.delegate = self
         session.activate()
@@ -22,26 +23,31 @@ class wcDelegate: NSObject, WCSessionDelegate, ObservableObject {
     
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        
     }
     
-    func sendString(text: String) -> Bool  {
-        if(session.isReachable){
-            DispatchQueue.main.async {
-                self.session.sendMessage(["fduhole": text], replyHandler: nil, errorHandler: {error -> Void in
-                    print(error)
-                })
-            }
-            return true
+    func requestToken() -> Bool {
+        if(!session.isReachable) {
+            return false
         }
-        return false
+        DispatchQueue.main.async {
+            self.session.sendMessage(["requestToken": true], replyHandler: nil)
+        }
+        return true
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         DispatchQueue.main.async {
-            self.token = message["fduhole_token"] as! String
+            self.token = message["token"] as! String
         }
-        setFduholeToken(token: message["fduhole_token"] as! String)
+        setFduholeToken(token: message["token"] as! String)
+    }
+    
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+        DispatchQueue.main.async {
+            self.token = userInfo["token"] as! String
+        }
+        self.setFduholeToken(token: userInfo["token"] as! String)
+        session.transferUserInfo(["token_set": true])
     }
     
     let defaults = UserDefaults.standard

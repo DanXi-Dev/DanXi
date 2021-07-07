@@ -9,7 +9,11 @@ import SwiftUI
 
 @main
 struct RunnerApp: App {
-    @StateObject var fduholeLoginInfo = wcDelegate()
+    @StateObject var fduholeLoginInfo = WatchSessionDelegate.shared
+    
+    init() {
+        WatchSessionDelegate.shared.activate()
+    }
     
     var body: some Scene {
         WindowGroup {

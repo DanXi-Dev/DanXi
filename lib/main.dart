@@ -80,6 +80,11 @@ ThemeData getTheme(BuildContext context) {
       : Constant.lightTheme(PlatformX.isCupertino(context));
 }
 
+void sendFduholeTokenToWatch(String token) {
+  const channel = const MethodChannel('fduhole');
+  channel.invokeMethod("send_token", token);
+}
+
 /// The main entry of the whole app.
 /// Do some initiative work here.
 void main() {
@@ -408,8 +413,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // Configure watch listeners on iOS.
       if (_needSendToWatch &&
           _preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-        const channel = const MethodChannel('fduhole');
-        channel.invokeMethod("send_token",
+        sendFduholeTokenToWatch(
             _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         // Only send once.
         _needSendToWatch = false;
@@ -432,8 +436,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (call.method == 'get_token') {
         // If we haven't loaded [_personInfo]
         if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-          const channel = const MethodChannel('fduhole');
-          channel.invokeMethod("send_token",
+          sendFduholeTokenToWatch(
               _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         } else {
           // Notify that we should send the token to watch later

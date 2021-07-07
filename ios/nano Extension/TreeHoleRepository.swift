@@ -9,7 +9,7 @@ import Foundation
 
 let BASE_URL = "https://www.fduhole.tk/v1"
 
-func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrder, completion: @escaping (T) -> Void) -> Void {
+func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrder, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
     var components = URLComponents(string: BASE_URL + "/discussions/")!
     components.queryItems = [
         URLQueryItem(name: "page", value: String(page)),
@@ -21,17 +21,22 @@ func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrde
     request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
     
     URLSession.shared.dataTask(with: request) { data, response, error in
-        if let data = data {
-            if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
-                // we have good data – go back to the main thread
-                completion(decodedResponse)
-                return
+        if (error == nil) {
+            if let data = data {
+                if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
+                    // we have good data – go back to the main thread
+                    completion(decodedResponse, nil)
+                    return
+                }
             }
+        }
+        else {
+            completion(nil, error!.localizedDescription)
         }
     }.resume()
 }
 
-func loadReplies<T: Decodable>(token: String, page: Int, discussionId: Int, completion: @escaping (T) -> Void) -> Void {
+func loadReplies<T: Decodable>(token: String, page: Int, discussionId: Int, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
     var components = URLComponents(string: BASE_URL + "/posts/")!
     components.queryItems = [
         URLQueryItem(name: "page", value: String(page)),
@@ -44,13 +49,18 @@ func loadReplies<T: Decodable>(token: String, page: Int, discussionId: Int, comp
     
     URLSession.shared.dataTask(with: request) {
         data, response, error in
+        if (error == nil) {
             if let data = data {
                 if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
                     // we have good data – go back to the main thread
-                    completion(decodedResponse)
+                    completion(decodedResponse, nil)
                     return
                 }
             }
+        }
+        else {
+            completion(nil, error!.localizedDescription)
+        }
     }.resume()
 }
 

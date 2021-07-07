@@ -8,19 +8,25 @@
 import SwiftUI
 
 struct TreeHolePage: View {
-    @EnvironmentObject var fduholeLoginInfo: wcDelegate
+    @EnvironmentObject var fduholeLoginInfo: WatchSessionDelegate
     @State private var discussions = [THDiscussion]()
     @State private var currentPage = 1
     @State private var endReached = false
+    @State private var error: String? = nil
     
     // Scroll Position Indicator
     @State private var isLoading = true
     
     func refreshDiscussions() {
+        
         currentPage = 1
         isLoading = true
-        loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]) -> Void in discussions = T
-            isLoading = false
+        loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
+            error = errorString
+            if (errorString == nil) {
+                discussions = T!
+                isLoading = false
+            }
         }
     }
     
@@ -28,44 +34,68 @@ struct TreeHolePage: View {
         currentPage += 1
         if (!isLoading) {
             isLoading = true
-            loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]) -> Void in
-                if (T.isEmpty) {
-                    endReached = true
+            loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
+                error = errorString
+                if (errorString == nil) {
+                    if (T!.isEmpty) {
+                        endReached = true
+                    }
+                    discussions.append(contentsOf: T!)
+                    isLoading = false
                 }
-                discussions.append(contentsOf: T)
-                isLoading = false
             }
         }
     }
     
     var body: some View {
-        if (discussions.isEmpty) {
-            List {
-                ProgressView()
+        if (error == nil) {
+            if (discussions.isEmpty) {
+                List {
+                    ProgressView()
+                }
+                .navigationTitle("treehole")
+                .onAppear(perform: refreshDiscussions)
             }
-            .navigationTitle("treehole")
-            .onAppear(perform: refreshDiscussions)
-        }
-        else {
-            VStack {
-                List(discussions) { discussion in
-                    VStack {
-                        ZStack {
-                            THPostView(discussion: discussion)
-                            NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.posts)) {
-                                EmptyView()
+            else {
+                List {
+                    ForEach(discussions) { discussion in
+                        VStack {
+                            ZStack {
+                                THPostView(discussion: discussion)
+                                NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.posts)) {
+                                    EmptyView()
+                                }
                             }
                         }
-                        if(discussion == discussions.last && !endReached) {
-                            ProgressView()
-                                .onAppear(perform: loadNextPage)
-                        }
+                    }
+                    if(!endReached) {
+                        ProgressView()
+                            .onAppear(perform: loadNextPage)
                     }
                 }
-                //ProgressView()
-                //.onAppear(perform: loadNextPage)
+                .navigationTitle("treehole")
             }
-            .navigationTitle("treehole")
+        }
+        else {
+            ErrorView(errorInfo: error ?? "Unknown Error")
+                .onTapGesture {
+                    refreshDiscussions()
+                }
+        }
+    }
+}
+
+struct ErrorView: View {
+    var errorInfo: String
+    
+    var body: some View {
+        VStack {
+            Image(systemName: "xmark.octagon")
+                .foregroundColor(.accentColor)
+                .imageScale(.large)
+            Text(NSLocalizedString("error", comment: "") + "\n\(errorInfo)")
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
         }
     }
 }
