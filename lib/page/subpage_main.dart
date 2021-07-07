@@ -76,7 +76,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    // initPlatformState();
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshHomepageEvent>().listen((event) {
           if (event.queueRefresh)
@@ -154,14 +154,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
     _refreshSubscription.cancel();
   }
 
-  //Get current brightness with _brightness
-  double _brightness = 1.0;
 
-  double get brightness => _brightness;
-
-  initPlatformState() async {
-    _brightness = await ScreenProxy.brightness;
-  }
 
   void addNotification(Feature feature) {
     if (_notifications.any((element) =>

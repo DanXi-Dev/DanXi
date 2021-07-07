@@ -31,8 +31,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 ///
 /// Also contains methods to send qr code to Apple Watch.
 class QRHelper {
-  static void showQRCode(
-      BuildContext context, PersonInfo personInfo, double brightness) {
+  static Future<void> showQRCode(
+      BuildContext context, PersonInfo personInfo) async {
+    double _brightness = await ScreenProxy.brightness;
     //Set screen brightness for displaying QR Code
     ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
@@ -42,7 +43,7 @@ class QRHelper {
         barrierDismissible: false,
         builder: (BuildContext context) => QRDialog(
               personInfo: personInfo,
-              originBrightness: brightness,
+              originBrightness: _brightness,
             ));
   }
 

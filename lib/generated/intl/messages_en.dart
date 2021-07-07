@@ -137,16 +137,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "fold" : MessageLookupByLibrary.simpleMessage("Fold"),
     "folded" : MessageLookupByLibrary.simpleMessage("This content is hidden. Tap to view"),
     "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
-    "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
-    "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
-    "fudan_daily" : MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
-    "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("In response to request from the University, Auto-CheckIn is no longer available."),
-    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Tap to check in"),
-    "fudan_daily_tick_countdown" : m4,
-    "fudan_daily_tick_link" : MessageLookupByLibrary.simpleMessage("Tap to open check-in webpage"),
-    "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),
-    "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
-    "good_afternoon" : MessageLookupByLibrary.simpleMessage("The afternoon knows what the morning never suspected."),
+        "forum_post_enter_content":
+            MessageLookupByLibrary.simpleMessage("Post"),
+        "fudan_aao_notices":
+            MessageLookupByLibrary.simpleMessage("Academic Announcements"),
+        "fudan_daily":
+            MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
+        "fudan_daily_disabled_notice": MessageLookupByLibrary.simpleMessage(
+            "In response to request from the University, Auto-CheckIn is no longer available."),
+        "fudan_daily_tick": MessageLookupByLibrary.simpleMessage(
+            "[WARNING: DEBUG FEATURE] Tap to check in"),
+        "fudan_daily_tick_countdown": m4,
+        "fudan_daily_tick_link": MessageLookupByLibrary.simpleMessage(
+            "Tap to open check-in webpage"),
+        "fudan_daily_ticked":
+            MessageLookupByLibrary.simpleMessage("Already done"),
+        "fudan_qr_code": MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
+        "good_afternoon": MessageLookupByLibrary.simpleMessage(
+            "The afternoon knows what the morning never suspected."),
         "good_morning": MessageLookupByLibrary.simpleMessage(
             "Every dawn is a new sunrise."),
         "good_night": MessageLookupByLibrary.simpleMessage(
@@ -180,18 +188,23 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("How to use the VPN？"),
         "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
         "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
-        "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
-    "last_created" : MessageLookupByLibrary.simpleMessage("Last created"),
-    "last_replied" : MessageLookupByLibrary.simpleMessage("Last replied"),
-    "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction"),
-    "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
-    "latest_reply" : m6,
-    "link" : MessageLookupByLibrary.simpleMessage("Link"),
-    "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
-    "loading_bbs_secure_connection" : MessageLookupByLibrary.simpleMessage("Performing server security check, please wait..."),
-    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
-    "location_permission_denied_promot" : MessageLookupByLibrary.simpleMessage("Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings."),
-    "login" : MessageLookupByLibrary.simpleMessage("Login"),
+        "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
+        "last_created": MessageLookupByLibrary.simpleMessage("Last created"),
+        "last_replied": MessageLookupByLibrary.simpleMessage("Last replied"),
+        "last_transaction":
+            MessageLookupByLibrary.simpleMessage("Last Transaction"),
+        "late_night": MessageLookupByLibrary.simpleMessage(
+            "The dead of midnight is the noon of thought."),
+        "latest_reply": m6,
+        "link": MessageLookupByLibrary.simpleMessage("Link"),
+        "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
+        "loading_bbs_secure_connection": MessageLookupByLibrary.simpleMessage(
+            "Performing server security check, please wait..."),
+        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
+            "Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
+        "location_permission_denied_promot": MessageLookupByLibrary.simpleMessage(
+            "Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings."),
+        "login" : MessageLookupByLibrary.simpleMessage("Login"),
     "login_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually."),
     "login_issue_1_action" : MessageLookupByLibrary.simpleMessage("Open UIS Login Page"),
     "login_issue_2" : MessageLookupByLibrary.simpleMessage("Failed to fetch information related to the semester from the server, please retry. \nIf you skip directly, there may be problems with date calculation for course schedules."),

@@ -410,7 +410,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (PlatformX.isMobile)
         quickActions.initialize((shortcutType) {
           if (shortcutType == 'action_qr_code' && _personInfo.value != null) {
-            QRHelper.showQRCode(context, _personInfo.value, _brightness);
+            QRHelper.showQRCode(context, _personInfo.value);
           }
         });
       // Configure watch listeners on iOS.
@@ -431,7 +431,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    _initPlatformState(); //Init brightness control
+    // _initPlatformState(); //Init brightness control
 
     // Init watchOS support
     const channel_a = const MethodChannel('fduhole');
@@ -449,13 +449,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  /// Current brightness
-  double _brightness = 1.0;
-
-  /// get current brightness so that we can restore it after showing QR code.
-  _initPlatformState() async {
-    _brightness = await ScreenProxy.brightness;
-  }
 
   /// Pop up a dialog where user can give his name & password.
   void _showLoginDialog({bool forceLogin = false}) => showPlatformDialog(
