@@ -137,74 +137,50 @@ class MessageLookup extends MessageLookupByLibrary {
     "fold" : MessageLookupByLibrary.simpleMessage("Fold"),
     "folded" : MessageLookupByLibrary.simpleMessage("This content is hidden. Tap to view"),
     "forum" : MessageLookupByLibrary.simpleMessage("Tree Hole"),
-        "forum_post_enter_content":
-            MessageLookupByLibrary.simpleMessage("Post"),
-        "fudan_aao_notices":
-            MessageLookupByLibrary.simpleMessage("Academic Announcements"),
-        "fudan_daily":
-            MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
-        "fudan_daily_disabled_notice": MessageLookupByLibrary.simpleMessage(
-            "In response to request from the University, Auto-CheckIn is no longer available."),
-        "fudan_daily_tick": MessageLookupByLibrary.simpleMessage(
-            "[WARNING: DEBUG FEATURE] Tap to check in"),
-        "fudan_daily_tick_countdown": m4,
-        "fudan_daily_tick_link": MessageLookupByLibrary.simpleMessage(
-            "Tap to open check-in webpage"),
-        "fudan_daily_ticked":
-            MessageLookupByLibrary.simpleMessage("Already done"),
-        "fudan_qr_code": MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
-        "good_afternoon": MessageLookupByLibrary.simpleMessage(
-            "The afternoon knows what the morning never suspected."),
-        "good_morning": MessageLookupByLibrary.simpleMessage(
-            "Every dawn is a new sunrise."),
-        "good_night": MessageLookupByLibrary.simpleMessage(
-            "Goodnight stars, goodnight air, goodnight noises everywhere."),
-        "good_noon": MessageLookupByLibrary.simpleMessage("Rise and shine."),
-        "gpa": MessageLookupByLibrary.simpleMessage("GPA"),
-        "handan_campus": MessageLookupByLibrary.simpleMessage("Handan"),
-        "hidden_widgets": MessageLookupByLibrary.simpleMessage("Hidden"),
-        "hide": MessageLookupByLibrary.simpleMessage("Hide"),
-        "hour_ago": m5,
-        "i_see": MessageLookupByLibrary.simpleMessage("OK"),
-        "image": MessageLookupByLibrary.simpleMessage("Image"),
-        "image_save_failed":
-            MessageLookupByLibrary.simpleMessage("Image was failed to save!"),
-        "image_save_success":
-            MessageLookupByLibrary.simpleMessage("Image saved to Gallery"),
-        "image_tag": MessageLookupByLibrary.simpleMessage("[Image]"),
-        "invalid_format":
-            MessageLookupByLibrary.simpleMessage("Invalid format"),
-        "jiangwan_campus": MessageLookupByLibrary.simpleMessage("Jiangwan"),
-        "lan_connection_issue_1": MessageLookupByLibrary.simpleMessage(
-            "Fail to connect to campus LAN"),
-        "lan_connection_issue_1_action":
-            MessageLookupByLibrary.simpleMessage("Campus VPN"),
-        "lan_connection_issue_1_description": MessageLookupByLibrary.simpleMessage(
-            "Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources."),
-        "lan_connection_issue_1_guide_content":
-            MessageLookupByLibrary.simpleMessage(
-                "3 simple steps:<br /><br />1. <a href=\"https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common\">Click here</a> to the download page and select the corresponding platform to install.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn, click OK。<br />3. A login page pops up. Enter your UIS account & password.<br /><br />Then All the functions of DanXi will work normally!"),
-        "lan_connection_issue_1_guide_title":
-            MessageLookupByLibrary.simpleMessage("How to use the VPN？"),
-        "last_15_days": MessageLookupByLibrary.simpleMessage("Last 15 days"),
-        "last_30_days": MessageLookupByLibrary.simpleMessage("Last 30 days"),
-        "last_7_days": MessageLookupByLibrary.simpleMessage("Last 7 days"),
-        "last_created": MessageLookupByLibrary.simpleMessage("Last created"),
-        "last_replied": MessageLookupByLibrary.simpleMessage("Last replied"),
-        "last_transaction":
-            MessageLookupByLibrary.simpleMessage("Last Transaction"),
-        "late_night": MessageLookupByLibrary.simpleMessage(
-            "The dead of midnight is the noon of thought."),
-        "latest_reply": m6,
-        "link": MessageLookupByLibrary.simpleMessage("Link"),
-        "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
-        "loading_bbs_secure_connection": MessageLookupByLibrary.simpleMessage(
-            "Performing server security check, please wait..."),
-        "loading_qr_code": MessageLookupByLibrary.simpleMessage(
-            "Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
-        "location_permission_denied_promot": MessageLookupByLibrary.simpleMessage(
-            "Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings."),
-        "login" : MessageLookupByLibrary.simpleMessage("Login"),
+    "forum_post_enter_content" : MessageLookupByLibrary.simpleMessage("Post"),
+    "fudan_aao_notices" : MessageLookupByLibrary.simpleMessage("Academic Announcements"),
+    "fudan_daily" : MessageLookupByLibrary.simpleMessage("Safety Fudan Check-In"),
+    "fudan_daily_disabled_notice" : MessageLookupByLibrary.simpleMessage("In response to request from the University, Auto-CheckIn is no longer available."),
+    "fudan_daily_tick" : MessageLookupByLibrary.simpleMessage("[WARNING: DEBUG FEATURE] Tap to check in"),
+    "fudan_daily_tick_countdown" : m4,
+    "fudan_daily_tick_link" : MessageLookupByLibrary.simpleMessage("Tap to open check-in webpage"),
+    "fudan_daily_ticked" : MessageLookupByLibrary.simpleMessage("Already done"),
+    "fudan_qr_code" : MessageLookupByLibrary.simpleMessage("Fudan QR Code"),
+    "good_afternoon" : MessageLookupByLibrary.simpleMessage("The afternoon knows what the morning never suspected."),
+    "good_morning" : MessageLookupByLibrary.simpleMessage("Every dawn is a new sunrise."),
+    "good_night" : MessageLookupByLibrary.simpleMessage("Goodnight stars, goodnight air, goodnight noises everywhere."),
+    "good_noon" : MessageLookupByLibrary.simpleMessage("Rise and shine."),
+    "gpa" : MessageLookupByLibrary.simpleMessage("GPA"),
+    "handan_campus" : MessageLookupByLibrary.simpleMessage("Handan"),
+    "hidden_widgets" : MessageLookupByLibrary.simpleMessage("Hidden"),
+    "hide" : MessageLookupByLibrary.simpleMessage("Hide"),
+    "hour_ago" : m5,
+    "i_see" : MessageLookupByLibrary.simpleMessage("OK"),
+    "image" : MessageLookupByLibrary.simpleMessage("Image"),
+    "image_save_failed" : MessageLookupByLibrary.simpleMessage("Failed to save image. Check your permission settings."),
+    "image_save_success" : MessageLookupByLibrary.simpleMessage("Image Saved"),
+    "image_tag" : MessageLookupByLibrary.simpleMessage("[Image]"),
+    "invalid_format" : MessageLookupByLibrary.simpleMessage("Invalid format"),
+    "jiangwan_campus" : MessageLookupByLibrary.simpleMessage("Jiangwan"),
+    "lan_connection_issue_1" : MessageLookupByLibrary.simpleMessage("Fail to connect to Fudan Campus Intranet "),
+    "lan_connection_issue_1_action" : MessageLookupByLibrary.simpleMessage("Campus VPN"),
+    "lan_connection_issue_1_description" : MessageLookupByLibrary.simpleMessage("Unable to connect to the Fudan Campus Intranet, some features will not be available.\n\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet."),
+    "lan_connection_issue_1_guide_content" : MessageLookupByLibrary.simpleMessage("3 simple steps:<br /><br />1. <a href=\"https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common\">Click here</a> to download the app.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn<br />3. Enter your UIS account & password.<br /><br />Then all features of DanXi will work normally."),
+    "lan_connection_issue_1_guide_title" : MessageLookupByLibrary.simpleMessage("How to use the VPN？"),
+    "last_15_days" : MessageLookupByLibrary.simpleMessage("Last 15 days"),
+    "last_30_days" : MessageLookupByLibrary.simpleMessage("Last 30 days"),
+    "last_7_days" : MessageLookupByLibrary.simpleMessage("Last 7 days"),
+    "last_created" : MessageLookupByLibrary.simpleMessage("Last created"),
+    "last_replied" : MessageLookupByLibrary.simpleMessage("Last replied"),
+    "last_transaction" : MessageLookupByLibrary.simpleMessage("Last Transaction"),
+    "late_night" : MessageLookupByLibrary.simpleMessage("The dead of midnight is the noon of thought."),
+    "latest_reply" : m6,
+    "link" : MessageLookupByLibrary.simpleMessage("Link"),
+    "loading" : MessageLookupByLibrary.simpleMessage("Loading..."),
+    "loading_bbs_secure_connection" : MessageLookupByLibrary.simpleMessage("Performing server security check, please wait..."),
+    "loading_qr_code" : MessageLookupByLibrary.simpleMessage("Loading Fudan QR Code...\nThis may take 5-10 seconds, depending on Fudan servers."),
+    "location_permission_denied_promot" : MessageLookupByLibrary.simpleMessage("Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings."),
+    "login" : MessageLookupByLibrary.simpleMessage("Login"),
     "login_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to log in through UIS system.\nIf you has attempted to log in with wrong passwords for several times, you might need to complete a successful login through a browser manually."),
     "login_issue_1_action" : MessageLookupByLibrary.simpleMessage("Open UIS Login Page"),
     "login_issue_2" : MessageLookupByLibrary.simpleMessage("Failed to fetch information related to the semester from the server, please retry. \nIf you skip directly, there may be problems with date calculation for course schedules."),

@@ -335,20 +335,20 @@ class S {
     );
   }
 
-  /// `Fail to connect to campus LAN`
+  /// `Fail to connect to Fudan Campus Intranet `
   String get lan_connection_issue_1 {
     return Intl.message(
-      'Fail to connect to campus LAN',
+      'Fail to connect to Fudan Campus Intranet ',
       name: 'lan_connection_issue_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources.`
+  /// `Unable to connect to the Fudan Campus Intranet, some features will not be available.\n\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet.`
   String get lan_connection_issue_1_description {
     return Intl.message(
-      'Unable to connect to the Fudan LAN, some functions not available. Are you off-campus or using mobile data link? \n\nYou can use the campus VPN (Easy Connect) or link to Eduroam hotspot to access LAN resources.',
+      'Unable to connect to the Fudan Campus Intranet, some features will not be available.\n\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet.',
       name: 'lan_connection_issue_1_description',
       desc: '',
       args: [],
@@ -375,10 +375,10 @@ class S {
     );
   }
 
-  /// `3 simple steps:<br /><br />1. <a href="https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common">Click here</a> to the download page and select the corresponding platform to install.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn, click OK。<br />3. A login page pops up. Enter your UIS account & password.<br /><br />Then All the functions of DanXi will work normally!`
+  /// `3 simple steps:<br /><br />1. <a href="https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common">Click here</a> to download the app.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn<br />3. Enter your UIS account & password.<br /><br />Then all features of DanXi will work normally.`
   String get lan_connection_issue_1_guide_content {
     return Intl.message(
-      '3 simple steps:<br /><br />1. <a href="https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common">Click here</a> to the download page and select the corresponding platform to install.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn, click OK。<br />3. A login page pops up. Enter your UIS account & password.<br /><br />Then All the functions of DanXi will work normally!',
+      '3 simple steps:<br /><br />1. <a href="https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common">Click here</a> to download the app.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn<br />3. Enter your UIS account & password.<br /><br />Then all features of DanXi will work normally.',
       name: 'lan_connection_issue_1_guide_content',
       desc: '',
       args: [],
@@ -1015,20 +1015,20 @@ class S {
     );
   }
 
-  /// `Image saved to Gallery`
+  /// `Image Saved`
   String get image_save_success {
     return Intl.message(
-      'Image saved to Gallery',
+      'Image Saved',
       name: 'image_save_success',
       desc: '',
       args: [],
     );
   }
 
-  /// `Image was failed to save!`
+  /// `Failed to save image. Check your permission settings.`
   String get image_save_failed {
     return Intl.message(
-      'Image was failed to save!',
+      'Failed to save image. Check your permission settings.',
       name: 'image_save_failed',
       desc: '',
       args: [],
