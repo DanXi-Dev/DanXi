@@ -524,8 +524,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                   loadingWidget: () => Container(
                                         foregroundDecoration: BoxDecoration(
                                             color: Colors.black12),
-                                        width: double.infinity,
-                                        height: 60,
+                                        width: 120,
+                                        height: 120,
                                         child: Center(
                                           child:
                                               PlatformCircularProgressIndicator(),
