@@ -1015,6 +1015,26 @@ class S {
     );
   }
 
+  /// `Image saved to Gallery`
+  String get image_save_success {
+    return Intl.message(
+      'Image saved to Gallery',
+      name: 'image_save_success',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Image was failed to save!`
+  String get image_save_failed {
+    return Intl.message(
+      'Image was failed to save!',
+      name: 'image_save_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Timetable for the new semester is available. However, we are unable to retrieve it from Fudan Servers.\n\nPlease make sure you are connected to the campus intranet, and try manually refreshing the timetable.\n\nTip: You can pull down at the Agenda page to refresh the timetable manually.`
   String get timetable_refresh_error {
     return Intl.message(
