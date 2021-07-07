@@ -18,11 +18,13 @@ class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
     @Published var token = ""
     
     func activate() {
-        token = getFduholeToken()
         session.delegate = self
         session.activate()
     }
     
+    func initialize() {
+        token = getFduholeToken()
+    }
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
     }

@@ -57,6 +57,9 @@ struct TreeHolePage: View {
             }
             else {
                 List {
+                    Button("refresh") {
+                        refreshDiscussions()
+                    }
                     ForEach(discussions) { discussion in
                         VStack {
                             ZStack {
