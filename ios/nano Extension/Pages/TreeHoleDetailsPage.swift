@@ -51,6 +51,9 @@ struct TreeHoleDetailsPage: View {
                         loadMoreReplies()
                     }
             }
+            else {
+                Text("end_reached")
+            }
         }
         .navigationTitle("#\(replyList.first!.discussion)")
     }

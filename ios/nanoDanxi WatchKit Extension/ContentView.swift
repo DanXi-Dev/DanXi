@@ -23,7 +23,6 @@ struct ContentView: View {
                 else {
                     Text("iphoneunreachable")
                 }
-                
                 /*TextField("test", text: $capturedText)
                 { isEditing in
                     

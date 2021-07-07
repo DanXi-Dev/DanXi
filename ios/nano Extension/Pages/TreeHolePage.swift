@@ -18,7 +18,6 @@ struct TreeHolePage: View {
     @State private var isLoading = true
     
     func refreshDiscussions() {
-        
         currentPage = 1
         isLoading = true
         loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
@@ -71,6 +70,9 @@ struct TreeHolePage: View {
                     if(!endReached) {
                         ProgressView()
                             .onAppear(perform: loadNextPage)
+                    }
+                    else {
+                        Text("end_reached")
                     }
                 }
                 .navigationTitle("treehole")
