@@ -1015,6 +1015,26 @@ class S {
     );
   }
 
+  /// `Image saved to Gallery`
+  String get image_save_success {
+    return Intl.message(
+      'Image saved to Gallery',
+      name: 'image_save_success',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Image was failed to save!`
+  String get image_save_failed {
+    return Intl.message(
+      'Image was failed to save!',
+      name: 'image_save_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(

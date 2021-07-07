@@ -98,6 +98,8 @@
     "link": "Link",
     "add": "Add",
     "image": "Image",
+    "image_save_success": "Image saved to Gallery",
+    "image_save_failed": "Image was failed to save!",
 
     "handan_campus": "Handan",
     "fenglin_campus": "Fenglin",

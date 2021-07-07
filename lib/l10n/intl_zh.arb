@@ -98,6 +98,8 @@
     "add": "添加",
     "pe_exercises": "体育锻炼",
     "image": "图片",
+    "image_save_success": "图片已保存到相册",
+    "image_save_failed": "图片保存失败，请检查您的权限设置",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",

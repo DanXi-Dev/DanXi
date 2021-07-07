@@ -27,7 +27,8 @@ class FutureWidget<T> extends StatefulWidget {
       @required this.future,
       @required this.successBuilder,
       @required this.errorBuilder,
-      @required this.loadingBuilder})
+      @required this.loadingBuilder,
+      this.nullable = false})
       : assert(successBuilder != null),
         super(key: key);
   final dynamic errorBuilder;
@@ -35,6 +36,13 @@ class FutureWidget<T> extends StatefulWidget {
   final Future<T> future;
   final AsyncWidgetBuilder<T> successBuilder;
   final T initialData;
+
+  /// Decide how the widget respond to the situation that snapshot.data is null
+  /// but snapshot.error is null, too.
+  ///
+  /// If [nullable] is true, [successBuilder] will be called;
+  /// If [nullable] is false, [errorBuilder] will be called;
+  final bool nullable;
 
   @override
   State<FutureWidget<T>> createState() => _FutureWidgetState<T>();
@@ -78,7 +86,7 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
         return SmartWidget.toWidget<T>(widget.loadingBuilder, context,
             snapshot: _snapshot);
       case ConnectionState.done:
-        if (_snapshot.hasError || !_snapshot.hasData) {
+        if (_snapshot.hasError || (!_snapshot.hasData && !widget.nullable)) {
           return SmartWidget.toWidget<T>(widget.errorBuilder, context,
               snapshot: _snapshot);
         } else {
