@@ -237,6 +237,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("打卡失败，无法获取上次打卡记录。\n出现此错误，很可能是由于您第一次使用旦夕，且昨天忘记打卡所致。\n您需要使用小程序手动完成第一次打卡，从下一次打卡开始，旦夕即可妥善处理此情况。"),
     "ticking" : MessageLookupByLibrary.simpleMessage("正在打卡..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("日程"),
+    "timetable_refresh_error" : MessageLookupByLibrary.simpleMessage("新学期的课表现已可用，但我们无法从复旦服务器下载新的课表。\n\n请确保您已连接到复旦校园内网，然后尝试手动刷新课表。\n\n提示：您可以在“日程”页面下拉刷新课表。"),
     "today_course" : MessageLookupByLibrary.simpleMessage("今日课程"),
     "unable_to_access_url" : MessageLookupByLibrary.simpleMessage("测试连接失败\n无法访问此网页，请检查URL"),
     "unmovable_widget" : MessageLookupByLibrary.simpleMessage("该项目不可移动"),

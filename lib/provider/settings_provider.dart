@@ -34,11 +34,24 @@ class SettingsProvider {
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
+  static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
+      "last_recorded_semester_start_time";
 
   SettingsProvider._(this._preferences);
 
   factory SettingsProvider.of(SharedPreferences preferences) {
     return SettingsProvider._(preferences);
+  }
+
+  String get lastSemesterStartTime {
+    if (_preferences.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
+      return _preferences.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME);
+    }
+    return null;
+  }
+
+  set lastSemesterStartTime(String value) {
+    _preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
   }
 
   /// User's preferences of Dashboard Widgets

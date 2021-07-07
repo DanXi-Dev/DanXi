@@ -1015,6 +1015,16 @@ class S {
     );
   }
 
+  /// `Timetable for the new semester is available. However, we are unable to retrieve it from Fudan Servers.\n\nPlease make sure you are connected to the campus intranet, and try manually refreshing the timetable.\n\nTip: You can pull down at the Agenda page to refresh the timetable manually.`
+  String get timetable_refresh_error {
+    return Intl.message(
+      'Timetable for the new semester is available. However, we are unable to retrieve it from Fudan Servers.\n\nPlease make sure you are connected to the campus intranet, and try manually refreshing the timetable.\n\nTip: You can pull down at the Agenda page to refresh the timetable manually.',
+      name: 'timetable_refresh_error',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Handan`
   String get handan_campus {
     return Intl.message(

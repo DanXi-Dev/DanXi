@@ -257,6 +257,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tick_issue_1" : MessageLookupByLibrary.simpleMessage("Failed to check in. Unable to obtain the previous record.\nIf you forgot to check in yesterday, you might need to check in manually."),
     "ticking" : MessageLookupByLibrary.simpleMessage("Checking in..."),
     "timetable" : MessageLookupByLibrary.simpleMessage("Agenda"),
+    "timetable_refresh_error" : MessageLookupByLibrary.simpleMessage("Timetable for the new semester is available. However, we are unable to retrieve it from Fudan Servers.\n\nPlease make sure you are connected to the campus intranet, and try manually refreshing the timetable.\n\nTip: You can pull down at the Agenda page to refresh the timetable manually."),
     "today_course" : MessageLookupByLibrary.simpleMessage("Courses Today"),
     "unable_to_access_url" : MessageLookupByLibrary.simpleMessage("Test connection failed\nCan\'t to connect to this website, please check your URL."),
     "unmovable_widget" : MessageLookupByLibrary.simpleMessage("This object cannot be moved"),
