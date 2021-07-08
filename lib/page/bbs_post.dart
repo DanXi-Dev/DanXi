@@ -273,11 +273,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   );
                 // If the page is showing search results, just show it whatever.
                 if (_searchResult != null)
-                  return _buildPage(_lastSnapshotData.data, true);
+                  return _buildPage(_lastSnapshotData.data);
 
                 // Otherwise, showing a list page with loading indicator at the bottom.
                 return NotificationListener<ScrollNotification>(
-                    child: _buildPage(snapshot.data, true),
+                    child: _buildPage(snapshot.data),
                     onNotification: onScrollToBottom);
               },
               successBuilder:
@@ -289,11 +289,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     _lastReplies.last.id != snapshot.data.last.id)
                   _lastReplies.addAll(snapshot.data);
                 _lastSnapshotData = snapshot;
-                if (_searchResult != null)
-                  return _buildPage(snapshot.data, false);
+                if (_searchResult != null) return _buildPage(snapshot.data);
                 // Only use scroll notification when data is paged
                 return NotificationListener<ScrollNotification>(
-                    child: _buildPage(snapshot.data, false),
+                    child: _buildPage(snapshot.data),
                     onNotification: onScrollToBottom);
               },
               errorBuilder: () => _buildErrorWidget(),
@@ -302,13 +301,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     );
   }
 
-  Widget _buildPage(List<Reply> data, bool isLoading) => WithScrollbar(
+  Widget _buildPage(List<Reply> data) => WithScrollbar(
         child: ListView.builder(
           primary: true,
           physics: const AlwaysScrollableScrollPhysics(),
-          cacheExtent: 2000,
-          itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE +
-              (isLoading ? 1 - POST_COUNT_PER_PAGE : 0),
+          addAutomaticKeepAlives: true,
+          itemCount: _lastReplies.length,
           itemBuilder: (context, index) => _buildListItem(index, data, true),
         ),
         controller: PrimaryScrollController.of(context),
