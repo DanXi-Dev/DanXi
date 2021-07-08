@@ -19,7 +19,7 @@ import 'dart:io';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/repository/exam_repository.dart';
+import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/future_widget.dart';

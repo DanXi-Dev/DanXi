@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

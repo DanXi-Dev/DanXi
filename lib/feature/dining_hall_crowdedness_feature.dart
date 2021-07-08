@@ -23,7 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
+import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:dan_xi/widget/small_tag.dart';
@@ -47,7 +47,7 @@ class DiningHallCrowdednessFeature extends Feature {
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
     Campus preferredCampus = SettingsProvider.of(_preferences).campus;
-    _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
+    _trafficInfos = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
       if (e is UnsuitableTimeException) {

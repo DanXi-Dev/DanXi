@@ -20,7 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/dining_hall_crowdedness_repository.dart';
+import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -62,7 +62,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   /// Load dining hall data
   Future<void> _onSelectedItemChanged(Campus e) async {
     setState(() => {_selectItem = e, _trafficInfos = null});
-    _trafficInfos = await DiningHallCrowdednessRepository.getInstance()
+    _trafficInfos = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(_personInfo, _selectItem.index)
         .catchError((e) {
       // If it's not time for a meal
@@ -132,7 +132,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     List<Widget> widgets = [];
     if (_trafficInfos == null) return widgets;
 
-    DiningHallCrowdednessRepository.getInstance()
+    DataCenterRepository.getInstance()
         .toZoneList(_selectItem.displayTitle(context), _trafficInfos)
         .forEach((key, value) {
       widgets.add(_buildZoneCard(key, value));

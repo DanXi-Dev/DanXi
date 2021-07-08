@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/repository/exam_repository.dart';
+import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';

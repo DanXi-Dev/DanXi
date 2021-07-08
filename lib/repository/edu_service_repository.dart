@@ -87,7 +87,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
         .getElementsByTagName("tr")
-        .map((e) => ExamScore.fromHtml(e))
+        .map((e) => ExamScore.fromEduServiceHtml(e))
         .toList();
   }
 
@@ -220,10 +220,23 @@ class ExamScore {
   final String credit;
   final String level;
   final String score;
+  static const MAP_LEVEL_SCORE = {
+    "A": "4.0",
+    "A-": "3.7",
+    "B+": "3.3",
+    "B": "3.0",
+    "B-": "2.7",
+    "C+": "2.3",
+    "C": "2.0",
+    "C-": "1.7",
+    "D+": "1.3",
+    "D": "1.0",
+    "F": "0",
+  };
 
   ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
 
-  factory ExamScore.fromHtml(DOM.Element html) {
+  factory ExamScore.fromEduServiceHtml(DOM.Element html) {
     List<DOM.Element> elements = html.getElementsByTagName("td");
     return ExamScore(
         elements[2].text.trim(),
@@ -232,6 +245,19 @@ class ExamScore {
         elements[5].text.trim(),
         elements[6].text.trim(),
         elements[7].text.trim());
+  }
+
+  /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
+  /// and [id] doesn't contain the last 2 digits.
+  factory ExamScore.fromDataCenterHtml(DOM.Element html) {
+    List<DOM.Element> elements = html.getElementsByTagName("td");
+    return ExamScore(
+        elements[0].text.trim(),
+        elements[3].text.trim(),
+        elements[1].text.trim() + ' ' + elements[2].text.trim(),
+        elements[4].text.trim(),
+        elements[5].text.trim(),
+        MAP_LEVEL_SCORE[elements[5].text.trim()]);
   }
 }
 

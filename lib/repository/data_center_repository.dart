@@ -17,24 +17,31 @@
 
 import 'dart:convert';
 
+import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dio/dio.dart';
+import 'package:html/dom.dart' as DOM;
 
-class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
+class DataCenterRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fmy.fudan.edu.cn%2Fsimple_list%2Fstqk";
-  static const String DETAIL_URL = "https://my.fudan.edu.cn/simple_list/stqk";
+  static const String DINING_DETAIL_URL =
+      "https://my.fudan.edu.cn/simple_list/stqk";
+  static const String SCORE_DETAIL_URL =
+      "https://my.fudan.edu.cn/list/bks_xx_cj";
 
-  DiningHallCrowdednessRepository._() {
+  DataCenterRepository._() {
     initRepository();
   }
 
-  static final _instance = DiningHallCrowdednessRepository._();
+  static final _instance = DataCenterRepository._();
 
-  factory DiningHallCrowdednessRepository.getInstance() => _instance;
+  factory DataCenterRepository.getInstance() => _instance;
 
   /// Divide canteens into different zones.
   /// e.g. 光华，南区，南苑，枫林，张江（枫林和张江无明显划分）
@@ -74,7 +81,7 @@ class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
 
   Future<Map<String, TrafficInfo>> _getCrowdednessInfo(int areaCode) async {
     var result = Map<String, TrafficInfo>();
-    var response = await dio.get(DETAIL_URL);
+    var response = await dio.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
     if (response.data.toString().contains("仅")) {
@@ -98,6 +105,29 @@ class DiningHallCrowdednessRepository extends BaseRepositoryWithDio {
     }
 
     return result;
+  }
+
+  /// Load exam scores of all semesters
+  ///
+  /// Compared to [EduServiceRepository]'s method of the same name,
+  /// this method doesn't require a Fudan LAN environment.
+  ///
+  /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
+  /// and [id] doesn't contain the last 2 digits.
+  Future<List<ExamScore>> loadAllExamScore(PersonInfo info) =>
+      Retrier.tryAsyncWithFix(
+          () => _loadAllExamScore(),
+          (exception) =>
+              UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
+
+  Future<List<ExamScore>> _loadAllExamScore() async {
+    Response r = await dio.get(SCORE_DETAIL_URL);
+    Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    DOM.Element tableBody = soup.find(id: "tbody");
+    return tableBody
+        .getElementsByTagName("tr")
+        .map((e) => ExamScore.fromDataCenterHtml(e))
+        .toList();
   }
 }
 
