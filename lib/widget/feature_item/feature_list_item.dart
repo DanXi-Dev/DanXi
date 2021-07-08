@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ffi';
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/public_extension_methods.dart';
