@@ -57,8 +57,13 @@ struct TreeHolePage: View {
             }
             else {
                 List {
-                    Button("refresh") {
-                        refreshDiscussions()
+                    Button(action: refreshDiscussions) {
+                        HStack {
+                            Text("refresh")
+                            if (isLoading) {
+                                ProgressView()
+                            }
+                        }
                     }
                     ForEach(discussions) { discussion in
                         VStack {
