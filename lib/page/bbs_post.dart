@@ -306,7 +306,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           primary: true,
           physics: const AlwaysScrollableScrollPhysics(),
           addAutomaticKeepAlives: true,
-          itemCount: _lastReplies.length,
+          itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
           itemBuilder: (context, index) => _buildListItem(index, data, true),
         ),
         controller: PrimaryScrollController.of(context),
