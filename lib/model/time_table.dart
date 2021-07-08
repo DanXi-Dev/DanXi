@@ -139,12 +139,11 @@ class TimeTable {
   }
 
   /// Convert the specific [week]'s timetable to [DayEvents], usually for a [ScheduleView].
-  ///
-  /// If [compact], it will not add the days to [result] on which no course takes place.
-  List<DayEvents> toDayEvents(int week, {bool compact = true}) {
+  List<DayEvents> toDayEvents(int week,
+      {TableDisplayType compact = TableDisplayType.COMPAT}) {
     Map<int, List<Event>> table = Map();
     List<DayEvents> result = [];
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < DateTime.daysPerWeek; i++) {
       table[i] = [];
     }
     courses.forEach((course) {
@@ -153,8 +152,10 @@ class TimeTable {
             table[courseTime.weekDay].add(Event(course, courseTime)));
       }
     });
-    for (int i = 0; i < 7; i++) {
-      if (!compact || table[i].isNotEmpty)
+    for (int i = 0; i < DateTime.daysPerWeek; i++) {
+      if ((compact == TableDisplayType.FULL) ||
+          (compact == TableDisplayType.STANDARD && i <= DateTime.friday - 1) ||
+          table[i].isNotEmpty)
         result.add(DayEvents(
             day: DateFormat.E().format(kMonday.add(Duration(days: i))),
             events: table[i],
@@ -162,6 +163,18 @@ class TimeTable {
     }
     return result;
   }
+}
+
+/// Control the result of [TimeTable.toDayEvents()].
+enum TableDisplayType {
+  /// Add everyday in the result
+  FULL,
+
+  /// Even no class, Mon. - Fri. will be added
+  STANDARD,
+
+  /// The days on which no course takes place will not be added
+  COMPAT
 }
 
 @JsonSerializable()

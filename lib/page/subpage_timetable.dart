@@ -209,15 +209,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemHeight: 140);
     _table = table;
     if (_showingTime == null) _showingTime = _table.now();
-    List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week);
-
-    // If the number of the days which have at least one lesson is less than 2,
-    // It will show every day of the week,
-    // in order to prevent the grid of [ScheduleView] becomes too large.
-    if (scheduleData.length <= 2) {
-      scheduleData = _table.toDayEvents(_showingTime.week, compact: false);
-    }
-
+    List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
+        compact: TableDisplayType.STANDARD);
     return Column(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

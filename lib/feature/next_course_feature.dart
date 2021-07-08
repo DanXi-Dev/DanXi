@@ -55,8 +55,8 @@ class NextCourseFeature extends Feature {
     Event nextCourse;
     int courseLeft = 0;
     TimeNow now = table.now();
-    DayEvents dayEvents =
-        table.toDayEvents(now.week, compact: false)[now.weekday];
+    DayEvents dayEvents = table.toDayEvents(now.week,
+        compact: TableDisplayType.FULL)[now.weekday];
     dayEvents.events.sort((a, b) => a.time.slot.compareTo(b.time.slot));
     for (var element in dayEvents.events) {
       TableEventTime startTime =
