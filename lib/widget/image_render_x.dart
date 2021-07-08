@@ -115,7 +115,7 @@ ImageRender networkImageClipRender({
               realHeight = maxHeight;
             return Center(
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 4),
+                padding: EdgeInsets.symmetric(vertical: 12),
                 constraints:
                     BoxConstraints(maxWidth: realWidth, maxHeight: realHeight),
                 child: AspectRatio(
