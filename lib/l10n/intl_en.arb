@@ -43,6 +43,8 @@
     "other_types_exam": "Paper and Other",
     "your_gpa": "Your GPA",
     "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}, Tap to View Details",
+    "limited_mode_title": "Limited Mode",
+    "limited_mode_description": "Currently unable to connect to the Fudan LAN. Alternate data source is being used and exams cannot be viewed by semester.",
     "gpa": "GPA",
     "credits": "Credits",
     "rank": "Rank",

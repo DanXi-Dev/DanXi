@@ -19,6 +19,7 @@ import 'dart:io';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -119,7 +120,7 @@ class _ExamListState extends State<ExamList> {
               icon: Icon(PlatformX.isMaterial(context)
                   ? Icons.share
                   : SFSymbols.square_arrow_up),
-              onPressed: () => _exportICal(),
+              onPressed: _exportICal,
             ),
           ],
         ),
@@ -140,11 +141,7 @@ class _ExamListState extends State<ExamList> {
                       PlatformIconButton(
                         icon: Icon(Icons.chevron_left),
                         onPressed: _showingSemester > 0
-                            ? () {
-                                setState(() {
-                                  --_showingSemester;
-                                });
-                              }
+                            ? () => setState(() => --_showingSemester)
                             : null,
                       ),
                       Text(S.of(context).semester(
@@ -153,12 +150,8 @@ class _ExamListState extends State<ExamList> {
                       PlatformIconButton(
                         icon: Icon(Icons.chevron_right),
                         onPressed:
-                            _showingSemester < _unpackedSemester.length - 1
-                                ? () {
-                                    setState(() {
-                                      ++_showingSemester;
-                                    });
-                                  }
+                        _showingSemester < _unpackedSemester.length - 1
+                                ? () => setState(() => ++_showingSemester)
                                 : null,
                       )
                     ],
@@ -170,7 +163,7 @@ class _ExamListState extends State<ExamList> {
               );
             },
             loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
-            errorBuilder: _buildErrorPage));
+            errorBuilder: _loadGradeViewFromDataCenter));
   }
 
   Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
@@ -204,22 +197,36 @@ class _ExamListState extends State<ExamList> {
           future: EduServiceRepository.getInstance().loadExamScoreRemotely(
               _info,
               semesterId: _unpackedSemester[_showingSemester].semesterId),
-          successBuilder: (_, snapShot) {
-            return Column(
-              children: [
-                Expanded(
-                    child: MediaQuery.removePadding(
-                        context: context,
-                        removeTop: true,
-                        child: WithScrollbar(
-                            controller: PrimaryScrollController.of(context),
-                            child: ListView(
-                              primary: true,
-                              children: _getListWidgetsGrade(snapShot.data),
-                            ))))
-              ],
-            );
-          },
+          successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
+          loadingBuilder: Container(
+              child: Center(
+            child: PlatformCircularProgressIndicator(),
+          )),
+          errorBuilder: _loadGradeViewFromDataCenter));
+
+  Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>> snapshot,
+          {bool isFallback = false}) =>
+      Column(
+        children: [
+          Expanded(
+              child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: WithScrollbar(
+                      controller: PrimaryScrollController.of(context),
+                      child: ListView(
+                        primary: true,
+                        children: _getListWidgetsGrade(snapshot.data,
+                            isFallback: isFallback),
+                      ))))
+        ],
+      );
+
+  Widget _loadGradeViewFromDataCenter() => GestureDetector(
+      child: FutureWidget<List<ExamScore>>(
+          future: DataCenterRepository.getInstance().loadAllExamScore(_info),
+          successBuilder: (_, snapShot) =>
+              _buildGradeLayout(snapShot, isFallback: true),
           loadingBuilder: Container(
               child: Center(
             child: PlatformCircularProgressIndicator(),
@@ -255,13 +262,31 @@ class _ExamListState extends State<ExamList> {
         ));
   }
 
-  List<Widget> _getListWidgetsGrade(List<ExamScore> scores) {
-    List<Widget> widgets = [_buildGPACard()];
+  List<Widget> _getListWidgetsGrade(List<ExamScore> scores,
+      {bool isFallback = false}) {
+    List<Widget> widgets = [];
+    if (isFallback) {
+      widgets.add(_buildLimitedCard());
+    } else {
+      widgets.add(_buildGPACard());
+    }
     scores.forEach((value) {
       widgets.add(_buildCardGrade(value, context));
     });
     return widgets;
   }
+
+  Widget _buildLimitedCard() => Card(
+      color: Theme.of(context).errorColor,
+      child: ListTile(
+        visualDensity: VisualDensity.comfortable,
+        title: Text(
+          S.of(context).limited_mode_title,
+          style: TextStyle(color: Colors.white),
+        ),
+        subtitle: Text(S.of(context).limited_mode_description,
+            style: TextStyle(color: Colors.white)),
+      ));
 
   Widget _buildGPACard() => Card(
         color: Theme.of(context).accentColor,
