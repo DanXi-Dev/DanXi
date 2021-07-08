@@ -113,25 +113,28 @@ ImageRender networkImageClipRender({
             var realHeight = _height(attributes) ?? snapshot.data.height;
             if (maxHeight != null && realHeight > maxHeight)
               realHeight = maxHeight;
-            return Container(
-              constraints:
-                  BoxConstraints(maxWidth: realWidth, maxHeight: realHeight),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Image.network(
-                  src,
-                  fit: BoxFit.fitWidth,
-                  headers: headers,
-                  width: realWidth,
-                  height: realHeight,
-                  frameBuilder: (ctx, child, frame, _) {
-                    if (frame == null) {
-                      return altWidget?.call(_alt(attributes)) ??
-                          Text(_alt(attributes) ?? "",
-                              style: context.style.generateTextStyle());
-                    }
-                    return child;
-                  },
+            return Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                constraints:
+                    BoxConstraints(maxWidth: realWidth, maxHeight: realHeight),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Image.network(
+                    src,
+                    fit: BoxFit.fitWidth,
+                    headers: headers,
+                    width: realWidth,
+                    height: realHeight,
+                    frameBuilder: (ctx, child, frame, _) {
+                      if (frame == null) {
+                        return altWidget?.call(_alt(attributes)) ??
+                            Text(_alt(attributes) ?? "",
+                                style: context.style.generateTextStyle());
+                      }
+                      return child;
+                    },
+                  ),
                 ),
               ),
             );

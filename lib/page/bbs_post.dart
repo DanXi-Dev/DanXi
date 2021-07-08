@@ -416,6 +416,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         BrowserUtil.openUrl(url);
       }
     };
+    double imageWidth = MediaQuery.of(context).size.width / 2;
     return GestureDetector(
       onLongPress: () {
         showPlatformModalSheet(
@@ -521,17 +522,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             },
                             customImageRenders: {
                               networkSourceMatcher(): networkImageClipRender(
-                                  loadingWidget: () => Container(
-                                        foregroundDecoration: BoxDecoration(
-                                            color: Colors.black12),
-                                        width: 120,
-                                        height: 120,
-                                        child: Center(
-                                          child:
-                                              PlatformCircularProgressIndicator(),
+                                  loadingWidget: () => Center(
+                                        child: Container(
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 4),
+                                          foregroundDecoration: BoxDecoration(
+                                              color: Colors.black12),
+                                          width: imageWidth,
+                                          height: imageWidth,
+                                          child: Center(
+                                            child:
+                                                PlatformCircularProgressIndicator(),
+                                          ),
                                         ),
                                       ),
-                                  maxHeight: 256),
+                                  maxHeight: imageWidth),
                             },
                             onLinkTap: onLinkTap,
                             onImageTap: onLinkTap,
