@@ -15,11 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// A Feature is a functional item shown on the dashboard, with which user interacts via tapping.
 abstract class Feature {
   /// Request FeatureContainer to update the content text/icon since they're changed
+  @nonVirtual
   notifyUpdate() => container.doUpdate();
 
   bool get clickable => false;

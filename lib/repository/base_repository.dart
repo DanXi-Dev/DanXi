@@ -28,6 +28,7 @@ class BaseRepositoryWithDio {
   NonpersistentCookieJar cookieJar = NonpersistentCookieJar();
 
   @protected
+  @nonVirtual
   void initRepository() {
     dio.interceptors.add(CookieManager(cookieJar));
     dio.interceptors.add(DioLogInterceptor());
