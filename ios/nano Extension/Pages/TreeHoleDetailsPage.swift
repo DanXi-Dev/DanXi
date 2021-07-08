@@ -46,7 +46,8 @@ struct TreeHoleDetailsPage: View {
                     .onAppear(perform: loadMoreReplies)
             }
             else if (error != nil) {
-                ErrorView(errorInfo: error!)
+                ErrorView(errorInfo: error ?? "Unknown Error")
+                    .environmentObject(fduholeLoginInfo)
                     .onTapGesture {
                         loadMoreReplies()
                     }

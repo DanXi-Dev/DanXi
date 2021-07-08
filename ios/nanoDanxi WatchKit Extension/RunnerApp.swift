@@ -14,9 +14,6 @@ struct RunnerApp: App {
     init() {
         // Read FDUHOLE Token
         WatchSessionDelegate.shared.initialize()
-        if (UserDefaults.standard.string(forKey: KEY_FDUHOLE_TOKEN) == nil) {
-            WatchSessionDelegate.shared.activate()
-        }
     }
     
     var body: some Scene {

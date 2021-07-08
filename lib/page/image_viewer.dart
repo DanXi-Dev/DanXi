@@ -157,11 +157,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   : SFSymbols.square_arrow_up),
               onPressed: shareImage,
             ),
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(Icons.save),
-              onPressed: saveImage,
-            )
+
+            // Not needed on iOS
+            if (PlatformX.isMaterial(context))
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.save),
+                onPressed: saveImage,
+              )
           ],
         ),
         body: Container(
