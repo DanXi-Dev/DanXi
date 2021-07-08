@@ -83,6 +83,7 @@ struct TreeHolePage: View {
         }
         else {
             ErrorView(errorInfo: error ?? "Unknown Error")
+                .environmentObject(fduholeLoginInfo)
                 .onTapGesture {
                     refreshDiscussions()
                 }
@@ -92,6 +93,7 @@ struct TreeHolePage: View {
 
 struct ErrorView: View {
     var errorInfo: String
+    @EnvironmentObject var fduholeLoginInfo: WatchSessionDelegate
     
     var body: some View {
         VStack {
@@ -101,6 +103,10 @@ struct ErrorView: View {
             Text(NSLocalizedString("error", comment: "") + "\n\(errorInfo)")
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+            Button("retry_login") {
+                fduholeLoginInfo.token = ""
+                UserDefaults.standard.removeObject(forKey: KEY_FDUHOLE_TOKEN)
+            }
         }
     }
 }

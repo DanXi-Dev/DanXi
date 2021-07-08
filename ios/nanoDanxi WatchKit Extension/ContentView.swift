@@ -33,6 +33,7 @@ struct ContentView: View {
                 .textContentType(.oneTimeCode)*/
             }
             .onAppear() {
+                WatchSessionDelegate.shared.activate()
                 connectionReachable = WatchSessionDelegate.shared.requestToken()
             }
             .onTapGesture() {
