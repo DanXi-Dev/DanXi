@@ -35,8 +35,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:provider/provider.dart';
-import 'package:rsa_encrypt/rsa_encrypt.dart';
-import 'package:pointycastle/api.dart' as crypto;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
@@ -611,9 +609,9 @@ class PostRepository extends BaseRepositoryWithDio {
       };
       return httpClient;
     };
-
-    crypto.PublicKey publicKey =
-        RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
+    //
+    // crypto.PublicKey publicKey =
+    //     RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
 
     Response response = await secureDio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
@@ -792,6 +790,7 @@ extension FavoredDiscussionEx on SetFavoredDiscussionMode {
 
 class NotLoginError implements Exception {
   String errorMessage;
+
   NotLoginError(this.errorMessage);
 }
 
