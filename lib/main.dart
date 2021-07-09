@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
@@ -117,7 +118,7 @@ void main() {
 
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
-  final Map<String, Function> routes = {
+  static final Map<String, Function> routes = {
     '/card/detail': (context, {arguments}) =>
         CardDetailPage(arguments: arguments),
     '/card/crowdData': (context, {arguments}) =>
@@ -180,7 +181,7 @@ class DanxiApp extends StatelessWidget {
           home: HomePage(),
           // Configure the page route behaviour of the whole app
           onGenerateRoute: (settings) {
-            final Function pageContentBuilder = this.routes[settings.name];
+            final Function pageContentBuilder = DanxiApp.routes[settings.name];
             if (pageContentBuilder != null) {
               return platformPageRoute(
                   context: context,
@@ -195,6 +196,8 @@ class DanxiApp extends StatelessWidget {
     ));
   }
 }
+
+GlobalKey<MasterDetailControllerState> masterDetailControllerKey;
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -247,7 +250,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       HomeSubpage(),
       BBSSubpage(),
       TimetableSubPage(),
-      SettingsSubpage()
+      SettingsSubpage(),
     ];
   }
 
@@ -382,6 +385,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       refreshSelf();
     });
 
+    //Global Key for MasterDetailController
+    masterDetailControllerKey = GlobalKey();
+
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
@@ -448,7 +454,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
   }
-
 
   /// Pop up a dialog where user can give his name & password.
   void _showLoginDialog({bool forceLogin = false}) => showPlatformDialog(
@@ -623,90 +628,94 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ChangeNotifierProvider.value(value: _personInfo),
           Provider.value(value: _preferences),
         ],
-        child: PlatformScaffold(
-          iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
-          iosContentPadding: _subpage[_pageIndex.value].needPadding,
-          appBar: PlatformAppBar(
-            cupertino: (_, __) => CupertinoNavigationBarData(
-              title: MediaQuery(
-                data: MediaQueryData(
-                    textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                child: TopController(
-                  child: _appTitleWidgetBuilder[_pageIndex.value](context),
+        child: MasterDetailController(
+          key: masterDetailControllerKey,
+          masterPage: PlatformScaffold(
+            iosContentBottomPadding:
+                _subpage[_pageIndex.value].needBottomPadding,
+            iosContentPadding: _subpage[_pageIndex.value].needPadding,
+            appBar: PlatformAppBar(
+              cupertino: (_, __) => CupertinoNavigationBarData(
+                title: MediaQuery(
+                  data: MediaQueryData(
+                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                  child: TopController(
+                    child: _appTitleWidgetBuilder[_pageIndex.value](context),
+                    controller: PrimaryScrollController.of(context),
+                  ),
+                ),
+              ),
+              material: (_, __) => MaterialAppBarData(
+                title: TopController(
+                  child: Text(
+                    S.of(context).app_name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   controller: PrimaryScrollController.of(context),
                 ),
               ),
+              leading: leadingButton,
+              trailingActions: trailingButtons,
             ),
-            material: (_, __) => MaterialAppBarData(
-              title: TopController(
-                child: Text(
-                  S.of(context).app_name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                controller: PrimaryScrollController.of(context),
-              ),
+            body: IndexedStack(
+              index: _pageIndex.value,
+              children: _subpage,
             ),
-            leading: leadingButton,
-            trailingActions: trailingButtons,
-          ),
-          body: IndexedStack(
-            index: _pageIndex.value,
-            children: _subpage,
-          ),
 
-          // 2021-5-19 @w568w:
-          // Override the builder to prevent the repeatedly built states.
-          // I don't know why it works...
-          cupertinoTabChildBuilder: (_, index) => _subpage[index],
-          bottomNavBar: PlatformNavBar(
-            items: [
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.purple,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.dashboard)
-                    : Icon(SFSymbols.square_stack_3d_up_fill),
-                label: S.of(context).dashboard,
+            // 2021-5-19 @w568w:
+            // Override the builder to prevent the repeatedly built states.
+            // I don't know why it works...
+            cupertinoTabChildBuilder: (_, index) => _subpage[index],
+            bottomNavBar: PlatformNavBar(
+              items: [
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.purple,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.dashboard)
+                      : Icon(SFSymbols.square_stack_3d_up_fill),
+                  label: S.of(context).dashboard,
+                ),
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.indigo,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.forum)
+                      : Icon(SFSymbols.text_bubble),
+                  label: S.of(context).forum,
+                ),
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.blue,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.calendar_today)
+                      : Icon(SFSymbols.calendar),
+                  label: S.of(context).timetable,
+                ),
+                BottomNavigationBarItem(
+                  //backgroundColor: Theme.of(context).primaryColor,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.settings)
+                      : Icon(SFSymbols.gear_alt),
+                  label: S.of(context).settings,
+                ),
+              ],
+              currentIndex: _pageIndex.value,
+              material: (_, __) => MaterialNavBarData(
+                type: BottomNavigationBarType.fixed,
+                selectedIconTheme:
+                    BottomNavigationBarTheme.of(context).selectedIconTheme,
+                unselectedIconTheme:
+                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
               ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.indigo,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.forum)
-                    : Icon(SFSymbols.text_bubble),
-                label: S.of(context).forum,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.blue,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.calendar_today)
-                    : Icon(SFSymbols.calendar),
-                label: S.of(context).timetable,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Theme.of(context).primaryColor,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.settings)
-                    : Icon(SFSymbols.gear_alt),
-                label: S.of(context).settings,
-              ),
-            ],
-            currentIndex: _pageIndex.value,
-            material: (_, __) => MaterialNavBarData(
-              type: BottomNavigationBarType.fixed,
-              selectedIconTheme:
-                  BottomNavigationBarTheme.of(context).selectedIconTheme,
-              unselectedIconTheme:
-                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
+              itemChanged: (index) {
+                if (index != _pageIndex.value) {
+                  // List<ScrollPosition> positions =
+                  //     PrimaryScrollController.of(context).positions.toList();
+                  // for (var p in positions.skip(1)) {
+                  //   PrimaryScrollController.of(context).detach(p);
+                  // }
+                  setState(() => _pageIndex.value = index);
+                }
+              },
             ),
-            itemChanged: (index) {
-              if (index != _pageIndex.value) {
-                // List<ScrollPosition> positions =
-                //     PrimaryScrollController.of(context).positions.toList();
-                // for (var p in positions.skip(1)) {
-                //   PrimaryScrollController.of(context).detach(p);
-                // }
-                setState(() => _pageIndex.value = index);
-              }
-            },
           ),
         ),
       );

@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
@@ -198,7 +199,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               Noticing.showNotice(context, S.of(context).invalid_format);
             }
           } else
-            Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+            NavigatorX.pushNamed(context, "/bbs/postDetail", arguments: {
               "post": PostRepository.getInstance().loadSearchResults(value)
             });
         },
@@ -235,7 +236,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-          Navigator.pushNamed(context, "/bbs/newPost",
+          NavigatorX.pushNamed(context, "/bbs/newPost",
                   arguments: {"tags": true})
               .then<int>((value) => value is PostEditorText
                   ? PostRepository.getInstance()
@@ -566,7 +567,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               ],
             ),
             onTap: () {
-              Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+              NavigatorX.pushNamed(context, "/bbs/postDetail", arguments: {
                 "post": postElement,
               });
             }),
