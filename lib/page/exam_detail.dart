@@ -18,6 +18,7 @@
 import 'dart:io';
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
@@ -150,7 +151,7 @@ class _ExamListState extends State<ExamList> {
                       PlatformIconButton(
                         icon: Icon(Icons.chevron_right),
                         onPressed:
-                        _showingSemester < _unpackedSemester.length - 1
+                            _showingSemester < _unpackedSemester.length - 1
                                 ? () => setState(() => ++_showingSemester)
                                 : null,
                       )
@@ -331,7 +332,7 @@ class _ExamListState extends State<ExamList> {
             },
             loadingBuilder: (_, __) => Text(S.of(context).loading),
           ),
-          onTap: () => Navigator.of(context).pushNamed("/exam/gpa", arguments: {
+          onTap: () => smartNavigatorPush(context, "/exam/gpa", arguments: {
             "gpalist": _gpa,
           }),
         ),

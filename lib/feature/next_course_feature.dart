@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -161,8 +162,8 @@ class NextCourseFeature extends Feature {
             ),
           ],
         ),
-        onTap: () => Navigator.of(context)
-            .pushNamed('/exam/detail', arguments: {'personInfo': _info}),
+        onTap: () => smartNavigatorPush(context, '/exam/detail',
+            arguments: {'personInfo': _info}),
       );
 
   @override

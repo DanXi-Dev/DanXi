@@ -19,6 +19,8 @@ import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -472,7 +474,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                 .open_source_software_licenses,
                                             recognizer: TapGestureRecognizer()
                                               ..onTap = () {
-                                                Navigator.of(context).pushNamed(
+                                                smartNavigatorPush(context,
                                                     "/about/openLicense",
                                                     arguments: {
                                                       "items": _LICENSE_ITEMS

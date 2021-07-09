@@ -119,6 +119,7 @@ void main() {
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
+    '/placeholder': (context, {arguments}) => Container(),
     '/card/detail': (context, {arguments}) =>
         CardDetailPage(arguments: arguments),
     '/card/crowdData': (context, {arguments}) =>
@@ -197,7 +198,8 @@ class DanxiApp extends StatelessWidget {
   }
 }
 
-GlobalKey<MasterDetailControllerState> masterDetailControllerKey;
+GlobalKey<MasterDetailControllerState> masterDetailControllerKey = GlobalKey();
+GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -385,9 +387,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       refreshSelf();
     });
 
-    //Global Key for MasterDetailController
-    masterDetailControllerKey = GlobalKey();
-
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
@@ -482,9 +481,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _onPressRightmostActionButton() async {
     switch (_pageIndex.value) {
       case 0:
-        Navigator.of(context).pushNamed('/dashboard/reorder', arguments: {
-          'preferences': _preferences
-        }).then((value) => RefreshHomepageEvent(onlyIfQueued: true).fire());
+        smartNavigatorPush(context, '/dashboard/reorder',
+                arguments: {'preferences': _preferences})
+            .then((value) => RefreshHomepageEvent(onlyIfQueued: true).fire());
         break;
       case 1:
         AddNewPostEvent().fire();
@@ -499,7 +498,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (_pageIndex.value) {
       //Entries omitted
       case 1:
-        Navigator.of(context).pushNamed('/bbs/discussions', arguments: {
+        smartNavigatorPush(context, '/bbs/discussions', arguments: {
           'showFavoredDiscussion': true,
           'preferences': _preferences,
         });
@@ -511,7 +510,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (_pageIndex.value) {
       //Entries omitted
       case 0:
-        Navigator.of(context).pushNamed('/announcement/list');
+        smartNavigatorPush(context, '/announcement/list');
         break;
       case 1:
         showPlatformModalSheet(

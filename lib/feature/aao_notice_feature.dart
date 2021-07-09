@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
@@ -88,7 +89,7 @@ class FudanAAONoticesFeature extends Feature {
   @override
   void onTap() {
     if (_initialData != null) {
-      Navigator.of(context).pushNamed("/notice/aao/list", arguments: {
+      smartNavigatorPush(context, "/notice/aao/list", arguments: {
         "initialData": _initialData,
         "personInfo": context.personInfo
       });

@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -32,7 +33,7 @@ class BBSEditor {
             ? S.of(context).reply_to(discussionId)
             : S.of(context).reply_to(postId));*/
 
-    content = (await Navigator.pushNamed(context, "/bbs/newPost", arguments: {
+    content = (await smartNavigatorPush(context, "/bbs/newPost", arguments: {
       "tags": false,
       'title': postId == null
           ? S.of(context).reply_to(discussionId)

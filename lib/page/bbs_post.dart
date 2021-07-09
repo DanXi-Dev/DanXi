@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/image_viewer.dart';
@@ -408,8 +409,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(Reply e, bool generateTags, bool isNested) {
     OnTap onLinkTap = (url, _, __, ___) {
       if (ImageViewerPage.isImage(url)) {
-        Navigator.of(context)
-            .pushNamed('/image/detail', arguments: {'url': url});
+        smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
       } else {
         BrowserUtil.openUrl(url);
       }
@@ -449,11 +449,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: generateTagWidgets(_post, (String tagname) {
-                        Navigator.of(context)
-                            .pushNamed('/bbs/discussions', arguments: {
-                          "tagFilter": tagname,
-                          'preferences': _preferences,
-                        });
+                        smartNavigatorPush(context, '/bbs/discussions',
+                            arguments: {
+                              "tagFilter": tagname,
+                              'preferences': _preferences,
+                            });
                       })),
                 Padding(
                   padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
@@ -583,7 +583,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               else {
                 ProgressFuture progressDialog = showProgressDialog(
                     loadingText: S.of(context).loading, context: context);
-                Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": await PostRepository.getInstance()
                       .loadSpecificPost(e.discussion)
                 });

@@ -21,6 +21,7 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
@@ -199,7 +200,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               Noticing.showNotice(context, S.of(context).invalid_format);
             }
           } else
-            NavigatorX.pushNamed(context, "/bbs/postDetail", arguments: {
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
               "post": PostRepository.getInstance().loadSearchResults(value)
             });
         },
@@ -223,7 +224,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       return null;
     });
     if (post != null)
-      Navigator.of(context).pushNamed("/bbs/postDetail", arguments: {
+      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
         "post": post,
       });
     progressDialog.dismiss();
@@ -236,8 +237,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-          NavigatorX.pushNamed(context, "/bbs/newPost",
-                  arguments: {"tags": true})
+          smartNavigatorPush(context, "/bbs/newPost", arguments: {"tags": true})
               .then<int>((value) => value is PostEditorText
                   ? PostRepository.getInstance()
                       .newPost(value?.content, tags: value?.tags)
@@ -469,8 +469,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 generateTagWidgets(postElement, (String tagname) {
-                  Navigator.of(context)
-                      .pushNamed('/bbs/discussions', arguments: {
+                  smartNavigatorPush(context, '/bbs/discussions', arguments: {
                     "tagFilter": tagname,
                     'preferences': _preferences,
                   });
@@ -567,7 +566,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               ],
             ),
             onTap: () {
-              NavigatorX.pushNamed(context, "/bbs/postDetail", arguments: {
+              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                 "post": postElement,
               });
             }),

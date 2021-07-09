@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
@@ -52,8 +53,8 @@ class ExamFeature extends Feature {
 
   @override
   void onTap() async {
-    Navigator.of(context)
-        .pushNamed('/exam/detail', arguments: {'personInfo': _info});
+    smartNavigatorPush(context, '/exam/detail',
+        arguments: {'personInfo': _info});
   }
 
   @override

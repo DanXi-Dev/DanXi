@@ -20,6 +20,7 @@ import 'dart:math';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -266,8 +267,8 @@ class DiningHallCrowdednessFeature extends Feature {
   @override
   void onTap() {
     if (_trafficInfos != null) {
-      Navigator.of(context)
-          .pushNamed("/card/crowdData", arguments: {"personInfo": _info});
+      smartNavigatorPush(context, "/card/crowdData",
+          arguments: {"personInfo": _info});
     } else {
       refreshData();
     }

@@ -17,7 +17,11 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/main.dart';
+import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/empty_classroom_detail.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
@@ -68,8 +72,8 @@ class EmptyClassroomFeature extends Feature {
 
   @override
   void onTap() async {
-    Navigator.of(context)
-        .pushNamed('/room/detail', arguments: {'personInfo': _info});
+    smartNavigatorPush(context, '/room/detail',
+        arguments: {'personInfo': _info});
   }
 
   @override

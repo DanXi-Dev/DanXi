@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/main.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -44,18 +45,11 @@ class MasterDetailController extends StatefulWidget {
 
 class MasterDetailControllerState extends State<MasterDetailController> {
   Widget masterPage;
-  Widget detailPage;
 
   @override
   void initState() {
     super.initState();
     masterPage = widget.masterPage;
-  }
-
-  void setDetailPage(Widget page) {
-    setState(() {
-      detailPage = page;
-    });
   }
 
   @override
@@ -73,15 +67,35 @@ class MasterDetailControllerState extends State<MasterDetailController> {
                 height: MediaQuery.of(context).size.height,
                 child: masterPage),
             SizedBox(
-              width: MediaQuery.of(context).size.width -
-                  kTabletMasterContainerWidth,
-              height: MediaQuery.of(context).size.height,
-              child: detailPage ??
-                  Center(
-                    child: Container(),
-                  ),
-            )
+                width: MediaQuery.of(context).size.width -
+                    kTabletMasterContainerWidth,
+                height: MediaQuery.of(context).size.height,
+                child: Navigator(
+                  key: detailNavigatorKey,
+                  onGenerateRoute: (settings) {
+                    final Function pageContentBuilder =
+                        DanxiApp.routes[settings.name];
+                    if (pageContentBuilder != null) {
+                      return platformPageRoute(
+                          context: context,
+                          builder: (context) => pageContentBuilder(context,
+                              arguments: settings.arguments));
+                    }
+                    return null;
+                  },
+                  initialRoute: '/placeholder',
+                ))
           ],
         ));
   }
+}
+
+Future<T> smartNavigatorPush<T extends Object>(
+    BuildContext context, String routeName,
+    {Object arguments}) {
+  if (isTablet(context)) {
+    return detailNavigatorKey.currentState
+        .pushNamed(routeName, arguments: arguments);
+  }
+  return Navigator.of(context).pushNamed(routeName, arguments: arguments);
 }

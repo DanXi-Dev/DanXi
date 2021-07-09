@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/card_repository.dart';
@@ -161,7 +162,7 @@ class EcardBalanceFeature extends Feature {
   @override
   void onTap() {
     if (_cardInfo != null) {
-      Navigator.of(context).pushNamed("/card/detail",
+      smartNavigatorPush(context, "/card/detail",
           arguments: {"cardInfo": _cardInfo, "personInfo": _info});
     } else {
       refreshData();
