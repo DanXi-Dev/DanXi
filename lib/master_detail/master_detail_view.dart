@@ -15,42 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/main.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
-import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/repository/fudan_aao_repository.dart';
-import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/material_x.dart';
-import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/top_controller.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
-class MasterDetailController extends StatefulWidget {
+class MasterDetailController extends StatelessWidget {
   final Widget masterPage;
-
-  @override
-  MasterDetailControllerState createState() => MasterDetailControllerState();
-
   MasterDetailController({Key key, this.masterPage}) : super(key: key);
-}
-
-class MasterDetailControllerState extends State<MasterDetailController> {
-  Widget masterPage;
-
-  @override
-  void initState() {
-    super.initState();
-    masterPage = widget.masterPage;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,35 +32,40 @@ class MasterDetailControllerState extends State<MasterDetailController> {
       return masterPage;
     }
     return Container(
-        color: Theme.of(context).backgroundColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-                width: kTabletMasterContainerWidth,
-                height: MediaQuery.of(context).size.height,
-                child: masterPage),
-            SizedBox(
-                width: MediaQuery.of(context).size.width -
-                    kTabletMasterContainerWidth,
-                height: MediaQuery.of(context).size.height,
-                child: Navigator(
-                  key: detailNavigatorKey,
-                  onGenerateRoute: (settings) {
-                    final Function pageContentBuilder =
-                        DanxiApp.routes[settings.name];
-                    if (pageContentBuilder != null) {
-                      return platformPageRoute(
-                          context: context,
-                          builder: (context) => pageContentBuilder(context,
-                              arguments: settings.arguments));
-                    }
-                    return null;
-                  },
-                  initialRoute: '/placeholder',
-                ))
-          ],
-        ));
+      color: Theme.of(context).backgroundColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Container(
+              width: kTabletMasterContainerWidth,
+              height: MediaQuery.of(context).size.height,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(),
+              child: masterPage),
+          Container(
+              width: MediaQuery.of(context).size.width -
+                  kTabletMasterContainerWidth,
+              height: MediaQuery.of(context).size.height,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(),
+              child: Navigator(
+                key: detailNavigatorKey,
+                onGenerateRoute: (settings) {
+                  final Function pageContentBuilder =
+                      DanxiApp.routes[settings.name];
+                  if (pageContentBuilder != null) {
+                    return platformPageRoute(
+                        context: context,
+                        builder: (context) => pageContentBuilder(context,
+                            arguments: settings.arguments));
+                  }
+                  return null;
+                },
+                initialRoute: '/placeholder',
+              ))
+        ],
+      ),
+    );
   }
 }
 

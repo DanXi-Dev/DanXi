@@ -198,7 +198,6 @@ class DanxiApp extends StatelessWidget {
   }
 }
 
-GlobalKey<MasterDetailControllerState> masterDetailControllerKey = GlobalKey();
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 
 class HomePage extends StatefulWidget {
@@ -628,7 +627,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           Provider.value(value: _preferences),
         ],
         child: MasterDetailController(
-          key: masterDetailControllerKey,
           masterPage: PlatformScaffold(
             iosContentBottomPadding:
                 _subpage[_pageIndex.value].needBottomPadding,
