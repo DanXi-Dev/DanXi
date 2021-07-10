@@ -209,6 +209,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
     List<DashboardCard> widgetList =
         SettingsProvider.of(_preferences).dashboardWidgetsSequence;
     return RefreshIndicator(
+        color: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           _rebuild();

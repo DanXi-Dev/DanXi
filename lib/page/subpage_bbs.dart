@@ -501,7 +501,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                               text: renderText(postElement.first_post.content,
                                   S.of(context).image_tag),
                               style: TextStyle(fontSize: 16),
-                              maxLines: 4,
+                              maxLines: 6,
                               overflow: TextOverflow.ellipsis,
                               onOpen: (link) async {
                                 if (await canLaunch(link.url)) {
@@ -519,7 +519,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         text: renderText(postElement.first_post.content,
                             S.of(context).image_tag),
                         style: TextStyle(fontSize: 16),
-                        maxLines: 4,
+                        maxLines: 6,
                         overflow: TextOverflow.ellipsis,
                         onOpen: (link) async {
                           if (await canLaunch(link.url)) {

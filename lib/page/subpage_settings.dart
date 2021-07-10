@@ -247,6 +247,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     final inAppReview = InAppReview.instance;
 
     return RefreshIndicator(
+        color: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           refreshSelf();
@@ -462,9 +464,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                 recognizer:
                                                     TapGestureRecognizer()
                                                       ..onTap = () async {
-                                                        await BrowserUtil.openUrl(S
-                                                            .of(context)
-                                                            .privacy_policy_url, context);
+                                                        await BrowserUtil.openUrl(
+                                                            S
+                                                                .of(context)
+                                                                .privacy_policy_url,
+                                                            context);
                                                       }),
                                             TextSpan(
                                               style: defaultText,
@@ -522,9 +526,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                 recognizer:
                                                     TapGestureRecognizer()
                                                       ..onTap = () async {
-                                                        await BrowserUtil.openUrl(S
-                                                            .of(context)
-                                                            .acknowledgement_link_1, context);
+                                                        await BrowserUtil.openUrl(
+                                                            S
+                                                                .of(context)
+                                                                .acknowledgement_link_1,
+                                                            context);
                                                       }),
                                             TextSpan(
                                               style: defaultText,
@@ -573,9 +579,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                                     .of(context)
                                                                     .dev_image_url_1)))),
                                                     onTap: () =>
-                                                        BrowserUtil.openUrl(S
-                                                            .of(context)
-                                                            .dev_page_1, context),
+                                                        BrowserUtil.openUrl(
+                                                            S
+                                                                .of(context)
+                                                                .dev_page_1,
+                                                            context),
                                                   ),
                                                   const SizedBox(
                                                       height:
@@ -608,9 +616,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                                     .of(context)
                                                                     .dev_image_url_2)))),
                                                     onTap: () =>
-                                                        BrowserUtil.openUrl(S
-                                                            .of(context)
-                                                            .dev_page_2, context),
+                                                        BrowserUtil.openUrl(
+                                                            S
+                                                                .of(context)
+                                                                .dev_page_2,
+                                                            context),
                                                   ),
                                                   const SizedBox(
                                                       height:
@@ -643,9 +653,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                                     .of(context)
                                                                     .dev_image_url_3)))),
                                                     onTap: () {
-                                                      BrowserUtil.openUrl(S
-                                                          .of(context)
-                                                          .dev_page_3, context);
+                                                      BrowserUtil.openUrl(
+                                                          S
+                                                              .of(context)
+                                                              .dev_page_3,
+                                                          context);
                                                     },
                                                   ),
                                                   const SizedBox(
@@ -679,9 +691,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                                     .of(context)
                                                                     .dev_image_url_4)))),
                                                     onTap: () {
-                                                      BrowserUtil.openUrl(S
-                                                          .of(context)
-                                                          .dev_page_4, context);
+                                                      BrowserUtil.openUrl(
+                                                          S
+                                                              .of(context)
+                                                              .dev_page_4,
+                                                          context);
                                                     },
                                                   ),
                                                   const SizedBox(
@@ -788,7 +802,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                         child: Text(S.of(context).project_page),
                                         onPressed: () {
                                           BrowserUtil.openUrl(
-                                              S.of(context).project_url, context);
+                                              S.of(context).project_url,
+                                              context);
                                         },
                                       ),
                                       const SizedBox(width: 8),

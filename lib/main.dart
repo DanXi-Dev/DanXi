@@ -497,12 +497,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (_pageIndex.value) {
       //Entries omitted
       case 1:
-        smartNavigatorPush(context, '/bbs/discussions',
-            arguments: {
-              'showFavoredDiscussion': true,
-              'preferences': _preferences,
-            },
-            forcePushOnMainNavigator: true);
+        smartNavigatorPush(context, '/bbs/discussions', arguments: {
+          'showFavoredDiscussion': true,
+          'preferences': _preferences,
+        });
         break;
     }
   }

@@ -229,6 +229,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       ),
       Expanded(
           child: RefreshIndicator(
+        color: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           refreshSelf();

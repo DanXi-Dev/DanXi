@@ -40,7 +40,10 @@ class MasterDetailController extends StatelessWidget {
               width: kTabletMasterContainerWidth,
               height: MediaQuery.of(context).size.height,
               clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(),
+              decoration: BoxDecoration(
+                  border: Border(
+                      right: BorderSide(
+                          width: 1, color: Theme.of(context).dividerColor))),
               child: masterPage),
           Container(
               width: MediaQuery.of(context).size.width -
