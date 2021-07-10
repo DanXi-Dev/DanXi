@@ -23,6 +23,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/tag_selector/selector.dart';
@@ -76,7 +77,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   DateTime selectDate;
 
   Widget _buildCupertinoDatePicker() => Container(
-      height: MediaQuery.of(context).size.height / 3,
+      height: ViewportUtils.getMainNavigatorHeight(context) / 3,
       child: CupertinoDatePicker(
         backgroundColor: Theme.of(context).bottomAppBarColor,
         mode: CupertinoDatePickerMode.date,
@@ -225,28 +226,39 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 children: <Widget>[
                   Container(
                     alignment: Alignment.centerLeft,
-                    width: (MediaQuery.of(context).size.width / 32 + 4) * 5 + 7,
-                    child: Text(
-                      "| " + S.of(context).morning,
-                      overflow: TextOverflow.fade,
-                    ),
-                  ),
+                        width:
+                            (ViewportUtils.getMainNavigatorWidth(context) / 32 +
+                                        4) *
+                                    5 +
+                                7,
+                        child: Text(
+                          "| " + S.of(context).morning,
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
                   Container(
                     alignment: Alignment.centerLeft,
-                    width: (MediaQuery.of(context).size.width / 32 + 4) * 5 + 7,
-                    child: Text(
-                      "| " + S.of(context).afternoon,
-                      overflow: TextOverflow.fade,
-                    ),
-                  ),
+                        width:
+                            (ViewportUtils.getMainNavigatorWidth(context) / 32 +
+                                        4) *
+                                    5 +
+                                7,
+                        child: Text(
+                          "| " + S.of(context).afternoon,
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
                   Container(
                     alignment: Alignment.centerLeft,
-                    width: (MediaQuery.of(context).size.width / 32 + 4) * 4,
-                    child: Text(
-                      "| " + S.of(context).evening,
-                      overflow: TextOverflow.fade,
-                    ),
-                  ),
+                        width:
+                            (ViewportUtils.getMainNavigatorWidth(context) / 32 +
+                                    4) *
+                                4,
+                        child: Text(
+                          "| " + S.of(context).evening,
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
                 ],
               ),
             ]),
@@ -355,7 +367,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 : null,
             color: element ? Colors.red : Colors.green,
             borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        width: MediaQuery.of(context).size.width / 32,
+        width: ViewportUtils.getMainNavigatorWidth(context) / 32,
         margin: EdgeInsets.symmetric(horizontal: 2),
         height: 22,
       ));

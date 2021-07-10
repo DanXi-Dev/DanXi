@@ -28,6 +28,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -204,7 +205,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     TimetableStyle style = TimetableStyle(
         startHour: TimeTable.kCourseSlotStartTime[0].hour,
         laneHeight: 16,
-        laneWidth: (MediaQuery.of(context).size.width - 50) / 5,
+        laneWidth: (ViewportUtils.getMainNavigatorWidth(context) - 50) / 5,
         timeItemWidth: 16,
         timeItemHeight: 140);
     _table = table;

@@ -30,6 +30,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -233,8 +234,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
     _preferences = Provider.of<SharedPreferences>(context);
     final Color _originalDividerColor = Theme.of(context).dividerColor;
     const double _avatarSpacing = 24;
-    double _avatarSize =
-        (MediaQuery.of(context).size.width - _avatarSpacing * 4 - 64) / 4;
+    double _avatarSize = (ViewportUtils.getMainNavigatorWidth(context) -
+            _avatarSpacing * 4 -
+            80) /
+        4;
     const double _avatarNameSpacing = 4;
     TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)

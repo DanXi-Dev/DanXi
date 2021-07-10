@@ -18,7 +18,7 @@
 import 'package:dan_xi/util/smart_widget.dart';
 import 'package:flutter/widgets.dart';
 
-/// [FutureWidget] is a variation of [FutureWidget],
+/// [FutureWidget] is a variation of [FutureBuilder],
 /// which will build different widgets depending on different states: See [ConnectionState.values].
 class FutureWidget<T> extends StatefulWidget {
   const FutureWidget(
