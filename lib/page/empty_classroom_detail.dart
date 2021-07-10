@@ -215,17 +215,18 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         Container(
           padding: EdgeInsets.fromLTRB(25, 10, 25, 0),
           child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
-                Widget>[
-              Text(
-                S.of(context).classroom,
-                style: TextStyle(fontSize: 18),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerLeft,
+                  Text(
+                    S.of(context).classroom,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.centerLeft,
                         width:
                             (ViewportUtils.getMainNavigatorWidth(context) / 32 +
                                         4) *
@@ -236,8 +237,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           overflow: TextOverflow.fade,
                         ),
                       ),
-                  Container(
-                    alignment: Alignment.centerLeft,
+                      Container(
+                        alignment: Alignment.centerLeft,
                         width:
                             (ViewportUtils.getMainNavigatorWidth(context) / 32 +
                                         4) *
@@ -248,8 +249,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           overflow: TextOverflow.fade,
                         ),
                       ),
-                  Container(
-                    alignment: Alignment.centerLeft,
+                      Container(
+                        alignment: Alignment.centerLeft,
                         width:
                             (ViewportUtils.getMainNavigatorWidth(context) / 32 +
                                     4) *
@@ -259,9 +260,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           overflow: TextOverflow.fade,
                         ),
                       ),
-                ],
-              ),
-            ]),
+                    ],
+                  ),
+                ]),
             Divider(),
           ]
               //subtitle: Divider(height: 5,),

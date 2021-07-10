@@ -35,6 +35,9 @@ import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -408,7 +411,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   Widget _getListItems(Reply e, bool generateTags, bool isNested) {
-    OnTap onLinkTap = (url, _, __, ___) {
+    LinkTapCallback onLinkTap = (url) {
       if (ImageViewerPage.isImage(url)) {
         smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
       } else {
@@ -449,10 +452,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (generateTags)
                   Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(_post, (String tagname) {
+                      child: generateTagWidgets(_post, (String tagName) {
                         smartNavigatorPush(context, '/bbs/discussions',
                             arguments: {
-                              "tagFilter": tagname,
+                              "tagFilter": tagName,
                               'preferences': _preferences,
                             });
                       })),
@@ -502,44 +505,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             }
                           },
                         )
-                      : Container(
-                          //constraints: BoxConstraints(maxHeight: 400),
-                          child: Html(
-                            shrinkWrap: true,
-                            data: preprocessContentForDisplay(e.content),
-                            style: {
-                              "body": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                              "p": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                            },
-                            customImageRenders: {
-                              networkSourceMatcher(): networkImageClipRender(
-                                  loadingWidget: () => Center(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 12),
-                                          foregroundDecoration: BoxDecoration(
-                                              color: Colors.black12),
-                                          width: imageWidth,
-                                          height: imageWidth,
-                                          child: Center(
-                                            child:
-                                                PlatformCircularProgressIndicator(),
-                                          ),
-                                        ),
-                                      ),
-                                  maxHeight: imageWidth),
-                            },
-                            onLinkTap: onLinkTap,
-                            onImageTap: onLinkTap,
-                          ),
+                      : PostRenderWidget(
+                    render: kHtmlRender,
+                          content: preprocessContentForDisplay(e.content),
+                          onTapImage: onLinkTap,
+                          onTapLink: onLinkTap,
                         ),
                 ),
               ],
