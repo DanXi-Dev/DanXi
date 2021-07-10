@@ -411,7 +411,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       if (ImageViewerPage.isImage(url)) {
         smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
       } else {
-        BrowserUtil.openUrl(url);
+        BrowserUtil.openUrl(url, context);
       }
     };
     double imageWidth = MediaQuery.of(context).size.width * 0.75;
@@ -494,7 +494,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           overflow: TextOverflow.ellipsis,
                           onOpen: (link) async {
                             if (await canLaunch(link.url)) {
-                              BrowserUtil.openUrl(link.url);
+                              BrowserUtil.openUrl(link.url, context);
                             } else {
                               Noticing.showNotice(
                                   context, S.of(context).cannot_launch_url);

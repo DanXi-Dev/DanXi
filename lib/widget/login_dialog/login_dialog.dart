@@ -183,7 +183,8 @@ class _LoginDialogState extends State<LoginDialog> {
                 text: S.of(context).privacy_policy,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () async {
-                    await BrowserUtil.openUrl(S.of(context).privacy_policy_url);
+                    await BrowserUtil.openUrl(
+                        S.of(context).privacy_policy_url, context);
                   }),
             TextSpan(
               style: defaultText,

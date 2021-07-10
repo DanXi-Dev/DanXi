@@ -39,14 +39,14 @@ class MasterDetailController extends StatelessWidget {
           Container(
               width: kTabletMasterContainerWidth,
               height: MediaQuery.of(context).size.height,
-              clipBehavior: Clip.antiAlias,
+              clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(),
               child: masterPage),
           Container(
               width: MediaQuery.of(context).size.width -
                   kTabletMasterContainerWidth,
               height: MediaQuery.of(context).size.height,
-              clipBehavior: Clip.antiAlias,
+              clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(),
               child: Navigator(
                 key: detailNavigatorKey,
@@ -71,8 +71,8 @@ class MasterDetailController extends StatelessWidget {
 
 Future<T> smartNavigatorPush<T extends Object>(
     BuildContext context, String routeName,
-    {Object arguments}) {
-  if (isTablet(context)) {
+    {Object arguments, bool forcePushOnMainNavigator = false}) {
+  if (isTablet(context) && !forcePushOnMainNavigator) {
     return detailNavigatorKey.currentState
         .pushNamed(routeName, arguments: arguments);
   }

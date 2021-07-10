@@ -154,8 +154,6 @@ class _HomeSubpageState extends State<HomeSubpage> {
     _refreshSubscription.cancel();
   }
 
-
-
   void addNotification(Feature feature) {
     if (_notifications.any((element) =>
         element.runtimeType.toString() == feature.runtimeType.toString()))
@@ -219,9 +217,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
         child: MediaQuery.removePadding(
             context: context,
             removeTop: true,
-            child: ListView(
+            child: Material(
+                child: ListView(
               padding: EdgeInsets.all(4),
               children: _buildCards(widgetList),
-            )));
+            ))));
   }
 }

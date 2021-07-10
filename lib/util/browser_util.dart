@@ -17,28 +17,36 @@
 
 import 'dart:math';
 
+import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
-  static InAppBrowserClassOptions options = InAppBrowserClassOptions(
-      // crossPlatform: InAppBrowserOptions(
-      //     hideUrlBar:
-      //         PlatformX.isAndroid), // No context here so can't use isMaterial
-      ios: IOSInAppBrowserOptions(
-        presentationStyle: IOSUIModalPresentationStyle.POPOVER,
-      ),
-      inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-            javaScriptEnabled: true, useOnDownloadStart: true),
-      ));
+  // Popover crashes on iPad
+  static InAppBrowserClassOptions getOptions(BuildContext context) =>
+      isTablet(context)
+          ? InAppBrowserClassOptions(
+              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+              crossPlatform: InAppWebViewOptions(
+                  javaScriptEnabled: true, useOnDownloadStart: true),
+            ))
+          : InAppBrowserClassOptions(
+              ios: IOSInAppBrowserOptions(
+                presentationStyle: IOSUIModalPresentationStyle.POPOVER,
+              ),
+              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    javaScriptEnabled: true, useOnDownloadStart: true),
+              ));
 
-  static openUrl(String url, [NonpersistentCookieJar cookieJar]) {
+  static openUrl(String url, BuildContext context,
+      [NonpersistentCookieJar cookieJar]) {
     // Sanitize URL
     url = Uri.encodeFull(url);
 
@@ -71,7 +79,8 @@ class BrowserUtil {
       });
     });
     CustomInAppBrowser().openUrlRequest(
-        urlRequest: URLRequest(url: Uri.parse(url)), options: options);
+        urlRequest: URLRequest(url: Uri.parse(url)),
+        options: getOptions(context));
   }
 }
 

@@ -182,8 +182,11 @@ class _BBSSubpageState extends State<BBSSubpage>
     // If user is filtering by tag, do not build search text field.
     if (widget.arguments != null) return Container();
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+    return Container(
+      color: Theme.of(context).canvasColor,
+      padding: Theme.of(context)
+          .cardTheme
+          .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
         focusNode: _searchFocus,
         placeholder: S.of(context).search_hint,
@@ -326,6 +329,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         },
         child: RefreshIndicator(
             color: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
               refreshSelf();
@@ -459,7 +463,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _getListItem(BBSPost postElement) {
     if (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded)
       return Container();
-    return ThemedMaterial(
+    return Material(
       child: Card(
           child: Column(children: [
         ListTile(
@@ -501,7 +505,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                               overflow: TextOverflow.ellipsis,
                               onOpen: (link) async {
                                 if (await canLaunch(link.url)) {
-                                  BrowserUtil.openUrl(link.url);
+                                  BrowserUtil.openUrl(link.url, context);
                                 } else {
                                   Noticing.showNotice(
                                       context, S.of(context).cannot_launch_url);
@@ -519,7 +523,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         overflow: TextOverflow.ellipsis,
                         onOpen: (link) async {
                           if (await canLaunch(link.url)) {
-                            BrowserUtil.openUrl(link.url);
+                            BrowserUtil.openUrl(link.url, context);
                           } else {
                             Noticing.showNotice(
                                 context, S.of(context).cannot_launch_url);
@@ -618,7 +622,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                       overflow: TextOverflow.ellipsis,
                       onOpen: (link) async {
                         if (await canLaunch(link.url)) {
-                          BrowserUtil.openUrl(link.url);
+                          BrowserUtil.openUrl(link.url, context);
                         } else {
                           Noticing.showNotice(
                               context, S.of(context).cannot_launch_url);

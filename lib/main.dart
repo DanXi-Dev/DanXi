@@ -339,7 +339,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   onPressed: () {
                     _isDialogShown = false;
                     Navigator.of(context).pop();
-                    BrowserUtil.openUrl(Constant.UIS_URL);
+                    BrowserUtil.openUrl(Constant.UIS_URL, context);
                   },
                 ),
               ],
@@ -497,10 +497,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (_pageIndex.value) {
       //Entries omitted
       case 1:
-        smartNavigatorPush(context, '/bbs/discussions', arguments: {
-          'showFavoredDiscussion': true,
-          'preferences': _preferences,
-        });
+        smartNavigatorPush(context, '/bbs/discussions',
+            arguments: {
+              'showFavoredDiscussion': true,
+              'preferences': _preferences,
+            },
+            forcePushOnMainNavigator: true);
         break;
     }
   }

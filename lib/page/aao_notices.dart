@@ -126,6 +126,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
         subtitle: Text(value.time),
         onTap: () => BrowserUtil.openUrl(
             value.url,
+            context,
             PlatformX.isAndroid
                 ? FudanAAORepository.getInstance().cookieJar
                 : null), // TODO: fix this for iOS

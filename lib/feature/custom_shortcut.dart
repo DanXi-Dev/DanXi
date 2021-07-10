@@ -42,7 +42,7 @@ class CustomShortcutFeature extends Feature {
   @override
   void onTap() async {
     if (await canLaunch(link)) {
-      BrowserUtil.openUrl(link);
+      BrowserUtil.openUrl(link, context);
     } else {
       Noticing.showNotice(context, S.of(context).cannot_launch_url);
     }
