@@ -125,46 +125,47 @@ class _ExamListState extends State<ExamList> {
             ),
           ],
         ),
-        body: FutureWidget<List<SemesterInfo>>(
-            future: _semester,
-            successBuilder: (BuildContext context,
-                AsyncSnapshot<List<SemesterInfo>> snapshot) {
-              _unpackedSemester = snapshot.data;
-              if (_showingSemester == null)
-                _showingSemester = _unpackedSemester.length -
-                    5; //TODO: Appropriate default value?
+        body: Material(
+            child: FutureWidget<List<SemesterInfo>>(
+                future: _semester,
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<SemesterInfo>> snapshot) {
+                  _unpackedSemester = snapshot.data;
+                  if (_showingSemester == null)
+                    _showingSemester = _unpackedSemester.length - 5;
 
-              return Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return Column(
                     children: [
-                      PlatformIconButton(
-                        icon: Icon(Icons.chevron_left),
-                        onPressed: _showingSemester > 0
-                            ? () => setState(() => --_showingSemester)
-                            : null,
-                      ),
-                      Text(S.of(context).semester(
-                          _unpackedSemester[_showingSemester].schoolYear,
-                          _unpackedSemester[_showingSemester].name)),
-                      PlatformIconButton(
-                        icon: Icon(Icons.chevron_right),
-                        onPressed:
-                            _showingSemester < _unpackedSemester.length - 1
-                                ? () => setState(() => ++_showingSemester)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          PlatformIconButton(
+                            icon: Icon(Icons.chevron_left),
+                            onPressed: _showingSemester > 0
+                                ? () => setState(() => --_showingSemester)
                                 : null,
+                          ),
+                          Text(S.of(context).semester(
+                              _unpackedSemester[_showingSemester].schoolYear,
+                              _unpackedSemester[_showingSemester].name)),
+                          PlatformIconButton(
+                            icon: Icon(Icons.chevron_right),
+                            onPressed:
+                                _showingSemester < _unpackedSemester.length - 1
+                                    ? () => setState(() => ++_showingSemester)
+                                    : null,
+                          )
+                        ],
+                      ),
+                      Expanded(
+                        child: _loadExamGradeHybridView(),
                       )
                     ],
-                  ),
-                  Expanded(
-                    child: _loadExamGradeHybridView(),
-                  )
-                ],
-              );
-            },
-            loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
-            errorBuilder: _loadGradeViewFromDataCenter));
+                  );
+                },
+                loadingBuilder:
+                    Center(child: PlatformCircularProgressIndicator()),
+                errorBuilder: _loadGradeViewFromDataCenter)));
   }
 
   Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(

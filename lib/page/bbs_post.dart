@@ -440,7 +440,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ));
       },
       child: Card(
-          color: isNested ? Theme.of(context).dividerColor : null,
+          color: isNested
+              ? Theme.of(context).dividerColor.withOpacity(0.05)
+              : null,
           child: ListTile(
             dense: true,
             title: Column(
