@@ -26,7 +26,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -36,7 +35,7 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// An full-screen editor page.
 ///
@@ -58,7 +57,7 @@ class BBSEditorPage extends StatefulWidget {
 class BBSEditorPageState extends State<BBSEditorPage> {
   //var _controller =
   //    PlatformX.isMobile ? HtmlEditorController() : QuillController.basic();
-  var _controller = HtmlEditorController();
+  var _controller = TextEditingController();
 
   /// Whether the send button is enabled
   bool _canSend = true;
@@ -87,288 +86,147 @@ class BBSEditorPageState extends State<BBSEditorPage> {
             PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: PlatformX.isAndroid
+                    ? const Icon(Icons.photo)
+                    : const Icon(SFSymbols.photo),
+                onPressed: _uploadImage),
+            PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: PlatformX.isAndroid
                     ? const Icon(Icons.send)
                     : const Icon(SFSymbols.paperplane),
-                onPressed: _canSend ? _sendDocument : null)
+                onPressed: _canSend ? _sendDocument : null),
           ],
         ),
-        body: Padding(
-            padding: EdgeInsets.all(4),
-            child: Column(
-              children: [
-                if (_supportTags)
-                  ThemedMaterial(
-                    child: FlutterTagging<PostTag>(
-                        initialItems: _tags,
-                        textFieldConfiguration: TextFieldConfiguration(
-                          decoration: InputDecoration(
-                            hintText: '',
-                            labelText: S.of(context).select_tags,
-                          ),
-                        ),
-                        findSuggestions: (String filter) async {
-                          if (_allTags == null)
-                            _allTags =
-                                await PostRepository.getInstance().loadTags();
-                          return _allTags
-                              .where((value) => value.name
-                                  .toLowerCase()
-                                  .contains(filter.toLowerCase()))
-                              .toList();
-                        },
-                        additionCallback: (value) =>
-                            PostTag(value, Constant.randomColor, 0),
-                        onAdded: (tag) => tag,
-                        configureSuggestion: (tag) => SuggestionConfiguration(
-                              title: Text(
-                                tag.name,
-                                style: TextStyle(
-                                    color:
-                                        Constant.getColorFromString(tag.color)),
+        body: Material(
+            child: Padding(
+                padding: EdgeInsets.all(4),
+                child: Column(
+                  children: [
+                    if (_supportTags)
+                      ThemedMaterial(
+                        child: FlutterTagging<PostTag>(
+                            initialItems: _tags,
+                            textFieldConfiguration: TextFieldConfiguration(
+                              decoration: InputDecoration(
+                                hintText: '',
+                                labelText: S.of(context).select_tags,
                               ),
-                              subtitle: Row(
-                                children: [
-                                  Icon(
-                                    SFSymbols.flame,
-                                    color:
-                                        Constant.getColorFromString(tag.color),
-                                    size: 12,
-                                  ),
-                                  const SizedBox(
-                                    width: 2,
-                                  ),
-                                  Text(
-                                    tag.count.toString(),
+                            ),
+                            findSuggestions: (String filter) async {
+                              if (_allTags == null)
+                                _allTags = await PostRepository.getInstance()
+                                    .loadTags();
+                              return _allTags
+                                  .where((value) => value.name
+                                      .toLowerCase()
+                                      .contains(filter.toLowerCase()))
+                                  .toList();
+                            },
+                            additionCallback: (value) =>
+                                PostTag(value, Constant.randomColor, 0),
+                            onAdded: (tag) => tag,
+                            configureSuggestion: (tag) =>
+                                SuggestionConfiguration(
+                                  title: Text(
+                                    tag.name,
                                     style: TextStyle(
-                                        fontSize: 13,
                                         color: Constant.getColorFromString(
                                             tag.color)),
                                   ),
-                                ],
-                              ),
-                              additionWidget: Chip(
-                                avatar: Icon(
-                                  Icons.add_circle,
-                                  color: Colors.white,
+                                  subtitle: Row(
+                                    children: [
+                                      Icon(
+                                        SFSymbols.flame,
+                                        color: Constant.getColorFromString(
+                                            tag.color),
+                                        size: 12,
+                                      ),
+                                      const SizedBox(
+                                        width: 2,
+                                      ),
+                                      Text(
+                                        tag.count.toString(),
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: Constant.getColorFromString(
+                                                tag.color)),
+                                      ),
+                                    ],
+                                  ),
+                                  additionWidget: Chip(
+                                    avatar: Icon(
+                                      Icons.add_circle,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(S.of(context).add_new_tag),
+                                    labelStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    backgroundColor:
+                                        Theme.of(context).accentColor,
+                                  ),
                                 ),
-                                label: Text(S.of(context).add_new_tag),
-                                labelStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w300,
+                            configureChip: (lang) => ChipConfiguration(
+                                  label: Text(lang.name),
+                                  backgroundColor:
+                                      Constant.getColorFromString(lang.color),
+                                  labelStyle: TextStyle(
+                                      color: Constant.getColorFromString(
+                                                      lang.color)
+                                                  .computeLuminance() >=
+                                              0.5
+                                          ? Colors.black
+                                          : Colors.white),
+                                  deleteIconColor:
+                                      Constant.getColorFromString(lang.color)
+                                                  .computeLuminance() >=
+                                              0.5
+                                          ? Colors.black
+                                          : Colors.white,
                                 ),
-                                backgroundColor: Theme.of(context).accentColor,
-                              ),
-                            ),
-                        configureChip: (lang) => ChipConfiguration(
-                              label: Text(lang.name),
-                              backgroundColor:
-                                  Constant.getColorFromString(lang.color),
-                              labelStyle: TextStyle(
-                                  color: Constant.getColorFromString(lang.color)
-                                              .computeLuminance() >=
-                                          0.5
-                                      ? Colors.black
-                                      : Colors.white),
-                              deleteIconColor:
-                                  Constant.getColorFromString(lang.color)
-                                              .computeLuminance() >=
-                                          0.5
-                                      ? Colors.black
-                                      : Colors.white,
-                            ),
-                        onChanged: () {}),
-                  ),
-                Expanded(
-                    child: // PlatformX.isMobile ?
-                        BBSMobileEditorWidget(
-                  htmlEditorController: _controller,
-                )
-                    /*: BBSDesktopEditorWidget(
-                          quillController: _controller,
-                        ),*/
-                    )
-              ],
-            )));
+                            onChanged: () {}),
+                      ),
+                    Expanded(
+                      child: PlatformTextField(
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        controller: _controller,
+                      ),
+                    ),
+                  ],
+                ))));
   }
 
   Future<void> _sendDocument() async {
-    //if (_controller is HtmlEditorController) {
-    //Handle Mobile
-    String text = await BBSMobileEditorWidget.getText(_controller);
-    if (BBSMobileEditorWidget.isEmpty(text)) return;
+    String text = _controller.text;
+    if (text.isEmpty) return;
     Navigator.pop<PostEditorText>(context, PostEditorText(text, _tags));
-    /*} else {
-      //Handle Desktop
-      if (BBSDesktopEditorWidget.isEmpty(_controller)) {
-      } else {
-        Navigator.pop<PostEditorText>(context,
-            PostEditorText(BBSDesktopEditorWidget.getText(_controller), _tags));
-      }
-    }*/
+  }
+
+  Future<void> _uploadImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final PickedFile _file =
+        await _picker.getImage(source: ImageSource.gallery);
+    if (_file == null) return;
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).uploading_image, context: context);
+    try {
+      await PostRepository.getInstance().uploadImage(File(_file.path)).then(
+          (value) {
+        if (value != null) _controller.text += "![]($value)";
+        //"showAnim: true" makes it crash. Don't know the reason.
+        progressDialog.dismiss(showAnim: false);
+        return value;
+      }, onError: (e) {
+        progressDialog.dismiss(showAnim: false);
+        Noticing.showNotice(context, S.of(context).uploading_image_failed);
+        throw e;
+      });
+    } catch (ignored) {}
   }
 }
-
-// Use HTML_EDITOR_ENHANCED for mobile
-class BBSMobileEditorWidget extends StatelessWidget {
-  final HtmlEditorController htmlEditorController;
-
-  const BBSMobileEditorWidget({Key key, this.htmlEditorController})
-      : super(key: key);
-
-  ///Note: this returns a Future<String>
-  static Future<String> getText(HtmlEditorController controller) {
-    return controller.getText();
-  }
-
-  static bool isEmpty(String text) {
-    return text == null || text.trim().isEmpty;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-        child: HtmlEditor(
-      controller: htmlEditorController,
-      htmlToolbarOptions: HtmlToolbarOptions(
-          mediaUploadInterceptor:
-              (PlatformFile file, InsertFileType type) async {
-            switch (type) {
-              case InsertFileType.image:
-                ProgressFuture progressDialog = showProgressDialog(
-                    loadingText: S.of(context).uploading_image,
-                    context: context);
-                try {
-                  htmlEditorController.insertNetworkImage(
-                      await PostRepository.getInstance()
-                          .uploadImage(File(file.path))
-                          .then((value) {
-                    //"showAnim: true" makes it crash. Don't know the reason.
-                    progressDialog.dismiss(showAnim: false);
-                    return value;
-                  }, onError: (e) {
-                    progressDialog.dismiss(showAnim: false);
-                    Noticing.showNotice(
-                        context, S.of(context).uploading_image_failed);
-                    throw e;
-                  }));
-                } catch (ignored) {}
-                return false;
-
-              case InsertFileType.audio:
-                // Ignored
-                break;
-              case InsertFileType.video:
-                // Ignored
-                break;
-            }
-            return false;
-          },
-          defaultToolbarButtons: [
-            FontButtons(clearAll: false),
-            InsertButtons(audio: false, video: false, table: false, hr: false),
-            ColorButtons(),
-            ParagraphButtons(
-                alignJustify: false,
-                increaseIndent: false,
-                decreaseIndent: false,
-                textDirection: false,
-                lineHeight: false,
-                caseConverter: false),
-          ]),
-      htmlEditorOptions: HtmlEditorOptions(
-        hint: S.of(context).editor_hint,
-      ),
-      otherOptions: OtherOptions(
-        height: ViewportUtils.getMainNavigatorHeight(context),
-      ),
-    ));
-  }
-}
-
-/*
-// Use Quill for Desktop
-class BBSDesktopEditorWidget extends StatefulWidget {
-  final QuillController quillController;
-
-  const BBSDesktopEditorWidget({Key key, this.quillController})
-      : super(key: key);
-
-  @override
-  _BBSDesktopEditorWidgetState createState() => _BBSDesktopEditorWidgetState();
-
-  static getText(QuillController controller) {
-    String html = markdown.markdownToHtml(
-        deltaToMarkdown(jsonEncode(controller.document.toDelta().toJson())));
-    return html;
-  }
-
-  static isEmpty(QuillController controller) {
-    return controller == null || controller.document.isEmpty();
-  }
-}
-
-class _BBSDesktopEditorWidgetState extends State<BBSDesktopEditorWidget> {
-  final _focusNode = FocusNode();
-
-  @override
-  Widget build(BuildContext context) {
-    var quillEditor = QuillEditor(
-      keyboardAppearance:
-          PlatformX.isDarkMode ? Brightness.dark : Brightness.light,
-      focusNode: _focusNode,
-      autoFocus: true,
-      controller: widget.quillController,
-      scrollController: ScrollController(),
-      expands: false,
-      padding: EdgeInsets.zero,
-      readOnly: false,
-      scrollable: true,
-      placeholder: S.of(context).editor_hint,
-    );
-    return Column(
-      children: [
-        Theme(
-          data: ThemeData(
-            canvasColor: Colors.transparent,
-            iconTheme: IconThemeData(
-              color: Theme.of(context).textTheme.bodyText1.color,
-            ),
-          ),
-          child: QuillToolbar.basic(
-            controller: widget.quillController,
-            showBackgroundColorButton: false,
-            showColorButton: false,
-            showStrikeThrough: false,
-            showUnderLineButton: false,
-            showListCheck: false,
-            showHistory: false,
-            onImagePickCallback: (File file) async {
-              ProgressFuture progressDialog = showProgressDialog(
-                  loadingText: S.of(context).uploading_image, context: context);
-              return await PostRepository.getInstance().uploadImage(file).then(
-                  (value) {
-                //"showAnim: true" makes it crash. Don't know the reason.
-                progressDialog.dismiss(showAnim: false);
-                return value;
-              }, onError: (e) {
-                progressDialog.dismiss(showAnim: false);
-                Noticing.showNotice(
-                    context, S.of(context).uploading_image_failed);
-                return null;
-              });
-            },
-          ),
-        ),
-        Expanded(
-          child: Container(
-            child: quillEditor,
-          ),
-        )
-      ],
-    );
-  }
-}*/
 
 class PostEditorText {
   final String content;
