@@ -67,61 +67,7 @@ class PEFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
-      case ConnectionStatus.DONE:
-        if (_exercises.isEmpty)
-          return S.of(context).no_data;
-        else {
-          // 1 Morning, 2 Must-do, 3 Select-do
-          List<int> exerciseCategory = [0, 0, 0];
-          _exercises.forEach((element) {
-            switch (element.title) {
-              case '早操':
-                exerciseCategory[0] += element.times;
-                break;
-              case '课外活动':
-                exerciseCategory[2] += element.times;
-                break;
-              case '晚锻炼':
-                exerciseCategory[2] += element.times;
-                break;
-              case '仰卧起坐':
-                exerciseCategory[1] += element.times;
-                break;
-              case '引体向上':
-                exerciseCategory[1] += element.times;
-                break;
-              case '中长跑':
-                exerciseCategory[1] += element.times;
-                break;
-              case '立定跳远':
-                exerciseCategory[1] += element.times;
-                break;
-              case '周末上午':
-                exerciseCategory[2] += element.times;
-                break;
-              case '加章1':
-                exerciseCategory[0] += element.times;
-                break;
-              case '加章2':
-                exerciseCategory[1] += element.times;
-                break;
-              case '加章3':
-                exerciseCategory[2] += element.times;
-                break;
-            }
-          });
-          return "早锻: ${exerciseCategory[0]} 必锻: ${exerciseCategory[1]} 选锻: ${exerciseCategory[2]}";
-        }
-        break;
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
-    }
-    return '';
+    return '早锻: 12 必锻:10 选锻: 6';
   }
 
   @override

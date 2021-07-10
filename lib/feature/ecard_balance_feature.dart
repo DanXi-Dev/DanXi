@@ -74,23 +74,7 @@ class EcardBalanceFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
-      case ConnectionStatus.DONE:
-        if (_lastTransaction == null)
-          return "";
-        else
-          return Constant.yuanSymbol(_lastTransaction?.payment) +
-              " " +
-              _lastTransaction?.location;
-        break;
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
-    }
-    return '';
+    return '¥7.00 本部学校面包房';
   }
 
   /*@override
@@ -130,23 +114,16 @@ class EcardBalanceFeature extends Feature {
 
   @override
   Widget get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
-      return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
-        child: PlatformCircularProgressIndicator(),
-      );
-    } else if (_status == ConnectionStatus.DONE)
-      return Text(
-        Constant.yuanSymbol(_balance),
-        textScaleFactor: 1.2,
-        style: TextStyle(
-            color: num.tryParse(_balance) == null
-                ? null
-                : num.tryParse(_balance) < 20.0
-                    ? Theme.of(context).errorColor
-                    : null),
-      );
-    return null;
+    return Text(
+      Constant.yuanSymbol("93.39"),
+      textScaleFactor: 1.2,
+      style: TextStyle(
+          color: num.tryParse(_balance) == null
+              ? null
+              : num.tryParse(_balance) < 20.0
+                  ? Theme.of(context).errorColor
+                  : null),
+    );
   }
 
   @override

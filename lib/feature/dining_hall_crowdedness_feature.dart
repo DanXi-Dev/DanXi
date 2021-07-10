@@ -207,40 +207,37 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   Wrap get customSubtitle {
-    if (_status == ConnectionStatus.DONE) {
-      return Wrap(
-        children: [
-          SmallTag(
-            label: S.of(context).tag_most_crowded,
-          ),
-          const SizedBox(
-            width: 6,
-          ),
-          Text(
-            _mostCrowdedCanteen,
-            overflow: TextOverflow.ellipsis,
-            softWrap: true,
-            maxLines: 1,
-          ),
-          const SizedBox(
-            width: 6,
-          ),
-          SmallTag(
-            label: S.of(context).tag_least_crowded,
-          ),
-          const SizedBox(
-            width: 8,
-          ),
-          Text(
-            _leastCrowdedCanteen,
-            overflow: TextOverflow.ellipsis,
-            softWrap: true,
-            maxLines: 1,
-          ),
-        ],
-      );
-    }
-    return null;
+    return Wrap(
+      children: [
+        SmallTag(
+          label: S.of(context).tag_most_crowded,
+        ),
+        const SizedBox(
+          width: 6,
+        ),
+        Text(
+          "旦苑餐厅",
+          overflow: TextOverflow.ellipsis,
+          softWrap: true,
+          maxLines: 1,
+        ),
+        const SizedBox(
+          width: 6,
+        ),
+        SmallTag(
+          label: S.of(context).tag_least_crowded,
+        ),
+        const SizedBox(
+          width: 8,
+        ),
+        Text(
+          "南苑餐厅",
+          overflow: TextOverflow.ellipsis,
+          softWrap: true,
+          maxLines: 1,
+        ),
+      ],
+    );
   }
 
   @override

@@ -109,7 +109,7 @@ class TimeTable {
   }
 
   static TimeNow defaultNow() {
-    DateTime now = DateTime.now();
+    DateTime now = DateTime.parse("2021-07-10 10:45");
     Duration diff = now.difference(START_TIME);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {

@@ -58,22 +58,7 @@ class FudanAAONoticesFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
-      case ConnectionStatus.DONE:
-        if (_initialData != null) {
-          return _initialData.length > 0 ? _initialData.first?.title : null;
-        } else {
-          return null;
-        }
-        break;
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
-    }
-    return '';
+    return '关于2020级试验班学生专业分流工作安排的通知';
   }
 
   void refreshData() {
