@@ -241,10 +241,10 @@ class _BBSSubpageState extends State<BBSSubpage>
     super.initState();
     initComplete = false;
     _initialize();
-
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-          smartNavigatorPush(context, "/bbs/newPost", arguments: {"tags": true})
+          smartNavigatorPush(context, "/bbs/newPost",
+                  arguments: {"tags": true}, forcePushOnMainNavigator: true)
               .then<int>((value) => value is PostEditorText
                   ? PostRepository.getInstance()
                       .newPost(value?.content, tags: value?.tags)
@@ -327,59 +327,71 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildBody() {
-    return RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          refreshSelf();
+    return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTapDown: (_) {
+          //SystemChannels.textInput.invokeMethod('TextInput.hide');
+          if (_searchFocus.hasFocus) _searchFocus.unfocus();
+          // FocusScope.of(context)?.focusedChild?.unfocus();
+          //FocusScope.of(context)?.unfocus();
         },
-        child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: FutureWidget<List<BBSPost>>(
-                future: _content,
-                successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<BBSPost>> snapshot) {
-                  // Handle Empty Favorites
-                  if (widget.arguments != null &&
-                      widget.arguments.containsKey('showFavoredDiscussion') &&
-                      snapshot.data.isEmpty) {
-                    return _buildEmptyFavoritesPage();
-                  }
+        child: RefreshIndicator(
+            color: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              refreshSelf();
+            },
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: FutureWidget<List<BBSPost>>(
+                    future: _content,
+                    successBuilder: (BuildContext context,
+                        AsyncSnapshot<List<BBSPost>> snapshot) {
+                      // Handle Empty Favorites
+                      if (widget.arguments != null &&
+                          widget.arguments
+                              .containsKey('showFavoredDiscussion') &&
+                          snapshot.data.isEmpty) {
+                        return _buildEmptyFavoritesPage();
+                      }
 
-                  if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
-                      snapshot.data.isEmpty ||
-                      _lastSnapshotData.data.last.id != snapshot.data.last.id)
-                    snapshot.data.forEach((element) {
-                      _lastPageItems.add(_getListItem(element));
-                    });
-                  _isRefreshing = false;
-                  _lastSnapshotData = snapshot;
-                  return _buildPage(snapshot.data, false);
-                },
-                errorBuilder: (BuildContext context,
-                    AsyncSnapshot<List<BBSPost>> snapshot) {
-                  if (snapshot.error == LoginExpiredError) {
-                    SettingsProvider.of(_preferences).deleteSavedFduholeToken();
-                    return _buildErrorPage(
-                        error: S.of(context).error_login_expired);
-                  } else if (snapshot.error is NotLoginError)
-                    return _buildErrorPage(
-                        error: (snapshot.error as NotLoginError).errorMessage);
-                  return _buildErrorPage(error: snapshot.error.toString());
-                },
-                loadingBuilder: () {
-                  _isRefreshing = true;
-                  if (_lastSnapshotData == null)
-                    return Container(
-                      padding: EdgeInsets.all(8),
-                      child: Center(
-                        child: PlatformCircularProgressIndicator(),
-                      ),
-                    );
-                  return _buildPage(_lastSnapshotData.data, true);
-                })));
+                      if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
+                          snapshot.data.isEmpty ||
+                          _lastSnapshotData.data.last.id !=
+                              snapshot.data.last.id)
+                        snapshot.data.forEach((element) {
+                          _lastPageItems.add(_getListItem(element));
+                        });
+                      _isRefreshing = false;
+                      _lastSnapshotData = snapshot;
+                      return _buildPage(snapshot.data, false);
+                    },
+                    errorBuilder: (BuildContext context,
+                        AsyncSnapshot<List<BBSPost>> snapshot) {
+                      if (snapshot.error == LoginExpiredError) {
+                        SettingsProvider.of(_preferences)
+                            .deleteSavedFduholeToken();
+                        return _buildErrorPage(
+                            error: S.of(context).error_login_expired);
+                      } else if (snapshot.error is NotLoginError)
+                        return _buildErrorPage(
+                            error:
+                                (snapshot.error as NotLoginError).errorMessage);
+                      return _buildErrorPage(error: snapshot.error.toString());
+                    },
+                    loadingBuilder: () {
+                      _isRefreshing = true;
+                      if (_lastSnapshotData == null)
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          child: Center(
+                            child: PlatformCircularProgressIndicator(),
+                          ),
+                        );
+                      return _buildPage(_lastSnapshotData.data, true);
+                    }))));
   }
 
   Widget _buildLoadingPage() => Container(
@@ -413,7 +425,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       NotificationListener<ScrollNotification>(
         child: WithScrollbar(
           child: ListView.builder(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            //keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             primary: true,
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE +
