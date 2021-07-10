@@ -23,6 +23,7 @@ import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:file_picker/file_picker.dart';
@@ -279,7 +280,7 @@ class BBSMobileEditorWidget extends StatelessWidget {
         hint: S.of(context).editor_hint,
       ),
       otherOptions: OtherOptions(
-        height: MediaQuery.of(context).size.height,
+        height: ViewportUtils.getMainNavigatorHeight(context),
       ),
     ));
   }

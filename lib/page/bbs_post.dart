@@ -30,6 +30,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
@@ -414,7 +415,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         BrowserUtil.openUrl(url);
       }
     };
-    double imageWidth = MediaQuery.of(context).size.width * 0.75;
+    double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
     return GestureDetector(
       onLongPress: () {
         showPlatformModalSheet(
