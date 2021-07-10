@@ -205,105 +205,109 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     };
 
     return PlatformScaffold(
-      iosContentPadding: true,
-      iosContentBottomPadding: true,
-      appBar: PlatformAppBarX(
-        title: Text(_searchResult == null
-            ? S.of(context).forum
-            : S.of(context).search_result),
-        trailingActions: [
-          if (_searchResult == null)
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: FutureWidget<bool>(
-                future: _isDiscussionFavorited(),
-                loadingBuilder: PlatformCircularProgressIndicator(),
-                successBuilder:
-                    (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                  _isFavorited = snapshot.data;
-                  return _isFavorited
-                      ? Icon(SFSymbols.star_fill)
-                      : Icon(SFSymbols.star);
-                },
-                errorBuilder: () => null,
-              ),
-              onPressed: () async {
-                if (_isFavorited == null) return;
-                setState(() => _isFavorited = !_isFavorited);
-                await PostRepository.getInstance()
-                    .setFavoredDiscussion(
-                        _isFavorited
-                            ? SetFavoredDiscussionMode.ADD
-                            : SetFavoredDiscussionMode.DELETE,
-                        _post.id)
-                    .onError((error, stackTrace) {
-                  Noticing.showNotice(context, S.of(context).operation_failed);
+        iosContentPadding: true,
+        iosContentBottomPadding: true,
+        appBar: PlatformAppBarX(
+          title: Text(_searchResult == null
+              ? S.of(context).forum
+              : S.of(context).search_result),
+          trailingActions: [
+            if (_searchResult == null)
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: FutureWidget<bool>(
+                  future: _isDiscussionFavorited(),
+                  loadingBuilder: PlatformCircularProgressIndicator(),
+                  successBuilder:
+                      (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                    _isFavorited = snapshot.data;
+                    return _isFavorited
+                        ? Icon(SFSymbols.star_fill)
+                        : Icon(SFSymbols.star);
+                  },
+                  errorBuilder: () => null,
+                ),
+                onPressed: () async {
+                  if (_isFavorited == null) return;
                   setState(() => _isFavorited = !_isFavorited);
-                  return null;
-                });
-              },
-            ),
-          if (_searchResult == null)
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.reply)
-                  : const Icon(SFSymbols.arrowshape_turn_up_left),
-              onPressed: () {
-                BBSEditor.createNewReply(context, _post.id, null)
-                    .then((_) => refreshSelf());
-              },
-            ),
-        ],
-      ),
-      body: RefreshIndicator(
+                  await PostRepository.getInstance()
+                      .setFavoredDiscussion(
+                          _isFavorited
+                              ? SetFavoredDiscussionMode.ADD
+                              : SetFavoredDiscussionMode.DELETE,
+                          _post.id)
+                      .onError((error, stackTrace) {
+                    Noticing.showNotice(
+                        context, S.of(context).operation_failed);
+                    setState(() => _isFavorited = !_isFavorited);
+                    return null;
+                  });
+                },
+              ),
+            if (_searchResult == null)
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.reply)
+                    : const Icon(SFSymbols.arrowshape_turn_up_left),
+                onPressed: () {
+                  BBSEditor.createNewReply(context, _post.id, null)
+                      .then((_) => refreshSelf());
+                },
+              ),
+          ],
+        ),
+        body: RefreshIndicator(
           color: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
             refreshSelf();
           },
           child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: FutureWidget<List<Reply>>(
-              future: _content,
-              loadingBuilder:
-                  (BuildContext context, AsyncSnapshot<List<Reply>> snapshot) {
-                _isRefreshing = true;
-                // If there is no data at all, show a full-screen loading indicator.
-                if (_lastSnapshotData == null)
-                  return Container(
-                    padding: EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
-                  );
-                // If the page is showing search results, just show it whatever.
-                if (_searchResult != null)
-                  return _buildPage(_lastSnapshotData.data);
+              context: context,
+              removeTop: true,
+              child: Material(
+                child: FutureWidget<List<Reply>>(
+                  future: _content,
+                  loadingBuilder: (BuildContext context,
+                      AsyncSnapshot<List<Reply>> snapshot) {
+                    _isRefreshing = true;
+                    // If there is no data at all, show a full-screen loading indicator.
+                    if (_lastSnapshotData == null)
+                      return Container(
+                        padding: EdgeInsets.all(8),
+                        child:
+                            Center(child: PlatformCircularProgressIndicator()),
+                      );
+                    // If the page is showing search results, just show it whatever.
+                    if (_searchResult != null)
+                      return _buildPage(_lastSnapshotData.data);
 
-                // Otherwise, showing a list page with loading indicator at the bottom.
-                return NotificationListener<ScrollNotification>(
-                    child: _buildPage(snapshot.data),
-                    onNotification: onScrollToBottom);
-              },
-              successBuilder:
-                  (BuildContext context, AsyncSnapshot<List<Reply>> snapshot) {
-                _isRefreshing = false;
-                // Prevent showing duplicate replies caused by refreshing repeatedly
-                if (_lastReplies.isEmpty ||
-                    snapshot.data.isEmpty ||
-                    _lastReplies.last.id != snapshot.data.last.id)
-                  _lastReplies.addAll(snapshot.data);
-                _lastSnapshotData = snapshot;
-                if (_searchResult != null) return _buildPage(snapshot.data);
-                // Only use scroll notification when data is paged
-                return NotificationListener<ScrollNotification>(
-                    child: _buildPage(snapshot.data),
-                    onNotification: onScrollToBottom);
-              },
-              errorBuilder: () => _buildErrorWidget(),
-            ),
-          )),
-    );
+                    // Otherwise, showing a list page with loading indicator at the bottom.
+                    return NotificationListener<ScrollNotification>(
+                        child: _buildPage(snapshot.data),
+                        onNotification: onScrollToBottom);
+                  },
+                  successBuilder: (BuildContext context,
+                      AsyncSnapshot<List<Reply>> snapshot) {
+                    _isRefreshing = false;
+                    // Prevent showing duplicate replies caused by refreshing repeatedly
+                    if (_lastReplies.isEmpty ||
+                        snapshot.data.isEmpty ||
+                        _lastReplies.last.id != snapshot.data.last.id)
+                      _lastReplies.addAll(snapshot.data);
+                    _lastSnapshotData = snapshot;
+                    if (_searchResult != null) return _buildPage(snapshot.data);
+                    // Only use scroll notification when data is paged
+                    return NotificationListener<ScrollNotification>(
+                        child: _buildPage(snapshot.data),
+                        onNotification: onScrollToBottom);
+                  },
+                  errorBuilder: () => _buildErrorWidget(),
+                ),
+              )),
+        ));
   }
 
   Widget _buildPage(List<Reply> data) => WithScrollbar(
@@ -337,7 +341,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       return _isEndIndicatorShown
           ? Container()
           : Center(child: PlatformCircularProgressIndicator());
-    return _wrapListItemInCanvas(_lastReplies[index], index == 0);
+    return _getListItems(_lastReplies[index], index == 0, false);
   }
 
   Widget _buildErrorWidget() => GestureDetector(
@@ -387,9 +391,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     ];
   }
 
-  Widget _wrapListItemInCanvas(Reply e, bool generateTags) =>
-      Material(child: _getListItems(e, generateTags, false));
-
   Widget _OPLeadingTag() => Container(
         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
         decoration: BoxDecoration(
@@ -415,7 +416,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       if (ImageViewerPage.isImage(url)) {
         smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
       } else {
-        BrowserUtil.openUrl(url);
+        BrowserUtil.openUrl(url, context);
       }
     };
     double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
@@ -442,8 +443,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ));
       },
       child: Card(
-          color:
-              isNested ? Theme.of(context).bannerTheme.backgroundColor : null,
+          color: isNested ? Theme.of(context).dividerColor : null,
           child: ListTile(
             dense: true,
             title: Column(
@@ -498,7 +498,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           overflow: TextOverflow.ellipsis,
                           onOpen: (link) async {
                             if (await canLaunch(link.url)) {
-                              BrowserUtil.openUrl(link.url);
+                              BrowserUtil.openUrl(link.url, context);
                             } else {
                               Noticing.showNotice(
                                   context, S.of(context).cannot_launch_url);

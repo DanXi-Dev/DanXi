@@ -202,7 +202,7 @@ class FudanDailyFeature extends Feature {
             }
           }
           BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
-              FudanDailyRepository.getInstance().cookieJar);
+              context, FudanDailyRepository.getInstance().cookieJar);
         }
         break;
       case ConnectionStatus.FAILED:

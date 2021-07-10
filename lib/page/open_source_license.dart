@@ -92,7 +92,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
             child: ListTile(
           title: Text(element.name),
           subtitle: Text(element.license.licenseName),
-          onTap: () => BrowserUtil.openUrl(element.url),
+          onTap: () => BrowserUtil.openUrl(element.url, context),
         )));
       });
     return widgets;

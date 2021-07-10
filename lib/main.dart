@@ -339,7 +339,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   onPressed: () {
                     _isDialogShown = false;
                     Navigator.of(context).pop();
-                    BrowserUtil.openUrl(Constant.UIS_URL);
+                    BrowserUtil.openUrl(Constant.UIS_URL, context);
                   },
                 ),
               ],

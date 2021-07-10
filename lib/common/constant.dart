@@ -43,10 +43,12 @@ class Constant {
         brightness: Brightness.light,
         accentColor: Color(0xFF007AFF),
         toggleableActiveColor: Color(0xFF007AFF),
-        canvasColor: Colors.white,
+        canvasColor: Color.fromRGBO(242, 242, 247, 1),
+        backgroundColor: Color.fromRGBO(242, 242, 247, 1),
+        scaffoldBackgroundColor: Color.fromRGBO(242, 242, 247, 1),
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
-          elevation: 2,
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -72,10 +74,11 @@ class Constant {
         accentColor: Color(0xFF007AFF),
         toggleableActiveColor: Color(0xFF007AFF),
         scaffoldBackgroundColor: Colors.black,
+        canvasColor: Colors.black,
         backgroundColor: Colors.black,
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(7, 8, 7, 8),
-          color: Color.fromRGBO(72, 72, 74, 0.55),
+          color: Color.fromRGBO(28, 28, 30, 1),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -84,7 +87,6 @@ class Constant {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
         ),
-        canvasColor: Colors.black,
         dialogBackgroundColor: Color.fromRGBO(28, 28, 30, 1.0),
         textTheme: Typography.whiteCupertino,
       );

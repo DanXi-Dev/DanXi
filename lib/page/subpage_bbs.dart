@@ -182,8 +182,11 @@ class _BBSSubpageState extends State<BBSSubpage>
     // If user is filtering by tag, do not build search text field.
     if (widget.arguments != null) return Container();
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+    return Container(
+      color: Theme.of(context).canvasColor,
+      padding: Theme.of(context)
+          .cardTheme
+          .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
         focusNode: _searchFocus,
         placeholder: S.of(context).search_hint,
@@ -316,70 +319,59 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildBody() {
-    return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTapDown: (_) {
-          SystemChannels.textInput.invokeMethod('TextInput.hide');
-          if (_searchFocus.hasFocus) _searchFocus.unfocus();
-          // FocusScope.of(context)?.focusedChild?.unfocus();
-          //FocusScope.of(context)?.unfocus();
+    return RefreshIndicator(
+        color: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          refreshSelf();
         },
-        child: RefreshIndicator(
-            color: Theme.of(context).accentColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              refreshSelf();
-            },
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: FutureWidget<List<BBSPost>>(
-                    future: _content,
-                    successBuilder: (BuildContext context,
-                        AsyncSnapshot<List<BBSPost>> snapshot) {
-                      // Handle Empty Favorites
-                      if (widget.arguments != null &&
-                          widget.arguments
-                              .containsKey('showFavoredDiscussion') &&
-                          snapshot.data.isEmpty) {
-                        return _buildEmptyFavoritesPage();
-                      }
+        child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: FutureWidget<List<BBSPost>>(
+                future: _content,
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<BBSPost>> snapshot) {
+                  // Handle Empty Favorites
+                  if (widget.arguments != null &&
+                      widget.arguments.containsKey('showFavoredDiscussion') &&
+                      snapshot.data.isEmpty) {
+                    return _buildEmptyFavoritesPage();
+                  }
 
-                      if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
-                          snapshot.data.isEmpty ||
-                          _lastSnapshotData.data.last.id !=
-                              snapshot.data.last.id)
-                        snapshot.data.forEach((element) {
-                          _lastPageItems.add(_getListItem(element));
-                        });
-                      _isRefreshing = false;
-                      _lastSnapshotData = snapshot;
-                      return _buildPage(snapshot.data, false);
-                    },
-                    errorBuilder: (BuildContext context,
-                        AsyncSnapshot<List<BBSPost>> snapshot) {
-                      if (snapshot.error == LoginExpiredError) {
-                        SettingsProvider.of(_preferences)
-                            .deleteSavedFduholeToken();
-                        return _buildErrorPage(
-                            error: S.of(context).error_login_expired);
-                      } else if (snapshot.error is NotLoginError)
-                        return _buildErrorPage(
-                            error:
-                                (snapshot.error as NotLoginError).errorMessage);
-                      return _buildErrorPage(error: snapshot.error.toString());
-                    },
-                    loadingBuilder: () {
-                      _isRefreshing = true;
-                      if (_lastSnapshotData == null)
-                        return Container(
-                          padding: EdgeInsets.all(8),
-                          child: Center(
-                            child: PlatformCircularProgressIndicator(),
-                          ),
-                        );
-                      return _buildPage(_lastSnapshotData.data, true);
-                    }))));
+                  if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
+                      snapshot.data.isEmpty ||
+                      _lastSnapshotData.data.last.id != snapshot.data.last.id)
+                    snapshot.data.forEach((element) {
+                      _lastPageItems.add(_getListItem(element));
+                    });
+                  _isRefreshing = false;
+                  _lastSnapshotData = snapshot;
+                  return _buildPage(snapshot.data, false);
+                },
+                errorBuilder: (BuildContext context,
+                    AsyncSnapshot<List<BBSPost>> snapshot) {
+                  if (snapshot.error == LoginExpiredError) {
+                    SettingsProvider.of(_preferences).deleteSavedFduholeToken();
+                    return _buildErrorPage(
+                        error: S.of(context).error_login_expired);
+                  } else if (snapshot.error is NotLoginError)
+                    return _buildErrorPage(
+                        error: (snapshot.error as NotLoginError).errorMessage);
+                  return _buildErrorPage(error: snapshot.error.toString());
+                },
+                loadingBuilder: () {
+                  _isRefreshing = true;
+                  if (_lastSnapshotData == null)
+                    return Container(
+                      padding: EdgeInsets.all(8),
+                      child: Center(
+                        child: PlatformCircularProgressIndicator(),
+                      ),
+                    );
+                  return _buildPage(_lastSnapshotData.data, true);
+                })));
   }
 
   Widget _buildLoadingPage() => Container(
@@ -413,6 +405,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       NotificationListener<ScrollNotification>(
         child: WithScrollbar(
           child: ListView.builder(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             primary: true,
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE +
@@ -459,7 +452,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _getListItem(BBSPost postElement) {
     if (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded)
       return Container();
-    return ThemedMaterial(
+    return Material(
       child: Card(
           child: Column(children: [
         ListTile(
@@ -497,11 +490,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                               text: renderText(postElement.first_post.content,
                                   S.of(context).image_tag),
                               style: TextStyle(fontSize: 16),
-                              maxLines: 4,
+                              maxLines: 6,
                               overflow: TextOverflow.ellipsis,
                               onOpen: (link) async {
                                 if (await canLaunch(link.url)) {
-                                  BrowserUtil.openUrl(link.url);
+                                  BrowserUtil.openUrl(link.url, context);
                                 } else {
                                   Noticing.showNotice(
                                       context, S.of(context).cannot_launch_url);
@@ -515,11 +508,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                         text: renderText(postElement.first_post.content,
                             S.of(context).image_tag),
                         style: TextStyle(fontSize: 16),
-                        maxLines: 4,
+                        maxLines: 6,
                         overflow: TextOverflow.ellipsis,
                         onOpen: (link) async {
                           if (await canLaunch(link.url)) {
-                            BrowserUtil.openUrl(link.url);
+                            BrowserUtil.openUrl(link.url, context);
                           } else {
                             Noticing.showNotice(
                                 context, S.of(context).cannot_launch_url);
@@ -618,7 +611,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                       overflow: TextOverflow.ellipsis,
                       onOpen: (link) async {
                         if (await canLaunch(link.url)) {
-                          BrowserUtil.openUrl(link.url);
+                          BrowserUtil.openUrl(link.url, context);
                         } else {
                           Noticing.showNotice(
                               context, S.of(context).cannot_launch_url);
