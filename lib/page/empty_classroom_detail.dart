@@ -272,25 +272,28 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   //subtitle: Divider(height: 5,),
                   ),
             ),
-            FutureWidget(
-                future: EmptyClassroomRepository.getInstance()
-                    .getBuildingRoomInfo(_personInfo,
-                        _buildingList[_selectBuildingIndex].data, selectDate),
-                successBuilder: (BuildContext context,
-                        AsyncSnapshot<dynamic> snapshot) =>
-                    Expanded(
-                        child: MediaQuery.removePadding(
-                            context: context,
-                            removeTop: true,
-                            child: WithScrollbar(
-                              controller: PrimaryScrollController.of(context),
-                              child: ListView(
+            Expanded(
+              child: FutureWidget(
+                  future: EmptyClassroomRepository.getInstance()
+                      .getBuildingRoomInfo(_personInfo,
+                          _buildingList[_selectBuildingIndex].data, selectDate),
+                  successBuilder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) =>
+                      Expanded(
+                          child: MediaQuery.removePadding(
+                              context: context,
+                              removeTop: true,
+                              child: WithScrollbar(
                                 controller: PrimaryScrollController.of(context),
-                                children: _getListWidgets(snapshot.data),
-                              ),
-                            ))),
-                errorBuilder: (_, snapShot) => _buildErrorWidget(),
-                loadingBuilder: _buildLoadingWidget())
+                                child: ListView(
+                                  controller:
+                                      PrimaryScrollController.of(context),
+                                  children: _getListWidgets(snapshot.data),
+                                ),
+                              ))),
+                  errorBuilder: (_, snapShot) => _buildErrorWidget(),
+                  loadingBuilder: _buildLoadingWidget()),
+            )
           ]),
         ));
   }
@@ -383,8 +386,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     return _list;
   }
 
-  Widget _buildLoadingWidget() => GestureDetector(
-        child: Center(child: PlatformCircularProgressIndicator()),
+  Widget _buildLoadingWidget() => Center(
+        child: PlatformCircularProgressIndicator(),
       );
 
   Widget _buildErrorWidget() {
