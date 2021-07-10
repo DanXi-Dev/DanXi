@@ -33,7 +33,7 @@ class Noticing {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
-                title: Text(title),
+                title: title == null ? null : Text(title),
                 content: Linkify(text: message),
                 actions: <Widget>[
                   PlatformDialogAction(

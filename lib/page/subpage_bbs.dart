@@ -233,9 +233,13 @@ class _BBSSubpageState extends State<BBSSubpage>
     progressDialog.dismiss();
   }
 
+  // This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
+  bool initComplete;
+
   @override
   void initState() {
     super.initState();
+    initComplete = false;
     _initialize();
 
     _postSubscription.bindOnlyInvalid(
@@ -264,13 +268,17 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void didChangeDependencies() {
-    if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
-      _tagFilter = widget.arguments['tagFilter'];
-    if (widget.arguments != null && widget.arguments.containsKey('preferences'))
-      _preferences = widget.arguments['preferences'];
-    else
-      _preferences = Provider.of<SharedPreferences>(context);
-    _setContent();
+    if (!initComplete) {
+      if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
+        _tagFilter = widget.arguments['tagFilter'];
+      if (widget.arguments != null &&
+          widget.arguments.containsKey('preferences'))
+        _preferences = widget.arguments['preferences'];
+      else
+        _preferences = Provider.of<SharedPreferences>(context);
+      _setContent();
+      initComplete = true;
+    }
     super.didChangeDependencies();
   }
 
