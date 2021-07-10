@@ -33,12 +33,14 @@ class BBSEditor {
             ? S.of(context).reply_to(discussionId)
             : S.of(context).reply_to(postId));*/
 
-    content = (await smartNavigatorPush(context, "/bbs/newPost", arguments: {
-      "tags": false,
-      'title': postId == null
-          ? S.of(context).reply_to(discussionId)
-          : S.of(context).reply_to(postId)
-    }) as PostEditorText);
+    content = (await smartNavigatorPush(context, "/bbs/newPost",
+        arguments: {
+          "tags": false,
+          'title': postId == null
+              ? S.of(context).reply_to(discussionId)
+              : S.of(context).reply_to(postId)
+        },
+        forcePushOnMainNavigator: true) as PostEditorText);
     if (content == null ||
         content.content == null ||
         content.content.trim() == "") return;
