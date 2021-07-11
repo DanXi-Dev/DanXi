@@ -233,10 +233,10 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
     final Color _originalDividerColor = Theme.of(context).dividerColor;
-    const double _avatarSpacing = 24;
+    const double _avatarSpacing = 12;
     double _avatarSize = (ViewportUtils.getMainNavigatorWidth(context) -
             _avatarSpacing * 4 -
-            80) /
+            96) /
         4;
     const double _avatarNameSpacing = 4;
     TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
