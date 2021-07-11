@@ -24,6 +24,7 @@ import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -125,46 +126,47 @@ class _ExamListState extends State<ExamList> {
             ),
           ],
         ),
-        body: FutureWidget<List<SemesterInfo>>(
-            future: _semester,
-            successBuilder: (BuildContext context,
-                AsyncSnapshot<List<SemesterInfo>> snapshot) {
-              _unpackedSemester = snapshot.data;
-              if (_showingSemester == null)
-                _showingSemester = _unpackedSemester.length -
-                    5; //TODO: Appropriate default value?
+        body: Material(
+            child: FutureWidget<List<SemesterInfo>>(
+                future: _semester,
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<SemesterInfo>> snapshot) {
+                  _unpackedSemester = snapshot.data;
+                  if (_showingSemester == null)
+                    _showingSemester = _unpackedSemester.length - 5;
 
-              return Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return Column(
                     children: [
-                      PlatformIconButton(
-                        icon: Icon(Icons.chevron_left),
-                        onPressed: _showingSemester > 0
-                            ? () => setState(() => --_showingSemester)
-                            : null,
-                      ),
-                      Text(S.of(context).semester(
-                          _unpackedSemester[_showingSemester].schoolYear,
-                          _unpackedSemester[_showingSemester].name)),
-                      PlatformIconButton(
-                        icon: Icon(Icons.chevron_right),
-                        onPressed:
-                            _showingSemester < _unpackedSemester.length - 1
-                                ? () => setState(() => ++_showingSemester)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          PlatformIconButton(
+                            icon: Icon(Icons.chevron_left),
+                            onPressed: _showingSemester > 0
+                                ? () => setState(() => --_showingSemester)
                                 : null,
+                          ),
+                          Text(S.of(context).semester(
+                              _unpackedSemester[_showingSemester].schoolYear,
+                              _unpackedSemester[_showingSemester].name)),
+                          PlatformIconButton(
+                            icon: Icon(Icons.chevron_right),
+                            onPressed:
+                                _showingSemester < _unpackedSemester.length - 1
+                                    ? () => setState(() => ++_showingSemester)
+                                    : null,
+                          )
+                        ],
+                      ),
+                      Expanded(
+                        child: _loadExamGradeHybridView(),
                       )
                     ],
-                  ),
-                  Expanded(
-                    child: _loadExamGradeHybridView(),
-                  )
-                ],
-              );
-            },
-            loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
-            errorBuilder: _loadGradeViewFromDataCenter));
+                  );
+                },
+                loadingBuilder:
+                    Center(child: PlatformCircularProgressIndicator()),
+                errorBuilder: _loadGradeViewFromDataCenter)));
   }
 
   Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
@@ -461,37 +463,34 @@ class _ExamListState extends State<ExamList> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${value.type}",
-                      textScaleFactor: 0.8,
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
-                    Text(
-                      "${value.name}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Container(
+                  width: ViewportUtils.getMainNavigatorWidth(context) - 80,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${value.type}",
+                        textScaleFactor: 0.8,
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                      ),
+                      Text(
+                        "${value.name}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-                Align(
+                Container(
+                  width: 28,
                   alignment: Alignment.centerLeft,
-                  child: Container(
-                    height: 28,
-                    width: 28,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        value.level,
-                        textScaleFactor: 1.2,
-                      ),
+                  child: Center(
+                    child: Text(
+                      value.level,
+                      textScaleFactor: 1.2,
                     ),
                   ),
                 ),

@@ -26,7 +26,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
-import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
@@ -128,8 +127,6 @@ class DanxiApp extends StatelessWidget {
         EmptyClassroomDetailPage(arguments: arguments),
     '/bbs/postDetail': (context, {arguments}) =>
         BBSPostDetail(arguments: arguments),
-    '/bbs/newPost': (context, {arguments}) =>
-        BBSEditorPage(arguments: arguments),
     '/notice/aao/list': (context, {arguments}) =>
         AAONoticesList(arguments: arguments),
     '/about/openLicense': (context, {arguments}) =>

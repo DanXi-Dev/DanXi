@@ -116,6 +116,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<List<Reply>> _content;
 
+  void scrollToEndIfNeeded() {
+    if (widget.arguments.containsKey('scroll_to_end') &&
+        widget.arguments['scroll_to_end'] == true) {
+      final _controller = PrimaryScrollController.of(context);
+      _controller.jumpTo(_controller.position.maxScrollExtent);
+      /*_controller.animateTo(
+        _controller.position.maxScrollExtent,
+        duration: Duration(seconds: 1),
+        curve: Curves.linearToEaseOut,
+      );*/
+    }
+  }
+
   void _setContent() {
     if (_searchResult != null)
       _content = _searchResult;
@@ -292,6 +305,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   successBuilder: (BuildContext context,
                       AsyncSnapshot<List<Reply>> snapshot) {
                     _isRefreshing = false;
+                    WidgetsBinding.instance
+                        .addPostFrameCallback((_) => scrollToEndIfNeeded());
                     // Prevent showing duplicate replies caused by refreshing repeatedly
                     if (_lastReplies.isEmpty ||
                         snapshot.data.isEmpty ||
@@ -443,7 +458,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ));
       },
       child: Card(
-          color: isNested ? Theme.of(context).dividerColor : null,
+          color: isNested
+              ? Theme.of(context).dividerColor.withOpacity(0.05)
+              : null,
           child: ListTile(
             dense: true,
             title: Column(

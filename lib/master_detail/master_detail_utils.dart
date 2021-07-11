@@ -17,7 +17,7 @@
 
 import 'package:flutter/widgets.dart';
 
-const kTabletMasterContainerWidth = 350.0;
+const kTabletMasterContainerWidth = 384.0;
 
 bool isTablet(BuildContext context) {
   return MediaQuery.of(context).size.width >= 768.0;

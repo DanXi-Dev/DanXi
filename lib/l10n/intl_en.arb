@@ -180,6 +180,7 @@
     "error_adding_exam": "There was an error adding exam \"{name}\".",
     "no_data": "Data is empty",
     "post_does_not_exist": "The requested post does not exist.",
+    "add_image": "Add Image",
 
     "classroom": "Classroom",
     "morning": "Morning",

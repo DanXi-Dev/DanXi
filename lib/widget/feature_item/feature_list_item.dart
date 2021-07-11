@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +49,11 @@ class _FeatureListItemState extends State<FeatureListItem>
       trailing: widget.feature.trailing,
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
-      title: Text(widget.feature.mainTitle),
+      title: Text(
+        widget.feature.mainTitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: widget.feature.customSubtitle == null
           ? Text(summary.join("\n"))
           : widget.feature.customSubtitle,

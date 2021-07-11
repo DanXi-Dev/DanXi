@@ -64,7 +64,12 @@ class _FeatureCardItemState extends State<FeatureCardItem>
                 SizedBox(
                   width: 8,
                 ),
-                Text(widget.feature.mainTitle, style: TextStyle(fontSize: 16))
+                Text(
+                  widget.feature.mainTitle,
+                  style: TextStyle(fontSize: 16),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
               ].takeWhile((value) => value != null).toList(),
             ),
             SizedBox(
