@@ -55,8 +55,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'bbs_editor.dart';
-
 /// Render the text from a clip of [html].
 /// Also supports adding image tag to markdown posts
 String renderText(String html, String imagePlaceholder) {
@@ -242,14 +240,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     initComplete = false;
     _initialize();
     _postSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-          smartNavigatorPush(context, "/bbs/newPost",
-                  arguments: {"tags": true}, forcePushOnMainNavigator: true)
-              .then<int>((value) => value is PostEditorText
-                  ? PostRepository.getInstance()
-                      .newPost(value?.content, tags: value?.tags)
-                  : 0)
-              .then((value) => refreshSelf());
+        Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
+          final bool success = await BBSEditor.createNewPost(context);
+          if (success) refreshSelf();
         }),
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
