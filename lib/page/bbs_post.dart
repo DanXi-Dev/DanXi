@@ -349,17 +349,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       );
     }
-
-    if (index >= _lastReplies.length) {
-      if (_isEndIndicatorShown) {
-        return Container();
-        // Only show the indicator at the next item of the last reply
-      } else if (index == _lastReplies.length) {
-        return Center(child: PlatformCircularProgressIndicator());
-      } else {
-        return Container();
-      }
-    }
+    if (index >= _lastReplies.length)
+      return _isEndIndicatorShown
+          ? Container()
+          : Center(child: PlatformCircularProgressIndicator());
     return _getListItems(_lastReplies[index], index == 0, false);
   }
 
