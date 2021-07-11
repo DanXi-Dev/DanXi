@@ -149,7 +149,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Future<bool> _isDiscussionFavorited() async {
     if (_isFavorited != null) return _isFavorited;
     final List<BBSPost> favorites =
-    await PostRepository.getInstance().getFavoredDiscussions();
+        await PostRepository.getInstance().getFavoredDiscussions();
     return favorites.any((element) => element.id == _post.id);
   }
 
@@ -242,10 +242,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   setState(() => _isFavorited = !_isFavorited);
                   await PostRepository.getInstance()
                       .setFavoredDiscussion(
-                      _isFavorited
-                          ? SetFavoredDiscussionMode.ADD
-                          : SetFavoredDiscussionMode.DELETE,
-                      _post.id)
+                          _isFavorited
+                              ? SetFavoredDiscussionMode.ADD
+                              : SetFavoredDiscussionMode.DELETE,
+                          _post.id)
                       .onError((error, stackTrace) {
                     Noticing.showNotice(
                         context, S.of(context).operation_failed);
@@ -288,7 +288,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       return Container(
                         padding: EdgeInsets.all(8),
                         child:
-                        Center(child: PlatformCircularProgressIndicator()),
+                            Center(child: PlatformCircularProgressIndicator()),
                       );
                     // If the page is showing search results, just show it whatever.
                     if (_searchResult != null)
@@ -323,15 +323,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _buildPage(List<Reply> data) => WithScrollbar(
-    child: ListView.builder(
-      primary: true,
-      physics: const AlwaysScrollableScrollPhysics(),
-      addAutomaticKeepAlives: true,
-      itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
-      itemBuilder: (context, index) => _buildListItem(index, data, true),
-    ),
-    controller: PrimaryScrollController.of(context),
-  );
+        child: ListView.builder(
+          primary: true,
+          physics: const AlwaysScrollableScrollPhysics(),
+          addAutomaticKeepAlives: true,
+          itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
+          itemBuilder: (context, index) => _buildListItem(index, data, true),
+        ),
+        controller: PrimaryScrollController.of(context),
+      );
 
   Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
     if (isNewData &&
@@ -349,10 +349,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       );
     }
-    if (index >= _lastReplies.length)
-      return _isEndIndicatorShown
-          ? Container()
-          : Center(child: PlatformCircularProgressIndicator());
+
+    if (index >= _lastReplies.length) {
+      if (_isEndIndicatorShown) {
+        return Container();
+        // Only show the indicator at the next item of the last reply
+      } else if (index == _lastReplies.length) {
+        return Center(child: PlatformCircularProgressIndicator());
+      } else {
+        return Container();
+      }
+    }
     return _getListItems(_lastReplies[index], index == 0, false);
   }
 
@@ -412,9 +419,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Constant.getColorFromString(_post.tag.first.color)
-                  .withOpacity(0.8)
-                  .computeLuminance() <=
-                  0.5
+                          .withOpacity(0.8)
+                          .computeLuminance() <=
+                      0.5
                   ? Colors.white
                   : Colors.black,
               fontSize: 12),
@@ -434,22 +441,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         showPlatformModalSheet(
             context: context,
             builder: (_) => PlatformWidget(
-              cupertino: (_, __) => CupertinoActionSheet(
-                actions: _buildContextMenu(e),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              material: (_, __) => Container(
-                height: 300,
-                child: Column(
-                  children: _buildContextMenu(e),
-                ),
-              ),
-            ));
+                  cupertino: (_, __) => CupertinoActionSheet(
+                    actions: _buildContextMenu(e),
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  material: (_, __) => Container(
+                    height: 300,
+                    child: Column(
+                      children: _buildContextMenu(e),
+                    ),
+                  ),
+                ));
       },
       child: Card(
           color: isNested
@@ -502,20 +509,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   child: isNested
                   // If content is being quoted, limit its height so that the view won't be too long.
                       ? Linkify(
-                    text: renderText(e.content, S.of(context).image_tag)
-                        .trim(),
-                    textScaleFactor: 0.8,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    onOpen: (link) async {
-                      if (await canLaunch(link.url)) {
-                        BrowserUtil.openUrl(link.url, context);
-                      } else {
-                        Noticing.showNotice(
-                            context, S.of(context).cannot_launch_url);
-                      }
-                    },
-                  )
+                          text: renderText(e.content, S.of(context).image_tag)
+                              .trim(),
+                          textScaleFactor: 0.8,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          onOpen: (link) async {
+                            if (await canLaunch(link.url)) {
+                              BrowserUtil.openUrl(link.url, context);
+                            } else {
+                              Noticing.showNotice(
+                                  context, S.of(context).cannot_launch_url);
+                            }
+                          },
+                        )
                       : PostRenderWidget(
                     render: kHtmlRender,
                           content: preprocessContentForDisplay(e.content),
@@ -528,36 +535,36 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             subtitle: isNested
                 ? null
                 : Column(children: [
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "#${e.id}",
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 12),
+                    const SizedBox(
+                      height: 8,
                     ),
-                    Text(
-                      HumanDuration.format(
-                          context, DateTime.parse(e.date_created)),
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 12),
-                    ),
-                    GestureDetector(
-                      child: Text(S.of(context).report,
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor,
-                              fontSize: 12)),
-                      onTap: () {
-                        BBSEditor.reportPost(context, e.id);
-                      },
-                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "#${e.id}",
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12),
+                          ),
+                          Text(
+                            HumanDuration.format(
+                                context, DateTime.parse(e.date_created)),
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12),
+                          ),
+                          GestureDetector(
+                            child: Text(S.of(context).report,
+                                style: TextStyle(
+                                    color: Theme.of(context).hintColor,
+                                    fontSize: 12)),
+                            onTap: () {
+                              BBSEditor.reportPost(context, e.id);
+                            },
+                          ),
+                        ]),
                   ]),
-            ]),
             onTap: () async {
               if (_searchResult == null)
                 BBSEditor.createNewReply(context, _post.id, e.id)
