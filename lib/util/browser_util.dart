@@ -37,6 +37,7 @@ class BrowserUtil {
                   javaScriptEnabled: true, useOnDownloadStart: true),
             ))
           : InAppBrowserClassOptions(
+          android: AndroidInAppBrowserOptions(hideTitleBar: true),
               ios: IOSInAppBrowserOptions(
                 presentationStyle: IOSUIModalPresentationStyle.POPOVER,
               ),
@@ -51,7 +52,7 @@ class BrowserUtil {
     url = Uri.encodeFull(url);
 
     if (cookieJar == null || PlatformX.isDesktop) {
-      launch(url, forceWebView: true, enableJavaScript: true);
+      launch(url, enableJavaScript: true);
       return;
     }
     cookieJar.hostCookies.forEach((host, value) {
