@@ -34,4 +34,7 @@ class Reply {
   factory Reply.fromJson(Map<String, dynamic> json) => _$ReplyFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReplyToJson(this);
+
+  /// Generate an empty Reply for special sakes.
+  factory Reply.dummy() => Reply(-1, "", "", null, "", -1, false);
 }
