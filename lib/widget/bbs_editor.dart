@@ -186,6 +186,7 @@ class BBSEditor {
                   controller: textController,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
+                  minLines: 5,
                   autofocus: true,
                 ),
               ]),
