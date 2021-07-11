@@ -117,11 +117,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (widget.arguments.containsKey('scroll_to_end') &&
         widget.arguments['scroll_to_end'] == true) {
       final _controller = PrimaryScrollController.of(context);
-      _controller.animateTo(
+      _controller.jumpTo(_controller.position.maxScrollExtent);
+      /*_controller.animateTo(
         _controller.position.maxScrollExtent,
-        duration: Duration(seconds: 2),
-        curve: Curves.fastLinearToSlowEaseIn,
-      );
+        duration: Duration(seconds: 1),
+        curve: Curves.linearToEaseOut,
+      );*/
     }
   }
 
@@ -230,8 +231,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   successBuilder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     _isFavorited = snapshot.data;
-                    WidgetsBinding.instance
-                        .addPostFrameCallback((_) => scrollToEndIfNeeded());
                     return _isFavorited
                         ? Icon(SFSymbols.star_fill)
                         : Icon(SFSymbols.star);
@@ -303,6 +302,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   successBuilder: (BuildContext context,
                       AsyncSnapshot<List<Reply>> snapshot) {
                     _isRefreshing = false;
+                    WidgetsBinding.instance
+                        .addPostFrameCallback((_) => scrollToEndIfNeeded());
                     // Prevent showing duplicate replies caused by refreshing repeatedly
                     if (_lastReplies.isEmpty ||
                         snapshot.data.isEmpty ||
