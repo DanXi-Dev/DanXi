@@ -113,6 +113,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<List<Reply>> _content;
 
+  void scrollToEndIfNeeded() {
+    if (widget.arguments.containsKey('scroll_to_end') &&
+        widget.arguments['scroll_to_end'] == true) {
+      final _controller = PrimaryScrollController.of(context);
+      _controller.animateTo(
+        _controller.position.maxScrollExtent,
+        duration: Duration(seconds: 2),
+        curve: Curves.fastLinearToSlowEaseIn,
+      );
+    }
+  }
+
   void _setContent() {
     if (_searchResult != null)
       _content = _searchResult;
@@ -218,6 +230,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   successBuilder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     _isFavorited = snapshot.data;
+                    WidgetsBinding.instance
+                        .addPostFrameCallback((_) => scrollToEndIfNeeded());
                     return _isFavorited
                         ? Icon(SFSymbols.star_fill)
                         : Icon(SFSymbols.star);

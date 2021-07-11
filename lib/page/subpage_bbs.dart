@@ -592,57 +592,59 @@ class _BBSSubpageState extends State<BBSSubpage>
             postElement.last_post.id != postElement.first_post.id)
           //_buildCommentView(postElement),
           ListTile(
-            dense: true,
-            minLeadingWidth: 16,
-            leading: Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-              child: Icon(
-                SFSymbols.quote_bubble,
-                color: Theme.of(context).hintColor,
-              ),
-            ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
-                  child: Text(
-                    S.of(context).latest_reply(
-                        postElement.last_post.username,
-                        HumanDuration.format(
-                            context,
-                            DateTime.parse(
-                                postElement.last_post.date_created))),
-                    style: TextStyle(color: Theme.of(context).hintColor),
-                  ),
+              dense: true,
+              minLeadingWidth: 16,
+              leading: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                child: Icon(
+                  SFSymbols.quote_bubble,
+                  color: Theme.of(context).hintColor,
                 ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                    child: Linkify(
-                      text: renderText(postElement.last_post.content,
-                                  S.of(context).image_tag)
-                              .trim()
-                              .isEmpty
-                          ? S.of(context).no_summary
-                          : renderText(postElement.last_post.content,
-                              S.of(context).image_tag),
-                      style: TextStyle(fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      onOpen: (link) async {
-                        if (await canLaunch(link.url)) {
-                          BrowserUtil.openUrl(link.url, context);
-                        } else {
-                          Noticing.showNotice(
-                              context, S.of(context).cannot_launch_url);
-                        }
-                      },
-                    )),
-              ],
-            ),
-            onTap: () => BBSEditor.createNewReply(
-                context, postElement.id, postElement.last_post.id),
-          )
+              ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
+                    child: Text(
+                      S.of(context).latest_reply(
+                          postElement.last_post.username,
+                          HumanDuration.format(
+                              context,
+                              DateTime.parse(
+                                  postElement.last_post.date_created))),
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
+                      child: Linkify(
+                        text: renderText(postElement.last_post.content,
+                                    S.of(context).image_tag)
+                                .trim()
+                                .isEmpty
+                            ? S.of(context).no_summary
+                            : renderText(postElement.last_post.content,
+                                S.of(context).image_tag),
+                        style: TextStyle(fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            BrowserUtil.openUrl(link.url, context);
+                          } else {
+                            Noticing.showNotice(
+                                context, S.of(context).cannot_launch_url);
+                          }
+                        },
+                      )),
+                ],
+              ),
+              onTap: () =>
+                  smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                    "post": postElement,
+                    "scroll_to_end": true,
+                  }))
       ])),
     );
   }
