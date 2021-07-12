@@ -83,7 +83,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
     String converted = converter.convertTo(_table);
     Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = File(
+    File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(converted, flush: true);

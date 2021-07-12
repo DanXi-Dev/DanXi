@@ -93,8 +93,8 @@ class _ExamListState extends State<ExamList> {
         }
     });
     Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile =
-        File("${documentDir.absolute.path}/output_timetable/${"exam.ics"}");
+    File outputFile = PlatformX.createPlatformFile(
+        "${documentDir.absolute.path}/output_timetable/exam.ics");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(cal.serialize(), flush: true);
     if (PlatformX.isIOS)

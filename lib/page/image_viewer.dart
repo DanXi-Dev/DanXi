@@ -102,7 +102,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   Future<File> saveToFile(
       String dirName, String fileName, List<int> bytes) async {
     Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = File("${documentDir.absolute.path}/$dirName/$fileName");
+    File outputFile = PlatformX.createPlatformFile(
+        "${documentDir.absolute.path}/$dirName/$fileName");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsBytes(bytes, flush: true);
     return outputFile;
@@ -110,7 +111,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> shareImage() async {
     // Save the image temporarily
-    Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = await saveToFile('temp_image', _fileName, _rawImage);
     if (PlatformX.isMobile)
       Share.shareFiles([outputFile.absolute.path],

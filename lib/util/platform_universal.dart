@@ -48,6 +48,25 @@ class PlatformX {
     return isMaterial(context) ? null : Theme.of(context).cardColor;
   }
 
+  static const illegalCharWindows = [r'\/', r':', r'@'];
+
+  static File createPlatformFile(String path) {
+    String fileSystemSlash = isWindows ? "\\" : "/";
+    String fileSystemSlashRegex = isWindows ? r'\\' : r'\/';
+    path = path.replaceAll(RegExp(r'\/'), fileSystemSlash);
+    List<String> pathSegment = path.split(RegExp(fileSystemSlashRegex));
+
+    // Skip the disk letter(like "C:")
+    for (int i = 1; i < pathSegment.length; i++) {
+      print(pathSegment[i]);
+      if (isWindows) {
+        illegalCharWindows.forEach((element) =>
+            pathSegment[i] = pathSegment[i].replaceAll(RegExp(element), ""));
+      }
+    }
+    return File(pathSegment.join(fileSystemSlash));
+  }
+
   static bool isMaterial(BuildContext context) =>
       platformImpl.isMaterial(context);
 
