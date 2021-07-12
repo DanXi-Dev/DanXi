@@ -233,11 +233,8 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
   Widget build(BuildContext context) {
     _preferences = Provider.of<SharedPreferences>(context);
     final Color _originalDividerColor = Theme.of(context).dividerColor;
-    const double _avatarSpacing = 12;
-    double _avatarSize = (ViewportUtils.getMainNavigatorWidth(context) -
-            _avatarSpacing * 4 -
-            96) /
-        4;
+    double _avatarSize =
+        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
     const double _avatarNameSpacing = 4;
     TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)
@@ -557,7 +554,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                           ),
                                           Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                MainAxisAlignment.spaceBetween,
                                             children: <Widget>[
                                               Column(
                                                 crossAxisAlignment:
@@ -594,8 +591,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(
-                                                  width: _avatarSpacing),
                                               Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
@@ -631,8 +626,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(
-                                                  width: _avatarSpacing),
                                               Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
@@ -669,8 +662,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(
-                                                  width: _avatarSpacing),
                                               Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
