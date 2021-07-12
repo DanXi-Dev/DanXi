@@ -59,7 +59,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
       iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).your_gpa),
+        title: Text(S.of(context).all_tags),
       ),
       body: MediaQuery.removePadding(
         removeTop: true,
