@@ -22,6 +22,7 @@ import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -334,7 +335,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
               padding: const EdgeInsets.only(top: 4.0),
               child: PostRenderWidget(
                 render: kMarkdownRender,
-                content: widget.controller.text,
+                content: preprocessContentForDisplay(widget.controller.text),
               ),
             ),
           ]),
