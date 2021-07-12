@@ -16,12 +16,14 @@
  */
 
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/widget/auto_network_image.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 import 'package:dan_xi/widget/image_render_x.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 BaseRender kHtmlRender = (BuildContext context, String content,
@@ -56,5 +58,35 @@ BaseRender kHtmlRender = (BuildContext context, String content,
     },
     onLinkTap: (url, _, __, ___) => onTapLink(url),
     onImageTap: (url, _, __, ___) => onTapImage(url),
+  );
+};
+BaseRender kMarkdownRender = (BuildContext context, String content,
+    LinkTapCallback onTapImage, LinkTapCallback onTapLink) {
+  double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
+  return MarkdownBody(
+    data: content,
+    onTapLink: (String text, String href, String title) =>
+        onTapLink?.call(href),
+    imageBuilder: (Uri uri, String title, String alt) {
+      if (uri != null && uri.toString() != null) {
+        return AutoNetworkImage(
+          src: uri.toString(),
+          maxWidth: imageWidth,
+          loadingWidget: Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              foregroundDecoration: BoxDecoration(color: Colors.black12),
+              width: imageWidth,
+              height: imageWidth,
+              child: Center(
+                child: PlatformCircularProgressIndicator(),
+              ),
+            ),
+          ),
+          onTap: () => onTapImage?.call((uri.toString())),
+        );
+      }
+      return Container();
+    },
   );
 };

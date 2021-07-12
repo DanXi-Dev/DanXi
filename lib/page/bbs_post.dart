@@ -454,7 +454,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ));
       },
       child: Card(
-          color: isNested
+          color: isNested && PlatformX.isCupertino(context)
               ? Theme.of(context).dividerColor.withOpacity(0.05)
               : null,
           child: ListTile(

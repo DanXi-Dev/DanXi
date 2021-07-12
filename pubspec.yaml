@@ -73,10 +73,10 @@ dependencies:
   linkify: ^4.0.0
   open_file: ^3.2.1
   dio_log: ^2.0.0
-  #json_annotation: ^3.1.1
   json_serializable: ^3.5.1
   photo_view: ^0.11.1
   gallery_saver: ^2.1.2
+  flutter_markdown: ^0.6.2
 
 dependency_overrides:
   fluttertoast:
