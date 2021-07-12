@@ -54,6 +54,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
@@ -140,10 +141,13 @@ class DanxiApp extends StatelessWidget {
     '/bbs/discussions': (context, {arguments}) =>
         BBSSubpage(arguments: arguments),
     '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
+    '/bbs/fullScreenEditor': (context, {arguments}) =>
+        BBSEditorPage(arguments: arguments),
     '/image/detail': (context, {arguments}) =>
         ImageViewerPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
   };
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
