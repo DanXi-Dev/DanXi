@@ -119,12 +119,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   bool _isFavorited;
   bool shouldUsePreloadedContent = true;
 
+  bool shouldScrollToEnd = false;
+
   /// Future of network loading.
   Future<List<Reply>> _content;
 
   void scrollToEndIfNeeded() {
-    if (widget.arguments.containsKey('scroll_to_end') &&
-        widget.arguments['scroll_to_end'] == true) {
+    if (shouldScrollToEnd) {
       final _controller = PrimaryScrollController.of(context);
       _controller.jumpTo(_controller.position.maxScrollExtent);
       /*_controller.animateTo(
@@ -163,6 +164,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // Create a dummy post for displaying search result
       _post = BBSPost.dummy();
     }
+    shouldScrollToEnd = widget.arguments.containsKey('scroll_to_end') &&
+        widget.arguments['scroll_to_end'] == true;
   }
 
   @override
@@ -180,6 +183,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   void refreshSelf() {
     if (mounted) {
       setState(() {
+        shouldScrollToEnd = false;
         _currentBBSPage = 1;
         _lastReplies = [];
         _lastSnapshotData = null;
