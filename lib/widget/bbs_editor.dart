@@ -100,7 +100,7 @@ class BBSEditor {
       {bool allowTags = false}) async {
     final textController = TextEditingController();
     List<PostTag> _tags = [];
-    switch (defaultType) {
+    switch (defaultType ?? BBSEditorType.DIALOG) {
       case BBSEditorType.DIALOG:
         return await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,

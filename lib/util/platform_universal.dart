@@ -48,6 +48,12 @@ class PlatformX {
     return isMaterial(context) ? null : Theme.of(context).cardColor;
   }
 
+  static Color backgroundAccentColor(BuildContext context) {
+    return isMaterial(context)
+        ? Theme.of(context).primaryColor
+        : Theme.of(context).accentColor;
+  }
+
   static const illegalCharWindows = [r'\/', r':', r'@'];
 
   static File createPlatformFile(String path) {

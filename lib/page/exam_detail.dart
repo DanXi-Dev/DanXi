@@ -293,7 +293,7 @@ class _ExamListState extends State<ExamList> {
       ));
 
   Widget _buildGPACard() => Card(
-        color: Theme.of(context).primaryColor,
+        color: PlatformX.backgroundAccentColor(context),
         child: ListTile(
           visualDensity: VisualDensity.comfortable,
           title: Text(
