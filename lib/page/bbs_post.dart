@@ -183,7 +183,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   void refreshSelf() {
     if (mounted) {
       setState(() {
-        shouldScrollToEnd = false;
+        shouldScrollToEnd = true;
         _currentBBSPage = 1;
         _lastReplies = [];
         _lastSnapshotData = null;
