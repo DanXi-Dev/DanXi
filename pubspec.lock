@@ -700,7 +700,7 @@ packages:
     source: hosted
     version: "5.0.1"
   markdown:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: markdown
       url: "https://pub.flutter-io.cn"

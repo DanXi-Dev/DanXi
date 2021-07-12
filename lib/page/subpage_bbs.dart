@@ -50,18 +50,28 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Render the text from a clip of [html].
-/// Also supports adding image tag to markdown posts
-String renderText(String html, String imagePlaceholder) {
-  // Deal with Markdown
-  html = html.replaceAll(RegExp(r"!\[\]\((https://.*)\)"), imagePlaceholder);
+bool isHtml(String content) {
+  var htmlMatcher = RegExp(r'<.+>.*</.+>');
+  return htmlMatcher.hasMatch(content);
+}
 
-  var soup = Beautifulsoup(html);
+/// Render the text from a clip of [content].
+/// Also supports adding image tag to markdown posts
+String renderText(String content, String imagePlaceholder) {
+  if (!isHtml(content)) {
+    content = md.markdownToHtml(content);
+  }
+  // Deal with Markdown
+  content =
+      content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
+
+  var soup = Beautifulsoup(content);
   var images = soup.find_all("img");
   if (images.length > 0) return soup.get_text().trim() + imagePlaceholder;
   return soup.get_text().trim();
@@ -296,7 +306,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   /// Log in and load all of the posts.
-  Future<List<BBSPost>> loginAndLoadPost(PersonInfo info, SortOrder sortOrder) async {
+  Future<List<BBSPost>> loginAndLoadPost(
+      PersonInfo info, SortOrder sortOrder) async {
     if (!PostRepository.getInstance().isUserInitialized)
       await PostRepository.getInstance().initializeUser(info, _preferences);
     return await PostRepository.getInstance()
@@ -381,7 +392,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                       } else if (snapshot.error is NotLoginError)
                         return _buildErrorPage(
                             error:
-                            (snapshot.error as NotLoginError).errorMessage);
+                                (snapshot.error as NotLoginError).errorMessage);
                       return _buildErrorPage(error: snapshot.error.toString());
                     },
                     loadingBuilder: () {
@@ -398,14 +409,14 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildLoadingPage() => Container(
-    padding: EdgeInsets.all(8),
-    child: Center(child: PlatformCircularProgressIndicator()),
-  );
+        padding: EdgeInsets.all(8),
+        child: Center(child: PlatformCircularProgressIndicator()),
+      );
 
   Widget _buildEmptyFavoritesPage() => Container(
-    padding: EdgeInsets.all(8),
-    child: Center(child: Text(S.of(context).no_favorites)),
-  );
+        padding: EdgeInsets.all(8),
+        child: Center(child: Text(S.of(context).no_favorites)),
+      );
 
   Widget _buildErrorPage({String error}) {
     return GestureDetector(
@@ -478,177 +489,177 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Material(
       child: Card(
           child: Column(children: [
-            ListTile(
-                contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
-                dense: false,
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    generateTagWidgets(postElement, (String tagname) {
-                      smartNavigatorPush(context, '/bbs/discussions', arguments: {
-                        "tagFilter": tagname,
-                        'preferences': _preferences,
-                      });
-                    }),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    (postElement.is_folded && _foldBehavior == FoldBehavior.FOLD)
-                        ? Theme(
-                      data: Theme.of(context)
-                          .copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                        expandedAlignment: Alignment.topLeft,
-                        childrenPadding: EdgeInsets.symmetric(vertical: 4),
-                        tilePadding: EdgeInsets.zero,
-                        title: Text(
-                          S.of(context).folded,
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor,
-                              fontSize: 12),
-                        ),
-                        children: [
-                          Linkify(
-                            text: renderText(postElement.first_post.content,
-                                S.of(context).image_tag),
-                            style: TextStyle(fontSize: 16),
-                            maxLines: 6,
-                            overflow: TextOverflow.ellipsis,
-                            onOpen: (link) async {
-                              if (await canLaunch(link.url)) {
-                                BrowserUtil.openUrl(link.url, context);
-                              } else {
-                                Noticing.showNotice(
-                                    context, S.of(context).cannot_launch_url);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-                        : Linkify(
-                      text: renderText(postElement.first_post.content,
-                          S.of(context).image_tag),
-                      style: TextStyle(fontSize: 16),
-                      maxLines: 6,
-                      overflow: TextOverflow.ellipsis,
-                      onOpen: (link) async {
-                        if (await canLaunch(link.url)) {
-                          BrowserUtil.openUrl(link.url, context);
-                        } else {
-                          Noticing.showNotice(
-                              context, S.of(context).cannot_launch_url);
-                        }
-                      },
-                    ),
-                  ],
+        ListTile(
+            contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
+            dense: false,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                generateTagWidgets(postElement, (String tagname) {
+                  smartNavigatorPush(context, '/bbs/discussions', arguments: {
+                    "tagFilter": tagname,
+                    'preferences': _preferences,
+                  });
+                }),
+                const SizedBox(
+                  height: 10,
                 ),
-                subtitle: Column(
-                  children: [
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "#${postElement.id}",
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor, fontSize: 12),
-                        ),
-                        Text(
-                          HumanDuration.format(
-                              context, DateTime.parse(postElement.date_created)),
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor, fontSize: 12),
-                        ),
-                        Row(
+                (postElement.is_folded && _foldBehavior == FoldBehavior.FOLD)
+                    ? Theme(
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          expandedAlignment: Alignment.topLeft,
+                          childrenPadding: EdgeInsets.symmetric(vertical: 4),
+                          tilePadding: EdgeInsets.zero,
+                          title: Text(
+                            S.of(context).folded,
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12),
+                          ),
                           children: [
-                            Text(
-                              postElement.count.toString() + " ",
-                              style: TextStyle(
-                                  color: Theme.of(context).hintColor, fontSize: 12),
-                            ),
-                            Icon(
-                              SFSymbols.ellipses_bubble,
-                              size: 12,
-                              color: Theme.of(context).hintColor,
+                            Linkify(
+                              text: renderText(postElement.first_post.content,
+                                  S.of(context).image_tag),
+                              style: TextStyle(fontSize: 16),
+                              maxLines: 6,
+                              overflow: TextOverflow.ellipsis,
+                              onOpen: (link) async {
+                                if (await canLaunch(link.url)) {
+                                  BrowserUtil.openUrl(link.url, context);
+                                } else {
+                                  Noticing.showNotice(
+                                      context, S.of(context).cannot_launch_url);
+                                }
+                              },
                             ),
                           ],
+                        ),
+                      )
+                    : Linkify(
+                        text: renderText(postElement.first_post.content,
+                            S.of(context).image_tag),
+                        style: TextStyle(fontSize: 16),
+                        maxLines: 6,
+                        overflow: TextOverflow.ellipsis,
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            BrowserUtil.openUrl(link.url, context);
+                          } else {
+                            Noticing.showNotice(
+                                context, S.of(context).cannot_launch_url);
+                          }
+                        },
+                      ),
+              ],
+            ),
+            subtitle: Column(
+              children: [
+                const SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "#${postElement.id}",
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    ),
+                    Text(
+                      HumanDuration.format(
+                          context, DateTime.parse(postElement.date_created)),
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          postElement.count.toString() + " ",
+                          style: TextStyle(
+                              color: Theme.of(context).hintColor, fontSize: 12),
+                        ),
+                        Icon(
+                          SFSymbols.ellipses_bubble,
+                          size: 12,
+                          color: Theme.of(context).hintColor,
                         ),
                       ],
                     ),
                   ],
                 ),
-                onTap: () {
-                  smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                    "post": postElement,
-                  });
-                }),
-            if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
-                postElement.last_post.id != postElement.first_post.id)
-              Divider(
-                height: 4,
+              ],
+            ),
+            onTap: () {
+              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                "post": postElement,
+              });
+            }),
+        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
+            postElement.last_post.id != postElement.first_post.id)
+          Divider(
+            height: 4,
+          ),
+        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
+            postElement.last_post.id != postElement.first_post.id)
+          //_buildCommentView(postElement),
+          ListTile(
+              dense: true,
+              minLeadingWidth: 16,
+              leading: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                child: Icon(
+                  SFSymbols.quote_bubble,
+                  color: Theme.of(context).hintColor,
+                ),
               ),
-            if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
-                postElement.last_post.id != postElement.first_post.id)
-            //_buildCommentView(postElement),
-              ListTile(
-                  dense: true,
-                  minLeadingWidth: 16,
-                  leading: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child: Icon(
-                      SFSymbols.quote_bubble,
-                      color: Theme.of(context).hintColor,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
+                    child: Text(
+                      S.of(context).latest_reply(
+                          postElement.last_post.username,
+                          HumanDuration.format(
+                              context,
+                              DateTime.parse(
+                                  postElement.last_post.date_created))),
+                      style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                   ),
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
-                        child: Text(
-                          S.of(context).latest_reply(
-                              postElement.last_post.username,
-                              HumanDuration.format(
-                                  context,
-                                  DateTime.parse(
-                                      postElement.last_post.date_created))),
-                          style: TextStyle(color: Theme.of(context).hintColor),
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                          child: Linkify(
-                            text: renderText(postElement.last_post.content,
-                                S.of(context).image_tag)
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
+                      child: Linkify(
+                        text: renderText(postElement.last_post.content,
+                                    S.of(context).image_tag)
                                 .trim()
                                 .isEmpty
-                                ? S.of(context).no_summary
-                                : renderText(postElement.last_post.content,
+                            ? S.of(context).no_summary
+                            : renderText(postElement.last_post.content,
                                 S.of(context).image_tag),
-                            style: TextStyle(fontSize: 14),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            onOpen: (link) async {
-                              if (await canLaunch(link.url)) {
-                                BrowserUtil.openUrl(link.url, context);
-                              } else {
-                                Noticing.showNotice(
-                                    context, S.of(context).cannot_launch_url);
-                              }
-                            },
-                          )),
-                    ],
-                  ),
-                  onTap: () =>
-                      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                        "post": postElement,
-                        "scroll_to_end": true,
-                      }))
-          ])),
+                        style: TextStyle(fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            BrowserUtil.openUrl(link.url, context);
+                          } else {
+                            Noticing.showNotice(
+                                context, S.of(context).cannot_launch_url);
+                          }
+                        },
+                      )),
+                ],
+              ),
+              onTap: () =>
+                  smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                    "post": postElement,
+                    "scroll_to_end": true,
+                  }))
+      ])),
     );
   }
 

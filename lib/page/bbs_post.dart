@@ -128,11 +128,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (shouldScrollToEnd) {
       final _controller = PrimaryScrollController.of(context);
       _controller.jumpTo(_controller.position.maxScrollExtent);
-      /*_controller.animateTo(
-        _controller.position.maxScrollExtent,
-        duration: Duration(seconds: 1),
-        curve: Curves.linearToEaseOut,
-      );*/
     }
   }
 
@@ -250,10 +245,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   setState(() => _isFavorited = !_isFavorited);
                   await PostRepository.getInstance()
                       .setFavoredDiscussion(
-                      _isFavorited
-                          ? SetFavoredDiscussionMode.ADD
-                          : SetFavoredDiscussionMode.DELETE,
-                      _post.id)
+                          _isFavorited
+                              ? SetFavoredDiscussionMode.ADD
+                              : SetFavoredDiscussionMode.DELETE,
+                          _post.id)
                       .onError((error, stackTrace) {
                     Noticing.showNotice(
                         context, S.of(context).operation_failed);
@@ -296,7 +291,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       return Container(
                         padding: EdgeInsets.all(8),
                         child:
-                        Center(child: PlatformCircularProgressIndicator()),
+                            Center(child: PlatformCircularProgressIndicator()),
                       );
                     // If the page is showing search results, just show it whatever.
                     if (_searchResult != null)
@@ -508,31 +503,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         true),
                   ),
                 Align(
-                  alignment: Alignment.topLeft,
-                  child: isNested
-                      // If content is being quoted, limit its height so that the view won't be too long.
-                      ? Linkify(
-                          text: renderText(e.content, S.of(context).image_tag)
-                              .trim(),
-                          textScaleFactor: 0.8,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          onOpen: (link) async {
-                            if (await canLaunch(link.url)) {
-                              BrowserUtil.openUrl(link.url, context);
-                            } else {
-                              Noticing.showNotice(
-                                  context, S.of(context).cannot_launch_url);
-                            }
-                          },
-                        )
-                      : PostRenderWidget(
-                          render: kHtmlRender,
-                          content: preprocessContentForDisplay(e.content),
-                          onTapImage: onLinkTap,
-                          onTapLink: onLinkTap,
-                        ),
-                ),
+                    alignment: Alignment.topLeft,
+                    child: isNested
+                        // If content is being quoted, limit its height so that the view won't be too long.
+                        ? Linkify(
+                            text: renderText(e.content, S.of(context).image_tag)
+                                .trim(),
+                            textScaleFactor: 0.8,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            onOpen: (link) async {
+                              if (await canLaunch(link.url)) {
+                                BrowserUtil.openUrl(link.url, context);
+                              } else {
+                                Noticing.showNotice(
+                                    context, S.of(context).cannot_launch_url);
+                              }
+                            },
+                          )
+                        : smartRender(e.content, onLinkTap, onLinkTap)),
               ],
             ),
             subtitle: isNested
@@ -585,4 +574,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           )),
     );
   }
+
+  PostRenderWidget smartRender(String content, LinkTapCallback onTapLink,
+          LinkTapCallback onTapImage) =>
+      isHtml(content)
+          ? PostRenderWidget(
+              render: kHtmlRender,
+              content: preprocessContentForDisplay(content),
+              onTapImage: onTapImage,
+              onTapLink: onTapLink,
+            )
+          : PostRenderWidget(
+              render: kMarkdownRender,
+              content: content,
+              onTapImage: onTapImage,
+              onTapLink: onTapLink,
+            );
 }
