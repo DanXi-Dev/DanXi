@@ -144,18 +144,9 @@ class DanxiApp extends StatelessWidget {
         ImageViewerPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
   };
-
-  /// Change the size of window on desktop to fit the proper ratio.
-  changeSizeOnDesktop() async {
-    if (PlatformX.isWindows) {
-      await DesktopWindow.setWindowSize(Size(480, 960));
-    }
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
       builder: (BuildContext context) => Theme(
