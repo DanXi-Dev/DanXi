@@ -14,27 +14,25 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:json_annotation/json_annotation.dart';
 
-part 'reply.g.dart';
+import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:flutter/widgets.dart';
 
-@JsonSerializable()
-class Reply {
-  final int id;
+class PostRenderWidget extends StatelessWidget {
   final String content;
-  final String username;
-  final int reply_to;
-  final String date_created;
-  final int discussion;
-  final bool is_me;
+  final BaseRender render;
+  final LinkTapCallback onTapImage;
+  final LinkTapCallback onTapLink;
 
-  Reply(this.id, this.content, this.username, this.reply_to, this.date_created,
-      this.discussion, this.is_me);
+  const PostRenderWidget(
+      {Key key,
+      @required this.content,
+      @required this.render,
+      this.onTapImage,
+      this.onTapLink})
+      : super(key: key);
 
-  factory Reply.fromJson(Map<String, dynamic> json) => _$ReplyFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ReplyToJson(this);
-
-  /// Generate an empty Reply for special sakes.
-  factory Reply.dummy() => Reply(-1, "", "", null, "", -1, false);
+  @override
+  Widget build(BuildContext context) =>
+      render.call(context, content, onTapImage, onTapLink);
 }

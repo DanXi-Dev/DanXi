@@ -35,6 +35,9 @@ import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -86,6 +89,8 @@ String preprocessContentForDisplay(String content) {
 /// Arguments:
 /// [BBSPost] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
 /// Otherwise as a list of search result.
+/// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
+/// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
 ///
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -97,20 +102,24 @@ class BBSPostDetail extends StatefulWidget {
 }
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
+  static const POST_COUNT_PER_PAGE = 10;
+
+  /// Unrelated to the state.
+  /// These field should only be initialized once when created.
   BBSPost _post;
+  Future<List<Reply>> _searchResult;
+  SharedPreferences _preferences;
+
+  /// Fields related to the display states.
   int _currentBBSPage = 1;
   List<Reply> _lastReplies = [];
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing = true;
   bool _isEndIndicatorShown = false;
   bool _isFavorited;
-  static const POST_COUNT_PER_PAGE = 10;
-
   bool shouldUsePreloadedContent = true;
 
-  Future<List<Reply>> _searchResult;
-  SharedPreferences _preferences;
-
+  /// Future of network loading.
   Future<List<Reply>> _content;
 
   void scrollToEndIfNeeded() {
@@ -126,7 +135,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     }
   }
 
-  void _setContent() {
+  /// Reload/load the (new) content and set the [_content] future.
+  void _loadContent() {
     if (_searchResult != null)
       _content = _searchResult;
     else if (_currentBBSPage == 1 && shouldUsePreloadedContent)
@@ -146,28 +156,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   @override
   void initState() {
     super.initState();
-
     if (widget.arguments['post'] is BBSPost) {
       _post = widget.arguments['post'];
     } else {
       _searchResult = widget.arguments['post'];
       // Create a dummy post for displaying search result
-      _post = new BBSPost(
-          -1,
-          new Reply(-1, "", "", null, "", -1, false),
-          -1,
-          null,
-          null,
-          false,
-          "",
-          "",
-          [new Reply(-1, "", "", null, "", -1, false)]);
+      _post = BBSPost.dummy();
     }
   }
 
   @override
-  void didChangeDependencies() async {
-    _setContent();
+  void didChangeDependencies() {
+    _loadContent();
     super.didChangeDependencies();
     _getSharedPreferences();
   }
@@ -176,7 +176,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  /// Rebuild everything on refreshing.
+  /// Rebuild everything and refresh itself.
   void refreshSelf() {
     if (mounted) {
       setState(() {
@@ -186,20 +186,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _isRefreshing = true;
         _isEndIndicatorShown = false;
         shouldUsePreloadedContent = false;
-        _setContent();
+        _loadContent();
       });
     }
   }
 
   @override
   void didUpdateWidget(covariant BBSPostDetail oldWidget) {
-    _setContent();
+    _loadContent();
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
-    // A listener to a scroll view, loading new content when scroll to the bottom.
+    // A listener to the scroll view, loading new content when scroll to the bottom.
     NotificationListenerCallback<ScrollNotification> onScrollToBottom =
         (ScrollNotification scrollInfo) {
       if (scrollInfo.metrics.extentAfter < 500 &&
@@ -208,7 +208,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _isRefreshing = true;
         setState(() {
           _currentBBSPage++;
-          _setContent();
+          _loadContent();
         });
       }
       return false;
@@ -365,43 +365,41 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu(Reply e) {
-    return [
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(context).pop();
-            FlutterClipboard.copy(renderText(e.content, ''));
-          },
-          child: Text(S.of(context).copy),
+  List<Widget> _buildContextMenu(Reply e) => [
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              FlutterClipboard.copy(renderText(e.content, ''));
+            },
+            child: Text(S.of(context).copy),
+          ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(context).copy),
+            onTap: () {
+              Navigator.of(context).pop();
+              FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
+                  Noticing.showNotice(context, S.of(context).copy_success));
+            },
+          ),
         ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(context).copy),
-          onTap: () {
-            Navigator.of(context).pop();
-            FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
-                Noticing.showNotice(context, S.of(context).copy_success));
-          },
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              BBSEditor.reportPost(context, e.id);
+            },
+            child: Text(S.of(context).report),
+          ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(context).report),
+            onTap: () {
+              Navigator.of(context).pop();
+              BBSEditor.reportPost(context, e.id);
+            },
+          ),
         ),
-      ),
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(context).pop();
-            BBSEditor.reportPost(context, e.id);
-          },
-          child: Text(S.of(context).report),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(context).report),
-          onTap: () {
-            Navigator.of(context).pop();
-            BBSEditor.reportPost(context, e.id);
-          },
-        ),
-      ),
-    ];
-  }
+      ];
 
   Widget _OPLeadingTag() => Container(
         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
@@ -424,14 +422,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   Widget _getListItems(Reply e, bool generateTags, bool isNested) {
-    OnTap onLinkTap = (url, _, __, ___) {
+    LinkTapCallback onLinkTap = (url) {
       if (ImageViewerPage.isImage(url)) {
         smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
       } else {
         BrowserUtil.openUrl(url, context);
       }
     };
-    double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
     return GestureDetector(
       onLongPress: () {
         showPlatformModalSheet(
@@ -466,10 +463,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (generateTags)
                   Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(_post, (String tagname) {
+                      child: generateTagWidgets(_post, (String tagName) {
                         smartNavigatorPush(context, '/bbs/discussions',
                             arguments: {
-                              "tagFilter": tagname,
+                              "tagFilter": tagName,
                               'preferences': _preferences,
                             });
                       })),
@@ -495,7 +492,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
                     child: _getListItems(
                         _lastReplies.firstWhere(
-                          (element) => element.id == e.reply_to,
+                              (element) => element.id == e.reply_to,
                         ),
                         false,
                         true),
@@ -503,7 +500,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: isNested
-                      // If content is being quoted, limit its height so that the view won't be too long.
+                  // If content is being quoted, limit its height so that the view won't be too long.
                       ? Linkify(
                           text: renderText(e.content, S.of(context).image_tag)
                               .trim(),
@@ -519,44 +516,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             }
                           },
                         )
-                      : Container(
-                          //constraints: BoxConstraints(maxHeight: 400),
-                          child: Html(
-                            shrinkWrap: true,
-                            data: preprocessContentForDisplay(e.content),
-                            style: {
-                              "body": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                              "p": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                            },
-                            customImageRenders: {
-                              networkSourceMatcher(): networkImageClipRender(
-                                  loadingWidget: () => Center(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 12),
-                                          foregroundDecoration: BoxDecoration(
-                                              color: Colors.black12),
-                                          width: imageWidth,
-                                          height: imageWidth,
-                                          child: Center(
-                                            child:
-                                                PlatformCircularProgressIndicator(),
-                                          ),
-                                        ),
-                                      ),
-                                  maxHeight: imageWidth),
-                            },
-                            onLinkTap: onLinkTap,
-                            onImageTap: onLinkTap,
-                          ),
+                      : PostRenderWidget(
+                    render: kHtmlRender,
+                          content: preprocessContentForDisplay(e.content),
+                          onTapImage: onLinkTap,
+                          onTapLink: onLinkTap,
                         ),
                 ),
               ],

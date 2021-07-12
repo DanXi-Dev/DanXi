@@ -14,27 +14,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:json_annotation/json_annotation.dart';
 
-part 'reply.g.dart';
+import 'package:flutter/cupertino.dart';
 
-@JsonSerializable()
-class Reply {
-  final int id;
-  final String content;
-  final String username;
-  final int reply_to;
-  final String date_created;
-  final int discussion;
-  final bool is_me;
+typedef LinkTapCallback = void Function(String url);
 
-  Reply(this.id, this.content, this.username, this.reply_to, this.date_created,
-      this.discussion, this.is_me);
-
-  factory Reply.fromJson(Map<String, dynamic> json) => _$ReplyFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ReplyToJson(this);
-
-  /// Generate an empty Reply for special sakes.
-  factory Reply.dummy() => Reply(-1, "", "", null, "", -1, false);
-}
+/// BaseRender is the base type of a render which renders the post raw [content] into a [Widget].
+///
+/// [kHtmlRender] is one of its implementations.
+typedef BaseRender = Widget Function(BuildContext context, String content,
+    LinkTapCallback onTapImage, LinkTapCallback onTapLink);
