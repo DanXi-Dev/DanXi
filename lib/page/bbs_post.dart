@@ -327,7 +327,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           primary: true,
           physics: const AlwaysScrollableScrollPhysics(),
           addAutomaticKeepAlives: true,
-          itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
+          itemCount: _isRefreshing
+              ? (_currentBBSPage - 1) * POST_COUNT_PER_PAGE
+              : _currentBBSPage * POST_COUNT_PER_PAGE,
           itemBuilder: (context, index) => _buildListItem(index, data, true),
         ),
         controller: PrimaryScrollController.of(context),
@@ -492,7 +494,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
                     child: _getListItems(
                         _lastReplies.firstWhere(
-                              (element) => element.id == e.reply_to,
+                          (element) => element.id == e.reply_to,
                         ),
                         false,
                         true),
@@ -500,7 +502,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: isNested
-                  // If content is being quoted, limit its height so that the view won't be too long.
+                      // If content is being quoted, limit its height so that the view won't be too long.
                       ? Linkify(
                           text: renderText(e.content, S.of(context).image_tag)
                               .trim(),
@@ -517,7 +519,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           },
                         )
                       : PostRenderWidget(
-                    render: kHtmlRender,
+                          render: kHtmlRender,
                           content: preprocessContentForDisplay(e.content),
                           onTapImage: onLinkTap,
                           onTapLink: onLinkTap,
