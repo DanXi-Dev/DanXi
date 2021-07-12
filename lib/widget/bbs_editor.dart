@@ -289,6 +289,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                   builder: (BuildContext context) {
                     return ThemedMaterial(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
