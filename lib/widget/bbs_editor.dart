@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
@@ -31,6 +32,7 @@ import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
@@ -148,7 +150,7 @@ class BBSEditor {
         loadingText: S.of(context).uploading_image, context: context);
     try {
       await PostRepository.getInstance().uploadImage(File(_file.path)).then(
-              (value) {
+          (value) {
         if (value != null) _controller.text += "![]($value)";
         //"showAnim: true" makes it crash. Don't know the reason.
         progressDialog.dismiss(showAnim: false);
@@ -287,7 +289,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 showPlatformModalSheet(
                   context: context,
                   builder: (BuildContext context) {
-                    return ThemedMaterial(
+                    return Material(
+                      color: PlatformX.backgroundColor(context),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -301,8 +304,10 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                           Divider(),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              S.of(context).markdown_description,
+                            child: Linkify(
+                              text: S.of(context).markdown_description,
+                              onOpen: (element) =>
+                                  BrowserUtil.openUrl(element.url, context),
                             ),
                           ),
                         ],

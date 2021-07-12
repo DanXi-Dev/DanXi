@@ -705,6 +705,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             overflow: TextOverflow.ellipsis,
             textScaleFactor: 0.9,
             maxLines: 2,
+            onOpen: (element) => BrowserUtil.openUrl(element.url, context),
           )
         ],
       ),

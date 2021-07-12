@@ -37,7 +37,7 @@ class BrowserUtil {
                   javaScriptEnabled: true, useOnDownloadStart: true),
             ))
           : InAppBrowserClassOptions(
-          android: AndroidInAppBrowserOptions(hideTitleBar: true),
+              android: AndroidInAppBrowserOptions(hideTitleBar: true),
               ios: IOSInAppBrowserOptions(
                 presentationStyle: IOSUIModalPresentationStyle.POPOVER,
               ),

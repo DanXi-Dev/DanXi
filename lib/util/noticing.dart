@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,14 +28,21 @@ class Noticing {
   static showNotice(BuildContext context, String message,
       {String confirmText, String title, bool androidUseSnackbar = true}) {
     if (PlatformX.isMaterial(context) && androidUseSnackbar) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Linkify(text: message)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Linkify(
+        text: message,
+        onOpen: (element) => BrowserUtil.openUrl(element.url, context),
+      )));
     } else {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: title == null ? null : Text(title),
-                content: Linkify(text: message),
+                content: Linkify(
+                  text: message,
+                  onOpen: (element) =>
+                      BrowserUtil.openUrl(element.url, context),
+                ),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(confirmText ?? S.of(context).i_see),

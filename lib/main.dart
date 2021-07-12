@@ -738,7 +738,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 title: Text(
                   S.of(context).developer_announcement(announcement.createdAt),
                 ),
-                content: Linkify(text: announcement.content),
+                content: Linkify(
+                  text: announcement.content,
+                  onOpen: (element) =>
+                      BrowserUtil.openUrl(element.url, context),
+                ),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(S.of(context).i_see),

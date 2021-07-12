@@ -182,7 +182,7 @@
     "post_does_not_exist": "The requested post does not exist.",
     "add_image": "Add Image",
     "markdown_enabled": "Markdown enabled",
-    "markdown_description": "Markdown parser is working. You can write posts with Markdown syntax. If you don't know what Markdown is, you can ignore this description. \n\nNote: In Markdown, if you want to make a line break, you need to type in two \"enters\" (i.e. leaving a blank line in between).",
+    "markdown_description": "Markdown parser enabled. You can write with Markdown syntax. If you don't know what Markdown is, check out https://www.runoob.com/markdown/md-tutorial.html\n\nNote: In Markdown, if you want to create a new line, you need to type in two \"enters\" (i.e. leaving a blank line in between).",
     "all_tags": "All Tags",
     "preview": "Preview",
 
