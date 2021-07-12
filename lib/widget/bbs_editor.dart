@@ -51,8 +51,8 @@ class BBSEditor {
     if (content?.content == null) return false;
     final int responseCode = await PostRepository.getInstance()
         .newPost(content.content, tags: content.tags)
-        .onError((error, stackTrace) => -1);
-    if (responseCode != 200) {
+        .onError((error, stackTrace) => HttpStatus.networkConnectTimeoutError);
+    if (responseCode != HttpStatus.ok) {
       Noticing.showNotice(context, S.of(context).post_failed,
           title: S.of(context).fatal_error, androidUseSnackbar: false);
       return false;
@@ -60,7 +60,8 @@ class BBSEditor {
     return true;
   }
 
-  static Future<void> createNewReply(BuildContext context, int discussionId, int postId) async {
+  static Future<void> createNewReply(
+      BuildContext context, int discussionId, int postId) async {
     final String content = (await _showEditor(
             context,
             postId == null
@@ -86,7 +87,7 @@ class BBSEditor {
     if (content == null || content.trim() == "") return;
 
     int responseCode =
-    await PostRepository.getInstance().reportPost(postId, content);
+        await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
       Noticing.showNotice(context, S.of(context).report_failed(responseCode),
           title: S.of(context).fatal_error, androidUseSnackbar: false);
@@ -147,12 +148,12 @@ class BBSEditor {
         loadingText: S.of(context).uploading_image, context: context);
     try {
       await PostRepository.getInstance().uploadImage(File(_file.path)).then(
-          (value) {
+              (value) {
         if (value != null) _controller.text += "![]($value)";
-            //"showAnim: true" makes it crash. Don't know the reason.
-            progressDialog.dismiss(showAnim: false);
-            return value;
-          }, onError: (e) {
+        //"showAnim: true" makes it crash. Don't know the reason.
+        progressDialog.dismiss(showAnim: false);
+        return value;
+      }, onError: (e) {
         progressDialog.dismiss(showAnim: false);
         Noticing.showNotice(context, S.of(context).uploading_image_failed);
         throw e;
