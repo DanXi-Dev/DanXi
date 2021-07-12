@@ -35,28 +35,34 @@ class RoundChip extends StatefulWidget {
 class _RoundChipState extends State<RoundChip> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-        height: 24,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: widget.color,
-            width: 1,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+            height: 24,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: widget.color,
+                width: 1,
+              ),
+              color:
+                  PlatformX.isDarkMode ? widget.color.withOpacity(0.3) : null,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Text(
+                widget.label,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: PlatformX.isDarkMode ? Colors.white : widget.color),
+              ),
+            ),
           ),
-          color: PlatformX.isDarkMode ? widget.color.withOpacity(0.3) : null,
-          borderRadius: BorderRadius.circular(16),
         ),
-        child: Center(
-          child: Text(
-            widget.label,
-            style: TextStyle(
-                fontSize: 14,
-                color: PlatformX.isDarkMode ? Colors.white : widget.color),
-          ),
-        ),
-      ),
+      ],
     );
   }
 }

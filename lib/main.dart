@@ -27,6 +27,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
 import 'package:dan_xi/page/bbs_post.dart';
+import 'package:dan_xi/page/bbs_tags.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/dashboard_reorder.dart';
@@ -138,6 +139,7 @@ class DanxiApp extends StatelessWidget {
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
         BBSSubpage(arguments: arguments),
+    '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
     '/image/detail': (context, {arguments}) =>
         ImageViewerPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
@@ -572,6 +574,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         onPressed: _onPressLeadingActionButton,
       );
     }
+
+    // BBS Subpage's third trailing button
+    if (_pageIndex.value == 1) {
+      trailingButtons.add(PlatformIconButton(
+        material: (_, __) =>
+            MaterialIconButtonData(tooltip: S.of(context).all_tags),
+        padding: EdgeInsets.zero,
+        cupertinoIcon: Icon(SFSymbols.tag),
+        materialIcon: Icon(Icons.tag),
+        onPressed: () => smartNavigatorPush(context, '/bbs/tags', arguments: {
+          'preferences': _preferences,
+        }),
+      ));
+    }
+
     if (_subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
             context) !=
         null) {
