@@ -134,7 +134,6 @@ class _ExamListState extends State<ExamList> {
                   _unpackedSemester = snapshot.data;
                   if (_showingSemester == null)
                     _showingSemester = _unpackedSemester.length - 5;
-
                   return Column(
                     children: [
                       Row(
@@ -205,7 +204,19 @@ class _ExamListState extends State<ExamList> {
               child: Center(
             child: PlatformCircularProgressIndicator(),
           )),
-          errorBuilder: _loadGradeViewFromDataCenter));
+          errorBuilder:
+              (BuildContext context, AsyncSnapshot<List<ExamScore>> snapshot) {
+            if (snapshot.error is RangeError)
+              return Padding(
+                child: Center(
+                  child: Text(
+                    S.of(context).no_data,
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 32),
+              );
+            return _loadGradeViewFromDataCenter();
+          }));
 
   Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>> snapshot,
           {bool isFallback = false}) =>
@@ -237,16 +248,6 @@ class _ExamListState extends State<ExamList> {
           errorBuilder: _buildErrorPage));
 
   Widget _buildErrorPage(BuildContext context, AsyncSnapshot snapshot) {
-    if (snapshot.error is RangeError)
-      return Padding(
-        child: Center(
-          child: Text(
-            S.of(context).no_data,
-          ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 32),
-      );
-
     return GestureDetector(
         onTap: () {
           setState(() {
