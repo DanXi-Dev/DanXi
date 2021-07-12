@@ -61,26 +61,41 @@ String preprocessContentForDisplay(String content) {
   String result = "";
   int hrefCount = 0;
 
-  // Workaround Markdown images
+  /* Workaround Markdown images
   content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
-      (match) => "<img src=\"${match.group(1)}\"></img>");
-
-  linkify(content, options: LinkifyOptions(humanize: false)).forEach((element) {
-    if (element is UrlElement) {
-      // Only add tag if tag has not yet been added.
-      if (hrefCount == 0) {
-        result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
+      (match) => "<img src=\"${match.group(1)}\"></img>");*/
+  if (isHtml(content)) {
+    linkify(content, options: LinkifyOptions(humanize: false))
+        .forEach((element) {
+      if (element is UrlElement) {
+        // Only add tag if tag has not yet been added.
+        if (hrefCount == 0) {
+          result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
+        } else {
+          result += element.text;
+          hrefCount--;
+        }
       } else {
+        if (element.text.contains('<a href='))
+          hrefCount++;
+        else if (element.text.contains('<img src="')) hrefCount++;
         result += element.text;
-        hrefCount--;
       }
-    } else {
-      if (element.text.contains('<a href='))
-        hrefCount++;
-      else if (element.text.contains('<img src="')) hrefCount++;
-      result += element.text;
-    }
-  });
+    });
+  } else {
+    linkify(content, options: LinkifyOptions(humanize: false))
+        .forEach((element) {
+      if (element is UrlElement) {
+        // Only add tag if tag has not yet been added.
+        if (RegExp("\\[.*?\\]\\(${element.url}\\)").hasMatch(content) ||
+            RegExp("\\[.*?${element.url}.*?\\]\\(http.*?\\)").hasMatch(content))
+          result += element.url;
+        else
+          result += "[${element.text}](${element.url})";
+      } else
+        result += element.text;
+    });
+  }
   return result;
 }
 
