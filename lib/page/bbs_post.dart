@@ -57,14 +57,15 @@ import 'package:url_launcher/url_launcher.dart';
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
 /// (2) Markdown Images are converted to HTML images.
-String preprocessContentForDisplay(String content) {
+String preprocessContentForDisplay(String content,
+    {bool forceMarkdown = false}) {
   String result = "";
   int hrefCount = 0;
 
   /* Workaround Markdown images
   content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
       (match) => "<img src=\"${match.group(1)}\"></img>");*/
-  if (isHtml(content)) {
+  if (isHtml(content) && !forceMarkdown) {
     linkify(content, options: LinkifyOptions(humanize: false))
         .forEach((element) {
       if (element is UrlElement) {
@@ -600,8 +601,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTapLink: onTapLink,
             )
           : PostRenderWidget(
-              render: kMarkdownRender,
-              content: content,
+        render: kMarkdownRender,
+              content: preprocessContentForDisplay(content),
               onTapImage: onTapImage,
               onTapLink: onTapLink,
             );
