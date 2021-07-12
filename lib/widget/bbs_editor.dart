@@ -278,7 +278,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       onChanged: () {}),
                 ),
               ),
-            IconButton(
+            PlatformIconButton(
               icon: Icon(
                 IconFont.markdown,
                 color: Theme.of(context).accentColor,
