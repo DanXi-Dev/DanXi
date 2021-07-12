@@ -143,7 +143,7 @@
     "report_success":"举报成功，感谢您为维护良好社区环境所作出的贡献。",
     "report_failed": "举报失败 (HTTP {code})",
     "reply_failed": "回复失败 (HTTP {code})",
-    "post_failed":"网络错误，帖子发布失败",
+    "post_failed":"发布失败",
     "folded": "该内容已折叠，点击查看",
     "share":"分享",
     "login_with_uis":"将使用以下信息匿名登录树洞",

@@ -205,7 +205,7 @@ class BBSEditor {
                     child: Text(S.of(context).submit),
                     onPressed: () async {
                       Navigator.of(context).pop<PostEditorText>(
-                          PostEditorText(textController.text, null));
+                          PostEditorText(textController.text, _tags));
                     }),
               ],
             ));
