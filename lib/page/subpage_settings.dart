@@ -291,7 +291,11 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                 },
                               ),
                               PlatformDialogAction(
-                                  child: Text(S.of(context).i_see),
+                                  child: Text(
+                                    S.of(context).i_see,
+                                    style: TextStyle(
+                                        color: Theme.of(context).errorColor),
+                                  ),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     _deleteAllDataAndExit();

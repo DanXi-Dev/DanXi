@@ -129,7 +129,7 @@ class BBSEditor {
                 ));
         break;
       case BBSEditorType.PAGE:
-        // Receive the value with dynamic to prevent automatic type inference
+        // Receive the value with dynamic variable to prevent automatic type inference
         dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
             arguments: {"title": title, "tags": allowTags});
