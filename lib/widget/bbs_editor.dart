@@ -18,11 +18,16 @@
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -30,6 +35,7 @@ import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 class BBSEditor {
   /// Returns true on success, false on failure
@@ -88,108 +94,16 @@ class BBSEditor {
       {bool allowTags = false}) async {
     final textController = TextEditingController();
     List<PostTag> _tags = [];
-    List<PostTag> _allTags;
     return await showPlatformDialog<PostEditorText>(
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
               title: Text(title),
-              content: Column(children: [
-                if (allowTags)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: ThemedMaterial(
-                      child: FlutterTagging<PostTag>(
-                          initialItems: _tags,
-                          textFieldConfiguration: TextFieldConfiguration(
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(fontSize: 12),
-                              labelText: S.of(context).select_tags,
-                            ),
-                          ),
-                          findSuggestions: (String filter) async {
-                            if (_allTags == null)
-                              _allTags =
-                                  await PostRepository.getInstance().loadTags();
-                            return _allTags
-                                .where((value) => value.name
-                                    .toLowerCase()
-                                    .contains(filter.toLowerCase()))
-                                .toList();
-                          },
-                          additionCallback: (value) =>
-                              PostTag(value, Constant.randomColor, 0),
-                          onAdded: (tag) => tag,
-                          configureSuggestion: (tag) => SuggestionConfiguration(
-                                title: Text(
-                                  tag.name,
-                                  style: TextStyle(
-                                      color: Constant.getColorFromString(
-                                          tag.color)),
-                                ),
-                                subtitle: Row(
-                                  children: [
-                                    Icon(
-                                      SFSymbols.flame,
-                                      color: Constant.getColorFromString(
-                                          tag.color),
-                                      size: 12,
-                                    ),
-                                    const SizedBox(
-                                      width: 2,
-                                    ),
-                                    Text(
-                                      tag.count.toString(),
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          color: Constant.getColorFromString(
-                                              tag.color)),
-                                    ),
-                                  ],
-                                ),
-                                additionWidget: Chip(
-                                  avatar: Icon(
-                                    Icons.add_circle,
-                                    color: Colors.white,
-                                  ),
-                                  label: Text(S.of(context).add_new_tag),
-                                  labelStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                  backgroundColor:
-                                      Theme.of(context).accentColor,
-                                ),
-                              ),
-                          configureChip: (lang) => ChipConfiguration(
-                                label: Text(lang.name),
-                                backgroundColor:
-                                    Constant.getColorFromString(lang.color),
-                                labelStyle: TextStyle(
-                                    color:
-                                        Constant.getColorFromString(lang.color)
-                                                    .computeLuminance() >=
-                                                0.5
-                                            ? Colors.black
-                                            : Colors.white),
-                                deleteIconColor:
-                                    Constant.getColorFromString(lang.color)
-                                                .computeLuminance() >=
-                                            0.5
-                                        ? Colors.black
-                                        : Colors.white,
-                              ),
-                          onChanged: () {}),
-                    ),
-                  ),
-                PlatformTextField(
-                  controller: textController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  minLines: 5,
-                  autofocus: true,
-                ),
-              ]),
+              content: BBSEditorWidget(
+                controller: textController,
+                allowTags: allowTags,
+                initialTags: _tags,
+              ),
               actions: [
                 PlatformDialogAction(
                     child: Text(S.of(context).cancel),
@@ -232,6 +146,180 @@ class BBSEditor {
         throw e;
       });
     } catch (ignored) {}
+  }
+}
+
+class BBSEditorWidget extends StatefulWidget {
+  final TextEditingController controller;
+  final bool allowTags;
+  final List<PostTag> initialTags;
+
+  const BBSEditorWidget(
+      {Key key, this.controller, this.allowTags, this.initialTags})
+      : super(key: key);
+
+  @override
+  _BBSEditorWidgetState createState() => _BBSEditorWidgetState();
+}
+
+class _BBSEditorWidgetState extends State<BBSEditorWidget> {
+  List<PostTag> _allTags;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(() {
+      refreshSelf();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.allowTags)
+              Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: ThemedMaterial(
+                  child: FlutterTagging<PostTag>(
+                      initialItems: widget.initialTags,
+                      textFieldConfiguration: TextFieldConfiguration(
+                        decoration: InputDecoration(
+                          labelStyle: TextStyle(fontSize: 12),
+                          labelText: S.of(context).select_tags,
+                        ),
+                      ),
+                      findSuggestions: (String filter) async {
+                        if (_allTags == null)
+                          _allTags =
+                              await PostRepository.getInstance().loadTags();
+                        return _allTags
+                            .where((value) => value.name
+                                .toLowerCase()
+                                .contains(filter.toLowerCase()))
+                            .toList();
+                      },
+                      additionCallback: (value) =>
+                          PostTag(value, Constant.randomColor, 0),
+                      onAdded: (tag) => tag,
+                      configureSuggestion: (tag) => SuggestionConfiguration(
+                            title: Text(
+                              tag.name,
+                              style: TextStyle(
+                                  color:
+                                      Constant.getColorFromString(tag.color)),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Icon(
+                                  SFSymbols.flame,
+                                  color: Constant.getColorFromString(tag.color),
+                                  size: 12,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  tag.count.toString(),
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Constant.getColorFromString(
+                                          tag.color)),
+                                ),
+                              ],
+                            ),
+                            additionWidget: Chip(
+                              avatar: Icon(
+                                Icons.add_circle,
+                                color: Colors.white,
+                              ),
+                              label: Text(S.of(context).add_new_tag),
+                              labelStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w300,
+                              ),
+                              backgroundColor: Theme.of(context).accentColor,
+                            ),
+                          ),
+                      configureChip: (tag) => ChipConfiguration(
+                            label: Text(tag.name),
+                            backgroundColor:
+                                Constant.getColorFromString(tag.color),
+                            labelStyle: TextStyle(
+                                color: Constant.getColorFromString(tag.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white),
+                            deleteIconColor:
+                                Constant.getColorFromString(tag.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white,
+                          ),
+                      onChanged: () {}),
+                ),
+              ),
+            IconButton(
+              icon: Icon(
+                IconFont.markdown,
+                color: Theme.of(context).accentColor,
+              ),
+              onPressed: () {
+                showPlatformModalSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ThemedMaterial(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: Icon(
+                              IconFont.markdown,
+                            ),
+                            title: Text(S.of(context).markdown_enabled),
+                          ),
+                          Divider(),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              S.of(context).markdown_description,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            PlatformTextField(
+              material: (_, __) => MaterialTextFieldData(
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(gapPadding: 2.0))),
+              controller: widget.controller,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              minLines: 5,
+              autofocus: true,
+            ),
+            Divider(),
+            Text(S.of(context).preview,
+                style: TextStyle(color: Theme.of(context).hintColor)),
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: PostRenderWidget(
+                render: kMarkdownRender,
+                content: widget.controller.text,
+              ),
+            ),
+          ]),
+    );
   }
 }
 

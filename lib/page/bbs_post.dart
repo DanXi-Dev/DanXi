@@ -215,6 +215,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     };
 
     return PlatformScaffold(
+        material: (_, __) =>
+            MaterialScaffoldData(resizeToAvoidBottomInset: false),
+        cupertino: (_, __) =>
+            CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
         iosContentPadding: true,
         iosContentBottomPadding: true,
         appBar: PlatformAppBarX(
@@ -242,10 +246,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   setState(() => _isFavorited = !_isFavorited);
                   await PostRepository.getInstance()
                       .setFavoredDiscussion(
-                          _isFavorited
-                              ? SetFavoredDiscussionMode.ADD
-                              : SetFavoredDiscussionMode.DELETE,
-                          _post.id)
+                      _isFavorited
+                          ? SetFavoredDiscussionMode.ADD
+                          : SetFavoredDiscussionMode.DELETE,
+                      _post.id)
                       .onError((error, stackTrace) {
                     Noticing.showNotice(
                         context, S.of(context).operation_failed);
@@ -288,7 +292,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       return Container(
                         padding: EdgeInsets.all(8),
                         child:
-                            Center(child: PlatformCircularProgressIndicator()),
+                        Center(child: PlatformCircularProgressIndicator()),
                       );
                     // If the page is showing search results, just show it whatever.
                     if (_searchResult != null)
