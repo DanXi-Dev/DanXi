@@ -576,9 +576,7 @@ class PostRepository extends BaseRepositoryWithDio {
   /// The token used for session authentication.
   String _token;
 
-  PostRepository._() {
-    initRepository();
-  }
+  PostRepository._();
 
   initializeUser(PersonInfo info, SharedPreferences _preferences) async {
     _token = SettingsProvider.of(_preferences).fduholeToken ??
@@ -772,6 +770,9 @@ class PostRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     return FduholeProfile.fromJson(response.data);
   }
+
+  @override
+  String get linkHost => "www.fduhole.tk";
 }
 
 enum SetFavoredDiscussionMode { ADD, DELETE }

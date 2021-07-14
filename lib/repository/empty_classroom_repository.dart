@@ -31,9 +31,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   static String detailUrl(String buildingName, DateTime date) =>
       "http://map.fudan.edu.cn/src/paike/index.php?b=$buildingName&d=${DateFormat("yyyy-MM-dd").format(date)}&i1=--&i2=--";
 
-  EmptyClassroomRepository._() {
-    initRepository();
-  }
+  EmptyClassroomRepository._();
 
   static final _instance = EmptyClassroomRepository._();
 
@@ -76,6 +74,9 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
     });
     return result;
   }
+
+  @override
+  String get linkHost => "map.fudan.edu.cn";
 }
 
 class RoomInfo {

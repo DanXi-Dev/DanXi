@@ -35,9 +35,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   static const String SCORE_DETAIL_URL =
       "https://my.fudan.edu.cn/list/bks_xx_cj";
 
-  DataCenterRepository._() {
-    initRepository();
-  }
+  DataCenterRepository._();
 
   static final _instance = DataCenterRepository._();
 
@@ -129,6 +127,9 @@ class DataCenterRepository extends BaseRepositoryWithDio {
         .map((e) => ExamScore.fromDataCenterHtml(e))
         .toList();
   }
+
+  @override
+  String get linkHost => "my.fudan.edu.cn";
 }
 
 class UnsuitableTimeException implements Exception {}

@@ -27,9 +27,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Fa7%2F97%2Fc9397a305047%2Fpage.psp";
 
-  FudanAAORepository._() {
-    initRepository();
-  }
+  FudanAAORepository._() {}
 
   static String _listUrl(String type, int page) {
     return "http://www.jwc.fudan.edu.cn/$type/list${page <= 1 ? "" : page.toString()}.htm";
@@ -71,6 +69,9 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   Future<bool> checkConnection(PersonInfo info) =>
       getNotices(TYPE_NOTICE_ANNOUNCEMENT, 1, info)
           .then((value) => true, onError: (e) => false);
+
+  @override
+  String get linkHost => "www.jwc.fudan.edu.cn";
 }
 
 class NotConnectedToLANError implements Exception {}

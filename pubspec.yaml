@@ -78,6 +78,7 @@ dependencies:
   gallery_saver: ^2.1.2
   flutter_markdown: ^0.6.2
   markdown: ^4.0.0
+  synchronized: ^3.0.0
 
 dependency_overrides:
   fluttertoast:

@@ -48,9 +48,7 @@ class CardRepository extends BaseRepositoryWithDio {
     "Sec-GPC": "1"
   };
 
-  CardRepository._() {
-    initRepository();
-  }
+  CardRepository._() {}
 
   static final _instance = CardRepository._();
 
@@ -168,6 +166,9 @@ class CardRepository extends BaseRepositoryWithDio {
     cardInfo.records = records;
     return cardInfo;
   }
+
+  @override
+  String get linkHost => "ecard.fudan.edu.cn";
 }
 
 class CardInfo {

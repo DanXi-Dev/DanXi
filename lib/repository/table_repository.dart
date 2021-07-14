@@ -43,9 +43,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
-  TimeTableRepository._() {
-    initRepository();
-  }
+  TimeTableRepository._();
 
   static final _instance = TimeTableRepository._();
 
@@ -92,6 +90,9 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         (object) => jsonEncode(object.toJson()),
         validate: (value) => value != null && !forceLoadFromRemote);
   }
+
+  @override
+  String get linkHost => "jwfw.fudan.edu.cn";
 }
 
 class Test {

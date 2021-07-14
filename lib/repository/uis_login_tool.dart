@@ -22,27 +22,32 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:dio_log/dio_log.dart';
 
 class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
   static const String CREDENTIALS_INVALID = "用户名或者密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
 
-  /// Warning: if having logged in, return null.
+  /// Log in Fudan UIS system and return the response.
   ///
-  /// TODO: Since [forceRelogin] is always true, we should remove the logic that decides whether logged in.
+  /// Warning: if having logged in, return null.
   static Future<Response> loginUIS(
       Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
       [bool forceRelogin = false]) async {
-    ArgumentError.checkNotNull(info);
-    ArgumentError.checkNotNull(jar);
-    ArgumentError.checkNotNull(dio);
-    ArgumentError.checkNotNull(serviceUrl);
+    dio.interceptors.requestLock.lock();
 
-    // If it has logged in, return null.
+    // Create a temporary dio for logging in.
+    Dio workDio = Dio();
+    NonpersistentCookieJar workJar = NonpersistentCookieJar.createFrom(jar);
+    workDio.interceptors.add(CookieManager(workJar));
+    workDio.interceptors.add(DioLogInterceptor());
+
+    // If we has logged in, return null.
     if (!forceRelogin &&
-        (await jar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
-      Response res = await dio.head(serviceUrl,
+        (await workJar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
+      Response res = await workDio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
       if (res.statusCode == 302 &&
           !res.headers.map.containsKey('set-cookie') &&
@@ -52,9 +57,9 @@ class UISLoginTool {
     }
 
     // Remove old cookies.
-    jar.deleteAll();
+    workJar.deleteAll();
     Map<String, String> data = {};
-    Response res = await dio.get(serviceUrl);
+    Response res = await workDio.get(serviceUrl);
     Beautifulsoup(res.data.toString()).find_all("input").forEach((element) {
       if (element.attributes['type'] != "button") {
         data[element.attributes['name']] = element.attributes['value'];
@@ -62,10 +67,10 @@ class UISLoginTool {
     });
     data['username'] = info.id;
     data["password"] = info.password;
-    res = await dio.post(serviceUrl,
+    res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    Response response = await DioUtils.processRedirect(dio, res);
+    Response response = await DioUtils.processRedirect(workDio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       throw CredentialsInvalidException();
     } else if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
@@ -76,6 +81,9 @@ class UISLoginTool {
       //TODO: Actually, the response (looks like) always contains Weak Password Warning if login is unsuccessful. We should modify this later.
       throw GeneralLoginFailedException();
     }
+
+    jar.cloneFrom(workJar);
+    dio.interceptors.requestLock.unlock();
     return response;
   }
 }

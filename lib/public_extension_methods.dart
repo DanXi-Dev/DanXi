@@ -23,7 +23,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 extension StringEx on String {
-  /// Get the sub string between [a] and [b].
+  /// Get the substring of [this] between [a] and [b].
   ///
   /// e.g.
   /// "I love flutter".between("l","t") == "ove flu"

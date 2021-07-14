@@ -26,7 +26,7 @@ import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:intl/intl.dart';
 
-class FudanDailyRepository extends BaseRepositoryWithDio {
+class FudanAppRepository extends BaseRepositoryWithDio {
   dynamic _historyData;
 
   static const String LOGIN_URL =
@@ -38,13 +38,14 @@ class FudanDailyRepository extends BaseRepositoryWithDio {
   static const String _KEY_PREF = "daily_payload_cache";
   PersonInfo _info;
 
-  FudanDailyRepository._() {
-    initRepository();
-  }
+  FudanAppRepository._() {}
 
-  static final _instance = FudanDailyRepository._();
+  @override
+  String get linkHost => "zlapp.fudan.edu.cn";
 
-  factory FudanDailyRepository.getInstance() => _instance;
+  static final _instance = FudanAppRepository._();
+
+  factory FudanAppRepository.getInstance() => _instance;
 
   Future<dynamic> _getHistoryInfo(PersonInfo info) async {
     _info = info;
