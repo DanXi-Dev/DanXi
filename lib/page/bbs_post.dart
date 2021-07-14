@@ -601,7 +601,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTapLink: onTapLink,
             )
           : PostRenderWidget(
-        render: kMarkdownRender,
+              render: kMarkdownRender,
               content: preprocessContentForDisplay(content),
               onTapImage: onTapImage,
               onTapLink: onTapLink,

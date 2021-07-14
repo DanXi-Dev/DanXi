@@ -57,7 +57,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 bool isHtml(String content) {
-  var htmlMatcher = RegExp(r'<.+>.*</.+>');
+  var htmlMatcher = RegExp(r'<.+>.*</.+>', dotAll: true);
   return htmlMatcher.hasMatch(content);
 }
 
