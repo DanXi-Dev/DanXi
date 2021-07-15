@@ -91,6 +91,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
         child: Text(S.of(context).fudan_aao_notices),

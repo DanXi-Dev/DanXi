@@ -71,6 +71,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
         controller: PrimaryScrollController.of(context),

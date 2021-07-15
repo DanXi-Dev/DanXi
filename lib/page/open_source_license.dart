@@ -48,6 +48,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: GestureDetector(
         onLongPress: () async {

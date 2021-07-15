@@ -58,6 +58,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: true,
+      //backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).all_tags),
       ),

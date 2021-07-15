@@ -324,6 +324,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       return PlatformScaffold(
         iosContentPadding: true,
         iosContentBottomPadding: false,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).favorites),
         ),
@@ -333,6 +334,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     return PlatformScaffold(
       iosContentPadding: true,
       iosContentBottomPadding: false,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).filtering_by_tag(_tagFilter)),
       ),

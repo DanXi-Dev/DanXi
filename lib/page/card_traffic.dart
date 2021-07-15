@@ -76,6 +76,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
