@@ -66,11 +66,11 @@ BaseRender kHtmlRender = (BuildContext context, String content,
 };
 
 MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) {
-  if (PlatformX.isCupertino(context)) {
-    return MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context));
-  } else {
-    return MarkdownStyleSheet.fromTheme(Theme.of(context));
-  }
+  // if (PlatformX.isCupertino(context)) {
+  //   return MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context));
+  // } else {
+  return MarkdownStyleSheet.fromTheme(Theme.of(context));
+  // }
 }
 
 MarkdownStyleSheet _fontSizeOverride(
