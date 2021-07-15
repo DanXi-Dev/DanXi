@@ -99,21 +99,23 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
         onTapLink?.call(href),
     imageBuilder: (Uri uri, String title, String alt) {
       if (uri != null && uri.toString() != null) {
-        return AutoNetworkImage(
-          src: uri.toString(),
-          maxWidth: imageWidth,
-          loadingWidget: Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              foregroundDecoration: BoxDecoration(color: Colors.black12),
-              width: imageWidth,
-              height: imageWidth,
-              child: Center(
-                child: PlatformCircularProgressIndicator(),
+        return Center(
+          child: AutoNetworkImage(
+            src: uri.toString(),
+            maxWidth: imageWidth,
+            loadingWidget: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                foregroundDecoration: BoxDecoration(color: Colors.black12),
+                width: imageWidth,
+                height: imageWidth,
+                child: Center(
+                  child: PlatformCircularProgressIndicator(),
+                ),
               ),
             ),
+            onTap: () => onTapImage?.call((uri.toString())),
           ),
-          onTap: () => onTapImage?.call((uri.toString())),
         );
       }
       return Container();
