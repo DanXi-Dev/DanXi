@@ -30,10 +30,8 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
-import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
@@ -48,7 +46,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:linkify/linkify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -132,7 +129,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   AsyncSnapshot _lastSnapshotData;
   bool _isRefreshing = true;
   bool _isEndIndicatorShown = false;
-  bool _isFavorited;
+  bool _isFavored;
   bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
@@ -142,6 +139,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   void scrollToEndIfNeeded() {
     if (shouldScrollToEnd) {
+      debugPrint("scrollToEnd!");
       final _controller = PrimaryScrollController.of(context);
       _controller.jumpTo(_controller.position.maxScrollExtent);
     }
@@ -158,8 +156,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           PostRepository.getInstance().loadReplies(_post, _currentBBSPage);
   }
 
-  Future<bool> _isDiscussionFavorited() async {
-    if (_isFavorited != null) return _isFavorited;
+  Future<bool> _isDiscussionFavored() async {
+    if (_isFavored != null) return _isFavored;
     final List<BBSPost> favorites =
         await PostRepository.getInstance().getFavoredDiscussions();
     return favorites.any((element) => element.id == _post.id);
@@ -310,28 +308,28 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _buildFavoredActionButton() => PlatformIconButton(
         padding: EdgeInsets.zero,
         icon: FutureWidget<bool>(
-          future: _isDiscussionFavorited(),
+          future: _isDiscussionFavored(),
           loadingBuilder: PlatformCircularProgressIndicator(),
           successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            _isFavorited = snapshot.data;
-            return _isFavorited
+            _isFavored = snapshot.data;
+            return _isFavored
                 ? Icon(SFSymbols.star_fill)
                 : Icon(SFSymbols.star);
           },
           errorBuilder: () => null,
         ),
         onPressed: () async {
-          if (_isFavorited == null) return;
-          setState(() => _isFavorited = !_isFavorited);
+          if (_isFavored == null) return;
+          setState(() => _isFavored = !_isFavored);
           await PostRepository.getInstance()
               .setFavoredDiscussion(
-                  _isFavorited
+                  _isFavored
                       ? SetFavoredDiscussionMode.ADD
                       : SetFavoredDiscussionMode.DELETE,
                   _post.id)
               .onError((error, stackTrace) {
             Noticing.showNotice(context, S.of(context).operation_failed);
-            setState(() => _isFavorited = !_isFavorited);
+            setState(() => _isFavored = !_isFavored);
             return null;
           });
         },
