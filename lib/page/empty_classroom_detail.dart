@@ -275,8 +275,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             Expanded(
               child: FutureWidget(
                   future: EmptyClassroomRepository.getInstance()
-                      .getBuildingRoomInfo(_personInfo,
-                          _buildingList[_selectBuildingIndex].data, selectDate),
+                      .getBuildingRoomInfo(
+                          _personInfo,
+                          _buildingList[_selectBuildingIndex].data[0],
+                          _buildingList[_selectBuildingIndex].data,
+                          selectDate),
                   successBuilder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) =>
                       Expanded(

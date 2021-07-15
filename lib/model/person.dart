@@ -17,12 +17,31 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum UserGroup {
+  /// Not logged in
+  VISITOR,
+
+  /// Log in as Fudan student
+  FUDAN_STUDENT,
+
+  /// Log in as Fudan stuff (Not implemented)
+  FUDAN_STUFF,
+
+  /// Log in as SJTU student (Not implemented)
+  SJTU_STUDENT
+}
+
+Map<UserGroup, Function> kUserGroupDescription = {
+  // UserGroup.VISITOR:(BuildContext context)=>S.of(context).
+};
+
 class PersonInfo {
+  UserGroup group;
   String id, password, name;
 
-  PersonInfo(this.id, this.password, this.name);
+  PersonInfo(this.id, this.password, this.name, this.group);
 
-  PersonInfo.createNewInfo(this.id, this.password) {
+  PersonInfo.createNewInfo(this.id, this.password, this.group) {
     name = "";
   }
 
@@ -36,13 +55,20 @@ class PersonInfo {
   }
 
   factory PersonInfo.fromSharedPreferences(SharedPreferences preferences) {
-    return PersonInfo(preferences.getString("id"),
-        preferences.getString("password"), preferences.getString("name"));
+    return PersonInfo(
+        preferences.getString("id"),
+        preferences.getString("password"),
+        preferences.getString("name"),
+        preferences.containsKey("user_group")
+            ? UserGroup.values.firstWhere((element) =>
+                element.toString() == preferences.getString("user_group"))
+            : UserGroup.FUDAN_STUDENT);
   }
 
   Future<void> saveAsSharedPreferences(SharedPreferences preferences) async {
     await preferences.setString("id", id);
     await preferences.setString("password", password);
     await preferences.setString("name", name);
+    await preferences.setString("user_group", group.toString());
   }
 }
