@@ -241,38 +241,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               ? S.of(context).forum
               : S.of(context).search_result),
           trailingActions: [
-            if (_searchResult == null)
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: FutureWidget<bool>(
-                  future: _isDiscussionFavorited(),
-                  loadingBuilder: PlatformCircularProgressIndicator(),
-                  successBuilder:
-                      (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                    _isFavorited = snapshot.data;
-                    return _isFavorited
-                        ? Icon(SFSymbols.star_fill)
-                        : Icon(SFSymbols.star);
-                  },
-                  errorBuilder: () => null,
-                ),
-                onPressed: () async {
-                  if (_isFavorited == null) return;
-                  setState(() => _isFavorited = !_isFavorited);
-                  await PostRepository.getInstance()
-                      .setFavoredDiscussion(
-                          _isFavorited
-                              ? SetFavoredDiscussionMode.ADD
-                              : SetFavoredDiscussionMode.DELETE,
-                          _post.id)
-                      .onError((error, stackTrace) {
-                    Noticing.showNotice(
-                        context, S.of(context).operation_failed);
-                    setState(() => _isFavorited = !_isFavorited);
-                    return null;
-                  });
-                },
-              ),
+            if (_searchResult == null) _buildFavoredActionButton(),
             if (_searchResult == null)
               PlatformIconButton(
                 padding: EdgeInsets.zero,
@@ -310,13 +279,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             Center(child: PlatformCircularProgressIndicator()),
                       );
                     // If the page is showing search results, just show it whatever.
-                    if (_searchResult != null)
-                      return _buildPage(_lastSnapshotData.data);
+                    if (_searchResult != null) return _buildPage();
 
                     // Otherwise, showing a list page with loading indicator at the bottom.
                     return NotificationListener<ScrollNotification>(
-                        child: _buildPage(snapshot.data),
-                        onNotification: onScrollToBottom);
+                        child: _buildPage(), onNotification: onScrollToBottom);
                   },
                   successBuilder: (BuildContext context,
                       AsyncSnapshot<List<Reply>> snapshot) {
@@ -329,11 +296,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         _lastReplies.last.id != snapshot.data.last.id)
                       _lastReplies.addAll(snapshot.data);
                     _lastSnapshotData = snapshot;
-                    if (_searchResult != null) return _buildPage(snapshot.data);
+                    if (_searchResult != null) return _buildPage();
                     // Only use scroll notification when data is paged
                     return NotificationListener<ScrollNotification>(
-                        child: _buildPage(snapshot.data),
-                        onNotification: onScrollToBottom);
+                        child: _buildPage(), onNotification: onScrollToBottom);
                   },
                   errorBuilder: () => _buildErrorWidget(),
                 ),
@@ -341,7 +307,37 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ));
   }
 
-  Widget _buildPage(List<Reply> data) => WithScrollbar(
+  Widget _buildFavoredActionButton() => PlatformIconButton(
+        padding: EdgeInsets.zero,
+        icon: FutureWidget<bool>(
+          future: _isDiscussionFavorited(),
+          loadingBuilder: PlatformCircularProgressIndicator(),
+          successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            _isFavorited = snapshot.data;
+            return _isFavorited
+                ? Icon(SFSymbols.star_fill)
+                : Icon(SFSymbols.star);
+          },
+          errorBuilder: () => null,
+        ),
+        onPressed: () async {
+          if (_isFavorited == null) return;
+          setState(() => _isFavorited = !_isFavorited);
+          await PostRepository.getInstance()
+              .setFavoredDiscussion(
+                  _isFavorited
+                      ? SetFavoredDiscussionMode.ADD
+                      : SetFavoredDiscussionMode.DELETE,
+                  _post.id)
+              .onError((error, stackTrace) {
+            Noticing.showNotice(context, S.of(context).operation_failed);
+            setState(() => _isFavorited = !_isFavorited);
+            return null;
+          });
+        },
+      );
+
+  Widget _buildPage() => WithScrollbar(
         child: ListView.builder(
           primary: true,
           physics: const AlwaysScrollableScrollPhysics(),
@@ -349,16 +345,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           itemCount: _isRefreshing
               ? (_currentBBSPage - 1) * POST_COUNT_PER_PAGE
               : _currentBBSPage * POST_COUNT_PER_PAGE,
-          itemBuilder: (context, index) => _buildListItem(index, data, true),
+          itemBuilder: (context, index) => _buildListItem(index, true),
         ),
         controller: PrimaryScrollController.of(context),
       );
 
-  Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
-    if (isNewData &&
-        index >= _lastReplies.length &&
-        !_isEndIndicatorShown &&
-        !_isRefreshing) {
+  Widget _buildListItem(int index, bool isNewData) {
+    if (isNewData && index == _lastReplies.length && !_isRefreshing) {
       _isEndIndicatorShown = true;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
