@@ -138,9 +138,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Future<List<Reply>> _content;
 
   void scrollToEndIfNeeded() {
-    if (shouldScrollToEnd) {
-      debugPrint("scrollToEnd!");
-      final _controller = PrimaryScrollController.of(context);
+    final _controller = PrimaryScrollController.of(context);
+    if (shouldScrollToEnd &&
+        _controller.position.pixels < _controller.position.maxScrollExtent) {
       _controller.jumpTo(_controller.position.maxScrollExtent);
     }
   }
