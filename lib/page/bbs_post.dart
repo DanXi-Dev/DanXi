@@ -85,11 +85,14 @@ String preprocessContentForDisplay(String content,
         .forEach((element) {
       if (element is UrlElement) {
         // Only add tag if tag has not yet been added.
-        if (RegExp("\\[.*?\\]\\(${element.url}\\)").hasMatch(content) ||
-            RegExp("\\[.*?${element.url}.*?\\]\\(http.*?\\)").hasMatch(content))
+        if (RegExp("\\[.*?\\]\\(${RegExp.escape(element.url)}\\)")
+                .hasMatch(content) ||
+            RegExp("\\[.*?${RegExp.escape(element.url)}.*?\\]\\(http.*?\\)")
+                .hasMatch(content)) {
           result += element.url;
-        else
+        } else {
           result += "[${element.text}](${element.url})";
+        }
       } else
         result += element.text;
     });
