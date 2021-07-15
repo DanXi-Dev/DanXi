@@ -73,9 +73,17 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
         successBuilder: (BuildContext context, AsyncSnapshot<Size> snapshot) {
           double displayWidth = min(snapshot.data.width, widget.maxWidth);
           return GestureDetector(
-            child: Image.memory(
-              _rawImage,
-              width: displayWidth,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                constraints: BoxConstraints(
+                    maxHeight: displayWidth, maxWidth: displayWidth),
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Image.memory(
+                  _rawImage,
+                  width: displayWidth,
+                ),
+              ),
             ),
             onTap: widget.onTap,
           );
