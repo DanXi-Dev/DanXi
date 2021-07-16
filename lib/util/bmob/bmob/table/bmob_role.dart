@@ -6,7 +6,6 @@ import '../table/bmob_object.dart';
 
 import '../type/bmob_relation.dart';
 
-import '../type/bmob_pointer.dart';
 
 part 'bmob_role.g.dart';
 

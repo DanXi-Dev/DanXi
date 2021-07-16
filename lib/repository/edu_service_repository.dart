@@ -16,7 +16,6 @@
  */
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
@@ -24,8 +23,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as DOM;
 import 'package:dan_xi/public_extension_methods.dart';
 
@@ -50,7 +47,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   @override
   String get linkHost => "jwfw.fudan.edu.cn";
 
-  EduServiceRepository._() {}
+  EduServiceRepository._();
 
   static final _instance = EduServiceRepository._();
 

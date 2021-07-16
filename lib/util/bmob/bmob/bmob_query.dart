@@ -1,8 +1,6 @@
 import 'bmob_dio.dart';
 import 'response/bmob_results.dart';
 import 'table/bmob_installation.dart';
-import 'table/bmob_role.dart';
-import 'package:dio/dio.dart';
 
 import 'dart:convert';
 

@@ -50,7 +50,7 @@ class CardRepository extends BaseRepositoryWithDio {
     "Sec-GPC": "1"
   };
 
-  CardRepository._() {}
+  CardRepository._();
 
   static final _instance = CardRepository._();
 

@@ -17,12 +17,12 @@
 
 import 'dart:async';
 import 'dart:html';
+import 'dart:io';
 
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
@@ -37,14 +37,11 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
-import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';

@@ -16,14 +16,10 @@
  */
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:photo_view/photo_view.dart';
 
 class GpaTablePage extends StatefulWidget {
   final Map<String, dynamic> arguments;

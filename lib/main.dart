@@ -53,14 +53,12 @@ import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
-import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 
-import 'package:desktop_window/desktop_window.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

@@ -28,7 +28,6 @@ import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/repository/empty_classroom_repository.dart';
 
 /// Save information of every feature.
 ///
