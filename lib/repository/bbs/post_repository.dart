@@ -790,7 +790,7 @@ extension FavoredDiscussionEx on SetFavoredDiscussionMode {
 }
 
 class NotLoginError implements Exception {
-  String errorMessage;
+  final String errorMessage;
 
   NotLoginError(this.errorMessage);
 }

@@ -22,17 +22,19 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 
 class CardRepository extends BaseRepositoryWithDio {
   PersonInfo _info;
-  static const String LOGIN_URL =
+  static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fecard.fudan.edu.cn%2Fepay%2Fj_spring_cas_security_check";
-  static const String USER_DETAIL_URL =
+  static const String _USER_DETAIL_URL =
       "https://ecard.fudan.edu.cn/epay/myepay/index";
-  static const String CONSUME_DETAIL_URL =
+  static const String _CONSUME_DETAIL_URL =
       "https://ecard.fudan.edu.cn/epay/consume/query";
-  static const String CONSUME_DETAIL_CSRF_URL =
+  static const String _CONSUME_DETAIL_CSRF_URL =
       "https://ecard.fudan.edu.cn/epay/consume/index";
 
   static const Map<String, String> _CONSUME_DETAIL_HEADER = {
@@ -54,22 +56,11 @@ class CardRepository extends BaseRepositoryWithDio {
 
   factory CardRepository.getInstance() => _instance;
 
-  Future<bool> _testLoginSuccess() async {
-    return (await cookieJar
-            .loadForRequest(Uri.parse("https://ecard.fudan.edu.cn/")))
-        .any((element) => element.name == "iPlanetDirectoryPro");
-  }
-
-  // Log in before calling any method in the repository.
+  /// Log in before calling any method in this repository.
   Future<void> init(PersonInfo info) async {
     _info = info;
-    await Retrier.runAsyncWithRetry(() async {
-      await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info, true);
-      if (!await _testLoginSuccess()) {
-        throw new LoginException();
-      }
-      return null;
-    });
+    await Retrier.runAsyncWithRetry(
+        () => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true));
   }
 
   Future<String> getName() async {
@@ -80,17 +71,17 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String> requestData, int pageNum) async {
     requestData['pageNo'] = pageNum.toString();
-    var detailResponse = await dio.post(CONSUME_DETAIL_URL,
+    Response detailResponse = await dio.post(_CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
         options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
-    var soup = Beautifulsoup(
+    Beautifulsoup soup = Beautifulsoup(
         detailResponse.data.toString().between("<![CDATA[", "]]>"));
-    var elements = soup.find(id: "tbody").querySelectorAll("tr");
+    List<Element> elements = soup.find(id: "tbody").querySelectorAll("tr");
     Iterable<CardRecord> records = elements.map((e) {
-      var details = e.querySelectorAll("td");
+      List<Element> details = e.querySelectorAll("td");
       return CardRecord(
           DateTime.parse(
-              "${details[0].children[0].text.trim().replaceAll("\.", "-")}T${details[0].children[1].text.trim()}"),
+              "${details[0].children[0].text.trim().replaceAll(RegExp.escape('.'), "-")}T${details[0].children[1].text.trim()}"),
           details[1].children[0].text.trim(),
           details[2].text.trim().replaceAll("&nbsp;", ""),
           details[3].text.trim().replaceAll("&nbsp;", ""));
@@ -106,20 +97,20 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<List<CardRecord>> loadCardRecord(int logDays) async {
     if (logDays < 0) return null;
     //Get csrf id.
-    var consumeCsrfPageResponse = await dio.get(CONSUME_DETAIL_CSRF_URL);
-    var consumeCsrfPageSoup =
+    Response consumeCsrfPageResponse = await dio.get(_CONSUME_DETAIL_CSRF_URL);
+    Beautifulsoup consumeCsrfPageSoup =
         Beautifulsoup(consumeCsrfPageResponse.data.toString());
-    var metas = consumeCsrfPageSoup.find_all("meta");
-    var element = metas.firstWhere(
+    List<Element> metas = consumeCsrfPageSoup.find_all("meta");
+    Element element = metas.firstWhere(
         (element) => element.attributes["name"] == "_csrf",
         orElse: () => null);
-    var csrfId = element.attributes["content"];
-    //Build the request body.
-    var end = new DateTime.now();
+    String csrfId = element.attributes["content"];
+    // Build the request body.
+    DateTime end = new DateTime.now();
     int backDays = logDays == 0 ? 30 : logDays;
-    var start = end.add(Duration(days: -backDays));
-    var formatter = new DateFormat('yyyy-MM-dd');
-    var data = {
+    DateTime start = end.add(Duration(days: -backDays));
+    DateFormat formatter = new DateFormat('yyyy-MM-dd');
+    Map<String, String> data = {
       "aaxmlrequest": "true",
       "pageNo": "1",
       "tabNo": "1",
@@ -132,17 +123,17 @@ class CardRepository extends BaseRepositoryWithDio {
       "_csrf": csrfId,
     };
 
-    //Get the number of pages, only when logDays > 0.
-    var totalPages = 1;
+    // Get the number of pages, only when logDays > 0.
+    int totalPages = 1;
     if (logDays > 0) {
-      var detailResponse = await dio.post(CONSUME_DETAIL_URL,
+      Response detailResponse = await dio.post(_CONSUME_DETAIL_URL,
           data: data.encodeMap(),
           options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
 
       totalPages =
           int.parse(detailResponse.data.toString().between('</b>/', '页'));
     }
-    //Get pages.
+    // Get pages.
     List<CardRecord> list = [];
     for (int pageIndex = 1; pageIndex <= totalPages; pageIndex++) {
       list.addAll(await _loadOnePageCardRecord(data, pageIndex));
@@ -151,13 +142,10 @@ class CardRepository extends BaseRepositoryWithDio {
   }
 
   Future<CardInfo> loadCardInfo(int logDays) async {
-    if (!await _testLoginSuccess()) {
-      throw new LoginException();
-    }
     var cardInfo = CardInfo();
 
     //获取用户页面信息
-    var userPageResponse = await dio.get(USER_DETAIL_URL);
+    var userPageResponse = await dio.get(_USER_DETAIL_URL);
     cardInfo.cash =
         userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
     cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");
@@ -177,13 +165,12 @@ class CardInfo {
   List<CardRecord> records;
 }
 
+@immutable
 class CardRecord {
-  DateTime time;
-  String type;
-  String location;
-  String payment;
+  final DateTime time;
+  final String type;
+  final String location;
+  final String payment;
 
   CardRecord(this.time, this.type, this.location, this.payment);
 }
-
-class LoginException implements Exception {}

@@ -98,7 +98,7 @@ class _LoginDialogState extends State<LoginDialog> {
         break;
       case UserGroup.FUDAN_STAFF:
       case UserGroup.SJTU_STUDENT:
-        progressDialog.dismiss();
+        progressDialog.dismiss(showAnim: false);
         break;
     }
   }
