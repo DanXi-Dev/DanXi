@@ -163,6 +163,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   bool _isEndIndicatorShown;
   FoldBehavior _foldBehavior;
 
+  /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
+  bool _initComplete;
+
   /// These field holds the content on the page.
   List<Widget> _lastPageItems;
   AsyncSnapshot _lastSnapshotData;
@@ -264,13 +267,10 @@ class _BBSSubpageState extends State<BBSSubpage>
     progressDialog.dismiss();
   }
 
-  // This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
-  bool initComplete;
-
   @override
   void initState() {
     super.initState();
-    initComplete = false;
+    _initComplete = false;
     _initialize();
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
@@ -294,7 +294,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void didChangeDependencies() {
-    if (!initComplete) {
+    if (!_initComplete) {
       if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
         _tagFilter = widget.arguments['tagFilter'];
       if (widget.arguments != null &&
@@ -303,7 +303,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       else
         _preferences = Provider.of<SharedPreferences>(context);
       _setContent();
-      initComplete = true;
+      _initComplete = true;
     }
     super.didChangeDependencies();
   }

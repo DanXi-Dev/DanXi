@@ -278,11 +278,14 @@ class _LoginDialogState extends State<LoginDialog> {
     );
   }
 
+  /// Change the login group and rebuild the dialog.
   _switchLoginGroup(UserGroup e) {
     // Close the dialog
     Navigator.of(context).pop();
     if (e == UserGroup.VISITOR) {
       _nameController.text = _pwdController.text = "visitor";
+    } else {
+      _nameController.text = _pwdController.text = "";
     }
     setState(() => _group = e);
   }
