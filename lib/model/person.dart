@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum UserGroup {
@@ -24,15 +26,18 @@ enum UserGroup {
   /// Log in as Fudan student
   FUDAN_STUDENT,
 
-  /// Log in as Fudan stuff (Not implemented)
-  FUDAN_STUFF,
+  /// Log in as Fudan staff (Not implemented)
+  FUDAN_STAFF,
 
   /// Log in as SJTU student (Not implemented)
   SJTU_STUDENT
 }
 
 Map<UserGroup, Function> kUserGroupDescription = {
-  // UserGroup.VISITOR:(BuildContext context)=>S.of(context).
+  UserGroup.VISITOR: (BuildContext context) => S.of(context).visitor,
+  UserGroup.FUDAN_STUDENT: (BuildContext context) => S.of(context).login_uis,
+  UserGroup.FUDAN_STAFF: (BuildContext context) => S.of(context).fudan_staff,
+  UserGroup.SJTU_STUDENT: (BuildContext context) => S.of(context).sjtu_student,
 };
 
 class PersonInfo {

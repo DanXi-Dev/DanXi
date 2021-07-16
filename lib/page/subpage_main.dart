@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/feature/custom_shortcut.dart';
@@ -191,6 +192,14 @@ class _HomeSubpageState extends State<HomeSubpage> {
               CustomShortcutFeature(title: element.title, link: element.link),
         ));
       } else {
+        // Skip incompatible items
+        if (widgetMap[element.internalString] is FeatureContainer) {
+          FeatureContainer container =
+              widgetMap[element.internalString] as FeatureContainer;
+          if (!checkFeature(container.childFeature, context.personInfo.group)) {
+            return;
+          }
+        }
         _currentCardChildren.add(widgetMap[element.internalString]);
       }
     });

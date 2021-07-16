@@ -19,6 +19,7 @@ import 'dart:async';
 
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
@@ -55,6 +56,12 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+const kCompatibleUserGroup = [
+  UserGroup.FUDAN_STUDENT,
+  UserGroup.FUDAN_STAFF,
+  UserGroup.SJTU_STUDENT
+];
 
 bool isHtml(String content) {
   var htmlMatcher = RegExp(r'<.+>.*</.+>', dotAll: true);
@@ -165,18 +172,23 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   void _setContent() {
-    _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
-        SortOrder.LAST_REPLIED;
-    _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
-        FoldBehavior.FOLD;
-    if (_tagFilter != null)
-      _content = PostRepository.getInstance()
-          .loadTagFilteredPosts(_tagFilter, _sortOrder);
-    else if (widget.arguments != null &&
-        widget.arguments.containsKey('showFavoredDiscussion'))
-      _content = PostRepository.getInstance().getFavoredDiscussions();
-    else
-      _content = loginAndLoadPost(context.personInfo, _sortOrder);
+    if (checkGroupByContext(kCompatibleUserGroup, context)) {
+      _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
+          SortOrder.LAST_REPLIED;
+      _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
+          FoldBehavior.FOLD;
+      if (_tagFilter != null)
+        _content = PostRepository.getInstance()
+            .loadTagFilteredPosts(_tagFilter, _sortOrder);
+      else if (widget.arguments != null &&
+          widget.arguments.containsKey('showFavoredDiscussion'))
+        _content = PostRepository.getInstance().getFavoredDiscussions();
+      else
+        _content = loginAndLoadPost(context.personInfo, _sortOrder);
+    } else {
+      _content =
+          Future<List<BBSPost>>.error(NotLoginError("Logged in as Visitor."));
+    }
   }
 
   void refreshSelf() {

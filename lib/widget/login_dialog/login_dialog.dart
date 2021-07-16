@@ -23,14 +23,18 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
 
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
 ///
@@ -55,6 +59,7 @@ class _LoginDialogState extends State<LoginDialog> {
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _pwdController = new TextEditingController();
   String _errorText = "";
+  UserGroup _group = UserGroup.FUDAN_STUDENT;
 
   Future<bool> _deleteAllData() async => await widget.sharedPreferences.clear();
 
@@ -65,26 +70,63 @@ class _LoginDialogState extends State<LoginDialog> {
     }
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
-    PersonInfo newInfo =
-        PersonInfo.createNewInfo(id, password, UserGroup.FUDAN_STUDENT);
-    await CardRepository.getInstance().init(newInfo).then((_) async {
-      newInfo.name = await CardRepository.getInstance().getName();
-      _deleteAllData();
-      await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
-      widget.personInfo.value = newInfo;
-      progressDialog.dismiss();
-      Navigator.of(context).pop();
-    }, onError: (e) {
-      progressDialog.dismiss();
-      throw e;
-    });
+    switch (_group) {
+      case UserGroup.VISITOR:
+        PersonInfo newInfo =
+            PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
+        _deleteAllData().then((value) async {
+          await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
+          widget.personInfo.value = newInfo;
+          progressDialog.dismiss(showAnim: false);
+          Navigator.of(context).pop();
+        });
+        break;
+      case UserGroup.FUDAN_STUDENT:
+        PersonInfo newInfo =
+            PersonInfo.createNewInfo(id, password, UserGroup.FUDAN_STUDENT);
+        await CardRepository.getInstance().init(newInfo).then((_) async {
+          newInfo.name = await CardRepository.getInstance().getName();
+          await _deleteAllData();
+          await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
+          widget.personInfo.value = newInfo;
+          progressDialog.dismiss(showAnim: false);
+          Navigator.of(context).pop();
+        }, onError: (e) {
+          progressDialog.dismiss(showAnim: false);
+          throw e;
+        });
+        break;
+      case UserGroup.FUDAN_STAFF:
+      case UserGroup.SJTU_STUDENT:
+        progressDialog.dismiss();
+        break;
+    }
   }
 
-  void testInternetAccess() async {
+  void requestInternetAccess() async {
     //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
     await Dio()
         .get('http://captive.apple.com')
         .catchError((ignoredError) => null);
+  }
+
+  List<Widget> _buildLoginAsList() {
+    List<Widget> widgets = [];
+    kCompatibleUserGroup.forEach((e) {
+      if (e != _group) {
+        widgets.add(PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () => _switchLoginGroup(e),
+            child: Text(kUserGroupDescription[e](context)),
+          ),
+          material: (_, __) => ListTile(
+            title: Text(kUserGroupDescription[e](context)),
+            onTap: () => _switchLoginGroup(e),
+          ),
+        ));
+      }
+    });
+    return widgets;
   }
 
   @override
@@ -98,11 +140,11 @@ class _LoginDialogState extends State<LoginDialog> {
 
     //Tackle #25
     if (!widget.forceLogin) {
-      testInternetAccess();
+      requestInternetAccess();
     }
 
     return AlertDialog(
-      title: Text(S.of(context).login_uis),
+      title: Text(kUserGroupDescription[_group](context)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -114,6 +156,7 @@ class _LoginDialogState extends State<LoginDialog> {
           ),
           TextField(
             controller: _nameController,
+            enabled: _group != UserGroup.VISITOR,
             keyboardType: TextInputType.number,
             //material: (_, __) => MaterialTextFieldData(
             decoration: InputDecoration(
@@ -129,6 +172,7 @@ class _LoginDialogState extends State<LoginDialog> {
           if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
           TextField(
             controller: _pwdController,
+            enabled: _group != UserGroup.VISITOR,
             //material: (_, __) => MaterialTextFieldData(
             decoration: InputDecoration(
               labelText: S.of(context).login_uis_pwd,
@@ -167,18 +211,6 @@ class _LoginDialogState extends State<LoginDialog> {
               style: defaultText,
               text: S.of(context).terms_and_conditions_content,
             ),
-            // TextSpan(
-            //     style: linkText,
-            //     text: S.of(context).terms_and_conditions,
-            //     recognizer: TapGestureRecognizer()
-            //       ..onTap = () async {
-            //         await BrowserUtil.openUrl(
-            //             S.of(context).terms_and_conditions_url);
-            //       }),
-            // TextSpan(
-            //   style: defaultText,
-            //   text: S.of(context).and,
-            // ),
             TextSpan(
                 style: linkText,
                 text: S.of(context).privacy_policy,
@@ -219,8 +251,39 @@ class _LoginDialogState extends State<LoginDialog> {
               refreshSelf();
             });
           },
-        )
+        ),
+        TextButton(
+            onPressed: () {
+              showPlatformModalSheet(
+                  context: context,
+                  builder: (_) => PlatformWidget(
+                        cupertino: (_, __) => CupertinoActionSheet(
+                          actions: _buildLoginAsList(),
+                          cancelButton: CupertinoActionSheetAction(
+                            child: Text(S.of(context).cancel),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                        material: (_, __) => Container(
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: _buildLoginAsList()),
+                        ),
+                      ));
+            },
+            child: Text(S.of(context).login_as_others))
       ],
     );
+  }
+
+  _switchLoginGroup(UserGroup e) {
+    // Close the dialog
+    Navigator.of(context).pop();
+    if (e == UserGroup.VISITOR) {
+      _nameController.text = _pwdController.text = "visitor";
+    }
+    setState(() => _group = e);
   }
 }

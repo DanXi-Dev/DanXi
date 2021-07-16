@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
@@ -111,6 +112,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+  // Init Feature registation.
+  FeatureMap.registerAllFeatures();
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,

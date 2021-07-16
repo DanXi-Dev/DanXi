@@ -20,8 +20,8 @@ import 'package:dan_xi/main.dart';
 import 'package:flutter/material.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
-/// A simple implementation of [FeatureContainer] to show the feature as a [Card].
-class FeatureCardItem extends StatefulWidget {
+/// A simple implementation of [FeatureContainerState] to show the feature as a [Card].
+class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   final Feature feature;
   final Map<String, dynamic> arguments;
   final Function onDismissed;
@@ -30,10 +30,13 @@ class FeatureCardItem extends StatefulWidget {
   _FeatureCardItemState createState() => _FeatureCardItemState();
 
   FeatureCardItem({@required this.feature, this.arguments, this.onDismissed});
+
+  @override
+  Feature get childFeature => feature;
 }
 
 class _FeatureCardItemState extends State<FeatureCardItem>
-    with FeatureContainer {
+    with FeatureContainerState {
   Key _key;
 
   @override

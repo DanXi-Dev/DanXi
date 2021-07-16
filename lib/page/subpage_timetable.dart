@@ -18,10 +18,13 @@
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -42,10 +45,9 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
-class TimetableSubPage extends PlatformSubpage {
-  // @override
-  // bool get needPadding => false;
+const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
 
+class TimetableSubPage extends PlatformSubpage {
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 }
@@ -72,9 +74,14 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   bool _loadFromRemote = false;
 
   void _setContent() {
-    _content = Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
-        .loadTimeTableLocally(context.personInfo,
-            forceLoadFromRemote: _loadFromRemote));
+    if (checkGroupByContext(kCompatibleUserGroup, context))
+      _content = Retrier.runAsyncWithRetry(() =>
+          TimeTableRepository.getInstance().loadTimeTableLocally(
+              context.personInfo,
+              forceLoadFromRemote: _loadFromRemote));
+    else
+      _content = Future<TimeTable>.error(
+          NotLoginError("Haven't logged in as FDU student."));
   }
 
   void _startShare(TimetableConverter converter) async {

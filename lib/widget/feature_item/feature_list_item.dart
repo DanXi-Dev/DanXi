@@ -20,8 +20,8 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-/// A simple implementation of [FeatureContainer] to show the feature as a [ListTile].
-class FeatureListItem extends StatefulWidget {
+/// A simple implementation of [FeatureContainerState] to show the feature as a [ListTile].
+class FeatureListItem extends StatefulWidget implements FeatureContainer {
   final Feature feature;
   final Map<String, dynamic> arguments;
 
@@ -29,10 +29,13 @@ class FeatureListItem extends StatefulWidget {
   _FeatureListItemState createState() => _FeatureListItemState();
 
   FeatureListItem({@required this.feature, this.arguments});
+
+  @override
+  Feature get childFeature => feature;
 }
 
 class _FeatureListItemState extends State<FeatureListItem>
-    with FeatureContainer {
+    with FeatureContainerState {
   @override
   Widget build(BuildContext context) {
     widget.feature
