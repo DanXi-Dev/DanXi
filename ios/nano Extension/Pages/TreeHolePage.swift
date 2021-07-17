@@ -66,14 +66,13 @@ struct TreeHolePage: View {
                         }
                     }
                     ForEach(discussions) { discussion in
-                        VStack {
-                            ZStack {
-                                THPostView(discussion: discussion)
-                                NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.posts)) {
-                                    EmptyView()
-                                }
+                        ZStack(alignment: .leading) {
+                            THPostView(discussion: discussion)
+                            NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.posts)) {
+                                EmptyView()
                             }
                         }
+                        
                     }
                     if(!endReached) {
                         ProgressView()
