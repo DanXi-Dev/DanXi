@@ -1,7 +1,4 @@
-import 'dart:io';
 
-import '../bmob.dart';
-import '../bmob_dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'bmob_file.g.dart';

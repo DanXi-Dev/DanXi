@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/auto_network_image.dart';
 import 'package:dan_xi/widget/render/base_render.dart';

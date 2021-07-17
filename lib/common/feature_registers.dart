@@ -20,7 +20,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
-/// A register table for [Feature], declaring its compatibility of user group.
+/// A static register table of [Feature], declaring its compatibility of user group.
 Map<String, List<UserGroup>> _kRegister = {};
 
 void registerFeature(Feature feature,

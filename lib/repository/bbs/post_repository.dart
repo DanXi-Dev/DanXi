@@ -15,13 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
-import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/main.dart';
 import 'package:dan_xi/model/fduhole_profile.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
@@ -31,10 +28,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_tagging/flutter_tagging.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
@@ -790,7 +784,7 @@ extension FavoredDiscussionEx on SetFavoredDiscussionMode {
 }
 
 class NotLoginError implements Exception {
-  String errorMessage;
+  final String errorMessage;
 
   NotLoginError(this.errorMessage);
 }

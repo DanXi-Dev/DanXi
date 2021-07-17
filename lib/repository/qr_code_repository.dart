@@ -28,7 +28,7 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   static const String QR_URL =
       "https://ecard.fudan.edu.cn/epay/wxpage/fudan/zfm/qrcode";
 
-  QRCodeRepository._() {}
+  QRCodeRepository._();
 
   static final _instance = QRCodeRepository._();
 

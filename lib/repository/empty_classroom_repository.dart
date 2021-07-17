@@ -17,14 +17,11 @@
 
 import 'dart:convert';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/src/response.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomRepository extends BaseRepositoryWithDio {

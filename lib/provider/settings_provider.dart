@@ -158,9 +158,9 @@ class SettingsProvider {
   set fduholeSortOrder(SortOrder value) =>
       _preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
 
-  //FDUHOLE Folded Post Behavior
+  /// FDUHOLE Folded Post Behavior
 
-  //NOTE: This getter defaults to a FOLD and won't return [null]
+  /// NOTE: This getter defaults to a FOLD and won't return [null]
   FoldBehavior get fduholeFoldBehavior {
     if (_preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
       int savedPref = _preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);

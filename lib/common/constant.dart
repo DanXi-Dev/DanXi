@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class Constant {
+  static const POST_COUNT_PER_PAGE = 10;
   static const bool IS_PRODUCTION_ENVIRONMENT =
       bool.fromEnvironment('dart.vm.product');
   static const String APPSTORE_APPID = '1568629997';

@@ -17,17 +17,12 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/main.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/empty_classroom_detail.dart';
-import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 
