@@ -189,6 +189,7 @@
     "markdown_description": "Markdown parser enabled. You can write with Markdown syntax. If you don't know what Markdown is, check out https://www.runoob.com/markdown/md-tutorial.html\n\nNote: In Markdown, if you want to create a new line, you need to type in two \"enters\" (i.e. leaving a blank line in between).",
     "all_tags": "All Tags",
     "preview": "Preview",
+    "seats": "{seats} seats",
 
     "classroom": "Classroom",
     "morning": "Morning",
