@@ -29,7 +29,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardReorderPage extends StatefulWidget {

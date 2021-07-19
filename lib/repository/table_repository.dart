@@ -17,7 +17,6 @@
 
 import 'dart:convert';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -26,7 +25,6 @@ import 'package:dan_xi/util/cache.dart';
 import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:html/dom.dart' as DOM;
 
 class TimeTableRepository extends BaseRepositoryWithDio {

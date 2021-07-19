@@ -79,7 +79,7 @@ class BmobQuery<T> {
 
   //复合查询条件or
   BmobQuery or(List<BmobQuery<T>> queries) {
-    List<Map<String, dynamic>> list = List();
+    List<Map<String, dynamic>> list = [];
     for (BmobQuery<T> bmobQuery in queries) {
       list.add(bmobQuery.where);
     }
@@ -89,7 +89,7 @@ class BmobQuery<T> {
 
   //复合查询条件and
   BmobQuery and(List<BmobQuery<T>> queries) {
-    List<Map<String, dynamic>> list = List();
+    List<Map<String, dynamic>> list = [];
     for (BmobQuery<T> bmobQuery in queries) {
       list.add(bmobQuery.where);
     }

@@ -5,7 +5,6 @@ import 'table/bmob_object.dart';
 import 'table/bmob_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'bmob_dio.dart';
 
 class BmobBatch {
   Future<List> insertBatch(List<BmobObject> bmobObjects) async {
@@ -21,7 +20,7 @@ class BmobBatch {
   }
 
   Future<List> process(String method, List<BmobObject> bmobObjects) async {
-    List list = List();
+    List list = [];
     Map params = Map();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();

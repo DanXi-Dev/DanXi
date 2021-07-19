@@ -26,6 +26,8 @@ import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:intl/intl.dart';
 
+import 'inpersistent_cookie_manager.dart';
+
 class FudanAppRepository extends BaseRepositoryWithDio {
   dynamic _historyData;
 
@@ -38,7 +40,7 @@ class FudanAppRepository extends BaseRepositoryWithDio {
   static const String _KEY_PREF = "daily_payload_cache";
   PersonInfo _info;
 
-  FudanAppRepository._() {}
+  FudanAppRepository._();
 
   @override
   String get linkHost => "zlapp.fudan.edu.cn";
@@ -46,6 +48,8 @@ class FudanAppRepository extends BaseRepositoryWithDio {
   static final _instance = FudanAppRepository._();
 
   factory FudanAppRepository.getInstance() => _instance;
+
+  NonpersistentCookieJar get thisCookies => cookieJar;
 
   Future<dynamic> _getHistoryInfo(PersonInfo info) async {
     _info = info;

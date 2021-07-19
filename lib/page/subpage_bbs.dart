@@ -25,7 +25,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -641,54 +640,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
   }
 
-  Widget _buildCommentView(BBSPost post) {
-    return Container(
-      height: 72,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-        itemBuilder: (context, id) {
-          if (id ~/ 2 + 1 >= post.posts.length) return Container();
-          if (id % 2 == 1) return VerticalDivider();
-          return _buildCommentBlock(post.posts[id ~/ 2 + 1]);
-        },
-        itemCount: post.posts.length * 2 + 1,
-      ),
-    );
-  }
 
-  Widget _buildCommentBlock(Reply reply) {
-    return Container(
-      width: 180,
-      height: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 2),
-      decoration: BoxDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "[${reply.username}]",
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Theme.of(context).hintColor),
-            textScaleFactor: 0.75,
-            maxLines: 1,
-          ),
-          SizedBox(
-            height: 2,
-          ),
-          Linkify(
-            text: renderText(reply.content, S.of(context).image_tag) + '\n\n',
-            overflow: TextOverflow.ellipsis,
-            textScaleFactor: 0.9,
-            maxLines: 2,
-            onOpen: _launchUrlWithNotice,
-          )
-        ],
-      ),
-    );
-  }
 
   @override
   bool get wantKeepAlive => true;

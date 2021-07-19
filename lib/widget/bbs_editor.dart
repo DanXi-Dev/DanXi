@@ -138,6 +138,7 @@ class BBSEditor {
             arguments: {"title": title, "tags": allowTags});
         return result;
     }
+    return null;
   }
 
   @protected

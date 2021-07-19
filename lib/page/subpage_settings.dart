@@ -19,7 +19,6 @@ import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/open_source_license.dart';
@@ -759,7 +758,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                                     children: <Widget>[
                                       FutureWidget<bool>(
                                         successBuilder: (context, snapshot) {
-                                          if (snapshot?.data)
+                                          if (snapshot.data)
                                             return TextButton(
                                               child: Text(S.of(context).rate),
                                               onPressed: () {

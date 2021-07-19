@@ -28,7 +28,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   static const String _INFO_URL =
       "http://www.fdty.fudan.edu.cn/SportScore/stScore.aspx";
 
-  FudanPERepository._() {}
+  FudanPERepository._();
 
   static final _instance = FudanPERepository._();
 

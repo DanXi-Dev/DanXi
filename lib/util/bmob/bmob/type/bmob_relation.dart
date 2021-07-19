@@ -19,7 +19,7 @@ class BmobRelation {
   List<Map<String, dynamic>> objects;
 
   BmobRelation() {
-    objects = List();
+    objects = [];
   }
 
   //添加某个关联关系

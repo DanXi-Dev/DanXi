@@ -1,7 +1,4 @@
 import 'package:dan_xi/util/bmob/bmob/response/bmob_error.dart';
-import 'package:flutter/foundation.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/status.dart' as status;
 import 'dart:io';
 
 import '../bmob.dart';
@@ -196,7 +193,7 @@ class Client {
         case 6:
           // ack
           final List<String> ackParts = parts[3].split("\\+");
-          List<String> arguments = List();
+          List<String> arguments = [];
           if (ackParts.length == 2) {
             arguments[1] = ackParts[1];
           }
@@ -237,7 +234,7 @@ class Client {
   ///
   /// @param tableName 监听的表名
   Future subTableUpdate(String tableName) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, "", ACTION_UPDATE_TABLE));
     emit("client_sub", args);
   }
@@ -246,7 +243,7 @@ class Client {
   ///
   /// @param tableName 取消监听的表名
   Future unsubTableUpdate(String tableName) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, "", "unsub_updateTable"));
     emit("client_unsub", args);
   }
@@ -255,7 +252,7 @@ class Client {
   ///
   /// @param tableName 监听的表名
   Future subTableDelete(String tableName) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, "", ACTION_DELETE_TABLE));
     emit("client_sub", args);
   }
@@ -264,7 +261,7 @@ class Client {
   ///
   /// @param tableName 取消监听的表名
   Future unsubTableDelete(String tableName) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, "", "unsub_deleteTable"));
     emit("client_unsub", args);
   }
@@ -274,7 +271,7 @@ class Client {
   /// @param tableName 监听的表名
   /// @param objectId  监听的行Id
   Future subRowUpdate(String tableName, String objectId) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, objectId, ACTION_UPDATE_ROW));
     emit("client_sub", args);
   }
@@ -284,7 +281,7 @@ class Client {
   /// @param tableName 取消监听的表名
   /// @param objectId  取消监听的行Id
   Future unsubRowUpdate(String tableName, String objectId) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, objectId, "unsub_updateRow"));
     emit("client_unsub", args);
   }
@@ -294,7 +291,7 @@ class Client {
   /// @param tableName 监听的表名
   /// @param objectId  监听的行Id
   Future subRowDelete(String tableName, String objectId) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, objectId, ACTION_DELETE_ROW));
     emit("client_sub", args);
   }
@@ -304,7 +301,7 @@ class Client {
   /// @param tableName 取消监听的表名
   /// @param objectId  取消监听的行Id
   Future unsubRowDelete(String tableName, String objectId) async {
-    List<String> args = List();
+    List<String> args = [];
     args.add(getArgs(tableName, objectId, "unsub_deleteRow"));
     emit("client_unsub", args);
   }
