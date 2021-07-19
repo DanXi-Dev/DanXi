@@ -64,13 +64,8 @@ BaseRender kHtmlRender = (BuildContext context, String content,
   );
 };
 
-MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) {
-  // if (PlatformX.isCupertino(context)) {
-  //   return MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context));
-  // } else {
-  return MarkdownStyleSheet.fromTheme(Theme.of(context));
-  // }
-}
+MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) =>
+    MarkdownStyleSheet.fromTheme(Theme.of(context));
 
 MarkdownStyleSheet _fontSizeOverride(
     MarkdownStyleSheet sheet, double fontSize) {

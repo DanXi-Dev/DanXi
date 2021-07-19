@@ -22,7 +22,6 @@ import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
-/// This repository is also designed to check whether the app is connected to the school LAN.
 class FudanAAORepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Fa7%2F97%2Fc9397a305047%2Fpage.psp";
