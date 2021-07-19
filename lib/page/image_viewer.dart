@@ -14,6 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -53,8 +54,14 @@ class ImageViewerPage extends StatefulWidget {
 
   ImageViewerPage({Key key, this.arguments});
 
+  static bool isBase64Image(String content) {
+    return content.startsWith(RegExp.escape("data:image/"));
+  }
+
   static bool isImage(String url) {
     if (url == null || url.isEmpty || Uri.tryParse(url) == null) return false;
+    if (isBase64Image(url)) return true;
+
     String path = Uri.parse(url).path?.toLowerCase();
     if (path == null) return false;
     return IMAGE_SUFFIX.any((element) => path.endsWith(element));
@@ -62,6 +69,9 @@ class ImageViewerPage extends StatefulWidget {
 
   static String getMineType(String url) {
     if (!isImage(url)) return '';
+    if (isBase64Image(url)) {
+      return url.between("data:", ";base64");
+    }
     String path = Uri.parse(url).path.toLowerCase();
     return 'image/' +
         IMAGE_SUFFIX
@@ -75,16 +85,28 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   List<int> _rawImage;
   String _url;
   String _fileName;
+  static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
 
   @override
   void initState() {
     super.initState();
     _url = widget.arguments['url'];
-    _fileName = Uri.parse(_url).pathSegments.last;
+    _fileName = getFileName(_url);
+  }
+
+  getFileName(String url) {
+    if (ImageViewerPage.isBase64Image(url)) {
+      return _BASE64_IMAGE_FILE_NAME;
+    }
+    return Uri.parse(_url).pathSegments.last;
   }
 
   Future<void> loadImage(String url) async {
     if (_rawImage != null && _rawImage.isNotEmpty) return;
+    if (ImageViewerPage.isBase64Image(url)) {
+      String base64Content = url.split(",")[1];
+      _rawImage = base64Decode(base64Content);
+    }
     Response response = await widget.dio.get(url);
     _rawImage = response.data;
   }

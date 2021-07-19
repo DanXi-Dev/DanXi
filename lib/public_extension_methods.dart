@@ -33,9 +33,11 @@ extension StringEx on String {
   /// e.g.
   /// "I love flutter".between("l","t",headGreedy = false) == "ove flut"
   String between(String a, String b, {bool headGreedy = true}) {
+    a = RegExp.escape(a);
+    b = RegExp.escape(b);
     if (indexOf(a) < 0) return null;
     if (headGreedy) {
-      if (indexOf(b, indexOf(a) + a.length) < 0) return null;
+      if (indexOf(RegExp.escape(a), indexOf(a) + a.length) < 0) return null;
       return substring(
           indexOf(a) + a.length, indexOf(b, indexOf(a) + a.length));
     } else {
