@@ -51,7 +51,7 @@ class Retrier {
 
   /// Try to run [function] for [retryTimes] times asynchronously.
   ///
-  /// If [function] throws an error, run [tryFix] to fix the problem. Then run it again.
+  /// If [function] throws an error, run [tryFix] to fix the problem. Then run the function again.
   ///
   /// Notes: Any errors thrown by [tryFix] will be ignored.
   ///

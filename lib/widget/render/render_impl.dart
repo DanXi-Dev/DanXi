@@ -17,18 +17,17 @@
 
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/auto_network_image.dart';
+import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
-
-import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 const double kFontSize = 16.0;
-
+const double kFontLargerSize = 24.0;
 BaseRender kHtmlRender = (BuildContext context, String content,
     LinkTapCallback onTapImage, LinkTapCallback onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
@@ -114,5 +113,18 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
       }
       return Container();
     },
+  );
+};
+
+BaseRender kMarkdownSelectorRender = (BuildContext context, String content,
+    LinkTapCallback onTapImage, LinkTapCallback onTapLink) {
+  return Markdown(
+    selectable: true,
+    data: content,
+    styleSheet: _fontSizeOverride(
+        _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
+    onTapLink: (String text, String href, String title) =>
+        onTapLink?.call(href),
+    imageBuilder: (Uri uri, String title, String alt) => Container(),
   );
 };

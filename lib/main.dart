@@ -42,6 +42,7 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/page/text_selector.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
@@ -146,6 +147,8 @@ class DanxiApp extends StatelessWidget {
         BBSEditorPage(arguments: arguments),
     '/image/detail': (context, {arguments}) =>
         ImageViewerPage(arguments: arguments),
+    '/text/detail': (context, {arguments}) =>
+        TextSelectorPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
   };
 
@@ -716,7 +719,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 if (index != _pageIndex.value) {
                   // List<ScrollPosition> positions =
                   //     PrimaryScrollController.of(context).positions.toList();
-                  // for (var p in positions.skip(1)) {
+                  // for (ScrollPosition p in positions) {
                   //   PrimaryScrollController.of(context).detach(p);
                   // }
                   setState(() => _pageIndex.value = index);

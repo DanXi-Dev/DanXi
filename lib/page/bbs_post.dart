@@ -381,6 +381,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(Reply e) => [
+        if (!isHtml(e.content))
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(context).pop();
+                smartNavigatorPush(context, "/text/detail",
+                    arguments: {"text": e.content});
+              },
+              child: Text(S.of(context).free_select),
+            ),
+            material: (_, __) => ListTile(
+              title: Text(S.of(context).free_select),
+              onTap: () {
+                Navigator.of(context).pop();
+                smartNavigatorPush(context, "/text/detail",
+                    arguments: {"text": e.content});
+              },
+            ),
+          ),
         PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
@@ -400,6 +419,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
+            isDestructiveAction: true,
             onPressed: () {
               Navigator.of(context).pop();
               BBSEditor.reportPost(context, e.id);
@@ -568,10 +588,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         ]),
                   ]),
             onTap: () async {
-              if (_searchResult == null)
-                BBSEditor.createNewReply(context, _post.id, e.id)
+              if (_searchResult == null) {
+                int replyId;
+                // Set the replyId to null when tapping on the first reply.
+                if (_post.first_post.id != e.id) {
+                  replyId = e.id;
+                }
+                BBSEditor.createNewReply(context, _post.id, replyId)
                     .then((value) => refreshSelf());
-              else {
+              } else {
                 ProgressFuture progressDialog = showProgressDialog(
                     loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
