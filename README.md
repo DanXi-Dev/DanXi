@@ -15,10 +15,12 @@
 - 提示并快速平安复旦打卡
 - 快速显示复活码（支持 Apple Watch 显示）
 - 空教室查询
+- 刷锻次数查询
 - FDU Hole 树洞
 - 课表查阅与导出至系统日历等
 - 显示教务处通知
 - 查询期中/期末考试日程与导出至系统日历等
+- 查询期末绩点和专业排名
 
 欢迎各位大佬加入开发~
 
@@ -37,14 +39,14 @@
 打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。  
 
 ## macOS
-打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 dmg 磁盘映像，挂载后将旦兮拖入 Applications 文件夹即可。
+由于 macOS 用户基数太少，专用于 macOS 的发行版本现在已经停止发布。如果有必要使用，可以考虑用iOS/iPadOS版本代替。
 
 # 构建
 ## 我们当前使用的 Flutter 编译版本
 ```shell script
 $ flutter --version
 Flutter 2.2.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision b22742018b (6 days ago) • 2021-05-14 19:12:57 -0700
+Framework • revision b22742018b (9 weeks ago) • 2021-05-14 19:12:57 -0700
 Engine • revision a9d88a4d18
 Tools • Dart 2.13.0
 ```
