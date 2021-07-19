@@ -31,6 +31,7 @@ class Constant {
 
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
+  static const String UIS_HOST = "uis.fudan.edu.cn";
   static const FUDAN_DAILY_COUNTDOWN_SECONDS = 5;
 
   static String yuanSymbol(String num) {

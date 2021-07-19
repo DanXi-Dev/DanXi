@@ -125,12 +125,11 @@ class _AAONoticesListState extends State<AAONoticesList> {
             : Icon(SFSymbols.info_circle_fill),
         title: Text(value.title),
         subtitle: Text(value.time),
-        onTap: () => BrowserUtil.openUrl(
+        onTap: () async => BrowserUtil.openUrl(
             value.url,
             context,
-            PlatformX.isAndroid
-                ? FudanAAORepository.getInstance().cookieJar
-                : null), // TODO: fix this for iOS
+            await FudanAAORepository.getInstance()
+                .thisCookies), // TODO: fix this for iOS
       )));
     });
 

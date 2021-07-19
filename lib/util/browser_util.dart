@@ -17,6 +17,7 @@
 
 import 'dart:math';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
@@ -47,7 +48,7 @@ class BrowserUtil {
               ));
 
   static openUrl(String url, BuildContext context,
-      [NonpersistentCookieJar cookieJar]) {
+      [NonpersistentCookieJar cookieJar]) async {
     // Sanitize URL
     url = Uri.encodeFull(url);
 
@@ -55,30 +56,46 @@ class BrowserUtil {
       launch(url, enableJavaScript: true);
       return;
     }
-    cookieJar.hostCookies.forEach((host, value) {
-      value.forEach((path, value) {
-        value.forEach((name, cookie) {
-          CookieManager.instance().setCookie(
-              url: Uri.parse(url),
-              name: name,
-              value: cookie.cookie.value,
-              domain: cookie.cookie.domain,
-              isSecure: cookie.cookie.secure);
+
+    Uri uri = Uri.parse(url);
+    CookieManager.instance().deleteCookies(url: uri);
+
+    if (uri.host.startsWith(Constant.UIS_HOST)) {
+      cookieJar.hostCookies.forEach((host, value) {
+        value.forEach((path, value) {
+          value.forEach((name, cookie) {
+            CookieManager.instance().setCookie(
+                url: uri,
+                name: name,
+                path: cookie.cookie.path,
+                value: cookie.cookie.value,
+                domain: cookie.cookie.domain);
+          });
         });
       });
-    });
-    cookieJar.domainCookies.forEach((host, value) {
-      value.forEach((path, value) {
-        value.forEach((name, cookie) {
-          CookieManager.instance().setCookie(
-              url: Uri.parse(url),
-              name: name,
-              value: cookie.cookie.value,
-              domain: cookie.cookie.domain,
-              isSecure: cookie.cookie.secure);
+      cookieJar.domainCookies.forEach((host, value) {
+        value.forEach((path, value) {
+          value.forEach((name, cookie) {
+            CookieManager.instance().setCookie(
+                url: uri,
+                name: name,
+                path: cookie.cookie.path,
+                value: cookie.cookie.value,
+                domain: cookie.cookie.domain);
+          });
         });
       });
-    });
+    } else {
+      var cookies = await cookieJar.loadForRequest(uri);
+      cookies.forEach((cookie) {
+        CookieManager.instance().setCookie(
+            url: uri,
+            name: cookie.name,
+            path: cookie.path,
+            value: cookie.value,
+            domain: cookie.domain);
+      });
+    }
     CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)),
         options: getOptions(context));
