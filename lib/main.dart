@@ -59,7 +59,6 @@ import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
-
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -633,101 +632,101 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // Show debug button for [Dio].
       if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
       return MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: _pageIndex),
-          ChangeNotifierProvider.value(value: _connectStatus),
-          ChangeNotifierProvider.value(value: _personInfo),
-          Provider.value(value: _preferences),
-        ],
-        child: MasterDetailController(
-          masterPage: PlatformScaffold(
-            iosContentBottomPadding:
-                _subpage[_pageIndex.value].needBottomPadding,
-            iosContentPadding: _subpage[_pageIndex.value].needPadding,
-            appBar: PlatformAppBar(
-              cupertino: (_, __) => CupertinoNavigationBarData(
-                title: MediaQuery(
-                  data: MediaQueryData(
-                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                  child: TopController(
-                    child: _appTitleWidgetBuilder[_pageIndex.value](context),
+          providers: [
+            ChangeNotifierProvider.value(value: _pageIndex),
+            ChangeNotifierProvider.value(value: _connectStatus),
+            ChangeNotifierProvider.value(value: _personInfo),
+            Provider.value(value: _preferences),
+          ],
+          child: MasterDetailController(
+            masterPage: PlatformScaffold(
+              iosContentBottomPadding:
+                  _subpage[_pageIndex.value].needBottomPadding,
+              iosContentPadding: _subpage[_pageIndex.value].needPadding,
+              appBar: PlatformAppBar(
+                cupertino: (_, __) => CupertinoNavigationBarData(
+                  title: MediaQuery(
+                    data: MediaQueryData(
+                        textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                    child: TopController(
+                      child: _appTitleWidgetBuilder[_pageIndex.value](context),
+                      controller: PrimaryScrollController.of(context),
+                    ),
+                  ),
+                ),
+                material: (_, __) => MaterialAppBarData(
+                  title: TopController(
+                    child: Text(
+                      S.of(context).app_name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     controller: PrimaryScrollController.of(context),
                   ),
                 ),
+                leading: leadingButton,
+                trailingActions: trailingButtons,
               ),
-              material: (_, __) => MaterialAppBarData(
-                title: TopController(
-                  child: Text(
-                    S.of(context).app_name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  controller: PrimaryScrollController.of(context),
-                ),
+              body: IndexedStack(
+                index: _pageIndex.value,
+                children: _subpage,
               ),
-              leading: leadingButton,
-              trailingActions: trailingButtons,
-            ),
-            body: IndexedStack(
-              index: _pageIndex.value,
-              children: _subpage,
-            ),
 
-          // 2021-5-19 @w568w:
-          // Override the builder to prevent the repeatedly built states.
-          // I don't know why it works...
-          cupertinoTabChildBuilder: (_, index) => _subpage[index],
-          bottomNavBar: PlatformNavBar(
-            items: [
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.purple,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.dashboard)
-                    : Icon(SFSymbols.square_stack_3d_up_fill),
-                label: S.of(context).dashboard,
+              // 2021-5-19 @w568w:
+              // Override the builder to prevent the repeatedly built states.
+              // I don't know why it works...
+              cupertinoTabChildBuilder: (_, index) => _subpage[index],
+              bottomNavBar: PlatformNavBar(
+                items: [
+                  BottomNavigationBarItem(
+                    //backgroundColor: Colors.purple,
+                    icon: PlatformX.isAndroid
+                        ? Icon(Icons.dashboard)
+                        : Icon(SFSymbols.square_stack_3d_up_fill),
+                    label: S.of(context).dashboard,
+                  ),
+                  BottomNavigationBarItem(
+                    //backgroundColor: Colors.indigo,
+                    icon: PlatformX.isAndroid
+                        ? Icon(Icons.forum)
+                        : Icon(SFSymbols.text_bubble),
+                    label: S.of(context).forum,
+                  ),
+                  BottomNavigationBarItem(
+                    //backgroundColor: Colors.blue,
+                    icon: PlatformX.isAndroid
+                        ? Icon(Icons.calendar_today)
+                        : Icon(SFSymbols.calendar),
+                    label: S.of(context).timetable,
+                  ),
+                  BottomNavigationBarItem(
+                    //backgroundColor: Theme.of(context).primaryColor,
+                    icon: PlatformX.isAndroid
+                        ? Icon(Icons.settings)
+                        : Icon(SFSymbols.gear_alt),
+                    label: S.of(context).settings,
+                  ),
+                ],
+                currentIndex: _pageIndex.value,
+                material: (_, __) => MaterialNavBarData(
+                  type: BottomNavigationBarType.fixed,
+                  selectedIconTheme:
+                      BottomNavigationBarTheme.of(context).selectedIconTheme,
+                  unselectedIconTheme:
+                      BottomNavigationBarTheme.of(context).unselectedIconTheme,
+                ),
+                itemChanged: (index) {
+                  if (index != _pageIndex.value) {
+                    // List<ScrollPosition> positions =
+                    //     PrimaryScrollController.of(context).positions.toList();
+                    // for (var p in positions.skip(1)) {
+                    //   PrimaryScrollController.of(context).detach(p);
+                    // }
+                    setState(() => _pageIndex.value = index);
+                  }
+                },
               ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.indigo,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.forum)
-                    : Icon(SFSymbols.text_bubble),
-                label: S.of(context).forum,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.blue,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.calendar_today)
-                    : Icon(SFSymbols.calendar),
-                label: S.of(context).timetable,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Theme.of(context).primaryColor,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.settings)
-                    : Icon(SFSymbols.gear_alt),
-                label: S.of(context).settings,
-              ),
-            ],
-            currentIndex: _pageIndex.value,
-            material: (_, __) => MaterialNavBarData(
-              type: BottomNavigationBarType.fixed,
-              selectedIconTheme:
-                  BottomNavigationBarTheme.of(context).selectedIconTheme,
-              unselectedIconTheme:
-                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
             ),
-            itemChanged: (index) {
-              if (index != _pageIndex.value) {
-                // List<ScrollPosition> positions =
-                //     PrimaryScrollController.of(context).positions.toList();
-                // for (var p in positions.skip(1)) {
-                //   PrimaryScrollController.of(context).detach(p);
-                // }
-                setState(() => _pageIndex.value = index);
-              }
-            },
-          ),
-        ),
-      );
+          ));
     }
   }
 
