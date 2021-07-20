@@ -81,7 +81,7 @@ class CardRepository extends BaseRepositoryWithDio {
       List<Element> details = e.querySelectorAll("td");
       return CardRecord(
           DateTime.parse(
-              "${details[0].children[0].text.trim().replaceAll(RegExp.escape('.'), "-")}T${details[0].children[1].text.trim()}"),
+              "${details[0].children[0].text.trim().replaceAll('.', "-")}T${details[0].children[1].text.trim()}"),
           details[1].children[0].text.trim(),
           details[2].text.trim().replaceAll("&nbsp;", ""),
           details[3].text.trim().replaceAll("&nbsp;", ""));

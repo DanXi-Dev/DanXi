@@ -19,6 +19,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/future_widget.dart';
@@ -32,7 +33,6 @@ import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 import 'package:share/share.dart';
 
 class ImageViewerPage extends StatefulWidget {
@@ -55,7 +55,7 @@ class ImageViewerPage extends StatefulWidget {
   ImageViewerPage({Key key, this.arguments});
 
   static bool isBase64Image(String content) {
-    return content.startsWith(RegExp.escape("data:image/"));
+    return content.startsWith("data:image/");
   }
 
   static bool isImage(String url) {
