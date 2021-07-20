@@ -343,9 +343,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           primary: true,
           physics: const AlwaysScrollableScrollPhysics(),
           addAutomaticKeepAlives: true,
-          itemCount: _isRefreshing
-              ? (_currentBBSPage - 1) * POST_COUNT_PER_PAGE
-              : _currentBBSPage * POST_COUNT_PER_PAGE,
+          itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
           itemBuilder: (context, index) => _buildListItem(index, true),
         ),
         controller: PrimaryScrollController.of(context),
@@ -364,10 +362,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       );
     }
-    if (index >= _lastReplies.length)
+    if (index == _lastReplies.length)
       return _isEndIndicatorShown
           ? Container()
           : Center(child: PlatformCircularProgressIndicator());
+    else if (index > _lastReplies.length) return Container();
     return _getListItems(_lastReplies[index], index == 0, false);
   }
 

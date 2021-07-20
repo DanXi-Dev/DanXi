@@ -258,7 +258,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                 (ViewportUtils.getMainNavigatorWidth(context) /
                                             32 +
                                         4) *
-                                    4,
+                                    3,
                             child: Text(
                               "| " + S.of(context).evening,
                               overflow: TextOverflow.fade,
@@ -308,13 +308,23 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         widgets.add(Material(
             child: Container(
           padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
-          child: Column(children: [
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    element.roomName,
-                    style: TextStyle(fontSize: 18),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        element.roomName,
+                        textScaleFactor: 1,
+                      ),
+                      Text(
+                        S.of(context).seats(element.seats),
+                        textScaleFactor: 0.8,
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      ),
+                    ],
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,

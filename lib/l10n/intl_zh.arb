@@ -184,9 +184,10 @@
     "post_does_not_exist": "没有这条树洞",
     "add_image": "添加图片",
     "markdown_enabled": "Markdown 已启用",
-    "markdown_description": "Markdown 解析器正在工作。您可以直接使用 Markdown 语法撰写帖子。如果您不知道什么是 Markdown，可以参阅 https://www.runoob.com/markdown/md-tutorial.html\n\n注意：在 Markdown 下，如果您想要让内容换行，您需要输入两个回车（即中间空一行）。",
+    "markdown_description": "Markdown 解析器已启用。您可以直接使用 Markdown 语法撰写帖子。如果您不知道什么是 Markdown，可以参阅 https://www.runoob.com/markdown/md-tutorial.html\n\n注意：在 Markdown 下，如果您想要让内容换行，您需要输入两个回车（即中间空一行）。",
     "preview": "预览",
 
+    "seats": "{seats}个座位",
     "all_tags": "所有标签",
 
     "classroom": "教室",

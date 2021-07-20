@@ -672,60 +672,59 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               children: _subpage,
             ),
 
-            // 2021-5-19 @w568w:
-            // Override the builder to prevent the repeatedly built states.
-            // I don't know why it works...
-            cupertinoTabChildBuilder: (_, index) => _subpage[index],
-            bottomNavBar: PlatformNavBar(
-              items: [
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.purple,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.dashboard)
-                      : Icon(SFSymbols.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.indigo,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.forum)
-                      : Icon(SFSymbols.text_bubble),
-                  label: S.of(context).forum,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.blue,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.calendar_today)
-                      : Icon(SFSymbols.calendar),
-                  label: S.of(context).timetable,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Theme.of(context).primaryColor,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.settings)
-                      : Icon(SFSymbols.gear_alt),
-                  label: S.of(context).settings,
-                ),
-              ],
-              currentIndex: _pageIndex.value,
-              material: (_, __) => MaterialNavBarData(
-                type: BottomNavigationBarType.fixed,
-                selectedIconTheme:
-                    BottomNavigationBarTheme.of(context).selectedIconTheme,
-                unselectedIconTheme:
-                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
+          // 2021-5-19 @w568w:
+          // Override the builder to prevent the repeatedly built states.
+          // I don't know why it works...
+          cupertinoTabChildBuilder: (_, index) => _subpage[index],
+          bottomNavBar: PlatformNavBar(
+            items: [
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.purple,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.dashboard)
+                    : Icon(SFSymbols.square_stack_3d_up_fill),
+                label: S.of(context).dashboard,
               ),
-              itemChanged: (index) {
-                if (index != _pageIndex.value) {
-                  // List<ScrollPosition> positions =
-                  //     PrimaryScrollController.of(context).positions.toList();
-                  // for (ScrollPosition p in positions) {
-                  //   PrimaryScrollController.of(context).detach(p);
-                  // }
-                  setState(() => _pageIndex.value = index);
-                }
-              },
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.indigo,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.forum)
+                    : Icon(SFSymbols.text_bubble),
+                label: S.of(context).forum,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.blue,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.calendar_today)
+                    : Icon(SFSymbols.calendar),
+                label: S.of(context).timetable,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Theme.of(context).primaryColor,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.settings)
+                    : Icon(SFSymbols.gear_alt),
+                label: S.of(context).settings,
+              ),
+            ],
+            currentIndex: _pageIndex.value,
+            material: (_, __) => MaterialNavBarData(
+              type: BottomNavigationBarType.fixed,
+              selectedIconTheme:
+                  BottomNavigationBarTheme.of(context).selectedIconTheme,
+              unselectedIconTheme:
+                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
             ),
+            itemChanged: (index) {
+              if (index != _pageIndex.value) {
+                // List<ScrollPosition> positions =
+                //     PrimaryScrollController.of(context).positions.toList();
+                // for (var p in positions.skip(1)) {
+                //   PrimaryScrollController.of(context).detach(p);
+                // }
+                setState(() => _pageIndex.value = index);
+              }
+            },
           ),
         ),
       );

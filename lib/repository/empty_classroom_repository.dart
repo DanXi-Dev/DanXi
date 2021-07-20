@@ -62,7 +62,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
     buildingInfo.values.forEach((element) {
       if (element is List) {
         element.forEach((element) {
-          RoomInfo info = RoomInfo(element['name'], date);
+          RoomInfo info = RoomInfo(element['name'], date, element['roomrl']);
           info.busy = [];
           if (element['kxsds'] is Map) {
             element['kxsds']
@@ -83,9 +83,10 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
 class RoomInfo {
   String roomName;
   DateTime date;
+  String seats;
 
   /// the x-th item of busy refers to whether the room is busy at x-th slot.
   List<bool> busy;
 
-  RoomInfo(this.roomName, this.date, {this.busy});
+  RoomInfo(this.roomName, this.date, this.seats, {this.busy});
 }
