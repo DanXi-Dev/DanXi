@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:flutter/widgets.dart';
@@ -92,4 +91,12 @@ extension MapEx on Map {
 extension BuildContextEx on BuildContext {
   PersonInfo get personInfo =>
       Provider.of<ValueNotifier<PersonInfo>>(this, listen: false)?.value;
+
+  PersonInfo get maybePersonInfo {
+    try {
+      return Provider.of<ValueNotifier<PersonInfo>>(this, listen: false)?.value;
+    } catch (ignored) {
+      return null;
+    }
+  }
 }

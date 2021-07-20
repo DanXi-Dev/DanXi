@@ -169,7 +169,9 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   void _setContent() {
-    if (checkGroupByContext(kCompatibleUserGroup, context)) {
+    // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
+    if (context.maybePersonInfo == null ||
+        checkGroupByContext(kCompatibleUserGroup, context)) {
       _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
           SortOrder.LAST_REPLIED;
       _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
@@ -639,8 +641,6 @@ class _BBSSubpageState extends State<BBSSubpage>
       ])),
     );
   }
-
-
 
   @override
   bool get wantKeepAlive => true;
