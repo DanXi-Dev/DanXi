@@ -31,9 +31,10 @@ class ScheduleView extends StatefulWidget {
   final TimetableStyle timetableStyle;
   final TimeNow today;
   final int showingWeek;
+  final ScrollController controller;
 
-  ScheduleView(
-      this.laneEventsList, this.timetableStyle, this.today, this.showingWeek);
+  ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
+      this.showingWeek, this.controller);
 
   @override
   _ScheduleViewState createState() => _ScheduleViewState();
@@ -48,6 +49,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     table = GridView.count(
         crossAxisCount: widget.laneEventsList.length + 1,
         children: _buildTable(),
+        controller: widget.controller,
         childAspectRatio: 0.8,
         shrinkWrap: true);
     return MediaQuery.removePadding(

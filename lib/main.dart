@@ -721,6 +721,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 // for (var p in positions.skip(1)) {
                 //   PrimaryScrollController.of(context).detach(p);
                 // }
+                for (int i = 0; i < _subpage.length; i++) {
+                  if (index != i) {
+                    _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
+                  }
+                }
+                _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
                 setState(() => _pageIndex.value = index);
               }
             },

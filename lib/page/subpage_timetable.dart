@@ -29,6 +29,7 @@ import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -47,9 +48,13 @@ import 'package:share/share.dart';
 
 const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
 
-class TimetableSubPage extends PlatformSubpage {
+class TimetableSubPage extends PlatformSubpage
+    with PageWithPrimaryScrollController {
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
+
+  @override
+  String get debugTag => "TimetablePage";
 }
 
 class ShareTimetableEvent {}
@@ -236,14 +241,14 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       ),
       Expanded(
           child: RefreshIndicator(
-        color: Theme.of(context).accentColor,
+            color: Theme.of(context).accentColor,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           refreshSelf();
         },
-        child:
-            ScheduleView(scheduleData, style, _table.now(), _showingTime.week),
+        child: ScheduleView(scheduleData, style, _table.now(),
+            _showingTime.week, widget.primaryScrollController(context)),
       ))
     ]);
   }

@@ -32,6 +32,7 @@ import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
@@ -43,6 +44,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
@@ -50,7 +52,6 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const kCompatibleUserGroup = [
@@ -107,7 +108,7 @@ Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
   );
 }
 
-class BBSSubpage extends PlatformSubpage {
+class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   bool get needPadding => true;
 
@@ -117,6 +118,9 @@ class BBSSubpage extends PlatformSubpage {
   _BBSSubpageState createState() => _BBSSubpageState();
 
   BBSSubpage({Key key, this.arguments});
+
+  @override
+  String get debugTag => "BBSPage";
 }
 
 class AddNewPostEvent {}
@@ -458,13 +462,13 @@ class _BBSSubpageState extends State<BBSSubpage>
     return NotificationListener<ScrollNotification>(
       child: WithScrollbar(
         child: ListView.builder(
-          primary: true,
+          controller: widget.primaryScrollController(context),
           physics: const AlwaysScrollableScrollPhysics(),
           itemCount: (_currentBBSPage) * Constant.POST_COUNT_PER_PAGE +
               (isLoading ? 1 - Constant.POST_COUNT_PER_PAGE : 0),
           itemBuilder: (context, index) => _getListItemAt(index, data),
         ),
-        controller: PrimaryScrollController.of(context),
+        controller: widget.primaryScrollController(context),
       ),
       onNotification: scrollToEnd,
     );

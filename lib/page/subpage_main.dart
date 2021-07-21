@@ -34,6 +34,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
@@ -43,7 +44,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeSubpage extends PlatformSubpage {
+class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   bool get needPadding => true;
 
@@ -54,6 +55,9 @@ class HomeSubpage extends PlatformSubpage {
   _HomeSubpageState createState() => _HomeSubpageState();
 
   HomeSubpage({Key key});
+
+  @override
+  String get debugTag => "HomePage";
 }
 
 class RefreshHomepageEvent {
@@ -226,6 +230,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
             removeTop: true,
             child: Material(
                 child: ListView(
+                  controller: widget.primaryScrollController(context),
               padding: EdgeInsets.all(4),
               children: _buildCards(widgetList),
             ))));

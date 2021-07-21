@@ -15,26 +15,25 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
-import 'package:flutter/widgets.dart';
+import 'package:dan_xi/util/scroller_fix/mirror_scroll_controller.dart';
+import 'package:flutter/cupertino.dart';
 
-abstract class PlatformSubpage extends StatefulWidget {
-  final bool needPadding = true;
-  final bool needBottomPadding = false;
+mixin PageWithPrimaryScrollController {
+  MirrorScrollController _thisPrimaryScrollController;
 
-  @mustCallSuper
-  void onViewStateChanged(SubpageViewState state) {
-    if (this is PageWithPrimaryScrollController) {
-      switch (state) {
-        case SubpageViewState.VISIBLE:
-          (this as PageWithPrimaryScrollController).reattachItself();
-          break;
-        case SubpageViewState.INVISIBLE:
-          (this as PageWithPrimaryScrollController).detachItself();
-          break;
-      }
+  String get debugTag => null;
+
+  MirrorScrollController primaryScrollController(BuildContext context) {
+    if (_thisPrimaryScrollController == null) {
+      _thisPrimaryScrollController = MirrorScrollController(
+          PrimaryScrollController.of(context),
+          debugTag: debugTag);
     }
+    return _thisPrimaryScrollController;
   }
-}
 
-enum SubpageViewState { VISIBLE, INVISIBLE }
+  void detachItself() => _thisPrimaryScrollController?.detachPosition?.call();
+
+  void reattachItself() =>
+      _thisPrimaryScrollController?.reattachPosition?.call();
+}
