@@ -49,7 +49,11 @@ class EcardBalanceFeature extends Feature {
     // If there's any transaction, we'll show it in the subtitle
     if (_cardInfo.records.isNotEmpty)
       _lastTransaction = _cardInfo.records.first;
-    _status = ConnectionStatus.DONE;
+    if (_balance == null) {
+      _status = ConnectionStatus.FAILED;
+    } else {
+      _status = ConnectionStatus.DONE;
+    }
     notifyUpdate();
   }
 
