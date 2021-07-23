@@ -19,6 +19,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:dan_xi/widget/future_widget.dart';
+import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -73,16 +74,13 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
         successBuilder: (BuildContext context, AsyncSnapshot<Size> snapshot) {
           double displayWidth = min(snapshot.data.width, widget.maxWidth);
           return GestureDetector(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                constraints: BoxConstraints(
-                    maxHeight: displayWidth, maxWidth: displayWidth),
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Image.memory(
-                  _rawImage,
-                  width: displayWidth,
-                ),
+            child: StdImageContainer(
+              width: displayWidth,
+              child: Image.memory(
+                _rawImage,
+                width: displayWidth,
+                height: displayWidth,
+                fit: BoxFit.fitHeight,
               ),
             ),
             onTap: widget.onTap,

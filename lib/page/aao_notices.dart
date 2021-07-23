@@ -128,8 +128,10 @@ class _AAONoticesListState extends State<AAONoticesList> {
         onTap: () async => BrowserUtil.openUrl(
             value.url,
             context,
-            await FudanAAORepository.getInstance()
-                .thisCookies), // TODO: fix this for iOS
+            PlatformX.isIOS
+                ? null
+                : await FudanAAORepository.getInstance()
+                    .thisCookies), // TODO: fix this for iOS
       )));
     });
 
