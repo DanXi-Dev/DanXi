@@ -25,6 +25,7 @@ import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/small_tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
 class BusFeature extends Feature {
@@ -34,7 +35,7 @@ class BusFeature extends Feature {
   List<BusScheduleItem> _busList;
 
   @override
-  Widget get icon => Icon(Icons.bus_alert);
+  Widget get icon => Icon(PlatformIcons(context).bus);
 
   @override
   String get mainTitle => S.of(context).bus_query;
@@ -79,7 +80,6 @@ class BusFeature extends Feature {
   Widget get customSubtitle {
     if (_status == ConnectionStatus.DONE && _busList != null) {
       _busList.forEach((element) {
-        debugPrint(element.realStartTime.toString());
         if (element.realStartTime == null) {
           debugPrint(element.id);
         }
