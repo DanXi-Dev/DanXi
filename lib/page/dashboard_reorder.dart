@@ -19,12 +19,12 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/new_shortcut_widget_dialog.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -169,6 +169,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       'new_card': S.of(context).add_new_card,
       'qr_feature': S.of(context).fudan_qr_code,
       'pe_feature': S.of(context).pe_exercises,
+      'bus_feature': S.of(context).bus_query,
     };
     List<Widget> _widgets = [];
 

@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/base_feature.dart';
+import 'package:dan_xi/feature/bus_feature.dart';
 import 'package:dan_xi/feature/custom_shortcut.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
@@ -145,6 +146,9 @@ class _HomeSubpageState extends State<HomeSubpage> {
       ),
       'pe_feature': FeatureListItem(
         feature: PEFeature(),
+      ),
+      'bus_feature': FeatureListItem(
+        feature: BusFeature(),
       ),
     };
   }

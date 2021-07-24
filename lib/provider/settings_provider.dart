@@ -77,6 +77,7 @@ class SettingsProvider {
       DashboardCard("fudan_daily_feature", null, null, true),
       DashboardCard("new_card", null, null, true),
       DashboardCard("qr_feature", null, null, true),
+      DashboardCard("bus_feature", null, null, true),
     ];
   }
 

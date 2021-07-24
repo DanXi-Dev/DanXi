@@ -37,7 +37,7 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
   factory FudanBusRepository.getInstance() => _instance;
 
-  Future<List<BusScheduleItem>> loadExerciseRecords(PersonInfo info) {
+  Future<List<BusScheduleItem>> loadBusList(PersonInfo info) {
     return Retrier.tryAsyncWithFix(
         () => _loadBusList(),
         (exception) =>
@@ -61,7 +61,7 @@ class FudanBusRepository extends BaseRepositoryWithDio {
   String get linkHost => "zlapp.fudan.edu.cn";
 }
 
-class BusScheduleItem {
+class BusScheduleItem implements Comparable<BusScheduleItem> {
   final String id;
   final Campus start;
   final Campus end;
@@ -70,8 +70,10 @@ class BusScheduleItem {
   final BusDirection direction;
   final bool holidayRun;
 
-  BusScheduleItem(this.id, this.start, this.end, this.startTime, this.endTime,
-      this.direction, this.holidayRun);
+  VagueTime get realStartTime => startTime ?? endTime;
+
+  const BusScheduleItem(this.id, this.start, this.end, this.startTime,
+      this.endTime, this.direction, this.holidayRun);
 
   factory BusScheduleItem.fromRawJson(Map json) => BusScheduleItem(
       json['id'],
@@ -85,6 +87,10 @@ class BusScheduleItem {
           : null,
       BusDirection.values[int.parse(json['arrow'])],
       int.parse(json['holiday']) != 0);
+
+  @override
+  int compareTo(BusScheduleItem other) =>
+      realStartTime.compareTo(other.realStartTime);
 }
 
 enum BusDirection {

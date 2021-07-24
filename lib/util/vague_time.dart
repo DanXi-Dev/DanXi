@@ -17,7 +17,7 @@
 
 /// VagueTime is a data class of time & date, which contains incomplete time fields so that
 /// they could be filled later. It is useful to represent some schedule(e.g. 8:00 everyday).
-class VagueTime {
+class VagueTime implements Comparable<VagueTime> {
   int year, month, day, hour, minute, second, millisecond, microsecond;
 
   VagueTime(
@@ -49,4 +49,8 @@ class VagueTime {
         millisecond ?? exactDate.millisecond,
         microsecond ?? exactDate.microsecond);
   }
+
+  @override
+  int compareTo(VagueTime other) =>
+      toExactTime().compareTo(other.toExactTime());
 }
