@@ -83,22 +83,13 @@ class ImageViewerPage extends StatefulWidget {
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
   List<int> _rawImage;
-  String _url;
   String _fileName;
   static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
 
   @override
   void initState() {
     super.initState();
-    _url = widget.arguments['url'];
-    _fileName = getFileName(_url);
-  }
-
-  getFileName(String url) {
-    if (ImageViewerPage.isBase64Image(url)) {
-      return _BASE64_IMAGE_FILE_NAME;
-    }
-    return Uri.parse(_url).pathSegments.last;
+    _rawImage = widget.arguments['raw_image'];
   }
 
   Future<void> loadImage(String url) async {
@@ -106,20 +97,11 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     if (ImageViewerPage.isBase64Image(url)) {
       String base64Content = url.split(",")[1];
       _rawImage = base64Decode(base64Content);
+      return;
     }
     Response response = await widget.dio.get(url);
     _rawImage = response.data;
   }
-
-  Widget _buildErrorWidget() => GestureDetector(
-        child: Center(
-          child: Text(S.of(context).failed),
-        ),
-        onTap: () {
-          _rawImage = null;
-          refreshSelf();
-        },
-      );
 
   Future<File> saveToFile(
       String dirName, String fileName, List<int> bytes) async {
@@ -136,7 +118,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     File outputFile = await saveToFile('temp_image', _fileName, _rawImage);
     if (PlatformX.isMobile)
       Share.shareFiles([outputFile.absolute.path],
-          mimeTypes: [ImageViewerPage.getMineType(_url)]);
+          mimeTypes: ["image/jpeg", "image/png"]);
     else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
@@ -168,7 +150,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
         iosContentBottomPadding: false,
-        iosContentPadding: true,
+        iosContentPadding: false,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).image),
           trailingActions: [
@@ -190,20 +172,11 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
           ],
         ),
         body: Container(
-            child: FutureWidget<void>(
-          nullable: true,
-          future: loadImage(_url),
-          successBuilder: (_, __) => PhotoView(
+          child: PhotoView(
             imageProvider: MemoryImage(Uint8List.fromList(_rawImage)),
             backgroundDecoration:
                 BoxDecoration(color: Theme.of(context).canvasColor),
           ),
-          loadingBuilder: Center(
-            child: PlatformCircularProgressIndicator(),
-          ),
-          errorBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-            return _buildErrorWidget();
-          },
-        )));
+        ));
   }
 }

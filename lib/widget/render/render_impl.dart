@@ -29,7 +29,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
 BaseRender kHtmlRender = (BuildContext context, String content,
-    LinkTapCallback onTapImage, LinkTapCallback onTapLink) {
+    ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
   Style noPaddingStyle = Style(
     margin: EdgeInsets.zero,
@@ -44,8 +44,12 @@ BaseRender kHtmlRender = (BuildContext context, String content,
       "p": noPaddingStyle,
     },
     customImageRenders: {
-      networkSourceMatcher(): networkImageClipRender(
-          loadingWidget: () => Center(
+      networkSourceMatcher(): (context, attributes, element) {
+        return Center(
+          child: AutoNetworkImage(
+              src: attributes['src'],
+              maxWidth: imageWidth,
+              loadingWidget: Center(
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 12),
                   foregroundDecoration: BoxDecoration(color: Colors.black12),
@@ -56,10 +60,10 @@ BaseRender kHtmlRender = (BuildContext context, String content,
                   ),
                 ),
               ),
-          maxHeight: imageWidth),
+              onTapImage: onTapImage),
+        );
+      },
     },
-    onLinkTap: (url, _, __, ___) => onTapLink(url),
-    onImageTap: (url, _, __, ___) => onTapImage(url),
   );
 };
 
@@ -81,7 +85,7 @@ MarkdownStyleSheet _fontSizeOverride(
 }
 
 BaseRender kMarkdownRender = (BuildContext context, String content,
-    LinkTapCallback onTapImage, LinkTapCallback onTapLink) {
+    ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
   return MarkdownBody(
@@ -94,21 +98,20 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
       if (uri != null && uri.toString() != null) {
         return Center(
           child: AutoNetworkImage(
-            src: uri.toString(),
-            maxWidth: imageWidth,
-            loadingWidget: Center(
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                foregroundDecoration: BoxDecoration(color: Colors.black12),
-                width: imageWidth,
-                height: imageWidth,
-                child: Center(
-                  child: PlatformCircularProgressIndicator(),
+              src: uri.toString(),
+              maxWidth: imageWidth,
+              loadingWidget: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  foregroundDecoration: BoxDecoration(color: Colors.black12),
+                  width: imageWidth,
+                  height: imageWidth,
+                  child: Center(
+                    child: PlatformCircularProgressIndicator(),
+                  ),
                 ),
               ),
-            ),
-            onTap: () => onTapImage?.call((uri.toString())),
-          ),
+              onTapImage: onTapImage),
         );
       }
       return Container();
@@ -117,7 +120,7 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
 };
 
 BaseRender kMarkdownSelectorRender = (BuildContext context, String content,
-    LinkTapCallback onTapImage, LinkTapCallback onTapLink) {
+    ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
   return Markdown(
     selectable: true,
     data: content,

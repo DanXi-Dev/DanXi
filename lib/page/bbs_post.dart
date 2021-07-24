@@ -457,11 +457,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Widget _getListItems(Reply e, bool generateTags, bool isNested) {
     LinkTapCallback onLinkTap = (url) {
-      if (ImageViewerPage.isImage(url)) {
-        smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
-      } else {
-        BrowserUtil.openUrl(url, context);
-      }
+      BrowserUtil.openUrl(url, context);
+    };
+    ImageTapCallback onImageTap = (rawImage) {
+      smartNavigatorPush(context, '/image/detail',
+          arguments: {'raw_image': rawImage});
     };
     return GestureDetector(
       onLongPress: () {
@@ -550,7 +550,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               }
                             },
                           )
-                        : smartRender(e.content, onLinkTap, onLinkTap)),
+                        : smartRender(e.content, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: isNested
@@ -610,7 +610,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   PostRenderWidget smartRender(String content, LinkTapCallback onTapLink,
-          LinkTapCallback onTapImage) =>
+          ImageTapCallback onTapImage) =>
       isHtml(content)
           ? PostRenderWidget(
               render: kHtmlRender,

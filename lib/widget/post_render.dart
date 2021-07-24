@@ -21,7 +21,7 @@ import 'package:flutter/widgets.dart';
 class PostRenderWidget extends StatelessWidget {
   final String content;
   final BaseRender render;
-  final LinkTapCallback onTapImage;
+  final ImageTapCallback onTapImage;
   final LinkTapCallback onTapLink;
 
   const PostRenderWidget(

@@ -20,6 +20,7 @@ import 'dart:ui' as ui;
 
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
+import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -33,7 +34,7 @@ class AutoNetworkImage extends StatefulWidget {
   final double maxWidth;
   final Widget loadingWidget;
   final Widget errorWidget;
-  final GestureTapCallback onTap;
+  final ImageTapCallback onTapImage;
 
   AutoNetworkImage(
       {Key key,
@@ -41,7 +42,7 @@ class AutoNetworkImage extends StatefulWidget {
       this.maxWidth,
       this.loadingWidget,
       this.errorWidget,
-      this.onTap})
+      this.onTapImage})
       : super(key: key);
 
   @override
@@ -83,7 +84,7 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
                 fit: BoxFit.fitHeight,
               ),
             ),
-            onTap: widget.onTap,
+            onTap: () => widget.onTapImage(_rawImage),
           );
         },
         errorBuilder: widget.errorWidget ?? Container(),
