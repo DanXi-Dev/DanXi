@@ -15,9 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
@@ -55,8 +57,13 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
 
   Future<Size> loadImage(String url) async {
     if (_rawImage == null || _rawImage.isEmpty) {
-      Response response = await widget.dio.get(url);
-      _rawImage = response.data;
+      if (ImageViewerPage.isBase64Image(url)) {
+        String base64Content = url.split(",")[1];
+        _rawImage = base64Decode(base64Content);
+      } else {
+        Response response = await widget.dio.get(url);
+        _rawImage = response.data;
+      }
     }
     ui.Image image = await decodeImageFromList(_rawImage);
     return Size(image.width.toDouble(), image.height.toDouble());
