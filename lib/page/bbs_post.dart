@@ -23,7 +23,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
-import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -459,9 +458,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     LinkTapCallback onLinkTap = (url) {
       BrowserUtil.openUrl(url, context);
     };
-    ImageTapCallback onImageTap = (rawImage) {
+    ImageTapCallback onImageTap = (rawImage, url) {
       smartNavigatorPush(context, '/image/detail',
-          arguments: {'raw_image': rawImage});
+          arguments: {'raw_image': rawImage, 'url': url});
     };
     return GestureDetector(
       onLongPress: () {

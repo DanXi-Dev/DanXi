@@ -84,7 +84,7 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
                 fit: BoxFit.fitHeight,
               ),
             ),
-            onTap: () => widget.onTapImage(_rawImage),
+            onTap: () => widget.onTapImage(_rawImage, widget.src),
           );
         },
         errorBuilder: widget.errorWidget ?? Container(),

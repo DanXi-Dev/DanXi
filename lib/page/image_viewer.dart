@@ -14,7 +14,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -22,7 +21,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +33,12 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share/share.dart';
 
+/// An image display page, allowing user to share or save the image.
+///
+/// Arguments:
+/// [Uint8List] raw_image: the raw byte array of the image.
+/// [String] url: the original url of the image, enabling the page to decide the file name.
+///
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
   @protected
@@ -85,22 +89,21 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   List<int> _rawImage;
   String _fileName;
   static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
+  String _url;
 
   @override
   void initState() {
     super.initState();
     _rawImage = widget.arguments['raw_image'];
+    _url = widget.arguments['url'];
+    _fileName = getFileName(_url);
   }
 
-  Future<void> loadImage(String url) async {
-    if (_rawImage != null && _rawImage.isNotEmpty) return;
+  getFileName(String url) {
     if (ImageViewerPage.isBase64Image(url)) {
-      String base64Content = url.split(",")[1];
-      _rawImage = base64Decode(base64Content);
-      return;
+      return _BASE64_IMAGE_FILE_NAME;
     }
-    Response response = await widget.dio.get(url);
-    _rawImage = response.data;
+    return Uri.parse(url).pathSegments.last;
   }
 
   Future<File> saveToFile(
@@ -118,7 +121,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     File outputFile = await saveToFile('temp_image', _fileName, _rawImage);
     if (PlatformX.isMobile)
       Share.shareFiles([outputFile.absolute.path],
-          mimeTypes: ["image/jpeg", "image/png"]);
+          mimeTypes: [ImageViewerPage.getMineType(_url)]);
     else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
