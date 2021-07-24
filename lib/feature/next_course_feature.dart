@@ -25,12 +25,12 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:flutter_timetable_view/src/models/table_event_time.dart';
 
 class NextCourseFeature extends Feature {
   LiveCourseModel _data;
@@ -60,14 +60,8 @@ class NextCourseFeature extends Feature {
         compact: TableDisplayType.FULL)[now.weekday];
     dayEvents.events.sort((a, b) => a.time.slot.compareTo(b.time.slot));
     for (var element in dayEvents.events) {
-      TableEventTime startTime =
-          TimeTable.kCourseSlotStartTime[element.time.slot];
-      // In case that app started on the first day but the date at the moment
-      // has been the second day.
-
-      // Rebuild the TableEventTime to get the date again.
-      DateTime exactStartTime =
-          TableEventTime(hour: startTime.hour, minute: startTime.minute);
+      VagueTime startTime = TimeTable.kCourseSlotStartTime[element.time.slot];
+      DateTime exactStartTime = startTime.toExactTime();
       if (exactStartTime.isBefore(DateTime.now()) &&
           exactStartTime
               .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE))

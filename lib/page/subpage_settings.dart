@@ -119,8 +119,6 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
         "https://github.com/sarbagyastha/flutter_tagging"),
     LicenseItem("flutter_test", LICENSE_BSD_3_0_CLAUSE,
         "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html"),
-    LicenseItem("flutter_timetable_view", LICENSE_MIT,
-        "https://github.com/yamarkz/flutter_timetable_view"),
     LicenseItem("gallery_saver", LICENSE_APACHE_2_0,
         "https://github.com/CarnegieTechnologies/gallery_saver"),
     LicenseItem("html_editor_enhanced", LICENSE_MIT,
