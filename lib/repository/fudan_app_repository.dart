@@ -28,7 +28,7 @@ import 'package:intl/intl.dart';
 
 import 'inpersistent_cookie_manager.dart';
 
-class FudanAppRepository extends BaseRepositoryWithDio {
+class FudanCOVID19Repository extends BaseRepositoryWithDio {
   dynamic _historyData;
 
   static const String LOGIN_URL =
@@ -40,14 +40,14 @@ class FudanAppRepository extends BaseRepositoryWithDio {
   static const String _KEY_PREF = "daily_payload_cache";
   PersonInfo _info;
 
-  FudanAppRepository._();
+  FudanCOVID19Repository._();
 
   @override
   String get linkHost => "zlapp.fudan.edu.cn";
 
-  static final _instance = FudanAppRepository._();
+  static final _instance = FudanCOVID19Repository._();
 
-  factory FudanAppRepository.getInstance() => _instance;
+  factory FudanCOVID19Repository.getInstance() => _instance;
 
   NonpersistentCookieJar get thisCookies => cookieJar;
 

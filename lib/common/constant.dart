@@ -189,6 +189,17 @@ enum Campus {
 }
 
 extension CampusEx on Campus {
+  static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
+
+  static Campus fromChineseName(String name) {
+    for (int i = 0; i < _CAMPUS_NAME.length; i++) {
+      if (name.contains(_CAMPUS_NAME[i])) {
+        return Constant.CAMPUS_VALUES[i];
+      }
+    }
+    return Campus.NONE;
+  }
+
   List<String> getTeachingBuildings() {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
@@ -223,7 +234,7 @@ extension CampusEx on Campus {
       case Campus.ZHANGJIANG_CAMPUS:
         return S.of(context).zhangjiang_campus;
         break;
-      // Select area when it's none
+    // Select area when it's none
       case Campus.NONE:
         return S.of(context).choose_area;
         break;

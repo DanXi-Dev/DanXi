@@ -156,6 +156,7 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Phoenix(
         child: PlatformProvider(
+          // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(

@@ -47,7 +47,9 @@ class FudanDailyFeature extends Feature {
   Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
     // Get the status of reporting
-    await FudanAppRepository.getInstance().hasTick(_info).then((bool ticked) {
+    await FudanCOVID19Repository.getInstance()
+        .hasTick(_info)
+        .then((bool ticked) {
       _status = ConnectionStatus.DONE;
 
       if (ticked) {
@@ -65,7 +67,7 @@ class FudanDailyFeature extends Feature {
 
   void tickFudanDaily() {
     if (!_hasTicked) {
-      FudanAppRepository.getInstance().tick(_info).then((_) {
+      FudanCOVID19Repository.getInstance().tick(_info).then((_) {
         refreshData();
       }, onError: (e) {
         if (e is NotTickYesterdayException) {
@@ -202,7 +204,7 @@ class FudanDailyFeature extends Feature {
             }
           }
           BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
-              context, FudanAppRepository.getInstance().thisCookies);
+              context, FudanCOVID19Repository.getInstance().thisCookies);
         }
         break;
       case ConnectionStatus.FAILED:
