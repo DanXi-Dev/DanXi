@@ -103,3 +103,21 @@ enum BusDirection {
   /// From start to end
   FORWARD
 }
+
+extension busDirectionExtension on BusDirection {
+  static const FORWARD_ARROW = " → ";
+  static const DUAL_ARROW = " ↔ ";
+
+  String toText() {
+    switch (this) {
+      case BusDirection.FORWARD:
+        return FORWARD_ARROW;
+      case BusDirection.BACKWARD:
+        return "(backward arrow)";
+      case BusDirection.DUAL:
+        return DUAL_ARROW;
+      default:
+        return null;
+    }
+  }
+}

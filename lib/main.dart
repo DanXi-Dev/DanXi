@@ -29,6 +29,7 @@ import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/bbs_tags.dart';
+import 'package:dan_xi/page/bus.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/dashboard_reorder.dart';
@@ -149,6 +150,7 @@ class DanxiApp extends StatelessWidget {
     '/text/detail': (context, {arguments}) =>
         TextSelectorPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
+    '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
   };
 
   // This widget is the root of your application.
