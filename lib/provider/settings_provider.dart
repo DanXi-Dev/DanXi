@@ -46,12 +46,12 @@ class SettingsProvider {
     DashboardCard("dining_hall_crowdedness_feature", null, null, true),
     DashboardCard("aao_notice_feature", null, null, true),
     DashboardCard("empty_classroom_feature", null, null, true),
+    DashboardCard("bus_feature", null, null, true),
     DashboardCard("pe_feature", null, null, true),
     DashboardCard("new_card", null, null, true),
     DashboardCard("fudan_daily_feature", null, null, true),
     DashboardCard("new_card", null, null, true),
     DashboardCard("qr_feature", null, null, true),
-    DashboardCard("bus_feature", null, null, true),
   ];
 
   SettingsProvider._(this._preferences);

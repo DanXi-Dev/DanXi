@@ -259,6 +259,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
               child: ListView(
                   padding: EdgeInsets.all(4),
                   controller: widget.primaryScrollController(context),
+                  physics: AlwaysScrollableScrollPhysics(),
                   children: <Widget>[
                     //Account Selection
                     Card(

@@ -234,7 +234,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
             removeTop: true,
             child: Material(
                 child: ListView(
-                  controller: widget.primaryScrollController(context),
+              controller: widget.primaryScrollController(context),
+              physics: AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.all(4),
               children: _buildCards(widgetList),
             ))));
