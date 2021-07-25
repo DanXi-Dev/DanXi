@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -34,8 +35,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BusFeature extends Feature {
-  static const _FORWARD_ARROW = " → ";
-  static const _DUAL_ARROW = " ↔ ";
   ConnectionStatus _status = ConnectionStatus.NONE;
   List<BusScheduleItem> _busList;
   SharedPreferences _preferences;
@@ -107,8 +106,9 @@ class BusFeature extends Feature {
         to = element.end;
         break;
     }
-    String connectChar =
-        element.direction == BusDirection.DUAL ? _DUAL_ARROW : _FORWARD_ARROW;
+    String connectChar = element.direction == BusDirection.DUAL
+        ? busDirectionExtension.DUAL_ARROW
+        : busDirectionExtension.FORWARD_ARROW;
     return Wrap(
       children: [
         /*SmallTag(
@@ -131,28 +131,19 @@ class BusFeature extends Feature {
   }
 
   BusScheduleItem nextBusForCampus(Campus campus) {
-    switch (campus) {
-      case Campus.HANDAN_CAMPUS:
-        // In this case, we don't know which campus the user wants to travel to
-        // So we will not filter based on preferences.
-        break;
-      default:
-        _busList = _busList
-            .where(
-                (element) => element.start == campus || element.end == campus)
-            .toList();
-        break;
-    }
+    final filteredBusList = _busList
+        .where((element) => element.start == campus || element.end == campus)
+        .toList();
     // Get the next bus time
-    _busList.sort();
-    for (var element in _busList) {
+    filteredBusList.sort();
+    for (var element in filteredBusList) {
       VagueTime startTime = element.realStartTime;
       if (startTime != null &&
           startTime.toExactTime().isAfter(DateTime.now())) {
         return element;
       }
     }
-    return _busList.first;
+    return filteredBusList.first;
   }
 
   void refreshData() {
@@ -163,9 +154,8 @@ class BusFeature extends Feature {
   @override
   void onTap() {
     if (_busList != null) {
-      // TODO
-      // smartNavigatorPush(context, "/card/crowdData",
-      //     arguments: {"personInfo": context.personInfo});
+      smartNavigatorPush(context, "/bus/detail",
+          arguments: {"personInfo": context.personInfo, "busList": _busList});
     } else {
       refreshData();
     }
