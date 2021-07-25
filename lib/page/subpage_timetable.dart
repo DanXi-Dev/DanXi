@@ -50,6 +50,9 @@ const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
 class TimetableSubPage extends PlatformSubpage
     with PageWithPrimaryScrollController {
   @override
+  bool get needPadding => false;
+
+  @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 
   @override
@@ -223,33 +226,37 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     if (_showingTime == null) _showingTime = _table.now();
     List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
         compact: TableDisplayType.STANDARD);
-    return Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return RefreshIndicator(
+      color: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      onRefresh: () async {
+        HapticFeedback.mediumImpact();
+        refreshSelf();
+      },
+      child: ListView(
+        // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+        physics: AlwaysScrollableScrollPhysics(),
         children: [
-          PlatformIconButton(
-            icon: Icon(Icons.chevron_left),
-            onPressed: _showingTime.week > 0 ? goToPrev : null,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PlatformIconButton(
+                icon: Icon(Icons.chevron_left),
+                onPressed: _showingTime.week > 0 ? goToPrev : null,
+              ),
+              Text(S.of(context).week(_showingTime.week)),
+              PlatformIconButton(
+                icon: Icon(Icons.chevron_right),
+                onPressed:
+                    _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
+              )
+            ],
           ),
-          Text(S.of(context).week(_showingTime.week)),
-          PlatformIconButton(
-            icon: Icon(Icons.chevron_right),
-            onPressed: _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
-          )
+          ScheduleView(scheduleData, style, _table.now(), _showingTime.week,
+              widget.primaryScrollController(context)),
         ],
       ),
-      Expanded(
-          child: RefreshIndicator(
-            color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          refreshSelf();
-        },
-        child: ScheduleView(scheduleData, style, _table.now(),
-            _showingTime.week, widget.primaryScrollController(context)),
-      ))
-    ]);
+    );
   }
 
   @override

@@ -156,7 +156,7 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Phoenix(
         child: PlatformProvider(
-          // initialPlatform: TargetPlatform.iOS,
+      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -625,6 +625,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBar(
           title: _appTitleWidgetBuilder[_pageIndex.value](context),
           trailingActions: trailingButtons,
@@ -644,6 +645,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: PlatformScaffold(
           iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
           iosContentPadding: _subpage[_pageIndex.value].needPadding,
+
+          // This workarounds a color bug
+          backgroundColor: _pageIndex.value == 2
+              ? null
+              : Theme.of(context).scaffoldBackgroundColor,
+
           appBar: PlatformAppBar(
             cupertino: (_, __) => CupertinoNavigationBarData(
               title: MediaQuery(
