@@ -19,20 +19,26 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_bus_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/vague_time.dart';
+import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:dan_xi/widget/small_tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BusFeature extends Feature {
   static const _FORWARD_ARROW = " → ";
   static const _DUAL_ARROW = " ↔ ";
   ConnectionStatus _status = ConnectionStatus.NONE;
   List<BusScheduleItem> _busList;
+  SharedPreferences _preferences;
 
   @override
   Widget get icon => Icon(PlatformIcons(context).bus);
@@ -42,6 +48,7 @@ class BusFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
+    _preferences = Provider.of<SharedPreferences>(context);
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -79,21 +86,8 @@ class BusFeature extends Feature {
   @override
   Widget get customSubtitle {
     if (_status == ConnectionStatus.DONE && _busList != null) {
-      _busList.forEach((element) {
-        if (element.realStartTime == null) {
-          debugPrint(element.id);
-        }
-      });
-      // Get the next bus time
-      _busList.sort();
-      for (var element in _busList) {
-        VagueTime startTime = element.realStartTime;
-        if (startTime != null &&
-            startTime.toExactTime().isAfter(DateTime.now())) {
-          return buildSubtitle(element);
-        }
-      }
-      return buildSubtitle(_busList.first);
+      return buildSubtitle(
+          nextBusForCampus(SettingsProvider.of(_preferences).campus));
     }
     return null;
   }
@@ -117,12 +111,12 @@ class BusFeature extends Feature {
         element.direction == BusDirection.DUAL ? _DUAL_ARROW : _FORWARD_ARROW;
     return Wrap(
       children: [
-        SmallTag(
+        /*SmallTag(
           label: S.of(context).next_bus,
         ),
         const SizedBox(
           width: 6,
-        ),
+        ),*/
         Text(
           "${DateFormat("HH:mm").format(element.realStartTime.toExactTime())} "
           "${from.displayTitle(context)}"
@@ -134,6 +128,31 @@ class BusFeature extends Feature {
         )
       ],
     );
+  }
+
+  BusScheduleItem nextBusForCampus(Campus campus) {
+    switch (campus) {
+      case Campus.HANDAN_CAMPUS:
+        // In this case, we don't know which campus the user wants to travel to
+        // So we will not filter based on preferences.
+        break;
+      default:
+        _busList = _busList
+            .where(
+                (element) => element.start == campus || element.end == campus)
+            .toList();
+        break;
+    }
+    // Get the next bus time
+    _busList.sort();
+    for (var element in _busList) {
+      VagueTime startTime = element.realStartTime;
+      if (startTime != null &&
+          startTime.toExactTime().isAfter(DateTime.now())) {
+        return element;
+      }
+    }
+    return _busList.first;
   }
 
   void refreshData() {
@@ -150,6 +169,17 @@ class BusFeature extends Feature {
     } else {
       refreshData();
     }
+  }
+
+  @override
+  Widget get trailing {
+    if (_status == ConnectionStatus.CONNECTING) {
+      return ScaleTransform(
+        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        child: PlatformCircularProgressIndicator(),
+      );
+    }
+    return null;
   }
 
   @override
