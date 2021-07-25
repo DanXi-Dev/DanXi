@@ -50,6 +50,10 @@ class _BusPageState extends State<BusPage> {
   Campus _selectItem = Campus.NONE;
   int _sliding;
 
+  // By default, only buses after DateTime.now() is displayed
+  // Set this to true to display all buses
+  bool _showAll = false;
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +68,7 @@ class _BusPageState extends State<BusPage> {
 
   void _onSelectedItemChanged(Campus e) {
     setState(() {
+      _showAll = false;
       _selectItem = e;
       _filteredBusList = _busList
           .where((element) => element.start == e || element.end == e)
@@ -110,7 +115,7 @@ class _BusPageState extends State<BusPage> {
                     controller: PrimaryScrollController.of(context),
                     child: ListView(
                       physics: AlwaysScrollableScrollPhysics(),
-                      controller: PrimaryScrollController.of(context),
+                      primary: true,
                       children: _getListWidgets(),
                     ),
                   )))
@@ -129,37 +134,76 @@ class _BusPageState extends State<BusPage> {
       .asMap();
 
   List<Widget> _getListWidgets() {
-    List<Widget> widgets = [];
+    final currentTime = DateTime.now();
+    List<Widget> widgets = [
+      if (!_showAll)
+        Card(
+          child: ListTile(
+            leading: Icon(PlatformIcons(context).info),
+            title: Text(S.of(context).school_bus_not_showing_all(
+                currentTime.hour, currentTime.minute)),
+            subtitle: Text(S.of(context).school_bus_tap_to_show_all),
+            onTap: () => setState(() {
+              _showAll = true;
+            }),
+          ),
+        )
+    ];
+    if (_filteredBusList == null) return [Container()];
     _filteredBusList.forEach((value) {
-      widgets.add(_buildBusCard(value));
+      if (_showAll ||
+          value.realStartTime == null ||
+          value.realStartTime.toExactTime().isAfter(currentTime))
+        widgets.add(_buildBusCard(value));
     });
     return widgets;
   }
 
   Card _buildBusCard(BusScheduleItem item) {
     return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(item.start.displayTitle(context)),
-              Text(item.direction.toText()),
-              Text(item.end.displayTitle(context))
-            ],
-          ),
-          Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(item.startTime?.toExactTime().toString() ?? "null"),
-              Text(item.endTime?.toExactTime().toString() ?? "null")
-            ],
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      item.start.displayTitle(context),
+                      textScaleFactor: 1.2,
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    Text(item.startTime?.toDisplayFormat() ?? ""),
+                  ],
+                ),
+                Text(
+                  item.direction.toText(),
+                  textScaleFactor: 1.5,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      item.end.displayTitle(context),
+                      textScaleFactor: 1.2,
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    Text(item.endTime?.toDisplayFormat() ?? ""),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

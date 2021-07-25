@@ -24,6 +24,7 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dio/src/response.dart';
+import 'package:intl/intl.dart';
 
 class FudanBusRepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
@@ -106,6 +107,7 @@ enum BusDirection {
 
 extension busDirectionExtension on BusDirection {
   static const FORWARD_ARROW = " → ";
+  static const BACKWARD_ARROW = " ← ";
   static const DUAL_ARROW = " ↔ ";
 
   String toText() {
@@ -113,11 +115,19 @@ extension busDirectionExtension on BusDirection {
       case BusDirection.FORWARD:
         return FORWARD_ARROW;
       case BusDirection.BACKWARD:
-        return "(backward arrow)";
+        return BACKWARD_ARROW;
       case BusDirection.DUAL:
         return DUAL_ARROW;
       default:
         return null;
     }
+  }
+}
+
+extension vagueTimeExtension on VagueTime {
+  String toDisplayFormat() {
+    final format = NumberFormat("00");
+    //if (this == null) return ""; Can't be null
+    return "${format.format(this.hour)}:${format.format(this.minute)}";
   }
 }

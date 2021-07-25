@@ -51,6 +51,7 @@
     "credits": "学分",
     "rank": "排名",
     "semester": "{schoolYear}学年 {semName}学期",
+    "all": "全部",
 
     "empty_classrooms": "空教室",
     "settings": "设置",
@@ -101,6 +102,8 @@
     "pe_exercises": "体育锻炼",
     "bus_query":"校车班次",
     "next_bus":"下一班",
+    "school_bus_not_showing_all": "仅显示 {hh}:{mm} 以后的校车班次",
+    "school_bus_tap_to_show_all": "点击以显示全部",
     "image": "图片",
     "timetable_refresh_error": "新学期的课表现已可用，但我们无法从复旦服务器下载新的课表。\n\n请确保您已连接到复旦校园内网，然后尝试手动刷新课表。\n\n提示：您可以在“日程”页面下拉刷新课表。",
     "image_save_success": "图片已保存到相册",

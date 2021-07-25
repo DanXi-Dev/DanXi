@@ -234,7 +234,7 @@ extension CampusEx on Campus {
       case Campus.ZHANGJIANG_CAMPUS:
         return S.of(context).zhangjiang_campus;
         break;
-    // Select area when it's none
+      // Select area when it's none
       case Campus.NONE:
         return S.of(context).choose_area;
         break;
