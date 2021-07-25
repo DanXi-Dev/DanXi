@@ -33,6 +33,8 @@ class SettingsProvider {
   //static const String KEY_PREFERRED_THEME = "theme";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
+  static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
+      "ec_last_choice";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
   static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
@@ -58,6 +60,17 @@ class SettingsProvider {
 
   factory SettingsProvider.of(SharedPreferences preferences) {
     return SettingsProvider._(preferences);
+  }
+
+  int get lastECBuildingChoiceRepresentation {
+    if (_preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
+      return _preferences.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE);
+    }
+    return null;
+  }
+
+  set lastECBuildingChoiceRepresentation(int value) {
+    _preferences.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
   }
 
   String get lastSemesterStartTime {

@@ -55,15 +55,26 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   List<Tag> _campusTags;
   int _selectCampusIndex = 0;
 
+  SharedPreferences preferences;
+
   List<Tag> _buildingTags;
   Map<int, Text> _buildingList;
-  int _selectBuildingIndex = 0;
+  int __selectBuildingIndex = 0;
+
+  int get _selectBuildingIndex => __selectBuildingIndex;
+  set _selectBuildingIndex(int value) {
+    __selectBuildingIndex = value;
+    SettingsProvider.of(preferences).lastECBuildingChoiceRepresentation = value;
+  }
 
   double _selectDate = 0;
 
   _loadDefaultRoom() async {
-    _selectCampusIndex =
-        SettingsProvider.of(await SharedPreferences.getInstance()).campus.index;
+    preferences = await SharedPreferences.getInstance();
+    _selectCampusIndex = SettingsProvider.of(preferences).campus.index;
+    _selectBuildingIndex =
+        SettingsProvider.of(preferences).lastECBuildingChoiceRepresentation ??
+            0;
     refreshSelf();
   }
 
@@ -108,6 +119,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .map((e) => Text(e))
         .toList()
         .asMap();
+    if (_selectBuildingIndex >= _buildingList.keys.length)
+      _selectBuildingIndex = 0;
 
     if (PlatformX.isMaterial(context))
       selectDate = DateTime.now().add(Duration(days: _selectDate.round()));
