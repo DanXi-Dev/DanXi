@@ -19,7 +19,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +32,7 @@ class WelcomeFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _info = context.personInfo;
+    _info = StateProvider.personInfo.value;
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
       _helloQuote = S.of(context).late_night;

@@ -17,13 +17,13 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 
 class QRFeature extends Feature {
   @override
@@ -39,8 +39,8 @@ class QRFeature extends Feature {
 
   @override
   void onTap() {
-    QRHelper.showQRCode(
-        context, context.personInfo); //TODO: Pass brightness to feature
+    QRHelper.showQRCode(context,
+        StateProvider.personInfo.value); //TODO: Pass brightness to feature
   }
 
   @override

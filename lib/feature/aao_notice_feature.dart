@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
@@ -26,7 +27,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 
 class FudanAAONoticesFeature extends Feature {
   List<Notice> _initialData;
@@ -35,7 +35,9 @@ class FudanAAONoticesFeature extends Feature {
   Future<void> _loadNotices() async {
     _status = ConnectionStatus.CONNECTING;
     _initialData = await FudanAAORepository.getInstance().getNotices(
-        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, 1, context.personInfo);
+        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
+        1,
+        StateProvider.personInfo.value);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
@@ -90,9 +92,7 @@ class FudanAAONoticesFeature extends Feature {
   void onTap() {
     if (_initialData != null) {
       smartNavigatorPush(context, "/notice/aao/list", arguments: {
-        "initialData": _initialData,
-        "personInfo": context.personInfo
-      });
+        "initialData": _initialData});
     } else {
       refreshData();
     }

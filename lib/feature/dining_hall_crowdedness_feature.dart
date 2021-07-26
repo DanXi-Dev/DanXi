@@ -23,7 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
@@ -167,7 +167,7 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _info = context.personInfo;
+    _info = StateProvider.personInfo.value;
     _preferences = Provider.of<SharedPreferences>(context);
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
@@ -267,8 +267,7 @@ class DiningHallCrowdednessFeature extends Feature {
   @override
   void onTap() {
     if (_trafficInfos != null) {
-      smartNavigatorPush(context, "/card/crowdData",
-          arguments: {"personInfo": _info});
+      smartNavigatorPush(context, "/card/crowdData");
     } else {
       refreshData();
     }

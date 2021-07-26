@@ -17,8 +17,7 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 
 /// A static register table of [Feature], declaring its compatibility of user group.
 Map<String, List<UserGroup>> _kRegister = {};
@@ -39,8 +38,6 @@ bool checkFeature(Feature feature, UserGroup group) {
   }
 }
 
-bool checkGroup(List<UserGroup> groups, PersonInfo info) =>
-    groups != null && info != null && groups.contains(info.group);
-
-bool checkGroupByContext(List<UserGroup> groups, BuildContext context) =>
-    checkGroup(groups, context.personInfo);
+bool checkGroup(List<UserGroup> groups, [PersonInfo info]) =>
+    groups != null &&
+    groups.contains((info ?? StateProvider.personInfo.value)?.group);

@@ -23,7 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -81,10 +81,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   bool _loadFromRemote = false;
 
   void _setContent() {
-    if (checkGroupByContext(kCompatibleUserGroup, context))
+    if (checkGroup(kCompatibleUserGroup))
       _content = Retrier.runAsyncWithRetry(() =>
           TimeTableRepository.getInstance().loadTimeTableLocally(
-              context.personInfo,
+              StateProvider.personInfo.value,
               forceLoadFromRemote: _loadFromRemote));
     else
       _content = Future<TimeTable>.error(

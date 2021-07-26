@@ -33,6 +33,7 @@ import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
@@ -96,7 +97,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   void checkConnection() {
     FudanAAORepository.getInstance()
-        .checkConnection(context.personInfo)
+        .checkConnection(StateProvider.personInfo.value)
         .then((connected) {
       if (connected) {
         removeNotification(LanConnectionNotification());
@@ -200,7 +201,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
         if (widgetMap[element.internalString] is FeatureContainer) {
           FeatureContainer container =
               widgetMap[element.internalString] as FeatureContainer;
-          if (!checkFeature(container.childFeature, context.personInfo.group)) {
+          if (!checkFeature(
+              container.childFeature, StateProvider.personInfo.value.group)) {
             return;
           }
         }

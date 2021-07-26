@@ -27,7 +27,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
@@ -174,8 +174,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   void _setContent() {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
-    if (context.maybePersonInfo == null ||
-        checkGroupByContext(kCompatibleUserGroup, context)) {
+    if (checkGroup(kCompatibleUserGroup)) {
       _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
           SortOrder.LAST_REPLIED;
       _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
@@ -187,7 +186,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           widget.arguments.containsKey('showFavoredDiscussion'))
         _contentFuture = PostRepository.getInstance().getFavoredDiscussions();
       else
-        _contentFuture = loginAndLoadPost(context.personInfo, _sortOrder);
+        _contentFuture =
+            loginAndLoadPost(StateProvider.personInfo.value, _sortOrder);
     } else {
       _contentFuture =
           Future<List<BBSPost>>.error(NotLoginError("Logged in as Visitor."));

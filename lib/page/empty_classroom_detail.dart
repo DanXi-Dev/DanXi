@@ -20,6 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -81,7 +82,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   @override
   void initState() {
     super.initState();
-    _personInfo = widget.arguments['personInfo'];
+    _personInfo = StateProvider.personInfo.value;
     _loadDefaultRoom();
   }
 

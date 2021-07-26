@@ -21,12 +21,11 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fudan_bus_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
-import 'package:dan_xi/widget/small_tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -52,7 +51,7 @@ class BusFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _loadBusList(context.personInfo).catchError((error) {
+      _loadBusList(StateProvider.personInfo.value).catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });
@@ -155,7 +154,7 @@ class BusFeature extends Feature {
   void onTap() {
     if (_busList != null) {
       smartNavigatorPush(context, "/bus/detail",
-          arguments: {"personInfo": context.personInfo, "busList": _busList});
+          arguments: {"busList": _busList});
     } else {
       refreshData();
     }

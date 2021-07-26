@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -35,7 +36,6 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 ///
 /// Arguments:
 /// [List<Notice>] initialData: the initial data to be shown as soon as the page's displayed.
-/// [PersonInfo] personInfo: personal information
 class AAONoticesList extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
@@ -56,7 +56,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
   void initState() {
     super.initState();
     _data = widget.arguments['initialData'];
-    _info = widget.arguments['personInfo'];
+    _info = StateProvider.personInfo.value;
   }
 
   @override

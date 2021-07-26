@@ -20,7 +20,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
@@ -59,7 +59,7 @@ class EcardBalanceFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _info = context.personInfo;
+    _info = StateProvider.personInfo.value;
 
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
@@ -96,38 +96,6 @@ class EcardBalanceFeature extends Feature {
     }
     return '';
   }
-
-  /*@override
-  Row get customSubtitle {
-    if (_status == ConnectionStatus.DONE) {
-      if (_lastTransaction == null)
-        return null;
-      else
-        return Row(
-          children: [
-            SmallTag(
-              label: S.of(context).last_transaction,
-            ),
-            const SizedBox(
-              width: 4,
-            ),
-            Text(Constant.yuanSymbol(_lastTransaction?.payment)),
-            const SizedBox(
-              width: 4,
-            ),
-            Expanded(
-              child: Text(
-                _lastTransaction?.location,
-                overflow: TextOverflow.ellipsis,
-                softWrap: true,
-                maxLines: 1,
-              ),
-            )
-          ],
-        );
-    }
-    return null;
-  }*/
 
   //@override
   //String get tertiaryTitle => _lastTransaction?.location;
@@ -167,7 +135,7 @@ class EcardBalanceFeature extends Feature {
   void onTap() {
     if (_cardInfo != null) {
       smartNavigatorPush(context, "/card/detail",
-          arguments: {"cardInfo": _cardInfo, "personInfo": _info});
+          arguments: {"cardInfo": _cardInfo});
     } else {
       refreshData();
     }

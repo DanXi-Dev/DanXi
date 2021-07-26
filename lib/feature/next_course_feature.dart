@@ -21,7 +21,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
@@ -44,7 +44,7 @@ class NextCourseFeature extends Feature {
       // Put a delay before retrying.
       await Future.delayed(Duration(milliseconds: 100));
       return await TimeTableRepository.getInstance()
-          .loadTimeTableLocally(context.personInfo);
+          .loadTimeTableLocally(StateProvider.personInfo.value);
     });
     _data = getNextCourse(timetable);
     _status = ConnectionStatus.DONE;
@@ -79,7 +79,7 @@ class NextCourseFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _info = context.personInfo;
+    _info = StateProvider.personInfo.value;
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -156,8 +156,7 @@ class NextCourseFeature extends Feature {
             ),
           ],
         ),
-        onTap: () => smartNavigatorPush(context, '/exam/detail',
-            arguments: {'personInfo': _info}),
+        onTap: () => smartNavigatorPush(context, '/exam/detail'),
       );
 
   @override

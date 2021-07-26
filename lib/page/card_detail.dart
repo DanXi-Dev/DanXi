@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
@@ -54,7 +55,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
   void initState() {
     super.initState();
     _cardInfo = widget.arguments['cardInfo'];
-    _personInfo = widget.arguments['personInfo'];
+    _personInfo = StateProvider.personInfo.value;
     _tags = [
       Tag(S.current.last_7_days,
           PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),

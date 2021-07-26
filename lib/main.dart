@@ -45,6 +45,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/page/text_selector.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
@@ -212,8 +213,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences _preferences;
 
-  ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
-
   /// A description for current connection status.
   ValueNotifier<String> _connectStatus = ValueNotifier("");
 
@@ -231,7 +230,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// If we need to send the QR code to iWatch now.
   ///
-  /// When notified [watchActivated], we should send it after [_personInfo] is loaded.
+  /// When notified [watchActivated], we should send it after [StateProvider.personInfo] is loaded.
   bool _needSendToWatch = false;
 
   /// Whether the error dialog is shown.
@@ -383,7 +382,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // Init for firebase services.
     FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
-    _personInfo.addListener(() {
+    StateProvider.personInfo.addListener(() {
       _rebuildPage();
       refreshSelf();
     });
@@ -415,8 +414,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)
         quickActions.initialize((shortcutType) {
-          if (shortcutType == 'action_qr_code' && _personInfo.value != null) {
-            QRHelper.showQRCode(context, _personInfo.value);
+          if (shortcutType == 'action_qr_code' &&
+              StateProvider.personInfo.value != null) {
+            QRHelper.showQRCode(context, StateProvider.personInfo.value);
           }
         });
       // Configure watch listeners on iOS.
@@ -443,7 +443,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     const channel_a = const MethodChannel('fduhole');
     channel_a.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'get_token') {
-        // If we haven't loaded [_personInfo]
+        // If we haven't loaded [StateProvider.personInfo]
         if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
           sendFduholeTokenToWatch(
               _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
@@ -461,7 +461,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       barrierDismissible: false,
       builder: (BuildContext context) => LoginDialog(
           sharedPreferences: _preferences,
-          personInfo: _personInfo,
+          personInfo: StateProvider.personInfo,
           forceLogin: forceLogin));
 
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
@@ -471,8 +471,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _preferences = await SharedPreferences.getInstance();
 
     if (!forceLogin && PersonInfo.verifySharedPreferences(_preferences)) {
-      setState(() =>
-          _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));
+      StateProvider.personInfo.value =
+          PersonInfo.fromSharedPreferences(_preferences);
     } else {
       _showLoginDialog(forceLogin: forceLogin);
     }
@@ -622,7 +622,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ));
     }
 
-    if (_personInfo.value == null) {
+    if (StateProvider.personInfo.value == null) {
       // Show an empty container if no person info is set
       return PlatformScaffold(
         iosContentBottomPadding: false,
@@ -641,7 +641,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         providers: [
           ChangeNotifierProvider.value(value: _pageIndex),
           ChangeNotifierProvider.value(value: _connectStatus),
-          ChangeNotifierProvider.value(value: _personInfo),
+          ChangeNotifierProvider.value(value: StateProvider.personInfo),
           Provider.value(value: _preferences),
         ],
         child: PlatformScaffold(
@@ -797,11 +797,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // Determine if Timetable needs to be updated
     if (SettingsProvider.of(_preferences).lastSemesterStartTime !=
             TimeTable.START_TIME.toIso8601String() &&
-        _personInfo.value != null) {
+        StateProvider.personInfo.value != null) {
       // Update Timetable
       Retrier.runAsyncWithRetry(
               () => TimeTableRepository.getInstance().loadTimeTableLocally(
-                  _personInfo.value,
+                  StateProvider.personInfo.value,
                   forceLoadFromRemote: true),
               retryTimes: 1)
           .onError((error, stackTrace) => Noticing.showNotice(

@@ -19,10 +19,8 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/data_center_repository.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fudan_bus_repository.dart';
-import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
@@ -31,7 +29,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BusPage extends StatefulWidget {
@@ -57,7 +54,7 @@ class _BusPageState extends State<BusPage> {
   @override
   void initState() {
     super.initState();
-    _personInfo = widget.arguments['personInfo'];
+    _personInfo = StateProvider.personInfo.value;
     _busList = widget.arguments['busList'];
     SharedPreferences.getInstance().then((preferences) {
       _selectItem = SettingsProvider.of(preferences).campus;

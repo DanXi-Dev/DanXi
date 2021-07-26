@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -62,7 +63,7 @@ class _ExamListState extends State<ExamList> {
   @override
   void initState() {
     super.initState();
-    _info = widget.arguments['personInfo'];
+    _info = StateProvider.personInfo.value;
     _examList = EduServiceRepository.getInstance().loadExamListRemotely(_info);
     _gpaList = EduServiceRepository.getInstance().loadGPARemotely(_info);
     _semester = EduServiceRepository.getInstance().loadSemesters(_info);

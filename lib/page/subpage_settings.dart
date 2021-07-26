@@ -26,6 +26,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -174,8 +175,7 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
 
   /// Pop up a dialog where user can give his name & password.
   void _showLoginDialog({bool forceLogin = false}) {
-    ValueNotifier<PersonInfo> _infoNotifier =
-        Provider.of<ValueNotifier<PersonInfo>>(context, listen: false);
+    ValueNotifier<PersonInfo> _infoNotifier = StateProvider.personInfo;
     showPlatformDialog(
         context: context,
         barrierDismissible: false,
@@ -269,9 +269,9 @@ class _SettingsSubpageState extends State<SettingsSubpage> {
                           leading: PlatformX.isMaterial(context)
                               ? const Icon(Icons.account_circle)
                               : const Icon(SFSymbols.person_circle),
-                          subtitle: Text(context.personInfo.name +
+                          subtitle: Text(StateProvider.personInfo.value.name +
                               ' (' +
-                              context.personInfo.id +
+                              StateProvider.personInfo.value.id +
                               ')'),
                         ),
                         ListTile(
