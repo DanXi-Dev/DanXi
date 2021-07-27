@@ -21,16 +21,36 @@ import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
+/// A ListView supporting paged loading and viewing.
 class PagedListView<T> extends StatefulWidget {
+  /// Use the PagedListViewController to control its behaviour, e.g. refreshing
   final PagedListViewController pagedController;
+
+  /// The data that will be used as preloaded data before loading.
   final List<T> initialData;
+
+  /// The builder to build every list item.
   final IndexedDataWidgetBuilder<T> builder;
+
+  /// The builder to build loading indicator.
   final WidgetBuilder loadingBuilder;
+
+  /// The builder to build error tips.
   final AsyncWidgetBuilder<List<T>> errorBuilder;
+
+  /// The builder to build end indicator.
   final WidgetBuilder endBuilder;
+
+  /// The start number of page index, usually zero to say that the first page is Page 0.
   final int startPage;
+
+  /// The method to load new data, usually from network.
   final DataReceiver<T> dataReceiver;
+
+  /// The scrollController of the ListView. If not set, it will be PrimaryScrollController.
   final ScrollController scrollController;
+
+  /// Should add a scrollbar or not. If true, [scrollController] may not be null.
   final bool withScrollbar;
 
   const PagedListView(
