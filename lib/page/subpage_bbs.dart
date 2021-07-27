@@ -417,7 +417,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     }))));
   }
 
-  Widget _buildLoadingPage() => Container(
+  Widget _buildLoadingWidget() => Container(
         padding: EdgeInsets.all(8),
         child: Center(child: PlatformCircularProgressIndicator()),
       );
@@ -490,7 +490,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       );
     }
     if (index >= _lastPageItems.length)
-      return _isEndIndicatorShown ? Container() : _buildLoadingPage();
+      return _isEndIndicatorShown ? Container() : _buildLoadingWidget();
     return _lastPageItems[index];
   }
 

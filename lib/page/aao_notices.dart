@@ -15,17 +15,17 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -47,9 +47,7 @@ class AAONoticesList extends StatefulWidget {
 
 class _AAONoticesListState extends State<AAONoticesList> {
   List<Notice> _data;
-  int _page = 1;
   ScrollController _controller;
-  ConnectionStatus _status = ConnectionStatus.NONE;
   PersonInfo _info;
 
   @override
@@ -57,33 +55,6 @@ class _AAONoticesListState extends State<AAONoticesList> {
     super.initState();
     _data = widget.arguments['initialData'];
     _info = StateProvider.personInfo.value;
-  }
-
-  @override
-  void didChangeDependencies() {
-    _controller = PrimaryScrollController.of(context);
-    if (_controller != null) {
-      _controller.addListener(() {
-        if (_controller.position.pixels ==
-            _controller.position.maxScrollExtent) {
-          if (_status != ConnectionStatus.CONNECTING) _loadNextPage();
-        }
-      });
-    }
-    super.didChangeDependencies();
-  }
-
-  Future<void> _loadNextPage() async {
-    _status = ConnectionStatus.CONNECTING;
-    List<Notice> newPage = await FudanAAORepository.getInstance().getNotices(
-        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, _page + 1, _info);
-    if (newPage != null) {
-      setState(() {
-        _page++;
-        _data.addAll(newPage);
-        _status = ConnectionStatus.DONE;
-      });
-    }
   }
 
   @override
@@ -103,38 +74,54 @@ class _AAONoticesListState extends State<AAONoticesList> {
               child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
-                  child: WithScrollbar(
-                      controller: _controller,
-                      child: ListView(
-                        controller: _controller,
-                        children: _getListWidgets(),
-                      ))))
+                  child: PagedListView<Notice>(
+                    withScrollbar: true,
+                    scrollController: PrimaryScrollController.of(context),
+                    builder: (_, __, Notice value) {
+                      return ThemedMaterial(
+                          child: ListTile(
+                        leading: PlatformX.isAndroid
+                            ? Icon(Icons.info)
+                            : Icon(SFSymbols.info_circle_fill),
+                        title: Text(value.title),
+                        subtitle: Text(value.time),
+                        onTap: () async => BrowserUtil.openUrl(
+                            value.url,
+                            context,
+                            PlatformX.isIOS
+                                ? null
+                                : await FudanAAORepository.getInstance()
+                                    .thisCookies), // TODO: fix this for iOS
+                      ));
+                    },
+                    loadingBuilder: (_) => Center(
+                      child: PlatformCircularProgressIndicator(),
+                    ),
+                    endBuilder: (_) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(S.of(context).end_reached),
+                        const SizedBox(
+                          height: 16,
+                        )
+                      ],
+                    ),
+                    initialData: _data,
+                    errorBuilder: (_, AsyncSnapshot<List<Notice>> __) =>
+                        GestureDetector(
+                      child: Center(
+                        child: Text(S.of(context).failed),
+                      ),
+                      onTap: () {
+                        refreshSelf();
+                      },
+                    ),
+                    dataReceiver: (index) => FudanAAORepository.getInstance()
+                        .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
+                            index + 1, _info),
+                  )))
         ],
       ),
     );
-  }
-
-  List<Widget> _getListWidgets() {
-    List<Widget> widgets = [];
-    if (_data == null) return widgets;
-    _data.forEach((Notice value) {
-      widgets.add(ThemedMaterial(
-          child: ListTile(
-        leading: PlatformX.isAndroid
-            ? Icon(Icons.info)
-            : Icon(SFSymbols.info_circle_fill),
-        title: Text(value.title),
-        subtitle: Text(value.time),
-        onTap: () async => BrowserUtil.openUrl(
-            value.url,
-            context,
-            PlatformX.isIOS
-                ? null
-                : await FudanAAORepository.getInstance()
-                    .thisCookies), // TODO: fix this for iOS
-      )));
-    });
-
-    return widgets;
   }
 }

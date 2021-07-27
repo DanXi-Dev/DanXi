@@ -28,6 +28,12 @@ class Reply {
   final int discussion;
   final bool is_me;
 
+  @override
+  int get hashCode => id;
+
+  @override
+  bool operator ==(Object other) => (other is Reply) && id == other.id;
+
   Reply(this.id, this.content, this.username, this.reply_to, this.date_created,
       this.discussion, this.is_me);
 
