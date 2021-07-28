@@ -126,7 +126,6 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
         future: _futureData,
         successBuilder: (_, snapshot) {
           _isRefreshing = false;
-
           if (snapshot.data.isEmpty ||
               _data.isEmpty ||
               snapshot.data.last != _data.last) {
@@ -135,8 +134,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
             valueKeys.addAll(List.generate(snapshot.data.length,
                 (index) => StateKey(snapshot.data[index])));
           }
-          if (snapshot.data.isEmpty && pageIndex != widget.startPage)
-            _isEnded = true;
+          if (snapshot.data.isEmpty) _isEnded = true;
           return _buildListView();
         },
         errorBuilder: widget.errorBuilder,
@@ -175,7 +173,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
     valueKeys.clear();
     pageIndex = widget.startPage;
 
-    _futureData = Future.value(widget.initialData);
+    _futureData = widget.initialData != null && widget.initialData.isNotEmpty
+        ? Future.value(widget.initialData)
+        : widget.dataReceiver(pageIndex);
   }
 
   notifyUpdate() {
