@@ -79,7 +79,8 @@ class PagedListView<T> extends StatefulWidget {
   _PagedListViewState<T> createState() => _PagedListViewState<T>();
 }
 
-class _PagedListViewState<T> extends State<PagedListView<T>> {
+class _PagedListViewState<T> extends State<PagedListView<T>>
+    with ListProvider<T> {
   final GlobalKey _scrollKey = GlobalKey();
 
   int pageIndex;
@@ -155,7 +156,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
     if (index < _data.length) {
       return WithStateKey(
         childKey: valueKeys[index],
-        child: widget.builder(context, index, _data[index]),
+        child: widget.builder(context, this, index, _data[index]),
       );
     } else if (index == _data.length) {
       if (_isRefreshing) {
@@ -210,6 +211,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
     initialize();
     widget.pagedController?.setListener(this);
   }
+
+  @override
+  T getElementAt(int index) => _data[index];
 }
 
 class PagedListViewController<T> {
@@ -236,9 +240,13 @@ class PagedListViewController<T> {
   }
 }
 
+mixin ListProvider<T> {
+  T getElementAt(int index);
+}
+
 /// Build a widget with index & data. You must apply the key to the root widget of item.
 typedef IndexedDataWidgetBuilder<T> = Widget Function(
-    BuildContext context, int index, T data);
+    BuildContext context, ListProvider<T> dataProvider, int index, T data);
 
 /// Retrieve data function
 typedef DataReceiver<T> = Future<List<T>> Function(int pageIndex);

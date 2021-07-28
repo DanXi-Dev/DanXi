@@ -35,11 +35,9 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -157,11 +155,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   final PagedListViewController _listViewController = PagedListViewController();
 
-  /// Fields related to the display states.
-  int _currentBBSPage;
   SortOrder _sortOrder;
-  bool _isRefreshing;
-  bool _isEndIndicatorShown;
   FoldBehavior _foldBehavior;
 
   /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
@@ -169,10 +163,6 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   /// These field holds the content on the page.
   List<Widget> _lastPageItems;
-  AsyncSnapshot _lastSnapshotData;
-
-  /// Future of network loading.
-  Future _contentFuture;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   Future<List<BBSPost>> _loadContent(int page) async {
@@ -205,17 +195,12 @@ class _BBSSubpageState extends State<BBSSubpage>
       // ignore: invalid_use_of_protected_member
       setState(() {
         _initialize();
-        //_setContent();
       });
     }
   }
 
   void _initialize() {
-    _currentBBSPage = 1;
     _lastPageItems = [];
-    _lastSnapshotData = null;
-    _isRefreshing = true;
-    _isEndIndicatorShown = false;
   }
 
   Widget _buildSearchTextField() {
@@ -421,7 +406,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
-  Widget _buildListItem(BuildContext context, int index, BBSPost postElement) {
+  Widget _buildListItem(BuildContext context, ListProvider<BBSPost> _,
+      int index, BBSPost postElement) {
     if (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded)
       return Container();
     Linkify postContentWidget = Linkify(

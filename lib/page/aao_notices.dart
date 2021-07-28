@@ -77,7 +77,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
                   child: PagedListView<Notice>(
                     withScrollbar: true,
                     scrollController: PrimaryScrollController.of(context),
-                    builder: (_, __, Notice value) {
+                    builder: (_, __, ___, Notice value) {
                       return ThemedMaterial(
                           child: ListTile(
                         leading: PlatformX.isAndroid
