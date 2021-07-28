@@ -262,15 +262,26 @@ class ExamScore {
 class GPAListItem {
   final String name;
   final String id;
+  final String year;
+  final String major;
+  final String college;
   final String gpa;
   final String credits;
   final String rank;
 
-  GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank);
+  GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
+      this.major, this.college);
 
   factory GPAListItem.fromHtml(DOM.Element html) {
     List<DOM.Element> elements = html.getElementsByTagName("td");
-    return GPAListItem(elements[1].text, elements[0].text, elements[5].text,
-        elements[6].text, elements[7].text);
+    return GPAListItem(
+        elements[1].text,
+        elements[0].text,
+        elements[5].text,
+        elements[6].text,
+        elements[7].text,
+        elements[2].text,
+        elements[3].text,
+        elements[4].text);
   }
 }

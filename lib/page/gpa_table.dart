@@ -43,14 +43,12 @@ class _GpaTablePageState extends State<GpaTablePage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
         iosContentBottomPadding: false,
-        iosContentPadding: true,
+        iosContentPadding: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).your_gpa),
         ),
-        body: MediaQuery.removePadding(
-            removeTop: true,
-            context: context,
+        body: SafeArea(
             child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                 controller: PrimaryScrollController.of(context),
@@ -62,18 +60,63 @@ class _GpaTablePageState extends State<GpaTablePage> {
   List<TableRow> _getGpaRow() {
     List<TableRow> widgets = [
       TableRow(children: [
-        Text(S.of(context).name),
-        Text(S.of(context).gpa),
-        Text(S.of(context).credits),
-        Text(S.of(context).rank)
+        Text(
+          S.of(context).name,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          S.of(context).major,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          S.of(context).gpa,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          S.of(context).credits,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          S.of(context).rank,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )
       ])
     ];
     gpalist.forEach((element) {
       widgets.add(TableRow(children: [
-        Text(element.name),
-        Text(element.gpa),
-        Text(element.credits),
-        Text(element.rank)
+        Text(
+          element.name,
+          textAlign: TextAlign.center,
+        ),
+        /*Text(
+          element.year,
+          textAlign: TextAlign.center,
+        ),*/
+        Text(
+          element.major,
+          textAlign: TextAlign.center,
+        ),
+        /*Text(
+          element.college,
+          textAlign: TextAlign.center,
+        ),*/
+        Text(
+          element.gpa,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          element.credits,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          element.rank,
+          textAlign: TextAlign.center,
+        )
       ]));
     });
     return widgets;
