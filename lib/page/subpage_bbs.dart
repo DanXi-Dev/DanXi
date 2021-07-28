@@ -35,9 +35,11 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -155,6 +157,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   final PagedListViewController _listViewController = PagedListViewController();
 
+  /// Fields related to the display states.
   SortOrder _sortOrder;
   FoldBehavior _foldBehavior;
 
@@ -193,14 +196,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      setState(() {
-        _initialize();
-      });
+      setState(() {});
     }
-  }
-
-  void _initialize() {
-    _lastPageItems = [];
   }
 
   Widget _buildSearchTextField() {
@@ -260,7 +257,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   void initState() {
     super.initState();
     _fieldInitComplete = false;
-    _initialize();
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success = await BBSEditor.createNewPost(context);

@@ -31,6 +31,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
+import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
@@ -117,8 +118,6 @@ class BBSPostDetail extends StatefulWidget {
 }
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
-  static const POST_COUNT_PER_PAGE = 10;
-
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   BBSPost _post;
@@ -126,18 +125,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   SharedPreferences _preferences;
 
   /// Fields related to the display states.
-  int _currentBBSPage = 1;
-  List<Reply> _lastReplies = [];
-  AsyncSnapshot _lastSnapshotData;
-  bool _isRefreshing = true;
-  bool _isEndIndicatorShown = false;
   bool _isFavored;
   bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
 
-  /// Future of network loading.
-  Future<List<Reply>> _content;
+  final PagedListViewController _listViewController = PagedListViewController();
 
   void scrollToEndIfNeeded() {
     final _controller = PrimaryScrollController.of(context);
@@ -148,14 +141,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Reload/load the (new) content and set the [_content] future.
-  void _loadContent() {
+  Future<List<Reply>> _loadContent(int page) {
     if (_searchResult != null)
-      _content = _searchResult;
-    else if (_currentBBSPage == 1 && shouldUsePreloadedContent)
-      _content = Future.value((widget.arguments['post'] as BBSPost).posts);
+      return _searchResult;
     else
-      _content =
-          PostRepository.getInstance().loadReplies(_post, _currentBBSPage);
+      return PostRepository.getInstance().loadReplies(_post, page);
   }
 
   Future<bool> _isDiscussionFavored() async {
@@ -181,7 +171,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   void didChangeDependencies() {
-    _loadContent();
     super.didChangeDependencies();
     _getSharedPreferences();
   }
@@ -195,78 +184,68 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (mounted) {
       setState(() {
         shouldScrollToEnd = false;
-        _currentBBSPage = 1;
-        _lastReplies = [];
-        _lastSnapshotData = null;
-        _isRefreshing = true;
-        _isEndIndicatorShown = false;
         shouldUsePreloadedContent = false;
-        _loadContent();
       });
     }
   }
 
   @override
-  void didUpdateWidget(covariant BBSPostDetail oldWidget) {
-    _loadContent();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // A listener to the scroll view, loading new content when scroll to the bottom.
-    NotificationListenerCallback<ScrollNotification> onScrollToBottom =
-        (ScrollNotification scrollInfo) {
-      if (scrollInfo.metrics.extentAfter < 500 &&
-          !_isRefreshing &&
-          !_isEndIndicatorShown) {
-        _isRefreshing = true;
-        setState(() {
-          _currentBBSPage++;
-          _loadContent();
-        });
-      }
-      return false;
-    };
-
     return PlatformScaffold(
-        material: (_, __) =>
-            MaterialScaffoldData(resizeToAvoidBottomInset: false),
-        cupertino: (_, __) =>
-            CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
-        iosContentPadding: true,
-        iosContentBottomPadding: true,
-        appBar: PlatformAppBarX(
-          title: Text(_searchResult == null
-              ? S.of(context).forum
-              : S.of(context).search_result),
-          trailingActions: [
-            if (_searchResult == null) _buildFavoredActionButton(),
-            if (_searchResult == null)
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.reply)
-                    : const Icon(SFSymbols.arrowshape_turn_up_left),
-                onPressed: () {
-                  BBSEditor.createNewReply(context, _post.id, null)
-                      .then((_) => refreshSelf());
-                },
-              ),
-          ],
-        ),
-        body: RefreshIndicator(
+      material: (_, __) =>
+          MaterialScaffoldData(resizeToAvoidBottomInset: false),
+      cupertino: (_, __) =>
+          CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
+      iosContentPadding: false,
+      iosContentBottomPadding: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: PlatformAppBarX(
+        title: Text(_searchResult == null
+            ? S.of(context).forum
+            : S.of(context).search_result),
+        trailingActions: [
+          if (_searchResult == null) _buildFavoredActionButton(),
+          if (_searchResult == null)
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.reply)
+                  : const Icon(SFSymbols.arrowshape_turn_up_left),
+              onPressed: () {
+                BBSEditor.createNewReply(context, _post.id, null)
+                    .then((_) => refreshSelf());
+              },
+            ),
+        ],
+      ),
+      body: RefreshIndicator(
           color: Theme.of(context).accentColor,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            refreshSelf();
+            _listViewController.notifyUpdate();
           },
-          child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: Material(
-                child: FutureWidget<List<Reply>>(
+          child: Material(
+              child: PagedListView<Reply>(
+            initialData: widget.arguments['post']?.posts ?? [],
+            startPage: 1,
+            pagedController: _listViewController,
+            withScrollbar: true,
+            scrollController: PrimaryScrollController.of(context),
+            dataReceiver: _loadContent,
+            builder: _getListItems,
+            loadingBuilder: (BuildContext context) => Container(
+              padding: EdgeInsets.all(8),
+              child: Center(child: PlatformCircularProgressIndicator()),
+            ),
+            endBuilder: (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(S.of(context).end_reached),
+              ),
+            ),
+            errorBuilder: _buildErrorWidget,
+          ) /*FutureWidget<List<Reply>>(
                   future: _content,
                   loadingBuilder: (BuildContext context,
                       AsyncSnapshot<List<Reply>> snapshot) {
@@ -302,9 +281,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         child: _buildPage(), onNotification: onScrollToBottom);
                   },
                   errorBuilder: () => _buildErrorWidget(),
-                ),
+                ),*/
               )),
-        ));
+    );
   }
 
   Widget _buildFavoredActionButton() => PlatformIconButton(
@@ -337,39 +316,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  Widget _buildPage() => WithScrollbar(
-        child: ListView.builder(
-          primary: true,
-          physics: const AlwaysScrollableScrollPhysics(),
-          addAutomaticKeepAlives: true,
-          itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
-          itemBuilder: (context, index) => _buildListItem(index, true),
-        ),
-        controller: PrimaryScrollController.of(context),
-      );
-
-  Widget _buildListItem(int index, bool isNewData) {
-    if (isNewData && index == _lastReplies.length && !_isRefreshing) {
-      _isEndIndicatorShown = true;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Text(S.of(context).end_reached),
-          const SizedBox(
-            height: 16,
-          )
-        ],
-      );
-    }
-    if (index == _lastReplies.length)
-      return _isEndIndicatorShown
-          ? Container()
-          : Center(child: PlatformCircularProgressIndicator());
-    else if (index > _lastReplies.length) return Container();
-    return _getListItems(_lastReplies[index], index == 0, false);
-  }
-
-  Widget _buildErrorWidget() => GestureDetector(
+  Widget _buildErrorWidget(
+          BuildContext context, AsyncSnapshot<List<Reply>> snapshot) =>
+      GestureDetector(
         child: Center(
           child: Text(S.of(context).failed),
         ),
@@ -454,7 +403,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       );
 
-  Widget _getListItems(Reply e, bool generateTags, bool isNested) {
+  Widget _getListItems(BuildContext context, int index, Reply e,
+      {bool isNested = false}) {
+    final bool generateTags = (index == 0);
     LinkTapCallback onLinkTap = (url) {
       BrowserUtil.openUrl(url, context);
     };
@@ -523,12 +474,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (e.reply_to != null && !isNested && _searchResult == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child: _getListItems(
+                    child: Text(
+                      S.of(context).reply_to(e.reply_to),
+                      textScaleFactor: 0.8,
+                      style: TextStyle(
+                          color: Constant.getColorFromString(
+                              _post.tag.first.color)),
+                    ),
+                    /*_getListItems(
+                        context,
+                        -1,
                         _lastReplies.firstWhere(
                           (element) => element.id == e.reply_to,
                         ),
-                        false,
-                        true),
+                        isNested: true),*/
                   ),
                 Align(
                     alignment: Alignment.topLeft,
