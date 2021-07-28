@@ -35,11 +35,9 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -164,9 +162,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
   bool _fieldInitComplete;
 
-  /// These field holds the content on the page.
-  List<Widget> _lastPageItems;
-
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   Future<List<BBSPost>> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
@@ -287,7 +282,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         _preferences = widget.arguments['preferences'];
       else
         _preferences = Provider.of<SharedPreferences>(context);
-      //_setContent();
       _fieldInitComplete = true;
     }
     super.didChangeDependencies();
@@ -305,7 +299,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (_lastPageItems.isEmpty) _lastPageItems = [_buildSearchTextField()];
     if (widget.arguments == null)
       return _buildPageBody();
     else if (widget.arguments.containsKey('showFavoredDiscussion')) {
@@ -344,6 +337,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           scrollController: PrimaryScrollController.of(context),
           startPage: 1,
           builder: _buildListItem,
+          // TODO: don't show the search field on Favoured discussions page
+          headBuilder: (_) => _buildSearchTextField(),
           loadingBuilder: (BuildContext context) => Container(
                 padding: EdgeInsets.all(8),
                 child: Center(child: PlatformCircularProgressIndicator()),

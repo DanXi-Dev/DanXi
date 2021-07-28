@@ -36,7 +36,6 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -403,7 +402,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       );
 
-  Widget _getListItems(BuildContext context, int index, Reply e,
+  Widget _getListItems(BuildContext context, ListProvider<Reply> dataProvider,
+      int index, Reply e,
       {bool isNested = false}) {
     final bool generateTags = (index == 0);
     LinkTapCallback onLinkTap = (url) {
