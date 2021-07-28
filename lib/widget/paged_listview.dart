@@ -237,13 +237,14 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   _scrollToKey(StateKey<T> key,
       [Duration duration = kDuration, Curve curve = kCurve]) {
-    RenderBox renderBox = key?.currentContext?.findRenderObject();
-    double dy = renderBox
+    final RenderBox renderBox = key?.currentContext?.findRenderObject();
+    final double dy = renderBox
         ?.localToGlobal(Offset.zero,
             ancestor: _scrollKey.currentContext.findRenderObject())
         ?.dy;
-    var itemY = dy + currentController.offset;
-    double stateTopHeight = MediaQueryData.fromWindow(window).padding.top;
+    final itemY = dy + currentController.offset;
+    //final double stateTopHeight = MediaQueryData.fromWindow(window).padding.top;
+    final stateTopHeight = MediaQuery.of(context).padding.top;
     currentController.animateTo(itemY - stateTopHeight,
         duration: duration, curve: curve);
   }
