@@ -178,9 +178,10 @@ class _BBSSubpageState extends State<BBSSubpage>
         return await PostRepository.getInstance()
             .loadTagFilteredPosts(_tagFilter, _sortOrder, page);
       else if (widget.arguments != null &&
-          widget.arguments.containsKey('showFavoredDiscussion'))
+          widget.arguments.containsKey('showFavoredDiscussion')) {
+        if (page > 1) return Future.value([]);
         return await PostRepository.getInstance().getFavoredDiscussions();
-      else {
+      } else {
         if (!PostRepository.getInstance().isUserInitialized)
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value, _preferences);
