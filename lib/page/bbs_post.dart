@@ -120,7 +120,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   BBSPost _post;
-  Future<List<Reply>> _searchResult;
+  String _searchKeyword;
   SharedPreferences _preferences;
 
   /// Fields related to the display states.
@@ -141,8 +141,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<Reply>> _loadContent(int page) {
-    if (_searchResult != null)
-      return _searchResult;
+    if (_searchKeyword != null)
+      return PostRepository.getInstance()
+          .loadSearchResults(_searchKeyword, page);
     else
       return PostRepository.getInstance().loadReplies(_post, page);
   }
@@ -157,10 +158,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   @override
   void initState() {
     super.initState();
-    if (widget.arguments['post'] is BBSPost) {
+    if (widget.arguments.containsKey('post')) {
       _post = widget.arguments['post'];
-    } else {
-      _searchResult = widget.arguments['post'];
+    } else if (widget.arguments.containsKey('searchKeyword')) {
+      _searchKeyword = widget.arguments['searchKeyword'];
       // Create a dummy post for displaying search result
       _post = BBSPost.dummy();
     }
@@ -199,12 +200,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       iosContentBottomPadding: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: Text(_searchResult == null
+        title: Text(_searchKeyword == null
             ? S.of(context).forum
             : S.of(context).search_result),
         trailingActions: [
-          if (_searchResult == null) _buildFavoredActionButton(),
-          if (_searchResult == null)
+          if (_searchKeyword == null) _buildFavoredActionButton(),
+          if (_searchKeyword == null)
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
@@ -226,7 +227,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           },
           child: Material(
               child: PagedListView<Reply>(
-            initialData: widget.arguments['post']?.posts ?? [],
+            initialData: _post?.posts ?? [],
             startPage: 1,
             pagedController: _listViewController,
             withScrollbar: true,
@@ -382,7 +383,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       ];
 
-  Widget _OPLeadingTag() => Container(
+  Widget _opLeadingTag() => Container(
         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
         decoration: BoxDecoration(
             color: Constant.getColorFromString(_post.tag.first.color)
@@ -459,7 +460,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   child: Row(
                     children: [
                       if (e.username == _post.first_post.username)
-                        _OPLeadingTag(),
+                        _opLeadingTag(),
                       if (e.username == _post.first_post.username)
                         const SizedBox(
                           width: 2,
@@ -471,7 +472,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ],
                   ),
                 ),
-                if (e.reply_to != null && !isNested && _searchResult == null)
+                if (e.reply_to != null && !isNested && _searchKeyword == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
                     child: Text(
@@ -545,7 +546,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         ]),
                   ]),
             onTap: () async {
-              if (_searchResult == null) {
+              if (_searchKeyword == null) {
                 int replyId;
                 // Set the replyId to null when tapping on the first reply.
                 if (_post.first_post.id != e.id) {

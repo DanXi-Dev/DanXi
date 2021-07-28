@@ -684,9 +684,9 @@ class PostRepository extends BaseRepositoryWithDio {
     return result.map((e) => Reply.fromJson(e)).toList();
   }
 
-  Future<List<Reply>> loadSearchResults(String searchString) async {
+  Future<List<Reply>> loadSearchResults(String searchString, int page) async {
     Response response = await dio.get(_BASE_URL + "/posts/",
-        queryParameters: {"search": searchString},
+        queryParameters: {"search": searchString, "page": page},
         options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();

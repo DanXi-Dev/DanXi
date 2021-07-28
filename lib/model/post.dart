@@ -58,7 +58,7 @@ class BBSPost {
 
   /// Generate an empty BBSPost for special sakes.
   factory BBSPost.dummy() => BBSPost(
-      -1, Reply.dummy(), -1, null, null, false, "", "", [Reply.dummy()]);
+      -1, Reply.dummy(), -1, [PostTag.dummy()], null, false, "", "", []);
 
   @override
   int get hashCode => id;

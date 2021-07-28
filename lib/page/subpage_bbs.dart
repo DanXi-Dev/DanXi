@@ -174,9 +174,10 @@ class _BBSSubpageState extends State<BBSSubpage>
         return await PostRepository.getInstance()
             .loadTagFilteredPosts(_tagFilter, _sortOrder, page);
       else if (widget.arguments != null &&
-          widget.arguments.containsKey('showFavoredDiscussion'))
+          widget.arguments.containsKey('showFavoredDiscussion')) {
+        if (page > 1) return Future.value([]);
         return await PostRepository.getInstance().getFavoredDiscussions();
-      else {
+      } else {
         if (!PostRepository.getInstance().isUserInitialized)
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value, _preferences);
@@ -197,7 +198,9 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildSearchTextField() {
     // If user is filtering by tag, do not build search text field.
-    if (_tagFilter != null) return Container();
+    if (_tagFilter != null ||
+        (widget.arguments?.containsKey('showFavoredDiscussion') ?? false))
+      return Container();
 
     return Container(
       color: Theme.of(context).canvasColor,
@@ -218,9 +221,8 @@ class _BBSSubpageState extends State<BBSSubpage>
             _goToPIDResultPage(
                 int.tryParse(pidPattern.firstMatch(value)[0].substring(1)));
           } else
-            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": PostRepository.getInstance().loadSearchResults(value)
-            });
+            smartNavigatorPush(context, "/bbs/postDetail",
+                arguments: {"searchKeyword": value});
         },
       ),
     );
@@ -303,7 +305,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       return _buildPageBody();
     else if (widget.arguments.containsKey('showFavoredDiscussion')) {
       return PlatformScaffold(
-        iosContentPadding: true,
+        iosContentPadding: false,
         iosContentBottomPadding: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
@@ -313,7 +315,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       );
     }
     return PlatformScaffold(
-      iosContentPadding: true,
+      iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
@@ -337,7 +339,6 @@ class _BBSSubpageState extends State<BBSSubpage>
           scrollController: PrimaryScrollController.of(context),
           startPage: 1,
           builder: _buildListItem,
-          // TODO: don't show the search field on Favoured discussions page
           headBuilder: (_) => _buildSearchTextField(),
           loadingBuilder: (BuildContext context) => Container(
                 padding: EdgeInsets.all(8),
@@ -353,10 +354,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                   error: (snapshot.error as NotLoginError).errorMessage);
             return _buildErrorPage(error: snapshot.error.toString());
           },
-          endBuilder: (context) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context).end_reached),
+          endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(S.of(context).end_reached),
+                ),
               ),
+          emptyBuilder: (_) => _buildEmptyFavoritesPage(),
           dataReceiver: _loadContent),
     );
     /*
