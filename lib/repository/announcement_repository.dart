@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
-import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +61,15 @@ class AnnouncementRepository {
         .setOrder("-createdAt")
         .addWhereGreaterThanOrEqualTo(
             "maxVersion", int.tryParse(packageInfo.buildNumber) ?? 0);
+    return (await query.queryObjects())
+        .map<Announcement>((e) => Announcement.fromJson(e))
+        .toList();
+  }
+
+  Future<List<Announcement>> getAllAnnouncements() async {
+    BmobQuery<Announcement> query = BmobQuery<Announcement>()
+        .setOrder("-createdAt")
+        .addWhereGreaterThanOrEqualTo("maxVersion", 0);
     return (await query.queryObjects())
         .map<Announcement>((e) => Announcement.fromJson(e))
         .toList();

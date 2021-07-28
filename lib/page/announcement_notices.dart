@@ -15,8 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -29,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 
 /// A list page showing announcement from developers.
 class AnnouncementList extends StatefulWidget {
@@ -43,6 +44,7 @@ class AnnouncementList extends StatefulWidget {
 
 class _AnnouncementListState extends State<AnnouncementList> {
   List<Announcement> _data = [];
+  bool _showingLatest = true;
 
   @override
   void initState() {
@@ -56,11 +58,25 @@ class _AnnouncementListState extends State<AnnouncementList> {
       iosContentPadding: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-          title: Text(
-        S.of(context).developer_announcement(''),
-      )),
+        title: Text(
+          S.of(context).developer_announcement(''),
+        ),
+        trailingActions: [
+          PlatformIconButton(
+            icon: AutoSizeText(
+              _showingLatest
+                  ? S.of(context).older_announcement
+                  : S.of(context).latest_announcement,
+              softWrap: true,
+            ),
+            onPressed: () => setState(() => _showingLatest = !_showingLatest),
+          )
+        ],
+      ),
       body: FutureWidget(
-        future: AnnouncementRepository.getInstance().getAnnouncements(),
+        future: _showingLatest
+            ? AnnouncementRepository.getInstance().getAnnouncements()
+            : AnnouncementRepository.getInstance().getAllAnnouncements(),
         successBuilder: (_, snapShot) {
           _data = snapShot.data;
           return Column(
@@ -72,7 +88,6 @@ class _AnnouncementListState extends State<AnnouncementList> {
                       child: WithScrollbar(
                           controller: PrimaryScrollController.of(context),
                           child: ListView(
-                            primary: true,
                             children: _getListWidgets(),
                           ))))
             ],

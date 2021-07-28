@@ -141,6 +141,8 @@
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
     "last_30_days":"Last 30 days",
+    "older_announcement":"Older",
+    "latest_announcement":"Latest",
     "dashboard":"Dashboard",
     "forum":"Tree Hole",
     "timetable":"Agenda",

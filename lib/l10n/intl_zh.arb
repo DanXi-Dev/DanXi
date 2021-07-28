@@ -138,6 +138,8 @@
     "last_7_days":"过去 7 天",
     "last_15_days":"过去 15 天",
     "last_30_days":"过去 30 天",
+    "older_announcement":"往期公告",
+    "latest_announcement":"最新公告",
     "dashboard":"首页",
     "forum":"树洞",
     "timetable":"日程",
