@@ -112,6 +112,8 @@ Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
 class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   bool get needPadding => false;
+  @override
+  bool get needBottomPadding => false;
 
   final Map<String, dynamic> arguments;
 
@@ -158,21 +160,11 @@ class _BBSSubpageState extends State<BBSSubpage>
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Fields related to the display states.
-  int _currentBBSPage;
   SortOrder _sortOrder;
-  bool _isRefreshing;
-  bool _isEndIndicatorShown;
   FoldBehavior _foldBehavior;
 
   /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
   bool _fieldInitComplete;
-
-  /// These field holds the content on the page.
-  List<Widget> _lastPageItems;
-  AsyncSnapshot _lastSnapshotData;
-
-  /// Future of network loading.
-  Future _contentFuture;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
   Future<List<BBSPost>> _loadContent(int page) async {
@@ -203,19 +195,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      setState(() {
-        _initialize();
-        //_setContent();
-      });
+      setState(() {});
     }
-  }
-
-  void _initialize() {
-    _currentBBSPage = 1;
-    _lastPageItems = [];
-    _lastSnapshotData = null;
-    _isRefreshing = true;
-    _isEndIndicatorShown = false;
   }
 
   Widget _buildSearchTextField() {
@@ -275,7 +256,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   void initState() {
     super.initState();
     _fieldInitComplete = false;
-    _initialize();
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success = await BBSEditor.createNewPost(context);
@@ -324,13 +304,12 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (_lastPageItems.isEmpty) _lastPageItems = [_buildSearchTextField()];
     if (widget.arguments == null)
       return _buildPageBody();
     else if (widget.arguments.containsKey('showFavoredDiscussion')) {
       return PlatformScaffold(
-        iosContentPadding: true,
-        iosContentBottomPadding: false,
+        iosContentPadding: false,
+        iosContentBottomPadding: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).favorites),
@@ -339,8 +318,8 @@ class _BBSSubpageState extends State<BBSSubpage>
       );
     }
     return PlatformScaffold(
-      iosContentPadding: true,
-      iosContentBottomPadding: false,
+      iosContentPadding: false,
+      iosContentBottomPadding: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).filtering_by_tag(_tagFilter)),
@@ -377,9 +356,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                   error: (snapshot.error as NotLoginError).errorMessage);
             return _buildErrorPage(error: snapshot.error.toString());
           },
-          endBuilder: (context) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context).end_reached),
+          endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(S.of(context).end_reached),
+                ),
               ),
           dataReceiver: _loadContent),
     );
