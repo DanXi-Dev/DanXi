@@ -47,8 +47,11 @@ class PagedListView<T> extends StatefulWidget {
   /// The builder to build end indicator.
   final WidgetBuilder endBuilder;
 
-  /// The builder to build head widget
+  /// The builder to build head widget.
   final WidgetBuilder headBuilder;
+
+  /// The builder to build empty widget.
+  final WidgetBuilder emptyBuilder;
 
   /// The start number of page index, usually zero to say that the first page is Page 0.
   final int startPage;
@@ -70,6 +73,7 @@ class PagedListView<T> extends StatefulWidget {
       @required this.loadingBuilder,
       @required this.errorBuilder,
       this.headBuilder,
+      this.emptyBuilder,
       this.startPage = 0,
       @required this.endBuilder,
       @required this.dataReceiver,
@@ -85,8 +89,11 @@ class PagedListView<T> extends StatefulWidget {
 
 class _PagedListViewState<T> extends State<PagedListView<T>>
     with ListProvider<T> {
+  /// The key for ListView.
   final GlobalKey _scrollKey = GlobalKey();
 
+  /// Whether the ListView should load anymore after reaching the bottom.
+  bool _shouldLoad = true;
   int pageIndex;
   bool _isRefreshing = false;
   bool _isEnded = false;
@@ -102,7 +109,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   Widget build(BuildContext context) {
     NotificationListenerCallback<ScrollNotification> scrollToEnd =
         (ScrollNotification scrollInfo) {
-      if (scrollInfo.metrics.extentAfter < 500 && !_isRefreshing && !_isEnded) {
+      if (scrollInfo.metrics.extentAfter < 500 &&
+          !_isRefreshing &&
+          !_isEnded &&
+          _shouldLoad) {
         pageIndex++;
         _isRefreshing = true;
         setState(() {
@@ -111,6 +121,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       }
       return false;
     };
+
     if (widget.withScrollbar) {
       return NotificationListener<ScrollNotification>(
         child: WithScrollbar(
@@ -148,14 +159,30 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   _buildListView() {
+    // Show an empty indicator if there's no data at all.
+    if (!_isRefreshing && _isEnded && _data.isEmpty) {
+      // Tell the listView not to try to load anymore.
+      _shouldLoad = false;
+      return ListView(
+        key: _scrollKey,
+        controller: widget.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          if (_hasHeadWidget) widget.headBuilder(context),
+          if (widget.emptyBuilder != null) widget.emptyBuilder(context)
+        ],
+      );
+    }
+
+    int realWidgetCount = _data.length +
+        (_isRefreshing ? 1 : 0) +
+        (_isEnded ? 1 : 0) +
+        (_hasHeadWidget ? 1 : 0);
     return ListView.builder(
       key: _scrollKey,
       controller: widget.scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: _data.length +
-          (_isRefreshing ? 1 : 0) +
-          (_isEnded ? 1 : 0) +
-          (_hasHeadWidget ? 1 : 0),
+      itemCount: realWidgetCount,
       itemBuilder: (context, index) => _getListItemAt(index),
     );
   }
@@ -183,6 +210,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   initialize() {
+    _shouldLoad = true;
     _hasHeadWidget = widget.headBuilder != null;
     _isRefreshing = _isEnded = false;
     _data.clear();
