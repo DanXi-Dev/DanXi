@@ -47,6 +47,9 @@ class PagedListView<T> extends StatefulWidget {
   /// The builder to build end indicator.
   final WidgetBuilder endBuilder;
 
+  /// The builder to build head widget
+  final WidgetBuilder headBuilder;
+
   /// The start number of page index, usually zero to say that the first page is Page 0.
   final int startPage;
 
@@ -66,6 +69,7 @@ class PagedListView<T> extends StatefulWidget {
       @required this.builder,
       @required this.loadingBuilder,
       @required this.errorBuilder,
+      this.headBuilder,
       this.startPage = 0,
       @required this.endBuilder,
       @required this.dataReceiver,
@@ -86,6 +90,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   int pageIndex;
   bool _isRefreshing = false;
   bool _isEnded = false;
+  bool _hasHeadWidget = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
   Future<List<T>> _futureData;
@@ -147,12 +152,21 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       key: _scrollKey,
       controller: widget.scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: _data.length + (_isRefreshing ? 1 : 0) + (_isEnded ? 1 : 0),
+      itemCount: _data.length +
+          (_isRefreshing ? 1 : 0) +
+          (_isEnded ? 1 : 0) +
+          (_hasHeadWidget ? 1 : 0),
       itemBuilder: (context, index) => _getListItemAt(index),
     );
   }
 
   _getListItemAt(int index) {
+    if (_hasHeadWidget) {
+      if (index == 0) {
+        return widget.headBuilder(context);
+      }
+      index--;
+    }
     if (index < _data.length) {
       return WithStateKey(
         childKey: valueKeys[index],
@@ -169,6 +183,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   initialize() {
+    _hasHeadWidget = widget.headBuilder != null;
     _isRefreshing = _isEnded = false;
     _data.clear();
     valueKeys.clear();
