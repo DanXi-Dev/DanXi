@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/page/bbs_post.dart';
@@ -45,12 +46,12 @@ import 'package:dan_xi/public_extension_methods.dart';
 enum BBSEditorType { DIALOG, PAGE }
 
 class BBSEditor {
-  static BBSEditorType defaultType = BBSEditorType.DIALOG;
-
   /// Returns true on success, false on failure
-  static Future<bool> createNewPost(BuildContext context) async {
-    final PostEditorText content =
-        await _showEditor(context, S.of(context).new_post, allowTags: true);
+  static Future<bool> createNewPost(BuildContext context,
+      {BBSEditorType editorType}) async {
+    final PostEditorText content = await _showEditor(
+        context, S.of(context).new_post,
+        allowTags: true, editorType: editorType);
     if (content?.content == null) return false;
     final int responseCode = await PostRepository.getInstance()
         .newPost(content.content, tags: content.tags)
@@ -64,12 +65,14 @@ class BBSEditor {
   }
 
   static Future<void> createNewReply(
-      BuildContext context, int discussionId, int postId) async {
+      BuildContext context, int discussionId, int postId,
+      {BBSEditorType editorType}) async {
     final String content = (await _showEditor(
             context,
             postId == null
                 ? S.of(context).reply_to(discussionId)
-                : S.of(context).reply_to(postId)))
+                : S.of(context).reply_to(postId),
+            editorType: editorType))
         ?.content;
     if (content == null || content.trim() == "") return;
     final int responseCode = await PostRepository.getInstance()
@@ -84,9 +87,10 @@ class BBSEditor {
   }
 
   static Future<void> reportPost(BuildContext context, int postId) async {
-    final String content =
-        (await _showEditor(context, S.of(context).reason_report_post(postId)))
-            .content;
+    final String content = (await _showEditor(
+            context, S.of(context).reason_report_post(postId),
+            editorType: BBSEditorType.DIALOG))
+        .content;
     if (content == null || content.trim() == "") return;
 
     int responseCode =
@@ -100,10 +104,12 @@ class BBSEditor {
   }
 
   static Future<PostEditorText> _showEditor(BuildContext context, String title,
-      {bool allowTags = false}) async {
+      {bool allowTags = false, @required BBSEditorType editorType}) async {
     final textController = TextEditingController();
+    final BBSEditorType defaultType =
+        isTablet(context) ? BBSEditorType.DIALOG : BBSEditorType.PAGE;
     List<PostTag> _tags = [];
-    switch (defaultType ?? BBSEditorType.DIALOG) {
+    switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
         return await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
