@@ -86,7 +86,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
   bool _isRefreshing = false;
   bool _isEnded = false;
   List<T> _data = [];
-  List<StateKey<T>> valueKeys;
+  List<StateKey<T>> valueKeys = [];
   Future<List<T>> _futureData;
 
   ScrollController get currentController =>

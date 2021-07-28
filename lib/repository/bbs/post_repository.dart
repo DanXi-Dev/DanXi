@@ -656,12 +656,13 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<BBSPost>> loadTagFilteredPosts(
-      String tag, SortOrder sortBy) async {
+      String tag, SortOrder sortBy, int page) async {
     Response response = await dio
         .get(_BASE_URL + "/discussions/",
             queryParameters: {
               "order": sortBy.getInternalString(),
-              "tag_name": tag
+              "tag_name": tag,
+              "page": page,
             },
             options: Options(headers: _tokenHeader))
         .onError((error, stackTrace) {
