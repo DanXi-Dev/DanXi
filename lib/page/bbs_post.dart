@@ -475,20 +475,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (e.reply_to != null && !isNested && _searchKeyword == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child: Text(
+                    child:
+                        /*Text(
                       S.of(context).reply_to(e.reply_to),
                       textScaleFactor: 0.8,
                       style: TextStyle(
                           color: Constant.getColorFromString(
                               _post.tag.first.color)),
-                    ),
-                    /*_getListItems(
-                        context,
-                        -1,
-                        _lastReplies.firstWhere(
-                          (element) => element.id == e.reply_to,
-                        ),
-                        isNested: true),*/
+                    ),*/
+                        _getListItems(
+                            context,
+                            dataProvider,
+                            -1,
+                            dataProvider.getElementFirstWhere(
+                              (element) => element.id == e.reply_to,
+                            ),
+                            isNested: true),
                   ),
                 Align(
                     alignment: Alignment.topLeft,
@@ -547,6 +549,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ]),
             onTap: () async {
               if (_searchKeyword == null) {
+                if (isNested) {
+                  // Scroll to the corrosponding post
+                  _listViewController.scrollToItem(e);
+                  return;
+                }
+
                 int replyId;
                 // Set the replyId to null when tapping on the first reply.
                 if (_post.first_post.id != e.id) {

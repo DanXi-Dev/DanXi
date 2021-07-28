@@ -257,6 +257,14 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   @override
   T getElementAt(int index) => _data[index];
+
+  @override
+  T getElementFirstWhere(bool Function(dynamic) test,
+          {dynamic Function() orElse}) =>
+      _data.firstWhere(test, orElse: orElse);
+
+  @override
+  int getIndexOf(T element, [int start = 0]) => _data.indexOf(element, start);
 }
 
 class PagedListViewController<T> {
@@ -285,6 +293,9 @@ class PagedListViewController<T> {
 
 mixin ListProvider<T> {
   T getElementAt(int index);
+  T getElementFirstWhere(bool Function(dynamic) test,
+      {dynamic Function() orElse});
+  int getIndexOf(T element, [int start = 0]);
 }
 
 /// Build a widget with index & data. You must apply the key to the root widget of item.
