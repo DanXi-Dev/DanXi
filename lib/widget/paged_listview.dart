@@ -15,11 +15,17 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/widget/future_widget.dart';
+import 'package:dan_xi/widget/state_key.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+
+const kDuration = Duration(milliseconds: 500);
+const kCurve = Curves.easeInOut;
 
 /// A ListView supporting paged loading and viewing.
 class PagedListView<T> extends StatefulWidget {
@@ -74,12 +80,17 @@ class PagedListView<T> extends StatefulWidget {
 }
 
 class _PagedListViewState<T> extends State<PagedListView<T>> {
+  final GlobalKey _scrollKey = GlobalKey();
+
   int pageIndex;
   bool _isRefreshing = false;
   bool _isEnded = false;
   List<T> _data = [];
-
+  List<StateKey<T>> valueKeys;
   Future<List<T>> _futureData;
+
+  ScrollController get currentController =>
+      widget.scrollController ?? PrimaryScrollController.of(context);
 
   @override
   Widget build(BuildContext context) {
@@ -118,8 +129,14 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
 
           if (snapshot.data.isEmpty ||
               _data.isEmpty ||
-              snapshot.data.last != _data.last) _data.addAll(snapshot.data);
-          if (snapshot.data.isEmpty) _isEnded = true;
+              snapshot.data.last != _data.last) {
+            _data.addAll(snapshot.data);
+            // Update value keys
+            valueKeys.addAll(List.generate(snapshot.data.length,
+                (index) => StateKey(snapshot.data[index])));
+          }
+          if (snapshot.data.isEmpty && pageIndex != widget.startPage)
+            _isEnded = true;
           return _buildListView();
         },
         errorBuilder: widget.errorBuilder,
@@ -128,6 +145,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
 
   _buildListView() {
     return ListView.builder(
+      key: _scrollKey,
       controller: widget.scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: _data.length + (_isRefreshing ? 1 : 0) + (_isEnded ? 1 : 0),
@@ -137,7 +155,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
 
   _getListItemAt(int index) {
     if (index < _data.length) {
-      return widget.builder(context, index, _data[index]);
+      return WithStateKey(
+        childKey: valueKeys[index],
+        child: widget.builder(context, index, _data[index]),
+      );
     } else if (index == _data.length) {
       if (_isRefreshing) {
         return widget.loadingBuilder(context);
@@ -151,37 +172,71 @@ class _PagedListViewState<T> extends State<PagedListView<T>> {
   initialize() {
     _isRefreshing = _isEnded = false;
     _data.clear();
+    valueKeys.clear();
     pageIndex = widget.startPage;
+
     _futureData = Future.value(widget.initialData);
+  }
+
+  notifyUpdate() {
+    initialize();
+    refreshSelf();
+  }
+
+  scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) =>
+      _scrollToKey(valueKeys.singleWhere((element) => element.value == item),
+          duration, curve);
+
+  scrollToIndex(int index,
+          [Duration duration = kDuration, Curve curve = kCurve]) =>
+      _scrollToKey(valueKeys[index], duration, curve);
+
+  _scrollToKey(StateKey<T> key,
+      [Duration duration = kDuration, Curve curve = kCurve]) {
+    RenderBox renderBox = key?.currentContext?.findRenderObject();
+    double dy = renderBox
+        ?.localToGlobal(Offset.zero,
+            ancestor: _scrollKey.currentContext.findRenderObject())
+        ?.dy;
+    var itemY = dy + currentController.offset;
+    double stateTopHeight = MediaQueryData.fromWindow(window).padding.top;
+    currentController.animateTo(itemY - stateTopHeight,
+        duration: duration, curve: curve);
   }
 
   @override
   void initState() {
     super.initState();
-    widget.pagedController?.setListener(() {
-      initialize();
-      refreshSelf();
-    });
     initialize();
+    widget.pagedController?.setListener(this);
   }
 }
 
-class PagedListViewController {
-  RefreshListener callback;
+class PagedListViewController<T> {
+  _PagedListViewState<T> _state;
 
   PagedListViewController();
 
   @protected
-  setListener(RefreshListener callback) {
-    this.callback = callback;
+  setListener(_PagedListViewState<T> state) {
+    this._state = state;
   }
 
   notifyUpdate() {
-    callback?.call();
+    _state?.notifyUpdate();
+  }
+
+  scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) {
+    _state?.scrollToItem(item, duration, curve);
+  }
+
+  scrollToIndex(int index,
+      [Duration duration = kDuration, Curve curve = kCurve]) {
+    _state?.scrollToIndex(index, duration, curve);
   }
 }
 
-/// Build a widget with index & data
+/// Build a widget with index & data. You must apply the key to the root widget of item.
 typedef IndexedDataWidgetBuilder<T> = Widget Function(
     BuildContext context, int index, T data);
 
