@@ -16,7 +16,9 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -53,6 +55,7 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
@@ -75,6 +78,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_tray/system_tray.dart';
 
 import 'generated/l10n.dart';
 
@@ -118,6 +122,12 @@ void main() {
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
       releaseConfig: releaseOptions);
+  doWhenWindowReady(() {
+    final win = appWindow;
+    win.alignment = Alignment.center;
+    win.title = "DanXi";
+    win.show();
+  });
 }
 
 class DanxiApp extends StatelessWidget {
@@ -307,6 +317,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     (cxt) => null,
     (cxt) => null,
   ];
+  final SystemTray _systemTray = SystemTray();
 
   @override
   void dispose() {
@@ -376,6 +387,36 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> initSystemTray() async {
+    if (!PlatformX.isWindows) return;
+
+    // We first init the systray menu and then add the menu entries
+    await _systemTray.initSystemTray("system tray",
+        iconPath: PlatformX.createPlatformFile(Platform.resolvedExecutable +
+                "/data/flutter_assets/assets/app_icon.ico")
+            .path,
+        toolTip: "DanXi is here~");
+
+    await _systemTray.setContextMenu(
+      [
+        MenuItem(
+          label: 'Show',
+          onClicked: () {
+            appWindow.show();
+          },
+        ),
+        MenuSeparator(),
+        MenuItem(
+          label: 'Exit',
+          onClicked: () {
+            appWindow.close();
+            FlutterApp.exitApp();
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -386,7 +427,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _rebuildPage();
       refreshSelf();
     });
-
+    initSystemTray();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
