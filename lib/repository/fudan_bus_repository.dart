@@ -64,17 +64,17 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
 class BusScheduleItem implements Comparable<BusScheduleItem> {
   final String id;
-  final Campus start;
-  final Campus end;
-  final VagueTime startTime;
-  final VagueTime endTime;
-  final BusDirection direction;
+  Campus start;
+  Campus end;
+  VagueTime startTime;
+  VagueTime endTime;
+  BusDirection direction;
   final bool holidayRun;
 
   VagueTime get realStartTime => startTime ?? endTime;
 
-  const BusScheduleItem(this.id, this.start, this.end, this.startTime,
-      this.endTime, this.direction, this.holidayRun);
+  BusScheduleItem(this.id, this.start, this.end, this.startTime, this.endTime,
+      this.direction, this.holidayRun);
 
   factory BusScheduleItem.fromRawJson(Map json) => BusScheduleItem(
       json['id'],

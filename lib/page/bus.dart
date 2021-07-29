@@ -29,6 +29,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BusPage extends StatefulWidget {
@@ -44,8 +45,14 @@ class _BusPageState extends State<BusPage> {
   PersonInfo _personInfo;
   List<BusScheduleItem> _busList;
   List<BusScheduleItem> _filteredBusList;
-  Campus _selectItem = Campus.NONE;
-  int _sliding;
+
+  // Start Location
+  Campus _startSelectItem = Campus.NONE;
+  int _startSliding;
+
+  // End Location
+  Campus _endSelectItem = Campus.NONE;
+  int _endSliding;
 
   // By default, only buses after DateTime.now() is displayed
   // Set this to true to display all buses
@@ -56,22 +63,62 @@ class _BusPageState extends State<BusPage> {
     super.initState();
     _personInfo = StateProvider.personInfo.value;
     _busList = widget.arguments['busList'];
+
+    // Normalize all entries
+    _busList.forEach((element) {
+      if (element.direction == BusDirection.BACKWARD) {
+        final start = element.start;
+        element.start = element.end;
+        element.end = start;
+        final startTime = element.startTime;
+        element.startTime = element.endTime;
+        element.endTime = startTime;
+        element.direction = BusDirection.FORWARD;
+      }
+    });
+
+    // Default to Handan
+    _startSelectItem = Campus.HANDAN_CAMPUS;
+    _startSliding = _startSelectItem.index;
+    _onStartLocationChanged(_startSelectItem);
+
     SharedPreferences.getInstance().then((preferences) {
-      _selectItem = SettingsProvider.of(preferences).campus;
-      _sliding = _selectItem.index;
-      _onSelectedItemChanged(_selectItem);
+      _endSelectItem = SettingsProvider.of(preferences).campus;
+      _endSliding = _endSelectItem.index;
+      _onEndLocationChanged(_endSelectItem);
     });
   }
 
-  void _onSelectedItemChanged(Campus e) {
+  void _onStartLocationChanged(Campus e) {
     setState(() {
-      _showAll = false;
-      _selectItem = e;
+      _startSelectItem = e;
       _filteredBusList = _busList
-          .where((element) => element.start == e || element.end == e)
+          .where((element) =>
+              element.start == _startSelectItem &&
+              element.end == _endSelectItem)
           .toList();
     });
   }
+
+  void _onEndLocationChanged(Campus e) {
+    setState(() {
+      _endSelectItem = e;
+      _filteredBusList = _busList
+          .where((element) =>
+              element.start == _startSelectItem &&
+              element.end == _endSelectItem)
+          .toList();
+    });
+  }
+
+  List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
+        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
+      }).toList(growable: false);
+
+  Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
+      .map((e) => Text(e.displayTitle(context)))
+      .toList(growable: false)
+      .asMap();
 
   @override
   Widget build(BuildContext context) {
@@ -85,25 +132,59 @@ class _BusPageState extends State<BusPage> {
               child: Text(S.of(context).bus_query))),
       body: Column(
         children: [
-          SizedBox(
-            height: PlatformX.isMaterial(context) ? 0 : 10,
-          ),
-          PlatformWidget(
-              material: (_, __) => DropdownButton<Campus>(
-                    items: _getItems(),
-                    // Don't select anything if _selectItem == Campus.NONE
-                    value: _selectItem == Campus.NONE ? null : _selectItem,
-                    hint: Text(_selectItem.displayTitle(context)),
-                    onChanged: (Campus e) => _onSelectedItemChanged(e),
-                  ),
-              cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(S.of(context).bus_start),
+              PlatformWidget(
+                material: (_, __) => DropdownButton<Campus>(
+                  items: _getItems(),
+                  // Don't select anything if _selectItem == Campus.NONE
+                  value:
+                      _startSelectItem == Campus.NONE ? null : _startSelectItem,
+                  hint: Text(_startSelectItem.displayTitle(context)),
+                  onChanged: (Campus e) => _onStartLocationChanged(e),
+                ),
+                cupertino: (_, __) => Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 4),
+                  child: CupertinoSlidingSegmentedControl<int>(
                     onValueChanged: (int value) {
-                      _sliding = value;
-                      _onSelectedItemChanged(Campus.values[_sliding]);
+                      _startSliding = value;
+                      _onStartLocationChanged(Campus.values[_startSliding]);
                     },
-                    groupValue: _sliding,
+                    groupValue: _startSliding,
                     children: _getCupertinoItems(),
-                  )),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(S.of(context).bus_dest),
+              PlatformWidget(
+                material: (_, __) => DropdownButton<Campus>(
+                  items: _getItems(),
+                  // Don't select anything if _selectItem == Campus.NONE
+                  value: _endSelectItem == Campus.NONE ? null : _endSelectItem,
+                  hint: Text(_endSelectItem.displayTitle(context)),
+                  onChanged: (Campus e) => _onEndLocationChanged(e),
+                ),
+                cupertino: (_, __) => Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 4),
+                  child: CupertinoSlidingSegmentedControl<int>(
+                    onValueChanged: (int value) {
+                      _endSliding = value;
+                      _onEndLocationChanged(Campus.values[_endSliding]);
+                    },
+                    groupValue: _endSliding,
+                    children: _getCupertinoItems(),
+                  ),
+                ),
+              ),
+            ],
+          ),
           Expanded(
               child: MediaQuery.removePadding(
                   context: context,
@@ -121,30 +202,28 @@ class _BusPageState extends State<BusPage> {
     );
   }
 
-  List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
-        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
-      }).toList(growable: false);
-
-  Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
-      .map((e) => Text(e.displayTitle(context)))
-      .toList(growable: false)
-      .asMap();
-
   List<Widget> _getListWidgets() {
     final currentTime = DateTime.now();
+    final format = NumberFormat("00");
     List<Widget> widgets = [
-      if (!_showAll)
-        Card(
-          child: ListTile(
-            leading: Icon(PlatformIcons(context).info),
-            title: Text(S.of(context).school_bus_not_showing_all(
-                currentTime.hour, currentTime.minute)),
-            subtitle: Text(S.of(context).school_bus_tap_to_show_all),
-            onTap: () => setState(() {
-              _showAll = true;
-            }),
-          ),
-        )
+      Card(
+        child: ListTile(
+          leading: Icon(PlatformIcons(context).info),
+          title: Text(_showAll
+              ? S.of(context).school_bus_showing_all
+              : S.of(context).school_bus_not_showing_all(
+                  format.format(currentTime.hour),
+                  format.format(currentTime.minute))),
+          subtitle: Text(_showAll
+              ? S.of(context).school_bus_tap_to_not_show_all(
+                  format.format(currentTime.hour),
+                  format.format(currentTime.minute))
+              : S.of(context).school_bus_tap_to_show_all),
+          onTap: () => setState(() {
+            _showAll = !_showAll;
+          }),
+        ),
+      )
     ];
     if (_filteredBusList == null) return [Container()];
     _filteredBusList.forEach((value) {
