@@ -56,8 +56,9 @@ class PlatformX {
 
   static const illegalCharWindows = [r'\/', r':', r'@'];
 
+  static String get fileSystemSlash => isWindows ? "\\" : "/";
+
   static File createPlatformFile(String path) {
-    String fileSystemSlash = isWindows ? "\\" : "/";
     String fileSystemSlashRegex = isWindows ? r'\\' : r'\/';
     path = path.replaceAll(RegExp(r'\/'), fileSystemSlash);
     List<String> pathSegment = path.split(RegExp(fileSystemSlashRegex));
@@ -71,6 +72,11 @@ class PlatformX {
       }
     }
     return File(pathSegment.join(fileSystemSlash));
+  }
+
+  static String getPathFromFile(String filePath) {
+    if (filePath.lastIndexOf(fileSystemSlash) == -1) return filePath;
+    return filePath.substring(0, filePath.lastIndexOf(fileSystemSlash));
   }
 
   static bool isMaterial(BuildContext context) =>

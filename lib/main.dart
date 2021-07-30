@@ -124,8 +124,6 @@ void main() {
       releaseConfig: releaseOptions);
   doWhenWindowReady(() {
     final win = appWindow;
-    win.alignment = Alignment.center;
-    win.title = "DanXi";
     win.show();
   });
 }
@@ -389,32 +387,50 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> initSystemTray() async {
     if (!PlatformX.isWindows) return;
-
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray("system tray",
-        iconPath: PlatformX.createPlatformFile(Platform.resolvedExecutable +
-                "/data/flutter_assets/assets/app_icon.ico")
+        iconPath: PlatformX.createPlatformFile(
+                PlatformX.getPathFromFile(Platform.resolvedExecutable) +
+                    "/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
         toolTip: "DanXi is here~");
-
-    await _systemTray.setContextMenu(
-      [
-        MenuItem(
-          label: 'Show',
-          onClicked: () {
-            appWindow.show();
-          },
-        ),
-        MenuSeparator(),
-        MenuItem(
-          label: 'Exit',
-          onClicked: () {
-            appWindow.close();
-            FlutterApp.exitApp();
-          },
-        ),
-      ],
-    );
+    List<MenuItemBase> showingMenu;
+    List<MenuItemBase> hidingMenu;
+    showingMenu = [
+      MenuItem(
+        label: 'Hide',
+        onClicked: () {
+          appWindow.hide();
+          _systemTray.setContextMenu(hidingMenu);
+        },
+      ),
+      MenuSeparator(),
+      MenuItem(
+        label: 'Exit',
+        onClicked: () {
+          appWindow.close();
+          FlutterApp.exitApp();
+        },
+      ),
+    ];
+    hidingMenu = [
+      MenuItem(
+        label: 'Show',
+        onClicked: () {
+          appWindow.show();
+          _systemTray.setContextMenu(showingMenu);
+        },
+      ),
+      MenuSeparator(),
+      MenuItem(
+        label: 'Exit',
+        onClicked: () {
+          appWindow.close();
+          FlutterApp.exitApp();
+        },
+      ),
+    ];
+    await _systemTray.setContextMenu(showingMenu);
   }
 
   @override

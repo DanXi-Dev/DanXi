@@ -336,7 +336,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       child: PagedListView<BBSPost>(
           pagedController: _listViewController,
           withScrollbar: true,
-          scrollController: PrimaryScrollController.of(context),
+          scrollController: widget.primaryScrollController(context),
           startPage: 1,
           builder: _buildListItem,
           headBuilder: (_) => _buildSearchTextField(),
