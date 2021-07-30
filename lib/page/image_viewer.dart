@@ -174,7 +174,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               )
           ],
         ),
-        body: Container(
+        body: SafeArea(
           child: PhotoView(
             imageProvider: MemoryImage(Uint8List.fromList(_rawImage)),
             backgroundDecoration:

@@ -60,8 +60,8 @@ class _AAONoticesListState extends State<AAONoticesList> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      iosContentBottomPadding: false,
-      iosContentPadding: true,
+      iosContentBottomPadding: true,
+      iosContentPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
@@ -71,55 +71,52 @@ class _AAONoticesListState extends State<AAONoticesList> {
       body: Column(
         children: [
           Expanded(
-              child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: PagedListView<Notice>(
-                    withScrollbar: true,
-                    scrollController: PrimaryScrollController.of(context),
-                    builder: (_, __, ___, Notice value) {
-                      return ThemedMaterial(
-                          child: ListTile(
-                        leading: PlatformX.isAndroid
-                            ? Icon(Icons.info)
-                            : Icon(SFSymbols.info_circle_fill),
-                        title: Text(value.title),
-                        subtitle: Text(value.time),
-                        onTap: () async => BrowserUtil.openUrl(
-                            value.url,
-                            context,
-                            PlatformX.isIOS
-                                ? null
-                                : await FudanAAORepository.getInstance()
-                                    .thisCookies), // TODO: fix this for iOS
-                      ));
-                    },
-                    loadingBuilder: (_) => Center(
-                      child: PlatformCircularProgressIndicator(),
-                    ),
-                    endBuilder: (_) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Text(S.of(context).end_reached),
-                        const SizedBox(
-                          height: 16,
-                        )
-                      ],
-                    ),
-                    initialData: _data,
-                    errorBuilder: (_, AsyncSnapshot<List<Notice>> __) =>
-                        GestureDetector(
-                      child: Center(
-                        child: Text(S.of(context).failed),
-                      ),
-                      onTap: () {
-                        refreshSelf();
-                      },
-                    ),
-                    dataReceiver: (index) => FudanAAORepository.getInstance()
-                        .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
-                            index + 1, _info),
-                  )))
+              child: PagedListView<Notice>(
+            withScrollbar: true,
+            scrollController: PrimaryScrollController.of(context),
+            builder: (_, __, ___, Notice value) {
+              return ThemedMaterial(
+                  child: ListTile(
+                leading: PlatformX.isAndroid
+                    ? Icon(Icons.info)
+                    : Icon(SFSymbols.info_circle_fill),
+                title: Text(value.title),
+                subtitle: Text(value.time),
+                onTap: () async => BrowserUtil.openUrl(
+                    value.url,
+                    context,
+                    PlatformX.isIOS
+                        ? null
+                        : await FudanAAORepository.getInstance()
+                            .thisCookies), // TODO: fix this for iOS
+              ));
+            },
+            loadingBuilder: (_) => Center(
+              child: PlatformCircularProgressIndicator(),
+            ),
+            endBuilder: (_) => Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(S.of(context).end_reached),
+                const SizedBox(
+                  height: 16,
+                )
+              ],
+            ),
+            initialData: _data,
+            errorBuilder: (_, AsyncSnapshot<List<Notice>> __) =>
+                GestureDetector(
+              child: Center(
+                child: Text(S.of(context).failed),
+              ),
+              onTap: () {
+                refreshSelf();
+              },
+            ),
+            dataReceiver: (index) => FudanAAORepository.getInstance()
+                .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
+                    index + 1, _info),
+          ))
         ],
       ),
     );
