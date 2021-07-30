@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
 
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/widget/future_widget.dart';
@@ -228,25 +227,17 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) =>
-      _scrollToKey(valueKeys.singleWhere((element) => element.value == item),
+      scrollToIndex(valueKeys.indexWhere((element) => element.value == item),
           duration, curve);
 
   scrollToIndex(int index,
-          [Duration duration = kDuration, Curve curve = kCurve]) =>
-      _scrollToKey(valueKeys[index], duration, curve);
-
-  _scrollToKey(StateKey<T> key,
       [Duration duration = kDuration, Curve curve = kCurve]) {
-    final RenderBox renderBox = key?.currentContext?.findRenderObject();
-    final double dy = renderBox
-        ?.localToGlobal(Offset.zero,
-            ancestor: _scrollKey.currentContext.findRenderObject())
-        ?.dy;
-    final itemY = dy + currentController.offset;
-    //final double stateTopHeight = MediaQueryData.fromWindow(window).padding.top;
-    final stateTopHeight = MediaQuery.of(context).padding.top;
-    currentController.animateTo(itemY - stateTopHeight,
-        duration: duration, curve: curve);
+    double itemTop =
+        valueKeys.getRange(0, index).fold<double>(0.0, (value, element) {
+      RenderBox box = element.currentContext?.findRenderObject();
+      return value + box.size.height;
+    });
+    currentController.animateTo(itemTop, duration: duration, curve: curve);
   }
 
   @override
@@ -294,8 +285,10 @@ class PagedListViewController<T> {
 
 mixin ListProvider<T> {
   T getElementAt(int index);
+
   T getElementFirstWhere(bool Function(dynamic) test,
       {dynamic Function() orElse});
+
   int getIndexOf(T element, [int start = 0]);
 }
 
