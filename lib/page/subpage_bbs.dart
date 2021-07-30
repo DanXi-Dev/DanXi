@@ -515,15 +515,24 @@ class _BBSSubpageState extends State<BBSSubpage>
                 children: [
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
-                    child: Text(
-                      S.of(context).latest_reply(
-                          postElement.last_post.username,
-                          HumanDuration.format(
-                              context,
-                              DateTime.parse(
-                                  postElement.last_post.date_created))),
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            S.of(context).latest_reply(
+                                postElement.last_post.username,
+                                HumanDuration.format(
+                                    context,
+                                    DateTime.parse(
+                                        postElement.last_post.date_created))),
+                            style:
+                                TextStyle(color: Theme.of(context).hintColor),
+                          ),
+                          Icon(SFSymbols.arrow_down_to_line,
+                              size: 14,
+                              color:
+                                  Theme.of(context).hintColor.withOpacity(0.5)),
+                        ]),
                   ),
                   Padding(
                       padding: EdgeInsets.only(bottom: 8),
