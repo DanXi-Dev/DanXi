@@ -36,6 +36,7 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -200,9 +201,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       iosContentBottomPadding: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: Text(_searchKeyword == null
-            ? S.of(context).forum
-            : S.of(context).search_result),
+        title: TopController(
+          controller: PrimaryScrollController.of(context),
+          child: Text(_searchKeyword == null
+              ? S.of(context).forum
+              : S.of(context).search_result),
+        ),
         trailingActions: [
           if (_searchKeyword == null) _buildFavoredActionButton(),
           if (_searchKeyword == null)
