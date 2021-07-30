@@ -231,7 +231,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             scrollController: PrimaryScrollController.of(context),
             dataReceiver: _loadContent,
             // Load all data if user instructed us to scroll to end
-            allDataReceiver: shouldScrollToEnd ? PostRepository.getInstance().loadReplies(_post, -1) : null,
+            allDataReceiver: (shouldScrollToEnd && _post.posts.length > 10)
+                ? PostRepository.getInstance().loadReplies(_post, -1)
+                : null,
             shouldScrollToEnd: shouldScrollToEnd,
             builder: _getListItems,
             loadingBuilder: (BuildContext context) => Container(
@@ -469,9 +471,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         "[${e.username}]",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 2,),
+                      const SizedBox(
+                        width: 2,
+                      ),
                       if (isNested)
-                        Center(child: Icon(SFSymbols.search, color: Theme.of(context).hintColor.withOpacity(0.2), size: 12),),
+                        Center(
+                          child: Icon(SFSymbols.search,
+                              color:
+                                  Theme.of(context).hintColor.withOpacity(0.2),
+                              size: 12),
+                        ),
                     ],
                   ),
                 ),
