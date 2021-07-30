@@ -63,6 +63,13 @@ class PagedListView<T> extends StatefulWidget {
   /// Should add a scrollbar or not. If true, [scrollController] may not be null.
   final bool withScrollbar;
 
+  /// If not null, will use this data source instead. Using this will turn PagedListView into a regular ListView with customizations.
+  final Future<List<T>> allDataReceiver;
+
+  /// Whether this should scroll to end upon loading complete
+  /// Will be executed only once
+  final bool shouldScrollToEnd;
+
   const PagedListView(
       {Key key,
       this.pagedController,
@@ -76,7 +83,9 @@ class PagedListView<T> extends StatefulWidget {
       @required this.endBuilder,
       @required this.dataReceiver,
       this.scrollController,
-      this.withScrollbar = false})
+      this.withScrollbar = false,
+      this.allDataReceiver,
+      this.shouldScrollToEnd})
       : assert(withScrollbar != null),
         assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         super(key: key);
@@ -96,6 +105,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _isRefreshing = false;
   bool _isEnded = false;
   bool _hasHeadWidget = false;
+  bool _scrollToEndQueued = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
   Future<List<T>> _futureData;
@@ -140,6 +150,15 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     return FutureWidget<List<T>>(
         future: _futureData,
         successBuilder: (_, snapshot) {
+          // Handle Scroll To End Requests
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) {
+                if (_scrollToEndQueued) {
+                  currentController.animateTo(currentController.position.maxScrollExtent, duration: Duration(milliseconds: 200), curve: Curves.decelerate);
+                  _scrollToEndQueued = false;
+                }
+          });
+
           _isRefreshing = false;
           if (snapshot.data.isEmpty ||
               _data.isEmpty ||
@@ -208,24 +227,46 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   initialize() {
-    _shouldLoad = true;
-    _hasHeadWidget = widget.headBuilder != null;
-    _isRefreshing = _isEnded = false;
-    _data.clear();
-    valueKeys.clear();
-    pageIndex = widget.startPage;
+      _hasHeadWidget = widget.headBuilder != null;
+      _data.clear();
+      valueKeys.clear();
+      pageIndex = widget.startPage;
 
-    if (widget.initialData != null && widget.initialData.isNotEmpty) {
-      _futureData = Future.value(widget.initialData);
-    } else {
-      _isRefreshing = true;
-      _futureData = widget.dataReceiver(pageIndex);
+      if (widget.allDataReceiver == null) {
+        _shouldLoad = true;
+        _isRefreshing = _isEnded = false;
+      if (widget.initialData != null && widget.initialData.isNotEmpty) {
+        _futureData = Future.value(widget.initialData);
+      } else {
+        _isRefreshing = true;
+        _futureData = widget.dataReceiver(pageIndex);
+      }
+    }
+    else {
+      _shouldLoad = _isRefreshing = false;
+      _isEnded = true;
+      _futureData = widget.allDataReceiver;
     }
   }
 
   notifyUpdate() {
     initialize();
     refreshSelf();
+  }
+
+  /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
+  /// Will no longer load content on scroll after this is called.
+  replaceDataWith(List<T> data) {
+    setState(() {
+      _data = data;
+      _isEnded = true;
+      _isRefreshing = false;
+      _shouldLoad = false;
+    });
+  }
+
+  queueScrollToEnd() {
+    _scrollToEndQueued = true;
   }
 
   scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) =>
@@ -247,6 +288,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     super.initState();
     initialize();
     widget.pagedController?.setListener(this);
+
+    // This ensures that scroll to end is not called upon rebuild.
+    if (widget.shouldScrollToEnd == true) {
+      _scrollToEndQueued = true;
+    }
   }
 
   @override
@@ -282,6 +328,16 @@ class PagedListViewController<T> {
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) {
     _state?.scrollToIndex(index, duration, curve);
+  }
+
+  queueScrollToEnd() {
+    _state?.queueScrollToEnd();
+  }
+
+  /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
+  /// Will no longer load content on scroll after this is called.
+  replaceDataWith(List<T> data) {
+    _state?.replaceDataWith(data);
   }
 }
 

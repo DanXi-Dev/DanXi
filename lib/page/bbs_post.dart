@@ -132,14 +132,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   final PagedListViewController _listViewController = PagedListViewController();
 
-  void scrollToEndIfNeeded() {
-    final _controller = PrimaryScrollController.of(context);
-    if (shouldScrollToEnd &&
-        _controller.position.pixels < _controller.position.maxScrollExtent) {
-      _controller.jumpTo(_controller.position.maxScrollExtent);
-    }
-  }
-
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<Reply>> _loadContent(int page) {
     if (_searchKeyword != null)
@@ -237,6 +229,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             withScrollbar: true,
             scrollController: PrimaryScrollController.of(context),
             dataReceiver: _loadContent,
+            // Load all data if user instructed us to scroll to end
+            allDataReceiver: shouldScrollToEnd ? PostRepository.getInstance().loadReplies(_post, -1) : null,
+            shouldScrollToEnd: shouldScrollToEnd,
             builder: _getListItems,
             loadingBuilder: (BuildContext context) => Container(
               padding: EdgeInsets.all(8),
