@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/state_key.dart';
@@ -216,9 +215,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     valueKeys.clear();
     pageIndex = widget.startPage;
 
-    _futureData = widget.initialData != null && widget.initialData.isNotEmpty
-        ? Future.value(widget.initialData)
-        : widget.dataReceiver(pageIndex);
+    if (widget.initialData != null && widget.initialData.isNotEmpty) {
+      _futureData = Future.value(widget.initialData);
+    } else {
+      _isRefreshing = true;
+      _futureData = widget.dataReceiver(pageIndex);
+    }
   }
 
   notifyUpdate() {
