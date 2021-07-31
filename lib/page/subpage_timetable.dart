@@ -64,6 +64,7 @@ class ShareTimetableEvent {}
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   final StateStreamListener _shareSubscription = StateStreamListener();
+  final ScrollController _dummyScrollController = ScrollController();
 
   /// A map of all converters.
   ///
@@ -235,6 +236,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       },
       child: ListView(
         // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+        controller: _dummyScrollController,
         physics: AlwaysScrollableScrollPhysics(),
         children: [
           Row(
@@ -248,7 +250,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               PlatformIconButton(
                 icon: Icon(Icons.chevron_right),
                 onPressed:
-                    _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
+                _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
               )
             ],
           ),

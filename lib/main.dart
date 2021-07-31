@@ -443,7 +443,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _rebuildPage();
       refreshSelf();
     });
-    initSystemTray();
+    initSystemTray().catchError((ignored) {});
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
@@ -788,6 +788,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 // for (var p in positions.skip(1)) {
                 //   PrimaryScrollController.of(context).detach(p);
                 // }
+                debugPrint("Call itemChanged");
                 for (int i = 0; i < _subpage.length; i++) {
                   if (index != i) {
                     _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);

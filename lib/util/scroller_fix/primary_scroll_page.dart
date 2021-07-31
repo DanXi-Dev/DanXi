@@ -23,17 +23,25 @@ mixin PageWithPrimaryScrollController {
 
   String get debugTag => null;
 
+  bool shown = true;
+
   MirrorScrollController primaryScrollController(BuildContext context) {
     if (_thisPrimaryScrollController == null) {
       _thisPrimaryScrollController = MirrorScrollController(
-          PrimaryScrollController.of(context),
+          PrimaryScrollController.of(context), context,
           debugTag: debugTag);
+      _thisPrimaryScrollController.addInterceptor(() => shown);
     }
     return _thisPrimaryScrollController;
   }
 
-  void detachItself() => _thisPrimaryScrollController?.detachPosition?.call();
+  void detachItself() {
+    shown = false;
+    _thisPrimaryScrollController?.detachPosition?.call();
+  }
 
-  void reattachItself() =>
-      _thisPrimaryScrollController?.reattachPosition?.call();
+  void reattachItself() {
+    shown = true;
+    _thisPrimaryScrollController?.reattachPosition?.call();
+  }
 }
