@@ -151,12 +151,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         future: _futureData,
         successBuilder: (_, snapshot) {
           // Handle Scroll To End Requests
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) {
-                if (_scrollToEndQueued) {
-                  currentController.animateTo(currentController.position.maxScrollExtent, duration: Duration(milliseconds: 200), curve: Curves.decelerate);
-                  _scrollToEndQueued = false;
-                }
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollToEndQueued) {
+              currentController
+                  .jumpTo(currentController.position.maxScrollExtent);
+              if (_isEnded) _scrollToEndQueued = false;
+            }
           });
 
           _isRefreshing = false;
@@ -227,22 +227,21 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   initialize() {
-      _hasHeadWidget = widget.headBuilder != null;
-      _data.clear();
-      valueKeys.clear();
-      pageIndex = widget.startPage;
+    _hasHeadWidget = widget.headBuilder != null;
+    _data.clear();
+    valueKeys.clear();
+    pageIndex = widget.startPage;
 
-      if (widget.allDataReceiver == null) {
-        _shouldLoad = true;
-        _isRefreshing = _isEnded = false;
+    if (widget.allDataReceiver == null) {
+      _shouldLoad = true;
+      _isRefreshing = _isEnded = false;
       if (widget.initialData != null && widget.initialData.isNotEmpty) {
         _futureData = Future.value(widget.initialData);
       } else {
         _isRefreshing = true;
         _futureData = widget.dataReceiver(pageIndex);
       }
-    }
-    else {
+    } else {
       _shouldLoad = _isRefreshing = false;
       _isEnded = true;
       _futureData = widget.allDataReceiver;
