@@ -76,10 +76,12 @@ void main() {
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
       releaseConfig: releaseOptions);
-  doWhenWindowReady(() {
-    final win = appWindow;
-    win.show();
-  });
+  if (PlatformX.isDesktop) {
+    doWhenWindowReady(() {
+      final win = appWindow;
+      win.show();
+    });
+  }
 }
 
 class DanxiApp extends StatelessWidget {
@@ -120,47 +122,49 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Phoenix(
-        child: PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
-      builder: (BuildContext context) => Theme(
-        data: PlatformX.getTheme(context),
-        child: PlatformApp(
-          title: '旦夕',
-          debugShowCheckedModeBanner: false,
-          // Fix cupertino UI text color issues
-          cupertino: (_, __) => CupertinoAppData(
-              theme: CupertinoThemeData(
-                  textTheme: CupertinoTextThemeData(
-                      textStyle: TextStyle(
-                          color: PlatformX.getTheme(context)
-                              .textTheme
-                              .bodyText1
-                              .color)))),
-          // Configure i18n delegates
-          localizationsDelegates: [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate
-          ],
-          supportedLocales: S.delegate.supportedLocales,
-          home: MasterDetailController(
-            masterPage: HomePage(),
+      child: PlatformProvider(
+        // initialPlatform: TargetPlatform.iOS,
+        builder: (BuildContext context) => Theme(
+          data: PlatformX.getTheme(context),
+          child: PlatformApp(
+            title: '旦夕',
+            debugShowCheckedModeBanner: false,
+            // Fix cupertino UI text color issues
+            cupertino: (_, __) => CupertinoAppData(
+                theme: CupertinoThemeData(
+                    textTheme: CupertinoTextThemeData(
+                        textStyle: TextStyle(
+                            color: PlatformX.getTheme(context)
+                                .textTheme
+                                .bodyText1
+                                .color)))),
+            // Configure i18n delegates
+            localizationsDelegates: [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            home: MasterDetailController(
+              masterPage: HomePage(),
+            ),
+            // Configure the page route behaviour of the whole app
+            onGenerateRoute: (settings) {
+              final Function pageContentBuilder =
+                  DanxiApp.routes[settings.name];
+              if (pageContentBuilder != null) {
+                return platformPageRoute(
+                    context: context,
+                    builder: (context) => pageContentBuilder(context,
+                        arguments: settings.arguments));
+              }
+              return null;
+            },
+            navigatorKey: Catcher.navigatorKey,
           ),
-          // Configure the page route behaviour of the whole app
-          onGenerateRoute: (settings) {
-            final Function pageContentBuilder = DanxiApp.routes[settings.name];
-            if (pageContentBuilder != null) {
-              return platformPageRoute(
-                  context: context,
-                  builder: (context) => pageContentBuilder(context,
-                      arguments: settings.arguments));
-            }
-            return null;
-          },
-          navigatorKey: Catcher.navigatorKey,
         ),
       ),
-    ));
+    );
   }
 }
