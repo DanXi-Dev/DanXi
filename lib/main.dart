@@ -685,7 +685,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBar(
           title: _appTitleWidgetBuilder[_pageIndex.value](context),
           trailingActions: trailingButtons,
@@ -707,9 +707,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           iosContentPadding: _subpage[_pageIndex.value].needPadding,
 
           // This workarounds a color bug
-          backgroundColor: _pageIndex.value == 2
-              ? null
-              : Theme.of(context).scaffoldBackgroundColor,
+          // backgroundColor: _pageIndex.value == 2
+          //     ? null
+          //     : Theme.of(context).scaffoldBackgroundColor,
 
           appBar: PlatformAppBar(
             cupertino: (_, __) => CupertinoNavigationBarData(

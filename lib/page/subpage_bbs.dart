@@ -108,8 +108,6 @@ Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
 }
 
 class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
-  @override
-  bool get needPadding => false;
 
   final Map<String, dynamic> arguments;
 

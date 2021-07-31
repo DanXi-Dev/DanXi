@@ -49,8 +49,6 @@ const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
 
 class TimetableSubPage extends PlatformSubpage
     with PageWithPrimaryScrollController {
-  @override
-  bool get needPadding => false;
 
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();

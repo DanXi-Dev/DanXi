@@ -47,11 +47,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
-  @override
-  bool get needPadding => true;
-
-  @override
-  bool get needBottomPadding => true;
 
   @override
   _HomeSubpageState createState() => _HomeSubpageState();

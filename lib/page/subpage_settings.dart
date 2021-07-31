@@ -50,11 +50,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsSubpage extends PlatformSubpage
     with PageWithPrimaryScrollController {
-  @override
-  bool get needPadding => true;
-
-  @override
-  bool get needBottomPadding => true;
 
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
