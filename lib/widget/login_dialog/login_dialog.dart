@@ -106,7 +106,7 @@ class _LoginDialogState extends State<LoginDialog> {
   void requestInternetAccess() async {
     //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
     await Dio()
-        .get('http://captive.apple.com')
+        .head('http://captive.apple.com')
         .catchError((ignoredError) => null);
   }
 
@@ -252,6 +252,7 @@ class _LoginDialogState extends State<LoginDialog> {
             });
           },
         ),
+        /*
         TextButton(
             onPressed: () {
               showPlatformModalSheet(
@@ -273,7 +274,7 @@ class _LoginDialogState extends State<LoginDialog> {
                         ),
                       ));
             },
-            child: Text(S.of(context).login_as_others))
+            child: Text(S.of(context).login_as_others))*/
       ],
     );
   }
