@@ -42,13 +42,13 @@ const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
 class LoginDialog extends StatefulWidget {
   final SharedPreferences sharedPreferences;
   final ValueNotifier<PersonInfo> personInfo;
-  final bool forceLogin;
+  final bool dismissible;
 
   const LoginDialog(
       {Key key,
       @required this.sharedPreferences,
       @required this.personInfo,
-      @required this.forceLogin})
+      @required this.dismissible})
       : super(key: key);
 
   @override
@@ -139,7 +139,7 @@ class _LoginDialogState extends State<LoginDialog> {
         .copyWith(color: Theme.of(context).accentColor, fontSize: 12);
 
     //Tackle #25
-    if (!widget.forceLogin) {
+    if (!widget.dismissible) {
       requestInternetAccess();
     }
 
@@ -227,7 +227,7 @@ class _LoginDialogState extends State<LoginDialog> {
         ],
       ),
       actions: [
-        if (widget.forceLogin)
+        if (widget.dismissible)
           TextButton(
               child: Text(S.of(context).cancel),
               onPressed: () {

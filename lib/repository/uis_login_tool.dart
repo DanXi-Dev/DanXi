@@ -37,7 +37,6 @@ class UISLoginTool {
       Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
       [bool forceRelogin = false]) async {
     dio.interceptors.requestLock.lock();
-
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
     NonpersistentCookieJar workJar = NonpersistentCookieJar.createFrom(jar);
@@ -72,6 +71,7 @@ class UISLoginTool {
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     Response response = await DioUtils.processRedirect(workDio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
+      CredentialsInvalidException().fire();
       throw CredentialsInvalidException();
     } else if (response.data.toString().contains(CAPTCHA_CODE_NEEDED)) {
       // Notify [main.dart] to show up a dialog to guide users to log in manually.

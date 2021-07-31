@@ -178,7 +178,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         builder: (BuildContext context) => LoginDialog(
             sharedPreferences: _preferences,
             personInfo: _infoNotifier,
-            forceLogin: forceLogin));
+            dismissible: forceLogin));
   }
 
   List<Widget> _buildCampusAreaList() {

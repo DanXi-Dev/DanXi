@@ -34,6 +34,7 @@
     "lan_connection_issue_1_action":"Campus VPN",
     "lan_connection_issue_1_guide_title":"How to use the VPN？",
     "lan_connection_issue_1_guide_content":"3 simple steps:<br /><br />1. <a href=\"https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common\">Click here</a> to download the app.<br />2. Open the installed app and type in the Address stuvpn.fudan.edu.cn<br />3. Enter your UIS account & password.<br /><br />Then all features of DanXi will work normally.",
+    "re_login":"Re-login",
     "retry":"Retry",
     "skip":"Skip",
     "location_permission_denied_promot": "Location information unavailable. You will not be able to check-in in the app. If you would like to grant location permission to this app, please adjust your preferences in Settings.",

@@ -167,7 +167,7 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Phoenix(
         child: PlatformProvider(
-      initialPlatform: TargetPlatform.iOS,
+      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -229,6 +229,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Open up a dialog to request user to log in manually in the browser.
   static StateStreamListener<CaptchaNeededException> _captchaSubscription =
       StateStreamListener();
+  static StateStreamListener<CredentialsInvalidException>
+      _credentialsInvalidSubscription = StateStreamListener();
 
   //Dark/Light Theme Control
   @override
@@ -245,6 +247,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// If a dialog has been shown, we will not show a duplicated one.
   /// See [_dealWithCaptchaNeededException]
   bool _isDialogShown = false;
+  bool _isLoginDialogShown = false;
 
   /// The tab page index.
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
@@ -338,22 +341,34 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               content: Text(S.of(context).login_issue_1),
               actions: [
                 PlatformDialogAction(
-                  child: Text(S.of(context).cancel),
+                  child: Text(S.of(context).retry),
                   onPressed: () {
                     _isDialogShown = false;
                     Navigator.of(context).pop();
+                    Phoenix.rebirth(context);
+                  },
+                ),
+                PlatformDialogAction(
+                  child: Text(S.of(context).re_login),
+                  onPressed: () {
+                    _isDialogShown = false;
+                    Navigator.of(context).pop();
+                    _dealWithCredentialsInvalidException();
                   },
                 ),
                 PlatformDialogAction(
                   child: Text(S.of(context).login_issue_1_action),
-                  onPressed: () {
-                    _isDialogShown = false;
-                    Navigator.of(context).pop();
-                    BrowserUtil.openUrl(Constant.UIS_URL, context);
-                  },
+                  onPressed: () =>
+                      BrowserUtil.openUrl(Constant.UIS_URL, context),
                 ),
               ],
             ));
+  }
+
+  /// Deal with login issue described at [CaptchaNeededException].
+  _dealWithCredentialsInvalidException() async {
+    PersonInfo.removeFromSharedPreferences(_preferences);
+    Phoenix.rebirth(context);
   }
 
   DateTime _lastRefreshTime;
@@ -462,6 +477,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .on<CaptchaNeededException>()
             .listen((_) => _dealWithCaptchaNeededException()),
         hashCode);
+    _credentialsInvalidSubscription.bindOnlyInvalid(
+        Constant.eventBus
+            .on<CredentialsInvalidException>()
+            .listen((_) => _dealWithCredentialsInvalidException()),
+        hashCode);
 
     // Load the latest announcement & the start date of the following term.
     // Just ignore the network error.
@@ -514,13 +534,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Pop up a dialog where user can give his name & password.
-  void _showLoginDialog({bool forceLogin = false}) => showPlatformDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => LoginDialog(
-          sharedPreferences: _preferences,
-          personInfo: StateProvider.personInfo,
-          forceLogin: forceLogin));
+  Future<void> _showLoginDialog({bool dismissible = false}) async =>
+      await showPlatformDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) => LoginDialog(
+              sharedPreferences: _preferences,
+              personInfo: StateProvider.personInfo,
+              dismissible: dismissible));
 
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
   ///
@@ -532,7 +553,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       StateProvider.personInfo.value =
           PersonInfo.fromSharedPreferences(_preferences);
     } else {
-      _showLoginDialog(forceLogin: forceLogin);
+      _showLoginDialog(dismissible: forceLogin);
     }
   }
 

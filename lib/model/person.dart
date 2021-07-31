@@ -76,4 +76,12 @@ class PersonInfo {
     await preferences.setString("name", name);
     await preferences.setString("user_group", group.toString());
   }
+
+  static Future<void> removeFromSharedPreferences(
+      SharedPreferences preferences) async {
+    const fieldString = ["id", "password", "name", "user_group"];
+    fieldString.forEach((element) async {
+      if (preferences.containsKey(element)) await preferences.remove(element);
+    });
+  }
 }
