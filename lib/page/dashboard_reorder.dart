@@ -187,7 +187,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             ),
           ),
           onDismissed: (direction) {
-            print(sequence[index].internalString);
             sequence.removeAt(index);
             SettingsProvider.of(_preferences).dashboardWidgetsSequence =
                 sequence;

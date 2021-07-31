@@ -61,7 +61,6 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   Future<TimeTable> _loadTimeTableRemotely({DateTime startTime}) async {
-    print("loading from remote");
     Response idPage = await dio.get(ID_URL);
     String termId = _getIds(idPage.data.toString());
     Response tablePage = await dio.post(TIME_TABLE_URL,
