@@ -38,6 +38,8 @@ class BusFeature extends Feature {
   List<BusScheduleItem> _busList;
   SharedPreferences _preferences;
 
+  bool isHoliday;
+
   @override
   Widget get icon => Icon(PlatformIcons(context).bus);
 
@@ -47,6 +49,7 @@ class BusFeature extends Feature {
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
     _preferences = Provider.of<SharedPreferences>(context);
+    isHoliday = isTodayHoliday();
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -58,9 +61,15 @@ class BusFeature extends Feature {
     }
   }
 
+  bool isTodayHoliday() {
+    final today = DateTime.now().weekday;
+    return (today == DateTime.sunday) || (today == DateTime.saturday);
+  }
+
   _loadBusList(PersonInfo personInfo) async {
     _status = ConnectionStatus.CONNECTING;
-    _busList = await FudanBusRepository.getInstance().loadBusList(personInfo);
+    _busList = await FudanBusRepository.getInstance()
+        .loadBusList(personInfo, holiday: isHoliday);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
@@ -71,9 +80,8 @@ class BusFeature extends Feature {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
         return S.of(context).loading;
-      // if _busList != null, subTitle will be [customSubtitle] rather than [subTitle] here,
-      // so [ConnectionStatus.DONE] here is same as FAILED or FATAL_ERROR.
       case ConnectionStatus.DONE:
+        return S.of(context).no_matching_bus;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context).failed;
@@ -91,6 +99,7 @@ class BusFeature extends Feature {
   }
 
   Widget buildSubtitle(BusScheduleItem element) {
+    if (element == null) return null;
     Campus from, to;
     switch (element.direction) {
       case BusDirection.NONE:
@@ -142,6 +151,7 @@ class BusFeature extends Feature {
         return element;
       }
     }
+    if (filteredBusList.isEmpty) return null;
     return filteredBusList.first;
   }
 
@@ -154,7 +164,7 @@ class BusFeature extends Feature {
   void onTap() {
     if (_busList != null) {
       smartNavigatorPush(context, "/bus/detail",
-          arguments: {"busList": _busList});
+          arguments: {"busList": _busList, "dataIsHoliday": isHoliday});
     } else {
       refreshData();
     }

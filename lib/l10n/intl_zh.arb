@@ -114,6 +114,9 @@
     "bus_start": "始发站",
     "bus_dest": "终点站",
     "unable_to_find_quote": "无法找到被引用的帖子",
+    "holiday": "休息日",
+    "weekday": "工作日",
+    "no_matching_bus": "您所在的校区没有可乘坐的校车",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",

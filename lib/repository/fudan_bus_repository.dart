@@ -23,6 +23,8 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/vague_time.dart';
+import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dio/dio.dart';
 import 'package:dio/src/response.dart';
 import 'package:intl/intl.dart';
 
@@ -38,16 +40,19 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
   factory FudanBusRepository.getInstance() => _instance;
 
-  Future<List<BusScheduleItem>> loadBusList(PersonInfo info) {
+  Future<List<BusScheduleItem>> loadBusList(PersonInfo info,
+      {bool holiday = false}) {
     return Retrier.tryAsyncWithFix(
-        () => _loadBusList(),
+        () => _loadBusList(holiday: holiday),
         (exception) =>
             UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true));
   }
 
-  Future<List<BusScheduleItem>> _loadBusList() async {
+  Future<List<BusScheduleItem>> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];
-    Response r = await dio.get(_INFO_URL);
+    Response r = await dio.post(_INFO_URL,
+        data: FormData.fromMap(
+            {"holiday": holiday.toRequestParamStringRepresentation()}));
     Map json = r.data is Map ? r.data : jsonDecode(r.data.toString());
     json['d']['data'].forEach((route) {
       if (route['lists'] is List) {

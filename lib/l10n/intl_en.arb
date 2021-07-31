@@ -143,6 +143,7 @@
     "bus_start": "From",
     "bus_dest": "To    ",
     "unable_to_find_quote": "Unable to find the quoted reply.",
+    "no_matching_bus": "There is no scheduled bus for your campus",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
@@ -205,6 +206,8 @@
     "preview": "Preview",
     "seats": "{seats} seats",
     "major": "Major",
+    "holiday": "Holiday",
+    "weekday": "Weekday",
 
     "classroom": "Classroom",
     "morning": "Morning",

@@ -86,3 +86,9 @@ extension MapEx on Map {
   }
 }
 
+extension ToStr on bool {
+  String toRequestParamStringRepresentation() {
+    if (this) return "1";
+    return "0";
+  }
+}
