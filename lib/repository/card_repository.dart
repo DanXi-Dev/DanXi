@@ -59,8 +59,7 @@ class CardRepository extends BaseRepositoryWithDio {
   /// Log in before calling any method in this repository.
   Future<void> init(PersonInfo info) async {
     _info = info;
-    await Retrier.runAsyncWithRetry(
-        () => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true));
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true);
   }
 
   Future<String> getName() async {

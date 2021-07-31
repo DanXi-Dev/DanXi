@@ -43,6 +43,23 @@ class LoginDialog extends StatefulWidget {
   final SharedPreferences sharedPreferences;
   final ValueNotifier<PersonInfo> personInfo;
   final bool dismissible;
+  static bool _isShown = false;
+
+  static bool get dialogShown => _isShown;
+
+  static showLoginDialog(BuildContext context, SharedPreferences _preferences,
+      ValueNotifier<PersonInfo> personInfo, bool dismissible) async {
+    if (_isShown) return;
+    _isShown = true;
+    await showPlatformDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => LoginDialog(
+            sharedPreferences: _preferences,
+            personInfo: personInfo,
+            dismissible: dismissible));
+    _isShown = false;
+  }
 
   const LoginDialog(
       {Key key,
@@ -188,6 +205,7 @@ class _LoginDialogState extends State<LoginDialog> {
               _tryLogin(_nameController.text, _pwdController.text)
                   .catchError((e) {
                 if (e is CredentialsInvalidException) {
+                  _pwdController.text = "";
                   _errorText = S.of(context).credentials_invalid;
                 } else if (e is CaptchaNeededException) {
                   _errorText = S.of(context).captcha_needed;
@@ -196,13 +214,13 @@ class _LoginDialogState extends State<LoginDialog> {
                 } else {
                   _errorText = S.of(context).connection_failed;
                 }
-                _pwdController.text = "";
+                // _pwdController.text = "";
                 refreshSelf();
               });
             },
           ),
           const SizedBox(
-            height: 25,
+            height: 24,
           ),
           //Legal
           RichText(

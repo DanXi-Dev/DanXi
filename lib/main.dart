@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// A description for current connection status.
   ValueNotifier<String> _connectStatus = ValueNotifier("");
 
-  /// Listener to the failure of logging in caused by necessary captcha.
+  /// Listener to the failure of logging in caused by different reasons.
   ///
   /// Open up a dialog to request user to log in manually in the browser.
   static StateStreamListener<CaptchaNeededException> _captchaSubscription =
@@ -247,7 +247,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// If a dialog has been shown, we will not show a duplicated one.
   /// See [_dealWithCaptchaNeededException]
   bool _isDialogShown = false;
-  bool _isLoginDialogShown = false;
 
   /// The tab page index.
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
@@ -340,22 +339,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               title: Text(S.of(context).fatal_error),
               content: Text(S.of(context).login_issue_1),
               actions: [
-                PlatformDialogAction(
-                  child: Text(S.of(context).retry),
-                  onPressed: () {
-                    _isDialogShown = false;
-                    Navigator.of(context).pop();
-                    Phoenix.rebirth(context);
-                  },
-                ),
-                PlatformDialogAction(
-                  child: Text(S.of(context).re_login),
-                  onPressed: () {
-                    _isDialogShown = false;
-                    Navigator.of(context).pop();
-                    _dealWithCredentialsInvalidException();
-                  },
-                ),
+                if (!LoginDialog.dialogShown)
+                  PlatformDialogAction(
+                    child: Text(S.of(context).retry),
+                    onPressed: () {
+                      _isDialogShown = false;
+                      Navigator.of(context).pop();
+                      Phoenix.rebirth(context);
+                    },
+                  ),
+                if (!LoginDialog.dialogShown)
+                  PlatformDialogAction(
+                    child: Text(S.of(context).re_login),
+                    onPressed: () {
+                      _isDialogShown = false;
+                      Navigator.of(context).pop();
+                      _dealWithCredentialsInvalidException();
+                    },
+                  )
+                else
+                  PlatformDialogAction(
+                    child: Text(S.of(context).cancel),
+                    onPressed: () {
+                      _isDialogShown = false;
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 PlatformDialogAction(
                   child: Text(S.of(context).login_issue_1_action),
                   onPressed: () =>
@@ -365,10 +374,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ));
   }
 
-  /// Deal with login issue described at [CaptchaNeededException].
+  /// Deal with login issue described at [CredentialsInvalidException].
   _dealWithCredentialsInvalidException() async {
-    PersonInfo.removeFromSharedPreferences(_preferences);
-    Phoenix.rebirth(context);
+    if (!LoginDialog.dialogShown) {
+      PersonInfo.removeFromSharedPreferences(_preferences);
+      Phoenix.rebirth(context);
+    }
   }
 
   DateTime _lastRefreshTime;
@@ -533,27 +544,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  /// Pop up a dialog where user can give his name & password.
-  Future<void> _showLoginDialog({bool dismissible = false}) async =>
-      await showPlatformDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) => LoginDialog(
-              sharedPreferences: _preferences,
-              personInfo: StateProvider.personInfo,
-              dismissible: dismissible));
-
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
   ///
   /// If user hasn't logged in before, request him to do so.
-  Future<void> _loadOrInitSharedPreference({bool forceLogin = false}) async {
+  Future<void> _loadOrInitSharedPreference() async {
     _preferences = await SharedPreferences.getInstance();
 
-    if (!forceLogin && PersonInfo.verifySharedPreferences(_preferences)) {
+    if (PersonInfo.verifySharedPreferences(_preferences)) {
       StateProvider.personInfo.value =
           PersonInfo.fromSharedPreferences(_preferences);
     } else {
-      _showLoginDialog(dismissible: forceLogin);
+      LoginDialog.showLoginDialog(
+          context, _preferences, StateProvider.personInfo, false);
     }
   }
 
@@ -724,9 +726,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           Provider.value(value: _preferences),
         ],
         child: PlatformScaffold(
-          iosContentBottomPadding:
-              false, //_subpage[_pageIndex.value].needBottomPadding,
-          iosContentPadding: false, //_subpage[_pageIndex.value].needPadding,
+          iosContentBottomPadding: false,
+          //_subpage[_pageIndex.value].needBottomPadding,
+          iosContentPadding: false,
+          //_subpage[_pageIndex.value].needPadding,
 
           // This workarounds a color bug
           // backgroundColor: _pageIndex.value == 2
