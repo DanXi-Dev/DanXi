@@ -186,7 +186,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       cupertino: (_, __) =>
           CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
       iosContentPadding: false,
-      iosContentBottomPadding: true,
+      iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: TopController(
@@ -210,7 +210,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             ),
         ],
       ),
-      body: RefreshIndicator(
+      body: SafeArea(
+        child: RefreshIndicator(
           color: Theme.of(context).accentColor,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
@@ -279,7 +280,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   },
                   errorBuilder: () => _buildErrorWidget(),
                 ),*/
-              )),
+              ),
+        ),
+      ),
     );
   }
 
