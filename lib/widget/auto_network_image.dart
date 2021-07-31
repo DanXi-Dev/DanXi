@@ -80,7 +80,18 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
     return FutureWidget<Size>(
         future: _loadResult,
         successBuilder: (BuildContext context, AsyncSnapshot<Size> snapshot) {
-          double displayWidth = min(snapshot.data.width, widget.maxWidth);
+          final double displayWidth = min(snapshot.data.width, widget.maxWidth);
+
+          if (snapshot.data.width > snapshot.data.height)
+            return GestureDetector(
+              child: Image.memory(
+                _rawImage,
+                width: displayWidth,
+                fit: BoxFit.scaleDown,
+              ),
+              onTap: () => widget.onTapImage(_rawImage, widget.src),
+            );
+
           return GestureDetector(
             child: StdImageContainer(
               width: displayWidth,
