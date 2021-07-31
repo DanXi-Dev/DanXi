@@ -49,7 +49,6 @@ const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
 
 class TimetableSubPage extends PlatformSubpage
     with PageWithPrimaryScrollController {
-
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 
@@ -182,7 +181,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    debugPrint("Build ${widget.debugTag}");
     return FutureWidget(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return _buildPage(snapshot.data);
@@ -226,36 +224,38 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     if (_showingTime == null) _showingTime = _table.now();
     List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
         compact: TableDisplayType.STANDARD);
-    return RefreshIndicator(
-      color: Theme.of(context).accentColor,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
-      onRefresh: () async {
-        HapticFeedback.mediumImpact();
-        refreshSelf();
-      },
-      child: ListView(
-        // This ListView is a workaround, so that we can apply a custom scroll physics to it.
-        controller: _dummyScrollController,
-        physics: AlwaysScrollableScrollPhysics(),
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              PlatformIconButton(
-                icon: Icon(Icons.chevron_left),
-                onPressed: _showingTime.week > 0 ? goToPrev : null,
-              ),
-              Text(S.of(context).week(_showingTime.week)),
-              PlatformIconButton(
-                icon: Icon(Icons.chevron_right),
-                onPressed:
-                _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
-              )
-            ],
-          ),
-          ScheduleView(scheduleData, style, _table.now(), _showingTime.week,
-              widget.primaryScrollController(context)),
-        ],
+    return SafeArea(
+      child: RefreshIndicator(
+        color: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          refreshSelf();
+        },
+        child: ListView(
+          // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+          controller: _dummyScrollController,
+          physics: AlwaysScrollableScrollPhysics(),
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                PlatformIconButton(
+                  icon: Icon(Icons.chevron_left),
+                  onPressed: _showingTime.week > 0 ? goToPrev : null,
+                ),
+                Text(S.of(context).week(_showingTime.week)),
+                PlatformIconButton(
+                  icon: Icon(Icons.chevron_right),
+                  onPressed:
+                      _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
+                )
+              ],
+            ),
+            ScheduleView(scheduleData, style, _table.now(), _showingTime.week,
+                widget.primaryScrollController(context)),
+          ],
+        ),
       ),
     );
   }

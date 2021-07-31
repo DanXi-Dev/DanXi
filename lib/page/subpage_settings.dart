@@ -50,7 +50,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsSubpage extends PlatformSubpage
     with PageWithPrimaryScrollController {
-
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 
@@ -230,7 +229,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    debugPrint("Build ${widget.debugTag}");
     _preferences = Provider.of<SharedPreferences>(context);
     final Color _originalDividerColor = Theme.of(context).dividerColor;
     double _avatarSize =
@@ -243,16 +241,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         .copyWith(color: Theme.of(context).accentColor);
     final inAppReview = InAppReview.instance;
 
-    return RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          refreshSelf();
-        },
-        child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
+    return SafeArea(
+        child: RefreshIndicator(
+            color: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              refreshSelf();
+            },
             child: Material(
               child: ListView(
                   padding: EdgeInsets.all(4),
@@ -284,30 +280,30 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               barrierDismissible: false,
                               builder: (BuildContext context) =>
                                   PlatformAlertDialog(
-                                    title: Text(
-                                        S.of(context).logout_question_prompt_title),
-                                    content:
+                                title: Text(
+                                    S.of(context).logout_question_prompt_title),
+                                content:
                                     Text(S.of(context).logout_question_prompt),
-                                    actions: [
-                                      PlatformDialogAction(
-                                        child: Text(S.of(context).cancel),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      PlatformDialogAction(
-                                          child: Text(
-                                            S.of(context).i_see,
-                                            style: TextStyle(
-                                                color:
-                                                Theme.of(context).errorColor),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            _deleteAllDataAndExit();
-                                          })
-                                    ],
+                                actions: [
+                                  PlatformDialogAction(
+                                    child: Text(S.of(context).cancel),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
                                   ),
+                                  PlatformDialogAction(
+                                      child: Text(
+                                        S.of(context).i_see,
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).errorColor),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        _deleteAllDataAndExit();
+                                      })
+                                ],
+                              ),
                             );
                           },
                         ),
@@ -329,26 +325,26 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             showPlatformModalSheet(
                                 context: context,
                                 builder: (_) => PlatformWidget(
-                                  cupertino: (_, __) =>
-                                      CupertinoActionSheet(
+                                      cupertino: (_, __) =>
+                                          CupertinoActionSheet(
                                         title:
-                                        Text(S.of(context).select_campus),
+                                            Text(S.of(context).select_campus),
                                         actions: _buildCampusAreaList(),
                                         cancelButton:
-                                        CupertinoActionSheetAction(
+                                            CupertinoActionSheetAction(
                                           child: Text(S.of(context).cancel),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                           },
                                         ),
                                       ),
-                                  material: (_, __) => Container(
-                                    height: 300,
-                                    child: Column(
-                                      children: _buildCampusAreaList(),
-                                    ),
-                                  ),
-                                ));
+                                      material: (_, __) => Container(
+                                        height: 300,
+                                        child: Column(
+                                          children: _buildCampusAreaList(),
+                                        ),
+                                      ),
+                                    ));
                           }
                         },
                       ),
@@ -369,34 +365,34 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             showPlatformModalSheet(
                                 context: context,
                                 builder: (_) => PlatformWidget(
-                                  cupertino: (_, __) =>
-                                      CupertinoActionSheet(
+                                      cupertino: (_, __) =>
+                                          CupertinoActionSheet(
                                         title: Text(S
                                             .of(context)
                                             .fduhole_nsfw_behavior),
                                         actions: _buildFoldBehaviorList(),
                                         cancelButton:
-                                        CupertinoActionSheetAction(
+                                            CupertinoActionSheetAction(
                                           child: Text(S.of(context).cancel),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                           },
                                         ),
                                       ),
-                                  material: (_, __) => Container(
-                                    height: 300,
-                                    child: Column(
-                                      children: _buildFoldBehaviorList(),
-                                    ),
-                                  ),
-                                ));
+                                      material: (_, __) => Container(
+                                        height: 300,
+                                        child: Column(
+                                          children: _buildFoldBehaviorList(),
+                                        ),
+                                      ),
+                                    ));
                           }
                         },
                       ),
                     ),
 
                     if (SettingsProvider.of(_preferences).debugMode)
-                    //Theme Selection
+                      //Theme Selection
                       Card(
                         child: ListTile(
                           title: Text(S.of(context).theme),
@@ -409,9 +405,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           onTap: () {
                             PlatformX.isMaterial(context)
                                 ? PlatformProvider.of(context)
-                                .changeToCupertinoPlatform()
+                                    .changeToCupertinoPlatform()
                                 : PlatformProvider.of(context)
-                                .changeToMaterialPlatform();
+                                    .changeToMaterialPlatform();
                           },
                         ),
                       ),
@@ -431,14 +427,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Container(
                                         padding:
-                                        EdgeInsets.fromLTRB(25, 5, 25, 0),
+                                            EdgeInsets.fromLTRB(25, 5, 25, 0),
                                         child: Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: <Widget>[
                                               //Description
                                               Text(
@@ -469,18 +465,18 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               ),
                                               RichText(
                                                   text: TextSpan(children: [
-                                                    TextSpan(
-                                                      style: defaultText,
-                                                      text: S
-                                                          .of(context)
-                                                          .terms_and_conditions_content,
-                                                    ),
-                                                    TextSpan(
-                                                        style: linkText,
-                                                        text: S
-                                                            .of(context)
-                                                            .privacy_policy,
-                                                        recognizer:
+                                                TextSpan(
+                                                  style: defaultText,
+                                                  text: S
+                                                      .of(context)
+                                                      .terms_and_conditions_content,
+                                                ),
+                                                TextSpan(
+                                                    style: linkText,
+                                                    text: S
+                                                        .of(context)
+                                                        .privacy_policy,
+                                                    recognizer:
                                                         TapGestureRecognizer()
                                                           ..onTap = () async {
                                                             await BrowserUtil.openUrl(
@@ -489,22 +485,22 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                                     .privacy_policy_url,
                                                                 context);
                                                           }),
-                                                    TextSpan(
-                                                      style: defaultText,
-                                                      text: S
-                                                          .of(context)
-                                                          .terms_and_conditions_content_end,
-                                                    ),
-                                                    TextSpan(
-                                                      style: defaultText,
-                                                      text: S.of(context).view_ossl,
-                                                    ),
-                                                    TextSpan(
-                                                        style: linkText,
-                                                        text: S
-                                                            .of(context)
-                                                            .open_source_software_licenses,
-                                                        recognizer:
+                                                TextSpan(
+                                                  style: defaultText,
+                                                  text: S
+                                                      .of(context)
+                                                      .terms_and_conditions_content_end,
+                                                ),
+                                                TextSpan(
+                                                  style: defaultText,
+                                                  text: S.of(context).view_ossl,
+                                                ),
+                                                TextSpan(
+                                                    style: linkText,
+                                                    text: S
+                                                        .of(context)
+                                                        .open_source_software_licenses,
+                                                    recognizer:
                                                         TapGestureRecognizer()
                                                           ..onTap = () {
                                                             smartNavigatorPush(
@@ -512,10 +508,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                                 "/about/openLicense",
                                                                 arguments: {
                                                                   "items":
-                                                                  _LICENSE_ITEMS
+                                                                      _LICENSE_ITEMS
                                                                 });
                                                           }),
-                                                  ])),
+                                              ])),
 
                                               const SizedBox(
                                                 height: 16,
@@ -531,18 +527,18 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               ),
                                               RichText(
                                                   text: TextSpan(children: [
-                                                    TextSpan(
-                                                      style: defaultText,
-                                                      text: S
-                                                          .of(context)
-                                                          .acknowledgements_1,
-                                                    ),
-                                                    TextSpan(
-                                                        style: linkText,
-                                                        text: S
-                                                            .of(context)
-                                                            .acknowledgement_name_1,
-                                                        recognizer:
+                                                TextSpan(
+                                                  style: defaultText,
+                                                  text: S
+                                                      .of(context)
+                                                      .acknowledgements_1,
+                                                ),
+                                                TextSpan(
+                                                    style: linkText,
+                                                    text: S
+                                                        .of(context)
+                                                        .acknowledgement_name_1,
+                                                    recognizer:
                                                         TapGestureRecognizer()
                                                           ..onTap = () async {
                                                             await BrowserUtil.openUrl(
@@ -551,13 +547,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                                     .acknowledgement_link_1,
                                                                 context);
                                                           }),
-                                                    TextSpan(
-                                                      style: defaultText,
-                                                      text: S
-                                                          .of(context)
-                                                          .acknowledgements_2,
-                                                    ),
-                                                  ])),
+                                                TextSpan(
+                                                  style: defaultText,
+                                                  text: S
+                                                      .of(context)
+                                                      .acknowledgements_2,
+                                                ),
+                                              ])),
 
                                               const SizedBox(
                                                 height: 16,
@@ -576,16 +572,16 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               ),
                                               Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: <Widget>[
                                                   Column(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       InkWell(
                                                         child: Container(
@@ -609,23 +605,23 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                       ),
                                                       const SizedBox(
                                                           height:
-                                                          _avatarNameSpacing),
+                                                              _avatarNameSpacing),
                                                       Text(
                                                         S
                                                             .of(context)
                                                             .dev_name_1,
                                                         textAlign:
-                                                        TextAlign.center,
+                                                            TextAlign.center,
                                                       ),
                                                     ],
                                                   ),
                                                   Column(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       InkWell(
                                                         child: Container(
@@ -649,23 +645,23 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                       ),
                                                       const SizedBox(
                                                           height:
-                                                          _avatarNameSpacing),
+                                                              _avatarNameSpacing),
                                                       Text(
                                                         S
                                                             .of(context)
                                                             .dev_name_2,
                                                         textAlign:
-                                                        TextAlign.center,
+                                                            TextAlign.center,
                                                       ),
                                                     ],
                                                   ),
                                                   Column(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       InkWell(
                                                         child: Container(
@@ -690,23 +686,23 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                       ),
                                                       const SizedBox(
                                                           height:
-                                                          _avatarNameSpacing),
+                                                              _avatarNameSpacing),
                                                       Text(
                                                         S
                                                             .of(context)
                                                             .dev_name_3,
                                                         textAlign:
-                                                        TextAlign.center,
+                                                            TextAlign.center,
                                                       ),
                                                     ],
                                                   ),
                                                   Column(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       InkWell(
                                                         child: Container(
@@ -731,13 +727,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                       ),
                                                       const SizedBox(
                                                           height:
-                                                          _avatarNameSpacing),
+                                                              _avatarNameSpacing),
                                                       Text(
                                                         S
                                                             .of(context)
                                                             .dev_name_4,
                                                         textAlign:
-                                                        TextAlign.center,
+                                                            TextAlign.center,
                                                       ),
                                                     ],
                                                   ),
@@ -747,7 +743,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               //Version
                                               FutureBuilder<PackageInfo>(
                                                 future:
-                                                PackageInfo.fromPlatform(),
+                                                    PackageInfo.fromPlatform(),
                                                 builder: (context, snapshot) {
                                                   switch (snapshot
                                                       .connectionState) {
@@ -757,14 +753,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                             .centerRight,
                                                         child: Text(
                                                           S
-                                                              .of(context)
-                                                              .version +
+                                                                  .of(context)
+                                                                  .version +
                                                               ' ${snapshot?.data?.version} build ${snapshot?.data?.buildNumber}',
                                                           textScaleFactor: 0.7,
                                                           style: TextStyle(
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .bold),
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       );
                                                     default:
@@ -776,8 +772,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                           textScaleFactor: 0.7,
                                                           style: TextStyle(
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .bold),
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       );
                                                   }
@@ -786,7 +782,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               const SizedBox(height: 4),
                                               Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                                    MainAxisAlignment.end,
                                                 children: <Widget>[
                                                   Text(
                                                     S
@@ -802,7 +798,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       const SizedBox(height: 8),
                                       Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.end,
+                                            MainAxisAlignment.end,
                                         children: <Widget>[
                                           FutureWidget<bool>(
                                             successBuilder:
@@ -810,7 +806,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               if (snapshot.data)
                                                 return TextButton(
                                                   child:
-                                                  Text(S.of(context).rate),
+                                                      Text(S.of(context).rate),
                                                   onPressed: () {
                                                     inAppReview
                                                         .openStoreListing(
@@ -823,19 +819,19 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 return Container();
                                             },
                                             loadingBuilder:
-                                            PlatformCircularProgressIndicator(),
+                                                PlatformCircularProgressIndicator(),
                                             errorBuilder: Container(),
                                             future: inAppReview.isAvailable(),
                                           ),
                                           const SizedBox(width: 8),
                                           TextButton(
                                             child:
-                                            Text(S.of(context).contact_us),
+                                                Text(S.of(context).contact_us),
                                             onPressed: () async {
                                               final Email email = Email(
                                                 body: '',
                                                 subject:
-                                                S.of(context).app_feedback,
+                                                    S.of(context).app_feedback,
                                                 recipients: [
                                                   S.of(context).feedback_email
                                                 ],

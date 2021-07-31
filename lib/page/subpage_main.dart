@@ -47,7 +47,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
-
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
@@ -220,18 +219,15 @@ class _HomeSubpageState extends State<HomeSubpage>
     super.build(context);
     List<DashboardCard> widgetList =
         SettingsProvider.of(_preferences).dashboardWidgetsSequence;
-    debugPrint("Build ${widget.debugTag}");
-    return RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          _rebuild();
-          refreshSelf();
-        },
-        child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
+    return SafeArea(
+        child: RefreshIndicator(
+            color: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              _rebuild();
+              refreshSelf();
+            },
             child: Material(
                 child: ListView(
               controller: widget.primaryScrollController(context),

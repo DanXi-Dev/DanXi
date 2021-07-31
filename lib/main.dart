@@ -703,8 +703,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           Provider.value(value: _preferences),
         ],
         child: PlatformScaffold(
-          iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
-          iosContentPadding: _subpage[_pageIndex.value].needPadding,
+          iosContentBottomPadding:
+              false, //_subpage[_pageIndex.value].needBottomPadding,
+          iosContentPadding: false, //_subpage[_pageIndex.value].needPadding,
 
           // This workarounds a color bug
           // backgroundColor: _pageIndex.value == 2
@@ -784,7 +785,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             itemChanged: (index) {
               if (index != _pageIndex.value) {
-                debugPrint("Call itemChanged");
                 for (int i = 0; i < _subpage.length; i++) {
                   if (index != i) {
                     _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
