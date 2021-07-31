@@ -63,11 +63,13 @@ class _AnnouncementListState extends State<AnnouncementList> {
         ),
         trailingActions: [
           PlatformIconButton(
-            icon: AutoSizeText(
+            padding: EdgeInsets.zero,
+            icon: Text(
               _showingLatest
                   ? S.of(context).older_announcement
                   : S.of(context).latest_announcement,
               softWrap: true,
+              textScaleFactor: 1.2,
             ),
             onPressed: () => setState(() => _showingLatest = !_showingLatest),
           )
