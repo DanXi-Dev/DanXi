@@ -45,6 +45,8 @@ class BusPage extends StatefulWidget {
 class _BusPageState extends State<BusPage> {
   Future<List<BusScheduleItem>> _busListWeekday;
   Future<List<BusScheduleItem>> _busListHoliday;
+  List<BusScheduleItem> _busListWeekdayLoaded;
+  List<BusScheduleItem> _busListHolidayLoaded;
 
   int _holidaySliding;
 
@@ -63,23 +65,58 @@ class _BusPageState extends State<BusPage> {
   Future<List<BusScheduleItem>> _setContent() async {
     List<BusScheduleItem> content;
     if (_holidaySliding == 1) {
-      content = await _busListHoliday;
+      content = _busListHolidayLoaded = await _busListHoliday;
     } else {
-      content = await _busListWeekday;
+      content = _busListWeekdayLoaded = await _busListWeekday;
     }
-    // Normalize all entries
-    content.forEach((element) {
-      if (element.direction == BusDirection.BACKWARD) {
-        final start = element.start;
-        element.start = element.end;
-        element.end = start;
-        final startTime = element.startTime;
-        element.startTime = element.endTime;
-        element.endTime = startTime;
-        element.direction = BusDirection.FORWARD;
-      }
-    });
     return _filterBus(content);
+  }
+
+  Widget _buildFutureWidget() => FutureWidget(
+      future: _setContent(),
+      successBuilder: (context, snapshot) {
+        return ListView(
+          physics: AlwaysScrollableScrollPhysics(),
+          primary: true,
+          children: _getListWidgets(snapshot.data),
+        );
+      },
+      errorBuilder: (context, snapshot) {
+        return Center(
+          child: GestureDetector(
+            child: Text(S.of(context).failed),
+            onTap: () => setState(() {}),
+          ),
+        );
+      },
+      loadingBuilder: (context) {
+        return Center(
+          child: PlatformCircularProgressIndicator(),
+        );
+      });
+
+  Widget _autoSelectWidget() {
+    if (_holidaySliding == 1) {
+      if (_busListHolidayLoaded == null)
+        return _buildFutureWidget();
+      else {
+        return ListView(
+          physics: AlwaysScrollableScrollPhysics(),
+          primary: true,
+          children: _getListWidgets(_filterBus(_busListHolidayLoaded)),
+        );
+      }
+    } else {
+      if (_busListWeekdayLoaded == null)
+        return _buildFutureWidget();
+      else {
+        return ListView(
+          physics: AlwaysScrollableScrollPhysics(),
+          primary: true,
+          children: _getListWidgets(_filterBus(_busListWeekdayLoaded)),
+        );
+      }
+    }
   }
 
   @override
@@ -88,12 +125,12 @@ class _BusPageState extends State<BusPage> {
     if (widget.arguments['dataIsHoliday']) {
       _busListWeekday = FudanBusRepository.getInstance()
           .loadBusList(StateProvider.personInfo.value, holiday: false);
-      _busListHoliday = Future.value(widget.arguments['busList']);
+      _busListHolidayLoaded = widget.arguments['busList'];
       _holidaySliding = 1;
     } else {
       _busListHoliday = FudanBusRepository.getInstance()
           .loadBusList(StateProvider.personInfo.value, holiday: true);
-      _busListWeekday = Future.value(widget.arguments['busList']);
+      _busListWeekdayLoaded = widget.arguments['busList'];
       _holidaySliding = 0;
     }
 
@@ -122,6 +159,18 @@ class _BusPageState extends State<BusPage> {
   }
 
   List<BusScheduleItem> _filterBus(List<BusScheduleItem> origBusList) {
+    // Normalize all entries
+    origBusList.forEach((element) {
+      if (element.direction == BusDirection.BACKWARD) {
+        final start = element.start;
+        element.start = element.end;
+        element.end = start;
+        final startTime = element.startTime;
+        element.startTime = element.endTime;
+        element.endTime = startTime;
+        element.direction = BusDirection.FORWARD;
+      }
+    });
     return origBusList
         .where((element) =>
             (element.start == _startSelectItem &&
@@ -226,30 +275,8 @@ class _BusPageState extends State<BusPage> {
               ),
               Expanded(
                 child: WithScrollbar(
-                  controller: PrimaryScrollController.of(context),
-                  child: FutureWidget(
-                      future: _setContent(),
-                      successBuilder: (context, snapshot) {
-                        return ListView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          primary: true,
-                          children: _getListWidgets(snapshot.data),
-                        );
-                      },
-                      errorBuilder: (context, snapshot) {
-                        return Center(
-                          child: GestureDetector(
-                            child: Text(S.of(context).failed),
-                            onTap: () => setState(() {}),
-                          ),
-                        );
-                      },
-                      loadingBuilder: (context) {
-                        return Center(
-                          child: PlatformCircularProgressIndicator(),
-                        );
-                      }),
-                ),
+                    controller: PrimaryScrollController.of(context),
+                    child: _autoSelectWidget()),
               ),
             ],
           ),
