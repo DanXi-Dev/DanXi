@@ -76,12 +76,10 @@ void main() {
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
       releaseConfig: releaseOptions);
-  if (PlatformX.isDesktop) {
-    doWhenWindowReady(() {
-      final win = appWindow;
-      win.show();
-    });
-  }
+  doWhenWindowReady(() {
+    final win = appWindow;
+    win.show();
+  });
 }
 
 class DanxiApp extends StatelessWidget {
