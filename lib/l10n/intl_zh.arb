@@ -113,6 +113,7 @@
     "image_save_failed": "图片保存失败，请检查您的权限设置",
     "bus_start": "始发站",
     "bus_dest": "终点站",
+    "unable_to_find_quote": "无法找到被引用的帖子",
 
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",
