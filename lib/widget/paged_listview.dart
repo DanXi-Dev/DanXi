@@ -151,11 +151,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         future: _futureData,
         successBuilder: (_, snapshot) {
           // Handle Scroll To End Requests
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.scheduleFrameCallback((_) {
             if (_scrollToEndQueued) {
-              currentController
-                  .jumpTo(currentController.position.maxScrollExtent);
-              if (_isEnded) _scrollToEndQueued = false;
+              if (currentController.position.extentBefore == 0)
+                currentController
+                    .jumpTo(currentController.position.maxScrollExtent);
+              _scrollToEndQueued = false;
             }
           });
 

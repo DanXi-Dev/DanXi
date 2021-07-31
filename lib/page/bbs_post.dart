@@ -225,7 +225,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             scrollController: PrimaryScrollController.of(context),
             dataReceiver: _loadContent,
             // Load all data if user instructed us to scroll to end
-            allDataReceiver: (shouldScrollToEnd && _post.posts.length > 10)
+            allDataReceiver: (shouldScrollToEnd && _post.count > 10)
                 ? PostRepository.getInstance().loadReplies(_post, -1)
                 : null,
             shouldScrollToEnd: shouldScrollToEnd,
