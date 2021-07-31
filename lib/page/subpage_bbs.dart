@@ -189,7 +189,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      setState(() {});
+      _listViewController.notifyUpdate();
     }
   }
 
@@ -330,7 +330,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            _listViewController.notifyUpdate();
+            refreshSelf();
           },
           child: PagedListView<BBSPost>(
               pagedController: _listViewController,
