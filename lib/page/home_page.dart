@@ -52,7 +52,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
@@ -202,7 +201,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     onPressed: () {
                       _isDialogShown = false;
                       Navigator.of(context).pop();
-                      Phoenix.rebirth(context);
+                      FlutterApp.restartApp(context);
                     },
                   ),
                 if (!LoginDialog.dialogShown)
@@ -235,8 +234,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
       PersonInfo.removeFromSharedPreferences(_preferences);
-      StateProvider.personInfo.value = null;
-      Phoenix.rebirth(context);
+      FlutterApp.restartApp(context);
     }
   }
 
@@ -339,7 +337,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // The timer below is a workaround to the issue.
       Timer(Duration(milliseconds: 500), () {
         if (WidgetsBinding.instance.platformDispatcher.platformBrightness !=
-            Theme.of(context).brightness) Phoenix.rebirth(context);
+            Theme.of(context).brightness) FlutterApp.restartApp(context);
       });
     };
 

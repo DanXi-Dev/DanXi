@@ -29,6 +29,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -40,7 +41,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -159,7 +159,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    await _preferences.clear().then((value) => {Phoenix.rebirth(context)});
+    await _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
 
   SharedPreferences _preferences;

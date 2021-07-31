@@ -30,4 +30,8 @@ class StateProvider {
 
   /// The user's basic information.
   static final ValueNotifier<PersonInfo> personInfo = ValueNotifier(null);
+
+  static void initialize() {
+    personInfo.value = null;
+  }
 }
