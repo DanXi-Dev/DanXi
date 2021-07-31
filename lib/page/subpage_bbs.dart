@@ -323,44 +323,46 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildPageBody() {
-    return SafeArea(
-      child: RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          _listViewController.notifyUpdate();
-        },
-        child: PagedListView<BBSPost>(
-            pagedController: _listViewController,
-            withScrollbar: true,
-            scrollController: widget.primaryScrollController(context),
-            startPage: 1,
-            builder: _buildListItem,
-            headBuilder: (_) => _buildSearchTextField(),
-            loadingBuilder: (BuildContext context) => Container(
-                  padding: EdgeInsets.all(8),
-                  child: Center(child: PlatformCircularProgressIndicator()),
-                ),
-            errorBuilder:
-                (BuildContext context, AsyncSnapshot<List<BBSPost>> snapshot) {
-              if (snapshot.error is LoginExpiredError) {
-                SettingsProvider.of(_preferences).deleteSavedFduholeToken();
-                return _buildErrorPage(
-                    error: S.of(context).error_login_expired);
-              } else if (snapshot.error is NotLoginError)
-                return _buildErrorPage(
-                    error: (snapshot.error as NotLoginError).errorMessage);
-              return _buildErrorPage(error: snapshot.error.toString());
-            },
-            endBuilder: (context) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(S.of(context).end_reached),
+    return Material(
+      child: SafeArea(
+        child: RefreshIndicator(
+          color: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            _listViewController.notifyUpdate();
+          },
+          child: PagedListView<BBSPost>(
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: widget.primaryScrollController(context),
+              startPage: 1,
+              builder: _buildListItem,
+              headBuilder: (_) => _buildSearchTextField(),
+              loadingBuilder: (BuildContext context) => Container(
+                    padding: EdgeInsets.all(8),
+                    child: Center(child: PlatformCircularProgressIndicator()),
                   ),
-                ),
-            emptyBuilder: (_) => _buildEmptyFavoritesPage(),
-            dataReceiver: _loadContent),
+              errorBuilder: (BuildContext context,
+                  AsyncSnapshot<List<BBSPost>> snapshot) {
+                if (snapshot.error is LoginExpiredError) {
+                  SettingsProvider.of(_preferences).deleteSavedFduholeToken();
+                  return _buildErrorPage(
+                      error: S.of(context).error_login_expired);
+                } else if (snapshot.error is NotLoginError)
+                  return _buildErrorPage(
+                      error: (snapshot.error as NotLoginError).errorMessage);
+                return _buildErrorPage(error: snapshot.error.toString());
+              },
+              endBuilder: (context) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(S.of(context).end_reached),
+                    ),
+                  ),
+              emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+              dataReceiver: _loadContent),
+        ),
       ),
     );
     /*
@@ -528,10 +530,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                             style:
                                 TextStyle(color: Theme.of(context).hintColor),
                           ),
-                          Icon(SFSymbols.arrow_down_to_line,
+                          Icon(SFSymbols.search,
                               size: 14,
                               color:
-                                  Theme.of(context).hintColor.withOpacity(0.5)),
+                                  Theme.of(context).hintColor.withOpacity(0.2)),
                         ]),
                   ),
                   Padding(

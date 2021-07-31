@@ -128,14 +128,15 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     else if (selectDate == null) selectDate = DateTime.now();
 
     return PlatformScaffold(
-        iosContentBottomPadding: true,
-        iosContentPadding: true,
+        iosContentBottomPadding: false,
+        iosContentPadding: false,
         appBar: PlatformAppBarX(
             title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(S.of(context).empty_classrooms),
         )),
-        body: Material(
+        body: SafeArea(
+            child: Material(
           child: Column(children: [
             SizedBox(
               height: PlatformX.isMaterial(context) ? 0 : 12,
@@ -294,25 +295,21 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                           _buildingList[_selectBuildingIndex].data[0],
                           _buildingList[_selectBuildingIndex].data,
                           selectDate),
-                  successBuilder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) =>
-                      Expanded(
-                          child: MediaQuery.removePadding(
-                              context: context,
-                              removeTop: true,
+                  successBuilder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) =>
+                          Expanded(
                               child: WithScrollbar(
-                                controller: PrimaryScrollController.of(context),
-                                child: ListView(
-                                  controller:
-                                      PrimaryScrollController.of(context),
-                                  children: _getListWidgets(snapshot.data),
-                                ),
-                              ))),
+                            controller: PrimaryScrollController.of(context),
+                            child: ListView(
+                              primary: true,
+                              children: _getListWidgets(snapshot.data),
+                            ),
+                          )),
                   errorBuilder: (_, snapShot) => _buildErrorWidget(),
                   loadingBuilder: _buildLoadingWidget()),
             )
           ]),
-        ));
+        )));
   }
 
   List<Widget> _getListWidgets(List<RoomInfo> data) {
