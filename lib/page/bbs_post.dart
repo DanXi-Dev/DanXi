@@ -173,8 +173,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Rebuild everything and refresh itself.
-  void refreshSelf() {
-    _listViewController.notifyUpdate();
+  void refreshSelf({scrollToEnd = false}) {
+    if (scrollToEnd) _listViewController.queueScrollToEnd();
+    _listViewController.notifyUpdate(useInitialData: false);
   }
 
   @override
@@ -204,7 +205,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   : const Icon(SFSymbols.arrowshape_turn_up_left),
               onPressed: () {
                 BBSEditor.createNewReply(context, _post.id, null)
-                    .then((_) => refreshSelf());
+                    .then((_) => refreshSelf(scrollToEnd: true));
               },
             ),
         ],
@@ -574,7 +575,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   replyId = e.id;
                 }
                 BBSEditor.createNewReply(context, _post.id, replyId)
-                    .then((value) => refreshSelf());
+                    .then((value) => refreshSelf(scrollToEnd: true));
               } else {
                 ProgressFuture progressDialog = showProgressDialog(
                     loadingText: S.of(context).loading, context: context);

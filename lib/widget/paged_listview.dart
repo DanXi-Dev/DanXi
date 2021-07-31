@@ -153,9 +153,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           // Handle Scroll To End Requests
           WidgetsBinding.instance.scheduleFrameCallback((_) {
             if (_scrollToEndQueued) {
-              if (currentController.position.extentBefore == 0)
-                currentController
-                    .jumpTo(currentController.position.maxScrollExtent);
+              currentController
+                  .jumpTo(currentController.position.maxScrollExtent);
               _scrollToEndQueued = false;
             }
           });
@@ -227,7 +226,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     return Container();
   }
 
-  initialize() {
+  initialize({useInitialData = true}) {
     _hasHeadWidget = widget.headBuilder != null;
     _data.clear();
     valueKeys.clear();
@@ -236,7 +235,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
-      if (widget.initialData != null && widget.initialData.isNotEmpty) {
+      if (widget.initialData != null &&
+          widget.initialData.isNotEmpty &&
+          useInitialData) {
         _isRefreshing = true;
         _futureData = Future.value(widget.initialData);
       } else {
@@ -250,8 +251,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     }
   }
 
-  notifyUpdate() {
-    initialize();
+  notifyUpdate({useInitialData = true}) {
+    initialize(useInitialData: useInitialData);
     refreshSelf();
   }
 
@@ -318,8 +319,8 @@ class PagedListViewController<T> {
     this._state = state;
   }
 
-  notifyUpdate() {
-    _state?.notifyUpdate();
+  notifyUpdate({useInitialData = true}) {
+    _state?.notifyUpdate(useInitialData: useInitialData);
   }
 
   scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) {
