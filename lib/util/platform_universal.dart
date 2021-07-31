@@ -17,6 +17,7 @@
 
 import 'dart:io';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -43,6 +44,12 @@ class PlatformX {
   static bool get isMobile => isAndroid || isIOS;
 
   static bool get isDesktop => !isMobile;
+
+  static ThemeData getTheme(BuildContext context) {
+    return PlatformX.isDarkMode
+        ? Constant.darkTheme(PlatformX.isCupertino(context))
+        : Constant.lightTheme(PlatformX.isCupertino(context));
+  }
 
   static Color backgroundColor(BuildContext context) {
     return isMaterial(context) ? null : Theme.of(context).cardColor;

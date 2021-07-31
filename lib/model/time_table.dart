@@ -40,7 +40,7 @@ class Event {
 @JsonSerializable()
 class TimeTable {
   /// Start time of the term.
-  static DateTime START_TIME = DateTime(2021, 3, 1); //TODO: Make this dynamic
+  static DateTime defaultStartTime = DateTime(2021, 3, 1);
 
   static final DateTime kMonday = DateTime.utc(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
@@ -98,7 +98,7 @@ class TimeTable {
 
   static TimeNow defaultNow() {
     DateTime now = DateTime.now();
-    Duration diff = now.difference(START_TIME);
+    Duration diff = now.difference(defaultStartTime);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {
       if (now.isAfter(kCourseSlotStartTime[i].toExactTime())) {

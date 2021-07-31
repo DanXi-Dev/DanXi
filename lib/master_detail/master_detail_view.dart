@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/main.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

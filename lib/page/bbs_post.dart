@@ -36,7 +36,6 @@ import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
-import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

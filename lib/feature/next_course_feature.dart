@@ -19,7 +19,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/table_repository.dart';
@@ -35,7 +34,6 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 class NextCourseFeature extends Feature {
   LiveCourseModel _data;
   ConnectionStatus _status = ConnectionStatus.NONE;
-  PersonInfo _info;
 
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
@@ -79,7 +77,6 @@ class NextCourseFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _info = StateProvider.personInfo.value;
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.

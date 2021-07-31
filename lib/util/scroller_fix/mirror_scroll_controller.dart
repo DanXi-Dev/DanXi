@@ -119,8 +119,10 @@ class MirrorScrollController extends ScrollController {
       originController.createScrollPosition(physics, context, oldPosition);
 
   @override
-  void debugFillDescription(List<String> description) =>
-      originController.debugFillDescription(description);
+  void debugFillDescription(List<String> description) {
+    super.debugFillDescription(description);
+    originController.debugFillDescription(description);
+  }
 }
 
 typedef AttachInterceptor = bool Function();

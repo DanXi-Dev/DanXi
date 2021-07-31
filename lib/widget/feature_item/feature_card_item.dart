@@ -16,9 +16,9 @@
  */
 
 import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/main.dart';
-import 'package:flutter/material.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/material.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [Card].
 class FeatureCardItem extends StatefulWidget implements FeatureContainer {
@@ -81,7 +81,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
             widget.feature.customSubtitle == null
                 ? Text(
                     summary.join("\n"),
-                    style: getTheme(context)
+              style: PlatformX.getTheme(context)
                         .textTheme
                         .headline1
                         .copyWith(fontSize: 12),

@@ -24,6 +24,7 @@ import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/page/bbs_post.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -36,12 +37,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
 
@@ -151,8 +151,7 @@ class BBSEditor {
   static Future<void> uploadImage(
       BuildContext context, TextEditingController _controller) async {
     final ImagePicker _picker = ImagePicker();
-    final PickedFile _file =
-        await _picker.getImage(source: ImageSource.gallery);
+    final XFile _file = await _picker.pickImage(source: ImageSource.gallery);
     if (_file == null) return;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);

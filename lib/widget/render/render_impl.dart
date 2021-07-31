@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/auto_network_image.dart';
-import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

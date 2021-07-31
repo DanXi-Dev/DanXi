@@ -17,11 +17,8 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fudan_bus_repository.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
@@ -42,7 +39,6 @@ class BusPage extends StatefulWidget {
 }
 
 class _BusPageState extends State<BusPage> {
-  PersonInfo _personInfo;
   List<BusScheduleItem> _busList;
   List<BusScheduleItem> _filteredBusList;
 
@@ -61,7 +57,6 @@ class _BusPageState extends State<BusPage> {
   @override
   void initState() {
     super.initState();
-    _personInfo = StateProvider.personInfo.value;
     _busList = widget.arguments['busList'];
 
     // Normalize all entries
