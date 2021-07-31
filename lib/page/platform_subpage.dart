@@ -15,9 +15,26 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class PlatformSubpage extends StatefulWidget {
   final bool needPadding = true;
   final bool needBottomPadding = false;
+
+  @mustCallSuper
+  void onViewStateChanged(SubpageViewState state) {
+    if (this is PageWithPrimaryScrollController) {
+      switch (state) {
+        case SubpageViewState.VISIBLE:
+          (this as PageWithPrimaryScrollController).reattachItself();
+          break;
+        case SubpageViewState.INVISIBLE:
+          (this as PageWithPrimaryScrollController).detachItself();
+          break;
+      }
+    }
+  }
 }
+
+enum SubpageViewState { VISIBLE, INVISIBLE }

@@ -22,7 +22,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/repository/fudan_daily_repository.dart';
+import 'package:dan_xi/repository/fudan_app_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -47,7 +47,9 @@ class FudanDailyFeature extends Feature {
   Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
     // Get the status of reporting
-    await FudanDailyRepository.getInstance().hasTick(_info).then((bool ticked) {
+    await FudanCOVID19Repository.getInstance()
+        .hasTick(_info)
+        .then((bool ticked) {
       _status = ConnectionStatus.DONE;
 
       if (ticked) {
@@ -65,7 +67,7 @@ class FudanDailyFeature extends Feature {
 
   void tickFudanDaily() {
     if (!_hasTicked) {
-      FudanDailyRepository.getInstance().tick(_info).then((_) {
+      FudanCOVID19Repository.getInstance().tick(_info).then((_) {
         refreshData();
       }, onError: (e) {
         if (e is NotTickYesterdayException) {
@@ -202,7 +204,7 @@ class FudanDailyFeature extends Feature {
             }
           }
           BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
-              context, FudanDailyRepository.getInstance().cookieJar);
+              context, FudanCOVID19Repository.getInstance().thisCookies);
         }
         break;
       case ConnectionStatus.FAILED:

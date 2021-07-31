@@ -28,9 +28,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   static const String _INFO_URL =
       "http://www.fdty.fudan.edu.cn/SportScore/stScore.aspx";
 
-  FudanPERepository._() {
-    initRepository();
-  }
+  FudanPERepository._();
 
   static final _instance = FudanPERepository._();
 
@@ -54,6 +52,9 @@ class FudanPERepository extends BaseRepositoryWithDio {
     });
     return items;
   }
+
+  @override
+  String get linkHost => "www.fdty.fudan.edu.cn";
 }
 
 class ExerciseItem {

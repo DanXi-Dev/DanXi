@@ -15,10 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/feature/feature_map.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// A Feature is a functional item shown on the dashboard, with which user interacts via tapping.
+///
+/// Notes: after creating a new [Feature], you may need to register it in [FeatureMap].
 abstract class Feature {
   /// Request FeatureContainer to update the content text/icon since they're changed
   @nonVirtual
@@ -40,7 +43,7 @@ abstract class Feature {
 
   bool get removable => false;
 
-  FeatureContainer container;
+  FeatureContainerState container;
 
   BuildContext context;
 
@@ -57,7 +60,11 @@ abstract class Feature {
 
 /// FeatureContainer is a container to render the feature as a list item.
 /// Usually is a class of [State<StatefulWidget>]
-mixin FeatureContainer {
+mixin FeatureContainerState {
   void doUpdate();
+}
+
+mixin FeatureContainer {
+  Feature get childFeature;
 }
 enum FeatureEvent { CREATE, REMOVE }

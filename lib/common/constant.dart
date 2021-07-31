@@ -24,12 +24,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class Constant {
+  static const POST_COUNT_PER_PAGE = 10;
   static const bool IS_PRODUCTION_ENVIRONMENT =
       bool.fromEnvironment('dart.vm.product');
   static const String APPSTORE_APPID = '1568629997';
 
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
+  static const String UIS_HOST = "uis.fudan.edu.cn";
   static const FUDAN_DAILY_COUNTDOWN_SECONDS = 5;
 
   static String yuanSymbol(String num) {
@@ -187,6 +189,17 @@ enum Campus {
 }
 
 extension CampusEx on Campus {
+  static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
+
+  static Campus fromChineseName(String name) {
+    for (int i = 0; i < _CAMPUS_NAME.length; i++) {
+      if (name.contains(_CAMPUS_NAME[i])) {
+        return Constant.CAMPUS_VALUES[i];
+      }
+    }
+    return Campus.NONE;
+  }
+
   List<String> getTeachingBuildings() {
     switch (this) {
       case Campus.HANDAN_CAMPUS:

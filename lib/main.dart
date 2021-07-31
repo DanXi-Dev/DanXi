@@ -16,18 +16,22 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
-import 'package:dan_xi/page/bbs_editor.dart';
 import 'package:dan_xi/page/bbs_post.dart';
+import 'package:dan_xi/page/bbs_tags.dart';
+import 'package:dan_xi/page/bus.dart';
 import 'package:dan_xi/page/card_detail.dart';
 import 'package:dan_xi/page/card_traffic.dart';
 import 'package:dan_xi/page/dashboard_reorder.dart';
@@ -41,7 +45,9 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/page/text_selector.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
@@ -49,16 +55,15 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
-import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/top_controller.dart';
-
-import 'package:desktop_window/desktop_window.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -73,6 +78,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_tray/system_tray.dart';
 
 import 'generated/l10n.dart';
 
@@ -110,10 +116,16 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+  // Init Feature registation.
+  FeatureMap.registerAllFeatures();
   Catcher(
       rootWidget: DanxiApp(),
       debugConfig: debugOptions,
       releaseConfig: releaseOptions);
+  doWhenWindowReady(() {
+    final win = appWindow;
+    win.show();
+  });
 }
 
 class DanxiApp extends StatelessWidget {
@@ -128,8 +140,6 @@ class DanxiApp extends StatelessWidget {
         EmptyClassroomDetailPage(arguments: arguments),
     '/bbs/postDetail': (context, {arguments}) =>
         BBSPostDetail(arguments: arguments),
-    '/bbs/newPost': (context, {arguments}) =>
-        BBSEditorPage(arguments: arguments),
     '/notice/aao/list': (context, {arguments}) =>
         AAONoticesList(arguments: arguments),
     '/about/openLicense': (context, {arguments}) =>
@@ -141,24 +151,23 @@ class DanxiApp extends StatelessWidget {
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
         BBSSubpage(arguments: arguments),
+    '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
+    '/bbs/fullScreenEditor': (context, {arguments}) =>
+        BBSEditorPage(arguments: arguments),
     '/image/detail': (context, {arguments}) =>
         ImageViewerPage(arguments: arguments),
+    '/text/detail': (context, {arguments}) =>
+        TextSelectorPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
+    '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
   };
-
-  /// Change the size of window on desktop to fit the proper ratio.
-  changeSizeOnDesktop() async {
-    if (PlatformX.isWindows) {
-      await DesktopWindow.setWindowSize(Size(480, 960));
-    }
-  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    changeSizeOnDesktop();
     return Phoenix(
         child: PlatformProvider(
+      // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -179,7 +188,9 @@ class DanxiApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate
           ],
           supportedLocales: S.delegate.supportedLocales,
-          home: HomePage(),
+          home: MasterDetailController(
+            masterPage: HomePage(),
+          ),
           // Configure the page route behaviour of the whole app
           onGenerateRoute: (settings) {
             final Function pageContentBuilder = DanxiApp.routes[settings.name];
@@ -210,8 +221,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences _preferences;
 
-  ValueNotifier<PersonInfo> _personInfo = ValueNotifier(null);
-
   /// A description for current connection status.
   ValueNotifier<String> _connectStatus = ValueNotifier("");
 
@@ -229,7 +238,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// If we need to send the QR code to iWatch now.
   ///
-  /// When notified [watchActivated], we should send it after [_personInfo] is loaded.
+  /// When notified [watchActivated], we should send it after [StateProvider.personInfo] is loaded.
   bool _needSendToWatch = false;
 
   /// Whether the error dialog is shown.
@@ -306,6 +315,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     (cxt) => null,
     (cxt) => null,
   ];
+  final SystemTray _systemTray = SystemTray();
 
   @override
   void dispose() {
@@ -375,17 +385,65 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> initSystemTray() async {
+    if (!PlatformX.isWindows) return;
+    // We first init the systray menu and then add the menu entries
+    await _systemTray.initSystemTray("system tray",
+        iconPath: PlatformX.createPlatformFile(
+                PlatformX.getPathFromFile(Platform.resolvedExecutable) +
+                    "/data/flutter_assets/assets/graphics/app_icon.ico")
+            .path,
+        toolTip: "DanXi is here~");
+    List<MenuItemBase> showingMenu;
+    List<MenuItemBase> hidingMenu;
+    showingMenu = [
+      MenuItem(
+        label: 'Hide',
+        onClicked: () {
+          appWindow.hide();
+          _systemTray.setContextMenu(hidingMenu);
+        },
+      ),
+      MenuSeparator(),
+      MenuItem(
+        label: 'Exit',
+        onClicked: () {
+          appWindow.close();
+          FlutterApp.exitApp();
+        },
+      ),
+    ];
+    hidingMenu = [
+      MenuItem(
+        label: 'Show',
+        onClicked: () {
+          appWindow.show();
+          _systemTray.setContextMenu(showingMenu);
+        },
+      ),
+      MenuSeparator(),
+      MenuItem(
+        label: 'Exit',
+        onClicked: () {
+          appWindow.close();
+          FlutterApp.exitApp();
+        },
+      ),
+    ];
+    await _systemTray.setContextMenu(showingMenu);
+  }
+
   @override
   void initState() {
     super.initState();
     // Init for firebase services.
     FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
-    _personInfo.addListener(() {
+    StateProvider.personInfo.addListener(() {
       _rebuildPage();
       refreshSelf();
     });
-
+    initSystemTray();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
@@ -413,8 +471,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // Configure shortcut listeners on Android & iOS.
       if (PlatformX.isMobile)
         quickActions.initialize((shortcutType) {
-          if (shortcutType == 'action_qr_code' && _personInfo.value != null) {
-            QRHelper.showQRCode(context, _personInfo.value);
+          if (shortcutType == 'action_qr_code' &&
+              StateProvider.personInfo.value != null) {
+            QRHelper.showQRCode(context, StateProvider.personInfo.value);
           }
         });
       // Configure watch listeners on iOS.
@@ -441,7 +500,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     const channel_a = const MethodChannel('fduhole');
     channel_a.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'get_token') {
-        // If we haven't loaded [_personInfo]
+        // If we haven't loaded [StateProvider.personInfo]
         if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
           sendFduholeTokenToWatch(
               _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
@@ -459,7 +518,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       barrierDismissible: false,
       builder: (BuildContext context) => LoginDialog(
           sharedPreferences: _preferences,
-          personInfo: _personInfo,
+          personInfo: StateProvider.personInfo,
           forceLogin: forceLogin));
 
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
@@ -469,8 +528,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _preferences = await SharedPreferences.getInstance();
 
     if (!forceLogin && PersonInfo.verifySharedPreferences(_preferences)) {
-      setState(() =>
-          _personInfo.value = PersonInfo.fromSharedPreferences(_preferences));
+      StateProvider.personInfo.value =
+          PersonInfo.fromSharedPreferences(_preferences);
     } else {
       _showLoginDialog(forceLogin: forceLogin);
     }
@@ -575,6 +634,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         onPressed: _onPressLeadingActionButton,
       );
     }
+
+    // BBS Subpage's third trailing button
+    if (_pageIndex.value == 1) {
+      trailingButtons.add(PlatformIconButton(
+        material: (_, __) =>
+            MaterialIconButtonData(tooltip: S.of(context).all_tags),
+        padding: EdgeInsets.zero,
+        cupertinoIcon: Icon(SFSymbols.tag),
+        materialIcon: Icon(Icons.tag),
+        onPressed: () => smartNavigatorPush(context, '/bbs/tags', arguments: {
+          'preferences': _preferences,
+        }),
+      ));
+    }
+
     if (_subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
             context) !=
         null) {
@@ -605,11 +679,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ));
     }
 
-    if (_personInfo.value == null) {
+    if (StateProvider.personInfo.value == null) {
       // Show an empty container if no person info is set
       return PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBar(
           title: _appTitleWidgetBuilder[_pageIndex.value](context),
           trailingActions: trailingButtons,
@@ -623,96 +698,105 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         providers: [
           ChangeNotifierProvider.value(value: _pageIndex),
           ChangeNotifierProvider.value(value: _connectStatus),
-          ChangeNotifierProvider.value(value: _personInfo),
+          ChangeNotifierProvider.value(value: StateProvider.personInfo),
           Provider.value(value: _preferences),
         ],
-        child: MasterDetailController(
-          masterPage: PlatformScaffold(
-            iosContentBottomPadding:
-                _subpage[_pageIndex.value].needBottomPadding,
-            iosContentPadding: _subpage[_pageIndex.value].needPadding,
-            appBar: PlatformAppBar(
-              cupertino: (_, __) => CupertinoNavigationBarData(
-                title: MediaQuery(
-                  data: MediaQueryData(
-                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                  child: TopController(
-                    child: _appTitleWidgetBuilder[_pageIndex.value](context),
-                    controller: PrimaryScrollController.of(context),
-                  ),
-                ),
-              ),
-              material: (_, __) => MaterialAppBarData(
-                title: TopController(
-                  child: Text(
-                    S.of(context).app_name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+        child: PlatformScaffold(
+          iosContentBottomPadding: _subpage[_pageIndex.value].needBottomPadding,
+          iosContentPadding: _subpage[_pageIndex.value].needPadding,
+
+          // This workarounds a color bug
+          backgroundColor: _pageIndex.value == 2
+              ? null
+              : Theme.of(context).scaffoldBackgroundColor,
+
+          appBar: PlatformAppBar(
+            cupertino: (_, __) => CupertinoNavigationBarData(
+              title: MediaQuery(
+                data: MediaQueryData(
+                    textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                child: TopController(
+                  child: _appTitleWidgetBuilder[_pageIndex.value](context),
                   controller: PrimaryScrollController.of(context),
                 ),
               ),
-              leading: leadingButton,
-              trailingActions: trailingButtons,
             ),
-            body: IndexedStack(
-              index: _pageIndex.value,
-              children: _subpage,
-            ),
-
-            // 2021-5-19 @w568w:
-            // Override the builder to prevent the repeatedly built states.
-            // I don't know why it works...
-            cupertinoTabChildBuilder: (_, index) => _subpage[index],
-            bottomNavBar: PlatformNavBar(
-              items: [
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.purple,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.dashboard)
-                      : Icon(SFSymbols.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
+            material: (_, __) => MaterialAppBarData(
+              title: TopController(
+                child: Text(
+                  S.of(context).app_name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.indigo,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.forum)
-                      : Icon(SFSymbols.text_bubble),
-                  label: S.of(context).forum,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Colors.blue,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.calendar_today)
-                      : Icon(SFSymbols.calendar),
-                  label: S.of(context).timetable,
-                ),
-                BottomNavigationBarItem(
-                  //backgroundColor: Theme.of(context).primaryColor,
-                  icon: PlatformX.isAndroid
-                      ? Icon(Icons.settings)
-                      : Icon(SFSymbols.gear_alt),
-                  label: S.of(context).settings,
-                ),
-              ],
-              currentIndex: _pageIndex.value,
-              material: (_, __) => MaterialNavBarData(
-                type: BottomNavigationBarType.fixed,
-                selectedIconTheme:
-                    BottomNavigationBarTheme.of(context).selectedIconTheme,
-                unselectedIconTheme:
-                    BottomNavigationBarTheme.of(context).unselectedIconTheme,
+                controller: PrimaryScrollController.of(context),
               ),
-              itemChanged: (index) {
-                if (index != _pageIndex.value) {
-                  // List<ScrollPosition> positions =
-                  //     PrimaryScrollController.of(context).positions.toList();
-                  // for (var p in positions.skip(1)) {
-                  //   PrimaryScrollController.of(context).detach(p);
-                  // }
-                  setState(() => _pageIndex.value = index);
-                }
-              },
             ),
+            leading: leadingButton,
+            trailingActions: trailingButtons,
+          ),
+          body: IndexedStack(
+            index: _pageIndex.value,
+            children: _subpage,
+          ),
+
+          // 2021-5-19 @w568w:
+          // Override the builder to prevent the repeatedly built states.
+          // I don't know why it works...
+          cupertinoTabChildBuilder: (_, index) => _subpage[index],
+          bottomNavBar: PlatformNavBar(
+            items: [
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.purple,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.dashboard)
+                    : Icon(SFSymbols.square_stack_3d_up_fill),
+                label: S.of(context).dashboard,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.indigo,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.forum)
+                    : Icon(SFSymbols.text_bubble),
+                label: S.of(context).forum,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.blue,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.calendar_today)
+                    : Icon(SFSymbols.calendar),
+                label: S.of(context).timetable,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Theme.of(context).primaryColor,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.settings)
+                    : Icon(SFSymbols.gear_alt),
+                label: S.of(context).settings,
+              ),
+            ],
+            currentIndex: _pageIndex.value,
+            material: (_, __) => MaterialNavBarData(
+              type: BottomNavigationBarType.fixed,
+              selectedIconTheme:
+                  BottomNavigationBarTheme.of(context).selectedIconTheme,
+              unselectedIconTheme:
+                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
+            ),
+            itemChanged: (index) {
+              if (index != _pageIndex.value) {
+                // List<ScrollPosition> positions =
+                //     PrimaryScrollController.of(context).positions.toList();
+                // for (var p in positions.skip(1)) {
+                //   PrimaryScrollController.of(context).detach(p);
+                // }
+                for (int i = 0; i < _subpage.length; i++) {
+                  if (index != i) {
+                    _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
+                  }
+                }
+                _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
+                setState(() => _pageIndex.value = index);
+              }
+            },
           ),
         ),
       );
@@ -729,7 +813,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 title: Text(
                   S.of(context).developer_announcement(announcement.createdAt),
                 ),
-                content: Linkify(text: announcement.content),
+                content: Linkify(
+                  text: announcement.content,
+                  onOpen: (element) =>
+                      BrowserUtil.openUrl(element.url, context),
+                ),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(S.of(context).i_see),
@@ -766,11 +854,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // Determine if Timetable needs to be updated
     if (SettingsProvider.of(_preferences).lastSemesterStartTime !=
             TimeTable.START_TIME.toIso8601String() &&
-        _personInfo.value != null) {
+        StateProvider.personInfo.value != null) {
       // Update Timetable
       Retrier.runAsyncWithRetry(
               () => TimeTableRepository.getInstance().loadTimeTableLocally(
-                  _personInfo.value,
+                  StateProvider.personInfo.value,
                   forceLoadFromRemote: true),
               retryTimes: 1)
           .onError((error, stackTrace) => Noticing.showNotice(

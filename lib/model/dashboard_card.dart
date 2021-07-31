@@ -32,4 +32,9 @@ class DashboardCard {
       _$DashboardCardFromJson(json);
 
   Map<String, dynamic> toJson() => _$DashboardCardToJson(this);
+
+  bool get isSpecialCard =>
+      internalString == 'new_card' ||
+      internalString == 'custom_card' ||
+      internalString == 'divider';
 }

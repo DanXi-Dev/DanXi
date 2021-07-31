@@ -17,19 +17,17 @@
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
-/// This repository is also designed to check whether the app is connected to the school LAN.
 class FudanAAORepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Fa7%2F97%2Fc9397a305047%2Fpage.psp";
+      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Feb%2Fb7%2Fc9397a388023%2Fpage.psp";
 
-  FudanAAORepository._() {
-    initRepository();
-  }
+  FudanAAORepository._();
 
   static String _listUrl(String type, int page) {
     return "http://www.jwc.fudan.edu.cn/$type/list${page <= 1 ? "" : page.toString()}.htm";
@@ -39,14 +37,25 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   static const String TYPE_NOTICE_ANNOUNCEMENT = "9397";
   static final _instance = FudanAAORepository._();
 
+  PersonInfo _info;
+
   factory FudanAAORepository.getInstance() => _instance;
 
+  Future<NonpersistentCookieJar> get thisCookies async {
+    // Log in before getting cookies.
+    await Retrier.runAsyncWithRetry(
+        () => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true));
+    return cookieJar;
+  }
+
   Future<List<Notice>> getNotices(
-          String type, int page, PersonInfo info) async =>
-      Retrier.tryAsyncWithFix(
-          () => _getNotices(type, page),
-          (exception) async => await UISLoginTool.loginUIS(
-              dio, _LOGIN_URL, cookieJar, info, true));
+      String type, int page, PersonInfo info) async {
+    _info = info;
+    return Retrier.tryAsyncWithFix(
+        () => _getNotices(type, page),
+        (exception) async => await UISLoginTool.loginUIS(
+            dio, _LOGIN_URL, cookieJar, info, true));
+  }
 
   Future<List<Notice>> _getNotices(String type, int page) async {
     List<Notice> notices = [];
@@ -71,6 +80,9 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   Future<bool> checkConnection(PersonInfo info) =>
       getNotices(TYPE_NOTICE_ANNOUNCEMENT, 1, info)
           .then((value) => true, onError: (e) => false);
+
+  @override
+  String get linkHost => "www.jwc.fudan.edu.cn";
 }
 
 class NotConnectedToLANError implements Exception {}

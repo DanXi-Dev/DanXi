@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -51,7 +52,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   @override
   void initState() {
     super.initState();
-    _personInfo = widget.arguments['personInfo'];
+    _personInfo = StateProvider.personInfo.value;
     SharedPreferences.getInstance().then((preferences) {
       _selectItem = SettingsProvider.of(preferences).campus;
       _sliding = _selectItem.index;
@@ -76,6 +77,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       iosContentBottomPadding: true,
       iosContentPadding: true,
       appBar: PlatformAppBarX(

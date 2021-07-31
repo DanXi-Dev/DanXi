@@ -8,6 +8,4 @@ class DataPlugin {
   static Future<String> get installationId async {
     return "";
   }
-
-  static void toast(String msg) async {}
 }

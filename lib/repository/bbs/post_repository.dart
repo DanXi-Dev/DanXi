@@ -15,13 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
-import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/main.dart';
 import 'package:dan_xi/model/fduhole_profile.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
@@ -31,10 +28,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_tagging/flutter_tagging.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
@@ -576,9 +570,7 @@ class PostRepository extends BaseRepositoryWithDio {
   /// The token used for session authentication.
   String _token;
 
-  PostRepository._() {
-    initRepository();
-  }
+  PostRepository._();
 
   initializeUser(PersonInfo info, SharedPreferences _preferences) async {
     _token = SettingsProvider.of(_preferences).fduholeToken ??
@@ -664,12 +656,13 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<BBSPost>> loadTagFilteredPosts(
-      String tag, SortOrder sortBy) async {
+      String tag, SortOrder sortBy, int page) async {
     Response response = await dio
         .get(_BASE_URL + "/discussions/",
             queryParameters: {
               "order": sortBy.getInternalString(),
-              "tag_name": tag
+              "tag_name": tag,
+              "page": page,
             },
             options: Options(headers: _tokenHeader))
         .onError((error, stackTrace) {
@@ -691,9 +684,9 @@ class PostRepository extends BaseRepositoryWithDio {
     return result.map((e) => Reply.fromJson(e)).toList();
   }
 
-  Future<List<Reply>> loadSearchResults(String searchString) async {
+  Future<List<Reply>> loadSearchResults(String searchString, int page) async {
     Response response = await dio.get(_BASE_URL + "/posts/",
-        queryParameters: {"search": searchString},
+        queryParameters: {"search": searchString, "page": page},
         options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
@@ -772,6 +765,9 @@ class PostRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     return FduholeProfile.fromJson(response.data);
   }
+
+  @override
+  String get linkHost => "www.fduhole.tk";
 }
 
 enum SetFavoredDiscussionMode { ADD, DELETE }
@@ -789,7 +785,7 @@ extension FavoredDiscussionEx on SetFavoredDiscussionMode {
 }
 
 class NotLoginError implements Exception {
-  String errorMessage;
+  final String errorMessage;
 
   NotLoginError(this.errorMessage);
 }

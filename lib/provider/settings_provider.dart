@@ -27,20 +27,50 @@ class SettingsProvider {
   SharedPreferences _preferences;
 
   static const String KEY_PREFERRED_CAMPUS = "campus";
+
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
+  static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
+      "ec_last_choice";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
   static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
       "last_recorded_semester_start_time";
+  static List<DashboardCard> _kDefaultDashboardCardList = [
+    DashboardCard("new_card", null, null, true),
+    DashboardCard("welcome_feature", null, null, true),
+    DashboardCard("next_course_feature", null, null, true),
+    DashboardCard("divider", null, null, true),
+    DashboardCard("ecard_balance_feature", null, null, true),
+    DashboardCard("dining_hall_crowdedness_feature", null, null, true),
+    DashboardCard("aao_notice_feature", null, null, true),
+    DashboardCard("empty_classroom_feature", null, null, true),
+    DashboardCard("bus_feature", null, null, true),
+    DashboardCard("pe_feature", null, null, true),
+    DashboardCard("new_card", null, null, true),
+    DashboardCard("fudan_daily_feature", null, null, true),
+    DashboardCard("new_card", null, null, true),
+    DashboardCard("qr_feature", null, null, true),
+  ];
 
   SettingsProvider._(this._preferences);
 
   factory SettingsProvider.of(SharedPreferences preferences) {
     return SettingsProvider._(preferences);
+  }
+
+  int get lastECBuildingChoiceRepresentation {
+    if (_preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
+      return _preferences.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE);
+    }
+    return null;
+  }
+
+  set lastECBuildingChoiceRepresentation(int value) {
+    _preferences.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
   }
 
   String get lastSemesterStartTime {
@@ -58,26 +88,21 @@ class SettingsProvider {
   /// This getter always return a non-null value, defaults to default setting
   List<DashboardCard> get dashboardWidgetsSequence {
     if (_preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
-      return (json.decode(_preferences.getString(KEY_DASHBOARD_WIDGETS))
-              as List)
-          .map((i) => DashboardCard.fromJson(i))
-          .toList();
+      var rawCardList =
+          (json.decode(_preferences.getString(KEY_DASHBOARD_WIDGETS)) as List)
+              .map((i) => DashboardCard.fromJson(i))
+              .toList();
+      // Merge new features which are added in the new version.
+      _kDefaultDashboardCardList.forEach((element) {
+        if (!element.isSpecialCard &&
+            !rawCardList
+                .any((card) => card.internalString == element.internalString)) {
+          rawCardList.add(element);
+        }
+      });
+      return rawCardList;
     }
-    return [
-      DashboardCard("new_card", null, null, true),
-      DashboardCard("welcome_feature", null, null, true),
-      DashboardCard("next_course_feature", null, null, true),
-      DashboardCard("divider", null, null, true),
-      DashboardCard("ecard_balance_feature", null, null, true),
-      DashboardCard("dining_hall_crowdedness_feature", null, null, true),
-      DashboardCard("aao_notice_feature", null, null, true),
-      DashboardCard("empty_classroom_feature", null, null, true),
-      DashboardCard("pe_feature", null, null, true),
-      DashboardCard("new_card", null, null, true),
-      DashboardCard("fudan_daily_feature", null, null, true),
-      DashboardCard("new_card", null, null, true),
-      DashboardCard("qr_feature", null, null, true),
-    ];
+    return _kDefaultDashboardCardList;
   }
 
   set dashboardWidgetsSequence(List<DashboardCard> value) {
@@ -158,9 +183,9 @@ class SettingsProvider {
   set fduholeSortOrder(SortOrder value) =>
       _preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
 
-  //FDUHOLE Folded Post Behavior
+  /// FDUHOLE Folded Post Behavior
 
-  //NOTE: This getter defaults to a FOLD and won't return [null]
+  /// NOTE: This getter defaults to a FOLD and won't return [null]
   FoldBehavior get fduholeFoldBehavior {
     if (_preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
       int savedPref = _preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);

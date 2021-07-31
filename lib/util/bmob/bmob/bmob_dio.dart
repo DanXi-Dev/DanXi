@@ -95,7 +95,6 @@ class BmobDio {
     options.headers.addAll(getHeaders(path, ""));
 
     var requestUrl = options.baseUrl + path;
-    var headers = options.headers.toString();
     Response response = await dio.get(
       requestUrl,
       queryParameters: data,
@@ -110,7 +109,6 @@ class BmobDio {
     options.headers.addAll(getHeaders(path, data));
 
     var requestUrl = options.baseUrl + path;
-    var headers = options.headers.toString();
     Response response = await dio.post(
       requestUrl,
       data: Stream.fromFuture(data),
@@ -125,7 +123,6 @@ class BmobDio {
     options.headers.addAll(getHeaders(path, data));
 
     var requestUrl = options.baseUrl + path;
-    var headers = options.headers.toString();
     Response response = await dio.post(
       requestUrl,
       data: data,
@@ -162,7 +159,6 @@ class BmobDio {
   Future<dynamic> getByUrl(requestUrl, {data, cancelToken}) async {
     options.headers.addAll(getHeaders(requestUrl, data));
 
-    var headers = options.headers.toString();
     Response response = await dio.get(
       requestUrl,
       queryParameters: data,

@@ -14,20 +14,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
-import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'time_table.g.dart';
-
-extension TableEventTimeEx on TableEventTime {
-  TableEventTime addMin(int minutes) {
-    DateTime time = add(Duration(minutes: minutes));
-    return TableEventTime(hour: time.hour, minute: time.minute);
-  }
-}
 
 abstract class TimetableConverter {
   String get fileName;
@@ -52,22 +45,22 @@ class TimeTable {
   static final DateTime kMonday = DateTime.utc(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
-  static final List<TableEventTime> kCourseSlotStartTime = [
-    TableEventTime(hour: 8, minute: 0),
-    TableEventTime(hour: 8, minute: 55),
-    TableEventTime(hour: 9, minute: 55),
-    TableEventTime(hour: 10, minute: 50),
-    TableEventTime(hour: 11, minute: 45),
-    TableEventTime(hour: 13, minute: 30),
-    TableEventTime(hour: 14, minute: 25),
-    TableEventTime(hour: 15, minute: 25),
-    TableEventTime(hour: 16, minute: 20),
-    TableEventTime(hour: 17, minute: 15),
-    TableEventTime(hour: 18, minute: 30),
-    TableEventTime(hour: 19, minute: 25),
-    TableEventTime(hour: 20, minute: 20),
-    TableEventTime(hour: 21, minute: 15),
-    TableEventTime(hour: 22, minute: 10),
+  static final List<VagueTime> kCourseSlotStartTime = [
+    VagueTime(hour: 8, minute: 0),
+    VagueTime(hour: 8, minute: 55),
+    VagueTime(hour: 9, minute: 55),
+    VagueTime(hour: 10, minute: 50),
+    VagueTime(hour: 11, minute: 45),
+    VagueTime(hour: 13, minute: 30),
+    VagueTime(hour: 14, minute: 25),
+    VagueTime(hour: 15, minute: 25),
+    VagueTime(hour: 16, minute: 20),
+    VagueTime(hour: 17, minute: 15),
+    VagueTime(hour: 18, minute: 30),
+    VagueTime(hour: 19, minute: 25),
+    VagueTime(hour: 20, minute: 20),
+    VagueTime(hour: 21, minute: 15),
+    VagueTime(hour: 22, minute: 10),
   ];
   List<Course> courses = [];
 
@@ -96,12 +89,7 @@ class TimeTable {
     Duration diff = now.difference(startTime);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {
-      // Considering that user might open the app near the midnight,
-      // the date in kCourseSlotStartTime may not be exactly today.
-      // We should build the [todaySlot] again, with today's date.
-      DateTime todaySlot = DateTime(now.year, now.month, now.day,
-          kCourseSlotStartTime[i].hour, kCourseSlotStartTime[i].minute);
-      if (now.isAfter(todaySlot)) {
+      if (now.isAfter(kCourseSlotStartTime[i].toExactTime())) {
         slot = i;
       }
     }
@@ -113,12 +101,7 @@ class TimeTable {
     Duration diff = now.difference(START_TIME);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {
-      // Considering that user might open the app near the midnight,
-      // the date in kCourseSlotStartTime may not be exactly today.
-      // We should build the [todaySlot] again, with today's date.
-      DateTime todaySlot = DateTime(now.year, now.month, now.day,
-          kCourseSlotStartTime[i].hour, kCourseSlotStartTime[i].minute);
-      if (now.isAfter(todaySlot)) {
+      if (now.isAfter(kCourseSlotStartTime[i].toExactTime())) {
         slot = i;
       }
     }

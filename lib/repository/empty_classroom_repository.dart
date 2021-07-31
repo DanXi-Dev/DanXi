@@ -15,25 +15,24 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'dart:convert';
+
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/src/response.dart';
-import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Ftac.fudan.edu.cn%2Fthirds%2Fmap.act";
+      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanzlfreeclass%252Fwap%252Fmobile%252Findex%253Fxqdm%253D%2526amp%253Bfloor%253D%2526amp%253Bdate%253D%2526amp%253Bpage%253D1%2526amp%253Bflag%253D3%2526amp%253Broomnum%253D%2526amp%253Bpagesize%253D10000%26from%3Dwap";
 
-  static String detailUrl(String buildingName, DateTime date) =>
-      "http://map.fudan.edu.cn/src/paike/index.php?b=$buildingName&d=${DateFormat("yyyy-MM-dd").format(date)}&i1=--&i2=--";
-
-  EmptyClassroomRepository._() {
-    initRepository();
+  static String detailUrl(String areaName, String buildingName, DateTime date) {
+    return "https://zlapp.fudan.edu.cn/fudanzlfreeclass/wap/mobile/index?xqdm=$areaName&floor=$buildingName&date=${DateFormat("yyyy-MM-dd").format(date)}&page=1&flag=3&roomnum=&pagesize=10000";
   }
+
+  EmptyClassroomRepository._();
 
   static final _instance = EmptyClassroomRepository._();
 
@@ -42,48 +41,52 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   /// Get [RoomInfo]s at [buildingName] on [date].
   ///
   /// Request [PersonInfo] for logging in, if necessary.
-  Future<List<RoomInfo>> getBuildingRoomInfo(
-      PersonInfo info, String buildingName, DateTime date) async {
+  Future<List<RoomInfo>> getBuildingRoomInfo(PersonInfo info, String areaName,
+      String buildingName, DateTime date) async {
     // To accelerate the retrieval of RoomInfo,
     // only execute logging in when necessary.
     return Retrier.tryAsyncWithFix(
-        () => _getBuildingRoomInfo(buildingName, date),
+        () => _getBuildingRoomInfo(areaName, buildingName, date),
         (exception) async =>
             await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
   }
 
   Future<List<RoomInfo>> _getBuildingRoomInfo(
-      String buildingName, DateTime date) async {
-    RegExp roomStatusMatcher = RegExp(r'(?<=div class=")\w+(?=")');
+      String areaName, String buildingName, DateTime date) async {
     List<RoomInfo> result = [];
-    Response response = await dio.get(detailUrl(buildingName, date));
-    Beautifulsoup soup = Beautifulsoup(response.data.toString());
-    Element mainTable = soup.find(id: "table");
-    List<Element> roomList = mainTable.querySelectorAll("tr")..removeAt(0);
-
-    roomList.forEach((roomNode) {
-      String roomName = roomNode.querySelector("a").text;
-      RoomInfo roomInfo = RoomInfo(roomName, date);
-      roomInfo.busy = [];
-      roomStatusMatcher.allMatches(roomNode.innerHtml).forEach((element) {
-        if (element.group(0) == 'free') {
-          roomInfo.busy.add(false);
-        } else {
-          roomInfo.busy.add(true);
-        }
-      });
-      result.add(roomInfo);
+    Response response = await dio.get(detailUrl(areaName, buildingName, date));
+    Map json = response.data is Map
+        ? response.data
+        : jsonDecode(response.data.toString());
+    Map buildingInfo = json['d']['list'];
+    buildingInfo.values.forEach((element) {
+      if (element is List) {
+        element.forEach((element) {
+          RoomInfo info = RoomInfo(element['name'], date, element['roomrl']);
+          info.busy = [];
+          if (element['kxsds'] is Map) {
+            element['kxsds']
+                .values
+                .forEach((element) => info.busy.add(element != "闲"));
+            result.add(info);
+          }
+        });
+      }
     });
     return result;
   }
+
+  @override
+  String get linkHost => "zlapp.fudan.edu.cn";
 }
 
 class RoomInfo {
   String roomName;
   DateTime date;
+  String seats;
 
   /// the x-th item of busy refers to whether the room is busy at x-th slot.
   List<bool> busy;
 
-  RoomInfo(this.roomName, this.date, {this.busy});
+  RoomInfo(this.roomName, this.date, this.seats, {this.busy});
 }

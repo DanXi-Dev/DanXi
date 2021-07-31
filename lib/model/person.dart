@@ -15,14 +15,38 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum UserGroup {
+  /// Not logged in
+  VISITOR,
+
+  /// Log in as Fudan student
+  FUDAN_STUDENT,
+
+  /// Log in as Fudan staff (Not implemented)
+  FUDAN_STAFF,
+
+  /// Log in as SJTU student (Not implemented)
+  SJTU_STUDENT
+}
+
+Map<UserGroup, Function> kUserGroupDescription = {
+  UserGroup.VISITOR: (BuildContext context) => S.of(context).visitor,
+  UserGroup.FUDAN_STUDENT: (BuildContext context) => S.of(context).login_uis,
+  UserGroup.FUDAN_STAFF: (BuildContext context) => S.of(context).fudan_staff,
+  UserGroup.SJTU_STUDENT: (BuildContext context) => S.of(context).sjtu_student,
+};
+
 class PersonInfo {
+  UserGroup group;
   String id, password, name;
 
-  PersonInfo(this.id, this.password, this.name);
+  PersonInfo(this.id, this.password, this.name, this.group);
 
-  PersonInfo.createNewInfo(this.id, this.password) {
+  PersonInfo.createNewInfo(this.id, this.password, this.group) {
     name = "";
   }
 
@@ -36,13 +60,20 @@ class PersonInfo {
   }
 
   factory PersonInfo.fromSharedPreferences(SharedPreferences preferences) {
-    return PersonInfo(preferences.getString("id"),
-        preferences.getString("password"), preferences.getString("name"));
+    return PersonInfo(
+        preferences.getString("id"),
+        preferences.getString("password"),
+        preferences.getString("name"),
+        preferences.containsKey("user_group")
+            ? UserGroup.values.firstWhere((element) =>
+                element.toString() == preferences.getString("user_group"))
+            : UserGroup.FUDAN_STUDENT);
   }
 
   Future<void> saveAsSharedPreferences(SharedPreferences preferences) async {
     await preferences.setString("id", id);
     await preferences.setString("password", password);
     await preferences.setString("name", name);
+    await preferences.setString("user_group", group.toString());
   }
 }

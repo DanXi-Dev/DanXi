@@ -28,10 +28,19 @@ class Reply {
   final int discussion;
   final bool is_me;
 
+  @override
+  int get hashCode => id;
+
+  @override
+  bool operator ==(Object other) => (other is Reply) && id == other.id;
+
   Reply(this.id, this.content, this.username, this.reply_to, this.date_created,
       this.discussion, this.is_me);
 
   factory Reply.fromJson(Map<String, dynamic> json) => _$ReplyFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReplyToJson(this);
+
+  /// Generate an empty Reply for special sakes.
+  factory Reply.dummy() => Reply(-1, "", "", null, "", -1, false);
 }

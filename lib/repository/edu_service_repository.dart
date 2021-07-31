@@ -16,7 +16,6 @@
  */
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/model/person.dart';
@@ -24,8 +23,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as DOM;
 import 'package:dan_xi/public_extension_methods.dart';
 
@@ -47,9 +44,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
-  EduServiceRepository._() {
-    initRepository();
-  }
+  @override
+  String get linkHost => "jwfw.fudan.edu.cn";
+
+  EduServiceRepository._();
 
   static final _instance = EduServiceRepository._();
 
@@ -118,11 +116,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<SemesterInfo>> _loadSemesters() async {
     await dio.get(EXAM_TABLE_URL);
-    Response r = await dio.post(SEMESTER_DATA_URL,
+    Response semesterResponse = await dio.post(SEMESTER_DATA_URL,
         data: "dataType=semesterCalendar&empty=false",
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    ;
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    Beautifulsoup soup = Beautifulsoup(semesterResponse.data.toString());
 
     var jsonText = _normalizeJson(soup.get_text().trim());
     var json = jsonDecode(jsonText);
@@ -134,6 +131,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         sems.addAll(annualSemesters);
       }
     });
+    if (sems.isEmpty) throw "Retrieval failed";
     return sems;
   }
 
@@ -264,15 +262,26 @@ class ExamScore {
 class GPAListItem {
   final String name;
   final String id;
+  final String year;
+  final String major;
+  final String college;
   final String gpa;
   final String credits;
   final String rank;
 
-  GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank);
+  GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
+      this.major, this.college);
 
   factory GPAListItem.fromHtml(DOM.Element html) {
     List<DOM.Element> elements = html.getElementsByTagName("td");
-    return GPAListItem(elements[1].text, elements[0].text, elements[5].text,
-        elements[6].text, elements[7].text);
+    return GPAListItem(
+        elements[1].text,
+        elements[0].text,
+        elements[5].text,
+        elements[6].text,
+        elements[7].text,
+        elements[2].text,
+        elements[3].text,
+        elements[4].text);
   }
 }

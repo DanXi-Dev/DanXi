@@ -16,8 +16,10 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/base_feature.dart';
+import 'package:dan_xi/feature/bus_feature.dart';
 import 'package:dan_xi/feature/custom_shortcut.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
@@ -28,25 +30,23 @@ import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
-import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
-import 'package:dan_xi/page/dashboard_reorder.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
-import 'package:dan_xi/util/screen_proxy.dart';
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
-import 'package:dio_log/dio_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeSubpage extends PlatformSubpage {
+class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   bool get needPadding => true;
 
@@ -57,6 +57,9 @@ class HomeSubpage extends PlatformSubpage {
   _HomeSubpageState createState() => _HomeSubpageState();
 
   HomeSubpage({Key key});
+
+  @override
+  String get debugTag => "HomePage";
 }
 
 class RefreshHomepageEvent {
@@ -94,7 +97,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   void checkConnection() {
     FudanAAORepository.getInstance()
-        .checkConnection(context.personInfo)
+        .checkConnection(StateProvider.personInfo.value)
         .then((connected) {
       if (connected) {
         removeNotification(LanConnectionNotification());
@@ -145,6 +148,9 @@ class _HomeSubpageState extends State<HomeSubpage> {
       'pe_feature': FeatureListItem(
         feature: PEFeature(),
       ),
+      'bus_feature': FeatureListItem(
+        feature: BusFeature(),
+      ),
     };
   }
 
@@ -191,6 +197,15 @@ class _HomeSubpageState extends State<HomeSubpage> {
               CustomShortcutFeature(title: element.title, link: element.link),
         ));
       } else {
+        // Skip incompatible items
+        if (widgetMap[element.internalString] is FeatureContainer) {
+          FeatureContainer container =
+              widgetMap[element.internalString] as FeatureContainer;
+          if (!checkFeature(
+              container.childFeature, StateProvider.personInfo.value.group)) {
+            return;
+          }
+        }
         _currentCardChildren.add(widgetMap[element.internalString]);
       }
     });
@@ -221,6 +236,8 @@ class _HomeSubpageState extends State<HomeSubpage> {
             removeTop: true,
             child: Material(
                 child: ListView(
+              controller: widget.primaryScrollController(context),
+              physics: AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.all(4),
               children: _buildCards(widgetList),
             ))));

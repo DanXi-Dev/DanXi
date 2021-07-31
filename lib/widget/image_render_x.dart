@@ -113,29 +113,22 @@ ImageRender networkImageClipRender({
             var realHeight = _height(attributes) ?? snapshot.data.height;
             if (maxHeight != null && realHeight > maxHeight)
               realHeight = maxHeight;
-            return Center(
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                constraints:
-                    BoxConstraints(maxWidth: realWidth, maxHeight: realHeight),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Image.network(
-                    src,
-                    fit: BoxFit.fitWidth,
-                    headers: headers,
-                    width: realWidth,
-                    height: realHeight,
-                    frameBuilder: (ctx, child, frame, _) {
-                      if (frame == null) {
-                        return altWidget?.call(_alt(attributes)) ??
-                            Text(_alt(attributes) ?? "",
-                                style: context.style.generateTextStyle());
-                      }
-                      return child;
-                    },
-                  ),
-                ),
+            return StdImageContainer(
+              width: realWidth,
+              child: Image.network(
+                src,
+                fit: BoxFit.fitHeight,
+                headers: headers,
+                width: realWidth,
+                height: realHeight,
+                frameBuilder: (ctx, child, frame, _) {
+                  if (frame == null) {
+                    return altWidget?.call(_alt(attributes)) ??
+                        Text(_alt(attributes) ?? "",
+                            style: context.style.generateTextStyle());
+                  }
+                  return child;
+                },
               ),
             );
           } else if (snapshot.hasError) {
@@ -148,3 +141,23 @@ ImageRender networkImageClipRender({
         },
       );
     };
+
+class StdImageContainer extends StatelessWidget {
+  @required
+  final Widget child;
+  @required
+  final double width;
+
+  const StdImageContainer({Key key, this.width, this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        constraints: BoxConstraints(maxWidth: width, maxHeight: width),
+        child: child,
+      ),
+    );
+  }
+}

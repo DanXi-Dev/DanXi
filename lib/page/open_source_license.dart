@@ -47,7 +47,8 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: true,
-      iosContentPadding: true,
+      iosContentPadding: false,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: GestureDetector(
         onLongPress: () async {
@@ -70,16 +71,13 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
       )),
       body: Column(children: [
         Expanded(
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: WithScrollbar(
-                  child: ListView(
-                    controller: PrimaryScrollController.of(context),
-                    children: _getListWidgets(),
-                  ),
-                  controller: PrimaryScrollController.of(context),
-                ))),
+            child: WithScrollbar(
+          child: ListView(
+            controller: PrimaryScrollController.of(context),
+            children: _getListWidgets(),
+          ),
+          controller: PrimaryScrollController.of(context),
+        )),
       ]),
     );
   }

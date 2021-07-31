@@ -18,14 +18,18 @@
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -37,17 +41,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
-class TimetableSubPage extends PlatformSubpage {
-  // @override
-  // bool get needPadding => false;
+const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
+
+class TimetableSubPage extends PlatformSubpage
+    with PageWithPrimaryScrollController {
+  @override
+  bool get needPadding => false;
 
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
+
+  @override
+  String get debugTag => "TimetablePage";
 }
 
 class ShareTimetableEvent {}
@@ -72,9 +81,14 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   bool _loadFromRemote = false;
 
   void _setContent() {
-    _content = Retrier.runAsyncWithRetry(() => TimeTableRepository.getInstance()
-        .loadTimeTableLocally(context.personInfo,
-            forceLoadFromRemote: _loadFromRemote));
+    if (checkGroup(kCompatibleUserGroup))
+      _content = Retrier.runAsyncWithRetry(() =>
+          TimeTableRepository.getInstance().loadTimeTableLocally(
+              StateProvider.personInfo.value,
+              forceLoadFromRemote: _loadFromRemote));
+    else
+      _content = Future<TimeTable>.error(
+          NotLoginError("Haven't logged in as FDU student."));
   }
 
   void _startShare(TimetableConverter converter) async {
@@ -83,7 +97,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
     String converted = converter.convertTo(_table);
     Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = File(
+    File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(converted, flush: true);
@@ -212,33 +226,37 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     if (_showingTime == null) _showingTime = _table.now();
     List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
         compact: TableDisplayType.STANDARD);
-    return Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return RefreshIndicator(
+      color: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      onRefresh: () async {
+        HapticFeedback.mediumImpact();
+        refreshSelf();
+      },
+      child: ListView(
+        // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+        physics: AlwaysScrollableScrollPhysics(),
         children: [
-          PlatformIconButton(
-            icon: Icon(Icons.chevron_left),
-            onPressed: _showingTime.week > 0 ? goToPrev : null,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PlatformIconButton(
+                icon: Icon(Icons.chevron_left),
+                onPressed: _showingTime.week > 0 ? goToPrev : null,
+              ),
+              Text(S.of(context).week(_showingTime.week)),
+              PlatformIconButton(
+                icon: Icon(Icons.chevron_right),
+                onPressed:
+                    _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
+              )
+            ],
           ),
-          Text(S.of(context).week(_showingTime.week)),
-          PlatformIconButton(
-            icon: Icon(Icons.chevron_right),
-            onPressed: _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
-          )
+          ScheduleView(scheduleData, style, _table.now(), _showingTime.week,
+              widget.primaryScrollController(context)),
         ],
       ),
-      Expanded(
-          child: RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          refreshSelf();
-        },
-        child:
-            ScheduleView(scheduleData, style, _table.now(), _showingTime.week),
-      ))
-    ]);
+    );
   }
 
   @override

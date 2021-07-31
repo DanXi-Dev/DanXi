@@ -21,16 +21,30 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/interceptor/dio_log_interceptor.dart';
 import 'package:flutter/foundation.dart';
 
-class BaseRepositoryWithDio {
-  @protected
-  Dio dio = Dio();
-  @protected
-  NonpersistentCookieJar cookieJar = NonpersistentCookieJar();
+abstract class BaseRepositoryWithDio {
+  /// The host that the implementation works with.
+  ///
+  /// Should not contain scheme and/or path. e.g. www.jwc.fudan.edu.cn
+  String get linkHost;
 
   @protected
-  @nonVirtual
-  void initRepository() {
-    dio.interceptors.add(CookieManager(cookieJar));
-    dio.interceptors.add(DioLogInterceptor());
+  Dio get dio {
+    if (!_dios.containsKey(linkHost)) {
+      _dios[linkHost] = Dio();
+      _dios[linkHost].interceptors.add(CookieManager(cookieJar));
+      _dios[linkHost].interceptors.add(DioLogInterceptor());
+    }
+    return _dios[linkHost];
   }
+
+  @protected
+  NonpersistentCookieJar get cookieJar {
+    if (!_cookieJars.containsKey(linkHost)) {
+      _cookieJars[linkHost] = NonpersistentCookieJar();
+    }
+    return _cookieJars[linkHost];
+  }
+
+  static Map<String, NonpersistentCookieJar> _cookieJars = {};
+  static Map<String, Dio> _dios = {};
 }

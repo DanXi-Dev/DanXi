@@ -165,6 +165,30 @@ class NonpersistentCookieJar implements CookieJar {
     return cookie.cookie.secure && scheme == 'https' || !_isExpired(cookie);
   }
 
+  factory NonpersistentCookieJar.createFrom(NonpersistentCookieJar otherJar) =>
+      NonpersistentCookieJar()..cloneFrom(otherJar);
+
+  void cloneFrom(NonpersistentCookieJar otherJar) {
+    _deepClone(otherJar.domainCookies, domainCookies);
+    _deepClone(otherJar.hostCookies, hostCookies);
+  }
+
+  static _deepClone(
+      Map<String, Map<String, Map<String, SerializableCookie>>> from,
+      Map<String, Map<String, Map<String, SerializableCookie>>> to) {
+    to.clear();
+    from.forEach((host, value) {
+      to[host] = {};
+      value.forEach((path, value) {
+        to[host][path] = {};
+        value.forEach((cookieName, value) {
+          to[host][path][cookieName] =
+              SerializableCookie.fromJson(value.toJson());
+        });
+      });
+    });
+  }
+
   @override
   final bool ignoreExpires;
 }

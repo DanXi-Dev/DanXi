@@ -18,12 +18,13 @@ Maybe the best all-rounded service app for Fudan University students!
 - Shortcut for Fudan QR Code (with support for Apple Watch)
 - View empty classrooms
 - Tree Hole
+- View compulsory-exercise records
 - View timetable and export as .ics file
 - Show Notices from Academic Affairs Office
 - View exam schedule and export as .ics file
+- View final exam GPA and ranking
 
-(Fudan changed the API behaviour a lot around Jan 2021. Some features are unavailable.)  
-This application is still at the very initial development stage, welcome to join the development and donation~
+This application is still at active development stage, welcome to join the development and donation~
 
 # Install
 Note: This application is still in early development and may have unpredictable bugs.   
@@ -36,28 +37,17 @@ Go to [release page](https://github.com/w568w/DanXi/releases), just download the
 (Depending on the device, you may need to allow "Install apps from unknown sources" in the settings.)  
 
 ## iOS/iPadOS (Via [AltStore](https://altstore.io) )
-  
-Due to the development team's inability to support the expensive Apple Developer Program fees, it's difficult to publish this app on the AppStore or to use other easier ways to install
-We provide a special method here, requiring a computer on the same LAN (macOS/Windows):
-  
-1. Install [AltServer](https://altstore.io) on your PC.
-2. Use AltServer to install AltStore on the device.
-3. Browse [release page](https://github.com/w568w/DanXi/releases) by Safari on your device and download the ipa file.
-4. Open the AltStore you installed on your device, select My Apps at the bottom, then click "+" in the upper left corner and select the ipa file you downloaded.
-5. The certificates needs to be refreshed **every 7 days** (the Expire time shown in the app), otherwise both of the AltStore and **the app will NOT work**.
-   
-### Useful links
-[FAQ](https://altstore.io/faq/)    
-AltStore [Project homepage](https://github.com/rileytestut/AltStore)  
-  
-Thanks for your understanding and support! :)
+Download from [App Store](https://apps.apple.com/us/app/旦夕/id1568629997)
+
+## macOS 
+Distributions for macOS are uncontinued now because of very few users. If necessary, consider using the iOS/iPadOS version instead.
 
 # Compile
 ## Flutter version that we're using
 ```shell script
 $ flutter --version
 Flutter 2.2.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision b22742018b (6 days ago) • 2021-05-14 19:12:57 -0700
+Framework • revision b22742018b (9 weeks ago) • 2021-05-14 19:12:57 -0700
 Engine • revision a9d88a4d18
 Tools • Dart 2.13.0
 ```
@@ -68,7 +58,7 @@ To build this app, you need to [download Flutter SDK](https://flutter.dev/docs/g
   
 If you are building for `Windows`, you should also [install and configure](https://visualstudio.microsoft.com/downloads/) `Visual Studio`.    
   
-If you are building for `Android`, you should also [install and configure](https://developer.android.com/studio)`Android Command Line Tools`.   
+If you are building for `Android`, you should also [install and configure](https://developer.android.com/studio) `Android Command Line Tools`.   
 
 If you are building for `iOS/iPadOS`, you should also [install and configure](https://apps.apple.com/cn/app/xcode/id497799835) `Xcode`.  
 Run the command `flutter run [ios/android]` to start the app.

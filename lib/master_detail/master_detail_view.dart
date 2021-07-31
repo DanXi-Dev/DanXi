@@ -24,6 +24,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class MasterDetailController extends StatelessWidget {
   final Widget masterPage;
+
   MasterDetailController({Key key, this.masterPage}) : super(key: key);
 
   @override
@@ -77,7 +78,7 @@ Future<T> smartNavigatorPush<T extends Object>(
     {Object arguments, bool forcePushOnMainNavigator = false}) {
   if (isTablet(context) && !forcePushOnMainNavigator) {
     return detailNavigatorKey.currentState
-        .pushNamed(routeName, arguments: arguments);
+        .pushNamed<T>(routeName, arguments: arguments);
   }
-  return Navigator.of(context).pushNamed(routeName, arguments: arguments);
+  return Navigator.of(context).pushNamed<T>(routeName, arguments: arguments);
 }

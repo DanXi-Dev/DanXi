@@ -19,7 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fudan_pe_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -51,7 +51,7 @@ class PEFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _info = context.personInfo;
+    _info = StateProvider.personInfo.value;
 
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,

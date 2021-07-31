@@ -33,6 +33,9 @@ class PostTag extends Taggable {
 
   Map<String, dynamic> toJson() => _$PostTagToJson(this);
 
+  /// Generate an empty BBSPost for special sakes.
+  factory PostTag.dummy() => PostTag("默认", "red", 0);
+
   @override
   List<Object> get props => [name];
 }

@@ -28,9 +28,7 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   static const String QR_URL =
       "https://ecard.fudan.edu.cn/epay/wxpage/fudan/zfm/qrcode";
 
-  QRCodeRepository._() {
-    initRepository();
-  }
+  QRCodeRepository._();
 
   static final _instance = QRCodeRepository._();
 
@@ -46,4 +44,7 @@ class QRCodeRepository extends BaseRepositoryWithDio {
     Beautifulsoup soup = Beautifulsoup(res.data.toString());
     return soup.find(id: "#myText").attributes['value'];
   }
+
+  @override
+  String get linkHost => "ecard.fudan.edu.cn";
 }

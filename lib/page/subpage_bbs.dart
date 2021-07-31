@@ -16,54 +16,65 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
-import 'package:dan_xi/widget/future_widget.dart';
-import 'package:dan_xi/widget/material_x.dart';
+import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'bbs_editor.dart';
+const kCompatibleUserGroup = [
+  UserGroup.FUDAN_STUDENT,
+  UserGroup.FUDAN_STAFF,
+  UserGroup.SJTU_STUDENT
+];
 
-/// Render the text from a clip of [html].
+bool isHtml(String content) {
+  var htmlMatcher = RegExp(r'<.+>.*</.+>', dotAll: true);
+  return htmlMatcher.hasMatch(content);
+}
+
+/// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
-String renderText(String html, String imagePlaceholder) {
+String renderText(String content, String imagePlaceholder) {
+  if (!isHtml(content)) {
+    content = md.markdownToHtml(content);
+  }
   // Deal with Markdown
-  html = html.replaceAll(RegExp(r"!\[\]\((https://.*)\)"), imagePlaceholder);
+  content =
+      content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
 
-  var soup = Beautifulsoup(html);
+  var soup = Beautifulsoup(content);
   var images = soup.find_all("img");
   if (images.length > 0) return soup.get_text().trim() + imagePlaceholder;
   return soup.get_text().trim();
@@ -96,9 +107,9 @@ Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
   );
 }
 
-class BBSSubpage extends PlatformSubpage {
+class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
-  bool get needPadding => true;
+  bool get needPadding => false;
 
   final Map<String, dynamic> arguments;
 
@@ -106,6 +117,9 @@ class BBSSubpage extends PlatformSubpage {
   _BBSSubpageState createState() => _BBSSubpageState();
 
   BBSSubpage({Key key, this.arguments});
+
+  @override
+  String get debugTag => "BBSPage";
 }
 
 class AddNewPostEvent {}
@@ -118,69 +132,75 @@ class SortOrderChangedEvent {
   SortOrderChangedEvent(this.newOrder);
 }
 
+/// A list page showing bbs posts.
+///
+/// Arguments:
+/// [bool] showFavoredDiscussion: if [showFavoredDiscussion] is not null,
+/// it means this page is showing user's favored posts.
+/// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
+/// the posts which is tagged with [tagFilter].
+///
 class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
+  /// Unrelated to the state.
+  /// These field should only be initialized once when created.
   final StateStreamListener _postSubscription = StateStreamListener();
   final StateStreamListener _refreshSubscription = StateStreamListener();
   final StateStreamListener _searchSubscription = StateStreamListener();
   final StateStreamListener _sortOrderChangedSubscription =
       StateStreamListener();
-
-  int _currentBBSPage;
-
-  SortOrder _sortOrder;
-
-  String _tagFilter;
-  List<Widget> _lastPageItems;
-  AsyncSnapshot _lastSnapshotData;
-  bool _isRefreshing;
-  bool _isEndIndicatorShown;
-  static const POST_COUNT_PER_PAGE = 10;
-
   SharedPreferences _preferences;
-  FoldBehavior _foldBehavior;
-
-  Future _content;
+  String _tagFilter;
   FocusNode _searchFocus = FocusNode();
 
+  final PagedListViewController _listViewController = PagedListViewController();
+
+  /// Fields related to the display states.
+  SortOrder _sortOrder;
+  FoldBehavior _foldBehavior;
+
+  /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
+  bool _fieldInitComplete;
+
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
-  void _setContent() {
-    _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
-        SortOrder.LAST_REPLIED;
-    _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
-        FoldBehavior.FOLD;
-    if (_tagFilter != null)
-      _content = PostRepository.getInstance()
-          .loadTagFilteredPosts(_tagFilter, _sortOrder);
-    else if (widget.arguments != null &&
-        widget.arguments.containsKey('showFavoredDiscussion'))
-      _content = PostRepository.getInstance().getFavoredDiscussions();
-    else
-      _content = loginAndLoadPost(context.personInfo, _sortOrder);
+  Future<List<BBSPost>> _loadContent(int page) async {
+    // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
+    if (checkGroup(kCompatibleUserGroup)) {
+      _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
+          SortOrder.LAST_REPLIED;
+      _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
+          FoldBehavior.FOLD;
+      if (_tagFilter != null)
+        return await PostRepository.getInstance()
+            .loadTagFilteredPosts(_tagFilter, _sortOrder, page);
+      else if (widget.arguments != null &&
+          widget.arguments.containsKey('showFavoredDiscussion')) {
+        if (page > 1) return Future.value([]);
+        return await PostRepository.getInstance().getFavoredDiscussions();
+      } else {
+        if (!PostRepository.getInstance().isUserInitialized)
+          await PostRepository.getInstance()
+              .initializeUser(StateProvider.personInfo.value, _preferences);
+        return await PostRepository.getInstance().loadPosts(page, _sortOrder);
+      }
+    } else {
+      return Future<List<BBSPost>>.error(
+          NotLoginError("Logged in as Visitor."));
+    }
   }
 
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      setState(() {
-        _initialize();
-        _setContent();
-      });
+      setState(() {});
     }
-  }
-
-  void _initialize() {
-    _currentBBSPage = 1;
-    _lastPageItems = [];
-    _lastSnapshotData = null;
-    _isRefreshing = true;
-    _isEndIndicatorShown = false;
-    _tagFilter = null;
   }
 
   Widget _buildSearchTextField() {
     // If user is filtering by tag, do not build search text field.
-    if (widget.arguments != null) return Container();
+    if (_tagFilter != null ||
+        (widget.arguments?.containsKey('showFavoredDiscussion') ?? false))
+      return Container();
 
     return Container(
       color: Theme.of(context).canvasColor,
@@ -194,30 +214,27 @@ class _BBSSubpageState extends State<BBSSubpage>
           value = value.trim();
           if (value.isEmpty) return;
           // Determine if user is using #PID pattern to reach a specific post
-          RegExp regExp = new RegExp(r"#[0-9]+");
-          if (value.startsWith(regExp)) {
-            try {
-              _pushToPIDResultPage(
-                  int.parse(regExp.firstMatch(value)[0].substring(1)));
-            } catch (ignored) {
-              Noticing.showNotice(context, S.of(context).invalid_format);
-            }
+          RegExp pidPattern = new RegExp(r'#[0-9]+');
+          if (value.startsWith(pidPattern)) {
+            // We needn't deal with the situation that "id = null" here.
+            // If so, it will turn into a 404 http error.
+            _goToPIDResultPage(
+                int.tryParse(pidPattern.firstMatch(value)[0].substring(1)));
           } else
-            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": PostRepository.getInstance().loadSearchResults(value)
-            });
+            smartNavigatorPush(context, "/bbs/postDetail",
+                arguments: {"searchKeyword": value});
         },
       ),
     );
   }
 
-  _pushToPIDResultPage(int pid) async {
+  _goToPIDResultPage(int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     final BBSPost post = await PostRepository.getInstance()
         .loadSpecificPost(pid)
         .onError((error, stackTrace) {
-      if (error is DioError && error.response?.statusCode == 404)
+      if (error.response?.statusCode == HttpStatus.notFound)
         Noticing.showNotice(context, S.of(context).post_does_not_exist,
             title: S.of(context).fatal_error);
       else
@@ -233,23 +250,14 @@ class _BBSSubpageState extends State<BBSSubpage>
     progressDialog.dismiss();
   }
 
-  // This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
-  bool initComplete;
-
   @override
   void initState() {
     super.initState();
-    initComplete = false;
-    _initialize();
+    _fieldInitComplete = false;
     _postSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<AddNewPostEvent>().listen((_) {
-          smartNavigatorPush(context, "/bbs/newPost",
-                  arguments: {"tags": true}, forcePushOnMainNavigator: true)
-              .then<int>((value) => value is PostEditorText
-                  ? PostRepository.getInstance()
-                      .newPost(value?.content, tags: value?.tags)
-                  : 0)
-              .then((value) => refreshSelf());
+        Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
+          final bool success = await BBSEditor.createNewPost(context);
+          if (success) refreshSelf();
         }),
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
@@ -259,8 +267,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         hashCode);
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-          _sortOrder = event.newOrder;
-          SettingsProvider.of(_preferences).fduholeSortOrder = _sortOrder;
+          SettingsProvider.of(_preferences).fduholeSortOrder =
+              _sortOrder = event.newOrder;
           refreshSelf();
         }),
         hashCode);
@@ -268,7 +276,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void didChangeDependencies() {
-    if (!initComplete) {
+    if (!_fieldInitComplete) {
       if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
         _tagFilter = widget.arguments['tagFilter'];
       if (widget.arguments != null &&
@@ -276,8 +284,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         _preferences = widget.arguments['preferences'];
       else
         _preferences = Provider.of<SharedPreferences>(context);
-      _setContent();
-      initComplete = true;
+      _fieldInitComplete = true;
     }
     super.didChangeDependencies();
   }
@@ -291,113 +298,79 @@ class _BBSSubpageState extends State<BBSSubpage>
     _sortOrderChangedSubscription.cancel();
   }
 
-  /// Log in and load all of the posts.
-  Future<List<BBSPost>> loginAndLoadPost(
-      PersonInfo info, SortOrder sortOrder) async {
-    if (!PostRepository.getInstance().isUserInitialized)
-      await PostRepository.getInstance().initializeUser(info, _preferences);
-    return await PostRepository.getInstance()
-        .loadPosts(_currentBBSPage, sortOrder);
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (_lastPageItems.isEmpty) _lastPageItems = [_buildSearchTextField()];
     if (widget.arguments == null)
-      return _buildBody();
+      return _buildPageBody();
     else if (widget.arguments.containsKey('showFavoredDiscussion')) {
       return PlatformScaffold(
-        iosContentPadding: true,
+        iosContentPadding: false,
         iosContentBottomPadding: false,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).favorites),
         ),
-        body: _buildBody(),
+        body: _buildPageBody(),
       );
     }
     return PlatformScaffold(
-      iosContentPadding: true,
+      iosContentPadding: false,
       iosContentBottomPadding: false,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).filtering_by_tag(_tagFilter)),
       ),
-      body: _buildBody(),
+      body: _buildPageBody(),
     );
   }
 
-  Widget _buildBody() {
-    return GestureDetector(
+  Widget _buildPageBody() {
+    return RefreshIndicator(
+      color: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      onRefresh: () async {
+        HapticFeedback.mediumImpact();
+        _listViewController.notifyUpdate();
+      },
+      child: PagedListView<BBSPost>(
+          pagedController: _listViewController,
+          withScrollbar: true,
+          scrollController: widget.primaryScrollController(context),
+          startPage: 1,
+          builder: _buildListItem,
+          headBuilder: (_) => _buildSearchTextField(),
+          loadingBuilder: (BuildContext context) => Container(
+                padding: EdgeInsets.all(8),
+                child: Center(child: PlatformCircularProgressIndicator()),
+              ),
+          errorBuilder:
+              (BuildContext context, AsyncSnapshot<List<BBSPost>> snapshot) {
+            if (snapshot.error is LoginExpiredError) {
+              SettingsProvider.of(_preferences).deleteSavedFduholeToken();
+              return _buildErrorPage(error: S.of(context).error_login_expired);
+            } else if (snapshot.error is NotLoginError)
+              return _buildErrorPage(
+                  error: (snapshot.error as NotLoginError).errorMessage);
+            return _buildErrorPage(error: snapshot.error.toString());
+          },
+          endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(S.of(context).end_reached),
+                ),
+              ),
+          emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+          dataReceiver: _loadContent),
+    );
+    /*
+     GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTapDown: (_) {
-          //SystemChannels.textInput.invokeMethod('TextInput.hide');
           if (_searchFocus.hasFocus) _searchFocus.unfocus();
-          // FocusScope.of(context)?.focusedChild?.unfocus();
-          //FocusScope.of(context)?.unfocus();
         },
-        child: RefreshIndicator(
-            color: Theme.of(context).accentColor,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              refreshSelf();
-            },
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: FutureWidget<List<BBSPost>>(
-                    future: _content,
-                    successBuilder: (BuildContext context,
-                        AsyncSnapshot<List<BBSPost>> snapshot) {
-                      // Handle Empty Favorites
-                      if (widget.arguments != null &&
-                          widget.arguments
-                              .containsKey('showFavoredDiscussion') &&
-                          snapshot.data.isEmpty) {
-                        return _buildEmptyFavoritesPage();
-                      }
-
-                      if ((_lastSnapshotData?.data?.isEmpty ?? true) ||
-                          snapshot.data.isEmpty ||
-                          _lastSnapshotData.data.last.id !=
-                              snapshot.data.last.id)
-                        snapshot.data.forEach((element) {
-                          _lastPageItems.add(_getListItem(element));
-                        });
-                      _isRefreshing = false;
-                      _lastSnapshotData = snapshot;
-                      return _buildPage(snapshot.data, false);
-                    },
-                    errorBuilder: (BuildContext context,
-                        AsyncSnapshot<List<BBSPost>> snapshot) {
-                      if (snapshot.error == LoginExpiredError) {
-                        SettingsProvider.of(_preferences)
-                            .deleteSavedFduholeToken();
-                        return _buildErrorPage(
-                            error: S.of(context).error_login_expired);
-                      } else if (snapshot.error is NotLoginError)
-                        return _buildErrorPage(
-                            error:
-                                (snapshot.error as NotLoginError).errorMessage);
-                      return _buildErrorPage(error: snapshot.error.toString());
-                    },
-                    loadingBuilder: () {
-                      _isRefreshing = true;
-                      if (_lastSnapshotData == null)
-                        return Container(
-                          padding: EdgeInsets.all(8),
-                          child: Center(
-                            child: PlatformCircularProgressIndicator(),
-                          ),
-                        );
-                      return _buildPage(_lastSnapshotData.data, true);
-                    }))));
+        child: */
   }
-
-  Widget _buildLoadingPage() => Container(
-        padding: EdgeInsets.all(8),
-        child: Center(child: PlatformCircularProgressIndicator()),
-      );
 
   Widget _buildEmptyFavoritesPage() => Container(
         padding: EdgeInsets.all(8),
@@ -418,65 +391,36 @@ class _BBSSubpageState extends State<BBSSubpage>
         refreshSelf();
       },
     );
-    //  ],);
   }
 
-  Widget _buildPage(List<BBSPost> data, bool isLoading) =>
-      NotificationListener<ScrollNotification>(
-        child: WithScrollbar(
-          child: ListView.builder(
-            //keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            primary: true,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: (_currentBBSPage) * POST_COUNT_PER_PAGE +
-                (isLoading ? 1 - POST_COUNT_PER_PAGE : 0),
-            itemBuilder: (context, index) => _buildListItem(index, data),
-          ),
-          controller: PrimaryScrollController.of(context),
-        ),
-        onNotification: (ScrollNotification scrollInfo) {
-          if (_tagFilter == null &&
-              scrollInfo.metrics.extentAfter < 500 &&
-              !_isRefreshing &&
-              !_isEndIndicatorShown) {
-            _isRefreshing = true;
-            setState(() {
-              _currentBBSPage++;
-              _setContent();
-            });
-          }
-          return false;
-        },
-      );
-
-  Widget _buildListItem(int index, List<BBSPost> data) {
-    if (!_isEndIndicatorShown &&
-        !_isRefreshing &&
-        index >= _lastPageItems.length) {
-      _isEndIndicatorShown = true;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Text(S.of(context).end_reached),
-          const SizedBox(
-            height: 16,
-          )
-        ],
-      );
+  _launchUrlWithNotice(LinkableElement link) async {
+    if (await canLaunch(link.url)) {
+      BrowserUtil.openUrl(link.url, context);
+    } else {
+      Noticing.showNotice(context, S.of(context).cannot_launch_url);
     }
-    if (index >= _lastPageItems.length)
-      return _isEndIndicatorShown ? Container() : _buildLoadingPage();
-    return _lastPageItems[index];
   }
 
-  Widget _getListItem(BBSPost postElement) {
+  Widget _buildListItem(BuildContext context, ListProvider<BBSPost> _,
+      int index, BBSPost postElement) {
     if (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded)
       return Container();
+    Linkify postContentWidget = Linkify(
+      text: renderText(postElement.first_post.content, S.of(context).image_tag),
+      style: TextStyle(fontSize: 16),
+      maxLines: 6,
+      overflow: TextOverflow.ellipsis,
+      onOpen: _launchUrlWithNotice,
+    );
+    TextStyle infoStyle =
+        TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
+    String lastReplyContent =
+        renderText(postElement.last_post.content, S.of(context).image_tag);
     return Material(
       child: Card(
           child: Column(children: [
         ListTile(
-            contentPadding: EdgeInsets.fromLTRB(17, 4, 10, 0),
+            contentPadding: EdgeInsets.fromLTRB(16, 4, 10, 0),
             dense: false,
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,44 +445,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                           tilePadding: EdgeInsets.zero,
                           title: Text(
                             S.of(context).folded,
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12),
+                            style: infoStyle,
                           ),
-                          children: [
-                            Linkify(
-                              text: renderText(postElement.first_post.content,
-                                  S.of(context).image_tag),
-                              style: TextStyle(fontSize: 16),
-                              maxLines: 6,
-                              overflow: TextOverflow.ellipsis,
-                              onOpen: (link) async {
-                                if (await canLaunch(link.url)) {
-                                  BrowserUtil.openUrl(link.url, context);
-                                } else {
-                                  Noticing.showNotice(
-                                      context, S.of(context).cannot_launch_url);
-                                }
-                              },
-                            ),
-                          ],
+                          children: [postContentWidget],
                         ),
                       )
-                    : Linkify(
-                        text: renderText(postElement.first_post.content,
-                            S.of(context).image_tag),
-                        style: TextStyle(fontSize: 16),
-                        maxLines: 6,
-                        overflow: TextOverflow.ellipsis,
-                        onOpen: (link) async {
-                          if (await canLaunch(link.url)) {
-                            BrowserUtil.openUrl(link.url, context);
-                          } else {
-                            Noticing.showNotice(
-                                context, S.of(context).cannot_launch_url);
-                          }
-                        },
-                      ),
+                    : postContentWidget,
               ],
             ),
             subtitle: Column(
@@ -551,26 +463,23 @@ class _BBSSubpageState extends State<BBSSubpage>
                   children: [
                     Text(
                       "#${postElement.id}",
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor, fontSize: 12),
+                      style: infoStyle,
                     ),
                     Text(
                       HumanDuration.format(
                           context, DateTime.parse(postElement.date_created)),
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor, fontSize: 12),
+                      style: infoStyle,
                     ),
                     Row(
                       children: [
                         Text(
-                          postElement.count.toString() + " ",
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor, fontSize: 12),
+                          "${postElement.count} ",
+                          style: infoStyle,
                         ),
                         Icon(
                           SFSymbols.ellipses_bubble,
-                          size: 12,
-                          color: Theme.of(context).hintColor,
+                          size: infoStyle.fontSize,
+                          color: infoStyle.color,
                         ),
                       ],
                     ),
@@ -592,106 +501,57 @@ class _BBSSubpageState extends State<BBSSubpage>
             postElement.last_post.id != postElement.first_post.id)
           //_buildCommentView(postElement),
           ListTile(
-            dense: true,
-            minLeadingWidth: 16,
-            leading: Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-              child: Icon(
-                SFSymbols.quote_bubble,
-                color: Theme.of(context).hintColor,
-              ),
-            ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
-                  child: Text(
-                    S.of(context).latest_reply(
-                        postElement.last_post.username,
-                        HumanDuration.format(
-                            context,
-                            DateTime.parse(
-                                postElement.last_post.date_created))),
-                    style: TextStyle(color: Theme.of(context).hintColor),
-                  ),
+              dense: true,
+              minLeadingWidth: 16,
+              leading: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(
+                  SFSymbols.quote_bubble,
+                  color: Theme.of(context).hintColor,
                 ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                    child: Linkify(
-                      text: renderText(postElement.last_post.content,
-                                  S.of(context).image_tag)
-                              .trim()
-                              .isEmpty
-                          ? S.of(context).no_summary
-                          : renderText(postElement.last_post.content,
-                              S.of(context).image_tag),
-                      style: TextStyle(fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      onOpen: (link) async {
-                        if (await canLaunch(link.url)) {
-                          BrowserUtil.openUrl(link.url, context);
-                        } else {
-                          Noticing.showNotice(
-                              context, S.of(context).cannot_launch_url);
-                        }
-                      },
-                    )),
-              ],
-            ),
-            onTap: () => BBSEditor.createNewReply(
-                context, postElement.id, postElement.last_post.id),
-          )
+              ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            S.of(context).latest_reply(
+                                postElement.last_post.username,
+                                HumanDuration.format(
+                                    context,
+                                    DateTime.parse(
+                                        postElement.last_post.date_created))),
+                            style:
+                                TextStyle(color: Theme.of(context).hintColor),
+                          ),
+                          Icon(SFSymbols.arrow_down_to_line,
+                              size: 14,
+                              color:
+                                  Theme.of(context).hintColor.withOpacity(0.5)),
+                        ]),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Linkify(
+                          text: lastReplyContent.trim().isEmpty
+                              ? S.of(context).no_summary
+                              : lastReplyContent,
+                          style: TextStyle(fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          onOpen: _launchUrlWithNotice)),
+                ],
+              ),
+              onTap: () =>
+                  smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                    "post": postElement,
+                    "scroll_to_end": true,
+                  }))
       ])),
-    );
-  }
-
-  Widget _buildCommentView(BBSPost post) {
-    return Container(
-      height: 72,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-        itemBuilder: (context, id) {
-          if (id ~/ 2 + 1 >= post.posts.length) return Container();
-          if (id % 2 == 1) return VerticalDivider();
-          return _buildCommentBlock(post.posts[id ~/ 2 + 1]);
-        },
-        itemCount: post.posts.length * 2 + 1,
-      ),
-    );
-  }
-
-  Widget _buildCommentBlock(Reply reply) {
-    return Container(
-      width: 180,
-      height: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 2),
-      decoration: BoxDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "[${reply.username}]",
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Theme.of(context).hintColor),
-            textScaleFactor: 0.75,
-            maxLines: 1,
-          ),
-          SizedBox(
-            height: 2,
-          ),
-          Linkify(
-            text: renderText(reply.content, S.of(context).image_tag) + '\n\n',
-            overflow: TextOverflow.ellipsis,
-            textScaleFactor: 0.9,
-            maxLines: 2,
-          )
-        ],
-      ),
     );
   }
 

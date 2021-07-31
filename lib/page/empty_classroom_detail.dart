@@ -20,6 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -55,22 +56,33 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   List<Tag> _campusTags;
   int _selectCampusIndex = 0;
 
+  SharedPreferences preferences;
+
   List<Tag> _buildingTags;
   Map<int, Text> _buildingList;
-  int _selectBuildingIndex = 0;
+  int __selectBuildingIndex = 0;
+
+  int get _selectBuildingIndex => __selectBuildingIndex;
+  set _selectBuildingIndex(int value) {
+    __selectBuildingIndex = value;
+    SettingsProvider.of(preferences).lastECBuildingChoiceRepresentation = value;
+  }
 
   double _selectDate = 0;
 
   _loadDefaultRoom() async {
-    _selectCampusIndex =
-        SettingsProvider.of(await SharedPreferences.getInstance()).campus.index;
+    preferences = await SharedPreferences.getInstance();
+    _selectCampusIndex = SettingsProvider.of(preferences).campus.index;
+    _selectBuildingIndex =
+        SettingsProvider.of(preferences).lastECBuildingChoiceRepresentation ??
+            0;
     refreshSelf();
   }
 
   @override
   void initState() {
     super.initState();
-    _personInfo = widget.arguments['personInfo'];
+    _personInfo = StateProvider.personInfo.value;
     _loadDefaultRoom();
   }
 
@@ -108,6 +120,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .map((e) => Text(e))
         .toList()
         .asMap();
+    if (_selectBuildingIndex >= _buildingList.keys.length)
+      _selectBuildingIndex = 0;
 
     if (PlatformX.isMaterial(context))
       selectDate = DateTime.now().add(Duration(days: _selectDate.round()));
@@ -258,7 +272,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                 (ViewportUtils.getMainNavigatorWidth(context) /
                                             32 +
                                         4) *
-                                    4,
+                                    3,
                             child: Text(
                               "| " + S.of(context).evening,
                               overflow: TextOverflow.fade,
@@ -275,8 +289,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             Expanded(
               child: FutureWidget(
                   future: EmptyClassroomRepository.getInstance()
-                      .getBuildingRoomInfo(_personInfo,
-                          _buildingList[_selectBuildingIndex].data, selectDate),
+                      .getBuildingRoomInfo(
+                          _personInfo,
+                          _buildingList[_selectBuildingIndex].data[0],
+                          _buildingList[_selectBuildingIndex].data,
+                          selectDate),
                   successBuilder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) =>
                       Expanded(
@@ -305,13 +322,23 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         widgets.add(Material(
             child: Container(
           padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
-          child: Column(children: [
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    element.roomName,
-                    style: TextStyle(fontSize: 18),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        element.roomName,
+                        textScaleFactor: 1,
+                      ),
+                      Text(
+                        S.of(context).seats(element.seats),
+                        textScaleFactor: 0.8,
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      ),
+                    ],
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,

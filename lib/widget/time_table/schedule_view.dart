@@ -22,7 +22,6 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:intl/intl.dart';
 
 /// A time table widget, usually used to show student's course schedule table.
@@ -31,9 +30,10 @@ class ScheduleView extends StatefulWidget {
   final TimetableStyle timetableStyle;
   final TimeNow today;
   final int showingWeek;
+  final ScrollController controller;
 
-  ScheduleView(
-      this.laneEventsList, this.timetableStyle, this.today, this.showingWeek);
+  ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
+      this.showingWeek, this.controller);
 
   @override
   _ScheduleViewState createState() => _ScheduleViewState();
@@ -48,6 +48,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     table = GridView.count(
         crossAxisCount: widget.laneEventsList.length + 1,
         children: _buildTable(),
+        controller: widget.controller,
         childAspectRatio: 0.8,
         shrinkWrap: true);
     return MediaQuery.removePadding(
@@ -83,33 +84,34 @@ class _ScheduleViewState extends State<ScheduleView> {
 
     // Build time indicator
     for (int slot = 0; slot <= _maxSlot; slot++) {
-      String startTime =
-      DateFormat("HH:mm").format(TimeTable.kCourseSlotStartTime[slot]);
+      String startTime = DateFormat("HH:mm")
+          .format(TimeTable.kCourseSlotStartTime[slot].toExactTime());
       String endTime = DateFormat("HH:mm").format(TimeTable
           .kCourseSlotStartTime[slot]
-          .addMin(TimeTable.MINUTES_OF_COURSE));
+          .toExactTime()
+          .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
       result[cols * (slot + 1)] = SizedBox(
         width: widget.timetableStyle.timeItemWidth,
         height: widget.timetableStyle.timeItemHeight,
         child: Center(
             child: Column(
-              children: [
-                Text((slot + 1).toString()),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
-                    startTime,
+          children: [
+            Text((slot + 1).toString()),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 5),
+              child: Text(
+                startTime,
                 style:
                     TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
               ),
-                ),
-                Text(
-                  endTime,
+            ),
+            Text(
+              endTime,
               style:
                   TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
             )
-              ],
-            )),
+          ],
+        )),
       );
     }
 
@@ -120,7 +122,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
       TextStyle highlightStyle =
-      TextStyle(color: Theme.of(context).accentColor);
+          TextStyle(color: Theme.of(context).accentColor);
       result[1 + day] = SizedBox(
         width: widget.timetableStyle.laneWidth,
         height: widget.timetableStyle.laneHeight,
@@ -130,17 +132,17 @@ class _ScheduleViewState extends State<ScheduleView> {
             children: [
               deltaDay == 0
                   ? Text(
-                widget.laneEventsList[day].day,
-                style: highlightStyle,
-              )
+                      widget.laneEventsList[day].day,
+                      style: highlightStyle,
+                    )
                   : Text(
-                widget.laneEventsList[day].day,
-              ),
+                      widget.laneEventsList[day].day,
+                    ),
               deltaDay == 0
                   ? Text(
-                DateFormat.Md().format(date),
-                style: highlightStyle,
-              )
+                      DateFormat.Md().format(date),
+                      style: highlightStyle,
+                    )
                   : Text(DateFormat.Md().format(date))
             ],
           ),
@@ -172,4 +174,66 @@ class _ScheduleViewState extends State<ScheduleView> {
 
     return result;
   }
+}
+
+class TimetableStyle {
+  final int startHour;
+
+  final int endHour;
+
+  final Color laneColor;
+
+  final Color cornerColor;
+
+  final Color timeItemTextColor;
+
+  final Color timelineColor;
+
+  final Color timelineItemColor;
+
+  final Color mainBackgroundColor;
+
+  final Color timelineBorderColor;
+
+  final Color decorationLineBorderColor;
+
+  final double laneWidth;
+
+  final double laneHeight;
+
+  final double timeItemHeight;
+
+  final double timeItemWidth;
+
+  final double decorationLineHeight;
+
+  final double decorationLineDashWidth;
+
+  final double decorationLineDashSpaceWidth;
+
+  final bool visibleTimeBorder;
+
+  final bool visibleDecorationBorder;
+
+  const TimetableStyle({
+    this.startHour: 0,
+    this.endHour: 24,
+    this.laneColor: Colors.white,
+    this.cornerColor: Colors.white,
+    this.timelineColor: Colors.white,
+    this.timelineItemColor: Colors.white,
+    this.mainBackgroundColor: Colors.white,
+    this.decorationLineBorderColor: const Color(0x1A000000),
+    this.timelineBorderColor: const Color(0x1A000000),
+    this.timeItemTextColor: Colors.blue,
+    this.laneWidth: 300,
+    this.laneHeight: 70,
+    this.timeItemHeight: 60,
+    this.timeItemWidth: 70,
+    this.decorationLineHeight: 20,
+    this.decorationLineDashWidth: 9,
+    this.decorationLineDashSpaceWidth: 4,
+    this.visibleTimeBorder: true,
+    this.visibleDecorationBorder: false,
+  });
 }

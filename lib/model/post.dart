@@ -50,6 +50,16 @@ class BBSPost {
 
   Map<String, dynamic> toJson() => _$BBSPostToJson(this);
 
+  @override
+  bool operator ==(Object other) => (other is BBSPost) && id == other.id;
+
   BBSPost(this.id, this.first_post, this.count, this.tag, this.mapping,
       this.is_folded, this.date_created, this.date_updated, this.posts);
+
+  /// Generate an empty BBSPost for special sakes.
+  factory BBSPost.dummy() => BBSPost(
+      -1, Reply.dummy(), -1, [PostTag.dummy()], null, false, "", "", []);
+
+  @override
+  int get hashCode => id;
 }

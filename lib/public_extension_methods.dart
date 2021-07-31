@@ -15,15 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:math';
-
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
 extension StringEx on String {
-  /// Get the sub string between [a] and [b].
+  /// Get the substring of [this] between [a] and [b].
   ///
   /// e.g.
   /// "I love flutter".between("l","t") == "ove flu"
@@ -33,6 +29,8 @@ extension StringEx on String {
   /// e.g.
   /// "I love flutter".between("l","t",headGreedy = false) == "ove flut"
   String between(String a, String b, {bool headGreedy = true}) {
+    // a = RegExp.escape(a);
+    // b = RegExp.escape(b);
     if (indexOf(a) < 0) return null;
     if (headGreedy) {
       if (indexOf(b, indexOf(a) + a.length) < 0) return null;
@@ -88,7 +86,3 @@ extension MapEx on Map {
   }
 }
 
-extension BuildContextEx on BuildContext {
-  PersonInfo get personInfo =>
-      Provider.of<ValueNotifier<PersonInfo>>(this, listen: false)?.value;
-}

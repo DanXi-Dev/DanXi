@@ -15,9 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 //import 'custom_cupertino_scrollbar.dart';
@@ -39,8 +39,8 @@ class _WithScrollbarState extends State<WithScrollbar> {
     return PlatformWidget(
         // Add a scrollbar on desktop platform
         material: (_, __) => Scrollbar(
-              controller: widget.controller,
-              // interactive: PlatformX.isDesktop,
+          controller: widget.controller,
+              interactive: PlatformX.isDesktop,
               child: widget.child,
             ),
         cupertino: (_, __) => CupertinoScrollbar(

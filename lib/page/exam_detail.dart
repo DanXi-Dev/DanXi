@@ -20,18 +20,18 @@ import 'dart:io';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -63,7 +63,7 @@ class _ExamListState extends State<ExamList> {
   @override
   void initState() {
     super.initState();
-    _info = widget.arguments['personInfo'];
+    _info = StateProvider.personInfo.value;
     _examList = EduServiceRepository.getInstance().loadExamListRemotely(_info);
     _gpaList = EduServiceRepository.getInstance().loadGPARemotely(_info);
     _semester = EduServiceRepository.getInstance().loadSemesters(_info);
@@ -92,8 +92,8 @@ class _ExamListState extends State<ExamList> {
         }
     });
     Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile =
-        File("${documentDir.absolute.path}/output_timetable/${"exam.ics"}");
+    File outputFile = PlatformX.createPlatformFile(
+        "${documentDir.absolute.path}/output_timetable/exam.ics");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(cal.serialize(), flush: true);
     if (PlatformX.isIOS)
@@ -133,7 +133,6 @@ class _ExamListState extends State<ExamList> {
                   _unpackedSemester = snapshot.data;
                   if (_showingSemester == null)
                     _showingSemester = _unpackedSemester.length - 5;
-
                   return Column(
                     children: [
                       Row(
@@ -204,7 +203,19 @@ class _ExamListState extends State<ExamList> {
               child: Center(
             child: PlatformCircularProgressIndicator(),
           )),
-          errorBuilder: _loadGradeViewFromDataCenter));
+          errorBuilder:
+              (BuildContext context, AsyncSnapshot<List<ExamScore>> snapshot) {
+            if (snapshot.error is RangeError)
+              return Padding(
+                child: Center(
+                  child: Text(
+                    S.of(context).no_data,
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 32),
+              );
+            return _loadGradeViewFromDataCenter();
+          }));
 
   Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>> snapshot,
           {bool isFallback = false}) =>
@@ -236,16 +247,6 @@ class _ExamListState extends State<ExamList> {
           errorBuilder: _buildErrorPage));
 
   Widget _buildErrorPage(BuildContext context, AsyncSnapshot snapshot) {
-    if (snapshot.error is RangeError)
-      return Padding(
-        child: Center(
-          child: Text(
-            S.of(context).no_data,
-          ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 32),
-      );
-
     return GestureDetector(
         onTap: () {
           setState(() {
@@ -291,7 +292,7 @@ class _ExamListState extends State<ExamList> {
       ));
 
   Widget _buildGPACard() => Card(
-        color: Theme.of(context).accentColor,
+        color: PlatformX.backgroundAccentColor(context),
         child: ListTile(
           visualDensity: VisualDensity.comfortable,
           title: Text(
@@ -462,37 +463,34 @@ class _ExamListState extends State<ExamList> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${value.type}",
-                      textScaleFactor: 0.8,
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
-                    Text(
-                      "${value.name}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Container(
+                  width: ViewportUtils.getMainNavigatorWidth(context) - 80,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${value.type}",
+                        textScaleFactor: 0.8,
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                      ),
+                      Text(
+                        "${value.name}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-                Align(
+                Container(
+                  width: 28,
                   alignment: Alignment.centerLeft,
-                  child: Container(
-                    height: 28,
-                    width: 28,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        value.level,
-                        textScaleFactor: 1.2,
-                      ),
+                  child: Center(
+                    child: Text(
+                      value.level,
+                      textScaleFactor: 1.2,
                     ),
                   ),
                 ),

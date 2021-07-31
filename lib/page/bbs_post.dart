@@ -23,19 +23,21 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
-import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/future_widget.dart';
-import 'package:dan_xi/widget/image_render_x.dart';
+import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
+import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
+import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:dan_xi/widget/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +47,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:linkify/linkify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,30 +55,49 @@ import 'package:url_launcher/url_launcher.dart';
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
 /// (2) Markdown Images are converted to HTML images.
-String preprocessContentForDisplay(String content) {
+String preprocessContentForDisplay(String content,
+    {bool forceMarkdown = false}) {
   String result = "";
   int hrefCount = 0;
 
-  // Workaround Markdown images
+  /* Workaround Markdown images
   content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
-      (match) => "<img src=\"${match.group(1)}\"></img>");
-
-  linkify(content, options: LinkifyOptions(humanize: false)).forEach((element) {
-    if (element is UrlElement) {
-      // Only add tag if tag has not yet been added.
-      if (hrefCount == 0) {
-        result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
+      (match) => "<img src=\"${match.group(1)}\"></img>");*/
+  if (isHtml(content) && !forceMarkdown) {
+    linkify(content, options: LinkifyOptions(humanize: false))
+        .forEach((element) {
+      if (element is UrlElement) {
+        // Only add tag if tag has not yet been added.
+        if (hrefCount == 0) {
+          result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
+        } else {
+          result += element.text;
+          hrefCount--;
+        }
       } else {
+        if (element.text.contains('<a href='))
+          hrefCount++;
+        else if (element.text.contains('<img src="')) hrefCount++;
         result += element.text;
-        hrefCount--;
       }
-    } else {
-      if (element.text.contains('<a href='))
-        hrefCount++;
-      else if (element.text.contains('<img src="')) hrefCount++;
-      result += element.text;
-    }
-  });
+    });
+  } else {
+    linkify(content, options: LinkifyOptions(humanize: false))
+        .forEach((element) {
+      if (element is UrlElement) {
+        // Only add tag if tag has not yet been added.
+        if (RegExp("\\[.*?\\]\\(${RegExp.escape(element.url)}\\)")
+                .hasMatch(content) ||
+            RegExp("\\[.*?${RegExp.escape(element.url)}.*?\\]\\(http.*?\\)")
+                .hasMatch(content)) {
+          result += element.url;
+        } else {
+          result += "[${element.text}](${element.url})";
+        }
+      } else
+        result += element.text;
+    });
+  }
   return result;
 }
 
@@ -86,6 +106,8 @@ String preprocessContentForDisplay(String content) {
 /// Arguments:
 /// [BBSPost] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
 /// Otherwise as a list of search result.
+/// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
+/// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
 ///
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -97,34 +119,31 @@ class BBSPostDetail extends StatefulWidget {
 }
 
 class _BBSPostDetailState extends State<BBSPostDetail> {
+  /// Unrelated to the state.
+  /// These field should only be initialized once when created.
   BBSPost _post;
-  int _currentBBSPage = 1;
-  List<Reply> _lastReplies = [];
-  AsyncSnapshot _lastSnapshotData;
-  bool _isRefreshing = true;
-  bool _isEndIndicatorShown = false;
-  bool _isFavorited;
-  static const POST_COUNT_PER_PAGE = 10;
-
-  bool shouldUsePreloadedContent = true;
-
-  Future<List<Reply>> _searchResult;
+  String _searchKeyword;
   SharedPreferences _preferences;
 
-  Future<List<Reply>> _content;
+  /// Fields related to the display states.
+  bool _isFavored;
+  bool shouldUsePreloadedContent = true;
 
-  void _setContent() {
-    if (_searchResult != null)
-      _content = _searchResult;
-    else if (_currentBBSPage == 1 && shouldUsePreloadedContent)
-      _content = Future.value((widget.arguments['post'] as BBSPost).posts);
+  bool shouldScrollToEnd = false;
+
+  final PagedListViewController _listViewController = PagedListViewController();
+
+  /// Reload/load the (new) content and set the [_content] future.
+  Future<List<Reply>> _loadContent(int page) {
+    if (_searchKeyword != null)
+      return PostRepository.getInstance()
+          .loadSearchResults(_searchKeyword, page);
     else
-      _content =
-          PostRepository.getInstance().loadReplies(_post, _currentBBSPage);
+      return PostRepository.getInstance().loadReplies(_post, page);
   }
 
-  Future<bool> _isDiscussionFavorited() async {
-    if (_isFavorited != null) return _isFavorited;
+  Future<bool> _isDiscussionFavored() async {
+    if (_isFavored != null) return _isFavored;
     final List<BBSPost> favorites =
         await PostRepository.getInstance().getFavoredDiscussions();
     return favorites.any((element) => element.id == _post.id);
@@ -133,28 +152,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   @override
   void initState() {
     super.initState();
-
-    if (widget.arguments['post'] is BBSPost) {
+    if (widget.arguments.containsKey('post')) {
       _post = widget.arguments['post'];
-    } else {
-      _searchResult = widget.arguments['post'];
+    } else if (widget.arguments.containsKey('searchKeyword')) {
+      _searchKeyword = widget.arguments['searchKeyword'];
       // Create a dummy post for displaying search result
-      _post = new BBSPost(
-          -1,
-          new Reply(-1, "", "", null, "", -1, false),
-          -1,
-          null,
-          null,
-          false,
-          "",
-          "",
-          [new Reply(-1, "", "", null, "", -1, false)]);
+      _post = BBSPost.dummy();
     }
+    shouldScrollToEnd = widget.arguments.containsKey('scroll_to_end') &&
+        widget.arguments['scroll_to_end'] == true;
   }
 
   @override
-  void didChangeDependencies() async {
-    _setContent();
+  void didChangeDependencies() {
     super.didChangeDependencies();
     _getSharedPreferences();
   }
@@ -163,109 +173,81 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  /// Rebuild everything on refreshing.
+  /// Rebuild everything and refresh itself.
   void refreshSelf() {
     if (mounted) {
       setState(() {
-        _currentBBSPage = 1;
-        _lastReplies = [];
-        _lastSnapshotData = null;
-        _isRefreshing = true;
-        _isEndIndicatorShown = false;
+        shouldScrollToEnd = false;
         shouldUsePreloadedContent = false;
-        _setContent();
       });
     }
   }
 
   @override
-  void didUpdateWidget(covariant BBSPostDetail oldWidget) {
-    _setContent();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // A listener to a scroll view, loading new content when scroll to the bottom.
-    NotificationListenerCallback<ScrollNotification> onScrollToBottom =
-        (ScrollNotification scrollInfo) {
-      if (scrollInfo.metrics.extentAfter < 500 &&
-          !_isRefreshing &&
-          !_isEndIndicatorShown) {
-        _isRefreshing = true;
-        setState(() {
-          _currentBBSPage++;
-          _setContent();
-        });
-      }
-      return false;
-    };
-
     return PlatformScaffold(
-        iosContentPadding: true,
-        iosContentBottomPadding: true,
-        appBar: PlatformAppBarX(
-          title: Text(_searchResult == null
+      material: (_, __) =>
+          MaterialScaffoldData(resizeToAvoidBottomInset: false),
+      cupertino: (_, __) =>
+          CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
+      iosContentPadding: false,
+      iosContentBottomPadding: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: PlatformAppBarX(
+        title: TopController(
+          controller: PrimaryScrollController.of(context),
+          child: Text(_searchKeyword == null
               ? S.of(context).forum
               : S.of(context).search_result),
-          trailingActions: [
-            if (_searchResult == null)
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: FutureWidget<bool>(
-                  future: _isDiscussionFavorited(),
-                  loadingBuilder: PlatformCircularProgressIndicator(),
-                  successBuilder:
-                      (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                    _isFavorited = snapshot.data;
-                    return _isFavorited
-                        ? Icon(SFSymbols.star_fill)
-                        : Icon(SFSymbols.star);
-                  },
-                  errorBuilder: () => null,
-                ),
-                onPressed: () async {
-                  if (_isFavorited == null) return;
-                  setState(() => _isFavorited = !_isFavorited);
-                  await PostRepository.getInstance()
-                      .setFavoredDiscussion(
-                          _isFavorited
-                              ? SetFavoredDiscussionMode.ADD
-                              : SetFavoredDiscussionMode.DELETE,
-                          _post.id)
-                      .onError((error, stackTrace) {
-                    Noticing.showNotice(
-                        context, S.of(context).operation_failed);
-                    setState(() => _isFavorited = !_isFavorited);
-                    return null;
-                  });
-                },
-              ),
-            if (_searchResult == null)
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.reply)
-                    : const Icon(SFSymbols.arrowshape_turn_up_left),
-                onPressed: () {
-                  BBSEditor.createNewReply(context, _post.id, null)
-                      .then((_) => refreshSelf());
-                },
-              ),
-          ],
         ),
-        body: RefreshIndicator(
+        trailingActions: [
+          if (_searchKeyword == null) _buildFavoredActionButton(),
+          if (_searchKeyword == null)
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.reply)
+                  : const Icon(SFSymbols.arrowshape_turn_up_left),
+              onPressed: () {
+                BBSEditor.createNewReply(context, _post.id, null)
+                    .then((_) => refreshSelf());
+              },
+            ),
+        ],
+      ),
+      body: RefreshIndicator(
           color: Theme.of(context).accentColor,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            refreshSelf();
+            _listViewController.notifyUpdate();
           },
-          child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: Material(
-                child: FutureWidget<List<Reply>>(
+          child: Material(
+              child: PagedListView<Reply>(
+            initialData: _post?.posts ?? [],
+            startPage: 1,
+            pagedController: _listViewController,
+            withScrollbar: true,
+            scrollController: PrimaryScrollController.of(context),
+            dataReceiver: _loadContent,
+            // Load all data if user instructed us to scroll to end
+            allDataReceiver: (shouldScrollToEnd && _post.posts.length > 10)
+                ? PostRepository.getInstance().loadReplies(_post, -1)
+                : null,
+            shouldScrollToEnd: shouldScrollToEnd,
+            builder: _getListItems,
+            loadingBuilder: (BuildContext context) => Container(
+              padding: EdgeInsets.all(8),
+              child: Center(child: PlatformCircularProgressIndicator()),
+            ),
+            endBuilder: (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(S.of(context).end_reached),
+              ),
+            ),
+            errorBuilder: _buildErrorWidget,
+          ) /*FutureWidget<List<Reply>>(
                   future: _content,
                   loadingBuilder: (BuildContext context,
                       AsyncSnapshot<List<Reply>> snapshot) {
@@ -278,70 +260,67 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             Center(child: PlatformCircularProgressIndicator()),
                       );
                     // If the page is showing search results, just show it whatever.
-                    if (_searchResult != null)
-                      return _buildPage(_lastSnapshotData.data);
+                    if (_searchResult != null) return _buildPage();
 
                     // Otherwise, showing a list page with loading indicator at the bottom.
                     return NotificationListener<ScrollNotification>(
-                        child: _buildPage(snapshot.data),
-                        onNotification: onScrollToBottom);
+                        child: _buildPage(), onNotification: onScrollToBottom);
                   },
                   successBuilder: (BuildContext context,
                       AsyncSnapshot<List<Reply>> snapshot) {
                     _isRefreshing = false;
+                    WidgetsBinding.instance
+                        .addPostFrameCallback((_) => scrollToEndIfNeeded());
                     // Prevent showing duplicate replies caused by refreshing repeatedly
                     if (_lastReplies.isEmpty ||
                         snapshot.data.isEmpty ||
                         _lastReplies.last.id != snapshot.data.last.id)
                       _lastReplies.addAll(snapshot.data);
                     _lastSnapshotData = snapshot;
-                    if (_searchResult != null) return _buildPage(snapshot.data);
+                    if (_searchResult != null) return _buildPage();
                     // Only use scroll notification when data is paged
                     return NotificationListener<ScrollNotification>(
-                        child: _buildPage(snapshot.data),
-                        onNotification: onScrollToBottom);
+                        child: _buildPage(), onNotification: onScrollToBottom);
                   },
                   errorBuilder: () => _buildErrorWidget(),
-                ),
+                ),*/
               )),
-        ));
+    );
   }
 
-  Widget _buildPage(List<Reply> data) => WithScrollbar(
-        child: ListView.builder(
-          primary: true,
-          physics: const AlwaysScrollableScrollPhysics(),
-          addAutomaticKeepAlives: true,
-          itemCount: _currentBBSPage * POST_COUNT_PER_PAGE,
-          itemBuilder: (context, index) => _buildListItem(index, data, true),
+  Widget _buildFavoredActionButton() => PlatformIconButton(
+        padding: EdgeInsets.zero,
+        icon: FutureWidget<bool>(
+          future: _isDiscussionFavored(),
+          loadingBuilder: PlatformCircularProgressIndicator(),
+          successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            _isFavored = snapshot.data;
+            return _isFavored
+                ? Icon(SFSymbols.star_fill)
+                : Icon(SFSymbols.star);
+          },
+          errorBuilder: () => null,
         ),
-        controller: PrimaryScrollController.of(context),
+        onPressed: () async {
+          if (_isFavored == null) return;
+          setState(() => _isFavored = !_isFavored);
+          await PostRepository.getInstance()
+              .setFavoredDiscussion(
+                  _isFavored
+                      ? SetFavoredDiscussionMode.ADD
+                      : SetFavoredDiscussionMode.DELETE,
+                  _post.id)
+              .onError((error, stackTrace) {
+            Noticing.showNotice(context, S.of(context).operation_failed);
+            setState(() => _isFavored = !_isFavored);
+            return null;
+          });
+        },
       );
 
-  Widget _buildListItem(int index, List<Reply> e, bool isNewData) {
-    if (isNewData &&
-        index >= _lastReplies.length &&
-        !_isEndIndicatorShown &&
-        !_isRefreshing) {
-      _isEndIndicatorShown = true;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Text(S.of(context).end_reached),
-          const SizedBox(
-            height: 16,
-          )
-        ],
-      );
-    }
-    if (index >= _lastReplies.length)
-      return _isEndIndicatorShown
-          ? Container()
-          : Center(child: PlatformCircularProgressIndicator());
-    return _getListItems(_lastReplies[index], index == 0, false);
-  }
-
-  Widget _buildErrorWidget() => GestureDetector(
+  Widget _buildErrorWidget(
+          BuildContext context, AsyncSnapshot<List<Reply>> snapshot) =>
+      GestureDetector(
         child: Center(
           child: Text(S.of(context).failed),
         ),
@@ -350,45 +329,63 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu(Reply e) {
-    return [
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(context).pop();
-            FlutterClipboard.copy(renderText(e.content, ''));
-          },
-          child: Text(S.of(context).copy),
+  List<Widget> _buildContextMenu(Reply e) => [
+        if (!isHtml(e.content))
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(context).pop();
+                smartNavigatorPush(context, "/text/detail",
+                    arguments: {"text": e.content});
+              },
+              child: Text(S.of(context).free_select),
+            ),
+            material: (_, __) => ListTile(
+              title: Text(S.of(context).free_select),
+              onTap: () {
+                Navigator.of(context).pop();
+                smartNavigatorPush(context, "/text/detail",
+                    arguments: {"text": e.content});
+              },
+            ),
+          ),
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              FlutterClipboard.copy(renderText(e.content, ''));
+            },
+            child: Text(S.of(context).copy),
+          ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(context).copy),
+            onTap: () {
+              Navigator.of(context).pop();
+              FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
+                  Noticing.showNotice(context, S.of(context).copy_success));
+            },
+          ),
         ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(context).copy),
-          onTap: () {
-            Navigator.of(context).pop();
-            FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
-                Noticing.showNotice(context, S.of(context).copy_success));
-          },
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(context).pop();
+              BBSEditor.reportPost(context, e.id);
+            },
+            child: Text(S.of(context).report),
+          ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(context).report),
+            onTap: () {
+              Navigator.of(context).pop();
+              BBSEditor.reportPost(context, e.id);
+            },
+          ),
         ),
-      ),
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(context).pop();
-            BBSEditor.reportPost(context, e.id);
-          },
-          child: Text(S.of(context).report),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(context).report),
-          onTap: () {
-            Navigator.of(context).pop();
-            BBSEditor.reportPost(context, e.id);
-          },
-        ),
-      ),
-    ];
-  }
+      ];
 
-  Widget _OPLeadingTag() => Container(
+  Widget _opLeadingTag() => Container(
         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
         decoration: BoxDecoration(
             color: Constant.getColorFromString(_post.tag.first.color)
@@ -408,15 +405,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       );
 
-  Widget _getListItems(Reply e, bool generateTags, bool isNested) {
-    OnTap onLinkTap = (url, _, __, ___) {
-      if (ImageViewerPage.isImage(url)) {
-        smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
-      } else {
-        BrowserUtil.openUrl(url, context);
-      }
+  Widget _getListItems(BuildContext context, ListProvider<Reply> dataProvider,
+      int index, Reply e,
+      {bool isNested = false}) {
+    final bool generateTags = (index == 0);
+    LinkTapCallback onLinkTap = (url) {
+      BrowserUtil.openUrl(url, context);
     };
-    double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
+    ImageTapCallback onImageTap = (rawImage, url) {
+      smartNavigatorPush(context, '/image/detail',
+          arguments: {'raw_image': rawImage, 'url': url});
+    };
     return GestureDetector(
       onLongPress: () {
         showPlatformModalSheet(
@@ -440,7 +439,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ));
       },
       child: Card(
-          color: isNested
+          color: isNested && PlatformX.isCupertino(context)
               ? Theme.of(context).dividerColor.withOpacity(0.05)
               : null,
           child: ListTile(
@@ -451,10 +450,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (generateTags)
                   Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(_post, (String tagname) {
+                      child: generateTagWidgets(_post, (String tagName) {
                         smartNavigatorPush(context, '/bbs/discussions',
                             arguments: {
-                              "tagFilter": tagname,
+                              "tagFilter": tagName,
                               'preferences': _preferences,
                             });
                       })),
@@ -463,7 +462,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   child: Row(
                     children: [
                       if (e.username == _post.first_post.username)
-                        _OPLeadingTag(),
+                        _opLeadingTag(),
                       if (e.username == _post.first_post.username)
                         const SizedBox(
                           width: 2,
@@ -472,78 +471,59 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         "[${e.username}]",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      const SizedBox(
+                        width: 2,
+                      ),
+                      if (isNested)
+                        Center(
+                          child: Icon(SFSymbols.search,
+                              color:
+                                  Theme.of(context).hintColor.withOpacity(0.2),
+                              size: 12),
+                        ),
                     ],
                   ),
                 ),
-                if (e.reply_to != null && !isNested && _searchResult == null)
+                if (e.reply_to != null && !isNested && _searchKeyword == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child: _getListItems(
-                        _lastReplies.firstWhere(
-                          (element) => element.id == e.reply_to,
-                        ),
-                        false,
-                        true),
+                    child:
+                        /*Text(
+                      S.of(context).reply_to(e.reply_to),
+                      textScaleFactor: 0.8,
+                      style: TextStyle(
+                          color: Constant.getColorFromString(
+                              _post.tag.first.color)),
+                    ),*/
+                        _getListItems(
+                            context,
+                            dataProvider,
+                            -1,
+                            dataProvider.getElementFirstWhere(
+                              (element) => element.id == e.reply_to,
+                            ),
+                            isNested: true),
                   ),
                 Align(
-                  alignment: Alignment.topLeft,
-                  child: isNested
-                      // If content is being quoted, limit its height so that the view won't be too long.
-                      ? Linkify(
-                          text: renderText(e.content, S.of(context).image_tag)
-                              .trim(),
-                          textScaleFactor: 0.8,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          onOpen: (link) async {
-                            if (await canLaunch(link.url)) {
-                              BrowserUtil.openUrl(link.url, context);
-                            } else {
-                              Noticing.showNotice(
-                                  context, S.of(context).cannot_launch_url);
-                            }
-                          },
-                        )
-                      : Container(
-                          //constraints: BoxConstraints(maxHeight: 400),
-                          child: Html(
-                            shrinkWrap: true,
-                            data: preprocessContentForDisplay(e.content),
-                            style: {
-                              "body": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
-                              "p": Style(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.zero,
-                                fontSize: FontSize(16),
-                              ),
+                    alignment: Alignment.topLeft,
+                    child: isNested
+                        // If content is being quoted, limit its height so that the view won't be too long.
+                        ? Linkify(
+                            text: renderText(e.content, S.of(context).image_tag)
+                                .trim(),
+                            textScaleFactor: 0.8,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            onOpen: (link) async {
+                              if (await canLaunch(link.url)) {
+                                BrowserUtil.openUrl(link.url, context);
+                              } else {
+                                Noticing.showNotice(
+                                    context, S.of(context).cannot_launch_url);
+                              }
                             },
-                            customImageRenders: {
-                              networkSourceMatcher(): networkImageClipRender(
-                                  loadingWidget: () => Center(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 12),
-                                          foregroundDecoration: BoxDecoration(
-                                              color: Colors.black12),
-                                          width: imageWidth,
-                                          height: imageWidth,
-                                          child: Center(
-                                            child:
-                                                PlatformCircularProgressIndicator(),
-                                          ),
-                                        ),
-                                      ),
-                                  maxHeight: imageWidth),
-                            },
-                            onLinkTap: onLinkTap,
-                            onImageTap: onLinkTap,
-                          ),
-                        ),
-                ),
+                          )
+                        : smartRender(e.content, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: isNested
@@ -580,10 +560,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         ]),
                   ]),
             onTap: () async {
-              if (_searchResult == null)
-                BBSEditor.createNewReply(context, _post.id, e.id)
+              if (_searchKeyword == null) {
+                if (isNested) {
+                  // Scroll to the corrosponding post
+                  _listViewController.scrollToItem(e);
+                  return;
+                }
+
+                int replyId;
+                // Set the replyId to null when tapping on the first reply.
+                if (_post.first_post.id != e.id) {
+                  replyId = e.id;
+                }
+                BBSEditor.createNewReply(context, _post.id, replyId)
                     .then((value) => refreshSelf());
-              else {
+              } else {
                 ProgressFuture progressDialog = showProgressDialog(
                     loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
@@ -596,4 +587,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           )),
     );
   }
+
+  PostRenderWidget smartRender(String content, LinkTapCallback onTapLink,
+          ImageTapCallback onTapImage) =>
+      isHtml(content)
+          ? PostRenderWidget(
+              render: kHtmlRender,
+              content: preprocessContentForDisplay(content),
+              onTapImage: onTapImage,
+              onTapLink: onTapLink,
+            )
+          : PostRenderWidget(
+              render: kMarkdownRender,
+              content: preprocessContentForDisplay(content),
+              onTapImage: onTapImage,
+              onTapLink: onTapLink,
+            );
 }

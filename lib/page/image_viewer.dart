@@ -18,9 +18,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -31,9 +31,14 @@ import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 import 'package:share/share.dart';
 
+/// An image display page, allowing user to share or save the image.
+///
+/// Arguments:
+/// [Uint8List] raw_image: the raw byte array of the image.
+/// [String] url: the original url of the image, enabling the page to decide the file name.
+///
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
   @protected
@@ -53,8 +58,14 @@ class ImageViewerPage extends StatefulWidget {
 
   ImageViewerPage({Key key, this.arguments});
 
+  static bool isBase64Image(String content) {
+    return content.startsWith("data:image/");
+  }
+
   static bool isImage(String url) {
     if (url == null || url.isEmpty || Uri.tryParse(url) == null) return false;
+    if (isBase64Image(url)) return true;
+
     String path = Uri.parse(url).path?.toLowerCase();
     if (path == null) return false;
     return IMAGE_SUFFIX.any((element) => path.endsWith(element));
@@ -62,6 +73,9 @@ class ImageViewerPage extends StatefulWidget {
 
   static String getMineType(String url) {
     if (!isImage(url)) return '';
+    if (isBase64Image(url)) {
+      return url.between("data:", ";base64");
+    }
     String path = Uri.parse(url).path.toLowerCase();
     return 'image/' +
         IMAGE_SUFFIX
@@ -73,36 +87,30 @@ class ImageViewerPage extends StatefulWidget {
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
   List<int> _rawImage;
-  String _url;
   String _fileName;
+  static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
+  String _url;
 
   @override
   void initState() {
     super.initState();
+    _rawImage = widget.arguments['raw_image'];
     _url = widget.arguments['url'];
-    _fileName = Uri.parse(_url).pathSegments.last;
+    _fileName = getFileName(_url);
   }
 
-  Future<void> loadImage(String url) async {
-    if (_rawImage != null && _rawImage.isNotEmpty) return;
-    Response response = await widget.dio.get(url);
-    _rawImage = response.data;
+  getFileName(String url) {
+    if (ImageViewerPage.isBase64Image(url)) {
+      return _BASE64_IMAGE_FILE_NAME;
+    }
+    return Uri.parse(url).pathSegments.last;
   }
-
-  Widget _buildErrorWidget() => GestureDetector(
-        child: Center(
-          child: Text(S.of(context).failed),
-        ),
-        onTap: () {
-          _rawImage = null;
-          refreshSelf();
-        },
-      );
 
   Future<File> saveToFile(
       String dirName, String fileName, List<int> bytes) async {
     Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = File("${documentDir.absolute.path}/$dirName/$fileName");
+    File outputFile = PlatformX.createPlatformFile(
+        "${documentDir.absolute.path}/$dirName/$fileName");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsBytes(bytes, flush: true);
     return outputFile;
@@ -110,7 +118,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> shareImage() async {
     // Save the image temporarily
-    Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = await saveToFile('temp_image', _fileName, _rawImage);
     if (PlatformX.isMobile)
       Share.shareFiles([outputFile.absolute.path],
@@ -146,7 +153,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
         iosContentBottomPadding: false,
-        iosContentPadding: true,
+        iosContentPadding: false,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).image),
           trailingActions: [
@@ -167,21 +174,12 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               )
           ],
         ),
-        body: Container(
-            child: FutureWidget<void>(
-          nullable: true,
-          future: loadImage(_url),
-          successBuilder: (_, __) => PhotoView(
+        body: SafeArea(
+          child: PhotoView(
             imageProvider: MemoryImage(Uint8List.fromList(_rawImage)),
             backgroundDecoration:
                 BoxDecoration(color: Theme.of(context).canvasColor),
           ),
-          loadingBuilder: Center(
-            child: PlatformCircularProgressIndicator(),
-          ),
-          errorBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-            return _buildErrorWidget();
-          },
-        )));
+        ));
   }
 }
