@@ -38,9 +38,11 @@ class WithStateKey<T> extends StatefulWidget {
   _WithStateKeyState<T> createState() => _WithStateKeyState<T>();
 }
 
-class _WithStateKeyState<T> extends State<WithStateKey<T>> {
+class _WithStateKeyState<T> extends State<WithStateKey<T>>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     widget.childKey.currentContext = context;
     return widget.child;
   }
@@ -50,4 +52,7 @@ class _WithStateKeyState<T> extends State<WithStateKey<T>> {
     super.initState();
     widget.childKey.currentContext = context;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
