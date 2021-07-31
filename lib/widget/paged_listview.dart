@@ -236,6 +236,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
       if (widget.initialData != null && widget.initialData.isNotEmpty) {
+        _isRefreshing = true;
         _futureData = Future.value(widget.initialData);
       } else {
         _isRefreshing = true;
