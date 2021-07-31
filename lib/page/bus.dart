@@ -87,23 +87,26 @@ class _BusPageState extends State<BusPage> {
   void _onStartLocationChanged(Campus e) {
     setState(() {
       _startSelectItem = e;
-      _filteredBusList = _busList
-          .where((element) =>
-              element.start == _startSelectItem &&
-              element.end == _endSelectItem)
-          .toList();
+      _filterBus();
     });
   }
 
   void _onEndLocationChanged(Campus e) {
     setState(() {
       _endSelectItem = e;
-      _filteredBusList = _busList
-          .where((element) =>
-              element.start == _startSelectItem &&
-              element.end == _endSelectItem)
-          .toList();
+      _filterBus();
     });
+  }
+
+  void _filterBus() {
+    _filteredBusList = _busList
+        .where((element) =>
+            (element.start == _startSelectItem &&
+                element.end == _endSelectItem) ||
+            (element.start == _endSelectItem &&
+                element.end == _startSelectItem &&
+                element.direction == BusDirection.DUAL))
+        .toList();
   }
 
   List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
