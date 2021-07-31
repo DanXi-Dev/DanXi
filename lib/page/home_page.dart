@@ -235,6 +235,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
       PersonInfo.removeFromSharedPreferences(_preferences);
+      StateProvider.personInfo.value = null;
       Phoenix.rebirth(context);
     }
   }
@@ -324,8 +325,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
-      _rebuildPage();
-      refreshSelf();
+      if (StateProvider.personInfo.value != null) {
+        _rebuildPage();
+        refreshSelf();
+      }
     });
     initSystemTray().catchError((ignored) {});
     WidgetsBinding.instance.addObserver(this);
