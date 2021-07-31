@@ -167,7 +167,7 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Phoenix(
         child: PlatformProvider(
-      // initialPlatform: TargetPlatform.iOS,
+      initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => Theme(
         data: getTheme(context),
         child: PlatformApp(
@@ -365,10 +365,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         // After the app returns from the background
         // Refresh the homepage if it hasn't been refreshed for 30 minutes
         // To keep the data up-to-date.
-        if (DateTime.now()
-                .difference(_lastRefreshTime)
-                .compareTo(Duration(minutes: 30)) >
-            0) {
+        if (_lastRefreshTime != null &&
+            DateTime.now()
+                    .difference(_lastRefreshTime)
+                    .compareTo(Duration(minutes: 30)) >
+                0) {
           _lastRefreshTime = DateTime.now();
           RefreshHomepageEvent().fire();
         }
@@ -783,11 +784,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             itemChanged: (index) {
               if (index != _pageIndex.value) {
-                // List<ScrollPosition> positions =
-                //     PrimaryScrollController.of(context).positions.toList();
-                // for (var p in positions.skip(1)) {
-                //   PrimaryScrollController.of(context).detach(p);
-                // }
                 debugPrint("Call itemChanged");
                 for (int i = 0; i < _subpage.length; i++) {
                   if (index != i) {

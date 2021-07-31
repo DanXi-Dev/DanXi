@@ -184,6 +184,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    debugPrint("Build ${widget.debugTag}");
     return FutureWidget(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return _buildPage(snapshot.data);

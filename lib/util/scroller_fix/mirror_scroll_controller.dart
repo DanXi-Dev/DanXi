@@ -37,17 +37,17 @@ class MirrorScrollController extends ScrollController {
 
   @override
   void attach(ScrollPosition position) {
-    debugPrint("tryAttach: $debugTag");
+    // debugPrint("tryAttach: $debugTag");
     bool noClients = !hasClients;
     bool intercepted =
         _interceptors.every((element) => element?.call() ?? true);
     if (noClients && intercepted) {
       // detachPosition();
-      debugPrint("attach!!: $debugTag");
+      // debugPrint("attach!!: $debugTag");
       originController.attach(position);
     } else {
-      debugPrint(
-          "$debugTag Attach failed, judgement(Should be true): noClients: $noClients, intercepted: $intercepted");
+      // debugPrint(
+      //     "$debugTag Attach failed, judgement(Should be true): noClients: $noClients, intercepted: $intercepted");
     }
     _oldPosition = position;
   }
@@ -82,15 +82,15 @@ class MirrorScrollController extends ScrollController {
 
   @override
   void detach(ScrollPosition position) {
-    debugPrint("tryDetach: $debugTag");
+    // debugPrint("tryDetach: $debugTag");
     if (positions.contains(position)) {
       originController.detach(position);
-      debugPrint("detached!!: $debugTag");
+      // debugPrint("detached!!: $debugTag");
     }
   }
 
   void detachPosition() {
-    debugPrint("detachAll: $debugTag");
+    // debugPrint("detachAll: $debugTag");
     if (!hasClients) return;
     var tempPos = positions.toList();
     tempPos.forEach((element) {
@@ -103,7 +103,7 @@ class MirrorScrollController extends ScrollController {
         _oldPosition != null &&
         !originController.positions.contains(_oldPosition)) {
       originController.attach(_oldPosition);
-      debugPrint("reattached!: $debugTag");
+      // debugPrint("reattached!: $debugTag");
     }
   }
 

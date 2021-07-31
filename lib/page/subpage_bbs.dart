@@ -301,6 +301,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    debugPrint("Build ${widget.debugTag}");
     if (widget.arguments == null)
       return _buildPageBody();
     else if (widget.arguments.containsKey('showFavoredDiscussion')) {

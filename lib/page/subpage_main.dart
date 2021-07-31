@@ -69,7 +69,8 @@ class RefreshHomepageEvent {
   RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
 }
 
-class _HomeSubpageState extends State<HomeSubpage> {
+class _HomeSubpageState extends State<HomeSubpage>
+    with AutomaticKeepAliveClientMixin {
   static final StateStreamListener _refreshSubscription = StateStreamListener();
   SharedPreferences _preferences;
   Map<String, Widget> widgetMap;
@@ -221,8 +222,10 @@ class _HomeSubpageState extends State<HomeSubpage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     List<DashboardCard> widgetList =
         SettingsProvider.of(_preferences).dashboardWidgetsSequence;
+    debugPrint("Build ${widget.debugTag}");
     return RefreshIndicator(
         color: Theme.of(context).accentColor,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
@@ -242,4 +245,7 @@ class _HomeSubpageState extends State<HomeSubpage> {
               children: _buildCards(widgetList),
             ))));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
