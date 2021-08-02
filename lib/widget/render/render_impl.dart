@@ -42,6 +42,7 @@ BaseRender kHtmlRender = (BuildContext context, String content,
       "body": noPaddingStyle,
       "p": noPaddingStyle,
     },
+    onLinkTap: (url, _, __, ___) => onTapLink?.call(url),
     customImageRenders: {
       networkSourceMatcher(): (context, attributes, element) {
         return Center(
