@@ -30,7 +30,6 @@ class FudanLibraryRepository extends BaseRepositoryWithDio {
 
   Future<bool> checkConnection() =>
       getLibraryRawData().then((value) => true, onError: (e) => false);
-
   /// Get current numbers of people in library.
   ///
   /// Return a list of 4, respectively referring to 文图，理图，张江，枫林,
@@ -44,7 +43,6 @@ class FudanLibraryRepository extends BaseRepositoryWithDio {
         .map((e) => int.tryParse(e.group(0)))
         .toList();
   }
-
   @override
   String get linkHost => "10.55.101.62";
 }

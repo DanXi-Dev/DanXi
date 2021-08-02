@@ -62,11 +62,6 @@ class CardRepository extends BaseRepositoryWithDio {
     await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true);
   }
 
-  Future<String> getName() async {
-    if (_info != null && _info.name.isNotEmpty) return _info.name;
-    return (await loadCardInfo(-1)).name;
-  }
-
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String> requestData, int pageNum) async {
     requestData['pageNo'] = pageNum.toString();
