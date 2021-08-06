@@ -8,9 +8,9 @@
 
 日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
   
-Maybe the best all-rounded service app for Fudan University students!    
- 
-**Only support Chinese (Simplified) and English language at the moment. Come on to help us!**    
+Maybe the best all-rounded service app for Fudan University students!
+
+**DanXi only support Chinese (Simplified) and English language at the moment. Come to help us!**
 
 - Campus card balance and transactions
 - Dining hall traffic
@@ -23,11 +23,11 @@ Maybe the best all-rounded service app for Fudan University students!
 - Show Notices from Academic Affairs Office
 - View exam schedule and export as .ics file
 - View final exam GPA and ranking
+- View school bus schedule
 
 This application is still at active development stage, welcome to join the development and donation~
 
 # Install
-Note: This application is still in early development and may have unpredictable bugs.   
 If you meet abnormal behavior in this application，Please [create an issue](https://github.com/w568w/DanXi/issues/new/choose) or [create a new pull request](https://github.com/w568w/DanXi/compare).
 ## Windows
 Go to [release page](https://github.com/w568w/DanXi/releases), just download the zip file and unzip it.   
@@ -44,12 +44,13 @@ Distributions for macOS are uncontinued now because of very few users. If necess
 
 # Compile
 ## Flutter version that we're using
+
 ```shell script
 $ flutter --version
-Flutter 2.2.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision b22742018b (9 weeks ago) • 2021-05-14 19:12:57 -0700
-Engine • revision a9d88a4d18
-Tools • Dart 2.13.0
+Flutter 2.2.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision f4abaa0735 (5 weeks ago) • 2021-07-01 12:46:11 -0700
+Engine • revision 241c87ad80
+Tools • Dart 2.13.4
 ```
 ## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  

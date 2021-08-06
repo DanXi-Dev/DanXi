@@ -70,7 +70,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
-  // Init Feature registation.
+  // Init Feature registration.
   FeatureMap.registerAllFeatures();
   Catcher(
       rootWidget: DanxiApp(),
