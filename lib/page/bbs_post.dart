@@ -316,13 +316,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(Reply e) => [
-        if (!isHtml(e.content))
+        if (!isHtml(e.filteredContent))
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.of(context).pop();
                 smartNavigatorPush(context, "/text/detail",
-                    arguments: {"text": e.content});
+                    arguments: {"text": e.filteredContent});
               },
               child: Text(S.of(context).free_select),
             ),
@@ -331,7 +331,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTap: () {
                 Navigator.of(context).pop();
                 smartNavigatorPush(context, "/text/detail",
-                    arguments: {"text": e.content});
+                    arguments: {"text": e.filteredContent});
               },
             ),
           ),
@@ -339,7 +339,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
-              FlutterClipboard.copy(renderText(e.content, ''));
+              FlutterClipboard.copy(renderText(e.filteredContent, ''));
             },
             child: Text(S.of(context).copy),
           ),
@@ -347,8 +347,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             title: Text(S.of(context).copy),
             onTap: () {
               Navigator.of(context).pop();
-              FlutterClipboard.copy(renderText(e.content, '')).then((value) =>
-                  Noticing.showNotice(context, S.of(context).copy_success));
+              FlutterClipboard.copy(renderText(e.filteredContent, '')).then(
+                  (value) =>
+                      Noticing.showNotice(context, S.of(context).copy_success));
             },
           ),
         ),
@@ -499,7 +500,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     child: isNested
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Linkify(
-                            text: renderText(e.content, S.of(context).image_tag)
+                      text: renderText(
+                                    e.filteredContent, S.of(context).image_tag)
                                 .trim(),
                             textScaleFactor: 0.8,
                             maxLines: 2,
@@ -513,7 +515,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               }
                             },
                           )
-                        : smartRender(e.content, onLinkTap, onImageTap)),
+                        : smartRender(
+                            e.filteredContent, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: isNested

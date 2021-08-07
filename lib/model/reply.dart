@@ -14,6 +14,8 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/clean_mode_filter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'reply.g.dart';
@@ -43,4 +45,8 @@ class Reply {
 
   /// Generate an empty Reply for special sakes.
   factory Reply.dummy() => Reply(-1, "", "", null, "", -1, false);
+
+  String get filteredContent => SettingsProvider.getInstance().cleanMode
+      ? CleanModeFilter.cleanText(content)
+      : content;
 }

@@ -35,6 +35,8 @@ import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
+import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -230,16 +232,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final Color _originalDividerColor = Theme.of(context).dividerColor;
-    double _avatarSize =
-        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
-    const double _avatarNameSpacing = 4;
-    TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
-    TextStyle linkText = Theme.of(context)
-        .textTheme
-        .bodyText2
-        .copyWith(color: Theme.of(context).accentColor);
-    final inAppReview = InAppReview.instance;
+
+    // Load preference fields
 
     return SafeArea(
         child: RefreshIndicator(
@@ -346,40 +340,60 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
                     //Fold Behavior
                     Card(
-                      child: ListTile(
-                        title: Text(S.of(context).fduhole_nsfw_behavior),
-                        leading: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.hide_image)
-                            : const Icon(SFSymbols.eye_slash),
-                        subtitle: Text(SettingsProvider.getInstance()
-                            .fduholeFoldBehavior
-                            .displayTitle(context)),
-                        onTap: () {
-                          showPlatformModalSheet(
-                              context: context,
-                              builder: (_) => PlatformWidget(
-                                    cupertino: (_, __) => CupertinoActionSheet(
-                                      title: Text(
-                                          S.of(context).fduhole_nsfw_behavior),
-                                      actions: _buildFoldBehaviorList(),
-                                      cancelButton: CupertinoActionSheetAction(
-                                        child: Text(S.of(context).cancel),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ),
-                                    material: (_, __) => Container(
-                                      height: 300,
-                                      child: Column(
-                                        children: _buildFoldBehaviorList(),
-                                      ),
-                                    ),
-                                  ));
-                        },
+                      child: Column(
+                        children: [
+                          ListTile(
+                            title: Text(S.of(context).fduhole_nsfw_behavior),
+                            leading: PlatformX.isMaterial(context)
+                                ? const Icon(Icons.hide_image)
+                                : const Icon(SFSymbols.eye_slash),
+                            subtitle: Text(SettingsProvider.getInstance()
+                                .fduholeFoldBehavior
+                                .displayTitle(context)),
+                            onTap: () {
+                              showPlatformModalSheet(
+                                  context: context,
+                                  builder: (_) => PlatformWidget(
+                                        cupertino: (_, __) =>
+                                            CupertinoActionSheet(
+                                          title: Text(S
+                                              .of(context)
+                                              .fduhole_nsfw_behavior),
+                                          actions: _buildFoldBehaviorList(),
+                                          cancelButton:
+                                              CupertinoActionSheetAction(
+                                            child: Text(S.of(context).cancel),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ),
+                                        material: (_, __) => Container(
+                                          height: 300,
+                                          child: Column(
+                                            children: _buildFoldBehaviorList(),
+                                          ),
+                                        ),
+                                      ));
+                            },
+                          ),
+                          SwitchListTile(
+                            title: Text(S.of(context).fduhole_clean_mode),
+                            secondary: const Icon(Icons.ac_unit),
+                            subtitle: Text(
+                                S.of(context).fduhole_clean_mode_description),
+                            value: SettingsProvider.getInstance().cleanMode,
+                            onChanged: (bool value) {
+                              if (value) {
+                                _showCleanModeGuideDialog();
+                              }
+                              setState(() => SettingsProvider.getInstance()
+                                  .cleanMode = value);
+                            },
+                          ),
+                        ],
                       ),
                     ),
-
                     if (SettingsProvider.getInstance().debugMode)
                       //Theme Selection
                       Card(
@@ -400,454 +414,410 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           },
                         ),
                       ),
+                    _buildAboutCard()
+                  ]),
+            )));
+  }
 
-                    //About Page
-                    Card(
-                        child: Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.transparent),
-                            child: ExpansionTile(
-                                maintainState: true,
-                                leading: PlatformX.isMaterial(context)
-                                    ? const Icon(Icons.info)
-                                    : const Icon(SFSymbols.info_circle),
-                                title: Text(S.of(context).about),
+  static const String CLEAN_MODE_EXAMPLE_BEFORE =
+      '`xx人差不多得了，自己什么样不会去看看🐎 😅😅😅😅😅😅😅😅`';
+  static const String CLEAN_MODE_EXAMPLE_AFTER = '`xx人差不多得了，自己什么样不会去看看🐎`';
+
+  _showCleanModeGuideDialog() => showPlatformDialog(
+      context: context,
+      builder: (_) => PlatformAlertDialog(
+            title: Text(S.of(context).fduhole_clean_mode),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(S.of(context).fduhole_clean_mode_detail),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(S.of(context).before_enabled),
+                SizedBox(
+                  height: 4,
+                ),
+                PostRenderWidget(
+                  render: kMarkdownRender,
+                  content: CLEAN_MODE_EXAMPLE_BEFORE,
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(S.of(context).after_enabled),
+                SizedBox(
+                  height: 4,
+                ),
+                PostRenderWidget(
+                  render: kMarkdownRender,
+                  content: CLEAN_MODE_EXAMPLE_AFTER,
+                ),
+              ],
+            ),
+            actions: [
+              PlatformDialogAction(
+                child: Text(S.of(context).i_see),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            ],
+          ));
+
+  Card _buildAboutCard() {
+    final inAppReview = InAppReview.instance;
+    final Color _originalDividerColor = Theme.of(context).dividerColor;
+    double _avatarSize =
+        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
+    const double _avatarNameSpacing = 4;
+    TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
+    TextStyle linkText = Theme.of(context)
+        .textTheme
+        .bodyText2
+        .copyWith(color: Theme.of(context).accentColor);
+    return Card(
+        child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+                maintainState: true,
+                leading: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.info)
+                    : const Icon(SFSymbols.info_circle),
+                title: Text(S.of(context).about),
+                children: <Widget>[
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              //Description
+                              Text(
+                                S.of(context).app_description_title,
+                                textScaleFactor: 1.1,
+                              ),
+                              Divider(
+                                color: _originalDividerColor,
+                              ),
+                              Text(S.of(context).app_description),
+                              const SizedBox(
+                                height: 16,
+                              ),
+
+                              //Terms and Conditions
+                              Text(
+                                S.of(context).terms_and_conditions_title,
+                                textScaleFactor: 1.1,
+                              ),
+                              Divider(
+                                color: _originalDividerColor,
+                              ),
+                              RichText(
+                                  text: TextSpan(children: [
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S
+                                      .of(context)
+                                      .terms_and_conditions_content,
+                                ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S.of(context).privacy_policy,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        await BrowserUtil.openUrl(
+                                            S.of(context).privacy_policy_url,
+                                            context);
+                                      }),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S
+                                      .of(context)
+                                      .terms_and_conditions_content_end,
+                                ),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S.of(context).view_ossl,
+                                ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S
+                                        .of(context)
+                                        .open_source_software_licenses,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        smartNavigatorPush(
+                                            context, "/about/openLicense",
+                                            arguments: {
+                                              "items": _LICENSE_ITEMS
+                                            });
+                                      }),
+                              ])),
+
+                              const SizedBox(
+                                height: 16,
+                              ),
+
+                              //Acknowledgement
+                              Text(
+                                S.of(context).acknowledgements,
+                                textScaleFactor: 1.1,
+                              ),
+                              Divider(
+                                color: _originalDividerColor,
+                              ),
+                              RichText(
+                                  text: TextSpan(children: [
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S.of(context).acknowledgements_1,
+                                ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S.of(context).acknowledgement_name_1,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        await BrowserUtil.openUrl(
+                                            S
+                                                .of(context)
+                                                .acknowledgement_link_1,
+                                            context);
+                                      }),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S.of(context).acknowledgements_2,
+                                ),
+                              ])),
+
+                              const SizedBox(
+                                height: 16,
+                              ),
+
+                              // Authors
+                              Text(
+                                S.of(context).authors,
+                                textScaleFactor: 1.1,
+                              ),
+                              Divider(
+                                color: _originalDividerColor,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Column(
-                                    mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Container(
-                                        padding:
-                                            EdgeInsets.fromLTRB(25, 5, 25, 0),
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              //Description
-                                              Text(
-                                                S
-                                                    .of(context)
-                                                    .app_description_title,
-                                                textScaleFactor: 1.1,
-                                              ),
-                                              Divider(
-                                                color: _originalDividerColor,
-                                              ),
-                                              Text(S
-                                                  .of(context)
-                                                  .app_description),
-                                              const SizedBox(
-                                                height: 16,
-                                              ),
-
-                                              //Terms and Conditions
-                                              Text(
-                                                S
-                                                    .of(context)
-                                                    .terms_and_conditions_title,
-                                                textScaleFactor: 1.1,
-                                              ),
-                                              Divider(
-                                                color: _originalDividerColor,
-                                              ),
-                                              RichText(
-                                                  text: TextSpan(children: [
-                                                TextSpan(
-                                                  style: defaultText,
-                                                  text: S
-                                                      .of(context)
-                                                      .terms_and_conditions_content,
-                                                ),
-                                                TextSpan(
-                                                    style: linkText,
-                                                    text: S
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new AssetImage(S
                                                         .of(context)
-                                                        .privacy_policy,
-                                                    recognizer:
-                                                        TapGestureRecognizer()
-                                                          ..onTap = () async {
-                                                            await BrowserUtil.openUrl(
-                                                                S
-                                                                    .of(context)
-                                                                    .privacy_policy_url,
-                                                                context);
-                                                          }),
-                                                TextSpan(
-                                                  style: defaultText,
-                                                  text: S
-                                                      .of(context)
-                                                      .terms_and_conditions_content_end,
-                                                ),
-                                                TextSpan(
-                                                  style: defaultText,
-                                                  text: S.of(context).view_ossl,
-                                                ),
-                                                TextSpan(
-                                                    style: linkText,
-                                                    text: S
-                                                        .of(context)
-                                                        .open_source_software_licenses,
-                                                    recognizer:
-                                                        TapGestureRecognizer()
-                                                          ..onTap = () {
-                                                            smartNavigatorPush(
-                                                                context,
-                                                                "/about/openLicense",
-                                                                arguments: {
-                                                                  "items":
-                                                                      _LICENSE_ITEMS
-                                                                });
-                                                          }),
-                                              ])),
-
-                                              const SizedBox(
-                                                height: 16,
-                                              ),
-
-                                              //Acknowledgement
-                                              Text(
-                                                S.of(context).acknowledgements,
-                                                textScaleFactor: 1.1,
-                                              ),
-                                              Divider(
-                                                color: _originalDividerColor,
-                                              ),
-                                              RichText(
-                                                  text: TextSpan(children: [
-                                                TextSpan(
-                                                  style: defaultText,
-                                                  text: S
-                                                      .of(context)
-                                                      .acknowledgements_1,
-                                                ),
-                                                TextSpan(
-                                                    style: linkText,
-                                                    text: S
-                                                        .of(context)
-                                                        .acknowledgement_name_1,
-                                                    recognizer:
-                                                        TapGestureRecognizer()
-                                                          ..onTap = () async {
-                                                            await BrowserUtil.openUrl(
-                                                                S
-                                                                    .of(context)
-                                                                    .acknowledgement_link_1,
-                                                                context);
-                                                          }),
-                                                TextSpan(
-                                                  style: defaultText,
-                                                  text: S
-                                                      .of(context)
-                                                      .acknowledgements_2,
-                                                ),
-                                              ])),
-
-                                              const SizedBox(
-                                                height: 16,
-                                              ),
-
-                                              // Authors
-                                              Text(
-                                                S.of(context).authors,
-                                                textScaleFactor: 1.1,
-                                              ),
-                                              Divider(
-                                                color: _originalDividerColor,
-                                              ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: <Widget>[
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: <Widget>[
-                                                      InkWell(
-                                                        child: Container(
-                                                            width: _avatarSize,
-                                                            height: _avatarSize,
-                                                            decoration: new BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                image: new DecorationImage(
-                                                                    fit: BoxFit
-                                                                        .fill,
-                                                                    image: new AssetImage(S
-                                                                        .of(context)
-                                                                        .dev_image_url_1)))),
-                                                        onTap: () =>
-                                                            BrowserUtil.openUrl(
-                                                                S
-                                                                    .of(context)
-                                                                    .dev_page_1,
-                                                                context),
-                                                      ),
-                                                      const SizedBox(
-                                                          height:
-                                                              _avatarNameSpacing),
-                                                      Text(
-                                                        S
-                                                            .of(context)
-                                                            .dev_name_1,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: <Widget>[
-                                                      InkWell(
-                                                        child: Container(
-                                                            width: _avatarSize,
-                                                            height: _avatarSize,
-                                                            decoration: new BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                image: new DecorationImage(
-                                                                    fit: BoxFit
-                                                                        .fill,
-                                                                    image: new AssetImage(S
-                                                                        .of(context)
-                                                                        .dev_image_url_2)))),
-                                                        onTap: () =>
-                                                            BrowserUtil.openUrl(
-                                                                S
-                                                                    .of(context)
-                                                                    .dev_page_2,
-                                                                context),
-                                                      ),
-                                                      const SizedBox(
-                                                          height:
-                                                              _avatarNameSpacing),
-                                                      Text(
-                                                        S
-                                                            .of(context)
-                                                            .dev_name_2,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: <Widget>[
-                                                      InkWell(
-                                                        child: Container(
-                                                            width: _avatarSize,
-                                                            height: _avatarSize,
-                                                            decoration: new BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                image: new DecorationImage(
-                                                                    fit: BoxFit
-                                                                        .fill,
-                                                                    image: new AssetImage(S
-                                                                        .of(context)
-                                                                        .dev_image_url_3)))),
-                                                        onTap: () {
-                                                          BrowserUtil.openUrl(
-                                                              S
-                                                                  .of(context)
-                                                                  .dev_page_3,
-                                                              context);
-                                                        },
-                                                      ),
-                                                      const SizedBox(
-                                                          height:
-                                                              _avatarNameSpacing),
-                                                      Text(
-                                                        S
-                                                            .of(context)
-                                                            .dev_name_3,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: <Widget>[
-                                                      InkWell(
-                                                        child: Container(
-                                                            width: _avatarSize,
-                                                            height: _avatarSize,
-                                                            decoration: new BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                image: new DecorationImage(
-                                                                    fit: BoxFit
-                                                                        .fill,
-                                                                    image: new AssetImage(S
-                                                                        .of(context)
-                                                                        .dev_image_url_4)))),
-                                                        onTap: () {
-                                                          BrowserUtil.openUrl(
-                                                              S
-                                                                  .of(context)
-                                                                  .dev_page_4,
-                                                              context);
-                                                        },
-                                                      ),
-                                                      const SizedBox(
-                                                          height:
-                                                              _avatarNameSpacing),
-                                                      Text(
-                                                        S
-                                                            .of(context)
-                                                            .dev_name_4,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 16),
-                                              //Version
-                                              FutureBuilder<PackageInfo>(
-                                                future:
-                                                    PackageInfo.fromPlatform(),
-                                                builder: (context, snapshot) {
-                                                  switch (snapshot
-                                                      .connectionState) {
-                                                    case ConnectionState.done:
-                                                      return Align(
-                                                        alignment: Alignment
-                                                            .centerRight,
-                                                        child: Text(
-                                                          S
-                                                                  .of(context)
-                                                                  .version +
-                                                              ' ${snapshot?.data?.version} build ${snapshot?.data?.buildNumber}',
-                                                          textScaleFactor: 0.7,
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      );
-                                                    default:
-                                                      return Align(
-                                                        alignment: Alignment
-                                                            .centerRight,
-                                                        child: Text(
-                                                          S.of(context).loading,
-                                                          textScaleFactor: 0.7,
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      );
-                                                  }
-                                                },
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: <Widget>[
-                                                  Text(
-                                                    S
-                                                        .of(context)
-                                                        .author_descriptor,
-                                                    textScaleFactor: 0.7,
-                                                    textAlign: TextAlign.right,
-                                                  )
-                                                ],
-                                              ),
-                                            ]),
+                                                        .dev_image_url_1)))),
+                                        onTap: () => BrowserUtil.openUrl(
+                                            S.of(context).dev_page_1, context),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          FutureWidget<bool>(
-                                            successBuilder:
-                                                (context, snapshot) {
-                                              if (snapshot.data)
-                                                return TextButton(
-                                                  child:
-                                                      Text(S.of(context).rate),
-                                                  onPressed: () {
-                                                    inAppReview
-                                                        .openStoreListing(
-                                                      appStoreId: Constant
-                                                          .APPSTORE_APPID,
-                                                    );
-                                                  },
-                                                );
-                                              else
-                                                return Container();
-                                            },
-                                            loadingBuilder:
-                                                PlatformCircularProgressIndicator(),
-                                            errorBuilder: Container(),
-                                            future: inAppReview.isAvailable(),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          TextButton(
-                                            child:
-                                                Text(S.of(context).contact_us),
-                                            onPressed: () async {
-                                              final Email email = Email(
-                                                body: '',
-                                                subject:
-                                                    S.of(context).app_feedback,
-                                                recipients: [
-                                                  S.of(context).feedback_email
-                                                ],
-                                                isHTML: false,
-                                              );
-                                              await FlutterEmailSender.send(
-                                                  email);
-                                            },
-                                          ),
-                                          const SizedBox(width: 8),
-                                          TextButton(
-                                            child: Text(
-                                                S.of(context).project_page),
-                                            onPressed: () {
-                                              BrowserUtil.openUrl(
-                                                  S.of(context).project_url,
-                                                  context);
-                                            },
-                                          ),
-                                          const SizedBox(width: 8),
-                                        ],
+                                      const SizedBox(
+                                          height: _avatarNameSpacing),
+                                      Text(
+                                        S.of(context).dev_name_1,
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
-                                ]))),
-                  ]),
-            )));
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new AssetImage(S
+                                                        .of(context)
+                                                        .dev_image_url_2)))),
+                                        onTap: () => BrowserUtil.openUrl(
+                                            S.of(context).dev_page_2, context),
+                                      ),
+                                      const SizedBox(
+                                          height: _avatarNameSpacing),
+                                      Text(
+                                        S.of(context).dev_name_2,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new AssetImage(S
+                                                        .of(context)
+                                                        .dev_image_url_3)))),
+                                        onTap: () {
+                                          BrowserUtil.openUrl(
+                                              S.of(context).dev_page_3,
+                                              context);
+                                        },
+                                      ),
+                                      const SizedBox(
+                                          height: _avatarNameSpacing),
+                                      Text(
+                                        S.of(context).dev_name_3,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Container(
+                                            width: _avatarSize,
+                                            height: _avatarSize,
+                                            decoration: new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: new DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: new AssetImage(S
+                                                        .of(context)
+                                                        .dev_image_url_4)))),
+                                        onTap: () {
+                                          BrowserUtil.openUrl(
+                                              S.of(context).dev_page_4,
+                                              context);
+                                        },
+                                      ),
+                                      const SizedBox(
+                                          height: _avatarNameSpacing),
+                                      Text(
+                                        S.of(context).dev_name_4,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              //Version
+                              FutureBuilder<PackageInfo>(
+                                future: PackageInfo.fromPlatform(),
+                                builder: (context, snapshot) {
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.done:
+                                      return Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          S.of(context).version +
+                                              ' ${snapshot?.data?.version} build ${snapshot?.data?.buildNumber}',
+                                          textScaleFactor: 0.7,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      );
+                                    default:
+                                      return Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          S.of(context).loading,
+                                          textScaleFactor: 0.7,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      );
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Text(
+                                    S.of(context).author_descriptor,
+                                    textScaleFactor: 0.7,
+                                    textAlign: TextAlign.right,
+                                  )
+                                ],
+                              ),
+                            ]),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          FutureWidget<bool>(
+                            successBuilder: (context, snapshot) {
+                              if (snapshot.data)
+                                return TextButton(
+                                  child: Text(S.of(context).rate),
+                                  onPressed: () {
+                                    inAppReview.openStoreListing(
+                                      appStoreId: Constant.APPSTORE_APPID,
+                                    );
+                                  },
+                                );
+                              else
+                                return Container();
+                            },
+                            loadingBuilder: PlatformCircularProgressIndicator(),
+                            errorBuilder: Container(),
+                            future: inAppReview.isAvailable(),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            child: Text(S.of(context).contact_us),
+                            onPressed: () async {
+                              final Email email = Email(
+                                body: '',
+                                subject: S.of(context).app_feedback,
+                                recipients: [S.of(context).feedback_email],
+                                isHTML: false,
+                              );
+                              await FlutterEmailSender.send(email);
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            child: Text(S.of(context).project_page),
+                            onPressed: () {
+                              BrowserUtil.openUrl(
+                                  S.of(context).project_url, context);
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+                    ],
+                  ),
+                ])));
   }
 
   @override

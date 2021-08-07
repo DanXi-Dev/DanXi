@@ -469,7 +469,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded)
       return Container();
     Linkify postContentWidget = Linkify(
-      text: renderText(postElement.first_post.content, S.of(context).image_tag),
+      text: renderText(
+          postElement.first_post.filteredContent, S.of(context).image_tag),
       style: TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -477,8 +478,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
     TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
-    String lastReplyContent =
-        renderText(postElement.last_post.content, S.of(context).image_tag);
+    String lastReplyContent = renderText(
+        postElement.last_post.filteredContent, S.of(context).image_tag);
     return Material(
       child: Card(
           child: Column(children: [

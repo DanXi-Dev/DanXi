@@ -186,6 +186,12 @@
     "tag_count":"Popularity: {count}",
     "filtering_by_tag": "Filtering by \"{tag}\"",
     "fduhole_nsfw_behavior": "FDUHole: NSFW content",
+    "fduhole_clean_mode": "FDUHole: Clean Mode",
+    "fduhole_clean_mode_description": "Smart filter of unfriendly posts in FDUHole",
+    "fduhole_clean_mode_detail": "When Clean Mode is enabled, some Emoji faces that are widely considered \"unfriendly\" will be filtered.",
+    "before_enabled": "Before",
+    "after_enabled": "After",
+
     "fold": "Fold",
     "hide": "Hide",
     "show": "Show",
