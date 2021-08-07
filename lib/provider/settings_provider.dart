@@ -39,6 +39,8 @@ class SettingsProvider {
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
   static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
       "last_recorded_semester_start_time";
+  static const String KEY_CLEAN_MODE = "clean_mode";
+  static const String KEY_DEBUG_MODE = "DEBUG";
   static List<DashboardCard> _kDefaultDashboardCardList = [
     DashboardCard("new_card", null, null, true),
     DashboardCard("welcome_feature", null, null, true),
@@ -84,9 +86,8 @@ class SettingsProvider {
     return null;
   }
 
-  set lastSemesterStartTime(String value) {
-    preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
-  }
+  set lastSemesterStartTime(String value) =>
+      preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting
@@ -109,9 +110,8 @@ class SettingsProvider {
     return _kDefaultDashboardCardList;
   }
 
-  set dashboardWidgetsSequence(List<DashboardCard> value) {
-    preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
-  }
+  set dashboardWidgetsSequence(List<DashboardCard> value) =>
+      preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
 
   Campus get campus {
     if (preferences.containsKey(KEY_PREFERRED_CAMPUS)) {
@@ -170,7 +170,15 @@ class SettingsProvider {
   void deleteSavedFduholeToken() => preferences.remove(KEY_FDUHOLE_TOKEN);
 
   //Debug Mode
-  bool get debugMode => preferences.containsKey("DEBUG");
+  bool get debugMode {
+    if (preferences.containsKey(KEY_DEBUG_MODE)) {
+      return preferences.getBool(KEY_DEBUG_MODE);
+    } else {
+      return false;
+    }
+  }
+
+  set debugMode(bool mode) => preferences.setBool(KEY_DEBUG_MODE, mode);
 
   //FDUHOLE Default Sorting Order
   SortOrder get fduholeSortOrder {
@@ -203,6 +211,17 @@ class SettingsProvider {
 
   set fduholeFoldBehavior(FoldBehavior value) =>
       preferences.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+
+  /// Clean Mode
+  bool get cleanMode {
+    if (preferences.containsKey(KEY_CLEAN_MODE)) {
+      return preferences.getBool(KEY_CLEAN_MODE);
+    } else {
+      return false;
+    }
+  }
+
+  set cleanMode(bool mode) => preferences.setBool(KEY_CLEAN_MODE, mode);
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }
