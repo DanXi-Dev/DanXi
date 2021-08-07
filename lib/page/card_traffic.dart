@@ -32,7 +32,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -53,11 +52,9 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   void initState() {
     super.initState();
     _personInfo = StateProvider.personInfo.value;
-    SharedPreferences.getInstance().then((preferences) {
-      _selectItem = SettingsProvider.of(preferences).campus;
-      _sliding = _selectItem.index;
-      _onSelectedItemChanged(_selectItem);
-    });
+    _selectItem = SettingsProvider.getInstance().campus;
+    _sliding = _selectItem.index;
+    _onSelectedItemChanged(_selectItem);
   }
 
   /// Load dining hall data

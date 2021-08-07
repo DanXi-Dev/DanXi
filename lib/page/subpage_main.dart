@@ -30,12 +30,15 @@ import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
@@ -43,8 +46,8 @@ import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
@@ -54,6 +57,31 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
 
   @override
   String get debugTag => "HomePage";
+
+  @override
+  Create<String> get title => (cxt) => S.of(cxt).app_name;
+
+  @override
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+        AppBarButtonItem(
+            S.of(cxt).developer_announcement(''),
+            Icon(PlatformX.isMaterial(cxt)
+                ? Icons.notifications
+                : SFSymbols.bell_circle),
+            () => smartNavigatorPush(cxt, '/announcement/list'))
+      ];
+
+  @override
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+        AppBarButtonItem(
+            S.of(cxt).dashboard_layout,
+            Text(
+              S.of(cxt).edit,
+              textScaleFactor: 1.2,
+            ),
+            () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
+                (value) => RefreshHomepageEvent(onlyIfQueued: true).fire()))
+      ];
 }
 
 class RefreshHomepageEvent {
@@ -66,7 +94,6 @@ class RefreshHomepageEvent {
 class _HomeSubpageState extends State<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
   static final StateStreamListener _refreshSubscription = StateStreamListener();
-  SharedPreferences _preferences;
   Map<String, Widget> widgetMap;
   bool isRefreshQueued = false;
   List<Feature> _notifications = [];
@@ -104,7 +131,6 @@ class _HomeSubpageState extends State<HomeSubpage>
 
   @override
   void didChangeDependencies() {
-    _preferences = Provider.of<SharedPreferences>(context);
     _rebuild();
     super.didChangeDependencies();
   }
@@ -218,7 +244,7 @@ class _HomeSubpageState extends State<HomeSubpage>
   Widget build(BuildContext context) {
     super.build(context);
     List<DashboardCard> widgetList =
-        SettingsProvider.of(_preferences).dashboardWidgetsSequence;
+        SettingsProvider.getInstance().dashboardWidgetsSequence;
     return SafeArea(
         child: RefreshIndicator(
             color: Theme.of(context).accentColor,

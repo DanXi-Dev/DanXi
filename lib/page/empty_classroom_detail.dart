@@ -38,7 +38,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class EmptyClassroomDetailPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -56,26 +55,23 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   List<Tag> _campusTags;
   int _selectCampusIndex = 0;
 
-  SharedPreferences preferences;
-
   List<Tag> _buildingTags;
   Map<int, Text> _buildingList;
   int __selectBuildingIndex = 0;
 
   int get _selectBuildingIndex => __selectBuildingIndex;
+
   set _selectBuildingIndex(int value) {
     __selectBuildingIndex = value;
-    SettingsProvider.of(preferences).lastECBuildingChoiceRepresentation = value;
+    SettingsProvider.getInstance().lastECBuildingChoiceRepresentation = value;
   }
 
   double _selectDate = 0;
 
   _loadDefaultRoom() async {
-    preferences = await SharedPreferences.getInstance();
-    _selectCampusIndex = SettingsProvider.of(preferences).campus.index;
+    _selectCampusIndex = SettingsProvider.getInstance().campus.index;
     _selectBuildingIndex =
-        SettingsProvider.of(preferences).lastECBuildingChoiceRepresentation ??
-            0;
+        SettingsProvider.getInstance().lastECBuildingChoiceRepresentation ?? 0;
     refreshSelf();
   }
 

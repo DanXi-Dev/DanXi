@@ -31,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BusPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -139,11 +138,9 @@ class _BusPageState extends State<BusPage> {
     _startSliding = _startSelectItem.index;
     _onStartLocationChanged(_startSelectItem);
 
-    SharedPreferences.getInstance().then((preferences) {
-      _endSelectItem = SettingsProvider.of(preferences).campus;
-      _endSliding = _endSelectItem.index;
-      _onEndLocationChanged(_endSelectItem);
-    });
+    _endSelectItem = SettingsProvider.getInstance().campus;
+    _endSliding = _endSelectItem.index;
+    _onEndLocationChanged(_endSelectItem);
   }
 
   void _onStartLocationChanged(Campus e) {

@@ -28,6 +28,7 @@ import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
@@ -50,7 +51,6 @@ import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const kCompatibleUserGroup = [
@@ -117,6 +117,72 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
 
   @override
   String get debugTag => "BBSPage";
+
+  /// Build a list of options controlling how to sort posts.
+  List<Widget> _buildSortOptionsList(BuildContext cxt) {
+    List<Widget> list = [];
+    Function onTapListener = (SortOrder newOrder) {
+      Navigator.of(cxt).pop();
+      SortOrderChangedEvent(newOrder).fire();
+    };
+    SortOrder.values.forEach((value) {
+      list.add(PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () => onTapListener(value),
+          child: Text(value.displayTitle(cxt)),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(value.displayTitle(cxt)),
+          onTap: () => onTapListener(value),
+        ),
+      ));
+    });
+    return list;
+  }
+
+  @override
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+        AppBarButtonItem(
+            S.of(cxt).sort_order,
+            Icon(SFSymbols.sort_down_circle),
+            () => showPlatformModalSheet(
+                context: cxt,
+                builder: (_) => PlatformWidget(
+                      cupertino: (_, __) => CupertinoActionSheet(
+                        title: Text(S.of(cxt).sort_order),
+                        actions: _buildSortOptionsList(cxt),
+                        cancelButton: CupertinoActionSheetAction(
+                          child: Text(S.of(cxt).cancel),
+                          onPressed: () {
+                            Navigator.of(cxt).pop();
+                          },
+                        ),
+                      ),
+                      material: (_, __) => Container(
+                        height: 300,
+                        child: Column(
+                          children: _buildSortOptionsList(cxt),
+                        ),
+                      ),
+                    )))
+      ];
+
+  @override
+  Create<String> get title => (cxt) => S.of(cxt).forum;
+
+  @override
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+        AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag),
+            () => smartNavigatorPush(cxt, '/bbs/tags')),
+        AppBarButtonItem(
+            S.of(cxt).favorites,
+            Icon(SFSymbols.star),
+            () => smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
+                  'showFavoredDiscussion': true,
+                })),
+        AppBarButtonItem(S.of(cxt).new_post, Icon(SFSymbols.sort_down_circle),
+            () => AddNewPostEvent().fire()),
+      ];
 }
 
 class AddNewPostEvent {}
@@ -146,7 +212,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   final StateStreamListener _searchSubscription = StateStreamListener();
   final StateStreamListener _sortOrderChangedSubscription =
       StateStreamListener();
-  SharedPreferences _preferences;
   String _tagFilter;
   FocusNode _searchFocus = FocusNode();
 
@@ -163,9 +228,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<List<BBSPost>> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
-      _sortOrder = SettingsProvider.of(_preferences).fduholeSortOrder ??
+      _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
           SortOrder.LAST_REPLIED;
-      _foldBehavior = SettingsProvider.of(_preferences).fduholeFoldBehavior ??
+      _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior ??
           FoldBehavior.FOLD;
       if (_tagFilter != null)
         return await PostRepository.getInstance()
@@ -176,8 +241,9 @@ class _BBSSubpageState extends State<BBSSubpage>
         return await PostRepository.getInstance().getFavoredDiscussions();
       } else {
         if (!PostRepository.getInstance().isUserInitialized)
-          await PostRepository.getInstance()
-              .initializeUser(StateProvider.personInfo.value, _preferences);
+          await PostRepository.getInstance().initializeUser(
+              StateProvider.personInfo.value,
+              SettingsProvider.getInstance().preferences);
         return await PostRepository.getInstance().loadPosts(page, _sortOrder);
       }
     } else {
@@ -264,7 +330,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         hashCode);
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-          SettingsProvider.of(_preferences).fduholeSortOrder =
+          SettingsProvider.getInstance().fduholeSortOrder =
               _sortOrder = event.newOrder;
           refreshSelf();
         }),
@@ -276,11 +342,6 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (!_fieldInitComplete) {
       if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
         _tagFilter = widget.arguments['tagFilter'];
-      if (widget.arguments != null &&
-          widget.arguments.containsKey('preferences'))
-        _preferences = widget.arguments['preferences'];
-      else
-        _preferences = Provider.of<SharedPreferences>(context);
       _fieldInitComplete = true;
     }
     super.didChangeDependencies();
@@ -346,7 +407,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               errorBuilder: (BuildContext context,
                   AsyncSnapshot<List<BBSPost>> snapshot) {
                 if (snapshot.error is LoginExpiredError) {
-                  SettingsProvider.of(_preferences).deleteSavedFduholeToken();
+                  SettingsProvider.getInstance().deleteSavedFduholeToken();
                   return _buildErrorPage(
                       error: S.of(context).error_login_expired);
                 } else if (snapshot.error is NotLoginError)
@@ -430,7 +491,6 @@ class _BBSSubpageState extends State<BBSSubpage>
                 generateTagWidgets(postElement, (String tagname) {
                   smartNavigatorPush(context, '/bbs/discussions', arguments: {
                     "tagFilter": tagname,
-                    'preferences': _preferences,
                   });
                 }),
                 const SizedBox(

@@ -17,10 +17,19 @@
 
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 abstract class PlatformSubpage extends StatefulWidget {
+  @deprecated
   final bool needPadding = false;
+  @deprecated
   final bool needBottomPadding = false;
+
+  Create<String> get title;
+
+  Create<List<AppBarButtonItem>> get leading => (_) => [];
+
+  Create<List<AppBarButtonItem>> get trailing => (_) => [];
 
   @mustCallSuper
   void onViewStateChanged(SubpageViewState state) {
@@ -35,6 +44,14 @@ abstract class PlatformSubpage extends StatefulWidget {
       }
     }
   }
+}
+
+class AppBarButtonItem {
+  final String caption;
+  final Widget widget;
+  final VoidCallback onPressed;
+
+  AppBarButtonItem(this.caption, this.widget, this.onPressed);
 }
 
 enum SubpageViewState { VISIBLE, INVISIBLE }

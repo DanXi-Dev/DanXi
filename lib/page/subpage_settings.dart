@@ -57,6 +57,9 @@ class SettingsSubpage extends PlatformSubpage
 
   @override
   String get debugTag => "SettingsPage";
+
+  @override
+  Create<String> get title => (cxt) => S.of(cxt).settings;
 }
 
 class _SettingsSubpageState extends State<SettingsSubpage>
@@ -162,8 +165,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     await _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
 
-  SharedPreferences _preferences;
-
   void initLogin({bool forceLogin = false}) {
     _showLoginDialog(forceLogin: forceLogin);
   }
@@ -175,7 +176,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => LoginDialog(
-            sharedPreferences: _preferences,
+            sharedPreferences: SettingsProvider.getInstance().preferences,
             personInfo: _infoNotifier,
             dismissible: forceLogin));
   }
@@ -183,7 +184,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   List<Widget> _buildCampusAreaList() {
     List<Widget> list = [];
     Function onTapListener = (Campus campus) {
-      SettingsProvider.of(_preferences).campus = campus;
+      SettingsProvider.getInstance().campus = campus;
       Navigator.of(context).pop();
       RefreshHomepageEvent().fire();
       refreshSelf();
@@ -206,7 +207,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   List<Widget> _buildFoldBehaviorList() {
     List<Widget> list = [];
     Function onTapListener = (FoldBehavior value) {
-      SettingsProvider.of(_preferences).fduholeFoldBehavior = value;
+      SettingsProvider.getInstance().fduholeFoldBehavior = value;
       RetrieveNewPostEvent().fire();
       Navigator.of(context).pop();
       refreshSelf();
@@ -229,7 +230,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    _preferences = Provider.of<SharedPreferences>(context);
     final Color _originalDividerColor = Theme.of(context).dividerColor;
     double _avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
@@ -287,9 +287,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 actions: [
                                   PlatformDialogAction(
                                     child: Text(S.of(context).cancel),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                   ),
                                   PlatformDialogAction(
                                       child: Text(
@@ -317,35 +316,30 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         leading: PlatformX.isMaterial(context)
                             ? const Icon(Icons.location_on)
                             : const Icon(SFSymbols.location),
-                        subtitle: Text(SettingsProvider.of(_preferences)
+                        subtitle: Text(SettingsProvider.getInstance()
                             .campus
                             .displayTitle(context)),
                         onTap: () {
-                          if (_preferences != null) {
-                            showPlatformModalSheet(
-                                context: context,
-                                builder: (_) => PlatformWidget(
-                                      cupertino: (_, __) =>
-                                          CupertinoActionSheet(
-                                        title:
-                                            Text(S.of(context).select_campus),
-                                        actions: _buildCampusAreaList(),
-                                        cancelButton:
-                                            CupertinoActionSheetAction(
-                                          child: Text(S.of(context).cancel),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
+                          showPlatformModalSheet(
+                              context: context,
+                              builder: (_) => PlatformWidget(
+                                    cupertino: (_, __) => CupertinoActionSheet(
+                                      title: Text(S.of(context).select_campus),
+                                      actions: _buildCampusAreaList(),
+                                      cancelButton: CupertinoActionSheetAction(
+                                        child: Text(S.of(context).cancel),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
                                       ),
-                                      material: (_, __) => Container(
-                                        height: 300,
-                                        child: Column(
-                                          children: _buildCampusAreaList(),
-                                        ),
+                                    ),
+                                    material: (_, __) => Container(
+                                      height: 300,
+                                      child: Column(
+                                        children: _buildCampusAreaList(),
                                       ),
-                                    ));
-                          }
+                                    ),
+                                  ));
                         },
                       ),
                     ),
@@ -357,41 +351,36 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         leading: PlatformX.isMaterial(context)
                             ? const Icon(Icons.hide_image)
                             : const Icon(SFSymbols.eye_slash),
-                        subtitle: Text(SettingsProvider.of(_preferences)
+                        subtitle: Text(SettingsProvider.getInstance()
                             .fduholeFoldBehavior
                             .displayTitle(context)),
                         onTap: () {
-                          if (_preferences != null) {
-                            showPlatformModalSheet(
-                                context: context,
-                                builder: (_) => PlatformWidget(
-                                      cupertino: (_, __) =>
-                                          CupertinoActionSheet(
-                                        title: Text(S
-                                            .of(context)
-                                            .fduhole_nsfw_behavior),
-                                        actions: _buildFoldBehaviorList(),
-                                        cancelButton:
-                                            CupertinoActionSheetAction(
-                                          child: Text(S.of(context).cancel),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
+                          showPlatformModalSheet(
+                              context: context,
+                              builder: (_) => PlatformWidget(
+                                    cupertino: (_, __) => CupertinoActionSheet(
+                                      title: Text(
+                                          S.of(context).fduhole_nsfw_behavior),
+                                      actions: _buildFoldBehaviorList(),
+                                      cancelButton: CupertinoActionSheetAction(
+                                        child: Text(S.of(context).cancel),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
                                       ),
-                                      material: (_, __) => Container(
-                                        height: 300,
-                                        child: Column(
-                                          children: _buildFoldBehaviorList(),
-                                        ),
+                                    ),
+                                    material: (_, __) => Container(
+                                      height: 300,
+                                      child: Column(
+                                        children: _buildFoldBehaviorList(),
                                       ),
-                                    ));
-                          }
+                                    ),
+                                  ));
                         },
                       ),
                     ),
 
-                    if (SettingsProvider.of(_preferences).debugMode)
+                    if (SettingsProvider.getInstance().debugMode)
                       //Theme Selection
                       Card(
                         child: ListTile(

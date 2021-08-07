@@ -29,7 +29,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardReorderPage extends StatefulWidget {
   /// 'items': A list of [LicenseItem] to display on the page
@@ -44,12 +43,11 @@ class DashboardReorderPage extends StatefulWidget {
 const List<String> NONFUNCTIONAL_WIDGET_LIST = ['divider', 'new_card'];
 
 class _DashboardReorderPage extends State<DashboardReorderPage> {
-  SharedPreferences _preferences;
   List<DashboardCard> sequence;
 
   @override
   Widget build(BuildContext context) {
-    sequence = SettingsProvider.of(_preferences).dashboardWidgetsSequence;
+    sequence = SettingsProvider.getInstance().dashboardWidgetsSequence;
 
     return PlatformScaffold(
       iosContentBottomPadding: false,
@@ -73,7 +71,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                         onTap: () {
                           sequence
                               .add(DashboardCard("new_card", null, null, true));
-                          SettingsProvider.of(_preferences)
+                          SettingsProvider.getInstance()
                               .dashboardWidgetsSequence = sequence;
                           RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
@@ -91,7 +89,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           sequence.add(
                             DashboardCard("divider", null, null, true),
                           );
-                          SettingsProvider.of(_preferences)
+                          SettingsProvider.getInstance()
                               .dashboardWidgetsSequence = sequence;
                           RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
@@ -111,7 +109,9 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                               barrierDismissible: true,
                               builder: (BuildContext context) =>
                                   NewShortcutDialog(
-                                    sharedPreferences: _preferences,
+                                    sharedPreferences:
+                                        SettingsProvider.getInstance()
+                                            .preferences,
                                   )).then((value) => refreshSelf());
                         },
                       ),
@@ -124,7 +124,8 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                         leading: Icon(PlatformIcons(context).removeCircled),
                         title: Text(S.of(context).reset_layout),
                         onTap: () async {
-                          await _preferences
+                          await SettingsProvider.getInstance()
+                              .preferences
                               .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
                           RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
@@ -141,7 +142,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                 DashboardCard tmp = sequence[oldIndex];
                 sequence.removeAt(oldIndex);
                 sequence.insert(newIndex, tmp);
-                SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                SettingsProvider.getInstance().dashboardWidgetsSequence =
                     sequence;
                 RefreshHomepageEvent(queueRefresh: true).fire();
                 refreshSelf();
@@ -188,8 +189,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
           ),
           onDismissed: (direction) {
             sequence.removeAt(index);
-            SettingsProvider.of(_preferences).dashboardWidgetsSequence =
-                sequence;
+            SettingsProvider.getInstance().dashboardWidgetsSequence = sequence;
             RefreshHomepageEvent(queueRefresh: true).fire();
             setState(() {});
           },
@@ -214,7 +214,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool value) {
                   sequence[index].enabled = value;
-                  SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                  SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
                   RefreshHomepageEvent(queueRefresh: true).fire();
                   setState(() {});
@@ -224,7 +224,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             ),
             onDismissed: (direction) {
               sequence.removeAt(index);
-              SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+              SettingsProvider.getInstance().dashboardWidgetsSequence =
                   sequence;
               RefreshHomepageEvent(queueRefresh: true).fire();
               setState(() {});
@@ -248,7 +248,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                 secondary: Icon(Icons.drag_handle_rounded),
                 onChanged: (bool value) {
                   sequence[index].enabled = value;
-                  SettingsProvider.of(_preferences).dashboardWidgetsSequence =
+                  SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
                   RefreshHomepageEvent(queueRefresh: true).fire();
                   refreshSelf();
@@ -265,7 +265,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
 
   @override
   void didChangeDependencies() {
-    _preferences = widget.arguments['preferences'];
     super.didChangeDependencies();
   }
 }

@@ -36,6 +36,7 @@ import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/text_selector.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -72,10 +73,12 @@ void main() {
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   // Init Feature registration.
   FeatureMap.registerAllFeatures();
-  Catcher(
-      rootWidget: DanxiApp(),
-      debugConfig: debugOptions,
-      releaseConfig: releaseOptions);
+  SettingsProvider.getInstance().init().then((_) {
+    Catcher(
+        rootWidget: DanxiApp(),
+        debugConfig: debugOptions,
+        releaseConfig: releaseOptions);
+  });
   if (PlatformX.isDesktop)
     doWhenWindowReady(() {
       final win = appWindow;

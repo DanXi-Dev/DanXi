@@ -24,6 +24,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -41,8 +42,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
 const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
@@ -54,6 +57,17 @@ class TimetableSubPage extends PlatformSubpage
 
   @override
   String get debugTag => "TimetablePage";
+
+  @override
+  Create<String> get title => (cxt) => S.of(cxt).timetable;
+
+  @override
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+        AppBarButtonItem(
+            S.of(cxt).share,
+            Icon(PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up),
+            () => ShareTimetableEvent().fire())
+      ];
 }
 
 class ShareTimetableEvent {}

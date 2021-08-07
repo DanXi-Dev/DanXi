@@ -32,7 +32,7 @@ class AnnouncementRepository {
   Future<Announcement> getLastNewAnnouncement() async {
     Announcement announcement = await getLastAnnouncement();
     if (announcement == null) return null;
-    var pre = await SharedPreferences.getInstance();
+    SharedPreferences pre = await SharedPreferences.getInstance();
     List<String> list = [];
     if (pre.containsKey(KEY_SEEN_ANNOUNCEMENT)) {
       list = pre.getStringList(KEY_SEEN_ANNOUNCEMENT);

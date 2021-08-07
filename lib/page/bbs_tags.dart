@@ -26,7 +26,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BBSTagsPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -39,7 +38,6 @@ class BBSTagsPage extends StatefulWidget {
 
 class _BBSTagsPageState extends State<BBSTagsPage> {
   Future<List<PostTag>> _content;
-  SharedPreferences _preferences;
 
   List<PostTag> tags;
   List<PostTag> filteredTags;
@@ -50,7 +48,6 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
   void initState() {
     super.initState();
     _content = PostRepository.getInstance().loadTags();
-    _preferences = widget.arguments['preferences'];
   }
 
   @override
@@ -103,7 +100,6 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
                                         context, '/bbs/discussions',
                                         arguments: {
                                           "tagFilter": e.name,
-                                          'preferences': _preferences,
                                         }),
                                   )),
                             )

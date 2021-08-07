@@ -21,8 +21,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeFeature extends Feature {
   PersonInfo _info;
@@ -55,7 +53,7 @@ class WelcomeFeature extends Feature {
 
   @override
   Widget get customSubtitle {
-    if (SettingsProvider.of(Provider.of<SharedPreferences>(context)).debugMode)
+    if (SettingsProvider.getInstance().debugMode)
       return Text(
         "Welcome, developer. [Debug Mode Enabled]",
         style: TextStyle(color: Colors.red),

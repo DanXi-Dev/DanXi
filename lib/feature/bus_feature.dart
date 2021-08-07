@@ -30,13 +30,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BusFeature extends Feature {
   ConnectionStatus _status = ConnectionStatus.NONE;
   List<BusScheduleItem> _busList;
-  SharedPreferences _preferences;
 
   bool isHoliday;
 
@@ -48,7 +45,6 @@ class BusFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
-    _preferences = Provider.of<SharedPreferences>(context);
     isHoliday = isTodayHoliday();
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
@@ -93,7 +89,7 @@ class BusFeature extends Feature {
   Widget get customSubtitle {
     if (_status == ConnectionStatus.DONE && _busList != null) {
       return buildSubtitle(
-          nextBusForCampus(SettingsProvider.of(_preferences).campus));
+          nextBusForCampus(SettingsProvider.getInstance().campus));
     }
     return null;
   }

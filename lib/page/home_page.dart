@@ -20,7 +20,6 @@ import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
@@ -77,9 +76,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences _preferences;
 
-  /// A description for current connection status.
-  ValueNotifier<String> _connectStatus = ValueNotifier("");
-
   /// Listener to the failure of logging in caused by different reasons.
   ///
   /// Open up a dialog to request user to log in manually in the browser.
@@ -122,57 +118,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     ];
   }
 
-  final List<Function> _appTitleWidgetBuilder = [
-    (cxt) => Text(S.of(cxt).app_name),
-    (cxt) => Text(S.of(cxt).forum),
-    (cxt) => Text(S.of(cxt).timetable),
-    (cxt) => Text(S.of(cxt).settings)
-  ];
-
-  /// List of all of the subpages' action button icon. They will show on the appbar of each tab page.
-  final List<Function> _subpageRightmostActionButtonWidgetBuilders = [
-    (cxt) => Text(
-          S.of(cxt).edit,
-          textScaleFactor: 1.2,
-        ),
-    (cxt) => Icon(
-        PlatformX.isAndroid ? PlatformIcons(cxt).add : SFSymbols.plus_circle),
-    (cxt) =>
-        Icon(PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up),
-    (cxt) => null
-  ];
-  final List<Function> _subpageRightsecondActionButtonIconBuilders = [
-    (cxt) => null,
-    (cxt) => SFSymbols.star,
-    (cxt) => null,
-    (cxt) => null
-  ];
-  final List<Function> _subpageLeadingActionButtonIconBuilders = [
-    (cxt) => PlatformX.isAndroid ? Icons.notifications : SFSymbols.bell_circle,
-    (cxt) => SFSymbols.sort_down_circle,
-    (cxt) => null,
-    (cxt) => null
-  ];
-
-  /// List of all of the subpage action buttons' description. They will show on the appbar of each tab page.
-  final List<Function> _subpageRightmostActionButtonTextBuilders = [
-    (cxt) => S.of(cxt).dashboard_layout,
-    (cxt) => S.of(cxt).new_post,
-    (cxt) => S.of(cxt).share,
-    (cxt) => null,
-  ];
-  final List<Function> _subpageRightsecondActionButtonTextBuilders = [
-    (cxt) => null,
-    (cxt) => S.of(cxt).favorites,
-    (cxt) => null,
-    (cxt) => null,
-  ];
-  final List<Function> _subpageLeadingActionButtonTextBuilders = [
-    (cxt) => S.of(cxt).developer_announcement(''),
-    (cxt) => S.of(cxt).sort_order,
-    (cxt) => null,
-    (cxt) => null,
-  ];
   final SystemTray _systemTray = SystemTray();
 
   @override
@@ -357,24 +302,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _loadAnnouncement().catchError((ignored) {});
     _loadStartDate().catchError((ignored) {});
 
-    _loadOrInitSharedPreference().then((_) {
-      // Configure shortcut listeners on Android & iOS.
-      if (PlatformX.isMobile)
-        quickActions.initialize((shortcutType) {
-          if (shortcutType == 'action_qr_code' &&
-              StateProvider.personInfo.value != null) {
-            QRHelper.showQRCode(context, StateProvider.personInfo.value);
-          }
-        });
-      // Configure watch listeners on iOS.
-      if (_needSendToWatch &&
-          _preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-        sendFduholeTokenToWatch(
-            _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
-        // Only send once.
-        _needSendToWatch = false;
-      }
-    });
+    _loadOrInitPersonInfo();
+    // Configure shortcut listeners on Android & iOS.
+    if (PlatformX.isMobile)
+      quickActions.initialize((shortcutType) {
+        if (shortcutType == 'action_qr_code' &&
+            StateProvider.personInfo.value != null) {
+          QRHelper.showQRCode(context, StateProvider.personInfo.value);
+        }
+      });
+    // Configure watch listeners on iOS.
+    if (_needSendToWatch &&
+        _preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+      sendFduholeTokenToWatch(
+          _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+      // Only send once.
+      _needSendToWatch = false;
+    }
     // Add shortcuts on Android & iOS.
     if (PlatformX.isMobile) {
       quickActions.setShortcutItems(<ShortcutItem>[
@@ -384,8 +328,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    // _initPlatformState(); //Init brightness control
-
     // Init watchOS support
     const channel_a = const MethodChannel('fduhole');
     channel_a.setMethodCallHandler((MethodCall call) async {
@@ -405,8 +347,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
   ///
   /// If user hasn't logged in before, request him to do so.
-  Future<void> _loadOrInitSharedPreference() async {
-    _preferences = await SharedPreferences.getInstance();
+  void _loadOrInitPersonInfo() {
+    _preferences = SettingsProvider.getInstance().preferences;
 
     if (PersonInfo.verifySharedPreferences(_preferences)) {
       StateProvider.personInfo.value =
@@ -417,148 +359,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  /// When user clicks the action button on appbar
-  void _onPressRightmostActionButton() async {
-    switch (_pageIndex.value) {
-      case 0:
-        smartNavigatorPush(context, '/dashboard/reorder',
-                arguments: {'preferences': _preferences})
-            .then((value) => RefreshHomepageEvent(onlyIfQueued: true).fire());
-        break;
-      case 1:
-        AddNewPostEvent().fire();
-        break;
-      case 2:
-        ShareTimetableEvent().fire();
-        break;
-    }
-  }
-
-  void _onPressRightSecondActionButton() async {
-    switch (_pageIndex.value) {
-      //Entries omitted
-      case 1:
-        smartNavigatorPush(context, '/bbs/discussions', arguments: {
-          'showFavoredDiscussion': true,
-          'preferences': _preferences,
-        });
-        break;
-    }
-  }
-
-  void _onPressLeadingActionButton() async {
-    switch (_pageIndex.value) {
-      //Entries omitted
-      case 0:
-        smartNavigatorPush(context, '/announcement/list');
-        break;
-      case 1:
-        showPlatformModalSheet(
-            context: context,
-            builder: (_) => PlatformWidget(
-                  cupertino: (_, __) => CupertinoActionSheet(
-                    title: Text(S.of(context).sort_order),
-                    actions: _buildSortOptionsList(),
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ),
-                  material: (_, __) => Container(
-                    height: 300,
-                    child: Column(
-                      children: _buildSortOptionsList(),
-                    ),
-                  ),
-                ));
-        break;
-    }
-  }
-
-  List<Widget> _buildSortOptionsList() {
-    List<Widget> list = [];
-    Function onTapListener = (SortOrder newOrder) {
-      Navigator.of(context).pop();
-      SortOrderChangedEvent(newOrder).fire();
-    };
-    SortOrder.values.forEach((value) {
-      list.add(PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)),
-          onTap: () => onTapListener(value),
-        ),
-      ));
-    });
-    return list;
-  }
-
   @override
   Widget build(BuildContext context) {
     _lastRefreshTime = DateTime.now();
     // Build action buttons.
     PlatformIconButton leadingButton;
     List<PlatformIconButton> trailingButtons = [];
-    if (_subpageLeadingActionButtonIconBuilders[_pageIndex.value](context) !=
-        null) {
+
+    String title = _subpage[_pageIndex.value].title.call(context);
+    List<AppBarButtonItem> leadingItems =
+        _subpage[_pageIndex.value].leading.call(context);
+    List<AppBarButtonItem> trailingItems =
+        _subpage[_pageIndex.value].trailing.call(context);
+
+    if (leadingItems.isNotEmpty) {
       leadingButton = PlatformIconButton(
-        material: (_, __) => MaterialIconButtonData(
-            tooltip: _subpageLeadingActionButtonTextBuilders[_pageIndex.value](
-                context)),
+        material: (_, __) =>
+            MaterialIconButtonData(tooltip: leadingItems.first.caption),
         padding: EdgeInsets.zero,
-        icon: Icon(
-            _subpageLeadingActionButtonIconBuilders[_pageIndex.value](context)),
-        onPressed: _onPressLeadingActionButton,
+        icon: leadingItems.first.widget,
+        onPressed: leadingItems.first.onPressed,
       );
     }
 
-    // BBS Subpage's third trailing button
-    if (_pageIndex.value == 1) {
-      trailingButtons.add(PlatformIconButton(
-        material: (_, __) =>
-            MaterialIconButtonData(tooltip: S.of(context).all_tags),
-        padding: EdgeInsets.zero,
-        cupertinoIcon: Icon(SFSymbols.tag),
-        materialIcon: Icon(Icons.tag),
-        onPressed: () => smartNavigatorPush(context, '/bbs/tags', arguments: {
-          'preferences': _preferences,
-        }),
-      ));
-    }
-
-    if (_subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
-            context) !=
-        null) {
-      trailingButtons.add(PlatformIconButton(
-        material: (_, __) => MaterialIconButtonData(
-            tooltip:
-                _subpageRightsecondActionButtonTextBuilders[_pageIndex.value](
-                    context)),
-        padding: EdgeInsets.zero,
-        icon: Icon(
-            _subpageRightsecondActionButtonIconBuilders[_pageIndex.value](
-                context)),
-        onPressed: _onPressRightSecondActionButton,
-      ));
-    }
-    if (_subpageRightmostActionButtonWidgetBuilders[_pageIndex.value](
-            context) !=
-        null) {
-      trailingButtons.add(PlatformIconButton(
-        material: (_, __) => MaterialIconButtonData(
-            tooltip:
-                _subpageRightmostActionButtonTextBuilders[_pageIndex.value](
-                    context)),
-        padding: EdgeInsets.zero,
-        icon: _subpageRightmostActionButtonWidgetBuilders[_pageIndex.value](
-            context),
-        onPressed: _onPressRightmostActionButton,
-      ));
+    if (trailingItems.isNotEmpty) {
+      trailingButtons = trailingItems
+          .map((e) => PlatformIconButton(
+                material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
+                padding: EdgeInsets.zero,
+                icon: e.widget,
+                onPressed: e.onPressed,
+              ))
+          .toList();
     }
 
     if (StateProvider.personInfo.value == null) {
@@ -568,7 +400,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         iosContentPadding: true,
         // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBar(
-          title: _appTitleWidgetBuilder[_pageIndex.value](context),
+          title: Text(title),
           trailingActions: trailingButtons,
         ),
         body: Container(),
@@ -579,28 +411,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: _pageIndex),
-          ChangeNotifierProvider.value(value: _connectStatus),
-          ChangeNotifierProvider.value(value: StateProvider.personInfo),
-          Provider.value(value: _preferences),
         ],
         child: PlatformScaffold(
           iosContentBottomPadding: false,
-          //_subpage[_pageIndex.value].needBottomPadding,
           iosContentPadding: false,
-          //_subpage[_pageIndex.value].needPadding,
-
-          // This workarounds a color bug
-          // backgroundColor: _pageIndex.value == 2
-          //     ? null
-          //     : Theme.of(context).scaffoldBackgroundColor,
-
           appBar: PlatformAppBar(
             cupertino: (_, __) => CupertinoNavigationBarData(
               title: MediaQuery(
                 data: MediaQueryData(
                     textScaleFactor: MediaQuery.textScaleFactorOf(context)),
                 child: TopController(
-                  child: _appTitleWidgetBuilder[_pageIndex.value](context),
+                  child: Text(title),
                   controller: PrimaryScrollController.of(context),
                 ),
               ),
@@ -608,7 +429,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             material: (_, __) => MaterialAppBarData(
               title: TopController(
                 child: Text(
-                  S.of(context).app_name,
+                  title,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 controller: PrimaryScrollController.of(context),
@@ -731,7 +552,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ));
     });
     // Determine if Timetable needs to be updated
-    if (SettingsProvider.of(_preferences).lastSemesterStartTime !=
+    if (SettingsProvider.getInstance().lastSemesterStartTime !=
             TimeTable.defaultStartTime.toIso8601String() &&
         StateProvider.personInfo.value != null) {
       // Update Timetable
@@ -744,7 +565,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               context, S.of(context).timetable_refresh_error,
               title: S.of(context).fatal_error, androidUseSnackbar: false));
 
-      SettingsProvider.of(_preferences).lastSemesterStartTime =
+      SettingsProvider.getInstance().lastSemesterStartTime =
           TimeTable.defaultStartTime.toIso8601String();
     }
   }

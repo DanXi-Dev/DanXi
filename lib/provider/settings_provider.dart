@@ -24,8 +24,8 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider {
-  SharedPreferences _preferences;
-
+  SharedPreferences preferences;
+  static final _instance = SettingsProvider._();
   static const String KEY_PREFERRED_CAMPUS = "campus";
 
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
@@ -56,40 +56,44 @@ class SettingsProvider {
     DashboardCard("qr_feature", null, null, true),
   ];
 
-  SettingsProvider._(this._preferences);
+  SettingsProvider._();
 
-  factory SettingsProvider.of(SharedPreferences preferences) {
-    return SettingsProvider._(preferences);
-  }
+  factory SettingsProvider.getInstance() => _instance;
+
+  Future<void> init() async =>
+      preferences = await SharedPreferences.getInstance();
+
+  @deprecated
+  factory SettingsProvider.of(_) => SettingsProvider.getInstance();
 
   int get lastECBuildingChoiceRepresentation {
-    if (_preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
-      return _preferences.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE);
+    if (preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
+      return preferences.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE);
     }
     return null;
   }
 
   set lastECBuildingChoiceRepresentation(int value) {
-    _preferences.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
+    preferences.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
   }
 
   String get lastSemesterStartTime {
-    if (_preferences.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
-      return _preferences.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME);
+    if (preferences.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
+      return preferences.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME);
     }
     return null;
   }
 
   set lastSemesterStartTime(String value) {
-    _preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
+    preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
   }
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting
   List<DashboardCard> get dashboardWidgetsSequence {
-    if (_preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
+    if (preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
       var rawCardList =
-          (json.decode(_preferences.getString(KEY_DASHBOARD_WIDGETS)) as List)
+          (json.decode(preferences.getString(KEY_DASHBOARD_WIDGETS)) as List)
               .map((i) => DashboardCard.fromJson(i))
               .toList();
       // Merge new features which are added in the new version.
@@ -106,12 +110,12 @@ class SettingsProvider {
   }
 
   set dashboardWidgetsSequence(List<DashboardCard> value) {
-    _preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+    preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
   }
 
   Campus get campus {
-    if (_preferences.containsKey(KEY_PREFERRED_CAMPUS)) {
-      String value = _preferences.getString(KEY_PREFERRED_CAMPUS);
+    if (preferences.containsKey(KEY_PREFERRED_CAMPUS)) {
+      String value = preferences.getString(KEY_PREFERRED_CAMPUS);
       return Constant.CAMPUS_VALUES
           .firstWhere((element) => element.toString() == value, orElse: () {
         campus = Campus.HANDAN_CAMPUS;
@@ -123,7 +127,7 @@ class SettingsProvider {
   }
 
   set campus(Campus campus) {
-    _preferences.setString(KEY_PREFERRED_CAMPUS, campus.toString());
+    preferences.setString(KEY_PREFERRED_CAMPUS, campus.toString());
   }
 
   //FudanDaily AutoTick
@@ -154,24 +158,24 @@ class SettingsProvider {
 
   //Token
   String get fduholeToken {
-    if (_preferences.containsKey(KEY_FDUHOLE_TOKEN)) {
-      return _preferences.getString(KEY_FDUHOLE_TOKEN);
+    if (preferences.containsKey(KEY_FDUHOLE_TOKEN)) {
+      return preferences.getString(KEY_FDUHOLE_TOKEN);
     }
     return null;
   }
 
   set fduholeToken(String value) =>
-      _preferences.setString(KEY_FDUHOLE_TOKEN, value);
+      preferences.setString(KEY_FDUHOLE_TOKEN, value);
 
-  void deleteSavedFduholeToken() => _preferences.remove(KEY_FDUHOLE_TOKEN);
+  void deleteSavedFduholeToken() => preferences.remove(KEY_FDUHOLE_TOKEN);
 
   //Debug Mode
-  bool get debugMode => _preferences.containsKey("DEBUG");
+  bool get debugMode => preferences.containsKey("DEBUG");
 
   //FDUHOLE Default Sorting Order
   SortOrder get fduholeSortOrder {
-    if (_preferences.containsKey(KEY_FDUHOLE_SORTORDER)) {
-      String str = _preferences.getString(KEY_FDUHOLE_SORTORDER);
+    if (preferences.containsKey(KEY_FDUHOLE_SORTORDER)) {
+      String str = preferences.getString(KEY_FDUHOLE_SORTORDER);
       if (str == SortOrder.LAST_CREATED.getInternalString())
         return SortOrder.LAST_CREATED;
       else if (str == SortOrder.LAST_REPLIED.getInternalString())
@@ -181,14 +185,14 @@ class SettingsProvider {
   }
 
   set fduholeSortOrder(SortOrder value) =>
-      _preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
+      preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
 
   /// FDUHOLE Folded Post Behavior
 
   /// NOTE: This getter defaults to a FOLD and won't return [null]
   FoldBehavior get fduholeFoldBehavior {
-    if (_preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
-      int savedPref = _preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
+    if (preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
+      int savedPref = preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
       return FoldBehavior.values.firstWhere(
         (element) => element.index == savedPref,
         orElse: () => FoldBehavior.FOLD,
@@ -198,7 +202,7 @@ class SettingsProvider {
   }
 
   set fduholeFoldBehavior(FoldBehavior value) =>
-      _preferences.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+      preferences.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

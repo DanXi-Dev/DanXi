@@ -48,7 +48,6 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:linkify/linkify.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
@@ -122,7 +121,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// These field should only be initialized once when created.
   BBSPost _post;
   String _searchKeyword;
-  SharedPreferences _preferences;
 
   /// Fields related to the display states.
   bool _isFavored;
@@ -160,16 +158,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     }
     shouldScrollToEnd = widget.arguments.containsKey('scroll_to_end') &&
         widget.arguments['scroll_to_end'] == true;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _getSharedPreferences();
-  }
-
-  _getSharedPreferences() async {
-    _preferences = await SharedPreferences.getInstance();
   }
 
   /// Rebuild everything and refresh itself.
@@ -450,10 +438,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: generateTagWidgets(_post, (String tagName) {
                         smartNavigatorPush(context, '/bbs/discussions',
-                            arguments: {
-                              "tagFilter": tagName,
-                              'preferences': _preferences,
-                            });
+                            arguments: {"tagFilter": tagName});
                       })),
                 Padding(
                   padding: EdgeInsets.fromLTRB(2, 4, 2, 4),

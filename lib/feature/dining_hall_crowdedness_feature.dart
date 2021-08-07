@@ -32,22 +32,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
   PersonInfo _info;
   Map<String, TrafficInfo> _trafficInfos;
   String _leastCrowdedCanteen;
   String _mostCrowdedCanteen;
-  SharedPreferences _preferences;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   Future<void> _loadCrowdednessSummary(PersonInfo info) async {
     _status = ConnectionStatus.CONNECTING;
-    Campus preferredCampus = SettingsProvider.of(_preferences).campus;
+    Campus preferredCampus = SettingsProvider.getInstance().campus;
     _trafficInfos = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
@@ -168,7 +165,6 @@ class DiningHallCrowdednessFeature extends Feature {
   @override
   void buildFeature([Map<String, dynamic> arguments]) {
     _info = StateProvider.personInfo.value;
-    _preferences = Provider.of<SharedPreferences>(context);
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
