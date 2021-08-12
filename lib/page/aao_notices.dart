@@ -77,7 +77,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
             builder: (_, __, ___, Notice value) {
               return ThemedMaterial(
                   child: ListTile(
-                leading: PlatformX.isAndroid
+                leading: PlatformX.isMaterial(context)
                     ? Icon(Icons.info)
                     : Icon(SFSymbols.info_circle_fill),
                 title: Text(value.title),

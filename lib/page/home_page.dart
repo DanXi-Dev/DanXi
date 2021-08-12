@@ -39,7 +39,6 @@ import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
@@ -98,7 +97,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Whether the error dialog is shown.
   /// If a dialog has been shown, we will not show a duplicated one.
   /// See [_dealWithCaptchaNeededException]
-  bool _isDialogShown = false;
+  bool _isErrorDialogShown = false;
 
   /// The tab page index.
   ValueNotifier<int> _pageIndex = ValueNotifier(0);
@@ -129,10 +128,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Deal with login issue described at [CaptchaNeededException].
   _dealWithCaptchaNeededException() {
-    if (_isDialogShown) {
+    if (_isErrorDialogShown) {
       return;
     }
-    _isDialogShown = true;
+    _isErrorDialogShown = true;
     showPlatformDialog(
         barrierDismissible: false,
         context: context,
@@ -144,7 +143,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   PlatformDialogAction(
                     child: Text(S.of(context).retry),
                     onPressed: () {
-                      _isDialogShown = false;
+                      _isErrorDialogShown = false;
                       Navigator.of(context).pop();
                       FlutterApp.restartApp(context);
                     },
@@ -153,7 +152,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   PlatformDialogAction(
                     child: Text(S.of(context).re_login),
                     onPressed: () {
-                      _isDialogShown = false;
+                      _isErrorDialogShown = false;
                       Navigator.of(context).pop();
                       _dealWithCredentialsInvalidException();
                     },
@@ -162,7 +161,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   PlatformDialogAction(
                     child: Text(S.of(context).cancel),
                     onPressed: () {
-                      _isDialogShown = false;
+                      _isErrorDialogShown = false;
                       Navigator.of(context).pop();
                     },
                   ),
@@ -359,14 +358,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    _lastRefreshTime = DateTime.now();
+  /// Show an empty container, if no person info is set.
+  Widget _buildDummyBody(String title) => PlatformScaffold(
+        iosContentBottomPadding: false,
+        iosContentPadding: true,
+        // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: PlatformAppBar(
+          title: Text(title),
+        ),
+        body: Container(),
+      );
+
+  Widget _buildBody(String title) {
     // Build action buttons.
     PlatformIconButton leadingButton;
     List<PlatformIconButton> trailingButtons = [];
-
-    String title = _subpage[_pageIndex.value].title.call(context);
     List<AppBarButtonItem> leadingItems =
         _subpage[_pageIndex.value].leading.call(context);
     List<AppBarButtonItem> trailingItems =
@@ -392,115 +398,112 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ))
           .toList();
     }
+    // Show debug button for [Dio].
+    if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
 
-    if (StateProvider.personInfo.value == null) {
-      // Show an empty container if no person info is set
-      return PlatformScaffold(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: _pageIndex),
+      ],
+      child: PlatformScaffold(
         iosContentBottomPadding: false,
-        iosContentPadding: true,
-        // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        iosContentPadding: false,
         appBar: PlatformAppBar(
-          title: Text(title),
-          trailingActions: trailingButtons,
-        ),
-        body: Container(),
-      );
-    } else {
-      // Show debug button for [Dio].
-      if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: _pageIndex),
-        ],
-        child: PlatformScaffold(
-          iosContentBottomPadding: false,
-          iosContentPadding: false,
-          appBar: PlatformAppBar(
-            cupertino: (_, __) => CupertinoNavigationBarData(
-              title: MediaQuery(
-                data: MediaQueryData(
-                    textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-                child: TopController(
-                  child: Text(title),
-                  controller: PrimaryScrollController.of(context),
-                ),
-              ),
-            ),
-            material: (_, __) => MaterialAppBarData(
-              title: TopController(
-                child: Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+          cupertino: (_, __) => CupertinoNavigationBarData(
+            title: MediaQuery(
+              data: MediaQueryData(
+                  textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+              child: TopController(
+                child: Text(title),
                 controller: PrimaryScrollController.of(context),
               ),
             ),
-            leading: leadingButton,
-            trailingActions: trailingButtons,
           ),
-          body: IndexedStack(
-            index: _pageIndex.value,
-            children: _subpage,
-          ),
-
-          // 2021-5-19 @w568w:
-          // Override the builder to prevent the repeatedly built states.
-          // I don't know why it works...
-          cupertinoTabChildBuilder: (_, index) => _subpage[index],
-          bottomNavBar: PlatformNavBar(
-            items: [
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.purple,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.dashboard)
-                    : Icon(SFSymbols.square_stack_3d_up_fill),
-                label: S.of(context).dashboard,
+          material: (_, __) => MaterialAppBarData(
+            title: TopController(
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.indigo,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.forum)
-                    : Icon(SFSymbols.text_bubble),
-                label: S.of(context).forum,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.blue,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.calendar_today)
-                    : Icon(SFSymbols.calendar),
-                label: S.of(context).timetable,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Theme.of(context).primaryColor,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.settings)
-                    : Icon(SFSymbols.gear_alt),
-                label: S.of(context).settings,
-              ),
-            ],
-            currentIndex: _pageIndex.value,
-            material: (_, __) => MaterialNavBarData(
-              type: BottomNavigationBarType.fixed,
-              selectedIconTheme:
-                  BottomNavigationBarTheme.of(context).selectedIconTheme,
-              unselectedIconTheme:
-                  BottomNavigationBarTheme.of(context).unselectedIconTheme,
+              controller: PrimaryScrollController.of(context),
             ),
-            itemChanged: (index) {
-              if (index != _pageIndex.value) {
-                for (int i = 0; i < _subpage.length; i++) {
-                  if (index != i) {
-                    _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
-                  }
-                }
-                _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
-                setState(() => _pageIndex.value = index);
-              }
-            },
           ),
+          leading: leadingButton,
+          trailingActions: trailingButtons,
         ),
-      );
-    }
+        body: IndexedStack(
+          index: _pageIndex.value,
+          children: _subpage,
+        ),
+
+        // 2021-5-19 @w568w:
+        // Override the builder to prevent the repeatedly built states.
+        // I don't know why it works...
+        cupertinoTabChildBuilder: (_, index) => _subpage[index],
+        bottomNavBar: PlatformNavBar(
+          items: [
+            BottomNavigationBarItem(
+              //backgroundColor: Colors.purple,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.dashboard)
+                  : Icon(SFSymbols.square_stack_3d_up_fill),
+              label: S.of(context).dashboard,
+            ),
+            BottomNavigationBarItem(
+              //backgroundColor: Colors.indigo,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.forum)
+                  : Icon(SFSymbols.text_bubble),
+              label: S.of(context).forum,
+            ),
+            BottomNavigationBarItem(
+              //backgroundColor: Colors.blue,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.calendar_today)
+                  : Icon(SFSymbols.calendar),
+              label: S.of(context).timetable,
+            ),
+            BottomNavigationBarItem(
+              //backgroundColor: Theme.of(context).primaryColor,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.settings)
+                  : Icon(SFSymbols.gear_alt),
+              label: S.of(context).settings,
+            ),
+          ],
+          currentIndex: _pageIndex.value,
+          material: (_, __) => MaterialNavBarData(
+            type: BottomNavigationBarType.fixed,
+            selectedIconTheme:
+                BottomNavigationBarTheme.of(context).selectedIconTheme,
+            unselectedIconTheme:
+                BottomNavigationBarTheme.of(context).unselectedIconTheme,
+          ),
+          itemChanged: (index) {
+            if (index != _pageIndex.value) {
+              for (int i = 0; i < _subpage.length; i++) {
+                if (index != i) {
+                  _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
+                }
+              }
+              _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
+              setState(() => _pageIndex.value = index);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _lastRefreshTime = DateTime.now();
+    String title = _subpage.isEmpty
+        ? S.of(context).app_name
+        : _subpage[_pageIndex.value].title.call(context);
+    return StateProvider.personInfo.value == null
+        ? _buildDummyBody(title)
+        : _buildBody(title);
   }
 
   Future<void> _loadAnnouncement() async {
@@ -556,11 +559,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             TimeTable.defaultStartTime.toIso8601String() &&
         StateProvider.personInfo.value != null) {
       // Update Timetable
-      Retrier.runAsyncWithRetry(
-              () => TimeTableRepository.getInstance().loadTimeTableLocally(
-                  StateProvider.personInfo.value,
-                  forceLoadFromRemote: true),
-              retryTimes: 1)
+      TimeTableRepository.getInstance()
+          .loadTimeTableLocally(StateProvider.personInfo.value,
+              forceLoadFromRemote: true)
           .onError((error, stackTrace) => Noticing.showNotice(
               context, S.of(context).timetable_refresh_error,
               title: S.of(context).fatal_error, androidUseSnackbar: false));

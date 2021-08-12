@@ -158,11 +158,9 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
                           },
                         ),
                       ),
-                      material: (_, __) => Container(
-                        height: 300,
-                        child: Column(
-                          children: _buildSortOptionsList(cxt),
-                        ),
+                      material: (_, __) => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: _buildSortOptionsList(cxt),
                       ),
                     )))
       ];
