@@ -301,7 +301,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _loadAnnouncement().catchError((ignored) {});
     _loadStartDate().catchError((ignored) {});
 
-    _loadOrInitPersonInfo();
     // Configure shortcut listeners on Android & iOS.
     if (PlatformX.isMobile)
       quickActions.initialize((shortcutType) {
@@ -341,6 +340,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // We have to load personInfo after [initState] and [build], since it may pop up a dialog,
+    // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
+    // Also, otherwise it will call [setState] before the frame is completed.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _loadOrInitPersonInfo());
   }
 
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
@@ -437,7 +446,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
 
         // 2021-5-19 @w568w:
-        // Override the builder to prevent the repeatedly built states.
+        // Override the builder to prevent the repeatedly built states on iOS.
         // I don't know why it works...
         cupertinoTabChildBuilder: (_, index) => _subpage[index],
         bottomNavBar: PlatformNavBar(
@@ -474,13 +483,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           currentIndex: _pageIndex.value,
           material: (_, __) => MaterialNavBarData(
             type: BottomNavigationBarType.fixed,
-            selectedIconTheme:
-                BottomNavigationBarTheme.of(context).selectedIconTheme,
-            unselectedIconTheme:
-                BottomNavigationBarTheme.of(context).unselectedIconTheme,
           ),
           itemChanged: (index) {
             if (index != _pageIndex.value) {
+              // Dispatch [SubpageViewState] events.
               for (int i = 0; i < _subpage.length; i++) {
                 if (index != i) {
                   _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
