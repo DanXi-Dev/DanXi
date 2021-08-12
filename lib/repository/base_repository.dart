@@ -45,6 +45,12 @@ abstract class BaseRepositoryWithDio {
     return _cookieJars[linkHost];
   }
 
+  static Future<void> clearAllCookies() async {
+    for (NonpersistentCookieJar jar in _cookieJars.values) {
+      await jar.deleteAll();
+    }
+  }
+
   static Map<String, NonpersistentCookieJar> _cookieJars = {};
   static Map<String, Dio> _dios = {};
 }
