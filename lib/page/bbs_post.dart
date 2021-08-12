@@ -199,6 +199,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       ),
       body: SafeArea(
+        bottom: false,
         child: RefreshIndicator(
           color: Theme.of(context).accentColor,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
@@ -500,7 +501,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     child: isNested
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Linkify(
-                      text: renderText(
+                            text: renderText(
                                     e.filteredContent, S.of(context).image_tag)
                                 .trim(),
                             textScaleFactor: 0.8,

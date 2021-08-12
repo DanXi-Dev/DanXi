@@ -49,6 +49,7 @@ class _GpaTablePageState extends State<GpaTablePage> {
           title: Text(S.of(context).your_gpa),
         ),
         body: SafeArea(
+            bottom: false,
             child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                 controller: PrimaryScrollController.of(context),
@@ -60,11 +61,11 @@ class _GpaTablePageState extends State<GpaTablePage> {
   List<TableRow> _getGpaRow() {
     List<TableRow> widgets = [
       TableRow(children: [
-        Text(
+        /*Text(
           S.of(context).name,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        ),*/
         Text(
           S.of(context).major,
           textAlign: TextAlign.center,
@@ -89,10 +90,10 @@ class _GpaTablePageState extends State<GpaTablePage> {
     ];
     gpalist.forEach((element) {
       widgets.add(TableRow(children: [
-        Text(
+        /*Text(
           element.name,
           textAlign: TextAlign.center,
-        ),
+        ),*/
         /*Text(
           element.year,
           textAlign: TextAlign.center,

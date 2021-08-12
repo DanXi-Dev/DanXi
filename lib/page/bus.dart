@@ -198,6 +198,7 @@ class _BusPageState extends State<BusPage> {
                 controller: PrimaryScrollController.of(context),
                 child: Text(S.of(context).bus_query))),
         body: SafeArea(
+          bottom: false,
           child: Column(
             children: [
               Padding(

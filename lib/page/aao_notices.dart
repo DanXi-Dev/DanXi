@@ -60,7 +60,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      iosContentBottomPadding: true,
+      iosContentBottomPadding: false,
       iosContentPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(

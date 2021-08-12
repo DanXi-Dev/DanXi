@@ -384,6 +384,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildPageBody() {
     return Material(
       child: SafeArea(
+        bottom: false,
         child: RefreshIndicator(
           color: Theme.of(context).accentColor,
           backgroundColor: Theme.of(context).dialogBackgroundColor,

@@ -54,6 +54,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       iosContentPadding: false,
       appBar: PlatformAppBarX(title: Text(S.of(context).dashboard_layout)),
       body: SafeArea(
+        bottom: false,
         child: Material(
           child: WithScrollbar(
             child: ReorderableListView(
