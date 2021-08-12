@@ -36,7 +36,7 @@ class Retrier {
   /// Try to run [function] for [retryTimes] times asynchronously.
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
   static Future<E> runAsyncWithRetry<E>(Future<E> function(),
-      {int retryTimes = 3}) async {
+      {int retryTimes = 1}) async {
     Function errorCatcher;
     errorCatcher = (e) async {
       if (retryTimes > 0) {
@@ -58,7 +58,7 @@ class Retrier {
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
   static Future<E> tryAsyncWithFix<E>(
       Future<E> function(), Future<void> tryFix(exception),
-      {int retryTimes = 3}) async {
+      {int retryTimes = 2}) async {
     Function errorCatcher;
     errorCatcher = (e) async {
       if (retryTimes > 0) {
