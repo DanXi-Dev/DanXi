@@ -39,8 +39,13 @@ class CleanModeFilter {
 
   static cleanText(String content) {
     String newContent = content;
-    DELETE_EMOJI
-        .forEach((element) => newContent = newContent.replaceAll(element, ' '));
+    (DELETE_EMOJI + FILTER_TEXT).forEach((element) {
+      final filterRegex = RegExp(
+          r'[\u4E00-\u9FFF\b]' + RegExp.escape(element) + r'[\u4E00-\u9FFF\b]',
+          caseSensitive: false,
+          unicode: true);
+      newContent = newContent.replaceAll(filterRegex, r' !@#$% ');
+    });
     return newContent;
   }
 }
