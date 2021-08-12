@@ -29,6 +29,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/clean_mode_filter.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
@@ -419,13 +420,11 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             )));
   }
 
-  static const String CLEAN_MODE_EXAMPLE_BEFORE =
-      '`xx人差不多得了，自己什么样不会去看看🐎 😅😅😅😅😅😅😅😅`';
-  static const String CLEAN_MODE_EXAMPLE_AFTER = '`xx人差不多得了，自己什么样不会去看看🐎`';
+  static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
-      builder: (_) => PlatformAlertDialog(
+      builder: (_) => AlertDialog(
             title: Text(S.of(context).fduhole_clean_mode),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -440,7 +439,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 ),
                 PostRenderWidget(
                   render: kMarkdownRender,
-                  content: CLEAN_MODE_EXAMPLE_BEFORE,
+                  content: CLEAN_MODE_EXAMPLE,
                 ),
                 SizedBox(
                   height: 8,
@@ -451,12 +450,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 ),
                 PostRenderWidget(
                   render: kMarkdownRender,
-                  content: CLEAN_MODE_EXAMPLE_AFTER,
+                  content: CleanModeFilter.cleanText(CLEAN_MODE_EXAMPLE),
                 ),
               ],
             ),
             actions: [
-              PlatformDialogAction(
+              TextButton(
                 child: Text(S.of(context).i_see),
                 onPressed: () => Navigator.of(context).pop(),
               )

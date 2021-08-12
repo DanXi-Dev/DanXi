@@ -27,8 +27,7 @@ import 'package:dio_log/dio_log.dart';
 
 class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
-  static const String CREDENTIALS_INVALID =
-      "IDCheckLoginError"; // Multi-lang support
+  static const String CREDENTIALS_INVALID = "密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
 
   /// Log in Fudan UIS system and return the response.

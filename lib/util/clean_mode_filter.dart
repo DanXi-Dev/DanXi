@@ -22,9 +22,9 @@ class CleanModeFilter {
     '😋',
     '🥰',
     '🤭',
-    '😀',
+    '😊',
     '😍',
-    '😃'
+    '😇'
   ];
   static const List<String> CN_FILTER_TEXT = [
     '差不多得了',
@@ -37,18 +37,18 @@ class CleanModeFilter {
     '批'
   ];
 
-  static cleanText(String content) {
-    String newContent;
+  static String cleanText(String content) {
+    String newContent = content;
     DELETE_EMOJI
-        .forEach((element) => newContent = content.replaceAll(element, ' '));
+        .forEach((element) => newContent = newContent.replaceAll(element, ' '));
 
-    CN_FILTER_TEXT.forEach((element) {
+    /* CN_FILTER_TEXT.forEach((element) {
       final filterRegex = RegExp(
           r'[\u4E00-\u9FFF\b]' + RegExp.escape(element) + r'[\u4E00-\u9FFF\b]',
           caseSensitive: false,
-          unicode: true);
+          unicode: false);
       newContent = newContent.replaceAll(filterRegex, r' !@#$% ');
-    });
+    });*/
     return newContent;
   }
 }
