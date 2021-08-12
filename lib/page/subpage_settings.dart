@@ -164,7 +164,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    await _preferences.clear().then((value) => FlutterApp.restartApp(context));
+    _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
 
   void initLogin({bool forceLogin = false}) {

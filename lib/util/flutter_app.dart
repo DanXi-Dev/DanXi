@@ -18,6 +18,7 @@
 import 'dart:io';
 
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -35,7 +36,8 @@ class FlutterApp {
     }
   }
 
-  static void restartApp(BuildContext context) {
+  static Future<void> restartApp(BuildContext context) async {
+    await BaseRepositoryWithDio.clearAllCookies();
     StateProvider.initialize();
     Phoenix.rebirth(context);
   }
