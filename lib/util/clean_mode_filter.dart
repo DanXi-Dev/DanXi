@@ -26,7 +26,7 @@ class CleanModeFilter {
     '😍',
     '😃'
   ];
-  static const List<String> FILTER_TEXT = [
+  static const List<String> CN_FILTER_TEXT = [
     '差不多得了',
     '傻逼',
     '伞兵',
@@ -39,13 +39,19 @@ class CleanModeFilter {
 
   static cleanText(String content) {
     String newContent = content;
-    (DELETE_EMOJI + FILTER_TEXT).forEach((element) {
-      final filterRegex = RegExp(
-          r'[\u4E00-\u9FFF\b]' + RegExp.escape(element) + r'[\u4E00-\u9FFF\b]',
-          caseSensitive: false,
-          unicode: true);
-      newContent = newContent.replaceAll(filterRegex, r' !@#$% ');
-    });
+    DELETE_EMOJI
+        .forEach((element) => newContent = newContent.replaceAll(element, ' '));
+
+    // Before we decide how to deal with filtered texts (in either Markdown or HTML syntax)
+    // and whether they should be hard-coded, we won't enable it.
+
+    // CN_FILTER_TEXT.forEach((element) {
+    //   final filterRegex = RegExp(
+    //       r'[\u4E00-\u9FFF\b]' + RegExp.escape(element) + r'[\u4E00-\u9FFF\b]',
+    //       caseSensitive: false,
+    //       unicode: true);
+    //   newContent = newContent.replaceAll(filterRegex, r' !@#$% ');
+    // });
     return newContent;
   }
 }
