@@ -27,7 +27,8 @@ import 'package:dio_log/dio_log.dart';
 
 class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
-  static const String CREDENTIALS_INVALID = "用户名或者密码有误";
+  static const String CREDENTIALS_INVALID =
+      "IDCheckLoginError"; // Multi-lang support
   static const String WEAK_PASSWORD = "弱密码提示";
 
   /// Log in Fudan UIS system and return the response.
@@ -69,7 +70,7 @@ class UISLoginTool {
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    Response response = await DioUtils.processRedirect(workDio, res);
+    final Response response = await DioUtils.processRedirect(workDio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       CredentialsInvalidException().fire();
       throw CredentialsInvalidException();
