@@ -38,7 +38,6 @@ import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/text_selector.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
-import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,14 +54,12 @@ import 'generated/l10n.dart';
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
   CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
-    FirebaseHandler(),
     ConsoleHandler()
   ], localizationOptions: [
     LocalizationOptions.buildDefaultEnglishOptions(),
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
   CatcherOptions releaseOptions = CatcherOptions(SilentReportMode(), [
-    FirebaseHandler(),
     ConsoleHandler()
   ], localizationOptions: [
     LocalizationOptions.buildDefaultEnglishOptions(),

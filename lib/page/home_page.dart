@@ -35,7 +35,6 @@ import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/util/firebase_handler.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -264,7 +263,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     // Init for firebase services.
-    FirebaseHandler.initFirebase();
+    // FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
       if (StateProvider.personInfo.value != null) {
@@ -507,7 +506,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String title = _subpage.isEmpty
         ? S.of(context).app_name
         : _subpage[_pageIndex.value].title.call(context);
-    return StateProvider.personInfo.value == null
+    return StateProvider.personInfo.value == null || _subpage.isEmpty
         ? _buildDummyBody(title)
         : _buildBody(title);
   }

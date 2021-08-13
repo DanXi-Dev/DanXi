@@ -51,8 +51,8 @@ dependencies:
   url_launcher: ^6.0.3
   package_info_plus: ^1.0.1
   desktop_window: ^0.4.0
-  firebase_core: ^1.0.4
-  firebase_crashlytics: ^2.0.1
+  #  firebase_core: ^1.0.4
+  #  firebase_crashlytics: ^2.0.1
   flutter_html: ^2.0.0
   intl: ^0.17.0-nullsafety.2
   http: ^0.13.1
@@ -77,10 +77,10 @@ dependencies:
   gallery_saver: ^2.1.2
   flutter_markdown: ^0.6.2
   markdown: ^4.0.0
-  synchronized: ^3.0.0
+  #  synchronized: ^3.0.0
   system_tray: ^0.0.6
   bitsdojo_window: ^0.1.1+1
-  scrollable_positioned_list: ^0.1.10
+#  scrollable_positioned_list: ^0.1.10
 
 dependency_overrides:
   fluttertoast:
