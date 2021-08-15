@@ -50,7 +50,7 @@ class BrowserUtil {
   static openUrl(String url, BuildContext context,
       [NonpersistentCookieJar cookieJar]) async {
     // Sanitize URL
-    url = Uri.encodeFull(url);
+    url = Uri.encodeFull(Uri.decodeFull(url));
 
     if (cookieJar == null || PlatformX.isDesktop) {
       launch(url, enableJavaScript: true);
