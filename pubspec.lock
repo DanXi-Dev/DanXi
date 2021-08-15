@@ -1279,7 +1279,7 @@ packages:
     source: hosted
     version: "2.0.12"
   win32:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: win32
       url: "https://pub.flutter-io.cn"

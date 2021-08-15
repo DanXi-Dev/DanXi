@@ -67,6 +67,7 @@ dependencies:
   system_tray: ^0.0.6
   bitsdojo_window: ^0.1.1+1
 #  scrollable_positioned_list: ^0.1.10
+  win32: ^2.2.5
 
 dependency_overrides:
   fluttertoast:

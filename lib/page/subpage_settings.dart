@@ -31,9 +31,11 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/clean_mode_filter.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/util/win32/auto_start.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/post_render.dart';
@@ -343,6 +345,28 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                     Card(
                       child: Column(
                         children: [
+                          if (PlatformX.isWindows)
+                            SwitchListTile(
+                              title:
+                                  Text(S.of(context).windows_auto_start_title),
+                              secondary: const Icon(Icons.settings_power),
+                              subtitle: Text(
+                                  S.of(context).windows_auto_start_description),
+                              value: WindowsAutoStart.autoStart,
+                              onChanged: (bool value) async {
+                                WindowsAutoStart.autoStart = value;
+                                await Noticing.showNotice(
+                                    context,
+                                    S
+                                        .of(context)
+                                        .windows_auto_start_wait_dialog_message,
+                                    title: S
+                                        .of(context)
+                                        .windows_auto_start_wait_dialog_title,
+                                    androidUseSnackbar: false);
+                                refreshSelf();
+                              },
+                            ),
                           ListTile(
                             title: Text(S.of(context).fduhole_nsfw_behavior),
                             leading: PlatformX.isMaterial(context)

@@ -23,7 +23,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
 class PlatformX {
@@ -80,6 +79,9 @@ class PlatformX {
     return File(pathSegment.join(fileSystemSlash));
   }
 
+  static String get executablePath =>
+      PlatformX.createPlatformFile(Platform.resolvedExecutable).path;
+
   static String getPathFromFile(String filePath) {
     if (filePath.lastIndexOf(fileSystemSlash) == -1) return filePath;
     return filePath.substring(0, filePath.lastIndexOf(fileSystemSlash));
@@ -94,11 +96,5 @@ class PlatformX {
   static bool get isDarkMode =>
       WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
 
-  static bool isDebugMode(SharedPreferences preferences) {
-    if (preferences != null) {
-      return SettingsProvider.of(preferences).debugMode;
-    } else {
-      return false;
-    }
-  }
+  static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode;
 }

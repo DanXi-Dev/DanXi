@@ -34,6 +34,7 @@ import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
 import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -360,6 +361,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (PersonInfo.verifySharedPreferences(_preferences)) {
       StateProvider.personInfo.value =
           PersonInfo.fromSharedPreferences(_preferences);
+      TestLifeCycle.onStart();
     } else {
       LoginDialog.showLoginDialog(
           context, _preferences, StateProvider.personInfo, false);
