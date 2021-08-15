@@ -18,7 +18,6 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_ehall_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';

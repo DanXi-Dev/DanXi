@@ -32,6 +32,7 @@ class GpaTablePage extends StatefulWidget {
 
 class _GpaTablePageState extends State<GpaTablePage> {
   List<GPAListItem> gpalist;
+  static const String NAME_HIDDEN = "****";
 
   @override
   void initState() {
@@ -54,18 +55,13 @@ class _GpaTablePageState extends State<GpaTablePage> {
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                 controller: PrimaryScrollController.of(context),
                 child: Table(
-                  children: _getGpaRow(),
+                  children: _buildGpaRow(),
                 ))));
   }
 
-  List<TableRow> _getGpaRow() {
+  List<TableRow> _buildGpaRow() {
     List<TableRow> widgets = [
       TableRow(children: [
-        /*Text(
-          S.of(context).name,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),*/
         Text(
           S.of(context).major,
           textAlign: TextAlign.center,
@@ -89,34 +85,29 @@ class _GpaTablePageState extends State<GpaTablePage> {
       ])
     ];
     gpalist.forEach((element) {
+      TextStyle textColorStyle = element.name == NAME_HIDDEN
+          ? null
+          : TextStyle(color: Theme.of(context).accentColor);
       widgets.add(TableRow(children: [
-        /*Text(
-          element.name,
-          textAlign: TextAlign.center,
-        ),*/
-        /*Text(
-          element.year,
-          textAlign: TextAlign.center,
-        ),*/
         Text(
           element.major,
           textAlign: TextAlign.center,
+          style: textColorStyle,
         ),
-        /*Text(
-          element.college,
-          textAlign: TextAlign.center,
-        ),*/
         Text(
           element.gpa,
           textAlign: TextAlign.center,
+          style: textColorStyle,
         ),
         Text(
           element.credits,
           textAlign: TextAlign.center,
+          style: textColorStyle,
         ),
         Text(
           element.rank,
           textAlign: TextAlign.center,
+          style: textColorStyle,
         )
       ]));
     });
