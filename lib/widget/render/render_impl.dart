@@ -49,17 +49,6 @@ BaseRender kHtmlRender = (BuildContext context, String content,
           child: AutoNetworkImage(
               src: attributes['src'],
               maxWidth: imageWidth,
-              loadingWidget: Center(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  foregroundDecoration: BoxDecoration(color: Colors.black12),
-                  width: imageWidth,
-                  height: imageWidth,
-                  child: Center(
-                    child: PlatformCircularProgressIndicator(),
-                  ),
-                ),
-              ),
               onTapImage: onTapImage),
         );
       },
@@ -100,17 +89,6 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
           child: AutoNetworkImage(
               src: uri.toString(),
               maxWidth: imageWidth,
-              loadingWidget: Center(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  foregroundDecoration: BoxDecoration(color: Colors.black12),
-                  width: imageWidth,
-                  height: imageWidth,
-                  child: Center(
-                    child: PlatformCircularProgressIndicator(),
-                  ),
-                ),
-              ),
               onTapImage: onTapImage),
         );
       }

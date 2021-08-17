@@ -18,6 +18,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -28,17 +29,11 @@ class AutoNetworkImage extends StatefulWidget {
   final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
   final String src;
   final double maxWidth;
-  final Widget loadingWidget;
   final Widget errorWidget;
   final ImageTapCallback onTapImage;
 
   AutoNetworkImage(
-      {Key key,
-      this.src,
-      this.maxWidth,
-      this.loadingWidget,
-      this.errorWidget,
-      this.onTapImage})
+      {Key key, this.src, this.maxWidth, this.errorWidget, this.onTapImage})
       : super(key: key);
 
   @override
@@ -59,15 +54,33 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
         constraints: BoxConstraints(maxHeight: widget.maxWidth),
         child: GestureDetector(
           child: CachedNetworkImage(
-            imageUrl: widget.src,
-            width: widget.maxWidth,
-            fit: BoxFit.contain,
-            progressIndicatorBuilder: (_, __, ___) =>
-                widget.loadingWidget ??
-                Center(
-                  child: PlatformCircularProgressIndicator(),
-                ),
-          ),
+              imageUrl: widget.src,
+              width: widget.maxWidth,
+              fit: BoxFit.contain,
+              progressIndicatorBuilder: (_, __, progress) {
+                Widget progressIndicator;
+                if (progress.progress == null)
+                  progressIndicator = PlatformCircularProgressIndicator();
+                else
+                  progressIndicator = Padding(
+                    padding: EdgeInsets.all(32),
+                    child: LinearProgressIndicator(
+                      value: progress.progress,
+                    ),
+                  );
+
+                return Center(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    foregroundDecoration: BoxDecoration(color: Colors.black12),
+                    width: widget.maxWidth,
+                    height: widget.maxWidth,
+                    child: Center(
+                      child: progressIndicator,
+                    ),
+                  ),
+                );
+              }),
           onTap: () => widget.onTapImage(widget.src),
         ),
       ),
