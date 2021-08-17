@@ -56,8 +56,33 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
           child: CachedNetworkImage(
               imageUrl: widget.src,
               width: widget.maxWidth,
+              height: widget
+                  .maxWidth, // Ensure shape is the same as the loading indicator
               fit: BoxFit.contain,
-              progressIndicatorBuilder: (_, __, progress) {
+              errorWidget: (context, url, error) => Center(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      foregroundDecoration:
+                          BoxDecoration(color: Colors.black12),
+                      width: widget.maxWidth,
+                      height: widget.maxWidth,
+                      child: Center(
+                        child: Icon(PlatformIcons(context).error),
+                      ),
+                    ),
+                  ),
+              progressIndicatorBuilder: (context, url, progress) {
+                Widget progressIndicator;
+                if (progress.progress == null)
+                  progressIndicator = Container();
+                else
+                  progressIndicator = Padding(
+                    padding: EdgeInsets.all(64),
+                    child: LinearProgressIndicator(
+                      value: progress.progress,
+                    ),
+                  );
+
                 return Center(
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12),
@@ -65,12 +90,7 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
                     width: widget.maxWidth,
                     height: widget.maxWidth,
                     child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(64),
-                        child: LinearProgressIndicator(
-                          value: progress.progress ?? 0,
-                        ),
-                      ),
+                      child: progressIndicator,
                     ),
                   ),
                 );
