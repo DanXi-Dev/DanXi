@@ -286,7 +286,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ? Icon(SFSymbols.star_fill)
                 : Icon(SFSymbols.star);
           },
-          errorBuilder: () => null,
+          errorBuilder: () => Icon(
+            PlatformIcons(context).error,
+            color: Theme.of(context).errorColor,
+          ),
         ),
         onPressed: () async {
           if (_isFavored == null) return;
@@ -401,8 +404,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       BrowserUtil.openUrl(url, context);
     };
     ImageTapCallback onImageTap = (url) {
-      smartNavigatorPush(context, '/image/detail',
-          arguments: {'url': url});
+      smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     };
     return GestureDetector(
       onLongPress: () {

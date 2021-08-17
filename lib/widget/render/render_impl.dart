@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/auto_network_image.dart';
+import 'package:dan_xi/widget/auto_bbs_image.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ BaseRender kHtmlRender = (BuildContext context, String content,
     customImageRenders: {
       networkSourceMatcher(): (context, attributes, element) {
         return Center(
-          child: AutoNetworkImage(
+          child: AutoBBSImage(
               src: attributes['src'],
               maxWidth: imageWidth,
               onTapImage: onTapImage),
@@ -85,7 +85,7 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
     imageBuilder: (Uri uri, String title, String alt) {
       if (uri != null && uri.toString() != null) {
         return Center(
-          child: AutoNetworkImage(
+          child: AutoBBSImage(
               src: uri.toString(),
               maxWidth: imageWidth,
               onTapImage: onTapImage),
