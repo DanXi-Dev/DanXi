@@ -15,9 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -25,10 +25,10 @@ import 'package:flutter/foundation.dart';
 /// You can write your feature-testing codes here, without worrying about whether
 /// [StateProvider] and [SettingsProvider] have been initialized.
 class _TestLifeCycle {
-  /// When app completes initialization of [StateProvider] and [SettingsProvider].
+  /// When app completes initialization of [StateProvider] and [SettingsProvider],
+  /// the [context] is from [HomePage].
   static void onStart(BuildContext context) {
     /// TEST CODE
-    Noticing.showNotice(context, "aaaaaaaaaaaaaaa");
   }
 
   static void onStartAsync(BuildContext context) async {}

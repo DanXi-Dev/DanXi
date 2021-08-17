@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/announcement_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/future_widget.dart';
@@ -28,6 +29,7 @@ import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
@@ -128,9 +130,12 @@ class _AnnouncementListState extends State<AnnouncementList> {
         onTap: () => showPlatformDialog(
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
-                  title: Text(
+              title: Text(
                       S.of(context).developer_announcement(value.createdAt)),
-                  content: Text(value.content),
+                  content: Linkify(
+                      text: value.content,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context)),
                   actions: <Widget>[
                     PlatformDialogAction(
                         child: PlatformText(S.of(context).i_see),
