@@ -178,7 +178,9 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
             () => smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
                   'showFavoredDiscussion': true,
                 })),
-        AppBarButtonItem(S.of(cxt).new_post, Icon(SFSymbols.plus_circle),
+        AppBarButtonItem(
+            S.of(cxt).new_post,
+            Icon(PlatformIcons(cxt).addCircled),
             () => AddNewPostEvent().fire()),
       ];
 }
