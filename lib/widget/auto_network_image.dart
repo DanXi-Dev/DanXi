@@ -15,14 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-import 'dart:math';
-import 'dart:ui' as ui;
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dan_xi/page/image_viewer.dart';
-import 'package:dan_xi/widget/future_widget.dart';
-import 'package:dan_xi/widget/image_render_x.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';

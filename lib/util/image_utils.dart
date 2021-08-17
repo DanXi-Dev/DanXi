@@ -18,21 +18,27 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_html/shims/dart_ui_real.dart';
 
 class ImageUtils {
   /// Only extract a frame.
-  static Future<Int64List> providerToBytes(
+  static Future<Uint8List> providerToBytes(
       BuildContext context, ImageProvider provider) async {
-    Completer<Int64List> completer = Completer();
+    Completer<Uint8List> completer = Completer();
     var stream = provider.resolve(createLocalImageConfiguration(context));
     stream.addListener(
         ImageStreamListener((ImageInfo image, bool synchronousCall) async {
-      ByteData byteData = await image.image.toByteData();
+      ByteData byteData =
+          await image.image.toByteData(format: ImageByteFormat.png);
+
+      // Important: Must call dispose after use
+      image.dispose();
+
       // TODO: does the [buffer] represent the WHOLE image's byte array,
       //  or just a fixed-size (e.g. 512 Bytes) buffer array
       //  that should be filled with data for multiple times to read in the image?
       //  We need more inspection.
-      completer.complete(byteData.buffer.asInt64List());
+      completer.complete(byteData.buffer.asUint8List());
     }));
     return completer.future;
   }

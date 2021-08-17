@@ -74,6 +74,9 @@ class ImageViewerPage extends StatefulWidget {
   }
 
   static String getMineType(String url) {
+    return 'image/png';
+
+    /*
     if (!isImage(url)) return '';
     if (isBase64Image(url)) {
       return url.between("data:", ";base64");
@@ -83,12 +86,12 @@ class ImageViewerPage extends StatefulWidget {
         IMAGE_SUFFIX
             .firstWhere((element) => path.endsWith(element))
             .replaceFirst(RegExp(r"\\."), "")
-            .replaceFirst(RegExp("jpg"), "jpeg");
+            .replaceFirst(RegExp("jpg"), "jpeg");*/
   }
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
-  Int64List _rawImageToSave;
+  Uint8List _rawImageToSave;
   String _fileName;
   static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
   String _url;
@@ -111,11 +114,15 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     if (ImageViewerPage.isBase64Image(url)) {
       return _BASE64_IMAGE_FILE_NAME;
     }
-    return Uri.parse(url).pathSegments.last;
+    return RegExp(r'(.*)\..*')
+            .firstMatch(Uri.parse(url).pathSegments.last)
+            .group(1) +
+        '.png';
+    //return Uri.parse(url).pathSegments.last;
   }
 
   Future<File> saveToFile(
-      String dirName, String fileName, Int64List bytes) async {
+      String dirName, String fileName, List<int> bytes) async {
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/$dirName/$fileName");
