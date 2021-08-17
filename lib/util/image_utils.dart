@@ -14,4 +14,26 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-class ImageUtils {}
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:flutter/widgets.dart';
+
+class ImageUtils {
+  /// Only extract a frame.
+  static Future<Uint8List> providerToBytes(
+      BuildContext context, ImageProvider provider) async {
+    Completer<Uint8List> completer = Completer();
+    var stream = provider.resolve(createLocalImageConfiguration(context));
+    stream.addListener(
+        ImageStreamListener((ImageInfo image, bool synchronousCall) async {
+      ByteData byteData = await image.image.toByteData();
+      // TODO: does the [buffer] represent the WHOLE image's byte array,
+      //  or just a fixed-size (e.g. 512 Bytes) buffer array
+      //  that should be filled with data for multiple times to read in the image?
+      //  We need more inspection.
+      completer.complete(byteData.buffer.asUint8List());
+    }));
+    return completer.future;
+  }
+}
