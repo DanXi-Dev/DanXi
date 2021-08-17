@@ -17,6 +17,8 @@
 
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 /// This is an app-specific test class.
@@ -24,19 +26,20 @@ import 'package:flutter/foundation.dart';
 /// [StateProvider] and [SettingsProvider] have been initialized.
 class _TestLifeCycle {
   /// When app completes initialization of [StateProvider] and [SettingsProvider].
-  static void onStart() {
+  static void onStart(BuildContext context) {
     /// TEST CODE
+    Noticing.showNotice(context, "aaaaaaaaaaaaaaa");
   }
 
-  static void onStartAsync() async {}
+  static void onStartAsync(BuildContext context) async {}
 }
 
 /// Don't modify this class. It should be invoked only by the app.
 class TestLifeCycle {
-  static void onStart() {
+  static void onStart(BuildContext context) {
     if (kDebugMode) {
-      _TestLifeCycle.onStartAsync();
-      _TestLifeCycle.onStart();
+      _TestLifeCycle.onStartAsync(context);
+      _TestLifeCycle.onStart(context);
     }
   }
 }

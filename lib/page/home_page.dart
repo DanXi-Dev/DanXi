@@ -361,7 +361,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (PersonInfo.verifySharedPreferences(_preferences)) {
       StateProvider.personInfo.value =
           PersonInfo.fromSharedPreferences(_preferences);
-      TestLifeCycle.onStart();
+      TestLifeCycle.onStart(context);
     } else {
       LoginDialog.showLoginDialog(
           context, _preferences, StateProvider.personInfo, false);
@@ -571,7 +571,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               forceLoadFromRemote: true)
           .onError((error, stackTrace) => Noticing.showNotice(
               context, S.of(context).timetable_refresh_error,
-              title: S.of(context).fatal_error, androidUseSnackbar: false));
+              title: S.of(context).fatal_error, useSnackBar: false));
 
       SettingsProvider.getInstance().lastSemesterStartTime =
           TimeTable.defaultStartTime.toIso8601String();

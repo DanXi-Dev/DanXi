@@ -23,15 +23,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-/// Simple helper class to show a [SnackBar] on Android or a [CupertinoAlertDialog] on iOS.
+/// Simple helper class to show a [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
 class Noticing {
   static showNotice(BuildContext context, String message,
-      {String confirmText,
-      String title,
-      bool androidUseSnackbar = true}) async {
-    if (PlatformX.isMaterial(context) && androidUseSnackbar) {
+      {String confirmText, String title, bool useSnackBar = true}) async {
+    if (PlatformX.isMaterial(context) && useSnackBar) {
+      // Override Linkify's default text style.
+      final bool isThemeDark = Theme.of(context).brightness == Brightness.dark;
+      final Brightness invertBrightness =
+          isThemeDark ? Brightness.light : Brightness.dark;
+      final TextStyle contentTextStyle =
+          Theme.of(context).snackBarTheme.contentTextStyle ??
+              ThemeData(brightness: invertBrightness).textTheme.subtitle1;
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Linkify(
+        style: contentTextStyle,
         text: message,
         onOpen: (element) => BrowserUtil.openUrl(element.url, context),
       )));

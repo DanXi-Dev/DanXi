@@ -58,7 +58,7 @@ class BBSEditor {
         .onError((error, stackTrace) => HttpStatus.networkConnectTimeoutError);
     if (responseCode != HttpStatus.ok) {
       Noticing.showNotice(context, S.of(context).post_failed,
-          title: S.of(context).fatal_error, androidUseSnackbar: false);
+          title: S.of(context).fatal_error, useSnackBar: false);
       return false;
     }
     return true;
@@ -79,7 +79,7 @@ class BBSEditor {
         .newReply(discussionId, postId, content)
         .onError((error, stackTrace) => Noticing.showNotice(
             context, S.of(context).reply_failed(error),
-            title: S.of(context).fatal_error, androidUseSnackbar: false));
+            title: S.of(context).fatal_error, useSnackBar: false));
     // Note: postId refers to the specific post the user is replying to, can be NULL
     if (responseCode != 200) {
       Noticing.showNotice(context, S.of(context).reply_failed(responseCode));
@@ -97,7 +97,7 @@ class BBSEditor {
         await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
       Noticing.showNotice(context, S.of(context).report_failed(responseCode),
-          title: S.of(context).fatal_error, androidUseSnackbar: false);
+          title: S.of(context).fatal_error, useSnackBar: false);
     } else {
       Noticing.showNotice(context, S.of(context).report_success);
     }

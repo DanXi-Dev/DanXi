@@ -363,7 +363,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     title: S
                                         .of(context)
                                         .windows_auto_start_wait_dialog_title,
-                                    androidUseSnackbar: false);
+                                    useSnackBar: false);
                                 refreshSelf();
                               },
                             ),

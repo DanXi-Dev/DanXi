@@ -153,7 +153,7 @@ class PEFeature extends Feature {
         body += "\n${element.title}: ${element.times}";
       });
       Noticing.showNotice(context, body,
-          title: S.of(context).pe_exercises, androidUseSnackbar: false);
+          title: S.of(context).pe_exercises, useSnackBar: false);
     } else {
       refreshData();
     }
