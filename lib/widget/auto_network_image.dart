@@ -58,17 +58,6 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
               width: widget.maxWidth,
               fit: BoxFit.contain,
               progressIndicatorBuilder: (_, __, progress) {
-                Widget progressIndicator;
-                if (progress.progress == null)
-                  progressIndicator = PlatformCircularProgressIndicator();
-                else
-                  progressIndicator = Padding(
-                    padding: EdgeInsets.all(32),
-                    child: LinearProgressIndicator(
-                      value: progress.progress,
-                    ),
-                  );
-
                 return Center(
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12),
@@ -76,7 +65,12 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
                     width: widget.maxWidth,
                     height: widget.maxWidth,
                     child: Center(
-                      child: progressIndicator,
+                      child: Padding(
+                        padding: EdgeInsets.all(64),
+                        child: LinearProgressIndicator(
+                          value: progress.progress ?? 0,
+                        ),
+                      ),
                     ),
                   ),
                 );
