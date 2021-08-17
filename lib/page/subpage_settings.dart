@@ -52,6 +52,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class SettingsSubpage extends PlatformSubpage
     with PageWithPrimaryScrollController {
@@ -164,6 +165,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   void initState() {
     super.initState();
   }
+
+  String _clearCacheSubtitle;
 
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -416,9 +419,24 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   .cleanMode = value);
                             },
                           ),
+                          // Clear Cache
+                          ListTile(
+                            leading: Icon(PlatformIcons(context).photoLibrary),
+                            title: Text(S.of(context).clear_cache),
+                            subtitle: Text(_clearCacheSubtitle ??
+                                S.of(context).clear_cache_description),
+                            onTap: () async {
+                              await DefaultCacheManager().emptyCache();
+                              setState(() {
+                                _clearCacheSubtitle =
+                                    S.of(context).cache_cleared;
+                              });
+                            },
+                          ),
                         ],
                       ),
                     ),
+
                     if (SettingsProvider.getInstance().debugMode)
                       //Theme Selection
                       Card(
