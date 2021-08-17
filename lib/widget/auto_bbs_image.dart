@@ -22,25 +22,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+class BBSImagePlaceholder extends StatelessWidget {
+  final Widget child;
+  final double size;
+
+  const BBSImagePlaceholder({Key key, this.child, this.size}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(64),
+        foregroundDecoration: BoxDecoration(color: Colors.black12),
+        width: size,
+        height: size,
+        child: Center(
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 /// A network image loader that will show the image from network, and
 /// fit the image's size to at most [maxWidth].
-class AutoNetworkImage extends StatefulWidget {
+class AutoBBSImage extends StatefulWidget {
   @protected
   final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
   final String src;
   final double maxWidth;
-  final Widget errorWidget;
   final ImageTapCallback onTapImage;
 
-  AutoNetworkImage(
-      {Key key, this.src, this.maxWidth, this.errorWidget, this.onTapImage})
+  AutoBBSImage({Key key, this.src, this.maxWidth, this.onTapImage})
       : super(key: key);
 
   @override
-  _AutoNetworkImageState createState() => _AutoNetworkImageState();
+  _AutoBBSImageState createState() => _AutoBBSImageState();
 }
 
-class _AutoNetworkImageState extends State<AutoNetworkImage> {
+class _AutoBBSImageState extends State<AutoBBSImage> {
   @override
   void initState() {
     super.initState();
@@ -50,7 +70,7 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 8),
         constraints: BoxConstraints(maxHeight: widget.maxWidth),
         child: GestureDetector(
           child: CachedNetworkImage(
@@ -59,40 +79,19 @@ class _AutoNetworkImageState extends State<AutoNetworkImage> {
               height: widget
                   .maxWidth, // Ensure shape is the same as the loading indicator
               fit: BoxFit.contain,
-              errorWidget: (context, url, error) => Center(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      foregroundDecoration:
-                          BoxDecoration(color: Colors.black12),
-                      width: widget.maxWidth,
-                      height: widget.maxWidth,
-                      child: Center(
-                        child: Icon(PlatformIcons(context).error),
-                      ),
-                    ),
+              errorWidget: (context, url, error) => BBSImagePlaceholder(
+                    size: widget.maxWidth,
+                    child: Icon(PlatformIcons(context).error,
+                        color: Theme.of(context).errorColor),
                   ),
               progressIndicatorBuilder: (context, url, progress) {
-                Widget progressIndicator;
-                if (progress.progress == null)
-                  progressIndicator = Container();
-                else
-                  progressIndicator = Padding(
-                    padding: EdgeInsets.all(64),
-                    child: LinearProgressIndicator(
-                      value: progress.progress,
-                    ),
-                  );
-
-                return Center(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    foregroundDecoration: BoxDecoration(color: Colors.black12),
-                    width: widget.maxWidth,
-                    height: widget.maxWidth,
-                    child: Center(
-                      child: progressIndicator,
-                    ),
-                  ),
+                return BBSImagePlaceholder(
+                  size: widget.maxWidth,
+                  child: progress.progress == null
+                      ? Container()
+                      : LinearProgressIndicator(
+                          value: progress.progress,
+                        ),
                 );
               }),
           onTap: () => widget.onTapImage(widget.src),
