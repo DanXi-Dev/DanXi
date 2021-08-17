@@ -29,6 +29,7 @@ import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/image_picker_proxy.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
@@ -41,7 +42,6 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
-import 'package:image_picker/image_picker.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
 
@@ -138,7 +138,7 @@ class BBSEditor {
                 ));
         break;
       case BBSEditorType.PAGE:
-        // Receive the value with dynamic variable to prevent automatic type inference
+      // Receive the value with **dynamic** variable to prevent automatic type inference
         dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
             arguments: {"title": title, "tags": allowTags});
@@ -150,14 +150,13 @@ class BBSEditor {
   @protected
   static Future<void> uploadImage(
       BuildContext context, TextEditingController _controller) async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile _file = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePickerProxy _picker = ImagePickerProxy.createPicker();
+    final String _file = await _picker.pickImage();
     if (_file == null) return;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
     try {
-      await PostRepository.getInstance().uploadImage(File(_file.path)).then(
-          (value) {
+      await PostRepository.getInstance().uploadImage(File(_file)).then((value) {
         if (value != null) _controller.text += "![]($value)";
         //"showAnim: true" makes it crash. Don't know the reason.
         progressDialog.dismiss(showAnim: false);
