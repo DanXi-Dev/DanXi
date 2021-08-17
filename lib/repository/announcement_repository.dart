@@ -15,9 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementRepository {
@@ -56,11 +56,10 @@ class AnnouncementRepository {
   }
 
   Future<List<Announcement>> getAnnouncements() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
     BmobQuery<Announcement> query = BmobQuery<Announcement>()
         .setOrder("-createdAt")
         .addWhereGreaterThanOrEqualTo(
-            "maxVersion", int.tryParse(packageInfo.buildNumber) ?? 0);
+            "maxVersion", int.tryParse(build.first) ?? 0);
     return (await query.queryObjects())
         .map<Announcement>((e) => Announcement.fromJson(e))
         .toList();

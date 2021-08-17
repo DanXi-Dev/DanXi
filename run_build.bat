@@ -7,6 +7,11 @@ echo.
 set /P version_code=Input your version name to continue:
 echo Start building...
 
+:exec_build_runner
+echo Executing build runner...
+echo.
+flutter pub run build_runner build --delete-conflicting-outputs
+
 :build_android
 echo Build for Android...
 echo.

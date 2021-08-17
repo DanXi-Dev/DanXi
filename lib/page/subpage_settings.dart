@@ -18,6 +18,7 @@
 import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
@@ -49,7 +50,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -751,33 +751,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               const SizedBox(height: 16),
                               //Version
-                              FutureBuilder<PackageInfo>(
-                                future: PackageInfo.fromPlatform(),
-                                builder: (context, snapshot) {
-                                  switch (snapshot.connectionState) {
-                                    case ConnectionState.done:
-                                      return Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          S.of(context).version +
-                                              ' ${snapshot?.data?.version} build ${snapshot?.data?.buildNumber}',
-                                          textScaleFactor: 0.7,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      );
-                                    default:
-                                      return Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          S.of(context).loading,
-                                          textScaleFactor: 0.7,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      );
-                                  }
-                                },
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '${S.of(context).version} $version',
+                                  textScaleFactor: 0.7,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Row(
