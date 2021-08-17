@@ -47,6 +47,9 @@ class FudanPERepository extends BaseRepositoryWithDio {
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     List<DOM.Element> tableLines = soup.find_all(
         "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr");
+
+    if (tableLines.isEmpty) throw "Unable to get the data";
+
     tableLines.forEach((line) {
       items.addAll(ExerciseItem.fromHtml(line));
     });
