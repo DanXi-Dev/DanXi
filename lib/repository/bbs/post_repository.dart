@@ -685,6 +685,9 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<Reply>> loadSearchResults(String searchString, int page) async {
+    // Search results only have a single page.
+    // Return nothing if [page] > 1.
+    if (page > 1) return Future.value([]);
     Response response = await dio.get(_BASE_URL + "/posts/",
         queryParameters: {"search": searchString, "page": page},
         options: Options(headers: _tokenHeader));

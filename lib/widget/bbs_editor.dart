@@ -90,7 +90,7 @@ class BBSEditor {
     final String content = (await _showEditor(
             context, S.of(context).reason_report_post(postId),
             editorType: BBSEditorType.DIALOG))
-        .content;
+        ?.content;
     if (content == null || content.trim() == "") return;
 
     int responseCode =
