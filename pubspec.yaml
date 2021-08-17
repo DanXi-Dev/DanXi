@@ -66,6 +66,7 @@ dependencies:
 #  scrollable_positioned_list: ^0.1.10
   win32: ^2.2.5
   file_picker: ^4.0.0
+  cached_network_image: ^3.1.0
 
 dependency_overrides:
   fluttertoast:

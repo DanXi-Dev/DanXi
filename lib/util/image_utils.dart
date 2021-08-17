@@ -21,9 +21,9 @@ import 'package:flutter/widgets.dart';
 
 class ImageUtils {
   /// Only extract a frame.
-  static Future<Uint8List> providerToBytes(
+  static Future<Int64List> providerToBytes(
       BuildContext context, ImageProvider provider) async {
-    Completer<Uint8List> completer = Completer();
+    Completer<Int64List> completer = Completer();
     var stream = provider.resolve(createLocalImageConfiguration(context));
     stream.addListener(
         ImageStreamListener((ImageInfo image, bool synchronousCall) async {
@@ -32,7 +32,7 @@ class ImageUtils {
       //  or just a fixed-size (e.g. 512 Bytes) buffer array
       //  that should be filled with data for multiple times to read in the image?
       //  We need more inspection.
-      completer.complete(byteData.buffer.asUint8List());
+      completer.complete(byteData.buffer.asInt64List());
     }));
     return completer.future;
   }

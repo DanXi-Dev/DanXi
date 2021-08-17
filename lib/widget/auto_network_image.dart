@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/page/image_viewer.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/image_render_x.dart';
@@ -52,63 +53,31 @@ class AutoNetworkImage extends StatefulWidget {
 }
 
 class _AutoNetworkImageState extends State<AutoNetworkImage> {
-  List<int> _rawImage;
-  Future<Size> _loadResult;
-
-  Future<Size> loadImage(String url) async {
-    if (_rawImage == null || _rawImage.isEmpty) {
-      if (ImageViewerPage.isBase64Image(url)) {
-        String base64Content = url.split(",")[1];
-        _rawImage = base64Decode(base64Content);
-      } else {
-        Response response = await widget.dio.get(url);
-        _rawImage = response.data;
-      }
-    }
-    ui.Image image = await decodeImageFromList(_rawImage);
-    return Size(image.width.toDouble(), image.height.toDouble());
-  }
-
   @override
   void initState() {
     super.initState();
-    _loadResult = loadImage(widget.src);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureWidget<Size>(
-        future: _loadResult,
-        successBuilder: (BuildContext context, AsyncSnapshot<Size> snapshot) {
-          final double displayWidth = min(snapshot.data.width, widget.maxWidth);
-
-          if (snapshot.data.width > snapshot.data.height)
-            return GestureDetector(
-              child: Image.memory(
-                _rawImage,
-                width: displayWidth,
-                fit: BoxFit.scaleDown,
-              ),
-              onTap: () => widget.onTapImage(_rawImage, widget.src),
-            );
-
-          return GestureDetector(
-            child: StdImageContainer(
-              width: displayWidth,
-              child: Image.memory(
-                _rawImage,
-                width: displayWidth,
-                height: displayWidth,
-                fit: BoxFit.fitHeight,
-              ),
-            ),
-            onTap: () => widget.onTapImage(_rawImage, widget.src),
-          );
-        },
-        errorBuilder: widget.errorWidget ?? Container(),
-        loadingBuilder: widget.loadingWidget ??
-            Center(
-              child: PlatformCircularProgressIndicator(),
-            ));
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        constraints: BoxConstraints(maxHeight: widget.maxWidth),
+        child: GestureDetector(
+          child: CachedNetworkImage(
+            imageUrl: widget.src,
+            width: widget.maxWidth,
+            fit: BoxFit.contain,
+            progressIndicatorBuilder: (_, __, ___) =>
+                widget.loadingWidget ??
+                Center(
+                  child: PlatformCircularProgressIndicator(),
+                ),
+          ),
+          onTap: () => widget.onTapImage(widget.src),
+        ),
+      ),
+    );
   }
 }

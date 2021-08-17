@@ -400,9 +400,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     LinkTapCallback onLinkTap = (url) {
       BrowserUtil.openUrl(url, context);
     };
-    ImageTapCallback onImageTap = (rawImage, url) {
+    ImageTapCallback onImageTap = (url) {
       smartNavigatorPush(context, '/image/detail',
-          arguments: {'raw_image': rawImage, 'url': url});
+          arguments: {'url': url});
     };
     return GestureDetector(
       onLongPress: () {

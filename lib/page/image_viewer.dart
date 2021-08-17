@@ -17,8 +17,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/image_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -86,7 +88,7 @@ class ImageViewerPage extends StatefulWidget {
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
-  List<int> _rawImage;
+  Int64List _rawImageToSave;
   String _fileName;
   static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
   String _url;
@@ -94,9 +96,15 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   @override
   void initState() {
     super.initState();
-    _rawImage = widget.arguments['raw_image'];
     _url = widget.arguments['url'];
+
     _fileName = getFileName(_url);
+  }
+
+  Future<void> _prepareImageForSaving() async {
+    if (_rawImageToSave == null)
+      _rawImageToSave = await ImageUtils.providerToBytes(
+          context, CachedNetworkImageProvider(_url));
   }
 
   getFileName(String url) {
@@ -107,7 +115,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<File> saveToFile(
-      String dirName, String fileName, List<int> bytes) async {
+      String dirName, String fileName, Int64List bytes) async {
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/$dirName/$fileName");
@@ -117,8 +125,10 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> shareImage() async {
+    await _prepareImageForSaving();
     // Save the image temporarily
-    File outputFile = await saveToFile('temp_image', _fileName, _rawImage);
+    File outputFile =
+        await saveToFile('temp_image', _fileName, _rawImageToSave);
     if (PlatformX.isMobile)
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: [ImageViewerPage.getMineType(_url)]);
@@ -128,6 +138,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> saveImage() async {
+    await _prepareImageForSaving();
     if (PlatformX.isAndroid) {
       PermissionStatus status = await Permission.storage.status;
       if (!status.isGranted &&
@@ -136,7 +147,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         return;
       }
     }
-    File outputFile = await saveToFile('image', _fileName, _rawImage);
+    File outputFile = await saveToFile('image', _fileName, _rawImageToSave);
     if (PlatformX.isMobile) {
       var result = await GallerySaver.saveImage(outputFile.absolute.path);
       if (result != null && result) {
@@ -166,7 +177,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
             ),
 
             // Not needed on iOS
-            if (PlatformX.isMaterial(context))
+            if (!PlatformX.isIOS)
               PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(Icons.save),
@@ -175,8 +186,9 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
           ],
         ),
         body: SafeArea(
+          bottom: false,
           child: PhotoView(
-            imageProvider: MemoryImage(Uint8List.fromList(_rawImage)),
+            imageProvider: CachedNetworkImageProvider(_url),
             backgroundDecoration:
                 BoxDecoration(color: Theme.of(context).canvasColor),
           ),
