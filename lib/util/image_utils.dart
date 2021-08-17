@@ -21,13 +21,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_html/shims/dart_ui_real.dart';
 
 class ImageUtils {
-  /// Only extract a frame.
+  /// Load image byte array from [provider].
+  ///
+  /// For animated images (e.g. .gif, .png, etc.), it only extracts a frame.
   static Future<Uint8List> providerToBytes(
       BuildContext context, ImageProvider provider) async {
     Completer<Uint8List> completer = Completer();
     var stream = provider.resolve(createLocalImageConfiguration(context));
     stream.addListener(
         ImageStreamListener((ImageInfo image, bool synchronousCall) async {
+      // Recode the image into png format.
       ByteData byteData =
           await image.image.toByteData(format: ImageByteFormat.png);
 

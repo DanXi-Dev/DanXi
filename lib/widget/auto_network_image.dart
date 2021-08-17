@@ -24,6 +24,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A network image loader that will show the image from network, and
 /// fit the image's size to at most [maxWidth].
+///
+/// It uses [CachedNetworkImage] to cache images.
 class AutoNetworkImage extends StatefulWidget {
   @protected
   final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
