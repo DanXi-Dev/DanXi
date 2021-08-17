@@ -60,14 +60,8 @@ class ImageViewerPage extends StatefulWidget {
 
   ImageViewerPage({Key key, this.arguments});
 
-  static bool isBase64Image(String content) {
-    return content.startsWith("data:image/");
-  }
-
   static bool isImage(String url) {
     if (url == null || url.isEmpty || Uri.tryParse(url) == null) return false;
-    if (isBase64Image(url)) return true;
-
     String path = Uri.parse(url).path?.toLowerCase();
     if (path == null) return false;
     return IMAGE_SUFFIX.any((element) => path.endsWith(element));
@@ -78,9 +72,6 @@ class ImageViewerPage extends StatefulWidget {
 
     /*
     if (!isImage(url)) return '';
-    if (isBase64Image(url)) {
-      return url.between("data:", ";base64");
-    }
     String path = Uri.parse(url).path.toLowerCase();
     return 'image/' +
         IMAGE_SUFFIX
@@ -93,14 +84,12 @@ class ImageViewerPage extends StatefulWidget {
 class _ImageViewerPageState extends State<ImageViewerPage> {
   Uint8List _rawImageToSave;
   String _fileName;
-  static const _BASE64_IMAGE_FILE_NAME = "base64.jpg";
   String _url;
 
   @override
   void initState() {
     super.initState();
     _url = widget.arguments['url'];
-
     _fileName = getFileName(_url);
   }
 
@@ -111,9 +100,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   getFileName(String url) {
-    if (ImageViewerPage.isBase64Image(url)) {
-      return _BASE64_IMAGE_FILE_NAME;
-    }
     return RegExp(r'(.*)\..*')
             .firstMatch(Uri.parse(url).pathSegments.last)
             .group(1) +
