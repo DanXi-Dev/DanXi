@@ -17,7 +17,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
     git:
-      url: git://github.com/kavinzhao/flutter_progress_dialog.git
+      url: git://github.com/w568w/flutter_progress_dialog.git
       ref: master
   beautifulsoup: ^0.0.1
   quick_actions: ^0.6.0+1
@@ -71,7 +71,7 @@ dependencies:
 dependency_overrides:
   fluttertoast:
     git:
-      url: https://github.com/ponnamkarthik/FlutterToast.git
+      url: git://github.com/ponnamkarthik/FlutterToast.git
       ref: master
   linkify:
     git:
