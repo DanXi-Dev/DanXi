@@ -18,7 +18,7 @@
 import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
@@ -772,7 +772,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  '${S.of(context).version} $version',
+                                  '${S.of(context).version} ${Pubspec.major}.${Pubspec.minor}.${Pubspec.patch} build ${Pubspec.build.first}',
                                   textScaleFactor: 0.7,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),

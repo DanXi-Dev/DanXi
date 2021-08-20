@@ -39,6 +39,7 @@ import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -414,7 +415,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                 } else if (snapshot.error is NotLoginError)
                   return _buildErrorPage(
                       error: (snapshot.error as NotLoginError).errorMessage);
-                return _buildErrorPage(error: snapshot.error.toString());
+                else if (snapshot.error is DioError)
+                  return _buildErrorPage(
+                      error: (snapshot.error as DioError).message);
+                return _buildErrorPage(error: snapshot.error);
               },
               endBuilder: (context) => Center(
                     child: Padding(
@@ -447,7 +451,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 48),
           child: Text(
-            S.of(context).failed + '\n\nThe error was:\n' + error,
+            S.of(context).failed + '\n\n' + error,
           ),
         ),
       ),

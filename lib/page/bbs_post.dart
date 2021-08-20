@@ -37,6 +37,7 @@ import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -301,7 +302,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       : SetFavoredDiscussionMode.DELETE,
                   _post.id)
               .onError((error, stackTrace) {
-            Noticing.showNotice(context, S.of(context).operation_failed);
+            Noticing.showNotice(context, error.toString(),
+                title: S.of(context).operation_failed, useSnackBar: false);
             setState(() => _isFavored = !_isFavored);
             return null;
           });
@@ -312,7 +314,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           BuildContext context, AsyncSnapshot<List<Reply>> snapshot) =>
       GestureDetector(
         child: Center(
-          child: Text(S.of(context).failed),
+          child: Text(S.of(context).failed +
+              '\n\n' +
+              ((snapshot.error is DioError)
+                  ? (snapshot.error as DioError).message
+                  : snapshot.error.toString())),
         ),
         onTap: () {
           refreshSelf();
