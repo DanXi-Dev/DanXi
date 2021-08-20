@@ -317,7 +317,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: Text(S.of(context).failed +
               '\n\n' +
               ((snapshot.error is DioError)
-                  ? (snapshot.error as DioError).message
+                  // If is network error, display the error code and response from server (if any)
+                  ? (snapshot.error as DioError).message +
+                      '\n' +
+                      ((snapshot.error as DioError)
+                              .response
+                              ?.data
+                              ?.toString() ??
+                          "")
+                  // Else, display the internal error
                   : snapshot.error.toString())),
         ),
         onTap: () {

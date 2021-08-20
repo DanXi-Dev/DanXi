@@ -417,7 +417,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                       error: (snapshot.error as NotLoginError).errorMessage);
                 else if (snapshot.error is DioError)
                   return _buildErrorPage(
-                      error: (snapshot.error as DioError).message);
+                      error: (snapshot.error as DioError).message +
+                          '\n' +
+                          ((snapshot.error as DioError)
+                                  .response
+                                  ?.data
+                                  ?.toString() ??
+                              ""));
                 return _buildErrorPage(error: snapshot.error);
               },
               endBuilder: (context) => Center(

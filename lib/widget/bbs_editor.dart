@@ -56,7 +56,10 @@ class BBSEditor {
     final success = await PostRepository.getInstance()
         .newPost(content.content, tags: content.tags)
         .onError((error, stackTrace) {
-      if (error is DioError) error = (error as DioError).message;
+      if (error is DioError)
+        error = (error as DioError).message +
+            '\n' +
+            ((error as DioError).response?.data?.toString() ?? "");
       Noticing.showNotice(context, error.toString(),
           title: S.of(context).post_failed, useSnackBar: false);
       return -1;
@@ -80,7 +83,8 @@ class BBSEditor {
         .newReply(discussionId, postId, content)
         .onError((error, stackTrace) {
       if (error is DioError) {
-        Noticing.showNotice(context, error.message,
+        Noticing.showNotice(context,
+            error.message + '\n' + (error.response?.data?.toString() ?? ""),
             title: S.of(context).reply_failed(error.type), useSnackBar: false);
       } else
         Noticing.showNotice(context, S.of(context).reply_failed(error),
