@@ -8,7 +8,7 @@
 #include <catcher/catcher_plugin.h>
 #include <desktop_window/desktop_window_plugin.h>
 #include <system_tray/system_tray_plugin.h>
-#include <url_launcher_windows/url_launcher_plugin.h>
+#include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   BitsdojoWindowPluginRegisterWithRegistrar(
@@ -19,6 +19,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("DesktopWindowPlugin"));
   SystemTrayPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SystemTrayPlugin"));
-  UrlLauncherPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("UrlLauncherPlugin"));
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
 }
