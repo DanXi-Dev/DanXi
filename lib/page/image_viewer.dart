@@ -25,10 +25,11 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -165,7 +166,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               padding: EdgeInsets.zero,
               icon: Icon(PlatformX.isMaterial(context)
                   ? Icons.share
-                  : SFSymbols.square_arrow_up),
+                  : CupertinoIcons.square_arrow_up),
               onPressed: shareImage,
             ),
 

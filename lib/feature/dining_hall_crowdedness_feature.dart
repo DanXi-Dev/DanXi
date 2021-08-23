@@ -28,10 +28,10 @@ import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
 import 'package:dan_xi/widget/small_tag.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
   PersonInfo _info;
@@ -242,7 +242,7 @@ class DiningHallCrowdednessFeature extends Feature {
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.stacked_line_chart)
-      : const Icon(SFSymbols.person_3_fill);
+      : const Icon(CupertinoIcons.person_3_fill);
 
   @override
   Widget get trailing {

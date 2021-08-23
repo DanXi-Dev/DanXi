@@ -29,7 +29,6 @@ import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class NextCourseFeature extends Feature {
   LiveCourseModel _data;
@@ -124,7 +123,7 @@ class NextCourseFeature extends Feature {
 
   @override
   Widget get icon =>
-      PlatformX.isAndroid ? Icon(Icons.today) : Icon(SFSymbols.today);
+      PlatformX.isAndroid ? Icon(Icons.today) : Icon(CupertinoIcons.today);
 
   @override
   void onTap() {

@@ -36,7 +36,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:intl/intl.dart';
 
 class EmptyClassroomDetailPage extends StatefulWidget {
@@ -104,12 +104,12 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     // Build tags and texts.
     _campusTags = Constant.CAMPUS_VALUES
         .map((e) => Tag(e.displayTitle(context),
-            PlatformX.isAndroid ? Icons.location_on : SFSymbols.location))
+            PlatformX.isAndroid ? Icons.location_on : CupertinoIcons.location))
         .toList();
     _buildingTags = Constant.CAMPUS_VALUES[_selectCampusIndex]
         .getTeachingBuildings()
-        .map((e) =>
-            Tag(e, PlatformX.isAndroid ? Icons.home_work : SFSymbols.location))
+        .map((e) => Tag(
+            e, PlatformX.isAndroid ? Icons.home_work : CupertinoIcons.location))
         .toList();
     _buildingList = Constant.CAMPUS_VALUES[_selectCampusIndex]
         .getTeachingBuildings()

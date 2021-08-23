@@ -41,7 +41,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:flutter_tagging/flutter_tagging.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
@@ -243,7 +243,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                             subtitle: Row(
                               children: [
                                 Icon(
-                                  SFSymbols.flame,
+                                  CupertinoIcons.flame,
                                   color: Constant.getColorFromString(tag.color),
                                   size: 12,
                                 ),
@@ -409,13 +409,13 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                 padding: EdgeInsets.zero,
                 icon: PlatformX.isAndroid
                     ? const Icon(Icons.photo)
-                    : const Icon(SFSymbols.photo),
+                    : const Icon(CupertinoIcons.photo),
                 onPressed: () => BBSEditor.uploadImage(context, _controller)),
             PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: PlatformX.isAndroid
                     ? const Icon(Icons.send)
-                    : const Icon(SFSymbols.paperplane),
+                    : const Icon(CupertinoIcons.paperplane),
                 onPressed: _canSend ? _sendDocument : null),
           ],
         ),

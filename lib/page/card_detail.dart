@@ -32,7 +32,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:intl/intl.dart';
 
 class CardDetailPage extends StatefulWidget {
@@ -58,11 +58,11 @@ class _CardDetailPageState extends State<CardDetailPage> {
     _personInfo = StateProvider.personInfo.value;
     _tags = [
       Tag(S.current.last_7_days,
-          PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
+          PlatformX.isAndroid ? Icons.timelapse : CupertinoIcons.clock_fill),
       Tag(S.current.last_15_days,
-          PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
+          PlatformX.isAndroid ? Icons.timelapse : CupertinoIcons.clock_fill),
       Tag(S.current.last_30_days,
-          PlatformX.isAndroid ? Icons.timelapse : SFSymbols.clock_fill),
+          PlatformX.isAndroid ? Icons.timelapse : CupertinoIcons.clock_fill),
     ];
     _tagDays = [7, 15, 30];
   }
@@ -91,16 +91,18 @@ class _CardDetailPageState extends State<CardDetailPage> {
               if (index >= 0) {
                 // Make the tags not clickable when data's being retrieved
                 setState(() {
-                  tag.checkedIcon =
-                      PlatformX.isAndroid ? Icons.pending : SFSymbols.hourglass;
+                  tag.checkedIcon = PlatformX.isAndroid
+                      ? Icons.pending
+                      : CupertinoIcons.hourglass;
                   _selectable = false;
                 });
                 _cardInfo.records = await Retrier.runAsyncWithRetryForever(() =>
                     CardRepository.getInstance()
                         .loadCardRecord(_tagDays[index]));
                 setState(() {
-                  tag.checkedIcon =
-                      PlatformX.isAndroid ? Icons.check : SFSymbols.checkmark;
+                  tag.checkedIcon = PlatformX.isAndroid
+                      ? Icons.check
+                      : CupertinoIcons.checkmark;
                   _selectable = true;
                 });
               }
@@ -129,7 +131,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
             child: ListTile(
           // leading: PlatformX.isAndroid
           //     ? Icon(Icons.monetization_on)
-          //     : Icon(SFSymbols.money_dollar_circle_fill),
+          //     : Icon(CupertinoIcons.money_dollar_circle_fill),
           title: Text(element.location),
           trailing: Text(Constant.yuanSymbol(element.payment)),
           subtitle:

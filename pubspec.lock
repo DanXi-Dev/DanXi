@@ -538,13 +538,6 @@ packages:
       url: "git://github.com/w568w/flutter_progress_dialog.git"
     source: git
     version: "0.1.0"
-  flutter_sfsymbols:
-    dependency: "direct main"
-    description:
-      name: flutter_sfsymbols
-      url: "https://mirrors.sjtug.sjtu.edu.cn/dart-pub"
-    source: hosted
-    version: "2.0.0"
   flutter_svg:
     dependency: transitive
     description:

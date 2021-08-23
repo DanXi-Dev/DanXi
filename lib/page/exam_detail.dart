@@ -34,7 +34,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:ical/serializer.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -120,7 +120,7 @@ class _ExamListState extends State<ExamList> {
               padding: EdgeInsets.zero,
               icon: Icon(PlatformX.isMaterial(context)
                   ? Icons.share
-                  : SFSymbols.square_arrow_up),
+                  : CupertinoIcons.square_arrow_up),
               onPressed: _exportICal,
             ),
           ],

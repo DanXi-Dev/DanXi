@@ -31,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 /// A list page showing announcement from developers.
 class AnnouncementList extends StatefulWidget {
@@ -119,7 +118,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
           child: ListTile(
         leading: PlatformX.isAndroid
             ? Icon(Icons.info)
-            : Icon(SFSymbols.info_circle_fill),
+            : Icon(CupertinoIcons.info_circle_fill),
         title: Text(
           value.content,
           maxLines: 1,
@@ -130,7 +129,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
         onTap: () => showPlatformDialog(
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
-              title: Text(
+                  title: Text(
                       S.of(context).developer_announcement(value.createdAt)),
                   content: Linkify(
                       text: value.content,

@@ -48,7 +48,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -262,7 +262,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           title: Text(S.of(context).account),
                           leading: PlatformX.isMaterial(context)
                               ? const Icon(Icons.account_circle)
-                              : const Icon(SFSymbols.person_circle),
+                              : const Icon(CupertinoIcons.person_circle),
                           subtitle: Text(StateProvider.personInfo.value.name +
                               ' (' +
                               StateProvider.personInfo.value.id +
@@ -272,7 +272,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           title: Text(S.of(context).logout),
                           leading: PlatformX.isMaterial(context)
                               ? const Icon(Icons.logout)
-                              : const Icon(SFSymbols.trash),
+                              : const Icon(CupertinoIcons.trash),
                           subtitle: Text(S.of(context).logout_subtitle),
                           onTap: () {
                             showPlatformDialog(
@@ -315,7 +315,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         title: Text(S.of(context).default_campus),
                         leading: PlatformX.isMaterial(context)
                             ? const Icon(Icons.location_on)
-                            : const Icon(SFSymbols.location),
+                            : const Icon(CupertinoIcons.location_fill),
                         subtitle: Text(SettingsProvider.getInstance()
                             .campus
                             .displayTitle(context)),
@@ -374,7 +374,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             title: Text(S.of(context).fduhole_nsfw_behavior),
                             leading: PlatformX.isMaterial(context)
                                 ? const Icon(Icons.hide_image)
-                                : const Icon(SFSymbols.eye_slash),
+                                : const Icon(CupertinoIcons.eye_slash),
                             subtitle: Text(SettingsProvider.getInstance()
                                 .fduholeFoldBehavior
                                 .displayTitle(context)),
@@ -444,7 +444,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           title: Text(S.of(context).theme),
                           leading: PlatformX.isMaterial(context)
                               ? const Icon(Icons.color_lens)
-                              : const Icon(SFSymbols.color_filter),
+                              : const Icon(CupertinoIcons.color_filter),
                           subtitle: Text(PlatformX.isMaterial(context)
                               ? S.of(context).material
                               : S.of(context).cupertino),
@@ -522,7 +522,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 maintainState: true,
                 leading: PlatformX.isMaterial(context)
                     ? const Icon(Icons.info)
-                    : const Icon(SFSymbols.info_circle),
+                    : const Icon(CupertinoIcons.info_circle),
                 title: Text(S.of(context).about),
                 children: <Widget>[
                   Column(

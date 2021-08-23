@@ -49,7 +49,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -145,7 +144,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).sort_order,
-            Icon(SFSymbols.sort_down_circle),
+            Icon(CupertinoIcons.sort_down_circle),
             () => showPlatformModalSheet(
                 context: cxt,
                 builder: (_) => PlatformWidget(
@@ -175,7 +174,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
             () => smartNavigatorPush(cxt, '/bbs/tags')),
         AppBarButtonItem(
             S.of(cxt).favorites,
-            Icon(SFSymbols.star),
+            Icon(CupertinoIcons.star),
             () => smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
                   'showFavoredDiscussion': true,
                 })),
@@ -554,7 +553,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                           style: infoStyle,
                         ),
                         Icon(
-                          SFSymbols.ellipses_bubble,
+                          CupertinoIcons.ellipses_bubble,
                           size: infoStyle.fontSize,
                           color: infoStyle.color,
                         ),
@@ -583,7 +582,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               leading: Padding(
                 padding: EdgeInsets.only(bottom: 4),
                 child: Icon(
-                  SFSymbols.quote_bubble,
+                  CupertinoIcons.quote_bubble,
                   color: Theme.of(context).hintColor,
                 ),
               ),
@@ -605,7 +604,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             style:
                                 TextStyle(color: Theme.of(context).hintColor),
                           ),
-                          Icon(SFSymbols.search,
+                          Icon(CupertinoIcons.search,
                               size: 14,
                               color:
                                   Theme.of(context).hintColor.withOpacity(0.2)),

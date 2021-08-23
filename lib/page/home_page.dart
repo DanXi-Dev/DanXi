@@ -51,7 +51,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -456,28 +456,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               //backgroundColor: Colors.purple,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.dashboard)
-                  : Icon(SFSymbols.square_stack_3d_up_fill),
+                  : Icon(CupertinoIcons.square_stack_3d_up_fill),
               label: S.of(context).dashboard,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.indigo,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.forum)
-                  : Icon(SFSymbols.text_bubble),
+                  : Icon(CupertinoIcons.text_bubble),
               label: S.of(context).forum,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.blue,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.calendar_today)
-                  : Icon(SFSymbols.calendar),
+                  : Icon(CupertinoIcons.calendar),
               label: S.of(context).timetable,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Theme.of(context).primaryColor,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.settings)
-                  : Icon(SFSymbols.gear_alt),
+                  : Icon(CupertinoIcons.gear_alt),
               label: S.of(context).settings,
             ),
           ],

@@ -28,10 +28,11 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 
 class FudanDailyFeature extends Feature {
@@ -133,7 +134,7 @@ class FudanDailyFeature extends Feature {
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.cloud_upload)
-      : const Icon(SFSymbols.arrow_up_doc);
+      : const Icon(CupertinoIcons.arrow_up_doc);
 
   void _processForgetTickIssue() {
     showPlatformDialog(

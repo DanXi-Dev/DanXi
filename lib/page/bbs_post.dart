@@ -47,7 +47,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -194,7 +194,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.reply)
-                  : const Icon(SFSymbols.arrowshape_turn_up_left),
+                  : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () {
                 BBSEditor.createNewReply(context, _post.id, null)
                     .then((_) => refreshSelf(scrollToEnd: true));
@@ -288,8 +288,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
             _isFavored = snapshot.data;
             return _isFavored
-                ? Icon(SFSymbols.star_fill)
-                : Icon(SFSymbols.star);
+                ? Icon(CupertinoIcons.star_fill)
+                : Icon(CupertinoIcons.star);
           },
           errorBuilder: () => Icon(
             PlatformIcons(context).error,
@@ -481,7 +481,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ),
                       if (isNested)
                         Center(
-                          child: Icon(SFSymbols.search,
+                          child: Icon(CupertinoIcons.search,
                               color:
                                   Theme.of(context).hintColor.withOpacity(0.2),
                               size: 12),
