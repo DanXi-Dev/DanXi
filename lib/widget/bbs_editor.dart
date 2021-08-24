@@ -345,10 +345,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: PostRenderWidget(
-                render: kMarkdownRender,
-                content: preprocessContentForDisplay(widget.controller.text),
-              ),
+              child: smartRender(widget.controller.text, null, null),
             ),
           ]),
     );
@@ -400,8 +397,9 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-        iosContentBottomPadding: true,
-        iosContentPadding: true,
+        iosContentBottomPadding: false,
+        iosContentPadding: false,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
           title: Text(_title),
           trailingActions: [
@@ -419,14 +417,16 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                 onPressed: _canSend ? _sendDocument : null),
           ],
         ),
-        body: Material(
-            child: Padding(
-                padding: EdgeInsets.all(8),
-                child: BBSEditorWidget(
-                  controller: _controller,
-                  allowTags: _supportTags,
-                  initialTags: _tags,
-                ))));
+        body: SafeArea(
+            bottom: false,
+            child: Material(
+                child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: BBSEditorWidget(
+                      controller: _controller,
+                      allowTags: _supportTags,
+                      initialTags: _tags,
+                    )))));
   }
 
   Future<void> _sendDocument() async {
