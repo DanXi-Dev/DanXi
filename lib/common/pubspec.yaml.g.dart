@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_raw_strings
 /// Current app version
-const String version = r'1.2.4+52';
+const String version = r'1.2.4+55';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -15,17 +15,17 @@ const int patch = 4;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'52'];
+const List<String> build = <String>[r'55'];
 
 /// Build date in Unix Time
-const int date = 1629194571;
+const int date = 1629801555;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
   'name':  r'dan_xi',
   'description':  r'Maybe the best all-rounded service app for Fudan University students.',
   'publish_to':  r'none',
-  'version':  r'1.2.4+52',
+  'version':  r'1.2.4+55',
   'environment':  <String, dynamic>{
       'sdk':  r'>=2.7.0 <3.0.0',
   },
@@ -40,7 +40,7 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
       'dio_cookie_manager':  r'^2.0.0',
       'flutter_progress_dialog':  <String, dynamic>{
         'git':  <String, dynamic>{
-        'url':  r'git://github.com/kavinzhao/flutter_progress_dialog.git',
+        'url':  r'git://github.com/w568w/flutter_progress_dialog.git',
         'ref':  r'master',
       },
       },
@@ -54,7 +54,6 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
       'share':  r'^2.0.1',
       'path_provider':  r'^2.0.1',
       'screen':  r'^0.0.5',
-      'flutter_sfsymbols':  r'^2.0.0',
       'flutter_email_sender':  r'^5.0.0',
       'auto_size_text':  r'^2.1.0',
       'ical':  r'^0.1.3',
@@ -92,7 +91,7 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
   'dependency_overrides':  <String, dynamic>{
       'fluttertoast':  <String, dynamic>{
         'git':  <String, dynamic>{
-        'url':  r'https://github.com/ponnamkarthik/FlutterToast.git',
+        'url':  r'git://github.com/ponnamkarthik/FlutterToast.git',
         'ref':  r'master',
       },
       },
@@ -120,14 +119,6 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
 r'assets/graphics/',
       ],
       'fonts':  <dynamic>[
-<String, dynamic>{
-        'family':  r'sficonsets',
-        'fonts':  <dynamic>[
-<String, dynamic>{
-        'asset':  r'packages/flutter_sfsymbols/fonts/sficonsets.ttf',
-      },
-      ],
-      },
 <String, dynamic>{
         'family':  r'iconfont',
         'fonts':  <dynamic>[
