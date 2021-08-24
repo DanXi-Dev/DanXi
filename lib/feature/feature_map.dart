@@ -20,6 +20,7 @@ import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/bus_feature.dart';
 import 'package:dan_xi/feature/custom_shortcut.dart';
 import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
+import 'package:dan_xi/feature/dorm_electricity_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
@@ -49,6 +50,7 @@ class FeatureMap {
     registerFeature(NextCourseFeature());
     registerFeature(PEFeature());
     registerFeature(QRFeature());
+    registerFeature(DormElectricityFeature());
     registerFeature(WelcomeFeature(), groups: UserGroup.values);
   }
 }

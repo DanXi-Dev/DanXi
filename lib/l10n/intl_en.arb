@@ -222,6 +222,10 @@
     "holiday": "Holiday",
     "weekday": "Weekday",
 
+    "dorm_electricity": "Dorm Electricity",
+    "dorm_electricity_subtitle": "Available: {available}W; Used: {used}W",
+    "last_updated": "Last Updated: {date}",
+
     "classroom": "Classroom",
     "morning": "Morning",
     "afternoon": "Afternoon",

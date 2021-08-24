@@ -127,6 +127,10 @@
     "jiangwan_campus": "江湾校区",
     "zhangjiang_campus": "张江校区",
 
+    "dorm_electricity": "寝室电量",
+    "dorm_electricity_subtitle": "剩余：{available}W；已用：{used}W",
+    "last_updated": "最近更新: {date}",
+
     "i_see":"好",
     "current_connection_failed":"获取 WiFi 名称失败，请授予精确定位权限",
     "current_connection_no_wifi":"没有连接到WLAN",
