@@ -60,7 +60,8 @@ class Retrier {
       Future<E> function(), Future<void> tryFix(exception),
       {int retryTimes = 2}) async {
     Function errorCatcher;
-    errorCatcher = (e) async {
+    errorCatcher = (e, stack) async {
+      // debugPrintStack(stackTrace: stack);
       if (retryTimes > 0) {
         retryTimes--;
         await tryFix(e).catchError((ignored) {});
