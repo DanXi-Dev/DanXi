@@ -34,33 +34,37 @@ import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:flutter_tagging/flutter_tagging.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
 
 class BBSEditor {
-  /// Returns true on success, false on failure
   static Future<bool> createNewPost(BuildContext context,
       {BBSEditorType editorType}) async {
     final PostEditorText content = await _showEditor(
         context, S.of(context).new_post,
         allowTags: true, editorType: editorType);
     if (content?.content == null) return false;
-    final int responseCode = await PostRepository.getInstance()
+    final success = await PostRepository.getInstance()
         .newPost(content.content, tags: content.tags)
-        .onError((error, stackTrace) => HttpStatus.networkConnectTimeoutError);
-    if (responseCode != HttpStatus.ok) {
-      Noticing.showNotice(context, S.of(context).post_failed,
-          title: S.of(context).fatal_error, useSnackBar: false);
-      return false;
-    }
+        .onError((error, stackTrace) {
+      if (error is DioError)
+        error = (error as DioError).message +
+            '\n' +
+            ((error as DioError).response?.data?.toString() ?? "");
+      Noticing.showNotice(context, error.toString(),
+          title: S.of(context).post_failed, useSnackBar: false);
+      return -1;
+    });
+    if (success == -1) return false;
     return true;
   }
 
@@ -75,15 +79,18 @@ class BBSEditor {
             editorType: editorType))
         ?.content;
     if (content == null || content.trim() == "") return;
-    final int responseCode = await PostRepository.getInstance()
+    await PostRepository.getInstance()
         .newReply(discussionId, postId, content)
-        .onError((error, stackTrace) => Noticing.showNotice(
-            context, S.of(context).reply_failed(error),
-            title: S.of(context).fatal_error, useSnackBar: false));
-    // Note: postId refers to the specific post the user is replying to, can be NULL
-    if (responseCode != 200) {
-      Noticing.showNotice(context, S.of(context).reply_failed(responseCode));
-    }
+        .onError((error, stackTrace) {
+      if (error is DioError) {
+        Noticing.showNotice(context,
+            error.message + '\n' + (error.response?.data?.toString() ?? ""),
+            title: S.of(context).reply_failed(error.type), useSnackBar: false);
+      } else
+        Noticing.showNotice(context, S.of(context).reply_failed(error),
+            title: S.of(context).fatal_error, useSnackBar: false);
+      return -1;
+    });
   }
 
   static Future<void> reportPost(BuildContext context, int postId) async {
@@ -138,7 +145,7 @@ class BBSEditor {
                 ));
         break;
       case BBSEditorType.PAGE:
-      // Receive the value with **dynamic** variable to prevent automatic type inference
+        // Receive the value with **dynamic** variable to prevent automatic type inference
         dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
             arguments: {"title": title, "tags": allowTags});
@@ -236,7 +243,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                             subtitle: Row(
                               children: [
                                 Icon(
-                                  SFSymbols.flame,
+                                  CupertinoIcons.flame,
                                   color: Constant.getColorFromString(tag.color),
                                   size: 12,
                                 ),
@@ -402,13 +409,13 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                 padding: EdgeInsets.zero,
                 icon: PlatformX.isAndroid
                     ? const Icon(Icons.photo)
-                    : const Icon(SFSymbols.photo),
+                    : const Icon(CupertinoIcons.photo),
                 onPressed: () => BBSEditor.uploadImage(context, _controller)),
             PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: PlatformX.isAndroid
                     ? const Icon(Icons.send)
-                    : const Icon(SFSymbols.paperplane),
+                    : const Icon(CupertinoIcons.paperplane),
                 onPressed: _canSend ? _sendDocument : null),
           ],
         ),

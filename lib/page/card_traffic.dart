@@ -31,7 +31,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic> arguments;
@@ -181,7 +180,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                         color: Theme.of(context).accentColor,
                       )
                     : Icon(
-                        SFSymbols.location_circle,
+                        CupertinoIcons.location_circle,
                         color: Theme.of(context).accentColor,
                       ),
                 Text(zoneName,

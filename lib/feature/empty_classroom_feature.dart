@@ -22,7 +22,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class EmptyClassroomFeature extends Feature {
   @override
@@ -34,7 +33,7 @@ class EmptyClassroomFeature extends Feature {
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.room)
-      : const Icon(SFSymbols.building_2_fill);
+      : const Icon(CupertinoIcons.building_2_fill);
 
   @override
   void onTap() async => smartNavigatorPush(context, '/room/detail');

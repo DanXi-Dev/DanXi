@@ -42,7 +42,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +65,9 @@ class TimetableSubPage extends PlatformSubpage
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).share,
-            Icon(PlatformX.isAndroid ? Icons.share : SFSymbols.square_arrow_up),
+            Icon(PlatformX.isAndroid
+                ? Icons.share
+                : CupertinoIcons.square_arrow_up),
             () => ShareTimetableEvent().fire())
       ];
 }

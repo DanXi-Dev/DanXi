@@ -25,10 +25,10 @@ import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class EcardBalanceFeature extends Feature {
   PersonInfo _info;
@@ -124,7 +124,7 @@ class EcardBalanceFeature extends Feature {
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.account_balance_wallet)
-      : const Icon(SFSymbols.creditcard);
+      : const Icon(CupertinoIcons.creditcard);
 
   void refreshData() {
     _status = ConnectionStatus.NONE;

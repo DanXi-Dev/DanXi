@@ -185,7 +185,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             child: ListTile(
               title: Text(widgetName[sequence[index].internalString]),
               trailing: Icon(Icons.drag_handle_rounded),
-              //leading: Icon(SFSymbols.arrow_left_right_circle),
+              //leading: Icon(CupertinoIcons.arrow_left_right_circle),
             ),
           ),
           onDismissed: (direction) {

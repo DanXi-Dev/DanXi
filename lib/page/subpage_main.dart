@@ -43,10 +43,11 @@ import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:provider/provider.dart';
 
 class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
@@ -67,7 +68,7 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
             S.of(cxt).developer_announcement(''),
             Icon(PlatformX.isMaterial(cxt)
                 ? Icons.notifications
-                : SFSymbols.bell_circle),
+                : CupertinoIcons.bell_circle),
             () => smartNavigatorPush(cxt, '/announcement/list'))
       ];
 

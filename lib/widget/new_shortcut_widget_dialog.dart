@@ -22,11 +22,12 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Allows user to create custom dashboard widgets that link to certain websites.
@@ -49,8 +50,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
 
   void _save() async {
     if (!_linkTextFieldController.text.startsWith('http'))
-                  _linkTextFieldController.text =
-                      'http://' + _linkTextFieldController.text;
+      _linkTextFieldController.text = 'http://' + _linkTextFieldController.text;
     // Validate URL
     final response = await Dio()
         .head(_linkTextFieldController.text)
@@ -100,7 +100,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
                 labelText: S.of(context).name,
                 icon: PlatformX.isAndroid
                     ? Icon(Icons.lock_outline)
-                    : Icon(SFSymbols.lock_circle),
+                    : Icon(CupertinoIcons.lock_circle),
               ),
             ),
             cupertino: (_, __) =>
@@ -123,7 +123,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
                       labelText: S.of(context).link,
                       icon: PlatformX.isAndroid
                           ? Icon(Icons.lock_outline)
-                          : Icon(SFSymbols.lock_circle),
+                          : Icon(CupertinoIcons.lock_circle),
                     ),
                   ),
               cupertino: (_, __) => CupertinoTextFieldData(

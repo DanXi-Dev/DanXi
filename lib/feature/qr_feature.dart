@@ -23,7 +23,6 @@ import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class QRFeature extends Feature {
   @override
@@ -35,7 +34,7 @@ class QRFeature extends Feature {
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.qr_code)
-      : const Icon(SFSymbols.qrcode);
+      : const Icon(CupertinoIcons.qrcode);
 
   @override
   void onTap() {

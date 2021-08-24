@@ -30,7 +30,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 /// A list page showing AAO notices.
 ///
@@ -79,7 +78,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
                   child: ListTile(
                 leading: PlatformX.isMaterial(context)
                     ? Icon(Icons.info)
-                    : Icon(SFSymbols.info_circle_fill),
+                    : Icon(CupertinoIcons.info_circle_fill),
                 title: Text(value.title),
                 subtitle: Text(value.time),
                 onTap: () async => BrowserUtil.openUrl(

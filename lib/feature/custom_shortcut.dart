@@ -22,7 +22,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomShortcutFeature extends Feature {
@@ -37,7 +37,7 @@ class CustomShortcutFeature extends Feature {
   String get subTitle => link;
 
   @override
-  Widget get icon => Icon(SFSymbols.bookmark);
+  Widget get icon => Icon(CupertinoIcons.bookmark);
 
   @override
   void onTap() async {

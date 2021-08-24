@@ -31,7 +31,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
@@ -181,7 +181,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 labelText: S.of(context).login_uis_uid,
                 icon: PlatformX.isAndroid
                     ? Icon(Icons.perm_identity)
-                    : Icon(SFSymbols.person_crop_circle)),
+                    : Icon(CupertinoIcons.person_crop_circle)),
             //),
             /*cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_uid),*/
@@ -196,7 +196,7 @@ class _LoginDialogState extends State<LoginDialog> {
               labelText: S.of(context).login_uis_pwd,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.lock_outline)
-                  : Icon(SFSymbols.lock_circle),
+                  : Icon(CupertinoIcons.lock_circle),
             ),
             //)),
             /*cupertino: (_, __) => CupertinoTextFieldData(

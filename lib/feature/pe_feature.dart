@@ -28,7 +28,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class PEFeature extends Feature {
   PersonInfo _info;
@@ -138,7 +137,7 @@ class PEFeature extends Feature {
   @override
   Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.wb_sunny)
-      : const Icon(SFSymbols.sun_max);
+      : const Icon(CupertinoIcons.sun_max);
 
   void refreshData() {
     _status = ConnectionStatus.NONE;

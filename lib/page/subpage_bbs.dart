@@ -39,6 +39,7 @@ import 'package:dan_xi/widget/bbs_editor.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -144,7 +144,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).sort_order,
-            Icon(SFSymbols.sort_down_circle),
+            Icon(CupertinoIcons.sort_down_circle),
             () => showPlatformModalSheet(
                 context: cxt,
                 builder: (_) => PlatformWidget(
@@ -174,7 +174,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
             () => smartNavigatorPush(cxt, '/bbs/tags')),
         AppBarButtonItem(
             S.of(cxt).favorites,
-            Icon(SFSymbols.star),
+            Icon(CupertinoIcons.star),
             () => smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
                   'showFavoredDiscussion': true,
                 })),
@@ -255,7 +255,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      _listViewController.notifyUpdate();
+      //_listViewController.notifyUpdate();
+      //TODO: Workaround
+      setState(() {});
     }
   }
 
@@ -395,6 +397,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             refreshSelf();
           },
           child: PagedListView<BBSPost>(
+              key: UniqueKey(),
               pagedController: _listViewController,
               withScrollbar: true,
               scrollController: widget.primaryScrollController(context),
@@ -414,7 +417,16 @@ class _BBSSubpageState extends State<BBSSubpage>
                 } else if (snapshot.error is NotLoginError)
                   return _buildErrorPage(
                       error: (snapshot.error as NotLoginError).errorMessage);
-                return _buildErrorPage(error: snapshot.error.toString());
+                else if (snapshot.error is DioError)
+                  return _buildErrorPage(
+                      error: (snapshot.error as DioError).message +
+                          '\n' +
+                          ((snapshot.error as DioError)
+                                  .response
+                                  ?.data
+                                  ?.toString() ??
+                              ""));
+                return _buildErrorPage(error: snapshot.error);
               },
               endBuilder: (context) => Center(
                     child: Padding(
@@ -447,7 +459,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 48),
           child: Text(
-            S.of(context).failed + '\n\nThe error was:\n' + error,
+            S.of(context).failed + '\n\n' + error,
           ),
         ),
       ),
@@ -541,7 +553,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                           style: infoStyle,
                         ),
                         Icon(
-                          SFSymbols.ellipses_bubble,
+                          CupertinoIcons.ellipses_bubble,
                           size: infoStyle.fontSize,
                           color: infoStyle.color,
                         ),
@@ -570,7 +582,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               leading: Padding(
                 padding: EdgeInsets.only(bottom: 4),
                 child: Icon(
-                  SFSymbols.quote_bubble,
+                  CupertinoIcons.quote_bubble,
                   color: Theme.of(context).hintColor,
                 ),
               ),
@@ -592,7 +604,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                             style:
                                 TextStyle(color: Theme.of(context).hintColor),
                           ),
-                          Icon(SFSymbols.search,
+                          Icon(CupertinoIcons.search,
                               size: 14,
                               color:
                                   Theme.of(context).hintColor.withOpacity(0.2)),
