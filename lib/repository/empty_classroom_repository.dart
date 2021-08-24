@@ -54,11 +54,12 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   Future<List<RoomInfo>> _getBuildingRoomInfo(
       String areaName, String buildingName, DateTime date) async {
     List<RoomInfo> result = [];
-    Response response = await dio.get(detailUrl(areaName, buildingName, date));
-    Map json = response.data is Map
+    final Response response =
+        await dio.get(detailUrl(areaName, buildingName, date));
+    final Map json = response.data is Map
         ? response.data
         : jsonDecode(response.data.toString());
-    Map buildingInfo = json['d']['list'];
+    final Map buildingInfo = json['d']['list'];
     buildingInfo.values.forEach((element) {
       if (element is List) {
         element.forEach((element) {

@@ -15,23 +15,20 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
-import 'package:dan_xi/model/pair.dart';
+import 'dart:convert';
+
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as DOM;
 
 class FudanDormRepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Felife.fudan.edu.cn%2Flogin2.action";
-  static const String _DORM_SELECT_URL =
-      "https://elife.fudan.edu.cn/public/ordinary/cityhot/rechargeElecteSelect.htm";
+      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanelec%252Fwap%252Fdefault%252Finfo%26from%3Dwap";
 
-  static String electricityUrl(String roomId) =>
-      'https://elife.fudan.edu.cn/public/ordinary/cityhot/rechargeElecte.htm?roomId=$roomId&isphone=';
+  static const String electricityUrl =
+      'https://zlapp.fudan.edu.cn/fudanelec/wap/default/info';
 
   FudanDormRepository._();
 
@@ -39,53 +36,39 @@ class FudanDormRepository extends BaseRepositoryWithDio {
 
   factory FudanDormRepository.getInstance() => _instance;
 
-  Future<List<Pair<String, String>>> loadDorms(PersonInfo info) {
+  Future<ElectricityItem> loadElectricityInfo(PersonInfo info) {
     return Retrier.tryAsyncWithFix(
-        () => _loadDorms(),
+        () => _loadElectricityInfo(),
         (exception) =>
             UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true));
   }
 
-  Future<List<Pair<String, String>>> _loadDorms() async {
-    Response r = await dio.get(_DORM_SELECT_URL);
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    List<DOM.Element> rawDorms = soup.find_all(r'option:not([value=""])');
-    if (rawDorms.isEmpty) throw 'Empty dorm data';
-    // Remove non-number characters from room Id
-    return rawDorms
-        .map((e) => Pair(
-            e.text.trim(), e.attributes['value'].replaceAll(RegExp(r'\D'), '')))
-        .toList();
-  }
+  Future<ElectricityItem> _loadElectricityInfo() async {
+    final Response r = await dio.get(electricityUrl);
+    final Map json = r.data is Map ? r.data : jsonDecode(r.data.toString());
 
-  Future<ElectricityItem> loadElectricityInfo(
-      PersonInfo info, Pair<String, String> roomInfo) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadElectricityInfo(roomInfo),
-        (exception) =>
-            UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true));
-  }
+    final data = json['d'];
+    // An example of data:
+    // {xq: (string, 校区), ting: (bool), xqid: (int, 校区), roomid: (int), tingid: null, realname: (string), ssmc: (string, 楼号), fjmc: (maybe int, 房间号), fj_update_time: 2021-08-24 00:00:00, fj_used: (double), fj_all: (double), fj_surplus: (double), t_update_time: (double), t_used: (double), t_all: (double), t_surplus: (double)}
 
-  Future<ElectricityItem> _loadElectricityInfo(
-      Pair<String, String> roomInfo) async {
-    Response r = await dio.get(electricityUrl(roomInfo.second));
-    // debugPrint(r.data.toString());
-    return ElectricityItem.fromHtml(roomInfo.first, roomInfo.second,
-        Beautifulsoup(r.data.toString()).find(id: 'table'));
+    return ElectricityItem(
+        data['fj_surplus'].toString(),
+        data['fj_used'].toString(),
+        data['fj_update_time'].toString(),
+        data['roomid'].toString(),
+        data['xq'].toString() +
+            data['ssmc'].toString() +
+            data['fjmc'].toString());
   }
 
   @override
-  String get linkHost => "elife.fudan.edu.cn";
+  String get linkHost => "zlapp.fudan.edu.cn";
 }
 
 class ElectricityItem {
-  static const _KEY_AVAILABLE = '剩余电数(KWh)：';
-  static const _KEY_USED = '电表读数(KWh)：';
-  static const _KEY_UPDATE_TIME = '更新时间：';
-
   final String available;
   final String used;
-  final DateTime updateTime;
+  final String updateTime;
   final String roomId;
   final String dormName;
 
@@ -95,25 +78,5 @@ class ElectricityItem {
   @override
   String toString() {
     return 'ElectricityItem{available: $available, used: $used, updateTime: $updateTime, roomId: $roomId, dormName: $dormName}';
-  }
-
-  factory ElectricityItem.fromHtml(
-      String dormName, String roomId, DOM.Element html) {
-    var keyValuePairs = html.getElementsByTagName('tr').map((e) {
-      List<DOM.Element> row = e.getElementsByTagName('td');
-      if (row.length == 2) return Pair(row[0].text.trim(), row[1].text.trim());
-    });
-    return ElectricityItem(
-        keyValuePairs
-            .firstWhere((element) => element.first == _KEY_AVAILABLE)
-            .second,
-        keyValuePairs
-            .firstWhere((element) => element.first == _KEY_USED)
-            .second,
-        DateTime.parse(keyValuePairs
-            .firstWhere((element) => element.first == _KEY_UPDATE_TIME)
-            .second),
-        roomId,
-        dormName);
   }
 }

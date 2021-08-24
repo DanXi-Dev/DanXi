@@ -39,11 +39,7 @@ class DormElectricityFeature extends Feature {
   void _loadData() async {
     _status = ConnectionStatus.CONNECTING;
     _electricity = await FudanDormRepository.getInstance()
-        .loadElectricityInfo(
-            StateProvider.personInfo.value,
-            (await FudanDormRepository.getInstance()
-                    .loadDorms(StateProvider.personInfo.value))
-                .first) // TODO: Could user have multiple dorms?
+        .loadElectricityInfo(StateProvider.personInfo.value)
         .onError((error, stackTrace) {
       _status = ConnectionStatus.FAILED;
       return null;
