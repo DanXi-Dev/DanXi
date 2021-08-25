@@ -14,30 +14,34 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-import 'package:dan_xi/master_detail/editor_object.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
-import 'package:flutter/cupertino.dart';
 
-/// Manage global states of the app.
-///
-/// Code structural warning: You should ONLY directly refer to this class in the codes of
-/// Application layer, rather than in Util, Model or Repository. Do NOT touch the decoupling
-/// of this project!
-class StateProvider {
-  StateProvider() {
-    throw UnimplementedError();
-  }
+/// [EditorObject] represents an object the [BBSEditorWidget] replies or posts to.
+class EditorObject {
+  /// The post id or discussion id.
+  ///
+  /// Set to 0 if creating a new post.
+  final int id;
+  final EditorObjectType type;
 
-  /// The user's basic information.
-  static final ValueNotifier<PersonInfo> personInfo = ValueNotifier(null);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EditorObject &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          type == other.type;
 
-  /// Caches of [BBSEditor].
-  static final Map<EditorObject, String> editorCache = {};
+  @override
+  int get hashCode => id.hashCode ^ type.hashCode;
 
-  static void initialize() {
-    personInfo.value = null;
-    editorCache.clear();
-  }
+  EditorObject(this.id, this.type);
+}
+
+enum EditorObjectType {
+  NONE,
+  REPLY_TO_REPLY,
+  REPLY_TO_DISCUSSION,
+  REPORT_REPLY,
+  NEW_POST
 }

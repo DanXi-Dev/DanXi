@@ -20,10 +20,12 @@ import 'dart:io';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/editor_object.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/page/bbs_post.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -32,8 +34,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/image_picker_proxy.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/post_render.dart';
-import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,9 @@ class BBSEditor {
       {BBSEditorType editorType}) async {
     final PostEditorText content = await _showEditor(
         context, S.of(context).new_post,
-        allowTags: true, editorType: editorType);
+        allowTags: true,
+        editorType: editorType,
+        object: EditorObject(0, EditorObjectType.NEW_POST));
     if (content?.content == null) return false;
     final success = await PostRepository.getInstance()
         .newPost(content.content, tags: content.tags)
@@ -76,7 +78,11 @@ class BBSEditor {
             postId == null
                 ? S.of(context).reply_to(discussionId)
                 : S.of(context).reply_to(postId),
-            editorType: editorType))
+            editorType: editorType,
+            object: postId == null
+                ? EditorObject(
+                    discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
+                : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY)))
         ?.content;
     if (content == null || content.trim() == "") return;
     await PostRepository.getInstance()
@@ -96,7 +102,8 @@ class BBSEditor {
   static Future<void> reportPost(BuildContext context, int postId) async {
     final String content = (await _showEditor(
             context, S.of(context).reason_report_post(postId),
-            editorType: BBSEditorType.DIALOG))
+            editorType: BBSEditorType.DIALOG,
+            object: EditorObject(postId, EditorObjectType.REPORT_REPLY)))
         ?.content;
     if (content == null || content.trim() == "") return;
 
@@ -111,8 +118,13 @@ class BBSEditor {
   }
 
   static Future<PostEditorText> _showEditor(BuildContext context, String title,
-      {bool allowTags = false, @required BBSEditorType editorType}) async {
-    final textController = TextEditingController();
+      {bool allowTags = false,
+      @required BBSEditorType editorType,
+      @required EditorObject object}) async {
+    final textController = TextEditingController(
+        text: StateProvider.editorCache.containsKey(object)
+            ? StateProvider.editorCache[object]
+            : null);
     final BBSEditorType defaultType =
         isTablet(context) ? BBSEditorType.DIALOG : BBSEditorType.PAGE;
     List<PostTag> _tags = [];
@@ -131,16 +143,21 @@ class BBSEditor {
                   actions: [
                     PlatformDialogAction(
                         child: Text(S.of(context).cancel),
-                        onPressed: () =>
-                            Navigator.of(context).pop<PostEditorText>(null)),
+                        onPressed: () {
+                          StateProvider.editorCache[object] =
+                              textController.text;
+                          Navigator.of(context).pop<PostEditorText>(null);
+                        }),
                     PlatformDialogAction(
                         child: Text(S.of(context).add_image),
                         onPressed: () => uploadImage(context, textController)),
                     PlatformDialogAction(
                         child: Text(S.of(context).submit),
-                        onPressed: () async => Navigator.of(context)
-                            .pop<PostEditorText>(
-                                PostEditorText(textController.text, _tags))),
+                        onPressed: () async {
+                          StateProvider.editorCache.remove(object);
+                          Navigator.of(context).pop<PostEditorText>(
+                              PostEditorText(textController.text, _tags));
+                        }),
                   ],
                 ));
         break;
@@ -148,7 +165,7 @@ class BBSEditor {
         // Receive the value with **dynamic** variable to prevent automatic type inference
         dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
-            arguments: {"title": title, "tags": allowTags});
+            arguments: {"title": title, "tags": allowTags, 'object': object});
         return result;
     }
     return null;
@@ -377,13 +394,13 @@ class BBSEditorPage extends StatefulWidget {
 }
 
 class BBSEditorPageState extends State<BBSEditorPage> {
-  var _controller = TextEditingController();
+  var _controller;
 
   /// Whether the send button is enabled
   bool _canSend = true;
   bool _supportTags;
   List<PostTag> _tags = [];
-
+  EditorObject _object;
   String _title;
 
   @override
@@ -391,47 +408,60 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     _supportTags = widget.arguments['tags'] ?? false;
     _title =
         widget.arguments['title'] ?? S.of(context).forum_post_enter_content;
+    _object = widget.arguments['object'];
+    if (StateProvider.editorCache.containsKey(_object))
+      _controller =
+          TextEditingController(text: StateProvider.editorCache[_object]);
+    else
+      _controller = TextEditingController();
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-        iosContentBottomPadding: false,
-        iosContentPadding: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: PlatformAppBarX(
-          title: Text(_title),
-          trailingActions: [
-            PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: PlatformX.isAndroid
-                    ? const Icon(Icons.photo)
-                    : const Icon(CupertinoIcons.photo),
-                onPressed: () => BBSEditor.uploadImage(context, _controller)),
-            PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: PlatformX.isAndroid
-                    ? const Icon(Icons.send)
-                    : const Icon(CupertinoIcons.paperplane),
-                onPressed: _canSend ? _sendDocument : null),
-          ],
-        ),
-        body: SafeArea(
-            bottom: false,
-            child: Material(
-                child: Padding(
-                    padding: EdgeInsets.all(8),
-                    child: BBSEditorWidget(
-                      controller: _controller,
-                      allowTags: _supportTags,
-                      initialTags: _tags,
-                    )))));
+    return WillPopScope(
+      onWillPop: () {
+        StateProvider.editorCache[_object] = _controller.text;
+        return Future.value(true);
+      },
+      child: PlatformScaffold(
+          iosContentBottomPadding: false,
+          iosContentPadding: false,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: PlatformAppBarX(
+            title: Text(_title),
+            trailingActions: [
+              PlatformIconButton(
+                  padding: EdgeInsets.zero,
+                  icon: PlatformX.isAndroid
+                      ? const Icon(Icons.photo)
+                      : const Icon(CupertinoIcons.photo),
+                  onPressed: () => BBSEditor.uploadImage(context, _controller)),
+              PlatformIconButton(
+                  padding: EdgeInsets.zero,
+                  icon: PlatformX.isAndroid
+                      ? const Icon(Icons.send)
+                      : const Icon(CupertinoIcons.paperplane),
+                  onPressed: _canSend ? _sendDocument : null),
+            ],
+          ),
+          body: SafeArea(
+              bottom: false,
+              child: Material(
+                  child: Padding(
+                      padding: EdgeInsets.all(8),
+                      child: BBSEditorWidget(
+                        controller: _controller,
+                        allowTags: _supportTags,
+                        initialTags: _tags,
+                      ))))),
+    );
   }
 
   Future<void> _sendDocument() async {
     String text = _controller.text;
     if (text.isEmpty) return;
+    StateProvider.editorCache.remove(_object);
     Navigator.pop<PostEditorText>(context, PostEditorText(text, _tags));
   }
 }
