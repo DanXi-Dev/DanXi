@@ -164,10 +164,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Rebuild everything and refresh itself.
   void refreshSelf({scrollToEnd = false}) {
     if (scrollToEnd) _listViewController.queueScrollToEnd();
-    setState(() {
-      _post.posts = null;
-    });
-    //_listViewController.notifyUpdate(useInitialData: false);
+    _listViewController.notifyUpdate(useInitialData: false);
   }
 
   @override
@@ -213,7 +210,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           },
           child: Material(
               child: PagedListView<Reply>(
-            key: UniqueKey(),
             initialData: _post?.posts ?? [],
             startPage: 1,
             pagedController: _listViewController,

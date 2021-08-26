@@ -255,9 +255,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   void refreshSelf() {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      //_listViewController.notifyUpdate();
-      //TODO: Workaround
-      setState(() {});
+      _listViewController.notifyUpdate();
     }
   }
 
@@ -397,7 +395,6 @@ class _BBSSubpageState extends State<BBSSubpage>
             refreshSelf();
           },
           child: PagedListView<BBSPost>(
-              key: UniqueKey(),
               pagedController: _listViewController,
               withScrollbar: true,
               scrollController: widget.primaryScrollController(context),
