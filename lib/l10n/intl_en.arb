@@ -223,7 +223,7 @@
     "weekday": "Weekday",
 
     "dorm_electricity": "Dorm Electricity",
-    "dorm_electricity_subtitle": "Available: {available}kW⋅h; Used: {used}kW⋅h",
+    "dorm_electricity_subtitle": "Available: {available} kWh; Used: {used} kWh",
     "last_updated": "Last Updated: {date}",
 
     "classroom": "Classroom",

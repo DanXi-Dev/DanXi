@@ -128,7 +128,7 @@
     "zhangjiang_campus": "张江校区",
 
     "dorm_electricity": "寝室电量",
-    "dorm_electricity_subtitle": "剩余：{available}kW⋅h；已用：{used}kW⋅h",
+    "dorm_electricity_subtitle": "剩余：{available} kWh；已用：{used} kWh",
     "last_updated": "最近更新: {date}",
 
     "i_see":"好",

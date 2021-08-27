@@ -121,15 +121,18 @@ class BBSEditor {
       {bool allowTags = false,
       @required BBSEditorType editorType,
       @required EditorObject object}) async {
-    final textController = TextEditingController(
-        text: StateProvider.editorCache.containsKey(object)
-            ? StateProvider.editorCache[object]
-            : null);
     final BBSEditorType defaultType =
         isTablet(context) ? BBSEditorType.DIALOG : BBSEditorType.PAGE;
     List<PostTag> _tags = [];
     switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
+        final textController = TextEditingController(
+            text: StateProvider.editorCache.containsKey(object)
+                ? StateProvider.editorCache[object]
+                : null);
+        textController.addListener(() {
+          StateProvider.editorCache[object] = textController.text;
+        });
         return await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
             context: context,
@@ -159,7 +162,10 @@ class BBSEditor {
                               PostEditorText(textController.text, _tags));
                         }),
                   ],
-                ));
+                )).then((value) {
+          textController.dispose();
+          return value;
+        });
         break;
       case BBSEditorType.PAGE:
         // Receive the value with **dynamic** variable to prevent automatic type inference
@@ -394,7 +400,7 @@ class BBSEditorPage extends StatefulWidget {
 }
 
 class BBSEditorPageState extends State<BBSEditorPage> {
-  var _controller;
+  final _controller = TextEditingController();
 
   /// Whether the send button is enabled
   bool _canSend = true;
@@ -404,57 +410,63 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   String _title;
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      StateProvider.editorCache[_object] = _controller.text;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     _supportTags = widget.arguments['tags'] ?? false;
     _title =
         widget.arguments['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments['object'];
     if (StateProvider.editorCache.containsKey(_object))
-      _controller =
-          TextEditingController(text: StateProvider.editorCache[_object]);
-    else
-      _controller = TextEditingController();
+      _controller.text = StateProvider.editorCache[_object];
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        StateProvider.editorCache[_object] = _controller.text;
-        return Future.value(true);
-      },
-      child: PlatformScaffold(
-          iosContentBottomPadding: false,
-          iosContentPadding: false,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          appBar: PlatformAppBarX(
-            title: Text(_title),
-            trailingActions: [
-              PlatformIconButton(
-                  padding: EdgeInsets.zero,
-                  icon: PlatformX.isAndroid
-                      ? const Icon(Icons.photo)
-                      : const Icon(CupertinoIcons.photo),
-                  onPressed: () => BBSEditor.uploadImage(context, _controller)),
-              PlatformIconButton(
-                  padding: EdgeInsets.zero,
-                  icon: PlatformX.isAndroid
-                      ? const Icon(Icons.send)
-                      : const Icon(CupertinoIcons.paperplane),
-                  onPressed: _canSend ? _sendDocument : null),
-            ],
-          ),
-          body: SafeArea(
-              bottom: false,
-              child: Material(
-                  child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: BBSEditorWidget(
-                        controller: _controller,
-                        allowTags: _supportTags,
-                        initialTags: _tags,
-                      ))))),
+    return PlatformScaffold(
+      iosContentBottomPadding: false,
+      iosContentPadding: false,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: PlatformAppBarX(
+        title: Text(_title),
+        trailingActions: [
+          PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isAndroid
+                  ? const Icon(Icons.photo)
+                  : const Icon(CupertinoIcons.photo),
+              onPressed: () => BBSEditor.uploadImage(context, _controller)),
+          PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isAndroid
+                  ? const Icon(Icons.send)
+                  : const Icon(CupertinoIcons.paperplane),
+              onPressed: _canSend ? _sendDocument : null),
+        ],
+      ),
+      body: SafeArea(
+          bottom: false,
+          child: Material(
+              child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: BBSEditorWidget(
+                    controller: _controller,
+                    allowTags: _supportTags,
+                    initialTags: _tags,
+                  )))),
     );
   }
 
