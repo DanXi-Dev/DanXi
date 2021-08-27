@@ -49,11 +49,10 @@ enum BBSEditorType { DIALOG, PAGE }
 class BBSEditor {
   static Future<bool> createNewPost(BuildContext context,
       {BBSEditorType editorType}) async {
+    final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText content = await _showEditor(
         context, S.of(context).new_post,
-        allowTags: true,
-        editorType: editorType,
-        object: EditorObject(0, EditorObjectType.NEW_POST));
+        allowTags: true, editorType: editorType, object: object);
     if (content?.content == null) return false;
     final success = await PostRepository.getInstance()
         .newPost(content.content, tags: content.tags)
@@ -67,22 +66,23 @@ class BBSEditor {
       return -1;
     });
     if (success == -1) return false;
+    StateProvider.editorCache.remove(object);
     return true;
   }
 
   static Future<void> createNewReply(
       BuildContext context, int discussionId, int postId,
       {BBSEditorType editorType}) async {
+    final object = postId == null
+        ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
+        : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY);
     final String content = (await _showEditor(
             context,
             postId == null
                 ? S.of(context).reply_to(discussionId)
                 : S.of(context).reply_to(postId),
             editorType: editorType,
-            object: postId == null
-                ? EditorObject(
-                    discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
-                : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY)))
+            object: object))
         ?.content;
     if (content == null || content.trim() == "") return;
     await PostRepository.getInstance()
@@ -97,13 +97,14 @@ class BBSEditor {
             title: S.of(context).fatal_error, useSnackBar: false);
       return -1;
     });
+    StateProvider.editorCache.remove(object);
   }
 
   static Future<void> reportPost(BuildContext context, int postId) async {
+    final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
     final String content = (await _showEditor(
             context, S.of(context).reason_report_post(postId),
-            editorType: BBSEditorType.DIALOG,
-            object: EditorObject(postId, EditorObjectType.REPORT_REPLY)))
+            editorType: BBSEditorType.DIALOG, object: object))
         ?.content;
     if (content == null || content.trim() == "") return;
 
@@ -113,6 +114,7 @@ class BBSEditor {
       Noticing.showNotice(context, S.of(context).report_failed(responseCode),
           title: S.of(context).fatal_error, useSnackBar: false);
     } else {
+      StateProvider.editorCache.remove(object);
       Noticing.showNotice(context, S.of(context).report_success);
     }
   }
@@ -157,7 +159,6 @@ class BBSEditor {
                     PlatformDialogAction(
                         child: Text(S.of(context).submit),
                         onPressed: () async {
-                          StateProvider.editorCache.remove(object);
                           Navigator.of(context).pop<PostEditorText>(
                               PostEditorText(textController.text, _tags));
                         }),
@@ -473,7 +474,6 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   Future<void> _sendDocument() async {
     String text = _controller.text;
     if (text.isEmpty) return;
-    StateProvider.editorCache.remove(_object);
     Navigator.pop<PostEditorText>(context, PostEditorText(text, _tags));
   }
 }
