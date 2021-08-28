@@ -41,7 +41,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-
 import 'package:flutter_tagging/flutter_tagging.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
@@ -128,7 +127,7 @@ class BBSEditor {
     switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
         if (!StateProvider.editorCache.containsKey(object))
-          StateProvider.editorCache[object] = PostEditorText("", null);
+          StateProvider.editorCache[object] = PostEditorText.newInstance();
         final textController =
             TextEditingController(text: StateProvider.editorCache[object].text);
         textController.addListener(() {
@@ -216,6 +215,14 @@ class BBSEditorWidget extends StatefulWidget {
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   List<PostTag> _allTags;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(() {
+      refreshSelf();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -371,9 +378,16 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
 
 class PostEditorText {
   String text;
+
+  /// Non-nullable
   List<PostTag> tags;
 
-  PostEditorText(this.text, this.tags);
+  PostEditorText(this.text, this.tags) : assert(tags != null);
+
+  PostEditorText.newInstance() {
+    text = '';
+    tags = [];
+  }
 }
 
 /// An full-screen editor page.
@@ -425,7 +439,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     if (StateProvider.editorCache.containsKey(_object))
       _controller.text = StateProvider.editorCache[_object].text;
     else
-      StateProvider.editorCache[_object] = PostEditorText("", null);
+      StateProvider.editorCache[_object] = PostEditorText.newInstance();
     super.didChangeDependencies();
   }
 

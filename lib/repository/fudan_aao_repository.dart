@@ -25,15 +25,15 @@ import 'package:html/dom.dart';
 
 class FudanAAORepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fwww.jwc.fudan.edu.cn%2Feb%2Fb7%2Fc9397a388023%2Fpage.psp";
+      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwc.fudan.edu.cn%2Feb%2Fb7%2Fc9397a388023%2Fpage.psp";
 
   FudanAAORepository._();
 
   static String _listUrl(String type, int page) {
-    return "http://www.jwc.fudan.edu.cn/$type/list${page <= 1 ? "" : page.toString()}.htm";
+    return "https://jwc.fudan.edu.cn/$type/list${page <= 1 ? "" : page.toString()}.htm";
   }
 
-  static const String _BASE_URL = "http://www.jwc.fudan.edu.cn";
+  static const String _BASE_URL = "https://jwc.fudan.edu.cn";
   static const String TYPE_NOTICE_ANNOUNCEMENT = "9397";
   static final _instance = FudanAAORepository._();
 
@@ -44,7 +44,8 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   Future<NonpersistentCookieJar> get thisCookies async {
     // Log in before getting cookies.
     await Retrier.runAsyncWithRetry(
-        () => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true));
+        () => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true),
+        retryTimes: 3);
     return cookieJar;
   }
 
@@ -82,7 +83,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
           .then((value) => true, onError: (e) => false);
 
   @override
-  String get linkHost => "www.jwc.fudan.edu.cn";
+  String get linkHost => "jwc.fudan.edu.cn";
 }
 
 class NotConnectedToLANError implements Exception {}
