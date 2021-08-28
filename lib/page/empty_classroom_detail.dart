@@ -36,7 +36,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:intl/intl.dart';
 
 class EmptyClassroomDetailPage extends StatefulWidget {
@@ -393,7 +392,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                     width: PlatformX.isDarkMode ? 1.5 : 2,
                   )
                 : null,
-            color: element ? Colors.red : Colors.green,
+            color: element ? Colors.deepOrange : Colors.lightBlueAccent,
             borderRadius: BorderRadius.all(Radius.circular(5.0))),
         width: ViewportUtils.getMainNavigatorWidth(context) / 32,
         margin: EdgeInsets.symmetric(horizontal: 2),
