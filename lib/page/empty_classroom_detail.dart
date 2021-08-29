@@ -383,16 +383,22 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     var _list = <Widget>[];
     var _time = 1;
     var _slot = TimeTable.defaultNow().slot + 1;
+    final busyColor = Theme.of(context).textTheme.bodyText1.color;
     roomInfo.busy.forEach((element) {
       _list.add(Container(
         decoration: BoxDecoration(
             border: _slot == _time
                 ? Border.all(
                     color: Theme.of(context).textTheme.bodyText1.color,
-                    width: PlatformX.isDarkMode ? 1.5 : 2,
+                    width: 2.5,
                   )
-                : null,
-            color: element ? Colors.deepOrange : Colors.lightBlueAccent,
+                : Border.all(
+                    color: element
+                        ? busyColor
+                        : Theme.of(context).textTheme.bodyText1.color,
+                    width: 0.75,
+                  ),
+            color: element ? busyColor : null,
             borderRadius: BorderRadius.all(Radius.circular(5.0))),
         width: ViewportUtils.getMainNavigatorWidth(context) / 32,
         margin: EdgeInsets.symmetric(horizontal: 2),
