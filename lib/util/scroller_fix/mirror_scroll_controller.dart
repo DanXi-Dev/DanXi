@@ -94,7 +94,15 @@ class MirrorScrollController extends ScrollController {
     if (!hasClients) return;
     var tempPos = positions.toList();
     tempPos.forEach((element) {
-      if (positions.contains(element)) originController.detach(element);
+      if (positions.contains(element)) {
+        try {
+          originController.detach(element);
+          // We should catch errors from [ChangeNotifier._debugAssertNotDisposed] and omit them, since they will
+          // be always thrown after offline notification from [_HomePageState._loadStartDate] in debug profile.
+          //
+          // Here, we simply ignore everything thrown.
+        } catch (ignored) {}
+      }
     });
   }
 
@@ -102,7 +110,13 @@ class MirrorScrollController extends ScrollController {
     if (_isMaterial &&
         _oldPosition != null &&
         !originController.positions.contains(_oldPosition)) {
-      originController.attach(_oldPosition);
+      try {
+        originController.attach(_oldPosition);
+        // We should catch errors from [ChangeNotifier._debugAssertNotDisposed] and omit them, since they will
+        // be always thrown after offline notification from [_HomePageState._loadStartDate] in debug profile.
+        //
+        // Here, we simply ignore everything thrown.
+      } catch (ignored) {}
       // debugPrint("reattached!: $debugTag");
     }
   }
