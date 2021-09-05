@@ -21,7 +21,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/table_repository.dart';
+import 'package:dan_xi/repository/time_table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/vague_time.dart';

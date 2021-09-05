@@ -18,6 +18,7 @@
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/sports_reserve_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -31,7 +32,10 @@ class _TestLifeCycle {
     /// TEST CODE
   }
 
-  static void onStartAsync(BuildContext context) async {}
+  static void onStartAsync(BuildContext context) async {
+    await SportsReserveRepository.getInstance()
+        .getStadiumList(StateProvider.personInfo.value);
+  }
 }
 
 /// Don't modify this class. It should be invoked only by the app.
