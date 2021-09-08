@@ -35,7 +35,7 @@ class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
 
   factory PostRepository.getInstance() => _instance;
-  static const String _BASE_URL = "https://www.fduhole.tk/v1";
+  static const String _BASE_URL = "https://www.fduhole.com/v1";
   static const List<int> PINNED_CERTIFICATE = [
     48,
     130,
@@ -565,20 +565,22 @@ class PostRepository extends BaseRepositoryWithDio {
     1
   ];
 
-  Dio secureDio = Dio();
-
   /// The token used for session authentication.
   String _token;
 
-  PostRepository._();
-
-  initializeUser(PersonInfo info, SharedPreferences _preferences) async {
-    _token = SettingsProvider.of(_preferences).fduholeToken ??
-        await requestToken(info, _preferences);
+  clearToken() {
+    _token = null;
   }
 
-  Future<String> requestToken(
-      PersonInfo info, SharedPreferences _preferences) async {
+  PostRepository._();
+
+  initializeUser(PersonInfo info) async {
+    _token =
+        SettingsProvider.getInstance().fduholeToken ?? await requestToken(info);
+  }
+
+  Future<String> requestToken(PersonInfo info) async {
+    Dio secureDio = Dio();
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
@@ -616,7 +618,7 @@ class PostRepository extends BaseRepositoryWithDio {
       throw NotLoginError(error.toString());
     });
     try {
-      return SettingsProvider.of(_preferences).fduholeToken =
+      return SettingsProvider.getInstance().fduholeToken =
           response.data["token"];
     } catch (e) {
       throw NotLoginError(e.toString());

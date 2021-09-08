@@ -241,9 +241,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         return await PostRepository.getInstance().getFavoredDiscussions();
       } else {
         if (!PostRepository.getInstance().isUserInitialized)
-          await PostRepository.getInstance().initializeUser(
-              StateProvider.personInfo.value,
-              SettingsProvider.getInstance().preferences);
+          await PostRepository.getInstance()
+              .initializeUser(StateProvider.personInfo.value);
         return await PostRepository.getInstance().loadPosts(page, _sortOrder);
       }
     } else {
