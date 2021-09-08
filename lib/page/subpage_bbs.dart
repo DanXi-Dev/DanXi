@@ -26,6 +26,7 @@ import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -49,6 +50,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -187,7 +189,10 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
 
 class AddNewPostEvent {}
 
-class RetrieveNewPostEvent {}
+class RefreshBBSEvent {
+  final bool refreshAll;
+  RefreshBBSEvent({this.refreshAll = false});
+}
 
 class SortOrderChangedEvent {
   SortOrder newOrder;
@@ -220,6 +225,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// Fields related to the display states.
   SortOrder _sortOrder;
   FoldBehavior _foldBehavior;
+
+  BannerAd bannerAd;
 
   /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
   bool _fieldInitComplete;
@@ -323,9 +330,12 @@ class _BBSSubpageState extends State<BBSSubpage>
         }),
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
-        Constant.eventBus
-            .on<RetrieveNewPostEvent>()
-            .listen((_) => refreshSelf()),
+        Constant.eventBus.on<RefreshBBSEvent>().listen((event) {
+          if (event.refreshAll == true) {
+            _refreshAll();
+          } else
+            refreshSelf();
+        }),
         hashCode);
     _sortOrderChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
@@ -334,6 +344,11 @@ class _BBSSubpageState extends State<BBSSubpage>
           refreshSelf();
         }),
         hashCode);
+    bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
+  }
+
+  void _refreshAll() {
+    setState(() {});
   }
 
   @override
@@ -386,62 +401,65 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Material(
       child: SafeArea(
         bottom: false,
-        child: RefreshIndicator(
-          color: Theme.of(context).accentColor,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            refreshSelf();
-          },
-          child: PagedListView<BBSPost>(
-              pagedController: _listViewController,
-              withScrollbar: true,
-              scrollController: widget.primaryScrollController(context),
-              startPage: 1,
-              builder: _buildListItem,
-              headBuilder: (_) => _buildSearchTextField(),
-              loadingBuilder: (BuildContext context) => Container(
-                    padding: EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
-                  ),
-              errorBuilder: (BuildContext context,
-                  AsyncSnapshot<List<BBSPost>> snapshot) {
-                if (snapshot.error is LoginExpiredError) {
-                  SettingsProvider.getInstance().deleteSavedFduholeToken();
-                  return _buildErrorPage(
-                      error: S.of(context).error_login_expired);
-                } else if (snapshot.error is NotLoginError)
-                  return _buildErrorPage(
-                      error: (snapshot.error as NotLoginError).errorMessage);
-                else if (snapshot.error is DioError)
-                  return _buildErrorPage(
-                      error: (snapshot.error as DioError).message +
-                          '\n' +
-                          ((snapshot.error as DioError)
-                                  .response
-                                  ?.data
-                                  ?.toString() ??
-                              ""));
-                return _buildErrorPage(error: snapshot.error);
-              },
-              endBuilder: (context) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(S.of(context).end_reached),
-                    ),
-                  ),
-              emptyBuilder: (_) => _buildEmptyFavoritesPage(),
-              dataReceiver: _loadContent),
+        child: Column(
+          children: [
+            AutoBannerAdWidget(bannerAd: bannerAd),
+            Expanded(
+              child: RefreshIndicator(
+                color: Theme.of(context).accentColor,
+                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                onRefresh: () async {
+                  HapticFeedback.mediumImpact();
+                  refreshSelf();
+                },
+                child: PagedListView<BBSPost>(
+                    pagedController: _listViewController,
+                    withScrollbar: true,
+                    scrollController: widget.primaryScrollController(context),
+                    startPage: 1,
+                    builder: _buildListItem,
+                    headBuilder: (_) => _buildSearchTextField(),
+                    loadingBuilder: (BuildContext context) => Container(
+                          padding: EdgeInsets.all(8),
+                          child: Center(
+                              child: PlatformCircularProgressIndicator()),
+                        ),
+                    errorBuilder: (BuildContext context,
+                        AsyncSnapshot<List<BBSPost>> snapshot) {
+                      if (snapshot.error is LoginExpiredError) {
+                        SettingsProvider.getInstance()
+                            .deleteSavedFduholeToken();
+                        return _buildErrorPage(
+                            error: S.of(context).error_login_expired);
+                      } else if (snapshot.error is NotLoginError)
+                        return _buildErrorPage(
+                            error:
+                                (snapshot.error as NotLoginError).errorMessage);
+                      else if (snapshot.error is DioError)
+                        return _buildErrorPage(
+                            error: (snapshot.error as DioError).message +
+                                '\n' +
+                                ((snapshot.error as DioError)
+                                        .response
+                                        ?.data
+                                        ?.toString() ??
+                                    ""));
+                      return _buildErrorPage(error: snapshot.error);
+                    },
+                    endBuilder: (context) => Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(S.of(context).end_reached),
+                          ),
+                        ),
+                    emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+                    dataReceiver: _loadContent),
+              ),
+            ),
+          ],
         ),
       ),
     );
-    /*
-     GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTapDown: (_) {
-          if (_searchFocus.hasFocus) _searchFocus.unfocus();
-        },
-        child: */
   }
 
   Widget _buildEmptyFavoritesPage() => Container(

@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -26,9 +27,9 @@ class AdManager {
       ? Constant.ADMOB_APP_ID_ANDROID
       : Constant.ADMOB_APP_ID_IOS;
 
-  static get unitId => PlatformX.isAndroid
-      ? Constant.ADMOB_UNIT_ID_ANDROID
-      : Constant.ADMOB_UNIT_ID_IOS;
+  static get unitIdList => PlatformX.isAndroid
+      ? Secret.ADMOB_UNIT_ID_LIST_ANDROID
+      : Secret.ADMOB_UNIT_ID_LIST_IOS;
 
   /// Initialize the banner Ad
   ///
@@ -45,13 +46,13 @@ class AdManager {
   /// ... and later in UI, use
   /// AdWidget(ad: bannerAd)
   ///
-  static BannerAd loadBannerAd() {
+  static BannerAd loadBannerAd(int index) {
     if (!PlatformX.isMobile) return null;
 
     BannerAd bannerAd;
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
-      onAdLoaded: (Ad ad) => print('Ad loaded.'),
+      onAdLoaded: (Ad ad) {},
       // Called when an ad request failed.
       onAdFailedToLoad: (Ad ad, LoadAdError error) {
         // Dispose the ad here to free resources.
@@ -59,14 +60,14 @@ class AdManager {
         print('Ad failed to load: $error');
       },
       // Called when an ad opens an overlay that covers the screen.
-      onAdOpened: (Ad ad) => print('Ad opened.'),
+      onAdOpened: (Ad ad) {},
       // Called when an ad removes an overlay that covers the screen.
-      onAdClosed: (Ad ad) => print('Ad closed.'),
+      onAdClosed: (Ad ad) {},
       // Called when an impression occurs on the ad.
-      onAdImpression: (Ad ad) => print('Ad impression.'),
+      onAdImpression: (Ad ad) {},
     );
     bannerAd = BannerAd(
-      adUnitId: unitId,
+      adUnitId: unitIdList[index],
       size: AdSize.banner,
       request: AdRequest(),
       listener: listener,
@@ -77,21 +78,27 @@ class AdManager {
 }
 
 /// A widget that automatically returns a AdWidget placed in a container
-/// or nothing (a [Container()) if user has not opted-in to Ads
+/// or nothing if user has not opted-in to Ads or [bannerAd] is [null]
 class AutoBannerAdWidget extends StatelessWidget {
   final BannerAd bannerAd;
 
-  const AutoBannerAdWidget({Key key, this.bannerAd}) : super(key: key);
+  const AutoBannerAdWidget({Key key, @required this.bannerAd})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (SettingsProvider.getInstance().isAdEnabled)
-      return Container(
-        alignment: Alignment.center,
-        child: AdWidget(ad: bannerAd),
-        width: bannerAd.size.width.toDouble(),
-        height: bannerAd.size.height.toDouble(),
+    if (SettingsProvider.getInstance().isAdEnabled && bannerAd != null) {
+      const double padding = 4.0;
+      return Center(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: padding),
+          alignment: Alignment.center,
+          child: AdWidget(ad: bannerAd),
+          width: bannerAd.size.width.toDouble(),
+          height: bannerAd.size.height.toDouble() + padding * 2,
+        ),
       );
+    }
     return Container();
   }
 }

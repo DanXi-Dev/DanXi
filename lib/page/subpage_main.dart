@@ -35,6 +35,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -48,6 +49,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
 
@@ -100,6 +102,8 @@ class _HomeSubpageState extends State<HomeSubpage>
   bool isRefreshQueued = false;
   List<Feature> _notifications = [];
 
+  BannerAd bannerAd;
+
   @override
   void initState() {
     super.initState();
@@ -117,6 +121,7 @@ class _HomeSubpageState extends State<HomeSubpage>
           }
         }),
         hashCode);
+    bannerAd = AdManager.loadBannerAd(0); // 0 for main page
   }
 
   void checkConnection() {
@@ -201,7 +206,11 @@ class _HomeSubpageState extends State<HomeSubpage>
   }
 
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
-    List<Widget> _widgets = [];
+    List<Widget> _widgets = [
+      AutoBannerAdWidget(
+        bannerAd: bannerAd,
+      )
+    ];
     _widgets.addAll(_notifications.map((e) => FeatureCardItem(
           feature: e,
           onDismissed: () => _notifications.remove(e),

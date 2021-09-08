@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
@@ -42,6 +43,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -73,9 +75,12 @@ class TimetableSubPage extends PlatformSubpage
 
 class ShareTimetableEvent {}
 
+class RefreshTimetableEvent {}
+
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   final StateStreamListener _shareSubscription = StateStreamListener();
+  final StateStreamListener _refreshSubscription = StateStreamListener();
   final ScrollController _dummyScrollController = ScrollController();
 
   /// A map of all converters.
@@ -92,6 +97,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   Future _content;
 
   bool _loadFromRemote = false;
+
+  BannerAd bannerAd;
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup))
@@ -167,6 +174,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                   ));
         }),
         hashCode);
+    _refreshSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<RefreshTimetableEvent>().listen((_) {
+          refreshSelf();
+        }),
+        hashCode);
+    bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
   void refreshSelf() {
@@ -252,6 +265,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           controller: _dummyScrollController,
           physics: AlwaysScrollableScrollPhysics(),
           children: [
+            AutoBannerAdWidget(bannerAd: bannerAd),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

@@ -26,6 +26,7 @@ import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -166,7 +167,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   @override
   void initState() {
     super.initState();
-    myBanner = AdManager.loadBannerAd();
+    myBanner = AdManager.loadBannerAd(3); // 3 for settings page
   }
 
   String _clearCacheSubtitle;
@@ -219,7 +220,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     List<Widget> list = [];
     Function onTapListener = (FoldBehavior value) {
       SettingsProvider.getInstance().fduholeFoldBehavior = value;
-      RetrieveNewPostEvent().fire();
+      RefreshBBSEvent().fire();
       Navigator.of(context).pop();
       refreshSelf();
     };
@@ -475,10 +476,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             SettingsProvider.getInstance().isAdEnabled
                                 ? S.of(context).sponsor_us_enabled
                                 : S.of(context).sponsor_us_disabled),
-                        onTap: () {
-                          SettingsProvider.getInstance().isAdEnabled =
-                              !SettingsProvider.getInstance().isAdEnabled;
-                          setState(() {});
+                        onTap: () async {
+                          if (SettingsProvider.getInstance().isAdEnabled) {
+                            _toggleAdDisplay();
+                          } else {
+                            if (await _showAdsDialog()) {
+                              _toggleAdDisplay();
+                            }
+                          }
                         },
                       ),
                     ),
@@ -489,7 +494,39 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             )));
   }
 
+  void _toggleAdDisplay() {
+    SettingsProvider.getInstance().isAdEnabled =
+        !SettingsProvider.getInstance().isAdEnabled;
+    RefreshHomepageEvent().fire();
+    RefreshBBSEvent().fire();
+    RefreshTimetableEvent().fire();
+    setState(() {});
+  }
+
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
+
+  Future<bool> _showAdsDialog() => showPlatformDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+            title: Text(S.of(context).sponsor_us),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("tbd:"),
+                Text("write something to convince users"),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text(S.of(context).cancel),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              TextButton(
+                child: Text(S.of(context).i_see),
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ));
 
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
