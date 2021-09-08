@@ -222,6 +222,10 @@
     "holiday": "Holiday",
     "weekday": "Weekday",
 
+    "sponsor_us": "Sponsor Us 🍀",
+    "sponsor_us_disabled": "If you like our project, you can sponsor us by turning on Ads. You can opt out at any time.",
+    "sponsor_us_enabled": "Thank you for sponsoring us! :) You may opt out at any time.",
+
     "dorm_electricity": "Dorm Electricity",
     "dorm_electricity_subtitle": "Available: {available} kWh; Used: {used} kWh",
     "last_updated": "Last Updated: {date}",

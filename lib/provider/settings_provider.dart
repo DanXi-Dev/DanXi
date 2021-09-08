@@ -41,6 +41,7 @@ class SettingsProvider {
       "last_recorded_semester_start_time";
   static const String KEY_CLEAN_MODE = "clean_mode";
   static const String KEY_DEBUG_MODE = "DEBUG";
+  static const String KEY_AD_ENABLED = "ad_enabled";
   static List<DashboardCard> _kDefaultDashboardCardList = [
     DashboardCard("new_card", null, null, true),
     DashboardCard("welcome_feature", null, null, true),
@@ -68,6 +69,19 @@ class SettingsProvider {
 
   @deprecated
   factory SettingsProvider.of(_) => SettingsProvider.getInstance();
+
+  /// Whether user has opted-in to Ads
+  /// Defaults to false, won't return null
+  bool get isAdEnabled {
+    if (preferences.containsKey(KEY_AD_ENABLED)) {
+      return preferences.getBool(KEY_AD_ENABLED);
+    }
+    return false;
+  }
+
+  set isAdEnabled(bool value) {
+    preferences.setBool(KEY_AD_ENABLED, value);
+  }
 
   int get lastECBuildingChoiceRepresentation {
     if (preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {

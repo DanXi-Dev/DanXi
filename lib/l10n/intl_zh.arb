@@ -122,6 +122,10 @@
     "weekday": "工作日",
     "no_matching_bus": "您所在的校区没有可乘坐的校车",
 
+    "sponsor_us": "赞助我们🍀",
+    "sponsor_us_disabled": "如果您喜欢我们的项目，您可以打开广告以赞助我们。开启后可以随时关闭",
+    "sponsor_us_enabled": "感谢您赞助我们！:) 您随时都可以关闭广告",
+
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",
     "jiangwan_campus": "江湾校区",

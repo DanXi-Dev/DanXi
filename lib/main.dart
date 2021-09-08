@@ -66,13 +66,21 @@ void main() {
     LocalizationOptions.buildDefaultEnglishOptions(),
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
+
   WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
+
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+
   // Init Feature registration.
   FeatureMap.registerAllFeatures();
   SettingsProvider.getInstance().init().then((_) {
+    // Initialize Ad only if user has opted-in to save resources
+    // If user decides to opt-in after the app has started,
+    // Admob SDK will automatically initialize on first request.
+    if (SettingsProvider.getInstance().isAdEnabled)
+      MobileAds.instance.initialize();
+
     Catcher(
         rootWidget: DanxiApp(),
         debugConfig: debugOptions,

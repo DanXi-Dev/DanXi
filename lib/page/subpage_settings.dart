@@ -26,6 +26,7 @@ import 'package:dan_xi/page/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -165,29 +166,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   @override
   void initState() {
     super.initState();
-    final BannerAdListener listener = BannerAdListener(
-      // Called when an ad is successfully received.
-      onAdLoaded: (Ad ad) => print('Ad loaded.'),
-      // Called when an ad request failed.
-      onAdFailedToLoad: (Ad ad, LoadAdError error) {
-        // Dispose the ad here to free resources.
-        ad.dispose();
-        print('Ad failed to load: $error');
-      },
-      // Called when an ad opens an overlay that covers the screen.
-      onAdOpened: (Ad ad) => print('Ad opened.'),
-      // Called when an ad removes an overlay that covers the screen.
-      onAdClosed: (Ad ad) => print('Ad closed.'),
-      // Called when an impression occurs on the ad.
-      onAdImpression: (Ad ad) => print('Ad impression.'),
-    );
-    myBanner = BannerAd(
-      adUnitId: 'ca-app-pub-4420475240805528/9471217915',
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: BannerAdListener(),
-    );
-    myBanner.load();
+    myBanner = AdManager.loadBannerAd();
   }
 
   String _clearCacheSubtitle;
@@ -279,11 +258,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                   controller: widget.primaryScrollController(context),
                   physics: AlwaysScrollableScrollPhysics(),
                   children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      child: AdWidget(ad: myBanner),
-                      width: myBanner.size.width.toDouble(),
-                      height: myBanner.size.height.toDouble(),
+                    AutoBannerAdWidget(
+                      bannerAd: myBanner,
                     ),
                     //Account Selection
                     Card(
@@ -487,6 +463,27 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           },
                         ),
                       ),
+
+                    // Sponsor Option
+                    Card(
+                      child: ListTile(
+                        leading: Icon(
+                          PlatformIcons(context).heartSolid,
+                        ),
+                        title: Text(S.of(context).sponsor_us),
+                        subtitle: Text(
+                            SettingsProvider.getInstance().isAdEnabled
+                                ? S.of(context).sponsor_us_enabled
+                                : S.of(context).sponsor_us_disabled),
+                        onTap: () {
+                          SettingsProvider.getInstance().isAdEnabled =
+                              !SettingsProvider.getInstance().isAdEnabled;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+
+                    // About
                     _buildAboutCard()
                   ]),
             )));

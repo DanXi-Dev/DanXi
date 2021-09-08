@@ -29,6 +29,15 @@ class Constant {
       bool.fromEnvironment('dart.vm.product');
   static const String APPSTORE_APPID = '1568629997';
 
+  static const String ADMOB_APP_ID_ANDROID =
+      "ca-app-pub-4420475240805528~7573357474";
+  static const String ADMOB_APP_ID_IOS =
+      "ca-app-pub-4420475240805528~1122982272";
+  static const String ADMOB_UNIT_ID_ANDROID =
+      "ca-app-pub-4420475240805528/9471217915";
+  static const String ADMOB_UNIT_ID_IOS =
+      "ca-app-pub-4420475240805528/6845054570";
+
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
