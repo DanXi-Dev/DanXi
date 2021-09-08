@@ -19,7 +19,6 @@ import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/image_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -29,7 +28,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -42,6 +40,7 @@ import 'package:share/share.dart';
 /// [Uint8List] raw_image: the raw byte array of the image.
 /// [String] url: the original url of the image, enabling the page to decide the file name.
 ///
+
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic> arguments;
   @protected

@@ -24,8 +24,8 @@ import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/src/response.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:html/dom.dart' as DOM;
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class SportsReserveRepository extends BaseRepositoryWithDio {
@@ -33,6 +33,8 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Felife.fudan.edu.cn%2Flogin2.action";
   static const String STADIUM_LIST_URL =
       "https://elife.fudan.edu.cn/public/front/search.htm??id=2c9c486e4f821a19014f82381feb0001";
+  static const String STADIUM_LIST_NUMBER_URL =
+      "https://elife.fudan.edu.cn/public/front/search.htm?1=1&id=2c9c486e4f821a19014f82381feb0001&orderBack=null&fieldID=&dicID=&dicSql=&pageBean.pageNo=1&pageBean.pageSize=10";
 
   SportsReserveRepository._();
 
@@ -40,21 +42,38 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
 
   factory SportsReserveRepository.getInstance() => _instance;
 
-  Future<List<StadiumData>> getStadiumList(PersonInfo info,
+  Future<List<StadiumData>> getStadiumFullList(PersonInfo info,
           {DateTime queryDate, SportsType type, Campus campus}) async =>
       Retrier.tryAsyncWithFix(
-          () =>
-              _getStadiumList(queryDate: queryDate, type: type, campus: campus),
+          () => _getStadiumFullList(
+              queryDate: queryDate, type: type, campus: campus),
           (exception) async => await UISLoginTool.loginUIS(
               dio, LOGIN_URL, cookieJar, info, true));
+
+  Future<int> _getStadiumPageNumber() async {
+    Response rep = await dio.get(STADIUM_LIST_NUMBER_URL);
+    String pageNumber = rep.data.toString().between('页次:1/', '页');
+    return int.parse(pageNumber);
+  }
+
+  Future<List<StadiumData>> _getStadiumFullList(
+      {DateTime queryDate, SportsType type, Campus campus}) async {
+    var result = <StadiumData>[];
+    int pages = await _getStadiumPageNumber();
+    for (int i = 1; i <= pages; i++) {
+      result.addAll(await _getStadiumList(
+          queryDate: queryDate, type: type, campus: campus, page: i));
+    }
+    return result;
+  }
 
   Future<List<StadiumData>> _getStadiumList(
       {DateTime queryDate,
       SportsType type,
       Campus campus,
       int page = 1}) async {
-    var body = "id=2c9c486e4f821a19014f82381feb0001&"
-        "resourceDate=&"
+    String body = "id=2c9c486e4f821a19014f82381feb0001&"
+        "resourceDate=${queryDate == null ? '' : DateFormat('yyyy-MM-dd').format(queryDate)}&"
         "beginTime=&"
         "endTime=&"
         "fieldID=2c9c486e4f821a19014f824467b70006&"
@@ -68,9 +87,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
     Beautifulsoup soup = Beautifulsoup(res.data.toString());
     List<DOM.Element> elements = soup.find_all('.order_list > table');
 
-    var result = elements.map((e) => StadiumData.fromHtml(e));
-    debugPrint(result.join(','));
-    return result.toList();
+    return elements.map((e) => StadiumData.fromHtml(e)).toList();
   }
 
   @override

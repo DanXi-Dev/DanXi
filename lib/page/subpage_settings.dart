@@ -46,13 +46,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class SettingsSubpage extends PlatformSubpage
     with PageWithPrimaryScrollController {
@@ -160,10 +160,34 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     LicenseItem(
         "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
   ];
+  BannerAd myBanner;
 
   @override
   void initState() {
     super.initState();
+    final BannerAdListener listener = BannerAdListener(
+      // Called when an ad is successfully received.
+      onAdLoaded: (Ad ad) => print('Ad loaded.'),
+      // Called when an ad request failed.
+      onAdFailedToLoad: (Ad ad, LoadAdError error) {
+        // Dispose the ad here to free resources.
+        ad.dispose();
+        print('Ad failed to load: $error');
+      },
+      // Called when an ad opens an overlay that covers the screen.
+      onAdOpened: (Ad ad) => print('Ad opened.'),
+      // Called when an ad removes an overlay that covers the screen.
+      onAdClosed: (Ad ad) => print('Ad closed.'),
+      // Called when an impression occurs on the ad.
+      onAdImpression: (Ad ad) => print('Ad impression.'),
+    );
+    myBanner = BannerAd(
+      adUnitId: 'ca-app-pub-4420475240805528/9471217915',
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(),
+    );
+    myBanner.load();
   }
 
   String _clearCacheSubtitle;
@@ -255,6 +279,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                   controller: widget.primaryScrollController(context),
                   physics: AlwaysScrollableScrollPhysics(),
                   children: <Widget>[
+                    Container(
+                      alignment: Alignment.center,
+                      child: AdWidget(ad: myBanner),
+                      width: myBanner.size.width.toDouble(),
+                      height: myBanner.size.height.toDouble(),
+                    ),
                     //Account Selection
                     Card(
                       child: Column(children: <Widget>[

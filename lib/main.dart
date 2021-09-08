@@ -46,6 +46,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'generated/l10n.dart';
 
@@ -66,6 +67,7 @@ void main() {
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
   // Init Feature registration.
