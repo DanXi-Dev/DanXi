@@ -520,8 +520,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("tbd:"),
-                Text("write something to convince users"),
+                Text(S.of(context).sponsor_us_detail),
               ],
             ),
             actions: [
