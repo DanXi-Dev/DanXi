@@ -237,7 +237,20 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 child: ThemedMaterial(
                   child: FlutterTagging<PostTag>(
                       initialItems:
-                          StateProvider.editorCache[widget.editorObject].tags,
+                          StateProvider.editorCache[widget.editorObject].tags ??
+                              [],
+                      emptyBuilder: (context) => Wrap(
+                            alignment: WrapAlignment.spaceAround,
+                            children: [
+                              Text(S.of(context).failed),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {});
+                                },
+                                child: Text(S.of(context).retry),
+                              ),
+                            ],
+                          ),
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: InputDecoration(
                           labelStyle: TextStyle(fontSize: 12),
