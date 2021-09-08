@@ -25,6 +25,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
+import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -191,6 +192,7 @@ class AddNewPostEvent {}
 
 class RefreshBBSEvent {
   final bool refreshAll;
+
   RefreshBBSEvent({this.refreshAll = false});
 }
 
@@ -250,7 +252,14 @@ class _BBSSubpageState extends State<BBSSubpage>
         if (!PostRepository.getInstance().isUserInitialized)
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value);
-        return await PostRepository.getInstance().loadPosts(page, _sortOrder);
+        // Filter blocked posts
+        List<BBSPost> loadedPost =
+            await PostRepository.getInstance().loadPosts(page, _sortOrder);
+        List<PostTag> hiddenTags = SettingsProvider.getInstance().hiddenTags;
+        loadedPost.removeWhere((element) => element.tag.any((thisTag) =>
+            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+        // About this line, see [PagedListView].
+        return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
       }
     } else {
       return Future<List<BBSPost>>.error(
@@ -413,6 +422,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                   refreshSelf();
                 },
                 child: PagedListView<BBSPost>(
+                    noneItem: BBSPost.DUMMY_POST,
                     pagedController: _listViewController,
                     withScrollbar: true,
                     scrollController: widget.primaryScrollController(context),
@@ -434,24 +444,24 @@ class _BBSSubpageState extends State<BBSSubpage>
                       } else if (snapshot.error is NotLoginError)
                         return _buildErrorPage(
                             error:
-                                (snapshot.error as NotLoginError).errorMessage);
+                            (snapshot.error as NotLoginError).errorMessage);
                       else if (snapshot.error is DioError)
                         return _buildErrorPage(
                             error: (snapshot.error as DioError).message +
                                 '\n' +
                                 ((snapshot.error as DioError)
-                                        .response
-                                        ?.data
-                                        ?.toString() ??
+                                    .response
+                                    ?.data
+                                    ?.toString() ??
                                     ""));
                       return _buildErrorPage(error: snapshot.error);
                     },
                     endBuilder: (context) => Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text(S.of(context).end_reached),
-                          ),
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(S.of(context).end_reached),
+                      ),
+                    ),
                     emptyBuilder: (_) => _buildEmptyFavoritesPage(),
                     dataReceiver: _loadContent),
               ),

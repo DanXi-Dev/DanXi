@@ -27,6 +27,17 @@ const kCurve = Curves.easeInOut;
 
 /// A ListView supporting paged loading and viewing.
 class PagedListView<T> extends StatefulWidget {
+  /// If [allDataReceiver] is null, [PagedListView] determines the content has ended
+  /// when [dataReceiver] return an empty list.
+  ///
+  /// In rare cases, you may expect the situation that there are some pages without items
+  /// but you're sure that there are more pages. If so, let [dataReceiver] return a
+  /// list with single item [noneItem]. Then the list view will just skip this page and
+  /// continue to the next one.
+  ///
+  /// [noneItem] only come into effect when it is NOT null.
+  final T noneItem;
+
   /// Use the PagedListViewController to control its behaviour, e.g. refreshing
   final PagedListViewController pagedController;
 
@@ -70,11 +81,10 @@ class PagedListView<T> extends StatefulWidget {
   /// Will be executed only once
   final bool shouldScrollToEnd;
 
-  const PagedListView(
-      {Key key,
-      this.pagedController,
-      this.initialData = const [],
-      @required this.builder,
+  const PagedListView({Key key,
+    this.pagedController,
+    this.initialData = const [],
+    @required this.builder,
       @required this.loadingBuilder,
       @required this.errorBuilder,
       this.headBuilder,
@@ -85,7 +95,8 @@ class PagedListView<T> extends StatefulWidget {
       this.scrollController,
       this.withScrollbar = false,
       this.allDataReceiver,
-      this.shouldScrollToEnd})
+      this.shouldScrollToEnd,
+      this.noneItem})
       : assert(withScrollbar != null),
         assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         super(key: key);
@@ -165,6 +176,14 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
             }
           });
           _isRefreshing = false;
+
+          // Process with [noneItem]
+          if (snapshot.data.length == 1 &&
+              widget.noneItem != null &&
+              snapshot.data.single == widget.noneItem) {
+            return _buildListView();
+          }
+
           if (snapshot.data.isEmpty ||
               _data.isEmpty ||
               snapshot.data.last != _data.last) {

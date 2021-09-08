@@ -116,9 +116,9 @@ class _QRDialogState extends State<QRDialog> {
         actions: <Widget>[
           TextButton(
               child: PlatformText(S.of(context).i_see),
-              onPressed: () {
-                ScreenProxy.setBrightness(widget.originBrightness);
-                ScreenProxy.keepOn(false);
+              onPressed: () async {
+                await ScreenProxy.setBrightness(widget.originBrightness);
+                await ScreenProxy.keepOn(false);
                 Navigator.pop(context);
               }),
         ],

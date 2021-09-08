@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
+import 'package:dan_xi/model/post_tag.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,6 +43,7 @@ class SettingsProvider {
   static const String KEY_CLEAN_MODE = "clean_mode";
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
+  static const String KEY_HIDDEN_TAGS = "hidden_tags";
   static List<DashboardCard> _kDefaultDashboardCardList = [
     DashboardCard("new_card", null, null, true),
     DashboardCard("welcome_feature", null, null, true),
@@ -237,6 +239,22 @@ class SettingsProvider {
   }
 
   set cleanMode(bool mode) => preferences.setBool(KEY_CLEAN_MODE, mode);
+
+  /// Hidden tags
+  List<PostTag> get hiddenTags {
+    try {
+      var json = jsonDecode(preferences.getString(KEY_HIDDEN_TAGS));
+      if (json is Iterable) {
+        return json.map((e) => PostTag.fromJson(e)).toList();
+      }
+    } catch (ignored) {}
+    return null;
+  }
+
+  set hiddenTags(List<PostTag> tags) {
+    if (tags == null) return;
+    preferences.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
+  }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

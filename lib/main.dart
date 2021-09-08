@@ -22,6 +22,7 @@ import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
+import 'package:dan_xi/page/bbs_hidden_tags_preference.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/page/bbs_tags.dart';
 import 'package:dan_xi/page/bus.dart';
@@ -125,6 +126,8 @@ class DanxiApp extends StatelessWidget {
         TextSelectorPage(arguments: arguments),
     '/exam/gpa': (context, {arguments}) => GpaTablePage(arguments: arguments),
     '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
+    '/bbs/tags/blocklist': (context, {arguments}) =>
+        BBSHiddenTagsPreferencePage(arguments: arguments),
   };
 
   // This widget is the root of your application.

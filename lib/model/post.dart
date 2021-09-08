@@ -60,6 +60,8 @@ class BBSPost {
   factory BBSPost.dummy() => BBSPost(
       -1, Reply.dummy(), -1, [PostTag.dummy()], null, false, "", "", []);
 
+  static final DUMMY_POST = BBSPost.dummy();
+
   @override
   int get hashCode => id;
 }

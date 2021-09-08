@@ -82,12 +82,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static StateStreamListener<CredentialsInvalidException>
       _credentialsInvalidSubscription = StateStreamListener();
 
-  //Dark/Light Theme Control
-  @override
-  void didChangePlatformBrightness() {
-    super.didChangePlatformBrightness();
-  }
-
   /// If we need to send the QR code to iWatch now.
   ///
   /// When notified [watchActivated], we should send it after [StateProvider.personInfo] is loaded.

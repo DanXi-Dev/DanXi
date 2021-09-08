@@ -14,14 +14,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/widget/bbs_tags_container.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -39,11 +38,6 @@ class BBSTagsPage extends StatefulWidget {
 class _BBSTagsPageState extends State<BBSTagsPage> {
   Future<List<PostTag>> _content;
 
-  List<PostTag> tags;
-  List<PostTag> filteredTags;
-
-  FocusNode _searchFocus = FocusNode();
-
   @override
   void initState() {
     super.initState();
@@ -55,7 +49,6 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: true,
-      //backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).all_tags),
       ),
@@ -64,58 +57,23 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
         context: context,
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-          controller: PrimaryScrollController.of(context),
+          primary: true,
           child: FutureWidget<List<PostTag>>(
             future: _content,
-            successBuilder: (context, snapshot) {
-              tags = snapshot.data;
-              return GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (_) {
-                  if (_searchFocus.hasFocus) _searchFocus.unfocus();
-                },
-                child: Column(
-                  children: [
-                    CupertinoSearchTextField(
-                      focusNode: _searchFocus,
-                      onChanged: (filter) {
-                        setState(() {
-                          filteredTags = tags
-                              .where((value) => value.name
-                                  .toLowerCase()
-                                  .contains(filter.toLowerCase()))
-                              .toList();
-                        });
-                      },
-                    ),
-                    Wrap(
-                        children: (filteredTags ?? tags)
-                            .map(
-                              (e) => Padding(
-                                  padding: EdgeInsets.only(top: 16, right: 12),
-                                  child: RoundChip(
-                                    label: e.name,
-                                    color: Constant.getColorFromString(e.color),
-                                    onTap: () => smartNavigatorPush(
-                                        context, '/bbs/discussions',
-                                        arguments: {
-                                          "tagFilter": e.name,
-                                        }),
-                                  )),
-                            )
-                            .toList())
-                  ],
-                ),
-              );
-            },
+            successBuilder: (context, snapshot) => BBSTagsContainer(
+              tags: snapshot.data,
+              onTap: (e) =>
+                  smartNavigatorPush(context, '/bbs/discussions', arguments: {
+                "tagFilter": e.name,
+              }),
+            ),
             errorBuilder: GestureDetector(
               child: Center(
                 child: Text(S.of(context).failed),
               ),
               onTap: () {
-                setState(() {
-                  _content = PostRepository.getInstance().loadTags();
-                });
+                setState(
+                    () => _content = PostRepository.getInstance().loadTags());
               },
             ),
             loadingBuilder: Center(

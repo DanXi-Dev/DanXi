@@ -195,9 +195,13 @@
     "fduhole_clean_mode_detail": "When Clean Mode is enabled, some Emoji faces that are widely considered \"unfriendly\" will be filtered.",
     "before_enabled": "Before",
     "after_enabled": "After",
+    "fduhole_hidden_tags":"FDUHole: Tag blocklist",
+    "fduhole_hidden_tags_description":"Block posts with specific tags",
+    "fduhole_hidden_tags_title":"Tag blocklist",
     "clear_cache": "FDUHole: Clear Image Cache",
     "clear_cache_description": "Images will reload next time you view them",
     "cache_cleared": "Cached cleared",
+
 
     "fold": "Fold",
     "hide": "Hide",

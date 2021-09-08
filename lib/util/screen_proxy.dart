@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/services.dart';
 
@@ -30,9 +29,9 @@ class ScreenProxy {
       return 1.0;
   }
 
-  static setBrightness(double brightness) {
+  static setBrightness(double brightness) async {
     if (PlatformX.isMobile)
-      _channel.invokeMethod('setBrightness', {"brightness": brightness});
+      await _channel.invokeMethod('setBrightness', {"brightness": brightness});
   }
 
   static Future<bool> get isKeptOn async {
@@ -42,7 +41,7 @@ class ScreenProxy {
       return true;
   }
 
-  static keepOn(bool on) {
-    if (PlatformX.isMobile) _channel.invokeMethod('keepOn', {"on": on});
+  static keepOn(bool on) async {
+    if (PlatformX.isMobile) await _channel.invokeMethod('keepOn', {"on": on});
   }
 }

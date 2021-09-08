@@ -28,6 +28,17 @@ class PostTag extends Taggable {
 
   PostTag(this.name, this.color, this.count);
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is PostTag &&
+          runtimeType == other.runtimeType &&
+          name == other.name;
+
+  @override
+  int get hashCode => super.hashCode ^ name.hashCode;
+
   factory PostTag.fromJson(Map<String, dynamic> json) =>
       _$PostTagFromJson(json);
 

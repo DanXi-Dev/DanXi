@@ -426,6 +426,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   .cleanMode = value);
                             },
                           ),
+                          ListTile(
+                            leading: Icon(Icons.block),
+                            title: Text(S.of(context).fduhole_hidden_tags),
+                            subtitle: Text(
+                                S.of(context).fduhole_hidden_tags_description),
+                            onTap: () async => smartNavigatorPush(
+                                context, '/bbs/tags/blocklist'),
+                          ),
                           // Clear Cache
                           ListTile(
                             leading: Icon(PlatformIcons(context).photoLibrary),
