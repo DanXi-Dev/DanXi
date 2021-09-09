@@ -427,7 +427,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             },
                           ),
                           ListTile(
-                            leading: Icon(Icons.block),
+                            leading: Icon(PlatformIcons(context).tag),
                             title: Text(S.of(context).fduhole_hidden_tags),
                             subtitle: Text(
                                 S.of(context).fduhole_hidden_tags_description),
@@ -490,6 +490,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           } else {
                             if (await _showAdsDialog()) {
                               _toggleAdDisplay();
+                              await _showAdsThankyouDialog();
                             }
                           }
                         },
@@ -531,6 +532,23 @@ class _SettingsSubpageState extends State<SettingsSubpage>
               TextButton(
                 child: Text(S.of(context).i_see),
                 onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ));
+
+  _showAdsThankyouDialog() => showPlatformDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(S.of(context).thankyouforenablingads),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text(S.of(context).i_see),
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ));

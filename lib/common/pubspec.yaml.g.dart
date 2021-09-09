@@ -18,7 +18,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'55'];
 
 /// Build date in Unix Time
-const int date = 1629801555;
+const int date = 1631096976;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
@@ -87,6 +87,7 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
       'win32':  r'^2.2.5',
       'file_picker':  r'^4.0.0',
       'cached_network_image':  r'^3.1.0',
+      'google_mobile_ads':  r'^0.13.4',
   },
   'dependency_overrides':  <String, dynamic>{
       'fluttertoast':  <String, dynamic>{
