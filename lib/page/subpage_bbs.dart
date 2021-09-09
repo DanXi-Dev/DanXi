@@ -255,7 +255,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         // Filter blocked posts
         List<BBSPost> loadedPost =
             await PostRepository.getInstance().loadPosts(page, _sortOrder);
-        List<PostTag> hiddenTags = SettingsProvider.getInstance().hiddenTags;
+        List<PostTag> hiddenTags =
+            SettingsProvider.getInstance().hiddenTags ?? [];
         loadedPost.removeWhere((element) => element.tag.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
         // About this line, see [PagedListView].
