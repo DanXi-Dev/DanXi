@@ -270,17 +270,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           leading: PlatformX.isMaterial(context)
                               ? const Icon(Icons.account_circle)
                               : const Icon(CupertinoIcons.person_circle),
-                          subtitle: Text(StateProvider.personInfo.value.name +
-                              ' (' +
-                              StateProvider.personInfo.value.id +
-                              ')'),
-                        ),
-                        ListTile(
-                          title: Text(S.of(context).logout),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.logout)
-                              : const Icon(CupertinoIcons.trash),
-                          subtitle: Text(S.of(context).logout_subtitle),
+                          subtitle: Text(
+                              "${StateProvider.personInfo.value.name} (${StateProvider.personInfo.value.id})"),
                           onTap: () {
                             showPlatformDialog(
                               context: context,
@@ -313,42 +304,43 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             );
                           },
                         ),
-                      ]),
-                    ),
 
-                    //Campus Selection
-                    Card(
-                      child: ListTile(
-                        title: Text(S.of(context).default_campus),
-                        leading: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.location_on)
-                            : const Icon(CupertinoIcons.location_fill),
-                        subtitle: Text(SettingsProvider.getInstance()
-                            .campus
-                            .displayTitle(context)),
-                        onTap: () {
-                          showPlatformModalSheet(
-                              context: context,
-                              builder: (_) => PlatformWidget(
-                                    cupertino: (_, __) => CupertinoActionSheet(
-                                      title: Text(S.of(context).select_campus),
-                                      actions: _buildCampusAreaList(),
-                                      cancelButton: CupertinoActionSheetAction(
-                                        child: Text(S.of(context).cancel),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
+                        // Campus
+                        ListTile(
+                          title: Text(S.of(context).default_campus),
+                          leading: PlatformX.isMaterial(context)
+                              ? const Icon(Icons.location_on)
+                              : const Icon(CupertinoIcons.location_fill),
+                          subtitle: Text(SettingsProvider.getInstance()
+                              .campus
+                              .displayTitle(context)),
+                          onTap: () {
+                            showPlatformModalSheet(
+                                context: context,
+                                builder: (_) => PlatformWidget(
+                                      cupertino: (_, __) =>
+                                          CupertinoActionSheet(
+                                        title:
+                                            Text(S.of(context).select_campus),
+                                        actions: _buildCampusAreaList(),
+                                        cancelButton:
+                                            CupertinoActionSheetAction(
+                                          child: Text(S.of(context).cancel),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                    material: (_, __) => Container(
-                                      height: 300,
-                                      child: Column(
-                                        children: _buildCampusAreaList(),
+                                      material: (_, __) => Container(
+                                        height: 300,
+                                        child: Column(
+                                          children: _buildCampusAreaList(),
+                                        ),
                                       ),
-                                    ),
-                                  ));
-                        },
-                      ),
+                                    ));
+                          },
+                        ),
+                      ]),
                     ),
 
                     // Accessibility
