@@ -351,7 +351,27 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                       ),
                     ),
 
-                    //Fold Behavior
+                    // Accessibility
+                    Card(
+                      child: ListTile(
+                        title: Text(S.of(context).accessibility_coloring),
+                        leading: Icon(Icons.accessibility_new_rounded),
+                        subtitle: Text(SettingsProvider.getInstance()
+                                .useAccessibilityColoring
+                            ? S.of(context).enabled
+                            : S.of(context).disabled),
+                        onTap: () {
+                          SettingsProvider.getInstance()
+                                  .useAccessibilityColoring =
+                              !SettingsProvider.getInstance()
+                                  .useAccessibilityColoring;
+                          RefreshBBSEvent(refreshAll: true).fire();
+                          setState(() {});
+                        },
+                      ),
+                    ),
+
+                    // FDUHOLE
                     Card(
                       child: Column(
                         children: [

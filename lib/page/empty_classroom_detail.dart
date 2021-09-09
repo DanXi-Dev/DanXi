@@ -383,27 +383,48 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     var _list = <Widget>[];
     var _time = 1;
     var _slot = TimeTable.defaultNow().slot + 1;
-    final busyColor = Theme.of(context).textTheme.bodyText1.color;
+
+    // Prevent repeated read from disk
+    final accessiblityColoring =
+        SettingsProvider.getInstance().useAccessibilityColoring;
+
     roomInfo.busy.forEach((element) {
-      _list.add(Container(
-        decoration: BoxDecoration(
-            border: _slot == _time
-                ? Border.all(
-                    color: Theme.of(context).textTheme.bodyText1.color,
-                    width: 2.5,
-                  )
-                : Border.all(
-                    color: element
-                        ? busyColor
-                        : Theme.of(context).textTheme.bodyText1.color,
-                    width: 0.75,
-                  ),
-            color: element ? busyColor : null,
-            borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        width: ViewportUtils.getMainNavigatorWidth(context) / 32,
-        margin: EdgeInsets.symmetric(horizontal: 2),
-        height: 22,
-      ));
+      if (accessiblityColoring) {
+        _list.add(Container(
+          decoration: BoxDecoration(
+              border: _slot == _time
+                  ? Border.all(
+                      color: Theme.of(context).textTheme.bodyText1.color,
+                      width: 2.5,
+                    )
+                  : Border.all(
+                      color: Theme.of(context).textTheme.bodyText1.color,
+                      width: 0.75,
+                    ),
+              color:
+                  element ? Theme.of(context).textTheme.bodyText1.color : null,
+              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+          width: ViewportUtils.getMainNavigatorWidth(context) / 32,
+          margin: EdgeInsets.symmetric(horizontal: 2),
+          height: 22,
+        ));
+      } else {
+        _list.add(Container(
+          decoration: BoxDecoration(
+              border: _slot == _time
+                  ? Border.all(
+                      color: Theme.of(context).textTheme.bodyText1.color,
+                      width: 1.5,
+                    )
+                  : null,
+              color: element ? Colors.red : Colors.green,
+              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+          width: ViewportUtils.getMainNavigatorWidth(context) / 32,
+          margin: EdgeInsets.symmetric(horizontal: 2),
+          height: 22,
+        ));
+      }
+
       if (_time++ % 5 == 0)
         _list.add(SizedBox(
           width: 7,

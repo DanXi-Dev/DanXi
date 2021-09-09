@@ -232,6 +232,10 @@
     "sponsor_us_enabled": "Thank you for supporting us! :) You may opt out at any time.",
     "thankyouforenablingads": "Thank you for enabling Ads!",
 
+    "accessibility_coloring": "Accessibility: High Contrast Coloring",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+
     "dorm_electricity": "Dorm Electricity",
     "dorm_electricity_subtitle": "Available: {available} kWh; Used: {used} kWh",
     "last_updated": "Last Updated: {date}",

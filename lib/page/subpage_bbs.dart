@@ -86,7 +86,8 @@ String renderText(String content, String imagePlaceholder) {
 const String KEY_NO_TAG = "默认";
 
 /// Turn tags into Widgets
-Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
+Widget generateTagWidgets(BuildContext context, BBSPost e,
+    void Function(String) onTap, bool useAccessibilityColoring) {
   if (e == null || e.tag == null) return Container();
   List<Widget> _tags = [];
   e.tag.forEach((element) {
@@ -98,7 +99,9 @@ Widget generateTagWidgets(BBSPost e, void Function(String) onTap) {
           RoundChip(
             onTap: () => onTap(element.name),
             label: element.name,
-            color: Constant.getColorFromString(element.color),
+            color: useAccessibilityColoring
+                ? Theme.of(context).textTheme.bodyText1.color
+                : Constant.getColorFromString(element.color),
           ),
         ]));
   });
@@ -522,11 +525,11 @@ class _BBSSubpageState extends State<BBSSubpage>
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                generateTagWidgets(postElement, (String tagname) {
+                generateTagWidgets(context, postElement, (String tagname) {
                   smartNavigatorPush(context, '/bbs/discussions', arguments: {
                     "tagFilter": tagname,
                   });
-                }),
+                }, SettingsProvider.getInstance().useAccessibilityColoring),
                 const SizedBox(
                   height: 10,
                 ),

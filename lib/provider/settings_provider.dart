@@ -24,6 +24,11 @@ import 'package:dan_xi/model/post_tag.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A class to manage [SharedPreferences] Settings
+///
+/// Code Integrity Notice:
+/// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
+/// Only return [null] when there is no default value.
 class SettingsProvider {
   SharedPreferences preferences;
   static final _instance = SettingsProvider._();
@@ -44,6 +49,7 @@ class SettingsProvider {
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
+  static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
   static List<DashboardCard> _kDefaultDashboardCardList = [
     DashboardCard("new_card", null, null, true),
     DashboardCard("welcome_feature", null, null, true),
@@ -72,8 +78,18 @@ class SettingsProvider {
   @deprecated
   factory SettingsProvider.of(_) => SettingsProvider.getInstance();
 
+  bool get useAccessibilityColoring {
+    if (preferences.containsKey(KEY_ACCESSIBILITY_COLORING)) {
+      return preferences.getBool(KEY_ACCESSIBILITY_COLORING);
+    }
+    return false;
+  }
+
+  set useAccessibilityColoring(bool value) {
+    preferences.setBool(KEY_ACCESSIBILITY_COLORING, value);
+  }
+
   /// Whether user has opted-in to Ads
-  /// Defaults to false, won't return null
   bool get isAdEnabled {
     if (preferences.containsKey(KEY_AD_ENABLED)) {
       return preferences.getBool(KEY_AD_ENABLED);

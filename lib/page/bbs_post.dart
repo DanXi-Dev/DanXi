@@ -24,6 +24,7 @@ import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
@@ -454,10 +455,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (generateTags)
                   Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(_post, (String tagName) {
+                      child: generateTagWidgets(context, _post,
+                          (String tagName) {
                         smartNavigatorPush(context, '/bbs/discussions',
                             arguments: {"tagFilter": tagName});
-                      })),
+                      },
+                          SettingsProvider.getInstance()
+                              .useAccessibilityColoring)),
                 Padding(
                   padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
                   child: Row(

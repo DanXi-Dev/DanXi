@@ -128,6 +128,10 @@
     "sponsor_us_enabled": "感谢您支持我们！:) 您可以随时关闭广告",
     "thankyouforenablingads": "感谢您打开广告！",
 
+    "accessibility_coloring": "辅助功能：高对比度颜色",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+
     "handan_campus": "邯郸校区",
     "fenglin_campus": "枫林校区",
     "jiangwan_campus": "江湾校区",
