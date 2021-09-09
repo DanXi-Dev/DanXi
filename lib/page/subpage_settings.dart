@@ -443,8 +443,11 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             title: Text(S.of(context).fduhole_hidden_tags),
                             subtitle: Text(
                                 S.of(context).fduhole_hidden_tags_description),
-                            onTap: () async => smartNavigatorPush(
-                                context, '/bbs/tags/blocklist'),
+                            onTap: () async {
+                              await smartNavigatorPush(
+                                  context, '/bbs/tags/blocklist');
+                              RefreshBBSEvent().fire();
+                            },
                           ),
                           // Clear Cache
                           ListTile(
