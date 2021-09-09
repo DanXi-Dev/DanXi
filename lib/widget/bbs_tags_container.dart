@@ -20,7 +20,7 @@ import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+/// A wrapped container for [PostTag].
 class BBSTagsContainer extends StatefulWidget {
   final List<PostTag> tags;
   final OnTapTag onTap;

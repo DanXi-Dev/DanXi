@@ -18,16 +18,17 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'55'];
 
 /// Build date in Unix Time
-const int date = 1631096976;
+const int date = 1631148813;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
-  'name':  r'dan_xi',
-  'description':  r'Maybe the best all-rounded service app for Fudan University students.',
-  'publish_to':  r'none',
-  'version':  r'1.2.4+55',
-  'environment':  <String, dynamic>{
-      'sdk':  r'>=2.7.0 <3.0.0',
+  'name': r'dan_xi',
+  'description':
+      r'Maybe the best all-rounded service app for Fudan University students.',
+  'publish_to': r'none',
+  'version': r'1.2.4+55',
+  'environment': <String, dynamic>{
+    'sdk': r'>=2.7.0 <3.0.0',
   },
   'dependencies':  <String, dynamic>{
       'flutter':  <String, dynamic>{

@@ -260,73 +260,73 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       findSuggestions: (String filter) async {
                         if (_allTags == null)
                           _allTags =
-                          await PostRepository.getInstance().loadTags();
+                              await PostRepository.getInstance().loadTags();
                         return _allTags
                             .where((value) => value.name
-                            .toLowerCase()
-                            .contains(filter.toLowerCase()))
+                                .toLowerCase()
+                                .contains(filter.toLowerCase()))
                             .toList();
                       },
                       additionCallback: (value) =>
                           PostTag(value, Constant.randomColor, 0),
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
-                        title: Text(
-                          tag.name,
-                          style: TextStyle(
-                              color:
-                              Constant.getColorFromString(tag.color)),
-                        ),
-                        subtitle: Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.flame,
-                              color: Constant.getColorFromString(tag.color),
-                              size: 12,
-                            ),
-                            const SizedBox(
-                              width: 2,
-                            ),
-                            Text(
-                              tag.count.toString(),
+                            title: Text(
+                              tag.name,
                               style: TextStyle(
-                                  fontSize: 13,
-                                  color: Constant.getColorFromString(
-                                      tag.color)),
+                                  color:
+                                      Constant.getColorFromString(tag.color)),
                             ),
-                          ],
-                        ),
-                        additionWidget: Chip(
-                          avatar: Icon(
-                            Icons.add_circle,
-                            color: Colors.white,
+                            subtitle: Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.flame,
+                                  color: Constant.getColorFromString(tag.color),
+                                  size: 12,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  tag.count.toString(),
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Constant.getColorFromString(
+                                          tag.color)),
+                                ),
+                              ],
+                            ),
+                            additionWidget: Chip(
+                              avatar: Icon(
+                                Icons.add_circle,
+                                color: Colors.white,
+                              ),
+                              label: Text(S.of(context).add_new_tag),
+                              labelStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w300,
+                              ),
+                              backgroundColor: Theme.of(context).accentColor,
+                            ),
                           ),
-                          label: Text(S.of(context).add_new_tag),
-                          labelStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w300,
-                          ),
-                          backgroundColor: Theme.of(context).accentColor,
-                        ),
-                      ),
                       configureChip: (tag) => ChipConfiguration(
-                        label: Text(tag.name),
-                        backgroundColor:
-                        Constant.getColorFromString(tag.color),
-                        labelStyle: TextStyle(
-                            color: Constant.getColorFromString(tag.color)
-                                .computeLuminance() >=
-                                0.5
-                                ? Colors.black
-                                : Colors.white),
-                        deleteIconColor:
-                        Constant.getColorFromString(tag.color)
-                            .computeLuminance() >=
-                            0.5
-                            ? Colors.black
-                            : Colors.white,
-                      ),
+                            label: Text(tag.name),
+                            backgroundColor:
+                                Constant.getColorFromString(tag.color),
+                            labelStyle: TextStyle(
+                                color: Constant.getColorFromString(tag.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white),
+                            deleteIconColor:
+                                Constant.getColorFromString(tag.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white,
+                          ),
                       onChanged: () {}),
                 ),
               ),
