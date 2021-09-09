@@ -20,7 +20,16 @@ class Secret {
   static const API_KEY = "YOUR-API-KEY";
 
   static const FDUHOLE_API_KEY = "YOUR-API-KEY";
-  static const RSA_PUBLIC_KEY = '''-----BEGIN RSA PUBLIC KEY-----
-  YOUR-RSA-PUBLIC-KEY
-  -----END RSA PUBLIC KEY-----''';
+  static const List<String> ADMOB_UNIT_ID_LIST_ANDROID = [
+    "ca-app-pub-",
+    "ca-app-pub-",
+    "ca-app-pub-",
+    "ca-app-pub-",
+  ];
+  static const List<String> ADMOB_UNIT_ID_LIST_IOS = [
+    "ca-app-pub-",
+    "ca-app-pub-",
+    "ca-app-pub-",
+    "ca-app-pub-",
+  ];
 }
