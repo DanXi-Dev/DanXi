@@ -88,14 +88,14 @@ class AutoBannerAdWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (SettingsProvider.getInstance().isAdEnabled && bannerAd != null) {
-      const double padding = 4.0;
+      const double padding = 8.0;
       return Center(
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: padding),
+          padding: EdgeInsets.only(bottom: padding),
           alignment: Alignment.center,
           child: AdWidget(ad: bannerAd),
           width: bannerAd.size.width.toDouble(),
-          height: bannerAd.size.height.toDouble() + padding * 2,
+          height: bannerAd.size.height.toDouble() + padding,
         ),
       );
     }

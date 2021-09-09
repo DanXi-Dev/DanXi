@@ -488,6 +488,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                     // Sponsor Option
                     Card(
                       child: ListTile(
+                        isThreeLine:
+                            !SettingsProvider.getInstance().isAdEnabled,
                         leading: Icon(
                           PlatformIcons(context).heartSolid,
                         ),
@@ -500,10 +502,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           if (SettingsProvider.getInstance().isAdEnabled) {
                             _toggleAdDisplay();
                           } else {
-                            if (await _showAdsDialog()) {
-                              _toggleAdDisplay();
-                              await _showAdsThankyouDialog();
-                            }
+                            //if (await _showAdsDialog()) {
+                            _toggleAdDisplay();
+                            await _showAdsThankyouDialog();
+                            //}
                           }
                         },
                       ),
@@ -550,6 +552,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   _showAdsThankyouDialog() => showPlatformDialog(
       context: context,
+      barrierDismissible: true,
       builder: (_) => AlertDialog(
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -557,12 +560,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 Text(S.of(context).thankyouforenablingads),
               ],
             ),
-            actions: [
-              TextButton(
-                child: Text(S.of(context).i_see),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
           ));
 
   _showCleanModeGuideDialog() => showPlatformDialog(
