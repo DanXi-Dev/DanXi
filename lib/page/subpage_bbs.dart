@@ -410,63 +410,58 @@ class _BBSSubpageState extends State<BBSSubpage>
     return Material(
       child: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            AutoBannerAdWidget(bannerAd: bannerAd),
-            Expanded(
-              child: RefreshIndicator(
-                color: Theme.of(context).accentColor,
-                backgroundColor: Theme.of(context).dialogBackgroundColor,
-                onRefresh: () async {
-                  HapticFeedback.mediumImpact();
-                  refreshSelf();
-                },
-                child: PagedListView<BBSPost>(
-                    noneItem: BBSPost.DUMMY_POST,
-                    pagedController: _listViewController,
-                    withScrollbar: true,
-                    scrollController: widget.primaryScrollController(context),
-                    startPage: 1,
-                    builder: _buildListItem,
-                    headBuilder: (_) => _buildSearchTextField(),
-                    loadingBuilder: (BuildContext context) => Container(
-                          padding: EdgeInsets.all(8),
-                          child: Center(
-                              child: PlatformCircularProgressIndicator()),
-                        ),
-                    errorBuilder: (BuildContext context,
-                        AsyncSnapshot<List<BBSPost>> snapshot) {
-                      if (snapshot.error is LoginExpiredError) {
-                        SettingsProvider.getInstance()
-                            .deleteSavedFduholeToken();
-                        return _buildErrorPage(
-                            error: S.of(context).error_login_expired);
-                      } else if (snapshot.error is NotLoginError)
-                        return _buildErrorPage(
-                            error:
-                            (snapshot.error as NotLoginError).errorMessage);
-                      else if (snapshot.error is DioError)
-                        return _buildErrorPage(
-                            error: (snapshot.error as DioError).message +
-                                '\n' +
-                                ((snapshot.error as DioError)
-                                    .response
-                                    ?.data
-                                    ?.toString() ??
-                                    ""));
-                      return _buildErrorPage(error: snapshot.error);
-                    },
-                    endBuilder: (context) => Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(S.of(context).end_reached),
-                      ),
+        child: RefreshIndicator(
+          color: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            refreshSelf();
+          },
+          child: PagedListView<BBSPost>(
+              noneItem: BBSPost.DUMMY_POST,
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: widget.primaryScrollController(context),
+              startPage: 1,
+              builder: _buildListItem,
+              headBuilder: (_) => Column(
+                    children: [
+                      AutoBannerAdWidget(bannerAd: bannerAd),
+                      _buildSearchTextField()
+                    ],
+                  ),
+              loadingBuilder: (BuildContext context) => Container(
+                    padding: EdgeInsets.all(8),
+                    child: Center(child: PlatformCircularProgressIndicator()),
+                  ),
+              errorBuilder: (BuildContext context,
+                  AsyncSnapshot<List<BBSPost>> snapshot) {
+                if (snapshot.error is LoginExpiredError) {
+                  SettingsProvider.getInstance().deleteSavedFduholeToken();
+                  return _buildErrorPage(
+                      error: S.of(context).error_login_expired);
+                } else if (snapshot.error is NotLoginError)
+                  return _buildErrorPage(
+                      error: (snapshot.error as NotLoginError).errorMessage);
+                else if (snapshot.error is DioError)
+                  return _buildErrorPage(
+                      error: (snapshot.error as DioError).message +
+                          '\n' +
+                          ((snapshot.error as DioError)
+                                  .response
+                                  ?.data
+                                  ?.toString() ??
+                              ""));
+                return _buildErrorPage(error: snapshot.error.toString());
+              },
+              endBuilder: (context) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(S.of(context).end_reached),
                     ),
-                    emptyBuilder: (_) => _buildEmptyFavoritesPage(),
-                    dataReceiver: _loadContent),
-              ),
-            ),
-          ],
+                  ),
+              emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+              dataReceiver: _loadContent),
         ),
       ),
     );
