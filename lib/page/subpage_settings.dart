@@ -43,6 +43,7 @@ import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -246,278 +247,288 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     // Load preference fields
 
     return SafeArea(
-        child: RefreshIndicator(
-            color: Theme.of(context).accentColor,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              refreshSelf();
-            },
-            child: Material(
-              child: ListView(
-                  padding: EdgeInsets.all(4),
-                  controller: widget.primaryScrollController(context),
-                  physics: AlwaysScrollableScrollPhysics(),
-                  children: <Widget>[
-                    AutoBannerAdWidget(
-                      bannerAd: myBanner,
-                    ),
-                    //Account Selection
-                    Card(
-                      child: Column(children: <Widget>[
-                        ListTile(
-                          title: Text(S.of(context).account),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.account_circle)
-                              : const Icon(CupertinoIcons.person_circle),
-                          subtitle: Text(
-                              "${StateProvider.personInfo.value.name} (${StateProvider.personInfo.value.id})"),
-                          onTap: () {
-                            showPlatformDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) =>
-                                  PlatformAlertDialog(
-                                title: Text(
-                                    S.of(context).logout_question_prompt_title),
-                                content:
-                                    Text(S.of(context).logout_question_prompt),
-                                actions: [
-                                  PlatformDialogAction(
-                                    child: Text(S.of(context).cancel),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                  ),
-                                  PlatformDialogAction(
-                                      child: Text(
-                                        S.of(context).i_see,
-                                        style: TextStyle(
-                                            color:
-                                                Theme.of(context).errorColor),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        _deleteAllDataAndExit();
-                                      })
-                                ],
-                              ),
-                            );
-                          },
+        child: WithScrollbar(
+            controller: widget.primaryScrollController(context),
+            child: RefreshIndicator(
+                color: Theme.of(context).accentColor,
+                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                onRefresh: () async {
+                  HapticFeedback.mediumImpact();
+                  refreshSelf();
+                },
+                child: Material(
+                  child: ListView(
+                      padding: EdgeInsets.all(4),
+                      controller: widget.primaryScrollController(context),
+                      physics: AlwaysScrollableScrollPhysics(),
+                      children: <Widget>[
+                        AutoBannerAdWidget(
+                          bannerAd: myBanner,
                         ),
-
-                        // Campus
-                        ListTile(
-                          title: Text(S.of(context).default_campus),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.location_on)
-                              : const Icon(CupertinoIcons.location_fill),
-                          subtitle: Text(SettingsProvider.getInstance()
-                              .campus
-                              .displayTitle(context)),
-                          onTap: () {
-                            showPlatformModalSheet(
-                                context: context,
-                                builder: (_) => PlatformWidget(
-                                      cupertino: (_, __) =>
-                                          CupertinoActionSheet(
-                                        title:
-                                            Text(S.of(context).select_campus),
-                                        actions: _buildCampusAreaList(),
-                                        cancelButton:
-                                            CupertinoActionSheetAction(
-                                          child: Text(S.of(context).cancel),
+                        //Account Selection
+                        Card(
+                          child: Column(children: <Widget>[
+                            ListTile(
+                              title: Text(S.of(context).account),
+                              leading: PlatformX.isMaterial(context)
+                                  ? const Icon(Icons.account_circle)
+                                  : const Icon(CupertinoIcons.person_circle),
+                              subtitle: Text(
+                                  "${StateProvider.personInfo.value.name} (${StateProvider.personInfo.value.id})"),
+                              onTap: () {
+                                showPlatformDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) =>
+                                      PlatformAlertDialog(
+                                    title: Text(S
+                                        .of(context)
+                                        .logout_question_prompt_title),
+                                    content: Text(
+                                        S.of(context).logout_question_prompt),
+                                    actions: [
+                                      PlatformDialogAction(
+                                        child: Text(S.of(context).cancel),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                      PlatformDialogAction(
+                                          child: Text(
+                                            S.of(context).i_see,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .errorColor),
+                                          ),
                                           onPressed: () {
                                             Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ),
-                                      material: (_, __) => Container(
-                                        height: 300,
-                                        child: Column(
-                                          children: _buildCampusAreaList(),
-                                        ),
-                                      ),
-                                    ));
-                          },
-                        ),
-                      ]),
-                    ),
-
-                    // Accessibility
-                    Card(
-                      child: ListTile(
-                        title: Text(S.of(context).accessibility_coloring),
-                        leading: Icon(Icons.accessibility_new_rounded),
-                        subtitle: Text(SettingsProvider.getInstance()
-                                .useAccessibilityColoring
-                            ? S.of(context).enabled
-                            : S.of(context).disabled),
-                        onTap: () {
-                          SettingsProvider.getInstance()
-                                  .useAccessibilityColoring =
-                              !SettingsProvider.getInstance()
-                                  .useAccessibilityColoring;
-                          RefreshBBSEvent(refreshAll: true).fire();
-                          setState(() {});
-                        },
-                      ),
-                    ),
-
-                    // FDUHOLE
-                    Card(
-                      child: Column(
-                        children: [
-                          if (PlatformX.isWindows)
-                            SwitchListTile(
-                              title:
-                                  Text(S.of(context).windows_auto_start_title),
-                              secondary: const Icon(Icons.settings_power),
-                              subtitle: Text(
-                                  S.of(context).windows_auto_start_description),
-                              value: WindowsAutoStart.autoStart,
-                              onChanged: (bool value) async {
-                                WindowsAutoStart.autoStart = value;
-                                await Noticing.showNotice(
-                                    context,
-                                    S
-                                        .of(context)
-                                        .windows_auto_start_wait_dialog_message,
-                                    title: S
-                                        .of(context)
-                                        .windows_auto_start_wait_dialog_title,
-                                    useSnackBar: false);
-                                refreshSelf();
+                                            _deleteAllDataAndExit();
+                                          })
+                                    ],
+                                  ),
+                                );
                               },
                             ),
-                          ListTile(
-                            title: Text(S.of(context).fduhole_nsfw_behavior),
-                            leading: PlatformX.isMaterial(context)
-                                ? const Icon(Icons.hide_image)
-                                : const Icon(CupertinoIcons.eye_slash),
+
+                            // Campus
+                            ListTile(
+                              title: Text(S.of(context).default_campus),
+                              leading: PlatformX.isMaterial(context)
+                                  ? const Icon(Icons.location_on)
+                                  : const Icon(CupertinoIcons.location_fill),
+                              subtitle: Text(SettingsProvider.getInstance()
+                                  .campus
+                                  .displayTitle(context)),
+                              onTap: () {
+                                showPlatformModalSheet(
+                                    context: context,
+                                    builder: (_) => PlatformWidget(
+                                          cupertino: (_, __) =>
+                                              CupertinoActionSheet(
+                                            title: Text(
+                                                S.of(context).select_campus),
+                                            actions: _buildCampusAreaList(),
+                                            cancelButton:
+                                                CupertinoActionSheetAction(
+                                              child: Text(S.of(context).cancel),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ),
+                                          material: (_, __) => Container(
+                                            height: 300,
+                                            child: Column(
+                                              children: _buildCampusAreaList(),
+                                            ),
+                                          ),
+                                        ));
+                              },
+                            ),
+                          ]),
+                        ),
+
+                        // Accessibility
+                        Card(
+                          child: ListTile(
+                            title: Text(S.of(context).accessibility_coloring),
+                            leading: Icon(Icons.accessibility_new_rounded),
                             subtitle: Text(SettingsProvider.getInstance()
-                                .fduholeFoldBehavior
-                                .displayTitle(context)),
+                                    .useAccessibilityColoring
+                                ? S.of(context).enabled
+                                : S.of(context).disabled),
                             onTap: () {
-                              showPlatformModalSheet(
-                                  context: context,
-                                  builder: (_) => PlatformWidget(
-                                        cupertino: (_, __) =>
-                                            CupertinoActionSheet(
-                                          title: Text(S
-                                              .of(context)
-                                              .fduhole_nsfw_behavior),
-                                          actions: _buildFoldBehaviorList(),
-                                          cancelButton:
-                                              CupertinoActionSheetAction(
-                                            child: Text(S.of(context).cancel),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ),
-                                        material: (_, __) => Container(
-                                          height: 300,
-                                          child: Column(
-                                            children: _buildFoldBehaviorList(),
-                                          ),
-                                        ),
-                                      ));
+                              SettingsProvider.getInstance()
+                                      .useAccessibilityColoring =
+                                  !SettingsProvider.getInstance()
+                                      .useAccessibilityColoring;
+                              RefreshBBSEvent(refreshAll: true).fire();
+                              setState(() {});
                             },
                           ),
-                          SwitchListTile(
-                            title: Text(S.of(context).fduhole_clean_mode),
-                            secondary: const Icon(Icons.ac_unit),
+                        ),
+
+                        // FDUHOLE
+                        Card(
+                          child: Column(
+                            children: [
+                              if (PlatformX.isWindows)
+                                SwitchListTile(
+                                  title: Text(
+                                      S.of(context).windows_auto_start_title),
+                                  secondary: const Icon(Icons.settings_power),
+                                  subtitle: Text(S
+                                      .of(context)
+                                      .windows_auto_start_description),
+                                  value: WindowsAutoStart.autoStart,
+                                  onChanged: (bool value) async {
+                                    WindowsAutoStart.autoStart = value;
+                                    await Noticing.showNotice(
+                                        context,
+                                        S
+                                            .of(context)
+                                            .windows_auto_start_wait_dialog_message,
+                                        title: S
+                                            .of(context)
+                                            .windows_auto_start_wait_dialog_title,
+                                        useSnackBar: false);
+                                    refreshSelf();
+                                  },
+                                ),
+                              ListTile(
+                                title:
+                                    Text(S.of(context).fduhole_nsfw_behavior),
+                                leading: PlatformX.isMaterial(context)
+                                    ? const Icon(Icons.hide_image)
+                                    : const Icon(CupertinoIcons.eye_slash),
+                                subtitle: Text(SettingsProvider.getInstance()
+                                    .fduholeFoldBehavior
+                                    .displayTitle(context)),
+                                onTap: () {
+                                  showPlatformModalSheet(
+                                      context: context,
+                                      builder: (_) => PlatformWidget(
+                                            cupertino: (_, __) =>
+                                                CupertinoActionSheet(
+                                              title: Text(S
+                                                  .of(context)
+                                                  .fduhole_nsfw_behavior),
+                                              actions: _buildFoldBehaviorList(),
+                                              cancelButton:
+                                                  CupertinoActionSheetAction(
+                                                child:
+                                                    Text(S.of(context).cancel),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ),
+                                            material: (_, __) => Container(
+                                              height: 300,
+                                              child: Column(
+                                                children:
+                                                    _buildFoldBehaviorList(),
+                                              ),
+                                            ),
+                                          ));
+                                },
+                              ),
+                              SwitchListTile(
+                                title: Text(S.of(context).fduhole_clean_mode),
+                                secondary: const Icon(Icons.ac_unit),
+                                subtitle: Text(S
+                                    .of(context)
+                                    .fduhole_clean_mode_description),
+                                value: SettingsProvider.getInstance().cleanMode,
+                                onChanged: (bool value) {
+                                  if (value) {
+                                    _showCleanModeGuideDialog();
+                                  }
+                                  setState(() => SettingsProvider.getInstance()
+                                      .cleanMode = value);
+                                },
+                              ),
+                              ListTile(
+                                leading: Icon(PlatformIcons(context).tag),
+                                title: Text(S.of(context).fduhole_hidden_tags),
+                                subtitle: Text(S
+                                    .of(context)
+                                    .fduhole_hidden_tags_description),
+                                onTap: () async {
+                                  await smartNavigatorPush(
+                                      context, '/bbs/tags/blocklist');
+                                  RefreshBBSEvent().fire();
+                                },
+                              ),
+                              // Clear Cache
+                              ListTile(
+                                leading:
+                                    Icon(PlatformIcons(context).photoLibrary),
+                                title: Text(S.of(context).clear_cache),
+                                subtitle: Text(_clearCacheSubtitle ??
+                                    S.of(context).clear_cache_description),
+                                onTap: () async {
+                                  await DefaultCacheManager().emptyCache();
+                                  setState(() {
+                                    _clearCacheSubtitle =
+                                        S.of(context).cache_cleared;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (SettingsProvider.getInstance().debugMode)
+                          //Theme Selection
+                          Card(
+                            child: ListTile(
+                              title: Text(S.of(context).theme),
+                              leading: PlatformX.isMaterial(context)
+                                  ? const Icon(Icons.color_lens)
+                                  : const Icon(CupertinoIcons.color_filter),
+                              subtitle: Text(PlatformX.isMaterial(context)
+                                  ? S.of(context).material
+                                  : S.of(context).cupertino),
+                              onTap: () {
+                                PlatformX.isMaterial(context)
+                                    ? PlatformProvider.of(context)
+                                        .changeToCupertinoPlatform()
+                                    : PlatformProvider.of(context)
+                                        .changeToMaterialPlatform();
+                              },
+                            ),
+                          ),
+
+                        // Sponsor Option
+                        Card(
+                          child: ListTile(
+                            isThreeLine:
+                                !SettingsProvider.getInstance().isAdEnabled,
+                            leading: Icon(
+                              PlatformIcons(context).heartSolid,
+                            ),
+                            title: Text(S.of(context).sponsor_us),
                             subtitle: Text(
-                                S.of(context).fduhole_clean_mode_description),
-                            value: SettingsProvider.getInstance().cleanMode,
-                            onChanged: (bool value) {
-                              if (value) {
-                                _showCleanModeGuideDialog();
+                                SettingsProvider.getInstance().isAdEnabled
+                                    ? S.of(context).sponsor_us_enabled
+                                    : S.of(context).sponsor_us_disabled),
+                            onTap: () async {
+                              if (SettingsProvider.getInstance().isAdEnabled) {
+                                _toggleAdDisplay();
+                              } else {
+                                //if (await _showAdsDialog()) {
+                                _toggleAdDisplay();
+                                await _showAdsThankyouDialog();
+                                //}
                               }
-                              setState(() => SettingsProvider.getInstance()
-                                  .cleanMode = value);
                             },
                           ),
-                          ListTile(
-                            leading: Icon(PlatformIcons(context).tag),
-                            title: Text(S.of(context).fduhole_hidden_tags),
-                            subtitle: Text(
-                                S.of(context).fduhole_hidden_tags_description),
-                            onTap: () async {
-                              await smartNavigatorPush(
-                                  context, '/bbs/tags/blocklist');
-                              RefreshBBSEvent().fire();
-                            },
-                          ),
-                          // Clear Cache
-                          ListTile(
-                            leading: Icon(PlatformIcons(context).photoLibrary),
-                            title: Text(S.of(context).clear_cache),
-                            subtitle: Text(_clearCacheSubtitle ??
-                                S.of(context).clear_cache_description),
-                            onTap: () async {
-                              await DefaultCacheManager().emptyCache();
-                              setState(() {
-                                _clearCacheSubtitle =
-                                    S.of(context).cache_cleared;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    if (SettingsProvider.getInstance().debugMode)
-                      //Theme Selection
-                      Card(
-                        child: ListTile(
-                          title: Text(S.of(context).theme),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.color_lens)
-                              : const Icon(CupertinoIcons.color_filter),
-                          subtitle: Text(PlatformX.isMaterial(context)
-                              ? S.of(context).material
-                              : S.of(context).cupertino),
-                          onTap: () {
-                            PlatformX.isMaterial(context)
-                                ? PlatformProvider.of(context)
-                                    .changeToCupertinoPlatform()
-                                : PlatformProvider.of(context)
-                                    .changeToMaterialPlatform();
-                          },
                         ),
-                      ),
 
-                    // Sponsor Option
-                    Card(
-                      child: ListTile(
-                        isThreeLine:
-                            !SettingsProvider.getInstance().isAdEnabled,
-                        leading: Icon(
-                          PlatformIcons(context).heartSolid,
-                        ),
-                        title: Text(S.of(context).sponsor_us),
-                        subtitle: Text(
-                            SettingsProvider.getInstance().isAdEnabled
-                                ? S.of(context).sponsor_us_enabled
-                                : S.of(context).sponsor_us_disabled),
-                        onTap: () async {
-                          if (SettingsProvider.getInstance().isAdEnabled) {
-                            _toggleAdDisplay();
-                          } else {
-                            //if (await _showAdsDialog()) {
-                            _toggleAdDisplay();
-                            await _showAdsThankyouDialog();
-                            //}
-                          }
-                        },
-                      ),
-                    ),
-
-                    // About
-                    _buildAboutCard()
-                  ]),
-            )));
+                        // About
+                        _buildAboutCard()
+                      ]),
+                ))));
   }
 
   void _toggleAdDisplay() {

@@ -38,6 +38,7 @@ import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -211,7 +212,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     super.build(context);
     return FutureWidget(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return _buildPage(snapshot.data);
+        return WithScrollbar(
+          controller: widget.primaryScrollController(context),
+          child: _buildPage(snapshot.data),
+        );
       },
       future: _content,
       errorBuilder: (_, snapShot) => GestureDetector(
