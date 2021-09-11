@@ -22,6 +22,7 @@ import 'package:dan_xi/repository/fudan_ehall_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -161,89 +162,96 @@ class _LoginDialogState extends State<LoginDialog> {
       requestInternetAccess();
     }
 
+    final scrollController = PrimaryScrollController.of(context);
+
     return AlertDialog(
       title: Text(kUserGroupDescription[_group](context)),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(S.of(context).login_uis_description),
-          Text(
-            _errorText,
-            textAlign: TextAlign.start,
-            style: TextStyle(fontSize: 12, color: Colors.red),
-          ),
-          TextField(
-            controller: _nameController,
-            enabled: _group != UserGroup.VISITOR,
-            keyboardType: TextInputType.number,
-            //material: (_, __) => MaterialTextFieldData(
-            decoration: InputDecoration(
-                labelText: S.of(context).login_uis_uid,
-                icon: PlatformX.isAndroid
-                    ? Icon(Icons.perm_identity)
-                    : Icon(CupertinoIcons.person_crop_circle)),
-            //),
-            /*cupertino: (_, __) => CupertinoTextFieldData(
+      content: WithScrollbar(
+        controller: scrollController,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(S.of(context).login_uis_description),
+              Text(
+                _errorText,
+                textAlign: TextAlign.start,
+                style: TextStyle(fontSize: 12, color: Colors.red),
+              ),
+              TextField(
+                controller: _nameController,
+                enabled: _group != UserGroup.VISITOR,
+                keyboardType: TextInputType.number,
+                //material: (_, __) => MaterialTextFieldData(
+                decoration: InputDecoration(
+                    labelText: S.of(context).login_uis_uid,
+                    icon: PlatformX.isAndroid
+                        ? Icon(Icons.perm_identity)
+                        : Icon(CupertinoIcons.person_crop_circle)),
+                //),
+                /*cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_uid),*/
-            autofocus: true,
-          ),
-          if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
-          TextField(
-            controller: _pwdController,
-            enabled: _group != UserGroup.VISITOR,
-            //material: (_, __) => MaterialTextFieldData(
-            decoration: InputDecoration(
-              labelText: S.of(context).login_uis_pwd,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.lock_outline)
-                  : Icon(CupertinoIcons.lock_circle),
-            ),
-            //)),
-            /*cupertino: (_, __) => CupertinoTextFieldData(
+                autofocus: true,
+              ),
+              if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
+              TextField(
+                controller: _pwdController,
+                enabled: _group != UserGroup.VISITOR,
+                //material: (_, __) => MaterialTextFieldData(
+                decoration: InputDecoration(
+                  labelText: S.of(context).login_uis_pwd,
+                  icon: PlatformX.isAndroid
+                      ? Icon(Icons.lock_outline)
+                      : Icon(CupertinoIcons.lock_circle),
+                ),
+                //)),
+                /*cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_pwd),*/
-            obscureText: true,
-            onSubmitted: (_) {
-              _tryLogin(_nameController.text, _pwdController.text)
-                  .catchError((e) {
-                if (e is CredentialsInvalidException) {
-                  _pwdController.text = "";
-                  _errorText = S.of(context).credentials_invalid;
-                } else if (e is CaptchaNeededException) {
-                  _errorText = S.of(context).captcha_needed;
-                } else if (e is GeneralLoginFailedException) {
-                  _errorText = S.of(context).weak_password;
-                } else {
-                  _errorText = S.of(context).connection_failed;
-                }
-                // _pwdController.text = "";
-                refreshSelf();
-              });
-            },
+                obscureText: true,
+                onSubmitted: (_) {
+                  _tryLogin(_nameController.text, _pwdController.text)
+                      .catchError((e) {
+                    if (e is CredentialsInvalidException) {
+                      _pwdController.text = "";
+                      _errorText = S.of(context).credentials_invalid;
+                    } else if (e is CaptchaNeededException) {
+                      _errorText = S.of(context).captcha_needed;
+                    } else if (e is GeneralLoginFailedException) {
+                      _errorText = S.of(context).weak_password;
+                    } else {
+                      _errorText = S.of(context).connection_failed;
+                    }
+                    // _pwdController.text = "";
+                    refreshSelf();
+                  });
+                },
+              ),
+              const SizedBox(
+                height: 24,
+              ),
+              //Legal
+              RichText(
+                  text: TextSpan(children: [
+                TextSpan(
+                  style: defaultText,
+                  text: S.of(context).terms_and_conditions_content,
+                ),
+                TextSpan(
+                    style: linkText,
+                    text: S.of(context).privacy_policy,
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () async {
+                        await BrowserUtil.openUrl(
+                            S.of(context).privacy_policy_url, context);
+                      }),
+                TextSpan(
+                  style: defaultText,
+                  text: S.of(context).terms_and_conditions_content_end,
+                ),
+              ])),
+            ],
           ),
-          const SizedBox(
-            height: 24,
-          ),
-          //Legal
-          RichText(
-              text: TextSpan(children: [
-            TextSpan(
-              style: defaultText,
-              text: S.of(context).terms_and_conditions_content,
-            ),
-            TextSpan(
-                style: linkText,
-                text: S.of(context).privacy_policy,
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () async {
-                    await BrowserUtil.openUrl(
-                        S.of(context).privacy_policy_url, context);
-                  }),
-            TextSpan(
-              style: defaultText,
-              text: S.of(context).terms_and_conditions_content_end,
-            ),
-          ])),
-        ],
+        ),
       ),
       actions: [
         if (widget.dismissible)
