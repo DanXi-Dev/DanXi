@@ -44,6 +44,16 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
+  static const Map<String, String> _JWFW_HEADER = {
+    "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
+    "Accept": "text/xml",
+    "Accept-Language": "zh-CN,en-US;q=0.7,en;q=0.3",
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "Origin": "https://jwfw.fudan.edu.cn",
+    "Connection": "keep-alive",
+  };
+
   @override
   String get linkHost => "jwfw.fudan.edu.cn";
 
@@ -60,9 +70,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
   Future<List<Exam>> _loadExamList() async {
-    Response r = await dio.get(EXAM_TABLE_URL);
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r = await dio.get(EXAM_TABLE_URL,
+        options: Options(headers: Map.of(_JWFW_HEADER)));
+    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    final DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
@@ -77,12 +88,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
   Future<List<ExamScore>> _loadExamScore([String semesterId]) async {
-    Response r = await dio.get(kExamScoreUrl(semesterId ??
-        (await cookieJar.loadForRequest(Uri.parse(HOST)))
-            .firstWhere((element) => element.name == "semester.id")
-            .value));
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r = await dio.get(
+        kExamScoreUrl(semesterId ??
+            (await cookieJar.loadForRequest(Uri.parse(HOST)))
+                .firstWhere((element) => element.name == "semester.id")
+                .value),
+        options: Options(headers: Map.of(_JWFW_HEADER)));
+    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    final DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromEduServiceHtml(e))
@@ -96,9 +109,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
   Future<List<GPAListItem>> _loadGPA() async {
-    Response r = await dio.get(GPA_URL);
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r =
+        await dio.get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
+    final DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => GPAListItem.fromHtml(e))
@@ -115,15 +129,16 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
   Future<List<SemesterInfo>> _loadSemesters() async {
-    await dio.get(EXAM_TABLE_URL);
-    Response semesterResponse = await dio.post(SEMESTER_DATA_URL,
+    await dio.get(EXAM_TABLE_URL,
+        options: Options(headers: Map.of(_JWFW_HEADER)));
+    final Response semesterResponse = await dio.post(SEMESTER_DATA_URL,
         data: "dataType=semesterCalendar&empty=false",
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    Beautifulsoup soup = Beautifulsoup(semesterResponse.data.toString());
+    final Beautifulsoup soup = Beautifulsoup(semesterResponse.data.toString());
 
-    var jsonText = _normalizeJson(soup.get_text().trim());
-    var json = jsonDecode(jsonText);
-    Map semesters = json['semesters'];
+    final jsonText = _normalizeJson(soup.get_text().trim());
+    final json = jsonDecode(jsonText);
+    final Map semesters = json['semesters'];
     List<SemesterInfo> sems = [];
     semesters.values.forEach((element) {
       if (element is List && element.isNotEmpty) {

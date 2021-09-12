@@ -1,7 +1,7 @@
 name: dan_xi
 description: Maybe the best all-rounded service app for Fudan University students.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.2.4+56
+version: 1.2.5+57
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
