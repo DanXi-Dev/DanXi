@@ -412,7 +412,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   Widget _getListItems(BuildContext context, ListProvider<Reply> dataProvider,
-      int index, Reply e,
+      int index, Reply reply,
       {bool isNested = false}) {
     final bool generateTags = (index == 0);
     LinkTapCallback onLinkTap = (url) {
@@ -427,7 +427,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             context: context,
             builder: (_) => PlatformWidget(
                   cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(e),
+                    actions: _buildContextMenu(reply),
                     cancelButton: CupertinoActionSheetAction(
                       child: Text(S.of(context).cancel),
                       onPressed: () {
@@ -438,7 +438,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   material: (_, __) => Container(
                     height: 300,
                     child: Column(
-                      children: _buildContextMenu(e),
+                      children: _buildContextMenu(reply),
                     ),
                   ),
                 ));
@@ -466,16 +466,37 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
                   child: Row(
                     children: [
-                      if (e.username == _post.first_post.username)
+                      if (reply.username == _post.first_post.username)
                         _opLeadingTag(),
-                      if (e.username == _post.first_post.username)
+                      if (reply.username == _post.first_post.username)
                         const SizedBox(
                           width: 2,
                         ),
-                      Text(
-                        "[${e.username}]",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Align(
+                              child: Text(
+                                "[${reply.username}]",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              alignment: Alignment.topLeft,
+                            ),
+                            Align(
+                              child: Text(
+                                  "${dataProvider.getIndexOf(reply) + 1}L",
+                                  style: TextStyle(fontSize: 12.5)),
+                              alignment: Alignment.topRight,
+                            )
+                          ],
+                        ),
                       ),
+
+                      // Text(
+                      //   index == 0 ? "GF" : "BF${index}",
+                      //   style: TextStyle(fontWeight: FontWeight.bold),
+                      // ),
                       const SizedBox(
                         width: 2,
                       ),
@@ -489,7 +510,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ],
                   ),
                 ),
-                if (e.reply_to != null && !isNested && _searchKeyword == null)
+                if (reply.reply_to != null &&
+                    !isNested &&
+                    _searchKeyword == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
                     child:
@@ -503,9 +526,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         _getListItems(
                             context,
                             dataProvider,
-                            -1,
+                            index + 1,
                             dataProvider.getElementFirstWhere(
-                                (element) => element.id == e.reply_to,
+                                (element) => element.id == reply.reply_to,
                                 orElse: () => Reply(
                                     -1,
                                     S.of(context).unable_to_find_quote,
@@ -521,8 +544,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     child: isNested
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Linkify(
-                            text: renderText(
-                                    e.filteredContent, S.of(context).image_tag)
+                            text: renderText(reply.filteredContent,
+                                    S.of(context).image_tag)
                                 .trim(),
                             textScaleFactor: 0.8,
                             maxLines: 2,
@@ -537,7 +560,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             },
                           )
                         : smartRender(
-                            e.filteredContent, onLinkTap, onImageTap)),
+                            reply.filteredContent, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: isNested
@@ -550,14 +573,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "#${e.id}",
+                            "#${reply.id}",
                             style: TextStyle(
                                 color: Theme.of(context).hintColor,
                                 fontSize: 12),
                           ),
                           Text(
                             HumanDuration.format(
-                                context, DateTime.parse(e.date_created)),
+                                context, DateTime.parse(reply.date_created)),
                             style: TextStyle(
                                 color: Theme.of(context).hintColor,
                                 fontSize: 12),
@@ -568,7 +591,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                     color: Theme.of(context).hintColor,
                                     fontSize: 12)),
                             onTap: () {
-                              BBSEditor.reportPost(context, e.id);
+                              BBSEditor.reportPost(context, reply.id);
                             },
                           ),
                         ]),
@@ -577,14 +600,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               if (_searchKeyword == null) {
                 if (isNested) {
                   // Scroll to the corrosponding post
-                  _listViewController.scrollToItem(e);
+                  _listViewController.scrollToItem(reply);
                   return;
                 }
 
                 int replyId;
                 // Set the replyId to null when tapping on the first reply.
-                if (_post.first_post.id != e.id) {
-                  replyId = e.id;
+                if (_post.first_post.id != reply.id) {
+                  replyId = reply.id;
                 }
                 BBSEditor.createNewReply(context, _post.id, replyId)
                     .then((value) => refreshSelf(scrollToEnd: true));
@@ -593,7 +616,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": await PostRepository.getInstance()
-                      .loadSpecificPost(e.discussion)
+                      .loadSpecificPost(reply.discussion)
                 });
                 progressDialog.dismiss();
               }
