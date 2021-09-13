@@ -93,6 +93,13 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
 
     return elements.map((e) => StadiumData.fromHtml(e)).toList();
   }
+
+  Future<StadiumScheduleData> _getScheduleData(
+      StadiumData stadium, DateTime date) async {
+    Response res = await dio.get(sStadiumDetailUrl(stadium.contentId, date));
+    Beautifulsoup soup = Beautifulsoup(res.data.toString());
+  }
+
   @override
   String get linkHost => "elife.fudan.edu.cn";
 }
@@ -142,6 +149,32 @@ class StadiumData {
     return StadiumData(name, campus, type, info, contentId);
   }
 }
+
+class StadiumScheduleData {
+  final StadiumData stadium;
+  final DateTime date;
+
+  /// Schedule and reservation details.
+  final List<StadiumScheduleItem> schedule;
+
+  StadiumScheduleData(this.stadium, this.schedule, this.date);
+
+// factory StadiumScheduleData.fromHtmlPart(List<DOM.Element> elements) {
+//   var items=[];
+//   elements.map((e) {
+//     e.getElementsByClassName('site_td1').first;
+//
+//   });
+// }
+}
+
+class StadiumScheduleItem {
+  final String startTime, endTime;
+  final int reserved, total;
+
+  StadiumScheduleItem(this.startTime, this.endTime, this.reserved, this.total);
+}
+
 class SportsType {
   final String id;
   final Create<String> name;
