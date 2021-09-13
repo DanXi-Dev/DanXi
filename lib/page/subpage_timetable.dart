@@ -212,10 +212,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     super.build(context);
     return FutureWidget(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return WithScrollbar(
-          controller: widget.primaryScrollController(context),
-          child: _buildPage(snapshot.data),
-        );
+        return _buildPage(snapshot.data);
       },
       future: _content,
       errorBuilder: (_, snapShot) => GestureDetector(
