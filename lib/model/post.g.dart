@@ -6,31 +6,21 @@ part of 'post.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BBSPost _$BBSPostFromJson(Map<String, dynamic> json) {
-  return BBSPost(
-    json['id'] as int,
-    json['first_post'] == null
-        ? null
-        : Reply.fromJson(json['first_post'] as Map<String, dynamic>),
-    json['count'] as int,
-    (json['tag'] as List)
-        ?.map((e) =>
-            e == null ? null : PostTag.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-    (json['mapping'] as Map<String, dynamic>)?.map(
-      (k, e) => MapEntry(k, e as String),
-    ),
-    json['is_folded'] as bool,
-    json['date_created'] as String,
-    json['date_updated'] as String,
-    (json['posts'] as List)
-        ?.map(
-            (e) => e == null ? null : Reply.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-  )..last_post = json['last_post'] == null
-      ? null
-      : Reply.fromJson(json['last_post'] as Map<String, dynamic>);
-}
+BBSPost _$BBSPostFromJson(Map<String, dynamic> json) => BBSPost(
+      json['id'] as int,
+      Reply.fromJson(json['first_post'] as Map<String, dynamic>),
+      json['count'] as int,
+      (json['tag'] as List<dynamic>)
+          .map((e) => PostTag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      Map<String, String>.from(json['mapping'] as Map),
+      json['is_folded'] as bool,
+      json['date_created'] as String,
+      json['date_updated'] as String,
+      (json['posts'] as List<dynamic>)
+          .map((e) => Reply.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    )..last_post = Reply.fromJson(json['last_post'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$BBSPostToJson(BBSPost instance) => <String, dynamic>{
       'id': instance.id,

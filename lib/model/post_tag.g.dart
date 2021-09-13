@@ -6,13 +6,11 @@ part of 'post_tag.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PostTag _$PostTagFromJson(Map<String, dynamic> json) {
-  return PostTag(
-    json['name'] as String,
-    json['color'] as String,
-    json['count'] as int,
-  );
-}
+PostTag _$PostTagFromJson(Map<String, dynamic> json) => PostTag(
+      json['name'] as String,
+      json['color'] as String,
+      json['count'] as int,
+    );
 
 Map<String, dynamic> _$PostTagToJson(PostTag instance) => <String, dynamic>{
       'name': instance.name,
