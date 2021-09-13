@@ -771,8 +771,57 @@ class PostRepository extends BaseRepositoryWithDio {
     return FduholeProfile.fromJson(response.data);
   }
 
+  /// Modify a post, requires Admin privilege
+  /// Throws on failure.
+  Future<void> adminModifyPost(
+      String content, int discussionId, int postId) async {
+    await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "content": content,
+          "operation": "modify",
+          "discussion_id": discussionId,
+          "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
+  /// Disable a post, requires Admin privilege
+  /// Throws on failure.
+  Future<void> adminDisablePost(int discussionId, int postId) async {
+    await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "disable",
+          "discussion_id": discussionId,
+          "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
+  /// Disable a discussion, requires Admin privilege
+  /// Throws on failure.
+  Future<void> adminDisableDiscussion(int discussionId) async {
+    await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "disable_discussion",
+          "discussion_id": discussionId,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
+  /// Get sender username of a post, requires Admin privilege
+  Future<void> adminGetUser(int discussionId, int postId) async {
+    final response = await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "get_user",
+          "discussion_id": discussionId,
+          "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+    return response.data;
+  }
+
   @override
-  String get linkHost => "www.fduhole.tk";
+  String get linkHost => "www.fduhole.com";
 }
 
 enum SetFavoredDiscussionMode { ADD, DELETE }
