@@ -6,10 +6,12 @@ part of 'bmob_error.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BmobError _$BmobErrorFromJson(Map<String, dynamic> json) => BmobError(
-      json['code'] as int,
-      json['error'] as String,
-    );
+BmobError _$BmobErrorFromJson(Map<String, dynamic> json) {
+  return BmobError(
+    json['code'] as int,
+    json['error'] as String,
+  );
+}
 
 Map<String, dynamic> _$BmobErrorToJson(BmobError instance) => <String, dynamic>{
       'code': instance.code,

@@ -6,9 +6,11 @@ part of 'bmob_date.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BmobDate _$BmobDateFromJson(Map<String, dynamic> json) => BmobDate()
-  ..iso = json['iso'] as String
-  ..type = json['__type'] as String;
+BmobDate _$BmobDateFromJson(Map<String, dynamic> json) {
+  return BmobDate()
+    ..iso = json['iso'] as String
+    ..type = json['__type'] as String;
+}
 
 Map<String, dynamic> _$BmobDateToJson(BmobDate instance) => <String, dynamic>{
       'iso': instance.iso,

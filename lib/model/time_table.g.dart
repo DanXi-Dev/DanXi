@@ -6,31 +6,39 @@ part of 'time_table.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-TimeTable _$TimeTableFromJson(Map<String, dynamic> json) => TimeTable()
-  ..courses = (json['courses'] as List<dynamic>)
-      .map((e) => Course.fromJson(e as Map<String, dynamic>))
-      .toList()
-  ..startTime = DateTime.parse(json['startTime'] as String);
+TimeTable _$TimeTableFromJson(Map<String, dynamic> json) {
+  return TimeTable()
+    ..courses = (json['courses'] as List)
+        ?.map((e) =>
+            e == null ? null : Course.fromJson(e as Map<String, dynamic>))
+        ?.toList()
+    ..startTime = json['startTime'] == null
+        ? null
+        : DateTime.parse(json['startTime'] as String);
+}
 
 Map<String, dynamic> _$TimeTableToJson(TimeTable instance) => <String, dynamic>{
       'courses': instance.courses,
-      'startTime': instance.startTime.toIso8601String(),
+      'startTime': instance.startTime?.toIso8601String(),
     };
 
-Course _$CourseFromJson(Map<String, dynamic> json) => Course()
-  ..teacherIds =
-      (json['teacherIds'] as List<dynamic>).map((e) => e as String).toList()
-  ..teacherNames =
-      (json['teacherNames'] as List<dynamic>).map((e) => e as String).toList()
-  ..courseId = json['courseId'] as String
-  ..courseName = json['courseName'] as String
-  ..roomId = json['roomId'] as String
-  ..roomName = json['roomName'] as String
-  ..availableWeeks =
-      (json['availableWeeks'] as List<dynamic>).map((e) => e as int).toList()
-  ..times = (json['times'] as List<dynamic>)
-      .map((e) => CourseTime.fromJson(e as Map<String, dynamic>))
-      .toList();
+Course _$CourseFromJson(Map<String, dynamic> json) {
+  return Course()
+    ..teacherIds =
+        (json['teacherIds'] as List)?.map((e) => e as String)?.toList()
+    ..teacherNames =
+        (json['teacherNames'] as List)?.map((e) => e as String)?.toList()
+    ..courseId = json['courseId'] as String
+    ..courseName = json['courseName'] as String
+    ..roomId = json['roomId'] as String
+    ..roomName = json['roomName'] as String
+    ..availableWeeks =
+        (json['availableWeeks'] as List)?.map((e) => e as int)?.toList()
+    ..times = (json['times'] as List)
+        ?.map((e) =>
+            e == null ? null : CourseTime.fromJson(e as Map<String, dynamic>))
+        ?.toList();
+}
 
 Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
       'teacherIds': instance.teacherIds,
@@ -43,10 +51,12 @@ Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
       'times': instance.times,
     };
 
-CourseTime _$CourseTimeFromJson(Map<String, dynamic> json) => CourseTime(
-      json['weekDay'] as int,
-      json['slot'] as int,
-    );
+CourseTime _$CourseTimeFromJson(Map<String, dynamic> json) {
+  return CourseTime(
+    json['weekDay'] as int,
+    json['slot'] as int,
+  );
+}
 
 Map<String, dynamic> _$CourseTimeToJson(CourseTime instance) =>
     <String, dynamic>{

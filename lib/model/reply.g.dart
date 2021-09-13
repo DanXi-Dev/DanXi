@@ -6,15 +6,17 @@ part of 'reply.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Reply _$ReplyFromJson(Map<String, dynamic> json) => Reply(
-      json['id'] as int,
-      json['content'] as String,
-      json['username'] as String,
-      json['reply_to'] as int,
-      json['date_created'] as String,
-      json['discussion'] as int,
-      json['is_me'] as bool,
-    );
+Reply _$ReplyFromJson(Map<String, dynamic> json) {
+  return Reply(
+    json['id'] as int,
+    json['content'] as String,
+    json['username'] as String,
+    json['reply_to'] as int,
+    json['date_created'] as String,
+    json['discussion'] as int,
+    json['is_me'] as bool,
+  );
+}
 
 Map<String, dynamic> _$ReplyToJson(Reply instance) => <String, dynamic>{
       'id': instance.id,
