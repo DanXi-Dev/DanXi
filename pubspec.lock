@@ -447,27 +447,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "5.3.2"
-  flutter_keyboard_visibility:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "5.0.3"
-  flutter_keyboard_visibility_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_platform_interface
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.0"
-  flutter_keyboard_visibility_web:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_web
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.0"
   flutter_layout_grid:
     dependency: transitive
     description:
@@ -548,22 +527,24 @@ packages:
   flutter_tagging:
     dependency: "direct main"
     description:
-      name: flutter_tagging
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.0.0"
+      path: "."
+      ref: master
+      resolved-ref: bf16e50f291187a677ac3dde558c96ae82e60550
+      url: "git://github.com/w568w/flutter_tagging.git"
+    source: git
+    version: "2.2.0+3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_typeahead:
+  flutter_typeahead_web:
     dependency: transitive
     description:
-      name: flutter_typeahead
+      name: flutter_typeahead_web
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.2.1"
+    version: "1.0.0+1"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
