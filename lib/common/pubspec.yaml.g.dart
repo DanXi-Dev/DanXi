@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_raw_strings
 /// Current app version
-const String version = r'1.2.4+55';
+const String version = r'1.2.4+56';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -15,10 +15,10 @@ const int patch = 4;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'55'];
+const List<String> build = <String>[r'56'];
 
 /// Build date in Unix Time
-const int date = 1631148813;
+const int date = 1631160731;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
@@ -26,20 +26,20 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
   'description':
       r'Maybe the best all-rounded service app for Fudan University students.',
   'publish_to': r'none',
-  'version': r'1.2.4+55',
+  'version': r'1.2.4+56',
   'environment': <String, dynamic>{
     'sdk': r'>=2.7.0 <3.0.0',
   },
-  'dependencies':  <String, dynamic>{
-      'flutter':  <String, dynamic>{
-        'sdk':  r'flutter',
-      },
-      'flutter_localizations':  <String, dynamic>{
-        'sdk':  r'flutter',
-      },
-      'cupertino_icons':  r'^1.0.2',
-      'dio_cookie_manager':  r'^2.0.0',
-      'flutter_progress_dialog':  <String, dynamic>{
+  'dependencies': <String, dynamic>{
+    'flutter': <String, dynamic>{
+      'sdk': r'flutter',
+    },
+    'flutter_localizations': <String, dynamic>{
+      'sdk': r'flutter',
+    },
+    'cupertino_icons': r'^1.0.2',
+    'dio_cookie_manager': r'^2.0.0',
+    'flutter_progress_dialog':  <String, dynamic>{
         'git':  <String, dynamic>{
         'url':  r'git://github.com/w568w/flutter_progress_dialog.git',
         'ref':  r'master',
