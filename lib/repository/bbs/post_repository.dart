@@ -568,6 +568,9 @@ class PostRepository extends BaseRepositoryWithDio {
   /// The token used for session authentication.
   String _token;
 
+  /// Current user profile, stored as cache by the repository
+  FduholeProfile _profile;
+
   clearToken() {
     _token = null;
   }
@@ -750,25 +753,32 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
-  Future<FduholeProfile> getUserProfile() async {
-    Response response = await dio.get(_BASE_URL + "/profile/",
-        options: Options(headers: _tokenHeader));
-    return FduholeProfile.fromJson(response.data);
+  Future<FduholeProfile> getUserProfile({bool forceUpdate = false}) async {
+    if (_profile == null || forceUpdate) {
+      final Response response = await dio.get(_BASE_URL + "/profile/",
+          options: Options(headers: _tokenHeader));
+      _profile = FduholeProfile.fromJson(response.data);
+    }
+    return _profile;
+  }
+
+  Future<bool> isUserAdmin() async {
+    return (await getUserProfile()).user.is_staff;
   }
 
   Future<List<BBSPost>> getFavoredDiscussions() async {
     return (await getUserProfile()).favored_discussion;
   }
 
-  Future<FduholeProfile> setFavoredDiscussion(
+  Future<void> setFavoredDiscussion(
       SetFavoredDiscussionMode mode, int discussionId) async {
-    Response response = await dio.put(_BASE_URL + "/profile/",
+    final Response response = await dio.put(_BASE_URL + "/profile/",
         data: {
           'mode': mode.getInternalString(),
           'favoredDiscussion': discussionId
         },
         options: Options(headers: _tokenHeader));
-    return FduholeProfile.fromJson(response.data);
+    _profile = FduholeProfile.fromJson(response.data);
   }
 
   /// Modify a post, requires Admin privilege
