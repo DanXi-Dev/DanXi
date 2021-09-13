@@ -335,6 +335,149 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(Reply e) => [
+        // Admin Operations
+        if (PostRepository.getInstance().isUserAdminNonAsync())
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+                BBSEditor.adminModifyReply(
+                    context, e.discussion, e.id, e.content);
+              },
+              child: Text("Modify Post"),
+            ),
+            material: (_, __) => ListTile(
+              title: Text("Modify Post"),
+              onTap: () {
+                Navigator.of(context).pop();
+                BBSEditor.adminModifyReply(
+                    context, e.discussion, e.id, e.content);
+              },
+            ),
+          ),
+        if (PostRepository.getInstance().isUserAdminNonAsync())
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+                PostRepository.getInstance()
+                    .adminDisablePost(e.discussion, e.id)
+                    .onError((error, stackTrace) {
+                  if (error is DioError) {
+                    Noticing.showNotice(
+                        context,
+                        error.message +
+                            '\n' +
+                            (error.response?.data?.toString() ?? ""),
+                        title: error.type.toString(),
+                        useSnackBar: false);
+                  } else
+                    Noticing.showNotice(context, error.toString(),
+                        title: S.of(context).fatal_error, useSnackBar: false);
+                  return -1;
+                });
+              },
+              child: Text("Disable Post"),
+            ),
+            material: (_, __) => ListTile(
+              title: Text("Disable Post"),
+              onTap: () {
+                Navigator.of(context).pop();
+                PostRepository.getInstance()
+                    .adminDisablePost(e.discussion, e.id)
+                    .onError((error, stackTrace) {
+                  if (error is DioError) {
+                    Noticing.showNotice(
+                        context,
+                        error.message +
+                            '\n' +
+                            (error.response?.data?.toString() ?? ""),
+                        title: error.type.toString(),
+                        useSnackBar: false);
+                  } else
+                    Noticing.showNotice(context, error.toString(),
+                        title: S.of(context).fatal_error, useSnackBar: false);
+                  return -1;
+                });
+              },
+            ),
+          ),
+        if (PostRepository.getInstance().isUserAdminNonAsync())
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+                PostRepository.getInstance()
+                    .adminDisableDiscussion(e.discussion)
+                    .onError((error, stackTrace) {
+                  if (error is DioError) {
+                    Noticing.showNotice(
+                        context,
+                        error.message +
+                            '\n' +
+                            (error.response?.data?.toString() ?? ""),
+                        title: error.type.toString(),
+                        useSnackBar: false);
+                  } else
+                    Noticing.showNotice(context, error.toString(),
+                        title: S.of(context).fatal_error, useSnackBar: false);
+                  return -1;
+                });
+              },
+              child: Text("Disable Discussion"),
+            ),
+            material: (_, __) => ListTile(
+              title: Text("Disable Discussion"),
+              onTap: () {
+                Navigator.of(context).pop();
+                PostRepository.getInstance()
+                    .adminDisableDiscussion(e.discussion)
+                    .onError((error, stackTrace) {
+                  if (error is DioError) {
+                    Noticing.showNotice(
+                        context,
+                        error.message +
+                            '\n' +
+                            (error.response?.data?.toString() ?? ""),
+                        title: error.type.toString(),
+                        useSnackBar: false);
+                  } else
+                    Noticing.showNotice(context, error.toString(),
+                        title: S.of(context).fatal_error, useSnackBar: false);
+                  return -1;
+                });
+              },
+            ),
+          ),
+        if (PostRepository.getInstance().isUserAdminNonAsync())
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+                PostRepository.getInstance()
+                    .adminGetUser(e.discussion, e.id)
+                    .then((value) => Noticing.showNotice(context, value,
+                        useSnackBar: false));
+              },
+              child: Text("Get Username"),
+            ),
+            material: (_, __) => ListTile(
+              title: Text("Get Username"),
+              onTap: () {
+                Navigator.of(context).pop();
+                PostRepository.getInstance()
+                    .adminGetUser(e.discussion, e.id)
+                    .then((value) => Noticing.showNotice(context, value,
+                        useSnackBar: false));
+              },
+            ),
+          ),
+
+        // Standard Operations
         if (!isHtml(e.filteredContent))
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(

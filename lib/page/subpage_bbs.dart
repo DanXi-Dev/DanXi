@@ -38,6 +38,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
@@ -310,6 +311,28 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
   }
 
+  Widget _autoAdminNotice() {
+    return FutureWidget(
+      future: PostRepository.getInstance().isUserAdmin(),
+      successBuilder: (context, snapshot) {
+        if (snapshot.data) {
+          return Card(
+            child: ListTile(
+              title: Text("FDUHole Administrative Interface"),
+              subtitle: Text(
+                "Status: Authorized",
+                style: TextStyle(color: Colors.green),
+              ),
+            ),
+          );
+        }
+        return Container();
+      },
+      errorBuilder: Container(),
+      loadingBuilder: Container(),
+    );
+  }
+
   _goToPIDResultPage(int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
@@ -431,7 +454,8 @@ class _BBSSubpageState extends State<BBSSubpage>
               headBuilder: (_) => Column(
                     children: [
                       AutoBannerAdWidget(bannerAd: bannerAd),
-                      _buildSearchTextField()
+                      _buildSearchTextField(),
+                      _autoAdminNotice()
                     ],
                   ),
               loadingBuilder: (BuildContext context) => Container(
@@ -487,7 +511,9 @@ class _BBSSubpageState extends State<BBSSubpage>
         ),
       ),
       onTap: () {
-        refreshSelf();
+        setState(() {
+          refreshSelf();
+        });
       },
     );
   }

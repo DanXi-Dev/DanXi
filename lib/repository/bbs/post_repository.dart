@@ -571,8 +571,9 @@ class PostRepository extends BaseRepositoryWithDio {
   /// Current user profile, stored as cache by the repository
   FduholeProfile _profile;
 
-  clearToken() {
+  clearCache() {
     _token = null;
+    _profile = null;
   }
 
   PostRepository._();
@@ -766,6 +767,11 @@ class PostRepository extends BaseRepositoryWithDio {
     return (await getUserProfile()).user.is_staff;
   }
 
+  /// Non-async version of [isUserAdmin], will return false if data is not yet ready
+  bool isUserAdminNonAsync() {
+    return _profile?.user?.is_staff ?? false;
+  }
+
   Future<List<BBSPost>> getFavoredDiscussions() async {
     return (await getUserProfile()).favored_discussion;
   }
@@ -819,7 +825,7 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   /// Get sender username of a post, requires Admin privilege
-  Future<void> adminGetUser(int discussionId, int postId) async {
+  Future<String> adminGetUser(int discussionId, int postId) async {
     final response = await dio.post(_BASE_URL + "/admin/",
         data: {
           "operation": "get_user",
@@ -827,7 +833,7 @@ class PostRepository extends BaseRepositoryWithDio {
           "post_id": postId,
         },
         options: Options(headers: _tokenHeader));
-    return response.data;
+    return response.data.toString();
   }
 
   @override
