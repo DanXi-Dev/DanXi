@@ -87,7 +87,9 @@ class AutoBannerAdWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (SettingsProvider.getInstance().isAdEnabled && bannerAd != null) {
+    if (SettingsProvider.getInstance().isAdEnabled &&
+        bannerAd != null &&
+        bannerAd.responseInfo?.responseId != null) {
       const double padding = 8.0;
       return Center(
         child: Container(

@@ -45,6 +45,7 @@ import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
+import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -260,21 +261,23 @@ class _HomeSubpageState extends State<HomeSubpage>
     List<DashboardCard> widgetList =
         SettingsProvider.getInstance().dashboardWidgetsSequence;
     return SafeArea(
-        child: RefreshIndicator(
-            color: Theme.of(context).accentColor,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              _rebuild();
-              refreshSelf();
-            },
-            child: Material(
-                child: ListView(
-              controller: widget.primaryScrollController(context),
-              physics: AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.all(4),
-              children: _buildCards(widgetList),
-            ))));
+        child: WithScrollbar(
+            controller: widget.primaryScrollController(context),
+            child: RefreshIndicator(
+                color: Theme.of(context).accentColor,
+                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                onRefresh: () async {
+                  HapticFeedback.mediumImpact();
+                  _rebuild();
+                  refreshSelf();
+                },
+                child: Material(
+                    child: ListView(
+                  controller: widget.primaryScrollController(context),
+                  physics: AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(4),
+                  children: _buildCards(widgetList),
+                )))));
   }
 
   @override
