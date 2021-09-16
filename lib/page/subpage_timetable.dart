@@ -212,10 +212,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     super.build(context);
     return FutureWidget(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return WithScrollbar(
-          controller: widget.primaryScrollController(context),
-          child: _buildPage(snapshot.data),
-        );
+        return _buildPage(snapshot.data);
       },
       future: _content,
       errorBuilder: (_, snapShot) => GestureDetector(
@@ -246,7 +243,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   }
 
   Widget _buildPage(TimeTable table) {
-    TimetableStyle style = TimetableStyle(
+    final TimetableStyle style = TimetableStyle(
         startHour: TimeTable.kCourseSlotStartTime[0].hour,
         laneHeight: 16,
         laneWidth: (ViewportUtils.getMainNavigatorWidth(context) - 50) / 5,
@@ -254,13 +251,14 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemHeight: 140);
     _table = table;
     if (_showingTime == null) _showingTime = _table.now();
-    List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
+    final List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
         compact: TableDisplayType.STANDARD);
     return SafeArea(
       child: RefreshIndicator(
         color: Theme.of(context).accentColor,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
+          _loadFromRemote = true;
           HapticFeedback.mediumImpact();
           refreshSelf();
         },

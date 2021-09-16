@@ -45,6 +45,9 @@ class BBSPost {
 
   List<Reply> posts;
 
+  //bool is_top;
+
+
   factory BBSPost.fromJson(Map<String, dynamic> json) =>
       _$BBSPostFromJson(json);
 

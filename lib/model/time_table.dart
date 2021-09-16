@@ -42,7 +42,7 @@ class TimeTable {
   /// Start time of the term.
   static DateTime defaultStartTime = DateTime(2021, 3, 1);
 
-  static final DateTime kMonday = DateTime.utc(2021, 3, 22);
+  static final DateTime kMonday = DateTime(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
   static final List<VagueTime> kCourseSlotStartTime = [
