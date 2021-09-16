@@ -39,7 +39,7 @@ class FlutterApp {
 
   static Future<void> restartApp(BuildContext context) async {
     await BaseRepositoryWithDio.clearAllCookies();
-    await PostRepository.getInstance().clearToken();
+    await PostRepository.getInstance().clearCache();
     StateProvider.initialize();
     Phoenix.rebirth(context);
   }

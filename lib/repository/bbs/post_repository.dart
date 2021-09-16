@@ -568,8 +568,12 @@ class PostRepository extends BaseRepositoryWithDio {
   /// The token used for session authentication.
   String _token;
 
-  clearToken() {
+  /// Current user profile, stored as cache by the repository
+  FduholeProfile _profile;
+
+  clearCache() {
     _token = null;
+    _profile = null;
   }
 
   PostRepository._();
@@ -750,29 +754,90 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
-  Future<FduholeProfile> getUserProfile() async {
-    Response response = await dio.get(_BASE_URL + "/profile/",
-        options: Options(headers: _tokenHeader));
-    return FduholeProfile.fromJson(response.data);
+  Future<FduholeProfile> getUserProfile({bool forceUpdate = false}) async {
+    if (_profile == null || forceUpdate) {
+      final Response response = await dio.get(_BASE_URL + "/profile/",
+          options: Options(headers: _tokenHeader));
+      _profile = FduholeProfile.fromJson(response.data);
+    }
+    return _profile;
+  }
+
+  Future<bool> isUserAdmin() async {
+    return (await getUserProfile()).user.is_staff;
+  }
+
+  /// Non-async version of [isUserAdmin], will return false if data is not yet ready
+  bool isUserAdminNonAsync() {
+    return _profile?.user?.is_staff ?? false;
   }
 
   Future<List<BBSPost>> getFavoredDiscussions() async {
     return (await getUserProfile()).favored_discussion;
   }
 
-  Future<FduholeProfile> setFavoredDiscussion(
+  Future<void> setFavoredDiscussion(
       SetFavoredDiscussionMode mode, int discussionId) async {
-    Response response = await dio.put(_BASE_URL + "/profile/",
+    final Response response = await dio.put(_BASE_URL + "/profile/",
         data: {
           'mode': mode.getInternalString(),
           'favoredDiscussion': discussionId
         },
         options: Options(headers: _tokenHeader));
-    return FduholeProfile.fromJson(response.data);
+    _profile = FduholeProfile.fromJson(response.data);
+  }
+
+  /// Modify a post, requires Admin privilege
+  /// Throws on failure.
+  Future<void> adminModifyPost(
+      String content, int discussionId, int postId) async {
+    await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "content": content,
+          "operation": "modify",
+          "discussion_id": discussionId,
+          "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
+  /// Disable a post, requires Admin privilege
+  /// Throws on failure.
+  Future<void> adminDisablePost(int discussionId, int postId) async {
+    await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "disable",
+          "discussion_id": discussionId,
+          "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
+  /// Disable a discussion, requires Admin privilege
+  /// Throws on failure.
+  Future<void> adminDisableDiscussion(int discussionId) async {
+    await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "disable_discussion",
+          "discussion_id": discussionId,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
+  /// Get sender username of a post, requires Admin privilege
+  Future<String> adminGetUser(int discussionId, int postId) async {
+    final response = await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "get_user",
+          "discussion_id": discussionId,
+          "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+    return response.data.toString();
   }
 
   @override
-  String get linkHost => "www.fduhole.tk";
+  String get linkHost => "www.fduhole.com";
 }
 
 enum SetFavoredDiscussionMode { ADD, DELETE }

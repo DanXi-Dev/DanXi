@@ -99,6 +99,37 @@ class BBSEditor {
     StateProvider.editorCache.remove(object);
   }
 
+  static Future<void> adminModifyReply(BuildContext context, int discussionId,
+      int postId, String originalContent,
+      {BBSEditorType editorType}) async {
+    // TODO: Show original content in the editor
+    final object = (discussionId == null
+        ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
+        : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
+    final String content = (await _showEditor(
+            context,
+            postId == null
+                ? S.of(context).reply_to(discussionId)
+                : S.of(context).reply_to(postId),
+            editorType: editorType,
+            object: object))
+        ?.text;
+    if (content == null || content.trim() == "") return;
+    await PostRepository.getInstance()
+        .adminModifyPost(content, discussionId, postId)
+        .onError((error, stackTrace) {
+      if (error is DioError) {
+        Noticing.showNotice(context,
+            error.message + '\n' + (error.response?.data?.toString() ?? ""),
+            title: S.of(context).reply_failed(error.type), useSnackBar: false);
+      } else
+        Noticing.showNotice(context, S.of(context).reply_failed(error),
+            title: S.of(context).fatal_error, useSnackBar: false);
+      return -1;
+    });
+    StateProvider.editorCache.remove(object);
+  }
+
   static Future<void> reportPost(BuildContext context, int postId) async {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
     final String content = (await _showEditor(
