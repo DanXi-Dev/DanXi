@@ -626,12 +626,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                               ),
                               alignment: Alignment.topLeft,
                             ),
-                            Align(
-                              child: Text(
-                                  "${dataProvider.getIndexOf(reply) + 1}L",
-                                  style: TextStyle(fontSize: 12.5)),
-                              alignment: Alignment.topRight,
-                            )
+                            // Align(
+                            //   child: Text(
+                            //       "${dataProvider.getIndexOf(reply) + 1}L",
+                            //       style: TextStyle(fontSize: 12.5)),
+                            //   alignment: Alignment.topRight,
+                            // )
                           ],
                         ),
                       ),
@@ -716,7 +716,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "#${reply.id}",
+                            "${dataProvider.getIndexOf(reply)+1}L",
                             style: TextStyle(
                                 color: Theme.of(context).hintColor,
                                 fontSize: 12),
