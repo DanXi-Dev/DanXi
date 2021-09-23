@@ -32,7 +32,7 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-// Skip Crashlytics upload. It breaks the process of building.
+// Skip Crashlytics upload. It breaks the procesmicof building.
 gradle.taskGraph.whenReady {
     tasks.each { task ->
         if (task.name.contains("uploadCrashlyticsMappingFileRelease")) {
@@ -52,7 +52,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "io.github.w568w.dan_xi"
+        applicationId "io.github.danxi-dev.dan_xi"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
