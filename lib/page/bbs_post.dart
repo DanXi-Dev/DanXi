@@ -48,7 +48,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-
 import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -145,7 +144,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_isFavored != null) return _isFavored;
     final List<BBSPost> favorites =
         await PostRepository.getInstance().getFavoredDiscussions();
-    return favorites.any((element) => element.id == _post.id);
+    return favorites.any((element) {
+      if (element?.id == null) return false;
+      return element.id == _post.id;
+    });
   }
 
   @override
