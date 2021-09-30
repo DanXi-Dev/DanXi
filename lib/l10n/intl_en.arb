@@ -1,6 +1,9 @@
 {
     "app_name":"DanXi",
     "developer_announcement":"DevTeam Announcement {date}",
+    "new_update_title":"New DanXi is available",
+    "new_update_description":"Current Version: {currentVersion}\nLatest Version: {latestVersion}\n\nChange logs:",
+    "update_now":"Update now",
     "fudan_qr_code":"Fudan QR Code",
     "welcome":"Welcome, {name}",
     "today_course":"Courses Today",

@@ -1,6 +1,9 @@
 {
     "app_name": "旦夕",
     "developer_announcement":"开发组公告 {date}",
+    "new_update_title":"发现新版本",
+    "new_update_description":"当前版本：{currentVersion}\n最新版本：{latestVersion}\n\n更新日志：",
+    "update_now":"马上更新",
     "fudan_qr_code":"复旦生活码",
     "welcome":"欢迎你，{name}",
     "today_course":"今日课程",

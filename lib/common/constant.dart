@@ -18,6 +18,7 @@
 import 'dart:math';
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,17 @@ class Constant {
   static String yuanSymbol(String num) {
     if (num == null || num.trim().isEmpty) return "";
     return '\u00A5' + num;
+  }
+
+  static String updateUrl() {
+    if (PlatformX.isDesktop) {
+      return "https://github.com/DanXi-Dev/DanXi/releases";
+    } else if (PlatformX.isAndroid) {
+      return "https://www.pgyer.com/danxi";
+    } else if (PlatformX.isIOS) {
+      return "https://apps.apple.com/cn/app/%E6%97%A6%E5%A4%95/id1568629997";
+    }
+    return "https://danxi-dev.github.io/";
   }
 
   static ThemeData lightTheme(bool isCupertino) {

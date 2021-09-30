@@ -19,6 +19,7 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
@@ -32,6 +33,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/repository/app/pgyer_repository.dart';
 import 'package:dan_xi/repository/time_table_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/test/test.dart';
@@ -41,7 +43,9 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
+import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/top_controller.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -289,9 +293,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .listen((_) => _dealWithCredentialsInvalidException()),
         hashCode);
 
-    // Load the latest announcement & the start date of the following term.
+    // Load the latest version, announcement & the start date of the following term.
     // Just ignore the network error.
-    _loadAnnouncement().catchError((ignored) {});
+    _loadUpdate().then((value) => _loadAnnouncement().catchError((ignored) {}),
+        onError: (ignored) {});
     _loadStartDate().catchError((ignored) {});
 
     // Configure shortcut listeners on Android & iOS.
@@ -504,6 +509,42 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return StateProvider.personInfo.value == null || _subpage.isEmpty
         ? _buildDummyBody(title)
         : _buildBody(title);
+  }
+
+  Future<void> _loadUpdate() async {
+    if (PlatformX.isIOS) return;
+    UpdateInfo updateInfo = await PgyerRepository.getInstance().checkVersion();
+    if (updateInfo.isAfter(major, minor, patch)) {
+      await showPlatformDialog(
+          context: context,
+          builder: (BuildContext context) => PlatformAlertDialog(
+                title: Text(
+                  S.of(context).new_update_title,
+                ),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(S.of(context).new_update_description(
+                        FlutterApp.versionName, updateInfo.latestVersion)),
+                    PostRenderWidget(
+                        content: "```\n${updateInfo.changeLog}\n```",
+                        render: kMarkdownRender)
+                  ],
+                ),
+                actions: <Widget>[
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).update_now),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        BrowserUtil.openUrl(Constant.updateUrl(), context);
+                      }),
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).skip),
+                      onPressed: () => Navigator.pop(context)),
+                ],
+              ));
+    }
   }
 
   Future<void> _loadAnnouncement() async {
