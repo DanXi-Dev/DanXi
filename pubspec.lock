@@ -240,7 +240,7 @@ packages:
     source: hosted
     version: "3.7.0"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       url: "https://pub.flutter-io.cn"
@@ -545,20 +545,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.22.0"
-  flutter_tagging:
-    dependency: "direct main"
-    description:
-      name: flutter_tagging
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
   flutter_typeahead:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_typeahead
       url: "https://pub.flutter-io.cn"
@@ -749,7 +742,7 @@ packages:
     source: hosted
     version: "0.12.10"
   meta:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: meta
       url: "https://pub.flutter-io.cn"

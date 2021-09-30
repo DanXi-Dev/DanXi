@@ -20,13 +20,15 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/widget/flutter_tagging/configurations.dart';
+import 'package:dan_xi/widget/flutter_tagging/tagging.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_tagging/flutter_tagging.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class BBSHiddenTagsPreferencePage extends StatefulWidget {
   final Map<String, dynamic> arguments;

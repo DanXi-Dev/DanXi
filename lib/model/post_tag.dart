@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter_tagging/flutter_tagging.dart';
+import 'package:dan_xi/widget/flutter_tagging/taggable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'post_tag.g.dart';

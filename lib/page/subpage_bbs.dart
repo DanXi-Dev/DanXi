@@ -529,6 +529,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildListItem(BuildContext context, ListProvider<BBSPost> _,
       int index, BBSPost postElement) {
     if (postElement?.first_post == null ||
+        postElement?.last_post == null ||
         (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
       return Container();
     Linkify postContentWidget = Linkify(

@@ -31,6 +31,7 @@ import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/flutter_tagging/configurations.dart';
 import 'package:dan_xi/widget/image_picker_proxy.dart';
 import 'package:dan_xi/widget/material_x.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -41,7 +42,9 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-import 'package:flutter_tagging/flutter_tagging.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+
+import 'flutter_tagging/tagging.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
 
