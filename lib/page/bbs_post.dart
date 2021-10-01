@@ -737,7 +737,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": await PostRepository.getInstance()
-                      .loadSpecificPost(e.discussion)
+                      .loadSpecificDiscussion(e.discussion)
                 });
                 progressDialog.dismiss();
               }

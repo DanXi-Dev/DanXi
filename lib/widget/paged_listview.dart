@@ -202,7 +202,6 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         errorBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
           _hasError = true;
           _isRefreshing = false;
-          print("error caught");
           return _buildListView(snapshot: snapshot);
         },
         loadingBuilder: (BuildContext context) {

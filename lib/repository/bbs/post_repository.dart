@@ -24,6 +24,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
@@ -635,7 +636,7 @@ class PostRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
+  Future<List<BBSPost>> loadDiscussions(int page, SortOrder sortBy) async {
     final Response response = await dio
         .get(_BASE_URL + "/discussions/",
             queryParameters: {
@@ -650,14 +651,14 @@ class PostRepository extends BaseRepositoryWithDio {
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
 
-  Future<BBSPost> loadSpecificPost(int disscussionId) async {
+  Future<BBSPost> loadSpecificDiscussion(int disscussionId) async {
     Response response = await dio.get(_BASE_URL + "/discussions/",
         queryParameters: {"discussion_id": disscussionId.toString()},
         options: Options(headers: _tokenHeader));
     return BBSPost.fromJson(response.data);
   }
 
-  Future<List<BBSPost>> loadTagFilteredPosts(
+  Future<List<BBSPost>> loadTagFilteredDiscussions(
       String tag, SortOrder sortBy, int page) async {
     Response response = await dio
         .get(_BASE_URL + "/discussions/",
@@ -831,6 +832,24 @@ class PostRepository extends BaseRepositoryWithDio {
           "operation": "get_user",
           "discussion_id": discussionId,
           "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+    return response.data.toString();
+  }
+
+  Future<List<Report>> adminGetReports(int page) async {
+    final response = await dio.get(_BASE_URL + "/admin/",
+        queryParameters: {"page": page, "show_only_undealt": true},
+        options: Options(headers: _tokenHeader));
+    final result = response.data;
+    return result.map<Report>((e) => Report.fromJson(e)).toList();
+  }
+
+  Future<String> adminSetReportDealt(int reportId) async {
+    final response = await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "set_report_dealed",
+          "report_id": reportId,
         },
         options: Options(headers: _tokenHeader));
     return response.data.toString();

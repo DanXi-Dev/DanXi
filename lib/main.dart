@@ -24,6 +24,7 @@ import 'package:dan_xi/page/aao_notices.dart';
 import 'package:dan_xi/page/announcement_notices.dart';
 import 'package:dan_xi/page/bbs_hidden_tags_preference.dart';
 import 'package:dan_xi/page/bbs_post.dart';
+import 'package:dan_xi/page/bbs_reports.dart';
 import 'package:dan_xi/page/bbs_tags.dart';
 import 'package:dan_xi/page/bus.dart';
 import 'package:dan_xi/page/card_detail.dart';
@@ -98,6 +99,8 @@ class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
     '/placeholder': (context, {arguments}) => Container(),
+    '/bbs/reports': (context, {arguments}) =>
+        BBSReportDetail(arguments: arguments),
     '/card/detail': (context, {arguments}) =>
         CardDetailPage(arguments: arguments),
     '/card/crowdData': (context, {arguments}) =>

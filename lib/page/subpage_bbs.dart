@@ -248,7 +248,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             FoldBehavior.FOLD;
         if (_tagFilter != null)
           return await PostRepository.getInstance()
-              .loadTagFilteredPosts(_tagFilter, _sortOrder, page);
+              .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
         else if (widget.arguments != null &&
             widget.arguments.containsKey('showFavoredDiscussion')) {
           if (page > 1) return Future.value([]);
@@ -258,8 +258,8 @@ class _BBSSubpageState extends State<BBSSubpage>
             await PostRepository.getInstance()
                 .initializeUser(StateProvider.personInfo.value);
           // Filter blocked posts
-          List<BBSPost> loadedPost =
-              await PostRepository.getInstance().loadPosts(page, _sortOrder);
+          List<BBSPost> loadedPost = await PostRepository.getInstance()
+              .loadDiscussions(page, _sortOrder);
           List<PostTag> hiddenTags =
               SettingsProvider.getInstance().hiddenTags ?? [];
           loadedPost.removeWhere((element) => element.tag.any((thisTag) =>
@@ -327,6 +327,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "Status: Authorized",
                 style: TextStyle(color: Colors.green),
               ),
+              onTap: () {
+                smartNavigatorPush(context, "/bbs/reports");
+              },
             ),
           );
         }
@@ -341,7 +344,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     final BBSPost post = await PostRepository.getInstance()
-        .loadSpecificPost(pid)
+        .loadSpecificDiscussion(pid)
         .onError((error, stackTrace) {
       if (error.response?.statusCode == HttpStatus.notFound)
         Noticing.showNotice(context, S.of(context).post_does_not_exist,
