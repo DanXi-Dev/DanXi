@@ -18,17 +18,16 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'58'];
 
 /// Build date in Unix Time
-const int date = 1632657105;
+const int date = 1633057066;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
-  'name': r'dan_xi',
-  'description':
-      r'Maybe the best all-rounded service app for Fudan University students.',
-  'publish_to': r'none',
-  'version': r'1.2.5+58',
-  'environment': <String, dynamic>{
-    'sdk': r'>=2.7.0 <3.0.0',
+  'name':  r'dan_xi',
+  'description':  r'Maybe the best all-rounded service app for Fudan University students.',
+  'publish_to':  r'none',
+  'version':  r'1.2.5+58',
+  'environment':  <String, dynamic>{
+      'sdk':  r'>=2.7.0 <3.0.0',
   },
   'dependencies':  <String, dynamic>{
       'flutter':  <String, dynamic>{
@@ -69,7 +68,6 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
       'flutter_phoenix':  r'^1.0.0',
       'asn1lib':  r'^1.0.0',
       'image_picker':  r'^0.8.1',
-      'flutter_tagging':  r'^3.0.0',
       'clipboard':  r'^0.1.3',
       'flutter_inappwebview':  r'^5.3.2',
       'permission_handler':  r'^8.1.4+2',
@@ -89,6 +87,9 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
       'file_picker':  r'^4.0.0',
       'cached_network_image':  r'^3.1.0',
       'google_mobile_ads':  r'^0.13.4',
+      'flutter_typeahead':  r'>=3.1.0 <4.0.0',
+      'collection':  r'>=1.15.0 <2.0.0',
+      'meta':  r'>=1.3.0 <2.0.0',
   },
   'dependency_overrides':  <String, dynamic>{
       'fluttertoast':  <String, dynamic>{

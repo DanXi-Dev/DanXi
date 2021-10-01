@@ -15,11 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/state_key.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const kDuration = Duration(milliseconds: 500);
@@ -50,9 +55,6 @@ class PagedListView<T> extends StatefulWidget {
   /// The builder to build loading indicator.
   final WidgetBuilder loadingBuilder;
 
-  /// The builder to build error tips.
-  final AsyncWidgetBuilder<List<T>> errorBuilder;
-
   /// The builder to build end indicator.
   final WidgetBuilder endBuilder;
 
@@ -81,12 +83,12 @@ class PagedListView<T> extends StatefulWidget {
   /// Will be executed only once
   final bool shouldScrollToEnd;
 
-  const PagedListView({Key key,
-    this.pagedController,
-    this.initialData = const [],
-    @required this.builder,
+  const PagedListView(
+      {Key key,
+      this.pagedController,
+      this.initialData = const [],
+      @required this.builder,
       @required this.loadingBuilder,
-      @required this.errorBuilder,
       this.headBuilder,
       this.emptyBuilder,
       this.startPage = 0,
@@ -117,6 +119,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _isEnded = false;
   bool _hasHeadWidget = false;
   bool _scrollToEndQueued = false;
+  bool _hasError = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
   Future<List<T>> _futureData;
@@ -176,6 +179,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
             }
           });
           _isRefreshing = false;
+          _hasError = false;
 
           // Process with [noneItem]
           if (snapshot.data.length == 1 &&
@@ -195,11 +199,72 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           if (snapshot.data.isEmpty) _isEnded = true;
           return _buildListView();
         },
-        errorBuilder: widget.errorBuilder,
-        loadingBuilder: _buildListView());
+        errorBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
+          _hasError = true;
+          _isRefreshing = false;
+          print("error caught");
+          return _buildListView(snapshot: snapshot);
+        },
+        loadingBuilder: (BuildContext context) {
+          return _buildListView();
+        });
   }
 
-  _buildListView() {
+  Widget _errorBuilder(AsyncSnapshot<List<T>> snapshot) {
+    String error;
+
+    if (snapshot == null)
+      error = "Unknown Error";
+    else {
+      if (snapshot.error is LoginExpiredError) {
+        SettingsProvider.getInstance().deleteSavedFduholeToken();
+      }
+
+      if (snapshot.error is NotLoginError)
+        error = (snapshot.error as NotLoginError).errorMessage.trim();
+      else if (snapshot.error is DioError)
+        error = (snapshot.error as DioError).message.trim() +
+            '\n' +
+            ((snapshot.error as DioError).response?.data?.toString()?.trim() ??
+                "");
+      else
+        error = snapshot.error.toString().trim();
+    }
+
+    return Card(
+      child: GestureDetector(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                S.of(context).failed,
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+              const SizedBox(
+                height: 4,
+              ),
+              Text(
+                error,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText2
+                    .copyWith(color: Theme.of(context).textTheme.caption.color),
+              ),
+            ],
+          ),
+        ),
+        onTap: () {
+          setState(() {
+            _futureData = _setFuture();
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildListView({AsyncSnapshot<List<T>> snapshot}) {
     // Show an empty indicator if there's no data at all.
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
       // Tell the listView not to try to load anymore.
@@ -210,25 +275,27 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           if (_hasHeadWidget) widget.headBuilder(context),
-          if (widget.emptyBuilder != null) widget.emptyBuilder(context)
+          if (!_hasError && widget.emptyBuilder != null)
+            widget.emptyBuilder(context),
         ],
       );
     }
 
-    int realWidgetCount = _data.length +
+    final realWidgetCount = _data.length +
         (_isRefreshing ? 1 : 0) +
         (_isEnded ? 1 : 0) +
+        (_hasError ? 1 : 0) +
         (_hasHeadWidget ? 1 : 0);
     return ListView.builder(
       key: _scrollKey,
       controller: widget.scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
-      itemBuilder: (context, index) => _getListItemAt(index),
+      itemBuilder: (context, index) => _getListItemAt(index, snapshot),
     );
   }
 
-  _getListItemAt(int index) {
+  _getListItemAt(int index, AsyncSnapshot<List<T>> snapshot) {
     if (_hasHeadWidget) {
       if (index == 0) {
         return widget.headBuilder(context);
@@ -241,7 +308,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         child: widget.builder(context, this, index, _data[index]),
       );
     } else if (index == _data.length) {
-      if (_isRefreshing) {
+      if (_hasError) {
+        return _errorBuilder(snapshot);
+      } else if (_isRefreshing) {
         return widget.loadingBuilder(context);
       } else if (_isEnded) {
         return widget.endBuilder(context);
@@ -250,12 +319,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     return Container();
   }
 
-  initialize({useInitialData = true}) {
-    _hasHeadWidget = widget.headBuilder != null;
-    _data.clear();
-    valueKeys.clear();
-    pageIndex = widget.startPage;
-
+  // Move things into a seperate function to control reload more easily
+  Future<List<T>> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
@@ -263,16 +328,26 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           widget.initialData.isNotEmpty &&
           useInitialData) {
         _isRefreshing = true;
-        _futureData = Future.value(widget.initialData);
+        return Future.value(widget.initialData);
       } else {
         _isRefreshing = true;
-        _futureData = widget.dataReceiver(pageIndex);
+        return widget.dataReceiver(pageIndex);
       }
     } else {
-      _shouldLoad = _isRefreshing = false;
+      _shouldLoad = false;
+      _isRefreshing = false;
       _isEnded = true;
-      _futureData = widget.allDataReceiver;
+      return widget.allDataReceiver;
     }
+  }
+
+  initialize({useInitialData = true}) {
+    _hasHeadWidget = widget.headBuilder != null;
+    _data.clear();
+    valueKeys.clear();
+    _hasError = false;
+    pageIndex = widget.startPage;
+    _futureData = _setFuture(useInitialData: useInitialData);
   }
 
   notifyUpdate({useInitialData = true}) {

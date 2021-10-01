@@ -235,7 +235,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 child: Text(S.of(context).end_reached),
               ),
             ),
-            errorBuilder: _buildErrorWidget,
           ) /*FutureWidget<List<Reply>>(
                   future: _content,
                   loadingBuilder: (BuildContext context,
