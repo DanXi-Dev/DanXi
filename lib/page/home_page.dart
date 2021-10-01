@@ -513,7 +513,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _loadUpdate() async {
     if (PlatformX.isIOS) return;
-    UpdateInfo updateInfo = await PgyerRepository.getInstance().checkVersion();
+    final UpdateInfo updateInfo =
+        await PgyerRepository.getInstance().checkVersion();
     if (updateInfo.isAfter(major, minor, patch)) {
       await showPlatformDialog(
           context: context,
@@ -548,7 +549,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadAnnouncement() async {
-    Announcement announcement =
+    final Announcement announcement =
         await AnnouncementRepository.getInstance().getLastNewAnnouncement();
     if (announcement != null) {
       showPlatformDialog(
