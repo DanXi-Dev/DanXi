@@ -31,8 +31,7 @@ class _TestLifeCycle {
     /// TEST CODE
   }
 
-  static void onStartAsync(BuildContext context) async {
-  }
+  static void onStartAsync(BuildContext context) async {}
 }
 
 /// Don't modify this class. It should be invoked only by the app.

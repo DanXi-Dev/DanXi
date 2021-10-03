@@ -48,6 +48,7 @@ class DiningHallCrowdednessFeature extends Feature {
     _trafficInfos = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
+      debugPrint(e.toString());
       if (e is UnsuitableTimeException) {
         // If it's not time for a meal
         _status = ConnectionStatus.FATAL_ERROR;
@@ -76,10 +77,10 @@ class DiningHallCrowdednessFeature extends Feature {
         _trafficInfos.forEach((keyUnprocessed, value) {
           if (value.current != 0) {
             //Ignore zero entries
-            var key = keyUnprocessed.split('\n')[0];
+            var keyList = keyUnprocessed.split('\n');
+            var key = keyList[0];
             var keySubtitle = '';
-            if (keyUnprocessed.length > 1)
-              keySubtitle = keyUnprocessed.split('\n')[1];
+            if (keyList.length > 1) keySubtitle = keyList[1];
             switch (key) {
               case '北区':
                 crowdednessSum[0] += value.current / value.max;
@@ -145,7 +146,7 @@ class DiningHallCrowdednessFeature extends Feature {
             _leastCrowdedCanteen = 'NULL';
         }
       } else {
-        var crowdedness = new Map<String, double>();
+        Map<String, double> crowdedness = {};
         _trafficInfos.forEach((key, value) {
           if (value.current != 0) crowdedness[key] = value.current / value.max;
         });
@@ -172,8 +173,10 @@ class DiningHallCrowdednessFeature extends Feature {
       _trafficInfos = null;
       _mostCrowdedCanteen = "";
       _leastCrowdedCanteen = "";
-      _loadCrowdednessSummary(_info).catchError((error) {
+      _loadCrowdednessSummary(_info).catchError((error, st) {
         _status = ConnectionStatus.FAILED;
+        debugPrint(error.toString());
+        debugPrint(st.toString());
         notifyUpdate();
       });
     }

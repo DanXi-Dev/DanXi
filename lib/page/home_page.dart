@@ -512,7 +512,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadUpdate() async {
+    //We don't need to check for update on iOS platform.
     if (PlatformX.isIOS) return;
+
     UpdateInfo updateInfo = await PgyerRepository.getInstance().checkVersion();
     if (updateInfo.isAfter(major, minor, patch)) {
       await showPlatformDialog(

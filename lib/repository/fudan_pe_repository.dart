@@ -20,6 +20,7 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:html/dom.dart' as DOM;
 
 class FudanPERepository extends BaseRepositoryWithDio {
@@ -35,10 +36,11 @@ class FudanPERepository extends BaseRepositoryWithDio {
   factory FudanPERepository.getInstance() => _instance;
 
   Future<List<ExerciseItem>> loadExerciseRecords(PersonInfo info) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadExerciseRecords(info),
-        (exception) =>
-            UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true));
+    return Retrier.tryAsyncWithFix(() => _loadExerciseRecords(info),
+        (exception) {
+      debugPrint(exception.toString());
+      return UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true);
+    });
   }
 
   Future<List<ExerciseItem>> _loadExerciseRecords(PersonInfo info) async {
