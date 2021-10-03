@@ -103,15 +103,6 @@ class _AAONoticesListState extends State<AAONoticesList> {
               ],
             ),
             initialData: _data,
-            errorBuilder: (_, AsyncSnapshot<List<Notice>> __) =>
-                GestureDetector(
-              child: Center(
-                child: Text(S.of(context).failed),
-              ),
-              onTap: () {
-                refreshSelf();
-              },
-            ),
             dataReceiver: (index) => FudanAAORepository.getInstance()
                 .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
                     index + 1, _info),

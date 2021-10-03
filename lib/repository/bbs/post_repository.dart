@@ -24,6 +24,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/model/reply.dart';
+import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
@@ -611,32 +612,32 @@ class PostRepository extends BaseRepositoryWithDio {
     // crypto.PublicKey publicKey =
     //     RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
 
-    Response response = await secureDio.post(_BASE_URL + "/register/", data: {
+    final Response response =
+        await secureDio.post(_BASE_URL + "/register/", data: {
       'api-key': Secret.FDUHOLE_API_KEY,
       'email': "${info.id}@fudan.edu.cn",
       // Temporarily disable v2 API until the protocol is ready.
       //'ID': base64.encode(utf8.encode(encrypt(info.id, publicKey)))
     }).onError((error, stackTrace) {
-      if (error is DioError && error.error is NotLoginError)
-        throw NotLoginError((error.error.errorMessage));
-      throw NotLoginError(error.toString());
+      return Future.error(error);
     });
     try {
       return SettingsProvider.getInstance().fduholeToken =
           response.data["token"];
     } catch (e) {
-      throw NotLoginError(e.toString());
+      return Future.error(e.toString());
     }
   }
 
   Map<String, String> get _tokenHeader {
+    if (_token == null) throw NotLoginError("Null Token");
     return {"Authorization": "Token " + _token};
   }
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<BBSPost>> loadPosts(int page, SortOrder sortBy) async {
-    Response response = await dio
+  Future<List<BBSPost>> loadDiscussions(int page, SortOrder sortBy) async {
+    final Response response = await dio
         .get(_BASE_URL + "/discussions/",
             queryParameters: {
               "page": page,
@@ -644,24 +645,20 @@ class PostRepository extends BaseRepositoryWithDio {
             },
             options: Options(headers: _tokenHeader))
         .onError((error, stackTrace) {
-      if (error.response?.statusCode == 401) {
-        _token = null;
-        throw LoginExpiredError;
-      }
-      throw error;
+      return Future.error(error);
     });
-    List result = response.data;
+    final List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
 
-  Future<BBSPost> loadSpecificPost(int disscussionId) async {
+  Future<BBSPost> loadSpecificDiscussion(int disscussionId) async {
     Response response = await dio.get(_BASE_URL + "/discussions/",
         queryParameters: {"discussion_id": disscussionId.toString()},
         options: Options(headers: _tokenHeader));
     return BBSPost.fromJson(response.data);
   }
 
-  Future<List<BBSPost>> loadTagFilteredPosts(
+  Future<List<BBSPost>> loadTagFilteredDiscussions(
       String tag, SortOrder sortBy, int page) async {
     Response response = await dio
         .get(_BASE_URL + "/discussions/",
@@ -683,10 +680,14 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<Reply>> loadReplies(BBSPost post, int page) async {
-    Response response = await dio.get(_BASE_URL + "/posts/",
-        queryParameters: {"page": page, "id": post.id},
-        options: Options(headers: _tokenHeader));
-    List result = response.data;
+    final Response response = await dio
+        .get(_BASE_URL + "/posts/",
+            queryParameters: {"page": page, "id": post.id},
+            options: Options(headers: _tokenHeader))
+        .onError((error, stackTrace) {
+      return Future.error(error);
+    });
+    final List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
   }
 
@@ -831,6 +832,24 @@ class PostRepository extends BaseRepositoryWithDio {
           "operation": "get_user",
           "discussion_id": discussionId,
           "post_id": postId,
+        },
+        options: Options(headers: _tokenHeader));
+    return response.data.toString();
+  }
+
+  Future<List<Report>> adminGetReports(int page) async {
+    final response = await dio.get(_BASE_URL + "/admin/",
+        queryParameters: {"page": page, "show_only_undealt": true},
+        options: Options(headers: _tokenHeader));
+    final result = response.data;
+    return result.map<Report>((e) => Report.fromJson(e)).toList();
+  }
+
+  Future<String> adminSetReportDealt(int reportId) async {
+    final response = await dio.post(_BASE_URL + "/admin/",
+        data: {
+          "operation": "set_report_dealed",
+          "report_id": reportId,
         },
         options: Options(headers: _tokenHeader));
     return response.data.toString();

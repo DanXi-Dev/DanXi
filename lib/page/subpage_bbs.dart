@@ -241,30 +241,34 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<List<BBSPost>> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
-      _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
-          SortOrder.LAST_REPLIED;
-      _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior ??
-          FoldBehavior.FOLD;
-      if (_tagFilter != null)
-        return await PostRepository.getInstance()
-            .loadTagFilteredPosts(_tagFilter, _sortOrder, page);
-      else if (widget.arguments != null &&
-          widget.arguments.containsKey('showFavoredDiscussion')) {
-        if (page > 1) return Future.value([]);
-        return await PostRepository.getInstance().getFavoredDiscussions();
-      } else {
-        if (!PostRepository.getInstance().isUserInitialized)
-          await PostRepository.getInstance()
-              .initializeUser(StateProvider.personInfo.value);
-        // Filter blocked posts
-        List<BBSPost> loadedPost =
-            await PostRepository.getInstance().loadPosts(page, _sortOrder);
-        List<PostTag> hiddenTags =
-            SettingsProvider.getInstance().hiddenTags ?? [];
-        loadedPost.removeWhere((element) => element.tag.any((thisTag) =>
-            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
-        // About this line, see [PagedListView].
-        return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
+      try {
+        _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
+            SortOrder.LAST_REPLIED;
+        _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior ??
+            FoldBehavior.FOLD;
+        if (_tagFilter != null)
+          return await PostRepository.getInstance()
+              .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
+        else if (widget.arguments != null &&
+            widget.arguments.containsKey('showFavoredDiscussion')) {
+          if (page > 1) return Future.value([]);
+          return await PostRepository.getInstance().getFavoredDiscussions();
+        } else {
+          if (!PostRepository.getInstance().isUserInitialized)
+            await PostRepository.getInstance()
+                .initializeUser(StateProvider.personInfo.value);
+          // Filter blocked posts
+          List<BBSPost> loadedPost = await PostRepository.getInstance()
+              .loadDiscussions(page, _sortOrder);
+          List<PostTag> hiddenTags =
+              SettingsProvider.getInstance().hiddenTags ?? [];
+          loadedPost.removeWhere((element) => element.tag.any((thisTag) =>
+              hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+          // About this line, see [PagedListView].
+          return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
+        }
+      } catch (e) {
+        return Future.error(e);
       }
     } else {
       return Future<List<BBSPost>>.error(
@@ -323,6 +327,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "Status: Authorized",
                 style: TextStyle(color: Colors.green),
               ),
+              onTap: () {
+                smartNavigatorPush(context, "/bbs/reports");
+              },
             ),
           );
         }
@@ -337,7 +344,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     final BBSPost post = await PostRepository.getInstance()
-        .loadSpecificPost(pid)
+        .loadSpecificDiscussion(pid)
         .onError((error, stackTrace) {
       if (error.response?.statusCode == HttpStatus.notFound)
         Noticing.showNotice(context, S.of(context).post_does_not_exist,
@@ -462,26 +469,6 @@ class _BBSSubpageState extends State<BBSSubpage>
                     padding: EdgeInsets.all(8),
                     child: Center(child: PlatformCircularProgressIndicator()),
                   ),
-              errorBuilder: (BuildContext context,
-                  AsyncSnapshot<List<BBSPost>> snapshot) {
-                if (snapshot.error is LoginExpiredError) {
-                  SettingsProvider.getInstance().deleteSavedFduholeToken();
-                  return _buildErrorPage(
-                      error: S.of(context).error_login_expired);
-                } else if (snapshot.error is NotLoginError)
-                  return _buildErrorPage(
-                      error: (snapshot.error as NotLoginError).errorMessage);
-                else if (snapshot.error is DioError)
-                  return _buildErrorPage(
-                      error: (snapshot.error as DioError).message +
-                          '\n' +
-                          ((snapshot.error as DioError)
-                                  .response
-                                  ?.data
-                                  ?.toString() ??
-                              ""));
-                return _buildErrorPage(error: snapshot.error.toString());
-              },
               endBuilder: (context) => Center(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 16),
@@ -499,24 +486,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         padding: EdgeInsets.all(8),
         child: Center(child: Text(S.of(context).no_favorites)),
       );
-
-  Widget _buildErrorPage({String error}) {
-    return GestureDetector(
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 48),
-          child: Text(
-            S.of(context).failed + '\n\n' + error,
-          ),
-        ),
-      ),
-      onTap: () {
-        setState(() {
-          refreshSelf();
-        });
-      },
-    );
-  }
 
   _launchUrlWithNotice(LinkableElement link) async {
     if (await canLaunch(link.url)) {

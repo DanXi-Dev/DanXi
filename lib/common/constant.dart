@@ -51,7 +51,7 @@ class Constant {
     } else if (PlatformX.isAndroid) {
       return "https://www.pgyer.com/danxi";
     } else if (PlatformX.isIOS) {
-      return "https://apps.apple.com/cn/app/%E6%97%A6%E5%A4%95/id1568629997";
+      return "https://apps.apple.com/app/id$APPSTORE_APPID";
     }
     return "https://danxi-dev.github.io/";
   }

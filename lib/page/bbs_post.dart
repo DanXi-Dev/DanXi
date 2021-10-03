@@ -235,7 +235,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 child: Text(S.of(context).end_reached),
               ),
             ),
-            errorBuilder: _buildErrorWidget,
           ) /*FutureWidget<List<Reply>>(
                   future: _content,
                   loadingBuilder: (BuildContext context,
@@ -738,7 +737,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": await PostRepository.getInstance()
-                      .loadSpecificPost(e.discussion)
+                      .loadSpecificDiscussion(e.discussion)
                 });
                 progressDialog.dismiss();
               }
