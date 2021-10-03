@@ -37,6 +37,18 @@ class UISLoginTool {
       Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
       [bool forceRelogin = false]) async {
     dio.interceptors.requestLock.lock();
+    Response result =
+        await _loginUIS(dio, serviceUrl, jar, info).whenComplete(() {
+      if (dio.interceptors.requestLock.locked) {
+        dio.interceptors.requestLock.unlock();
+      }
+    });
+    return result;
+  }
+
+  static Future<Response> _loginUIS(
+      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
+      [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
     NonpersistentCookieJar workJar = NonpersistentCookieJar.createFrom(jar);

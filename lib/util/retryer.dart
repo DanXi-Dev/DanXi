@@ -64,7 +64,11 @@ class Retrier {
       // debugPrintStack(stackTrace: stack);
       if (retryTimes > 0) {
         retryTimes--;
-        await tryFix(e).catchError((ignored) {});
+        await tryFix(e).catchError((error, stackTrace) {
+          // debugPrint("Error when trying fix ${function.runtimeType.toString()}:");
+          // debugPrint(error.toString());
+          // debugPrint(stackTrace.toString());
+        });
         return await function().catchError(errorCatcher);
       } else {
         throw e;
