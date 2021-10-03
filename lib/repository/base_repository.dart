@@ -31,6 +31,11 @@ abstract class BaseRepositoryWithDio {
   Dio get dio {
     if (!_dios.containsKey(linkHost)) {
       _dios[linkHost] = Dio();
+      _dios[linkHost].options = BaseOptions(
+          receiveDataWhenStatusError: true,
+          connectTimeout: 3000,
+          receiveTimeout: 5000,
+          sendTimeout: 5000);
       _dios[linkHost].interceptors.add(CookieManager(cookieJar));
       _dios[linkHost].interceptors.add(DioLogInterceptor());
     }
