@@ -214,7 +214,6 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     ImageTapCallback onImageTap = (url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     };
-    print(e.discussion);
     return GestureDetector(
       onLongPress: () {
         showPlatformModalSheet(
