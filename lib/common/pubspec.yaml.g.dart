@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_raw_strings
 /// Current app version
-const String version = r'1.2.5+58';
+const String version = r'1.2.6+59';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -9,23 +9,23 @@ const int major = 1;
 const int minor = 2;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 5;
+const int patch = 6;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'58'];
+const List<String> build = <String>[r'59'];
 
 /// Build date in Unix Time
-const int date = 1633057066;
+const int date = 1633350712;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
   'name':  r'dan_xi',
   'description':  r'Maybe the best all-rounded service app for Fudan University students.',
   'publish_to':  r'none',
-  'version':  r'1.2.5+58',
+  'version':  r'1.2.6+59',
   'environment':  <String, dynamic>{
       'sdk':  r'>=2.7.0 <3.0.0',
   },

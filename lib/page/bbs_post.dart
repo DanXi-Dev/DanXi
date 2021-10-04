@@ -721,7 +721,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               if (_searchKeyword == null) {
                 if (isNested) {
                   // Scroll to the corrosponding post
-                  _listViewController.scrollToItem(e);
+                  while (!_listViewController.scrollToItem(e)) {
+                    if (_listViewController.getScrollController().offset < 10)
+                      break; // Prevent deadlock
+                    _listViewController.scrollDelta(
+                        -MediaQuery.of(context).size.height / 2,
+                        Duration(milliseconds: 50),
+                        Curves.linear);
+                  }
                   return;
                 }
 

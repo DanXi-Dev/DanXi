@@ -375,12 +375,22 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) {
-    double itemTop =
+    final double itemTop =
         valueKeys.getRange(0, index).fold<double>(0.0, (value, element) {
-      RenderBox box = element.currentContext?.findRenderObject();
+      final RenderBox box = element.currentContext?.findRenderObject();
       return value + box.size.height;
     });
     currentController.animateTo(itemTop, duration: duration, curve: curve);
+  }
+
+  void scrollDelta(double pixels,
+      [Duration duration = kDuration, Curve curve = kCurve]) {
+    currentController.animateTo(currentController.offset + pixels,
+        duration: duration, curve: curve);
+  }
+
+  ScrollController getScrollController() {
+    return currentController;
   }
 
   @override
@@ -421,13 +431,31 @@ class PagedListViewController<T> {
     _state?.notifyUpdate(useInitialData: useInitialData);
   }
 
-  scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) {
-    _state?.scrollToItem(item, duration, curve);
+  /// Returns whether the scroll was successful or not
+  /// May fail due to RenderObject not cached
+  /// in which case, try scrolling up
+  bool scrollToItem(T item,
+      [Duration duration = kDuration, Curve curve = kCurve]) {
+    try {
+      _state?.scrollToItem(item, duration, curve);
+    } catch (ignored) {
+      return false;
+    }
+    return true;
   }
 
-  scrollToIndex(int index,
+  void scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) {
     _state?.scrollToIndex(index, duration, curve);
+  }
+
+  void scrollDelta(double pixels,
+      [Duration duration = kDuration, Curve curve = kCurve]) {
+    _state?.scrollDelta(pixels, duration, curve);
+  }
+
+  ScrollController getScrollController() {
+    return _state?.getScrollController();
   }
 
   queueScrollToEnd() {
