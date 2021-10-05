@@ -9,12 +9,6 @@ import WatchConnectivity
     let defaults = UserDefaults.standard
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        /*if (defaults.bool(forKey: "token_set")) {
-            let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-            let channel = FlutterMethodChannel(name: "fduhole",
-                                               binaryMessenger: controller.binaryMessenger)
-            channel.invokeMethod("get_token", arguments: nil)
-        }*/
     }
     
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
@@ -45,44 +39,75 @@ import WatchConnectivity
         }
     }
     
+    override func application(_ application: UIApplication,
+                didRegisterForRemoteNotificationsWithDeviceToken
+                    deviceToken: Data) {
+        let token: String = deviceToken.map { String(format: "%.2hhx", $0) }.joined()
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "no_device_id"
+        print("\n\n\n\n\n\n\n")
+        print(token)
+        print(deviceId)
+        /* Send token to FDUHole */
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
+        channel.invokeMethod("upload_apns_token", arguments: ["token": token, "id": deviceId])
+    }
+    
+
+    override func application(_ application: UIApplication,
+                didFailToRegisterForRemoteNotificationsWithError
+                    error: Error) {
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                guard (settings.authorizationStatus == .authorized) ||
+                        (settings.authorizationStatus == .notDetermined) else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
+                    application.registerForRemoteNotifications()
+                }
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
+                application.registerForRemoteNotifications()
+            }
+        }
+    }
+    
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        //watchOS Support
+        /* Flutter */
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
+        channel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "send_token"){
+                self.sendString(text: call.arguments as! String)
+            }
+        })
+        
+        /* APNS support */
+        if #available(iOS 10.0, *) {
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(
+                options: authOptions,
+                completionHandler: {_, _ in })
+            UNUserNotificationCenter.current().delegate = self
+        } else {
+            let settings: UIUserNotificationSettings =
+                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+            application.registerUserNotificationSettings(settings)
+        }
+
+        application.registerForRemoteNotifications()
+        
+        /* watchOS Support */
         if(WCSession.isSupported()){
             let session = WCSession.default;
             session.delegate = self;
             session.activate();
         }
-        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "fduhole",
-                                           binaryMessenger: controller.binaryMessenger)
-        channel.setMethodCallHandler({
-            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            if(call.method == "send_token"){
-                // We will call a method called "sendStringToNative" in flutter.
-                self.sendString(text: call.arguments as! String)
-            }
-        })
-        
-        /*let appCtrlChannel = FlutterMethodChannel(name: "appControl",
-         binaryMessenger: controller.binaryMessenger)
-         
-         //TODO: WARNING This might not pass App Store Review
-         appCtrlChannel.setMethodCallHandler({
-         (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-         if(call.method == "exit"){
-         UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
-         Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { (timer) in
-         exit(0)
-         }
-         }
-         else if(call.method == "minimize"){
-         UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
-         }
-         })*/
         
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)

@@ -34,6 +34,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/app/pgyer_repository.dart';
+import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/time_table_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/test/test.dart';
@@ -324,18 +325,29 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    // Init watchOS support
-    const channel_a = const MethodChannel('fduhole');
-    channel_a.setMethodCallHandler((MethodCall call) async {
-      if (call.method == 'get_token') {
-        // If we haven't loaded [StateProvider.personInfo]
-        if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-          sendFduholeTokenToWatch(
-              _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
-        } else {
-          // Notify that we should send the token to watch later
-          _needSendToWatch = true;
-        }
+    // Init watchOS and push notification support
+    const channel_fduhole = const MethodChannel('fduhole');
+    channel_fduhole.setMethodCallHandler((MethodCall call) async {
+      switch (call.method) {
+        case 'upload_apns_token':
+          final token = call.arguments['token'];
+          final deviceId = call.arguments['id'];
+          try {
+            await PostRepository.getInstance().updatePushNotificationToken(
+                token, deviceId, PushNotificationServiceType.APNS);
+          } catch (ignored) {} // Doesn't matter if it fails. Will try again next time.
+          break;
+
+        case 'get_token':
+          // If we haven't loaded [StateProvider.personInfo]
+          if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+            sendFduholeTokenToWatch(
+                _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          } else {
+            // Notify that we should send the token to watch later
+            _needSendToWatch = true;
+          }
+          break;
       }
     });
   }
