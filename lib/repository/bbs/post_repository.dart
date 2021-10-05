@@ -30,7 +30,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -577,7 +576,10 @@ class PostRepository extends BaseRepositoryWithDio {
     _profile = null;
   }
 
-  PostRepository._();
+  PostRepository._() {
+    // Override the options set in parent class.
+    dio.options = BaseOptions(receiveDataWhenStatusError: true);
+  }
 
   initializeUser(PersonInfo info) async {
     _token =
