@@ -18,7 +18,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'59'];
 
 /// Build date in Unix Time
-const int date = 1633350712;
+const int date = 1633530907;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{

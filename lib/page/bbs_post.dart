@@ -636,29 +636,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (e.reply_to != null && !isNested && _searchKeyword == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child:
-                        /*Text(
-                      S.of(context).reply_to(e.reply_to),
-                      textScaleFactor: 0.8,
-                      style: TextStyle(
-                          color: Constant.getColorFromString(
-                              _post.tag.first.color)),
-                    ),*/
-                        _getListItems(
-                            context,
-                            dataProvider,
-                            -1,
-                            dataProvider.getElementFirstWhere(
-                                (element) => element.id == e.reply_to,
-                                orElse: () => Reply(
-                                    -1,
-                                    S.of(context).unable_to_find_quote,
-                                    S.of(context).fatal_error,
-                                    null,
-                                    DateTime.now().toIso8601String(),
-                                    -1,
-                                    null)),
-                            isNested: true),
+                    child: _getListItems(
+                        context,
+                        dataProvider,
+                        -1,
+                        dataProvider.getElementFirstWhere(
+                            (element) => element.id == e.reply_to,
+                            orElse: () => Reply(
+                                -1,
+                                S.of(context).unable_to_find_quote,
+                                S.of(context).fatal_error,
+                                null,
+                                DateTime.now().toIso8601String(),
+                                -1,
+                                null)),
+                        isNested: true),
                   ),
                 Align(
                     alignment: Alignment.topLeft,
@@ -721,13 +713,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               if (_searchKeyword == null) {
                 if (isNested) {
                   // Scroll to the corrosponding post
-                  while (!_listViewController.scrollToItem(e)) {
+                  while (!(await _listViewController.scrollToItem(e))) {
                     if (_listViewController.getScrollController().offset < 10)
                       break; // Prevent deadlock
-                    _listViewController.scrollDelta(
-                        -MediaQuery.of(context).size.height / 2,
-                        Duration(milliseconds: 50),
-                        Curves.linear);
+                    await _listViewController.scrollDelta(
+                        -100, Duration(milliseconds: 1), Curves.linear);
                   }
                   return;
                 }
