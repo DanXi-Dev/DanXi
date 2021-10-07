@@ -28,6 +28,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/time_table_repository.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
@@ -38,7 +39,6 @@ import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
-import 'package:dan_xi/widget/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,13 +103,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup))
-      _content = Retrier.runAsyncWithRetry(() =>
+      _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
           TimeTableRepository.getInstance().loadTimeTableLocally(
               StateProvider.personInfo.value,
-              forceLoadFromRemote: _loadFromRemote));
+              forceLoadFromRemote: _loadFromRemote)));
     else
-      _content = Future<TimeTable>.error(
-          NotLoginError("Haven't logged in as FDU student."));
+      _content = LazyFuture.pack(Future<TimeTable>.error(
+          NotLoginError("Haven't logged in as FDU student.")));
   }
 
   void _startShare(TimetableConverter converter) async {

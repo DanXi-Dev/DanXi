@@ -20,8 +20,8 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
-import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 
 class FudanEhallRepository extends BaseRepositoryWithDio {
   static const String _INFO_URL =
@@ -42,6 +42,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
 
   Future<StudentInfo> _getStudentInfo() async {
     Response rep = await dio.get(_INFO_URL);
+    debugPrint(rep.data.toString());
     Map rawJson = rep.data is Map ? rep.data : jsonDecode(rep.data.toString());
     if (rawJson['data']['userName'] == null)
       throw GeneralLoginFailedException();

@@ -18,6 +18,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/widget/bbs_tags_container.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
@@ -41,7 +42,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
   @override
   void initState() {
     super.initState();
-    _content = PostRepository.getInstance().loadTags();
+    _content = LazyFuture.pack(PostRepository.getInstance().loadTags());
   }
 
   @override
@@ -72,8 +73,8 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
                 child: Text(S.of(context).failed),
               ),
               onTap: () {
-                setState(
-                    () => _content = PostRepository.getInstance().loadTags());
+                setState(() => _content =
+                    LazyFuture.pack(PostRepository.getInstance().loadTags()));
               },
             ),
             loadingBuilder: Center(

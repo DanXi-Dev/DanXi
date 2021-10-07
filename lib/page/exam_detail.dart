@@ -23,6 +23,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/data_center_repository.dart';
 import 'package:dan_xi/repository/edu_service_repository.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -34,7 +35,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:ical/serializer.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -64,9 +64,12 @@ class _ExamListState extends State<ExamList> {
   void initState() {
     super.initState();
     _info = StateProvider.personInfo.value;
-    _examList = EduServiceRepository.getInstance().loadExamListRemotely(_info);
-    _gpaList = EduServiceRepository.getInstance().loadGPARemotely(_info);
-    _semester = EduServiceRepository.getInstance().loadSemesters(_info);
+    _examList = LazyFuture.pack(
+        EduServiceRepository.getInstance().loadExamListRemotely(_info));
+    _gpaList = LazyFuture.pack(
+        EduServiceRepository.getInstance().loadGPARemotely(_info));
+    _semester = LazyFuture.pack(
+        EduServiceRepository.getInstance().loadSemesters(_info));
   }
 
   void _exportICal() async {
@@ -186,10 +189,9 @@ class _ExamListState extends State<ExamList> {
             ],
           );
         },
-        loadingBuilder: Container(
-            child: Center(
+        loadingBuilder: Center(
           child: PlatformCircularProgressIndicator(),
-        )),
+        ),
         errorBuilder: _loadGradeView,
       );
 
@@ -199,10 +201,9 @@ class _ExamListState extends State<ExamList> {
               _info,
               semesterId: _unpackedSemester[_showingSemester].semesterId),
           successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
-          loadingBuilder: Container(
-              child: Center(
+          loadingBuilder: Center(
             child: PlatformCircularProgressIndicator(),
-          )),
+          ),
           errorBuilder:
               (BuildContext context, AsyncSnapshot<List<ExamScore>> snapshot) {
             if (snapshot.error is RangeError)
@@ -235,24 +236,27 @@ class _ExamListState extends State<ExamList> {
         ],
       );
 
-  Widget _loadGradeViewFromDataCenter() => GestureDetector(
-      child: FutureWidget<List<ExamScore>>(
-          future: DataCenterRepository.getInstance().loadAllExamScore(_info),
-          successBuilder: (_, snapShot) =>
-              _buildGradeLayout(snapShot, isFallback: true),
-          loadingBuilder: Container(
-              child: Center(
-            child: PlatformCircularProgressIndicator(),
-          )),
-          errorBuilder: _buildErrorPage));
+  Widget _loadGradeViewFromDataCenter() {
+    return GestureDetector(
+        child: FutureWidget<List<ExamScore>>(
+            future: DataCenterRepository.getInstance().loadAllExamScore(_info),
+            successBuilder: (_, snapShot) =>
+                _buildGradeLayout(snapShot, isFallback: true),
+            loadingBuilder: Container(
+                child: Center(
+              child: PlatformCircularProgressIndicator(),
+            )),
+            errorBuilder: _buildErrorPage));
+  }
 
   Widget _buildErrorPage(BuildContext context, AsyncSnapshot snapshot) {
     return GestureDetector(
         onTap: () {
           setState(() {
-            _semester = EduServiceRepository.getInstance().loadSemesters(_info);
-            _examList =
-                EduServiceRepository.getInstance().loadExamListRemotely(_info);
+            _semester = LazyFuture.pack(
+                EduServiceRepository.getInstance().loadSemesters(_info));
+            _examList = LazyFuture.pack(
+                EduServiceRepository.getInstance().loadExamListRemotely(_info));
           });
         },
         child: Padding(

@@ -31,13 +31,13 @@ class GpaTablePage extends StatefulWidget {
 }
 
 class _GpaTablePageState extends State<GpaTablePage> {
-  List<GPAListItem> gpalist;
+  List<GPAListItem> gpaList;
   static const String NAME_HIDDEN = "****";
 
   @override
   void initState() {
     super.initState();
-    gpalist = widget.arguments['gpalist'];
+    gpaList = widget.arguments['gpalist'];
   }
 
   @override
@@ -84,7 +84,7 @@ class _GpaTablePageState extends State<GpaTablePage> {
         )
       ])
     ];
-    gpalist.forEach((element) {
+    gpaList.forEach((element) {
       TextStyle textColorStyle = element.name == NAME_HIDDEN
           ? null
           : TextStyle(color: Theme.of(context).accentColor);

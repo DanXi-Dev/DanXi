@@ -51,6 +51,11 @@ class UISLoginTool {
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
+    workDio.options = BaseOptions(
+        receiveDataWhenStatusError: true,
+        connectTimeout: 5000,
+        receiveTimeout: 5000,
+        sendTimeout: 5000);
     NonpersistentCookieJar workJar = NonpersistentCookieJar.createFrom(jar);
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());

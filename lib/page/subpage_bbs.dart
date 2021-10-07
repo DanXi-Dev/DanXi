@@ -42,7 +42,6 @@ import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -234,7 +233,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   BannerAd bannerAd;
 
-  /// This is to prevent the entire thing being rebuilt on iOS when the keyboard pops
+  /// This is to prevent the entire page being rebuilt on iOS when the keyboard pops up
   bool _fieldInitComplete;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.

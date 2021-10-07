@@ -25,6 +25,7 @@ import 'package:dan_xi/repository/edu_service_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart' as DOM;
 
 class DataCenterRepository extends BaseRepositoryWithDio {
@@ -119,6 +120,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
               UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
 
   Future<List<ExamScore>> _loadAllExamScore() async {
+    debugPrint("Try _loadAllExamScore() from data center...");
     Response r = await dio.get(SCORE_DETAIL_URL);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");

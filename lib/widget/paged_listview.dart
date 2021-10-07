@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/state_key.dart';
 import 'package:dan_xi/widget/with_scrollbar.dart';
@@ -68,6 +69,9 @@ class PagedListView<T> extends StatefulWidget {
   final int startPage;
 
   /// The method to load new data, usually from network.
+  ///
+  /// Note: You should not need to pack the future with [LazyFuture],
+  /// since [PagedListView] will handle the situation.
   final DataReceiver<T> dataReceiver;
 
   /// The scrollController of the ListView. If not set, it will be PrimaryScrollController.
@@ -138,7 +142,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         pageIndex++;
         _isRefreshing = true;
         setState(() {
-          _futureData = widget.dataReceiver(pageIndex);
+          _futureData = LazyFuture.pack(widget.dataReceiver(pageIndex));
         });
       }
       return false;
@@ -318,7 +322,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     return Container();
   }
 
-  // Move things into a seperate function to control reload more easily
+  // Move things into a separate function to control reload more easily
   Future<List<T>> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
@@ -330,13 +334,13 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         return Future.value(widget.initialData);
       } else {
         _isRefreshing = true;
-        return widget.dataReceiver(pageIndex);
+        return LazyFuture.pack(widget.dataReceiver(pageIndex));
       }
     } else {
       _shouldLoad = false;
       _isRefreshing = false;
       _isEnded = true;
-      return widget.allDataReceiver;
+      return LazyFuture.pack(widget.allDataReceiver);
     }
   }
 

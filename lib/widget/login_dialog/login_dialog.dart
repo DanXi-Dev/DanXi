@@ -110,8 +110,10 @@ class _LoginDialogState extends State<LoginDialog> {
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
-        }, onError: (e) {
+        }, onError: (e, st) {
           progressDialog.dismiss(showAnim: false);
+          debugPrint(e.toString());
+          debugPrint(st.toString());
           throw e;
         });
         break;
