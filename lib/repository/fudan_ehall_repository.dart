@@ -42,7 +42,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
 
   Future<StudentInfo> _getStudentInfo() async {
     Response rep = await dio.get(_INFO_URL);
-    debugPrint(rep.data.toString());
+    debugPrint("Login Student info: ${rep.data}");
     Map rawJson = rep.data is Map ? rep.data : jsonDecode(rep.data.toString());
     if (rawJson['data']['userName'] == null)
       throw GeneralLoginFailedException();

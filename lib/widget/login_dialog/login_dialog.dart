@@ -32,7 +32,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_progress_dialog/src/progress_dialog.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
@@ -112,6 +111,7 @@ class _LoginDialogState extends State<LoginDialog> {
           Navigator.of(context).pop();
         }, onError: (e, st) {
           progressDialog.dismiss(showAnim: false);
+          debugPrint("Error occurred when attempting to log in:");
           debugPrint(e.toString());
           debugPrint(st.toString());
           throw e;

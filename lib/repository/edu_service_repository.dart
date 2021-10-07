@@ -24,7 +24,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:html/dom.dart' as DOM;
 
 class EduServiceRepository extends BaseRepositoryWithDio {
@@ -130,7 +129,6 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
 
   Future<List<SemesterInfo>> _loadSemesters() async {
-    debugPrint("Try _loadSemesters() from edu service...");
     await dio.get(EXAM_TABLE_URL,
         options: Options(headers: Map.of(_JWFW_HEADER)));
     final Response semesterResponse = await dio.post(SEMESTER_DATA_URL,

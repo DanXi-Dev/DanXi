@@ -48,7 +48,6 @@ class DiningHallCrowdednessFeature extends Feature {
     _trafficInfos = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(info, preferredCampus.index)
         .catchError((e) {
-      debugPrint(e.toString());
       if (e is UnsuitableTimeException) {
         // If it's not time for a meal
         _status = ConnectionStatus.FATAL_ERROR;
@@ -175,8 +174,6 @@ class DiningHallCrowdednessFeature extends Feature {
       _leastCrowdedCanteen = "";
       _loadCrowdednessSummary(_info).catchError((error, st) {
         _status = ConnectionStatus.FAILED;
-        debugPrint(error.toString());
-        debugPrint(st.toString());
         notifyUpdate();
       });
     }

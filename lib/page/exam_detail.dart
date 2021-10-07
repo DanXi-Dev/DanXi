@@ -52,8 +52,8 @@ class ExamList extends StatefulWidget {
 class _ExamListState extends State<ExamList> {
   List<Exam> _data = [];
   PersonInfo _info;
-  Future _examList;
-  Future _gpaList;
+  Future<List<Exam>> _examList;
+  Future<List<GPAListItem>> _gpaList;
   List<GPAListItem> _gpa;
 
   Future<List<SemesterInfo>> _semester;
@@ -64,7 +64,7 @@ class _ExamListState extends State<ExamList> {
   void initState() {
     super.initState();
     _info = StateProvider.personInfo.value;
-    _examList = LazyFuture.pack(
+    _examList = LazyFuture<List<Exam>>.pack(
         EduServiceRepository.getInstance().loadExamListRemotely(_info));
     _gpaList = LazyFuture.pack(
         EduServiceRepository.getInstance().loadGPARemotely(_info));
