@@ -150,29 +150,46 @@ class _ScheduleViewState extends State<ScheduleView> {
       );
 
       widget.laneEventsList[day].events.forEach((Event event) {
-        result[1 + day + cols * (event.time.slot + 1)] = SizedBox(
-          width: widget.timetableStyle.laneWidth,
-          height: widget.timetableStyle.timeItemHeight,
-          child: Container(
-            margin: EdgeInsets.all(2),
-            padding: EdgeInsets.all(2),
-            decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(4)),
-            child: AutoSizeText(
-                event.course.courseName + '\n' + event.course.roomName,
-                minFontSize: 8,
-                style: Theme.of(context).textTheme.overline.copyWith(
-                    color: Theme.of(context).accentColorBrightness ==
-                        Brightness.light
-                        ? Colors.black
-                        : Colors.white)),
-          ),
-        );
+        bool notFirstCourse = widget.laneEventsList[day].events.any((element) =>
+            element.time.slot == event.time.slot - 1 &&
+            element.course.courseName == event.course.courseName);
+        bool notLastCourse = widget.laneEventsList[day].events.any((element) =>
+            element.time.slot == event.time.slot + 1 &&
+            element.course.courseName == event.course.courseName);
+        result[1 + day + cols * (event.time.slot + 1)] = _buildCourse(
+            event.course.courseName + "\n" + event.course.roomName,
+            !notFirstCourse,
+            !notLastCourse);
       });
     }
 
     return result;
+  }
+
+  Widget _buildCourse(String courseName, bool isFirst, bool isLast) {
+    bool noBottomSpace = (isFirst && !isLast) || (!isFirst && !isLast);
+    bool noTopSpace = (!isFirst && isLast) || (!isFirst && !isLast);
+    return SizedBox(
+      width: widget.timetableStyle.laneWidth,
+      height: widget.timetableStyle.timeItemHeight,
+      child: Container(
+        margin: EdgeInsets.fromLTRB(
+            2, noTopSpace ? 0 : 2, 2, noBottomSpace ? 0 : 2),
+        padding: EdgeInsets.all(2),
+        decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius: BorderRadius.vertical(
+                top: Radius.circular(noTopSpace ? 0 : 2),
+                bottom: Radius.circular(noBottomSpace ? 0 : 2))),
+        child: AutoSizeText(isFirst ? courseName : "",
+            minFontSize: 8,
+            style: Theme.of(context).textTheme.overline.copyWith(
+                color:
+                    Theme.of(context).accentColorBrightness == Brightness.light
+                        ? Colors.black
+                        : Colors.white)),
+      ),
+    );
   }
 }
 
