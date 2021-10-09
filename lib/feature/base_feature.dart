@@ -16,12 +16,20 @@
  */
 
 import 'package:dan_xi/feature/feature_map.dart';
+import 'package:dan_xi/page/subpage_main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// A Feature is a functional item shown on the dashboard, with which user interacts via tapping.
 ///
-/// Notes: after creating a new [Feature], you may need to register it in [FeatureMap].
+///
+/// ## Note: A Checklist After Creating a New [Feature]
+///
+/// 1. Register it in [FeatureMap].
+/// 2. Add it to [_HomeSubpageState.widgetMap] in [HomeSubpage],
+///   whose initialization you will find at [_HomeSubpageState._rebuild].
+/// 3. Insert it at a appropriate position to [SettingsProvider._kDefaultDashboardCardList] in [SettingsProvider].
+///
 abstract class Feature {
   /// Request FeatureContainer to update the content text/icon since they're changed
   @nonVirtual

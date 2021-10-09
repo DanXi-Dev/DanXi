@@ -123,6 +123,7 @@ class _ScheduleViewState extends State<ScheduleView> {
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
       TextStyle highlightStyle =
           TextStyle(color: Theme.of(context).accentColor);
+      // Build weekday indicators
       result[1 + day] = SizedBox(
         width: widget.timetableStyle.laneWidth,
         height: widget.timetableStyle.laneHeight,
@@ -150,25 +151,36 @@ class _ScheduleViewState extends State<ScheduleView> {
       );
 
       widget.laneEventsList[day].events.forEach((Event event) {
+        // Build course blocks
         bool notFirstCourse = widget.laneEventsList[day].events.any((element) =>
             element.time.slot == event.time.slot - 1 &&
             element.course.courseName == event.course.courseName);
         bool notLastCourse = widget.laneEventsList[day].events.any((element) =>
             element.time.slot == event.time.slot + 1 &&
             element.course.courseName == event.course.courseName);
-        result[1 + day + cols * (event.time.slot + 1)] = _buildCourse(
-            event.course.courseName + "\n" + event.course.roomName,
-            !notFirstCourse,
-            !notLastCourse);
+        result[1 + day + cols * (event.time.slot + 1)] =
+            _buildCourse(event.course, !notFirstCourse, !notLastCourse);
       });
     }
 
     return result;
   }
 
-  Widget _buildCourse(String courseName, bool isFirst, bool isLast) {
+  /// Build a course block according to its position. To be specific, [isFirst] means if [course] is
+  /// the start of a continuous course block, and [isLast] means whether [course] is the last one or not.
+  /// They controls the margin and border of layout returned, in order to show a continuous style block all together.
+  ///
+  /// Note: It is likely to meet with
+  /// layout overflow (A RenderFlex overflowed by ** pixels on the bottom.).
+  /// But we have not found a better way to solve so. After all, it won't break the layout on most
+  /// devices with a properly large screen.
+  Widget _buildCourse(Course course, bool isFirst, bool isLast) {
     bool noBottomSpace = (isFirst && !isLast) || (!isFirst && !isLast);
     bool noTopSpace = (!isFirst && isLast) || (!isFirst && !isLast);
+    final TextStyle textStyle = Theme.of(context).textTheme.overline.copyWith(
+        color: Theme.of(context).accentColorBrightness == Brightness.light
+            ? Colors.black
+            : Colors.white);
     return SizedBox(
       width: widget.timetableStyle.laneWidth,
       height: widget.timetableStyle.timeItemHeight,
@@ -181,13 +193,20 @@ class _ScheduleViewState extends State<ScheduleView> {
             borderRadius: BorderRadius.vertical(
                 top: Radius.circular(noTopSpace ? 0 : 2),
                 bottom: Radius.circular(noBottomSpace ? 0 : 2))),
-        child: AutoSizeText(isFirst ? courseName : "",
-            minFontSize: 8,
-            style: Theme.of(context).textTheme.overline.copyWith(
-                color:
-                    Theme.of(context).accentColorBrightness == Brightness.light
-                        ? Colors.black
-                        : Colors.white)),
+        child: isFirst
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AutoSizeText(course.courseName,
+                      // minFontSize: 8,
+                      style: textStyle.copyWith(fontWeight: FontWeight.bold)),
+                  SizedBox(
+                    height: 4,
+                  ),
+                  AutoSizeText(course.roomName, style: textStyle),
+                ],
+              )
+            : Container(),
       ),
     );
   }

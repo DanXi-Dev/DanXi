@@ -23,7 +23,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A full-screen page to allow user to select text with a larger font size, using
-/// selectable markdown render.
+/// selectable markdown render [kMarkdownSelectorRender].
 ///
 /// Arguments:
 /// [String] text: the text to display.

@@ -95,6 +95,14 @@ void main() {
     });
 }
 
+/// ## Note: A Checklist After Creating a New Page
+///
+/// [TextSelectorPage] is a simple example of what a typical page in DanXi looks like.
+/// Also have a look at [AAONoticesList] if you are looking for something a bit advanced.
+///
+/// 1. Register it in [DanxiApp.routes] below, with the same syntax.
+/// 2. Call [smartNavigatorPush] to navigate to the page.
+///
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
