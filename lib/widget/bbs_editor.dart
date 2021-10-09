@@ -87,18 +87,20 @@ class BBSEditor {
             object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
-    await PostRepository.getInstance()
+    final success = await PostRepository.getInstance()
         .newReply(discussionId, postId, content)
         .onError((error, stackTrace) {
       if (error is DioError) {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
             title: S.of(context).reply_failed(error.type), useSnackBar: false);
-      } else
+      } else {
         Noticing.showNotice(context, S.of(context).reply_failed(error),
             title: S.of(context).fatal_error, useSnackBar: false);
+      }
       return -1;
     });
+    if (success == -1) return;
     StateProvider.editorCache.remove(object);
   }
 
@@ -164,9 +166,8 @@ class BBSEditor {
           StateProvider.editorCache[object] = PostEditorText.newInstance();
         final textController =
             TextEditingController(text: StateProvider.editorCache[object].text);
-        textController.addListener(() {
-          StateProvider.editorCache[object].text = textController.text;
-        });
+        textController.addListener(
+            () => StateProvider.editorCache[object].text = textController.text);
         return await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
             context: context,
