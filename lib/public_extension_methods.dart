@@ -92,3 +92,18 @@ extension ToStr on bool {
     return "0";
   }
 }
+
+extension ListEx<T> on List<T> {
+  /// Remove any element in list which [filter] returns false.
+  List<T> filter(FilterFunction<T> filter) {
+    List<T> newList = [];
+    this?.forEach((element) {
+      if (filter(element)) {
+        newList.add(element);
+      }
+    });
+    return newList;
+  }
+}
+
+typedef FilterFunction<T> = bool Function(T element);

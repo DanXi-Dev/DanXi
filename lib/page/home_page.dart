@@ -179,6 +179,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  /// Deal with bmob error (e.g. unable to obtain data in [AnnouncementRepository]).
+  _dealWithBmobError() async {
+    await showPlatformDialog(
+        context: context,
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: Text(
+                S.of(context).fatal_error,
+              ),
+              content: Text(S.of(context).login_issue_2),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).retry),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _loadDataFromBmob();
+                    }),
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).skip),
+                    onPressed: () => Navigator.pop(context)),
+              ],
+            ));
+  }
+
+  void _loadDataFromBmob() {
+    AnnouncementRepository.getInstance().loadData().then((value) {
+      _loadUpdate().then(
+          (value) => _loadAnnouncement().catchError((ignored) {}),
+          onError: (ignored) {});
+      _loadStartDate().catchError((ignored) {});
+    }, onError: (e) => _dealWithBmobError());
+  }
+
   DateTime _lastRefreshTime;
 
   @override
@@ -294,11 +326,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         hashCode);
 
     // Load the latest version, announcement & the start date of the following term.
-    // Just ignore the network error.
-    _loadUpdate().then((value) => _loadAnnouncement().catchError((ignored) {}),
-        onError: (ignored) {});
-    _loadStartDate().catchError((ignored) {});
-
+    _loadDataFromBmob();
     // Configure shortcut listeners on Android & iOS.
     if (PlatformX.isMobile)
       quickActions.initialize((shortcutType) {
@@ -515,7 +543,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //We don't need to check for update on iOS platform.
     if (PlatformX.isIOS) return;
     final UpdateInfo updateInfo =
-        await PgyerRepository.getInstance().checkVersion();
+        AnnouncementRepository.getInstance().checkVersion();
     if (updateInfo.isAfter(major, minor, patch)) {
       await showPlatformDialog(
           context: context,
@@ -574,29 +602,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadStartDate() async {
-    TimeTable.defaultStartTime = await AnnouncementRepository.getInstance()
-        .getStartDate()
-        .catchError((e) {
-      showPlatformDialog(
-          context: context,
-          builder: (BuildContext context) => PlatformAlertDialog(
-                title: Text(
-                  S.of(context).fatal_error,
-                ),
-                content: Text(S.of(context).login_issue_2),
-                actions: <Widget>[
-                  PlatformDialogAction(
-                      child: PlatformText(S.of(context).retry),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _loadStartDate();
-                      }),
-                  PlatformDialogAction(
-                      child: PlatformText(S.of(context).skip),
-                      onPressed: () => Navigator.pop(context)),
-                ],
-              ));
-    });
+    TimeTable.defaultStartTime =
+        AnnouncementRepository.getInstance().getStartDate();
     // Determine if Timetable needs to be updated
     if (SettingsProvider.getInstance().lastSemesterStartTime !=
             TimeTable.defaultStartTime.toIso8601String() &&

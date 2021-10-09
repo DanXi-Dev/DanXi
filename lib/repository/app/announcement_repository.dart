@@ -17,20 +17,33 @@
 
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementRepository {
   static const KEY_SEEN_ANNOUNCEMENT = "seen_announcement";
+  static const _ID_START_DATE = -1;
+  static const _ID_LATEST_VERSION = -2;
+  static const _ID_CHANGE_LOG = -3;
 
   AnnouncementRepository._();
 
   static final _instance = AnnouncementRepository._();
 
   factory AnnouncementRepository.getInstance() => _instance;
+  List<Announcement> _announcementCache;
+
+  Future<void> loadData() async {
+    BmobQuery<Announcement> query =
+        BmobQuery<Announcement>().setOrder("-createdAt");
+    _announcementCache = (await query.queryObjects())
+        .map<Announcement>((e) => Announcement.fromJson(e))
+        .toList();
+  }
 
   Future<Announcement> getLastNewAnnouncement() async {
-    Announcement announcement = await getLastAnnouncement();
+    Announcement announcement = getLastAnnouncement();
     if (announcement == null) return null;
     SharedPreferences pre = await SharedPreferences.getInstance();
     List<String> list = [];
@@ -50,34 +63,57 @@ class AnnouncementRepository {
     }
   }
 
-  Future<Announcement> getLastAnnouncement() async {
-    List<Announcement> list = await getAnnouncements();
+  Announcement getLastAnnouncement() {
+    List<Announcement> list = getAnnouncements();
     return list.length > 0 ? list[0] : null;
   }
 
-  Future<List<Announcement>> getAnnouncements() async {
-    BmobQuery<Announcement> query = BmobQuery<Announcement>()
-        .setOrder("-createdAt")
-        .addWhereGreaterThanOrEqualTo(
-            "maxVersion", int.tryParse(build.first) ?? 0);
-    return (await query.queryObjects())
-        .map<Announcement>((e) => Announcement.fromJson(e))
-        .toList();
+  List<Announcement> getAnnouncements() {
+    final version = int.tryParse(build.first) ?? 0;
+    return _announcementCache
+        .filter((element) => element.maxVersion >= version);
   }
 
-  Future<List<Announcement>> getAllAnnouncements() async {
-    BmobQuery<Announcement> query = BmobQuery<Announcement>()
-        .setOrder("-createdAt")
-        .addWhereGreaterThanOrEqualTo("maxVersion", 0);
-    return (await query.queryObjects())
-        .map<Announcement>((e) => Announcement.fromJson(e))
-        .toList();
+  List<Announcement> getAllAnnouncements() =>
+      _announcementCache.filter((element) => element.maxVersion >= 0);
+
+  DateTime getStartDate() => DateTime.parse(_announcementCache
+      .firstWhere((element) => element.maxVersion == _ID_START_DATE)
+      .content);
+
+  UpdateInfo checkVersion() => UpdateInfo(
+      _announcementCache
+          .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
+          .content,
+      _announcementCache
+          .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
+          .content);
+}
+
+class UpdateInfo {
+  final String latestVersion;
+  final String changeLog;
+
+  @override
+  String toString() {
+    return 'UpdateInfo{latestVersion: $latestVersion, changeLog: $changeLog}';
   }
 
-  Future<DateTime> getStartDate() async {
-    BmobQuery<Announcement> query =
-        BmobQuery<Announcement>().addWhereEqualTo("maxVersion", -1);
-    return DateTime.parse(
-        Announcement.fromJson((await query.queryObjects()).single).content);
+  UpdateInfo(this.latestVersion, this.changeLog);
+
+  bool isAfter(int major, int minor, int patch) {
+    List<int> versions =
+        latestVersion.split(".").map((e) => int.tryParse(e)).toList();
+    if (versions[0] > major)
+      return true;
+    else if (versions[0] < major) return false;
+
+    if (versions[1] > minor)
+      return true;
+    else if (versions[1] < minor) return false;
+
+    if (versions[2] > patch) return true;
+
+    return false;
   }
 }

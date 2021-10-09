@@ -76,11 +76,11 @@ class _AnnouncementListState extends State<AnnouncementList> {
         ],
       ),
       body: FutureWidget(
-        future: _showingLatest
-            ? AnnouncementRepository.getInstance().getAnnouncements()
-            : AnnouncementRepository.getInstance().getAllAnnouncements(),
+        future: AnnouncementRepository.getInstance().loadData(),
         successBuilder: (_, snapShot) {
-          _data = snapShot.data;
+          _data = _showingLatest
+              ? AnnouncementRepository.getInstance().getAnnouncements()
+              : AnnouncementRepository.getInstance().getAllAnnouncements();
           return Column(
             children: [
               Expanded(
