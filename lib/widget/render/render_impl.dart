@@ -77,6 +77,7 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
   return MarkdownBody(
+    softLineBreak: true,
     data: content,
     styleSheet: _fontSizeOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
@@ -99,6 +100,7 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
 BaseRender kMarkdownSelectorRender = (BuildContext context, String content,
     ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
   return Markdown(
+    softLineBreak: true,
     selectable: true,
     data: content,
     styleSheet: _fontSizeOverride(
