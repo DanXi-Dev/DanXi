@@ -198,12 +198,13 @@ class _ScheduleViewState extends State<ScheduleView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText(course.courseName,
-                      // minFontSize: 8,
+                      minFontSize: 6,
                       style: textStyle.copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(
                     height: 4,
                   ),
-                  AutoSizeText(course.roomName, style: textStyle),
+                  AutoSizeText(course.roomName,
+                      minFontSize: 6, style: textStyle),
                 ],
               )
             : Container(),
