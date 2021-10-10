@@ -212,67 +212,31 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             refreshSelf();
           },
           child: Material(
-              child: PagedListView<Reply>(
-            initialData: _post?.posts ?? [],
-            startPage: 1,
-            pagedController: _listViewController,
-            withScrollbar: true,
-            scrollController: PrimaryScrollController.of(context),
-            dataReceiver: _loadContent,
-            // Load all data if user instructed us to scroll to end
-            allDataReceiver: (shouldScrollToEnd && _post.count > 10)
-                ? PostRepository.getInstance().loadReplies(_post, -1)
-                : null,
-            shouldScrollToEnd: shouldScrollToEnd,
-            builder: _getListItems,
-            loadingBuilder: (BuildContext context) => Container(
-              padding: EdgeInsets.all(8),
-              child: Center(child: PlatformCircularProgressIndicator()),
-            ),
-            endBuilder: (context) => Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context).end_reached),
+            child: PagedListView<Reply>(
+              initialData: _post?.posts ?? [],
+              startPage: 1,
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: PrimaryScrollController.of(context),
+              dataReceiver: _loadContent,
+              // Load all data if user instructed us to scroll to end
+              allDataReceiver: (shouldScrollToEnd && _post.count > 10)
+                  ? PostRepository.getInstance().loadReplies(_post, -1)
+                  : null,
+              shouldScrollToEnd: shouldScrollToEnd,
+              builder: _getListItems,
+              loadingBuilder: (BuildContext context) => Container(
+                padding: EdgeInsets.all(8),
+                child: Center(child: PlatformCircularProgressIndicator()),
+              ),
+              endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(S.of(context).end_reached),
+                ),
               ),
             ),
-          ) /*FutureWidget<List<Reply>>(
-                  future: _content,
-                  loadingBuilder: (BuildContext context,
-                      AsyncSnapshot<List<Reply>> snapshot) {
-                    _isRefreshing = true;
-                    // If there is no data at all, show a full-screen loading indicator.
-                    if (_lastSnapshotData == null)
-                      return Container(
-                        padding: EdgeInsets.all(8),
-                        child:
-                            Center(child: PlatformCircularProgressIndicator()),
-                      );
-                    // If the page is showing search results, just show it whatever.
-                    if (_searchResult != null) return _buildPage();
-
-                    // Otherwise, showing a list page with loading indicator at the bottom.
-                    return NotificationListener<ScrollNotification>(
-                        child: _buildPage(), onNotification: onScrollToBottom);
-                  },
-                  successBuilder: (BuildContext context,
-                      AsyncSnapshot<List<Reply>> snapshot) {
-                    _isRefreshing = false;
-                    WidgetsBinding.instance
-                        .addPostFrameCallback((_) => scrollToEndIfNeeded());
-                    // Prevent showing duplicate replies caused by refreshing repeatedly
-                    if (_lastReplies.isEmpty ||
-                        snapshot.data.isEmpty ||
-                        _lastReplies.last.id != snapshot.data.last.id)
-                      _lastReplies.addAll(snapshot.data);
-                    _lastSnapshotData = snapshot;
-                    if (_searchResult != null) return _buildPage();
-                    // Only use scroll notification when data is paged
-                    return NotificationListener<ScrollNotification>(
-                        child: _buildPage(), onNotification: onScrollToBottom);
-                  },
-                  errorBuilder: () => _buildErrorWidget(),
-                ),*/
-              ),
+          ),
         ),
       ),
     );
@@ -309,29 +273,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             setState(() => _isFavored = !_isFavored);
             return null;
           });
-        },
-      );
-
-  Widget _buildErrorWidget(
-          BuildContext context, AsyncSnapshot<List<Reply>> snapshot) =>
-      GestureDetector(
-        child: Center(
-          child: Text(S.of(context).failed +
-              '\n\n' +
-              ((snapshot.error is DioError)
-                  // If is network error, display the error code and response from server (if any)
-                  ? (snapshot.error as DioError).message +
-                      '\n' +
-                      ((snapshot.error as DioError)
-                              .response
-                              ?.data
-                              ?.toString() ??
-                          "")
-                  // Else, display the internal error
-                  : snapshot.error.toString())),
-        ),
-        onTap: () {
-          refreshSelf();
         },
       );
 
@@ -685,11 +626,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "#${e.id}",
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "${index + 1}F",
+                                style: TextStyle(
+                                  color: Theme.of(context).hintColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "  (#${e.id})",
+                                style: TextStyle(
+                                  color: Theme.of(context).hintColor,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
                           ),
                           Text(
                             HumanDuration.format(
