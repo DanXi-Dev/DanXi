@@ -44,6 +44,8 @@ class PlatformX {
 
   static bool get isDesktop => !isMobile;
 
+  static bool get isApplePlatform => isIOS || isMacOS;
+
   static ThemeData getTheme(BuildContext context) {
     return PlatformX.isDarkMode
         ? Constant.darkTheme(PlatformX.isCupertino(context))

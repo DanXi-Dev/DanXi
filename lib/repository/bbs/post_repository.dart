@@ -857,8 +857,37 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.data.toString();
   }
 
+  /* BEGIN v2 API */
+
+  /// Upload or update Push Notification token to server
+  /// API Version: v2
+  Future<void> updatePushNotificationToken(String token, String deviceId,
+      PushNotificationServiceType service) async {
+    await dio.post(_BASE_URL + "/users",
+        data: {
+          "service": service.toStringRepresentation(),
+          "device_id": deviceId,
+          "token": token,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
   @override
   String get linkHost => "www.fduhole.com";
+}
+
+enum PushNotificationServiceType { APNS, MIPUSH }
+
+extension StringRepresentation on PushNotificationServiceType {
+  String toStringRepresentation() {
+    switch (this) {
+      case PushNotificationServiceType.APNS:
+        return 'apns';
+      case PushNotificationServiceType.MIPUSH:
+        return 'mipush';
+    }
+    return null;
+  }
 }
 
 enum SetFavoredDiscussionMode { ADD, DELETE }
