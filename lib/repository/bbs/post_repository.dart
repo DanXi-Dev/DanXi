@@ -27,9 +27,11 @@ import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/util/platform_bridge.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:win32/win32.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -571,9 +573,16 @@ class PostRepository extends BaseRepositoryWithDio {
   /// Current user profile, stored as cache by the repository
   FduholeProfile _profile;
 
+  /// Push Notification Registeration Cache
+  String _deviceId, _pushNotificationToken;
+  PushNotificationServiceType _pushNotificationService;
+
   clearCache() {
     _token = null;
     _profile = null;
+    _deviceId = null;
+    _pushNotificationService = null;
+    _pushNotificationToken = null;
   }
 
   PostRepository._() {
@@ -582,8 +591,13 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   initializeUser(PersonInfo info) async {
-    _token =
-        SettingsProvider.getInstance().fduholeToken ?? await requestToken(info);
+    if (SettingsProvider.getInstance().fduholeToken != null) {
+      _token = SettingsProvider.getInstance().fduholeToken;
+    } else {
+      _token = await requestToken(info);
+      PlatformBridge.requestNotificationPermission();
+      updatePushNotificationToken();
+    }
   }
 
   Future<String> requestToken(PersonInfo info) async {
@@ -627,7 +641,7 @@ class PostRepository extends BaseRepositoryWithDio {
       return SettingsProvider.getInstance().fduholeToken =
           response.data["token"];
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error(e);
     }
   }
 
@@ -861,15 +875,22 @@ class PostRepository extends BaseRepositoryWithDio {
 
   /// Upload or update Push Notification token to server
   /// API Version: v2
-  Future<void> updatePushNotificationToken(String token, String deviceId,
-      PushNotificationServiceType service) async {
-    await dio.post(_BASE_URL + "/users",
-        data: {
-          "service": service.toStringRepresentation(),
-          "device_id": deviceId,
-          "token": token,
-        },
-        options: Options(headers: _tokenHeader));
+  Future<void> updatePushNotificationToken(
+      [String token, String id, PushNotificationServiceType service]) async {
+    if (isUserInitialized) {
+      await dio.post(_BASE_URL + "/users",
+          data: {
+            "service":
+                (service ?? _pushNotificationService).toStringRepresentation(),
+            "device_id": id ?? _deviceId,
+            "token": token ?? _pushNotificationToken,
+          },
+          options: Options(headers: _tokenHeader));
+    } else {
+      _deviceId = id;
+      _pushNotificationToken = token;
+      _pushNotificationService = service;
+    }
   }
 
   @override

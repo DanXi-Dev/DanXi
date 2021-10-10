@@ -40,23 +40,20 @@ import WatchConnectivity
     }
     
     override func application(_ application: UIApplication,
-                didRegisterForRemoteNotificationsWithDeviceToken
-                    deviceToken: Data) {
+                              didRegisterForRemoteNotificationsWithDeviceToken
+                              deviceToken: Data) {
         let token: String = deviceToken.map { String(format: "%.2hhx", $0) }.joined()
-        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "no_device_id"
-        print("\n\n\n\n\n\n\n")
-        print(token)
-        print(deviceId)
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "null_device_id"
         /* Send token to FDUHole */
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
         channel.invokeMethod("upload_apns_token", arguments: ["token": token, "id": deviceId])
     }
     
-
+    
     override func application(_ application: UIApplication,
-                didFailToRegisterForRemoteNotificationsWithError
-                    error: Error) {
+                              didFailToRegisterForRemoteNotificationsWithError
+                              error: Error) {
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().getNotificationSettings { settings in
                 guard (settings.authorizationStatus == .authorized) ||
@@ -82,24 +79,27 @@ import WatchConnectivity
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
         channel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            if(call.method == "send_token"){
+            switch (call.method) {
+            case "request_notification_permission":
+                if #available(iOS 10.0, *) {
+                    let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+                    UNUserNotificationCenter.current().requestAuthorization(
+                        options: authOptions,
+                        completionHandler: {_, _ in })
+                    UNUserNotificationCenter.current().delegate = self
+                } else {
+                    let settings: UIUserNotificationSettings =
+                    UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+                    application.registerUserNotificationSettings(settings)
+                }
+            case "send_token":
                 self.sendString(text: call.arguments as! String)
+            default:
+                break
             }
         })
         
         /* APNS support */
-        if #available(iOS 10.0, *) {
-            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-            UNUserNotificationCenter.current().requestAuthorization(
-                options: authOptions,
-                completionHandler: {_, _ in })
-            UNUserNotificationCenter.current().delegate = self
-        } else {
-            let settings: UIUserNotificationSettings =
-                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-            application.registerUserNotificationSettings(settings)
-        }
-
         application.registerForRemoteNotifications()
         
         /* watchOS Support */
