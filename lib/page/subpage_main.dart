@@ -216,14 +216,14 @@ class _HomeSubpageState extends State<HomeSubpage>
           feature: e,
           onDismissed: () => _notifications.remove(e),
         )));
-    List<Widget?> _currentCardChildren = [];
+    List<Widget> _currentCardChildren = [];
     widgetSequence.forEach((element) {
       if (!element.enabled!) return;
       if (element.internalString == 'new_card') {
         if (_currentCardChildren.isEmpty) return;
         _widgets.add(Card(
           child: Column(
-            children: _currentCardChildren as List<Widget>,
+            children: _currentCardChildren,
           ),
         ));
         _currentCardChildren = [];
@@ -242,7 +242,7 @@ class _HomeSubpageState extends State<HomeSubpage>
             return;
           }
         }
-        _currentCardChildren.add(widgetMap[element.internalString!]);
+        _currentCardChildren.add(widgetMap[element.internalString!]!);
       }
     });
     if (_currentCardChildren.isNotEmpty) {

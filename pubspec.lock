@@ -534,8 +534,8 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "0a9fba566bc59a2b04227682b90eb6ba1f752aa6"
-      url: "git://github.com/w568w/flutter_progress_dialog.git"
+      resolved-ref: "1ae069cd3cd75dea9dd804d9dd493690860d5f25"
+      url: "git://github.com/kavinzhao/flutter_progress_dialog.git"
     source: git
     version: "0.1.0"
   flutter_svg:

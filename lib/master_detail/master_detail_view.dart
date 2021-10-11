@@ -79,7 +79,7 @@ Future<T?> smartNavigatorPush<T extends Object>(
     {Object? arguments, bool forcePushOnMainNavigator = false}) {
   if (isTablet(context) && !forcePushOnMainNavigator) {
     return detailNavigatorKey.currentState!
-        .pushNamed<T>(routeName, arguments: arguments);
+        .pushNamed<T?>(routeName, arguments: arguments);
   }
   return Navigator.of(context).pushNamed<T>(routeName, arguments: arguments);
 }

@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'60'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1633916915;
+const int timestamp = 1633925327;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -98,11 +98,11 @@ const Map<String, Object> dependencies = <String, Object>{
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/w568w/flutter_progress_dialog.git',
+      'url': r'git://github.com/kavinzhao/flutter_progress_dialog.git',
       'ref': r'master',
     },
   },
-  'beautifulsoup': r'^0.0.1',
+  'beautiful_soup_dart': r'^0.2.0',
   'quick_actions': r'^0.6.0+1',
   'qr_flutter': r'^4.0.0',
   'provider': r'^6.0.0',
@@ -111,10 +111,15 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_platform_widgets': r'^1.1.0',
   'share': r'^2.0.1',
   'path_provider': r'^2.0.1',
-  'screen': r'^0.0.5',
+  'screen_brightness': r'^0.0.4',
   'flutter_email_sender': r'^5.0.0',
   'auto_size_text': r'^3.0.0-nullsafety.0',
-  'ical': r'^0.1.3',
+  'ical': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/julisanchez/ical.git',
+      'ref': r'null-safety',
+    },
+  },
   'url_launcher': r'^6.0.3',
   'desktop_window': r'^0.4.0',
   'flutter_html': r'^2.0.0',

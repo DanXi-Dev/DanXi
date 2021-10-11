@@ -173,7 +173,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Deal with login issue described at [CredentialsInvalidException].
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
-      PersonInfo.removeFromSharedPreferences(_preferences);
+      // TODO: Can [_preferences] be null when this is called?
+      PersonInfo.removeFromSharedPreferences(_preferences!);
       FlutterApp.restartApp(context);
     }
   }

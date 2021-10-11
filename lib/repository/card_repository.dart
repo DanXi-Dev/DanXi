@@ -137,7 +137,7 @@ class CardRepository extends BaseRepositoryWithDio {
     return list;
   }
 
-  Future<CardInfo> loadCardInfo(int logDays) async {
+  Future<CardInfo?> loadCardInfo(int logDays) async {
     var cardInfo = CardInfo();
 
     //获取用户页面信息

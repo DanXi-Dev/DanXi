@@ -1,5 +1,3 @@
-// @dart=2.9
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -44,7 +42,7 @@ Map<UserGroup, Function> kUserGroupDescription = {
 
 class PersonInfo {
   UserGroup group;
-  String id, password, name;
+  String? id, password, name;
 
   PersonInfo(this.id, this.password, this.name, this.group);
 
@@ -73,9 +71,9 @@ class PersonInfo {
   }
 
   Future<void> saveAsSharedPreferences(SharedPreferences preferences) async {
-    await preferences.setString("id", id);
-    await preferences.setString("password", password);
-    await preferences.setString("name", name);
+    await preferences.setString("id", id!);
+    await preferences.setString("password", password!);
+    await preferences.setString("name", name!);
     await preferences.setString("user_group", group.toString());
   }
 

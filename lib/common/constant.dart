@@ -221,42 +221,35 @@ extension CampusEx on Campus? {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
         return ['HGX', 'H2', 'H3', 'H4', 'H5', 'H6'];
-        break;
       case Campus.FENGLIN_CAMPUS:
         return ['F1', 'F2'];
-        break;
       case Campus.JIANGWAN_CAMPUS:
         return ['JA', 'JB'];
-        break;
       case Campus.ZHANGJIANG_CAMPUS:
         return ['Z2'];
-        break;
       case Campus.NONE:
         break;
+      case null:
+        return ['?'];
     }
-    return null;
   }
 
   String? displayTitle(BuildContext? context) {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
-        return S.of(context!)!.handan_campus;
-        break;
+        return S.of(context!).handan_campus;
       case Campus.FENGLIN_CAMPUS:
-        return S.of(context!)!.fenglin_campus;
-        break;
+        return S.of(context!).fenglin_campus;
       case Campus.JIANGWAN_CAMPUS:
-        return S.of(context!)!.jiangwan_campus;
-        break;
+        return S.of(context!).jiangwan_campus;
       case Campus.ZHANGJIANG_CAMPUS:
-        return S.of(context!)!.zhangjiang_campus;
-        break;
+        return S.of(context!).zhangjiang_campus;
       // Select area when it's none
       case Campus.NONE:
-        return S.of(context!)!.choose_area;
-        break;
+        return S.of(context!).choose_area;
+      case null:
+        return "?";
     }
-    return null;
   }
 }
 
