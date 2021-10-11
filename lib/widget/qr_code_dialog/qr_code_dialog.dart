@@ -33,9 +33,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 class QRHelper {
   static Future<void> showQRCode(
       BuildContext context, PersonInfo? personInfo) async {
-    double? _brightness = await ScreenProxy.brightness;
     //Set screen brightness for displaying QR Code
-    ScreenProxy.keepOn(true);
+    //ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
 
     showPlatformDialog(
@@ -43,7 +42,6 @@ class QRHelper {
         barrierDismissible: false,
         builder: (BuildContext context) => QRDialog(
               personInfo: personInfo,
-              originBrightness: _brightness,
             ));
   }
 
@@ -59,10 +57,8 @@ class QRHelper {
 
 class QRDialog extends StatefulWidget {
   final PersonInfo? personInfo;
-  final double? originBrightness;
 
-  const QRDialog({Key? key, this.personInfo, this.originBrightness})
-      : super(key: key);
+  const QRDialog({Key? key, this.personInfo}) : super(key: key);
 
   @override
   _QRDialogState createState() => _QRDialogState();
@@ -94,11 +90,11 @@ class _QRDialogState extends State<QRDialog> {
                             case ConnectionState.none:
                             case ConnectionState.waiting:
                             case ConnectionState.active:
-                              return Text(S.of(context)!.loading_qr_code);
+                              return Text(S.of(context).loading_qr_code);
                             case ConnectionState.done:
                               if (snapshot.hasError) {
                                 _status = ConnectionStatus.FAILED;
-                                return Text(S.of(context)!.fail_to_acquire_qr);
+                                return Text(S.of(context).fail_to_acquire_qr);
                               } else {
                                 _status = ConnectionStatus.DONE;
                                 return QrImage(
@@ -114,8 +110,8 @@ class _QRDialogState extends State<QRDialog> {
           TextButton(
               child: PlatformText(S.of(context)!.i_see),
               onPressed: () async {
-                ScreenProxy.setBrightness(widget.originBrightness);
-                ScreenProxy.keepOn(false);
+                ScreenProxy.resetBrightness();
+                //ScreenProxy.keepOn(false);
                 Navigator.pop(context);
               }),
         ],

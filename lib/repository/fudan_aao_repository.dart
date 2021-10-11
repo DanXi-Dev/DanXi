@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
@@ -64,9 +64,10 @@ class FudanAAORepository extends BaseRepositoryWithDio {
     if (response.data.toString().contains("Under Maintenance")) {
       throw NotConnectedToLANError();
     }
-    Beautifulsoup soup = Beautifulsoup(response.data.toString());
-    List<Element> noticeNodes = soup
-        .find_all(".wp_article_list_table > tbody > tr > td > table > tbody");
+    BeautifulSoup soup = BeautifulSoup(response.data.toString());
+    Iterable<Element> noticeNodes = soup
+        .findAll(".wp_article_list_table > tbody > tr > td > table > tbody")
+        .map((e) => e.element!);
     for (Element noticeNode in noticeNodes) {
       List<Element> noticeInfo =
           noticeNode.querySelector("tr")!.querySelectorAll("td");

@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
@@ -41,8 +41,8 @@ class QRCodeRepository extends BaseRepositoryWithDio {
 
   Future<String?> _getQRCode() async {
     Response res = await dio!.get(QR_URL);
-    Beautifulsoup soup = Beautifulsoup(res.data.toString());
-    return soup.find(id: "#myText").attributes['value'];
+    BeautifulSoup soup = BeautifulSoup(res.data.toString());
+    return soup.find("*", id: "#myText")!.attributes['value'];
   }
 
   @override

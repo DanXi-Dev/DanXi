@@ -38,8 +38,7 @@ class QRFeature extends Feature {
 
   @override
   void onTap() {
-    QRHelper.showQRCode(context!,
-        StateProvider.personInfo.value); //TODO: Pass brightness to feature
+    QRHelper.showQRCode(context!, StateProvider.personInfo.value);
   }
 
   @override

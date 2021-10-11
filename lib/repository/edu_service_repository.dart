@@ -17,7 +17,7 @@
 
 import 'dart:convert';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -70,10 +70,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<Exam>> _loadExamList() async {
-    final Response r = await dio!.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    final DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r = await dio!
+        .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
@@ -94,8 +94,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
                 .firstWhere((element) => element.name == "semester.id")
                 .value),
         options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    final DOM.Element tableBody = soup.find(id: "tbody");
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromEduServiceHtml(e))
@@ -109,10 +109,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<GPAListItem>> _loadGPA() async {
-    final Response r =
-        await dio!.get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    final DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r = await dio!
+        .get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => GPAListItem.fromHtml(e))
@@ -129,14 +129,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<SemesterInfo>> _loadSemesters() async {
-    await dio!.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
+    await dio!
+        .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
     final Response semesterResponse = await dio!.post(SEMESTER_DATA_URL,
         data: "dataType=semesterCalendar&empty=false",
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    final Beautifulsoup soup = Beautifulsoup(semesterResponse.data.toString());
+    final BeautifulSoup soup = BeautifulSoup(semesterResponse.data.toString());
 
-    final jsonText = _normalizeJson(soup.get_text().trim());
+    final jsonText = _normalizeJson(soup.getText().trim());
     final json = jsonDecode(jsonText);
     final Map semesters = json['semesters'];
     List<SemesterInfo> sems = [];

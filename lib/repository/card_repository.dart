@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -69,9 +69,10 @@ class CardRepository extends BaseRepositoryWithDio {
     Response detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
         options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
-    Beautifulsoup soup = Beautifulsoup(
+    BeautifulSoup soup = BeautifulSoup(
         detailResponse.data.toString().between("<![CDATA[", "]]>")!);
-    List<Element> elements = soup.find(id: "tbody").querySelectorAll("tr");
+    List<Element> elements =
+        soup.find('*', id: "tbody")!.element!.querySelectorAll("tr");
     Iterable<CardRecord> records = elements.map((e) {
       List<Element> details = e.querySelectorAll("td");
       return CardRecord(
@@ -93,11 +94,12 @@ class CardRepository extends BaseRepositoryWithDio {
     if (logDays < 0) return null;
     //Get csrf id.
     Response consumeCsrfPageResponse = await dio!.get(_CONSUME_DETAIL_CSRF_URL);
-    Beautifulsoup consumeCsrfPageSoup =
-        Beautifulsoup(consumeCsrfPageResponse.data.toString());
-    List<Element> metas = consumeCsrfPageSoup.find_all("meta");
-    Element element = metas.firstWhereOrNull(
-        (element) => element.attributes["name"] == "_csrf")!;
+    BeautifulSoup consumeCsrfPageSoup =
+        BeautifulSoup(consumeCsrfPageResponse.data.toString());
+    Iterable<Element> metas =
+        consumeCsrfPageSoup.findAll("meta").map((e) => e.element!);
+    Element element = metas
+        .firstWhereOrNull((element) => element.attributes["name"] == "_csrf")!;
     String? csrfId = element.attributes["content"];
     // Build the request body.
     DateTime end = new DateTime.now();

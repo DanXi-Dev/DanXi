@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -88,8 +88,9 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
     Response res = await dio!.post(STADIUM_LIST_URL,
         data: body,
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    Beautifulsoup soup = Beautifulsoup(res.data.toString());
-    List<DOM.Element> elements = soup.find_all('.order_list > table');
+    BeautifulSoup soup = BeautifulSoup(res.data.toString());
+    Iterable<DOM.Element> elements =
+        soup.findAll('.order_list > table').map((e) => e.element!);
 
     return elements.map((e) => StadiumData.fromHtml(e)).toList();
   }
@@ -97,7 +98,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   Future<StadiumScheduleData> _getScheduleData(
       StadiumData stadium, DateTime date) async {
     Response res = await dio!.get(sStadiumDetailUrl(stadium.contentId, date));
-    Beautifulsoup soup = Beautifulsoup(res.data.toString());
+    BeautifulSoup soup = BeautifulSoup(res.data.toString());
     throw UnimplementedError();
   }
 

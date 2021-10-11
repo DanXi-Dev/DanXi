@@ -18,7 +18,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -77,10 +77,10 @@ String renderText(String content, String imagePlaceholder) {
   content =
       content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
 
-  var soup = Beautifulsoup(content);
-  var images = soup.find_all("img");
-  if (images.length > 0) return soup.get_text().trim() + imagePlaceholder;
-  return soup.get_text().trim();
+  var soup = BeautifulSoup(content);
+  var images = soup.findAll("img");
+  if (images.length > 0) return soup.getText().trim() + imagePlaceholder;
+  return soup.getText().trim();
 }
 
 const String KEY_NO_TAG = "默认";

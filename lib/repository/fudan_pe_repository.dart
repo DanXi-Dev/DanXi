@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
@@ -44,9 +44,11 @@ class FudanPERepository extends BaseRepositoryWithDio {
   Future<List<ExerciseItem>> _loadExerciseRecords(PersonInfo? info) async {
     List<ExerciseItem> items = [];
     Response r = await dio!.get(_INFO_URL);
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    List<DOM.Element> tableLines = soup.find_all(
-        "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr");
+    BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    Iterable<DOM.Element> tableLines = soup
+        .findAll(
+            "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
+        .map((e) => e.element!);
 
     if (tableLines.isEmpty) throw "Unable to get the data";
 

@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -76,7 +76,7 @@ class UISLoginTool {
     workJar.deleteAll();
     Map<String?, String?> data = {};
     Response res = await workDio.get(serviceUrl);
-    Beautifulsoup(res.data.toString()).find_all("input").forEach((element) {
+    BeautifulSoup(res.data.toString()).findAll("input").forEach((element) {
       if (element.attributes['type'] != "button") {
         data[element.attributes['name']] = element.attributes['value'];
       }

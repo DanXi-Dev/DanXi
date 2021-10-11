@@ -43,13 +43,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.0-nullsafety.0"
-  beautifulsoup:
+  beautiful_soup_dart:
     dependency: "direct main"
     description:
-      name: beautifulsoup
+      name: beautiful_soup_dart
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.0.1"
+    version: "0.2.0"
   bitsdojo_window:
     dependency: "direct main"
     description:
@@ -637,9 +637,11 @@ packages:
   ical:
     dependency: "direct main"
     description:
-      name: ical
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: null-safety
+      resolved-ref: "3a866420780e7cb3fa2d20b61fbd87c40f3b289f"
+      url: "https://github.com/julisanchez/ical.git"
+    source: git
     version: "0.1.4"
   image_picker:
     dependency: "direct main"
@@ -768,7 +770,7 @@ packages:
       name: nanoid
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.0"
+    version: "1.0.0"
   nested:
     dependency: transitive
     description:
@@ -1035,13 +1037,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.27.2"
-  screen:
+  screen_brightness:
     dependency: "direct main"
     description:
-      name: screen
+      name: screen_brightness
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.0.5"
+    version: "0.0.4"
   sentry:
     dependency: transitive
     description:

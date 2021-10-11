@@ -17,7 +17,7 @@
 
 import 'dart:convert';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -88,8 +88,10 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     var dataString =
         response.data.toString().between("}", "</script>", headGreedy: false)!;
     var jsonExtraction = new RegExp(r'\[.+\]').allMatches(dataString);
-    List names = jsonDecode(
-        jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("\'", "\""));
+    List names = jsonDecode(jsonExtraction
+        .elementAt(areaCode * 3)
+        .group(0)!
+        .replaceAll("\'", "\""));
     List? cur = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 1)
         .group(0)!
@@ -120,8 +122,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
 
   Future<List<ExamScore>> _loadAllExamScore() async {
     Response r = await dio!.get(SCORE_DETAIL_URL);
-    Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    DOM.Element tableBody = soup.find(id: "tbody");
+    BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromDataCenterHtml(e))
