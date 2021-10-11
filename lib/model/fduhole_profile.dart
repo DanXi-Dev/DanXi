@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 /*
  *     Copyright (C) 2021  DanXi-Dev
@@ -25,15 +25,15 @@ part 'fduhole_profile.g.dart';
 
 @JsonSerializable()
 class FduholeProfile {
-  final int id;
+  final int? id;
 
-  final FduholeUser user;
-
-  // ignore: non_constant_identifier_names
-  final List<BBSPost> favored_discussion;
+  final FduholeUser? user;
 
   // ignore: non_constant_identifier_names
-  final String encrypted_email;
+  final List<BBSPost>? favored_discussion;
+
+  // ignore: non_constant_identifier_names
+  final String? encrypted_email;
 
   factory FduholeProfile.fromJson(Map<String, dynamic> json) =>
       _$FduholeProfileFromJson(json);

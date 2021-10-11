@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// @dart=2.9
-
 part of 'report.dart';
 
 // **************************************************************************
@@ -10,13 +8,13 @@ part of 'report.dart';
 
 Report _$ReportFromJson(Map<String, dynamic> json) {
   return Report(
-    json['id'] as int,
-    json['reason'] as String,
-    json['post'] as int,
-    json['date_created'] as String,
-    json['dealed'] as bool,
-    json['content'] as String,
-    json['discussion'] as int,
+    json['id'] as int?,
+    json['reason'] as String?,
+    json['post'] as int?,
+    json['date_created'] as String?,
+    json['dealed'] as bool?,
+    json['content'] as String?,
+    json['discussion'] as int?,
   );
 }
 

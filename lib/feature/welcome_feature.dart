@@ -46,7 +46,7 @@ class WelcomeFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.welcome(_info?.name);
+  String get mainTitle => S.of(context!).welcome(_info?.name ?? "?");
 
   @override
   String get subTitle => _helloQuote;

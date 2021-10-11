@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 /*
  *     Copyright (C) 2021  DanXi-Dev
@@ -25,27 +25,27 @@ part 'post.g.dart';
 
 @JsonSerializable()
 class BBSPost {
-  int id;
+  int? id;
 
   // ignore: non_constant_identifier_names
-  Reply first_post;
-  int count;
-  List<PostTag> tag;
-  Map<String, String> mapping;
+  Reply? first_post;
+  int? count;
+  List<PostTag>? tag;
+  Map<String, String>? mapping;
 
   // ignore: non_constant_identifier_names
-  String date_created;
+  String? date_created;
 
   // ignore: non_constant_identifier_names
-  String date_updated;
+  String? date_updated;
 
   // ignore: non_constant_identifier_names
-  bool is_folded;
+  bool? is_folded;
 
   // ignore: non_constant_identifier_names
-  Reply last_post;
+  Reply? last_post;
 
-  List<Reply> posts;
+  List<Reply>? posts;
 
   factory BBSPost.fromJson(Map<String, dynamic> json) =>
       _$BBSPostFromJson(json);
@@ -65,5 +65,5 @@ class BBSPost {
   static final DUMMY_POST = BBSPost.dummy();
 
   @override
-  int get hashCode => id;
+  int get hashCode => id!;
 }

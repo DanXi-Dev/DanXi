@@ -101,7 +101,8 @@ class NextCourseFeature extends Feature {
           if (_data!.nextCourse?.course?.courseName != null) {
             // TODO make it more readable (like adding a [SmallTag], etc.)
             return Text(S.of(context!)!.next_course_is(
-                _data!.nextCourse?.course?.courseName, _data!.courseLeft));
+                _data!.nextCourse?.course?.courseName ?? "",
+                _data!.courseLeft));
           } else {
             return Text(S.of(context!)!.next_course_none);
           }

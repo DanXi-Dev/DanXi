@@ -80,7 +80,7 @@ class BBSEditor {
     final String? content = (await _showEditor(
             context,
             postId == null
-                ? S.of(context)!.reply_to(discussionId)
+                ? S.of(context)!.reply_to(discussionId ?? "?")
                 : S.of(context)!.reply_to(postId),
             editorType: editorType,
             object: object))
@@ -113,7 +113,7 @@ class BBSEditor {
     final String? content = (await _showEditor(
             context,
             postId == null
-                ? S.of(context)!.reply_to(discussionId)
+                ? S.of(context)!.reply_to(discussionId ?? "?")
                 : S.of(context)!.reply_to(postId),
             editorType: editorType,
             object: object))
@@ -137,7 +137,7 @@ class BBSEditor {
   static Future<void> reportPost(BuildContext context, int? postId) async {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
     final String? content = (await _showEditor(
-            context, S.of(context)!.reason_report_post(postId),
+            context, S.of(context)!.reason_report_post(postId ?? "?"),
             editorType: BBSEditorType.DIALOG, object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
@@ -145,7 +145,8 @@ class BBSEditor {
     int? responseCode =
         await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
-      Noticing.showNotice(context, S.of(context)!.report_failed(responseCode),
+      Noticing.showNotice(
+          context, S.of(context)!.report_failed(responseCode ?? "?"),
           title: S.of(context)!.fatal_error, useSnackBar: false);
     } else {
       StateProvider.editorCache.remove(object);

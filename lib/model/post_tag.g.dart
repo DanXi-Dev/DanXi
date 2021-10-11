@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// @dart=2.9
-
 part of 'post_tag.dart';
 
 // **************************************************************************
@@ -10,9 +8,9 @@ part of 'post_tag.dart';
 
 PostTag _$PostTagFromJson(Map<String, dynamic> json) {
   return PostTag(
-    json['name'] as String,
-    json['color'] as String,
-    json['count'] as int,
+    json['name'] as String?,
+    json['color'] as String?,
+    json['count'] as int?,
   );
 }
 

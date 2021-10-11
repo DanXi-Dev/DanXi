@@ -9,9 +9,9 @@ part of 'bmob_relation.dart';
 BmobRelation _$BmobRelationFromJson(Map<String, dynamic> json) {
   return BmobRelation()
     ..op = json['__op'] as String?
-    ..objects = (json['objects'] as List?)
+    ..objects = (json['objects'] as List<dynamic>?)
         ?.map((e) => e as Map<String, dynamic>)
-        ?.toList();
+        .toList();
 }
 
 Map<String, dynamic> _$BmobRelationToJson(BmobRelation instance) =>

@@ -432,7 +432,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context)!.filtering_by_tag(_tagFilter)),
+        title: Text(S.of(context)!.filtering_by_tag(_tagFilter ?? "?")),
       ),
       body: _buildPageBody(),
     );
@@ -623,7 +623,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                   children: [
                     Text(
                       S.of(context)!.latest_reply(
-                          postElement.last_post!.username,
+                          postElement.last_post!.username ?? "?",
                           HumanDuration.format(
                               context,
                               DateTime.parse(

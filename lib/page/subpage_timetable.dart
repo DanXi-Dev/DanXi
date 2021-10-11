@@ -115,8 +115,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
     Navigator.of(context).pop();
-
-    String converted = converter.convertTo(_table);
+    if (_table == null) {
+      // TODO: Handle null
+      Noticing.showNotice(context, S.of(context).fatal_error);
+      return;
+    }
+    String converted = converter.convertTo(_table!);
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
@@ -251,8 +255,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemHeight: 140);
     _table = table;
     if (_showingTime == null) _showingTime = _table!.now();
-    final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
-        compact: TableDisplayType.STANDARD);
+    final List<DayEvents> scheduleData = _table!
+        .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return SafeArea(
       child: RefreshIndicator(
         color: Theme.of(context).accentColor,

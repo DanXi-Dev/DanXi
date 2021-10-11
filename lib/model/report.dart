@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 /*
  *     Copyright (C) 2021  DanXi-Dev
@@ -22,19 +22,19 @@ part 'report.g.dart';
 
 @JsonSerializable()
 class Report {
-  final int id;
-  final String reason;
-  final String content;
-  final int discussion;
-  final int post;
-  final String date_created;
-  final bool dealed;
+  final int? id;
+  final String? reason;
+  final String? content;
+  final int? discussion;
+  final int? post;
+  final String? date_created;
+  final bool? dealed;
 
   Report(this.id, this.reason, this.post, this.date_created, this.dealed,
       this.content, this.discussion);
 
   @override
-  int get hashCode => id;
+  int get hashCode => id!;
 
   @override
   bool operator ==(Object other) => (other is Report) && id == other.id;

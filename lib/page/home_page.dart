@@ -555,7 +555,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(S.of(context)!.new_update_description(
-                        FlutterApp.versionName, updateInfo.latestVersion)),
+                        FlutterApp.versionName,
+                        updateInfo.latestVersion ?? "?")),
                     PostRenderWidget(
                         content: "```\n${updateInfo.changeLog}\n```",
                         render: kMarkdownRender)
@@ -584,7 +585,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(
-                  S.of(context)!.developer_announcement(announcement.createdAt),
+                  S
+                      .of(context)!
+                      .developer_announcement(announcement.createdAt ?? "?"),
                 ),
                 content: Linkify(
                   text: announcement.content!,

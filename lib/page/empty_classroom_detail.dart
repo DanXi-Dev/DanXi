@@ -327,7 +327,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         textScaleFactor: 1,
                       ),
                       Text(
-                        S.of(context)!.seats(element.seats),
+                        S.of(context)!.seats(element.seats ?? "?"),
                         textScaleFactor: 0.8,
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),

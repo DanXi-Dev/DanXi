@@ -1,5 +1,3 @@
-// @dart=2.9
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -24,9 +22,9 @@ part 'post_tag.g.dart';
 
 @JsonSerializable()
 class PostTag extends Taggable {
-  final String name;
-  final String color;
-  final int count;
+  final String? name;
+  final String? color;
+  final int? count;
 
   PostTag(this.name, this.color, this.count);
 
@@ -50,5 +48,5 @@ class PostTag extends Taggable {
   factory PostTag.dummy() => PostTag("默认", "red", 0);
 
   @override
-  List<Object> get props => [name];
+  List<Object> get props => [name ?? ""]; //TODO: What default should we give?
 }

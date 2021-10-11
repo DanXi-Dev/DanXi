@@ -148,8 +148,11 @@ class _ExamListState extends State<ExamList> {
                                 : null,
                           ),
                           Text(S.of(context)!.semester(
-                              _unpackedSemester![_showingSemester!].schoolYear,
-                              _unpackedSemester![_showingSemester!].name)),
+                              _unpackedSemester![_showingSemester!]
+                                      .schoolYear ??
+                                  "?",
+                              _unpackedSemester![_showingSemester!].name ??
+                                  "?")),
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_right),
                             onPressed: _showingSemester! <

@@ -124,13 +124,14 @@ class _AnnouncementListState extends State<AnnouncementList> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text(
-            HumanDuration.format(context, DateTime.tryParse(value.updatedAt!)!)),
+        subtitle: Text(HumanDuration.format(
+            context, DateTime.tryParse(value.updatedAt!)!)),
         onTap: () => showPlatformDialog(
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
-                  title: Text(
-                      S.of(context)!.developer_announcement(value.createdAt)),
+                  title: Text(S
+                      .of(context)!
+                      .developer_announcement(value.createdAt ?? "")),
                   content: Linkify(
                       text: value.content!,
                       onOpen: (element) =>

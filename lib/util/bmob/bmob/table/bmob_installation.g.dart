@@ -11,7 +11,9 @@ BmobInstallation _$BmobInstallationFromJson(Map<String, dynamic> json) {
     ..createdAt = json['createdAt'] as String?
     ..updatedAt = json['updatedAt'] as String?
     ..objectId = json['objectId'] as String?
-    ..ACL = (json['ACL'] as Map<String, dynamic>?) as Map<String, Object>?
+    ..ACL = (json['ACL'] as Map<String, dynamic>?)?.map(
+      (k, e) => MapEntry(k, e as Object),
+    )
     ..deviceType = json['deviceType'] as String?
     ..installationId = json['installationId'] as String?
     ..timeZone = json['timeZone'] as String?

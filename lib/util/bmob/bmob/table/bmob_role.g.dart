@@ -11,7 +11,9 @@ BmobRole _$BmobRoleFromJson(Map<String, dynamic> json) {
     ..createdAt = json['createdAt'] as String?
     ..updatedAt = json['updatedAt'] as String?
     ..objectId = json['objectId'] as String?
-    ..ACL = (json['ACL'] as Map<String, dynamic>?) as Map<String, Object>?
+    ..ACL = (json['ACL'] as Map<String, dynamic>?)?.map(
+      (k, e) => MapEntry(k, e as Object),
+    )
     ..name = json['name'] as String?
     ..roles = json['roles'] as Map<String, dynamic>?
     ..users = json['users'] as Map<String, dynamic>?;

@@ -19,6 +19,7 @@ import 'dart:convert';
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/cache.dart';
@@ -56,8 +57,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       {DateTime? startTime}) {
     return Retrier.tryAsyncWithFix(
         () => _loadTimeTableRemotely(startTime: startTime),
-        (exception) async =>
-            await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+        (exception) async => await UISLoginTool.loginUIS(
+            dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<TimeTable> _loadTimeTableRemotely({DateTime? startTime}) async {
@@ -74,7 +75,12 @@ class TimeTableRepository extends BaseRepositoryWithDio {
               .value
         },
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    return TimeTable.fromHtml(startTime, tablePage.data.toString());
+    return TimeTable.fromHtml(
+        startTime ??
+            DateTime.tryParse(
+                SettingsProvider.getInstance().lastSemesterStartTime ?? "") ??
+            DateTime(2021, 9, 13), //TODO: Default value?
+        tablePage.data.toString());
   }
 
   Future<TimeTable> loadTimeTableLocally(PersonInfo? info,

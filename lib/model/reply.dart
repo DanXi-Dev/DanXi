@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 /*
  *     Copyright (C) 2021  DanXi-Dev
@@ -24,16 +24,16 @@ part 'reply.g.dart';
 
 @JsonSerializable()
 class Reply {
-  final int id;
-  final String content;
-  final String username;
-  final int reply_to;
-  final String date_created;
-  final int discussion;
-  final bool is_me;
+  final int? id;
+  final String? content;
+  final String? username;
+  final int? reply_to;
+  final String? date_created;
+  final int? discussion;
+  final bool? is_me;
 
   @override
-  int get hashCode => id;
+  int get hashCode => id!;
 
   @override
   bool operator ==(Object other) => (other is Reply) && id == other.id;
@@ -48,7 +48,7 @@ class Reply {
   /// Generate an empty Reply for special sakes.
   factory Reply.dummy() => Reply(-1, "", "", null, "", -1, false);
 
-  String get filteredContent => SettingsProvider.getInstance().cleanMode
+  String? get filteredContent => SettingsProvider.getInstance().cleanMode
       ? CleanModeFilter.cleanText(content)
       : content;
 }
