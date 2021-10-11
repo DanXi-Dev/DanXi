@@ -81,5 +81,5 @@ Future<T?> smartNavigatorPush<T extends Object>(
     return detailNavigatorKey.currentState!
         .pushNamed<T?>(routeName, arguments: arguments);
   }
-  return Navigator.of(context).pushNamed<T>(routeName, arguments: arguments);
+  return Navigator.of(context).pushNamed<T?>(routeName, arguments: arguments);
 }
