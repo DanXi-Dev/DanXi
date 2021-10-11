@@ -72,7 +72,7 @@ class CardRepository extends BaseRepositoryWithDio {
     BeautifulSoup soup = BeautifulSoup(
         detailResponse.data.toString().between("<![CDATA[", "]]>")!);
     List<Element> elements =
-        soup.find('*', id: "tbody")!.element!.querySelectorAll("tr");
+        soup.find("tbody")!.element!.querySelectorAll("tr");
     Iterable<CardRecord> records = elements.map((e) {
       List<Element> details = e.querySelectorAll("td");
       return CardRecord(

@@ -142,7 +142,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<bool?> _isDiscussionFavored() async {
     if (_isFavored != null) return _isFavored;
-    print("1");
     final List<BBSPost>? favorites =
         await (PostRepository.getInstance().getFavoredDiscussions());
     print(favorites);
