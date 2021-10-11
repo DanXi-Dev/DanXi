@@ -276,7 +276,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   builder: (BuildContext context) =>
                                       PlatformAlertDialog(
                                     title: Text(S
-                                        .of(context).logout_question_prompt_title),
+                                        .of(context)
+                                        .logout_question_prompt_title),
                                     content: Text(
                                         S.of(context).logout_question_prompt),
                                     actions: [
@@ -370,16 +371,19 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       S.of(context).windows_auto_start_title),
                                   secondary: const Icon(Icons.settings_power),
                                   subtitle: Text(S
-                                      .of(context).windows_auto_start_description),
+                                      .of(context)
+                                      .windows_auto_start_description),
                                   value: WindowsAutoStart.autoStart,
                                   onChanged: (bool value) async {
                                     WindowsAutoStart.autoStart = value;
                                     await Noticing.showNotice(
                                         context,
                                         S
-                                            .of(context).windows_auto_start_wait_dialog_message,
+                                            .of(context)
+                                            .windows_auto_start_wait_dialog_message,
                                         title: S
-                                            .of(context).windows_auto_start_wait_dialog_title,
+                                            .of(context)
+                                            .windows_auto_start_wait_dialog_title,
                                         useSnackBar: false);
                                     refreshSelf();
                                   },
@@ -400,7 +404,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                             cupertino: (_, __) =>
                                                 CupertinoActionSheet(
                                               title: Text(S
-                                                  .of(context).fduhole_nsfw_behavior),
+                                                  .of(context)
+                                                  .fduhole_nsfw_behavior),
                                               actions: _buildFoldBehaviorList(),
                                               cancelButton:
                                                   CupertinoActionSheetAction(
@@ -425,7 +430,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 title: Text(S.of(context).fduhole_clean_mode),
                                 secondary: const Icon(Icons.ac_unit),
                                 subtitle: Text(S
-                                    .of(context).fduhole_clean_mode_description),
+                                    .of(context)
+                                    .fduhole_clean_mode_description),
                                 value: SettingsProvider.getInstance().cleanMode,
                                 onChanged: (bool value) {
                                   if (value) {
@@ -439,7 +445,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 leading: Icon(PlatformIcons(context).tag),
                                 title: Text(S.of(context).fduhole_hidden_tags),
                                 subtitle: Text(S
-                                    .of(context).fduhole_hidden_tags_description),
+                                    .of(context)
+                                    .fduhole_hidden_tags_description),
                                 onTap: () async {
                                   await smartNavigatorPush(
                                       context, '/bbs/tags/blocklist');
@@ -659,7 +666,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 TextSpan(
                                   style: defaultText,
                                   text: S
-                                      .of(context).terms_and_conditions_content,
+                                      .of(context)
+                                      .terms_and_conditions_content,
                                 ),
                                 TextSpan(
                                     style: linkText,
@@ -673,7 +681,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 TextSpan(
                                   style: defaultText,
                                   text: S
-                                      .of(context).terms_and_conditions_content_end,
+                                      .of(context)
+                                      .terms_and_conditions_content_end,
                                 ),
                                 TextSpan(
                                   style: defaultText,
@@ -682,7 +691,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 TextSpan(
                                     style: linkText,
                                     text: S
-                                        .of(context).open_source_software_licenses,
+                                        .of(context)
+                                        .open_source_software_licenses,
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         smartNavigatorPush(
@@ -718,7 +728,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       ..onTap = () async {
                                         await BrowserUtil.openUrl(
                                             S
-                                                .of(context).acknowledgement_link_1,
+                                                .of(context)
+                                                .acknowledgement_link_1,
                                             context);
                                       }),
                                 TextSpan(
@@ -760,7 +771,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context).dev_image_url_1)))),
+                                                        .of(context)
+                                                        .dev_image_url_1)))),
                                         onTap: () => BrowserUtil.openUrl(
                                             S.of(context).dev_page_1, context),
                                       ),
@@ -786,7 +798,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context).dev_image_url_2)))),
+                                                        .of(context)
+                                                        .dev_image_url_2)))),
                                         onTap: () => BrowserUtil.openUrl(
                                             S.of(context).dev_page_2, context),
                                       ),
@@ -812,7 +825,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context).dev_image_url_3)))),
+                                                        .of(context)
+                                                        .dev_image_url_3)))),
                                         onTap: () {
                                           BrowserUtil.openUrl(
                                               S.of(context).dev_page_3,
@@ -841,7 +855,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context).dev_image_url_4)))),
+                                                        .of(context)
+                                                        .dev_image_url_4)))),
                                         onTap: () {
                                           BrowserUtil.openUrl(
                                               S.of(context).dev_page_4,
@@ -885,22 +900,20 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          FutureWidget<bool>(
-                            successBuilder: (context, snapshot) {
-                              if (snapshot.data!)
-                                return TextButton(
-                                  child: Text(S.of(context).rate),
-                                  onPressed: () {
-                                    inAppReview.openStoreListing(
-                                      appStoreId: Constant.APPSTORE_APPID,
-                                    );
-                                  },
-                                );
-                              else
+                          FutureBuilder<bool>(
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.hasError || snapshot.data == false)
                                 return Container();
+                              return TextButton(
+                                child: Text(S.of(context).rate),
+                                onPressed: () {
+                                  inAppReview.openStoreListing(
+                                    appStoreId: Constant.APPSTORE_APPID,
+                                  );
+                                },
+                              );
                             },
-                            loadingBuilder: PlatformCircularProgressIndicator(),
-                            errorBuilder: Container(),
                             future: inAppReview.isAvailable(),
                           ),
                           const SizedBox(width: 8),
