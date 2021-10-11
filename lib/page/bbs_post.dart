@@ -142,9 +142,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<bool?> _isDiscussionFavored() async {
     if (_isFavored != null) return _isFavored;
-    final List<BBSPost> favorites = await (PostRepository.getInstance()
-        .getFavoredDiscussions() as FutureOr<List<BBSPost>>);
-    return favorites.any((element) {
+    print("1");
+    final List<BBSPost>? favorites =
+        await (PostRepository.getInstance().getFavoredDiscussions());
+    print(favorites);
+    return favorites!.any((element) {
       if (element.id == null) return false;
       return element.id == _post!.id;
     });
@@ -453,8 +455,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             onTap: () {
               Navigator.of(context).pop();
               FlutterClipboard.copy(renderText(e.filteredContent!, '')).then(
-                  (value) => Noticing.showNotice(
-                      context, S.of(context).copy_success));
+                  (value) =>
+                      Noticing.showNotice(context, S.of(context).copy_success));
             },
           ),
         ),
@@ -599,8 +601,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     child: isNested
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Linkify(
-                            text: renderText(e.filteredContent!,
-                                    S.of(context).image_tag)
+                            text: renderText(
+                                    e.filteredContent!, S.of(context).image_tag)
                                 .trim(),
                             textScaleFactor: 0.8,
                             maxLines: 2,
