@@ -1,42 +1,43 @@
 // ignore_for_file: unnecessary_raw_strings
 /// Current app version
-const String version = r'1.2.6+59';
+const String version = r'1.3.0+60';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
 
 /// The minor version number: "2" in "1.2.3".
-const int minor = 2;
+const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 6;
+const int patch = 0;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'59'];
+const List<String> build = <String>[r'60'];
 
 /// Build date in Unix Time
-const int date = 1633530907;
+const int date = 1633857645;
 
 /// Get pubspec.yaml as Map<String, dynamic>
 const Map<String, dynamic> pubspec = <String, dynamic>{
-  'name':  r'dan_xi',
-  'description':  r'Maybe the best all-rounded service app for Fudan University students.',
-  'publish_to':  r'none',
-  'version':  r'1.2.6+59',
-  'environment':  <String, dynamic>{
-      'sdk':  r'>=2.7.0 <3.0.0',
+  'name': r'dan_xi',
+  'description':
+      r'Maybe the best all-rounded service app for Fudan University students.',
+  'publish_to': r'none',
+  'version': r'1.3.0+60',
+  'environment': <String, dynamic>{
+    'sdk': r'>=2.7.0 <3.0.0',
   },
-  'dependencies':  <String, dynamic>{
-      'flutter':  <String, dynamic>{
-        'sdk':  r'flutter',
-      },
-      'flutter_localizations':  <String, dynamic>{
-        'sdk':  r'flutter',
-      },
-      'cupertino_icons':  r'^1.0.2',
+  'dependencies': <String, dynamic>{
+    'flutter': <String, dynamic>{
+      'sdk': r'flutter',
+    },
+    'flutter_localizations': <String, dynamic>{
+      'sdk': r'flutter',
+    },
+    'cupertino_icons':  r'^1.0.2',
       'dio_cookie_manager':  r'^2.0.0',
       'flutter_progress_dialog':  <String, dynamic>{
         'git':  <String, dynamic>{
@@ -63,7 +64,6 @@ const Map<String, dynamic> pubspec = <String, dynamic>{
       'intl':  r'^0.17.0-nullsafety.2',
       'http':  r'^0.13.1',
       'dio':  r'^4.0.0',
-      'crypto':  r'^3.0.1',
       'shared_preferences':  r'^2.0.5',
       'flutter_phoenix':  r'^1.0.0',
       'asn1lib':  r'^1.0.0',

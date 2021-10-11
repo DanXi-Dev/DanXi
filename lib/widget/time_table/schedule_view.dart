@@ -20,8 +20,10 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:intl/intl.dart';
 
 /// A time table widget, usually used to show student's course schedule table.
@@ -45,42 +47,43 @@ class _ScheduleViewState extends State<ScheduleView> {
   @override
   Widget build(BuildContext context) {
     Widget table;
-    table = GridView.count(
-        crossAxisCount: widget.laneEventsList.length + 1,
-        children: _buildTable(),
-        controller: widget.controller,
-        childAspectRatio: 0.8,
-        shrinkWrap: true);
-    return MediaQuery.removePadding(
-        context: context, removeTop: true, child: table);
-  }
-
-  List<Widget> _buildTable() {
     widget.laneEventsList.forEach((element) {
       element.events.forEach((element) {
         _maxSlot = max(_maxSlot, element.time.slot);
       });
     });
     int cols = widget.laneEventsList.length + 1, rows = _maxSlot + 2;
-    List<Widget> result = List.filled(
+    table = LayoutGrid(
+      columnSizes: List.filled(cols, 1.fr),
+      rowSizes: List.filled(rows, (MediaQuery.of(context).size.height / 8).px),
+      children: _buildTable(cols, rows),
+    );
+    // table = GridView.count(
+    //     crossAxisCount: widget.laneEventsList.length + 1,
+    //     children: _buildTable(),
+    //     controller: widget.controller,
+    //     childAspectRatio: 0.8,
+    //     shrinkWrap: true);
+    return MediaQuery.removePadding(
+        context: context, removeTop: true, child: table);
+  }
+
+  List<Widget> _buildTable(int cols, int rows) {
+    List<Widget> result = List.generate(
         cols * rows,
-        SizedBox(
-          width: widget.timetableStyle.laneWidth,
-          height: widget.timetableStyle.timeItemHeight,
-          child: Container(
-            margin: EdgeInsets.all(2),
-            padding: EdgeInsets.all(2),
-            decoration: BoxDecoration(
-                color: Theme.of(context).hintColor.withOpacity(0.14),
-                borderRadius: BorderRadius.circular(4)),
-          ),
-        ));
+        (index) => Container(
+              margin: EdgeInsets.all(2),
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).hintColor.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(4)),
+            ).withRatio(0.8).withGridPlacement(
+                rowStart: index ~/ cols, columnStart: index % cols));
 
     // Build corner
-    result[0] = SizedBox(
-      width: widget.timetableStyle.timeItemWidth,
-      height: widget.timetableStyle.laneHeight,
-    );
+    result[0] = Container()
+        .withRatio(0.8)
+        .withGridPlacement(columnStart: 0, rowStart: 0);
 
     // Build time indicator
     for (int slot = 0; slot <= _maxSlot; slot++) {
@@ -90,29 +93,24 @@ class _ScheduleViewState extends State<ScheduleView> {
           .kCourseSlotStartTime[slot]
           .toExactTime()
           .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
-      result[cols * (slot + 1)] = SizedBox(
-        width: widget.timetableStyle.timeItemWidth,
-        height: widget.timetableStyle.timeItemHeight,
-        child: Center(
-            child: Column(
-          children: [
-            Text((slot + 1).toString()),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 5),
-              child: Text(
-                startTime,
-                style:
-                    TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
-              ),
-            ),
-            Text(
-              endTime,
+      result[cols * (slot + 1)] = Center(
+          child: Column(
+        children: [
+          Text((slot + 1).toString()),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 2),
+            child: Text(
+              startTime,
               style:
                   TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
-            )
-          ],
-        )),
-      );
+            ),
+          ),
+          Text(
+            endTime,
+            style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+          )
+        ],
+      )).withRatio(0.8).withGridPlacement(columnStart: 0, rowStart: slot + 1);
     }
 
     // Build day indicator & courses
@@ -124,93 +122,96 @@ class _ScheduleViewState extends State<ScheduleView> {
       TextStyle highlightStyle =
           TextStyle(color: Theme.of(context).accentColor);
       // Build weekday indicators
-      result[1 + day] = SizedBox(
-        width: widget.timetableStyle.laneWidth,
-        height: widget.timetableStyle.laneHeight,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              deltaDay == 0
-                  ? Text(
-                      widget.laneEventsList[day].day,
-                      style: highlightStyle,
-                    )
-                  : Text(
-                      widget.laneEventsList[day].day,
-                    ),
-              deltaDay == 0
-                  ? Text(
-                      DateFormat.Md().format(date),
-                      style: highlightStyle,
-                    )
-                  : Text(DateFormat.Md().format(date))
-            ],
-          ),
+      result[1 + day] = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            deltaDay == 0
+                ? Text(
+                    widget.laneEventsList[day].day,
+                    style: highlightStyle,
+                  )
+                : Text(
+                    widget.laneEventsList[day].day,
+                  ),
+            deltaDay == 0
+                ? Text(
+                    DateFormat.Md().format(date),
+                    style: highlightStyle,
+                  )
+                : Text(DateFormat.Md().format(date))
+          ],
         ),
-      );
+      ).withRatio(0.8).withGridPlacement(columnStart: day + 1, rowStart: 0);
 
-      widget.laneEventsList[day].events.forEach((Event event) {
-        // Build course blocks
-        bool notFirstCourse = widget.laneEventsList[day].events.any((element) =>
-            element.time.slot == event.time.slot - 1 &&
-            element.course.courseName == event.course.courseName);
-        bool notLastCourse = widget.laneEventsList[day].events.any((element) =>
-            element.time.slot == event.time.slot + 1 &&
-            element.course.courseName == event.course.courseName);
-        result[1 + day + cols * (event.time.slot + 1)] =
-            _buildCourse(event.course, !notFirstCourse, !notLastCourse);
-      });
+      // widget.laneEventsList[day].events.forEach((Event event) {
+      //   // Build course blocks
+      //   bool notFirstCourse = widget.laneEventsList[day].events.any((element) =>
+      //       element.time.slot == event.time.slot - 1 &&
+      //       element.course.courseName == event.course.courseName);
+      //   bool notLastCourse = widget.laneEventsList[day].events.any((element) =>
+      //       element.time.slot == event.time.slot + 1 &&
+      //       element.course.courseName == event.course.courseName);
+      //   result[1 + day + cols * (event.time.slot + 1)] =
+      //       _buildCourse(event.course, !notFirstCourse, !notLastCourse);
+      // });
+      for (int i = 0; i < widget.laneEventsList[day].events.length;) {
+        int slotSpan = 0;
+        Event firstCourse = widget.laneEventsList[day].events[i];
+        while (i < widget.laneEventsList[day].events.length &&
+            widget.laneEventsList[day].events[i].course.courseName ==
+                firstCourse.course.courseName) {
+          if (widget.laneEventsList[day].events[i].time.slot <
+              firstCourse.time.slot) {
+            firstCourse = widget.laneEventsList[day].events[i];
+          }
+          i++;
+          slotSpan++;
+        }
+        result[1 + day + cols * (firstCourse.time.slot + 1)] =
+            _buildCourse(firstCourse.course).withGridPlacement(
+                columnStart: 1 + day,
+                rowStart: firstCourse.time.slot + 1,
+                rowSpan: slotSpan);
+        for (int j = 1; j < slotSpan; j++) {
+          result[1 + day + cols * (firstCourse.time.slot + 1 + j)] = null;
+        }
+      }
     }
-
+    result.removeWhere((element) => element == null);
     return result;
   }
 
-  /// Build a course block according to its position. To be specific, [isFirst] means if [course] is
-  /// the start of a continuous course block, and [isLast] means whether [course] is the last one or not.
-  /// They controls the margin and border of layout returned, in order to show a continuous style block all together.
-  ///
-  /// Note: It is likely to meet with
-  /// layout overflow (A RenderFlex overflowed by ** pixels on the bottom.).
-  /// But we have not found a better way to solve so. After all, it won't break the layout on most
-  /// devices with a properly large screen.
-  Widget _buildCourse(Course course, bool isFirst, bool isLast) {
-    bool noBottomSpace = (isFirst && !isLast) || (!isFirst && !isLast);
-    bool noTopSpace = (!isFirst && isLast) || (!isFirst && !isLast);
+  Widget _buildCourse(Course course) {
     final TextStyle textStyle = Theme.of(context).textTheme.overline.copyWith(
         color: Theme.of(context).accentColorBrightness == Brightness.light
             ? Colors.black
             : Colors.white);
-    return SizedBox(
-      width: widget.timetableStyle.laneWidth,
-      height: widget.timetableStyle.timeItemHeight,
-      child: Container(
-        margin: EdgeInsets.fromLTRB(
-            2, noTopSpace ? 0 : 2, 2, noBottomSpace ? 0 : 2),
-        padding: EdgeInsets.all(2),
-        decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
-            borderRadius: BorderRadius.vertical(
-                top: Radius.circular(noTopSpace ? 0 : 2),
-                bottom: Radius.circular(noBottomSpace ? 0 : 2))),
-        child: isFirst
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AutoSizeText(course.courseName,
-                      minFontSize: 6,
-                      style: textStyle.copyWith(fontWeight: FontWeight.bold)),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  AutoSizeText(course.roomName,
-                      minFontSize: 6, style: textStyle),
-                ],
-              )
-            : Container(),
+    return Container(
+      margin: EdgeInsets.all(2),
+      padding: EdgeInsets.all(2),
+      decoration: BoxDecoration(
+          color: Theme.of(context).accentColor,
+          borderRadius: BorderRadius.circular(2)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AutoSizeText(course.courseName,
+              minFontSize: 8,
+              style: textStyle.copyWith(fontWeight: FontWeight.bold)),
+          SizedBox(
+            height: 4,
+          ),
+          AutoSizeText(course.roomName, minFontSize: 8, style: textStyle),
+        ],
       ),
     );
   }
+}
+
+extension WidgetEx on Widget {
+  Widget withRatio(double aspectRatio) => this;
 }
 
 class TimetableStyle {

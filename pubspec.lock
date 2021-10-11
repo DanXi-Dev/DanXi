@@ -469,7 +469,7 @@ packages:
     source: hosted
     version: "2.0.0"
   flutter_layout_grid:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_layout_grid
       url: "https://pub.flutter-io.cn"
