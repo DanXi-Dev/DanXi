@@ -54,7 +54,7 @@ class BBSEditor {
       {BBSEditorType? editorType}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText? content = await _showEditor(
-        context, S.of(context)!.new_post,
+        context, S.of(context).new_post,
         allowTags: true, editorType: editorType, object: object);
     if (content?.text == null) return false;
     final success = await (PostRepository.getInstance()
@@ -63,7 +63,7 @@ class BBSEditor {
       if (error is DioError)
         error = error.message + '\n' + (error.response?.data?.toString() ?? "");
       Noticing.showNotice(context, error.toString(),
-          title: S.of(context)!.post_failed, useSnackBar: false);
+          title: S.of(context).post_failed, useSnackBar: false);
       return -1;
     }) as FutureOr<int>);
     if (success == -1) return false;
@@ -80,8 +80,8 @@ class BBSEditor {
     final String? content = (await _showEditor(
             context,
             postId == null
-                ? S.of(context)!.reply_to(discussionId ?? "?")
-                : S.of(context)!.reply_to(postId),
+                ? S.of(context).reply_to(discussionId ?? "?")
+                : S.of(context).reply_to(postId),
             editorType: editorType,
             object: object))
         ?.text;
@@ -92,10 +92,10 @@ class BBSEditor {
       if (error is DioError) {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
-            title: S.of(context)!.reply_failed(error.type), useSnackBar: false);
+            title: S.of(context).reply_failed(error.type), useSnackBar: false);
       } else {
-        Noticing.showNotice(context, S.of(context)!.reply_failed(error),
-            title: S.of(context)!.fatal_error, useSnackBar: false);
+        Noticing.showNotice(context, S.of(context).reply_failed(error),
+            title: S.of(context).fatal_error, useSnackBar: false);
       }
       return -1;
     }) as FutureOr<int>);
@@ -113,8 +113,8 @@ class BBSEditor {
     final String? content = (await _showEditor(
             context,
             postId == null
-                ? S.of(context)!.reply_to(discussionId ?? "?")
-                : S.of(context)!.reply_to(postId),
+                ? S.of(context).reply_to(discussionId ?? "?")
+                : S.of(context).reply_to(postId),
             editorType: editorType,
             object: object))
         ?.text;
@@ -125,10 +125,10 @@ class BBSEditor {
       if (error is DioError) {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
-            title: S.of(context)!.reply_failed(error.type), useSnackBar: false);
+            title: S.of(context).reply_failed(error.type), useSnackBar: false);
       } else
-        Noticing.showNotice(context, S.of(context)!.reply_failed(error),
-            title: S.of(context)!.fatal_error, useSnackBar: false);
+        Noticing.showNotice(context, S.of(context).reply_failed(error),
+            title: S.of(context).fatal_error, useSnackBar: false);
       return -1;
     });
     StateProvider.editorCache.remove(object);
@@ -137,7 +137,7 @@ class BBSEditor {
   static Future<void> reportPost(BuildContext context, int? postId) async {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
     final String? content = (await _showEditor(
-            context, S.of(context)!.reason_report_post(postId ?? "?"),
+            context, S.of(context).reason_report_post(postId ?? "?"),
             editorType: BBSEditorType.DIALOG, object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
@@ -146,11 +146,11 @@ class BBSEditor {
         await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
       Noticing.showNotice(
-          context, S.of(context)!.report_failed(responseCode ?? "?"),
-          title: S.of(context)!.fatal_error, useSnackBar: false);
+          context, S.of(context).report_failed(responseCode ?? "?"),
+          title: S.of(context).fatal_error, useSnackBar: false);
     } else {
       StateProvider.editorCache.remove(object);
-      Noticing.showNotice(context, S.of(context)!.report_success);
+      Noticing.showNotice(context, S.of(context).report_success);
     }
   }
 
@@ -180,17 +180,17 @@ class BBSEditor {
                   ),
                   actions: [
                     PlatformDialogAction(
-                        child: Text(S.of(context)!.cancel),
+                        child: Text(S.of(context).cancel),
                         onPressed: () {
                           StateProvider.editorCache[object]!.text =
                               textController.text;
                           Navigator.of(context).pop<PostEditorText>(null);
                         }),
                     PlatformDialogAction(
-                        child: Text(S.of(context)!.add_image),
+                        child: Text(S.of(context).add_image),
                         onPressed: () => uploadImage(context, textController)),
                     PlatformDialogAction(
-                        child: Text(S.of(context)!.submit),
+                        child: Text(S.of(context).submit),
                         onPressed: () async {
                           Navigator.of(context).pop<PostEditorText>(
                               PostEditorText(textController.text,
@@ -219,7 +219,7 @@ class BBSEditor {
     final String? _file = await _picker.pickImage();
     if (_file == null) return;
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S.of(context)!.uploading_image, context: context);
+        loadingText: S.of(context).uploading_image, context: context);
     try {
       await PostRepository.getInstance().uploadImage(File(_file)).then((value) {
         if (value != null) _controller.text += "![]($value)";
@@ -228,7 +228,7 @@ class BBSEditor {
         return value;
       }, onError: (e) {
         progressDialog.dismiss(showAnim: false);
-        Noticing.showNotice(context, S.of(context)!.uploading_image_failed);
+        Noticing.showNotice(context, S.of(context).uploading_image_failed);
         throw e;
       });
     } catch (ignored) {}
@@ -278,19 +278,19 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       emptyBuilder: (context) => Wrap(
                             alignment: WrapAlignment.spaceAround,
                             children: [
-                              Text(S.of(context)!.failed),
+                              Text(S.of(context).failed),
                               TextButton(
                                 onPressed: () {
                                   setState(() {});
                                 },
-                                child: Text(S.of(context)!.retry),
+                                child: Text(S.of(context).retry),
                               ),
                             ],
                           ),
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: InputDecoration(
                           labelStyle: TextStyle(fontSize: 12),
-                          labelText: S.of(context)!.select_tags,
+                          labelText: S.of(context).select_tags,
                         ),
                       ),
                       findSuggestions: (String filter) async {
@@ -337,7 +337,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 Icons.add_circle,
                                 color: Colors.white,
                               ),
-                              label: Text(S.of(context)!.add_new_tag),
+                              label: Text(S.of(context).add_new_tag),
                               labelStyle: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14.0,
@@ -385,13 +385,13 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                             leading: Icon(
                               IconFont.markdown,
                             ),
-                            title: Text(S.of(context)!.markdown_enabled),
+                            title: Text(S.of(context).markdown_enabled),
                           ),
                           Divider(),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Linkify(
-                              text: S.of(context)!.markdown_description,
+                              text: S.of(context).markdown_description,
                               onOpen: (element) =>
                                   BrowserUtil.openUrl(element.url, context),
                             ),
@@ -414,7 +414,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
               autofocus: true,
             ),
             Divider(),
-            Text(S.of(context)!.preview,
+            Text(S.of(context).preview,
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
@@ -483,7 +483,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   void didChangeDependencies() {
     _supportTags = widget.arguments!['tags'] ?? false;
     _title =
-        widget.arguments!['title'] ?? S.of(context)!.forum_post_enter_content;
+        widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments!['object'];
     if (StateProvider.editorCache.containsKey(_object))
       _controller.text = StateProvider.editorCache[_object]!.text!;

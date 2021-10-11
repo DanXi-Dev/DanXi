@@ -62,17 +62,17 @@ class PEFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.pe_exercises;
+  String get mainTitle => S.of(context!).pe_exercises;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context!)!.loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
         if (_exercises!.isEmpty)
-          return S.of(context!)!.no_data;
+          return S.of(context!).no_data;
         else {
           // 1 Morning, 2 Must-do, 3 Select-do
           List<int> exerciseCategory = [0, 0, 0];
@@ -118,7 +118,7 @@ class PEFeature extends Feature {
         break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context!)!.failed;
+        return S.of(context!).failed;
     }
     return '';
   }
@@ -152,7 +152,7 @@ class PEFeature extends Feature {
         body += "\n${element.title}: ${element.times}";
       });
       Noticing.showNotice(context!, body,
-          title: S.of(context!)!.pe_exercises, useSnackBar: false);
+          title: S.of(context!).pe_exercises, useSnackBar: false);
     } else {
       refreshData();
     }

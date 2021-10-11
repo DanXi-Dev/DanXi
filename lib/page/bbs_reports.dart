@@ -178,7 +178,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             endBuilder: (context) => Center(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context)!.end_reached),
+                child: Text(S.of(context).end_reached),
               ),
             ),
           )),
@@ -222,7 +222,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   cupertino: (_, __) => CupertinoActionSheet(
                     actions: _buildContextMenu(e),
                     cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context)!.cancel),
+                      child: Text(S.of(context).cancel),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -280,12 +280,12 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             ]),
             onTap: () async {
               ProgressFuture progressDialog = showProgressDialog(
-                  loadingText: S.of(context)!.loading, context: context);
+                  loadingText: S.of(context).loading, context: context);
               final BBSPost post = await PostRepository.getInstance()
                   .loadSpecificDiscussion(e.discussion)
                   .onError((dynamic error, stackTrace) {
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context)!.fatal_error);
+                        title: S.of(context).fatal_error);
                     progressDialog.dismiss();
                     return null;
                   } as FutureOr<BBSPost> Function(Error, StackTrace));

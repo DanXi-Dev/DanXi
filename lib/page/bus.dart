@@ -84,7 +84,7 @@ class _BusPageState extends State<BusPage> {
       errorBuilder: (context, snapshot) {
         return Center(
           child: GestureDetector(
-            child: Text(S.of(context)!.failed),
+            child: Text(S.of(context).failed),
             onTap: () => setState(() {}),
           ),
         );
@@ -198,7 +198,7 @@ class _BusPageState extends State<BusPage> {
         appBar: PlatformAppBarX(
             title: TopController(
                 controller: PrimaryScrollController.of(context),
-                child: Text(S.of(context)!.bus_query))),
+                child: Text(S.of(context).bus_query))),
         body: SafeArea(
           bottom: false,
           child: Column(
@@ -213,15 +213,15 @@ class _BusPageState extends State<BusPage> {
                   },
                   groupValue: _holidaySliding,
                   children: {
-                    0: Text(S.of(context)!.weekday),
-                    1: Text(S.of(context)!.holiday)
+                    0: Text(S.of(context).weekday),
+                    1: Text(S.of(context).holiday)
                   },
                 ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(S.of(context)!.bus_start),
+                  Text(S.of(context).bus_start),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
                       items: _getItems() as List<DropdownMenuItem<Campus>>?,
@@ -250,7 +250,7 @@ class _BusPageState extends State<BusPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(S.of(context)!.bus_dest),
+                  Text(S.of(context).bus_dest),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
                       items: _getItems() as List<DropdownMenuItem<Campus>>?,
@@ -292,15 +292,15 @@ class _BusPageState extends State<BusPage> {
         child: ListTile(
           leading: Icon(PlatformIcons(context).info),
           title: Text(_showAll
-              ? S.of(context)!.school_bus_showing_all
-              : S.of(context)!.school_bus_not_showing_all(
+              ? S.of(context).school_bus_showing_all
+              : S.of(context).school_bus_not_showing_all(
                   format.format(currentTime.hour),
                   format.format(currentTime.minute))),
           subtitle: Text(_showAll
-              ? S.of(context)!.school_bus_tap_to_not_show_all(
+              ? S.of(context).school_bus_tap_to_not_show_all(
                   format.format(currentTime.hour),
                   format.format(currentTime.minute))
-              : S.of(context)!.school_bus_tap_to_show_all),
+              : S.of(context).school_bus_tap_to_show_all),
           onTap: () => setState(() {
             _showAll = !_showAll;
           }),

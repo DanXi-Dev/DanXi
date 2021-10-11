@@ -180,25 +180,24 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.dining_hall_crowdedness;
+  String get mainTitle => S.of(context!).dining_hall_crowdedness;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context!)!.loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
         if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null)
-          return S.of(context!)!.most_least_crowded_canteen(
+          return S.of(context!).most_least_crowded_canteen(
               _mostCrowdedCanteen!, _leastCrowdedCanteen!);
         return '';
       case ConnectionStatus.FAILED:
-        return S.of(context!)!.failed;
+        return S.of(context!).failed;
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context!)!.out_of_dining_time;
+        return S.of(context!).out_of_dining_time;
     }
-    return '';
   }
 
   @override
@@ -207,7 +206,7 @@ class DiningHallCrowdednessFeature extends Feature {
       return Wrap(
         children: [
           SmallTag(
-            label: S.of(context!)!.tag_most_crowded,
+            label: S.of(context!).tag_most_crowded,
           ),
           const SizedBox(
             width: 6,
@@ -222,7 +221,7 @@ class DiningHallCrowdednessFeature extends Feature {
             width: 6,
           ),
           SmallTag(
-            label: S.of(context!)!.tag_least_crowded,
+            label: S.of(context!).tag_least_crowded,
           ),
           const SizedBox(
             width: 8,

@@ -52,7 +52,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: false,
-      appBar: PlatformAppBarX(title: Text(S.of(context)!.dashboard_layout)),
+      appBar: PlatformAppBarX(title: Text(S.of(context).dashboard_layout)),
       body: SafeArea(
         bottom: false,
         child: Material(
@@ -68,7 +68,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).addCircled),
-                        title: Text(S.of(context)!.add_new_card),
+                        title: Text(S.of(context).add_new_card),
                         onTap: () {
                           sequence!
                               .add(DashboardCard("new_card", null, null, true));
@@ -85,7 +85,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).addCircled),
-                        title: Text(S.of(context)!.add_new_divider),
+                        title: Text(S.of(context).add_new_divider),
                         onTap: () {
                           sequence!.add(
                             DashboardCard("divider", null, null, true),
@@ -103,7 +103,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).addCircled),
-                        title: Text(S.of(context)!.new_shortcut_card),
+                        title: Text(S.of(context).new_shortcut_card),
                         onTap: () {
                           showPlatformDialog(
                               context: context,
@@ -123,7 +123,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).removeCircled),
-                        title: Text(S.of(context)!.reset_layout),
+                        title: Text(S.of(context).reset_layout),
                         onTap: () async {
                           await SettingsProvider.getInstance()
                               .preferences!
@@ -136,7 +136,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                   ],
               onReorder: (oldIndex, newIndex) {
                 if (oldIndex >= sequence!.length) {
-                  Noticing.showNotice(context, S.of(context)!.unmovable_widget);
+                  Noticing.showNotice(context, S.of(context).unmovable_widget);
                   return;
                 }
                 if (newIndex > oldIndex) --newIndex;
@@ -158,19 +158,19 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
 
   List<Widget> _getListWidgets() {
     Map<String, String> widgetName = {
-      'welcome_feature': S.of(context)!.welcome_feature,
-      'next_course_feature': S.of(context)!.today_course,
-      'divider': S.of(context)!.divider,
-      'ecard_balance_feature': S.of(context)!.ecard_balance,
-      'dining_hall_crowdedness_feature': S.of(context)!.dining_hall_crowdedness,
-      'aao_notice_feature': S.of(context)!.fudan_aao_notices,
-      'empty_classroom_feature': S.of(context)!.empty_classrooms,
-      'fudan_daily_feature': S.of(context)!.fudan_daily,
-      'new_card': S.of(context)!.add_new_card,
-      'qr_feature': S.of(context)!.fudan_qr_code,
-      'pe_feature': S.of(context)!.pe_exercises,
-      'bus_feature': S.of(context)!.bus_query,
-      'dorm_electricity_feature': S.of(context)!.dorm_electricity,
+      'welcome_feature': S.of(context).welcome_feature,
+      'next_course_feature': S.of(context).today_course,
+      'divider': S.of(context).divider,
+      'ecard_balance_feature': S.of(context).ecard_balance,
+      'dining_hall_crowdedness_feature': S.of(context).dining_hall_crowdedness,
+      'aao_notice_feature': S.of(context).fudan_aao_notices,
+      'empty_classroom_feature': S.of(context).empty_classrooms,
+      'fudan_daily_feature': S.of(context).fudan_daily,
+      'new_card': S.of(context).add_new_card,
+      'qr_feature': S.of(context).fudan_qr_code,
+      'pe_feature': S.of(context).pe_exercises,
+      'bus_feature': S.of(context).bus_query,
+      'dorm_electricity_feature': S.of(context).dorm_electricity,
     };
     List<Widget> _widgets = [];
 
@@ -241,7 +241,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
           Dismissible(
             key: UniqueKey(),
             confirmDismiss: (_) => Future.value(false),
-            background: Center(child: Text(S.of(context)!.unmovable_widget)),
+            background: Center(child: Text(S.of(context).unmovable_widget)),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(

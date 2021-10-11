@@ -54,7 +54,7 @@ class Noticing {
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
-                      child: PlatformText(confirmText ?? S.of(context)!.i_see),
+                      child: PlatformText(confirmText ?? S.of(context).i_see),
                       onPressed: () => Navigator.pop(context)),
                 ],
               ));

@@ -242,7 +242,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                S.of(context)!.failed,
+                S.of(context).failed,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               const SizedBox(

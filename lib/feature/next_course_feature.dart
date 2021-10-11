@@ -88,33 +88,30 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.today_course;
+  String get mainTitle => S.of(context!).today_course;
 
   @override
   Widget? get customSubtitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return Text(S.of(context!)!.loading);
+        return Text(S.of(context!).loading);
       case ConnectionStatus.DONE:
         if (_data != null) {
-          if (_data!.nextCourse?.course?.courseName != null) {
+          if (_data!.nextCourse?.course.courseName != null) {
             // TODO make it more readable (like adding a [SmallTag], etc.)
-            return Text(S.of(context!)!.next_course_is(
-                _data!.nextCourse?.course?.courseName ?? "",
-                _data!.courseLeft));
+            return Text(S.of(context!).next_course_is(
+                _data!.nextCourse?.course.courseName ?? "", _data!.courseLeft));
           } else {
-            return Text(S.of(context!)!.next_course_none);
+            return Text(S.of(context!).next_course_none);
           }
         } else {
           return null;
         }
-        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return Text(S.of(context!)!.failed);
+        return Text(S.of(context!).failed);
     }
-    return null;
   }
 
   void refreshData() {
@@ -148,7 +145,7 @@ class NextCourseFeature extends Feature {
               height: 2,
             ),
             Text(
-              S.of(context!)!.exam_schedule,
+              S.of(context!).exam_schedule,
               textScaleFactor: 0.8,
             ),
           ],

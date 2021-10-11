@@ -26,10 +26,10 @@ import 'package:flutter/widgets.dart';
 
 class QRFeature extends Feature {
   @override
-  String get mainTitle => S.of(context!)!.fudan_qr_code;
+  String get mainTitle => S.of(context!).fudan_qr_code;
 
   @override
-  String get subTitle => S.of(context!)!.tap_to_view;
+  String get subTitle => S.of(context!).tap_to_view;
 
   @override
   Widget get icon => PlatformX.isAndroid

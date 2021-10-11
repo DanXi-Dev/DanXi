@@ -64,7 +64,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
         .catchError((e) {
       // If it's not time for a meal
       if (e is UnsuitableTimeException) {
-        Noticing.showNotice(context, S.of(context)!.out_of_dining_time);
+        Noticing.showNotice(context, S.of(context).out_of_dining_time);
       }
     });
     refreshSelf();
@@ -79,7 +79,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
       appBar: PlatformAppBarX(
           title: TopController(
               controller: PrimaryScrollController.of(context),
-              child: Text(S.of(context)!.dining_hall_crowdedness))),
+              child: Text(S.of(context).dining_hall_crowdedness))),
       body: Column(
         children: [
           SizedBox(

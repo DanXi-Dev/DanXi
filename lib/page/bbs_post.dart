@@ -184,8 +184,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? S.of(context)!.forum
-              : S.of(context)!.search_result),
+              ? S.of(context).forum
+              : S.of(context).search_result),
         ),
         trailingActions: [
           if (_searchKeyword == null) _buildFavoredActionButton(),
@@ -232,7 +232,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               endBuilder: (context) => Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(S.of(context)!.end_reached),
+                  child: Text(S.of(context).end_reached),
                 ),
               ),
             ),
@@ -270,7 +270,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   _post!.id)
               .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
-                title: S.of(context)!.operation_failed, useSnackBar: false);
+                title: S.of(context).operation_failed, useSnackBar: false);
             setState(() => _isFavored = !_isFavored!);
             return null;
           });
@@ -318,7 +318,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context)!.fatal_error, useSnackBar: false);
+                        title: S.of(context).fatal_error, useSnackBar: false);
                   return -1;
                 });
               },
@@ -341,7 +341,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context)!.fatal_error, useSnackBar: false);
+                        title: S.of(context).fatal_error, useSnackBar: false);
                   return -1;
                 });
               },
@@ -366,7 +366,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context)!.fatal_error, useSnackBar: false);
+                        title: S.of(context).fatal_error, useSnackBar: false);
                   return -1;
                 });
               },
@@ -389,7 +389,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context)!.fatal_error, useSnackBar: false);
+                        title: S.of(context).fatal_error, useSnackBar: false);
                   return -1;
                 });
               },
@@ -429,10 +429,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 smartNavigatorPush(context, "/text/detail",
                     arguments: {"text": e.filteredContent});
               },
-              child: Text(S.of(context)!.free_select),
+              child: Text(S.of(context).free_select),
             ),
             material: (_, __) => ListTile(
-              title: Text(S.of(context)!.free_select),
+              title: Text(S.of(context).free_select),
               onTap: () {
                 Navigator.of(context).pop();
                 smartNavigatorPush(context, "/text/detail",
@@ -446,15 +446,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               Navigator.of(context).pop();
               FlutterClipboard.copy(renderText(e.filteredContent!, ''));
             },
-            child: Text(S.of(context)!.copy),
+            child: Text(S.of(context).copy),
           ),
           material: (_, __) => ListTile(
-            title: Text(S.of(context)!.copy),
+            title: Text(S.of(context).copy),
             onTap: () {
               Navigator.of(context).pop();
               FlutterClipboard.copy(renderText(e.filteredContent!, '')).then(
                   (value) => Noticing.showNotice(
-                      context, S.of(context)!.copy_success));
+                      context, S.of(context).copy_success));
             },
           ),
         ),
@@ -465,10 +465,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               Navigator.of(context).pop();
               BBSEditor.reportPost(context, e.id);
             },
-            child: Text(S.of(context)!.report),
+            child: Text(S.of(context).report),
           ),
           material: (_, __) => ListTile(
-            title: Text(S.of(context)!.report),
+            title: Text(S.of(context).report),
             onTap: () {
               Navigator.of(context).pop();
               BBSEditor.reportPost(context, e.id);
@@ -515,7 +515,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   cupertino: (_, __) => CupertinoActionSheet(
                     actions: _buildContextMenu(e),
                     cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context)!.cancel),
+                      child: Text(S.of(context).cancel),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -586,8 +586,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             (element) => element.id == e.reply_to,
                             orElse: () => Reply(
                                 -1,
-                                S.of(context)!.unable_to_find_quote,
-                                S.of(context)!.fatal_error,
+                                S.of(context).unable_to_find_quote,
+                                S.of(context).fatal_error,
                                 null,
                                 DateTime.now().toIso8601String(),
                                 -1,
@@ -600,7 +600,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Linkify(
                             text: renderText(e.filteredContent!,
-                                    S.of(context)!.image_tag)
+                                    S.of(context).image_tag)
                                 .trim(),
                             textScaleFactor: 0.8,
                             maxLines: 2,
@@ -610,7 +610,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 BrowserUtil.openUrl(link.url, context);
                               } else {
                                 Noticing.showNotice(
-                                    context, S.of(context)!.cannot_launch_url);
+                                    context, S.of(context).cannot_launch_url);
                               }
                             },
                           )
@@ -655,7 +655,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 fontSize: 12),
                           ),
                           GestureDetector(
-                            child: Text(S.of(context)!.report,
+                            child: Text(S.of(context).report,
                                 style: TextStyle(
                                     color: Theme.of(context).hintColor,
                                     fontSize: 12)),
@@ -687,7 +687,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     .then((value) => refreshSelf(scrollToEnd: true));
               } else {
                 ProgressFuture progressDialog = showProgressDialog(
-                    loadingText: S.of(context)!.loading, context: context);
+                    loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": await PostRepository.getInstance()
                       .loadSpecificDiscussion(e.discussion)

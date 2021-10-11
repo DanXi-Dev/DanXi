@@ -144,9 +144,9 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     if (PlatformX.isMobile) {
       var result = await GallerySaver.saveImage(outputFile.absolute.path);
       if (result != null && result) {
-        Noticing.showNotice(context, S.of(context)!.image_save_success);
+        Noticing.showNotice(context, S.of(context).image_save_success);
       } else {
-        Noticing.showNotice(context, S.of(context)!.image_save_failed);
+        Noticing.showNotice(context, S.of(context).image_save_failed);
       }
     } else {
       Noticing.showNotice(context, outputFile.absolute.path);
@@ -159,7 +159,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         iosContentBottomPadding: false,
         iosContentPadding: false,
         appBar: PlatformAppBarX(
-          title: Text(S.of(context)!.image),
+          title: Text(S.of(context).image),
           trailingActions: [
             PlatformIconButton(
               padding: EdgeInsets.zero,

@@ -64,7 +64,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
-        child: Text(S.of(context)!.fudan_aao_notices),
+        child: Text(S.of(context).fudan_aao_notices),
         controller: _controller,
       )),
       body: Column(
@@ -96,7 +96,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
             endBuilder: (_) => Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Text(S.of(context)!.end_reached),
+                Text(S.of(context).end_reached),
                 const SizedBox(
                   height: 16,
                 )

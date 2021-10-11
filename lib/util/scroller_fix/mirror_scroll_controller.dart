@@ -39,8 +39,7 @@ class MirrorScrollController extends ScrollController {
   void attach(ScrollPosition position) {
     // debugPrint("tryAttach: $debugTag");
     bool noClients = !hasClients;
-    bool intercepted =
-        _interceptors.every((element) => element?.call() ?? true);
+    bool intercepted = _interceptors.every((element) => element.call());
     if (noClients && intercepted) {
       // detachPosition();
       // debugPrint("attach!!: $debugTag");

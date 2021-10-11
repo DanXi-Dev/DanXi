@@ -37,11 +37,11 @@ mixin PageWithPrimaryScrollController {
 
   void detachItself() {
     shown = false;
-    _thisPrimaryScrollController?.detachPosition?.call();
+    _thisPrimaryScrollController?.detachPosition.call();
   }
 
   void reattachItself() {
     shown = true;
-    _thisPrimaryScrollController?.reattachPosition?.call();
+    _thisPrimaryScrollController?.reattachPosition.call();
   }
 }

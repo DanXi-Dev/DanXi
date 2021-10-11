@@ -69,7 +69,7 @@ class _QRDialogState extends State<QRDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        title: Text(S.of(context)!.fudan_qr_code),
+        title: Text(S.of(context).fudan_qr_code),
         content: GestureDetector(
             onTap: () {
               if (_status == ConnectionStatus.FAILED) {
@@ -108,7 +108,7 @@ class _QRDialogState extends State<QRDialog> {
                         })))),
         actions: <Widget>[
           TextButton(
-              child: PlatformText(S.of(context)!.i_see),
+              child: PlatformText(S.of(context).i_see),
               onPressed: () async {
                 ScreenProxy.resetBrightness();
                 //ScreenProxy.keepOn(false);

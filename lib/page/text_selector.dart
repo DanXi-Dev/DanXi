@@ -48,7 +48,7 @@ class _TextSelectorPageState extends State<TextSelectorPage> {
         iosContentBottomPadding: false,
         iosContentPadding: true,
         appBar: PlatformAppBarX(
-          title: Text(S.of(context)!.free_select),
+          title: Text(S.of(context).free_select),
         ),
         body: PostRenderWidget(
           render: kMarkdownSelectorRender,

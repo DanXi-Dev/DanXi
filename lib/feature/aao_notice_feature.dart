@@ -56,14 +56,14 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.fudan_aao_notices;
+  String get mainTitle => S.of(context!).fudan_aao_notices;
 
   @override
   String? get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context!)!.loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
         if (_initialData != null) {
           return _initialData!.length > 0 ? _initialData!.first.title : null;
@@ -72,7 +72,7 @@ class FudanAAONoticesFeature extends Feature {
         }
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context!)!.failed;
+        return S.of(context!).failed;
     }
   }
 

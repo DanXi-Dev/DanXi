@@ -59,15 +59,15 @@ class _AnnouncementListState extends State<AnnouncementList> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(
-          S.of(context)!.developer_announcement(''),
+          S.of(context).developer_announcement(''),
         ),
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: Text(
               _showingLatest
-                  ? S.of(context)!.older_announcement
-                  : S.of(context)!.latest_announcement,
+                  ? S.of(context).older_announcement
+                  : S.of(context).latest_announcement,
               softWrap: true,
               textScaleFactor: 1.2,
             ),
@@ -103,7 +103,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
             refreshSelf();
           },
           child: Center(
-            child: Text(S.of(context)!.failed),
+            child: Text(S.of(context).failed),
           ),
         ),
       ),
@@ -130,15 +130,14 @@ class _AnnouncementListState extends State<AnnouncementList> {
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
                   title: Text(S
-                      .of(context)!
-                      .developer_announcement(value.createdAt ?? "")),
+                      .of(context).developer_announcement(value.createdAt ?? "")),
                   content: Linkify(
                       text: value.content!,
                       onOpen: (element) =>
                           BrowserUtil.openUrl(element.url, context)),
                   actions: <Widget>[
                     PlatformDialogAction(
-                        child: PlatformText(S.of(context)!.i_see),
+                        child: PlatformText(S.of(context).i_see),
                         onPressed: () => Navigator.pop(context)),
                   ],
                 )),

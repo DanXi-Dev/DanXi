@@ -44,7 +44,7 @@ class CustomShortcutFeature extends Feature {
     if (await canLaunch(link!)) {
       BrowserUtil.openUrl(link!, context);
     } else {
-      Noticing.showNotice(context!, S.of(context!)!.cannot_launch_url);
+      Noticing.showNotice(context!, S.of(context!).cannot_launch_url);
     }
   }
 

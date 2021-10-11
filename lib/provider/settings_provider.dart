@@ -279,25 +279,23 @@ extension SortOrderEx on SortOrder? {
   String? displayTitle(BuildContext context) {
     switch (this) {
       case SortOrder.LAST_REPLIED:
-        return S.of(context)!.last_replied;
-        break;
+        return S.of(context).last_replied;
       case SortOrder.LAST_CREATED:
-        return S.of(context)!.last_created;
-        break;
+        return S.of(context).last_created;
+      case null:
+        return null;
     }
-    return null;
   }
 
   String? getInternalString() {
     switch (this) {
       case SortOrder.LAST_REPLIED:
         return "last_updated";
-        break;
       case SortOrder.LAST_CREATED:
         return "last_created";
-        break;
+      case null:
+        return null;
     }
-    return null;
   }
 }
 
@@ -308,15 +306,11 @@ extension FoldBehaviorEx on FoldBehavior {
   String? displayTitle(BuildContext context) {
     switch (this) {
       case FoldBehavior.FOLD:
-        return S.of(context)!.fold;
-        break;
+        return S.of(context).fold;
       case FoldBehavior.HIDE:
-        return S.of(context)!.hide;
-        break;
+        return S.of(context).hide;
       case FoldBehavior.SHOW:
-        return S.of(context)!.show;
-        break;
+        return S.of(context).show;
     }
-    return null;
   }
 }

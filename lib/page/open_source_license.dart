@@ -65,7 +65,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
             }
           }
         },
-        child: Text(S.of(context)!.open_source_software_licenses),
+        child: Text(S.of(context).open_source_software_licenses),
       )),
       body: Column(children: [
         Expanded(

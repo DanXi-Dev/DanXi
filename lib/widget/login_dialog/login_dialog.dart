@@ -86,7 +86,7 @@ class _LoginDialogState extends State<LoginDialog> {
       return;
     }
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S.of(context)!.logining, context: context);
+        loadingText: S.of(context).logining, context: context);
     switch (_group) {
       case UserGroup.VISITOR:
         PersonInfo newInfo =
@@ -174,7 +174,7 @@ class _LoginDialogState extends State<LoginDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(S.of(context)!.login_uis_description),
+              Text(S.of(context).login_uis_description),
               Text(
                 _errorText,
                 textAlign: TextAlign.start,
@@ -186,7 +186,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 keyboardType: TextInputType.number,
                 //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
-                    labelText: S.of(context)!.login_uis_uid,
+                    labelText: S.of(context).login_uis_uid,
                     icon: PlatformX.isAndroid
                         ? Icon(Icons.perm_identity)
                         : Icon(CupertinoIcons.person_crop_circle)),
@@ -201,7 +201,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 enabled: _group != UserGroup.VISITOR,
                 //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
-                  labelText: S.of(context)!.login_uis_pwd,
+                  labelText: S.of(context).login_uis_pwd,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.lock_outline)
                       : Icon(CupertinoIcons.lock_circle),
@@ -215,13 +215,13 @@ class _LoginDialogState extends State<LoginDialog> {
                       .catchError((e) {
                     if (e is CredentialsInvalidException) {
                       _pwdController.text = "";
-                      _errorText = S.of(context)!.credentials_invalid;
+                      _errorText = S.of(context).credentials_invalid;
                     } else if (e is CaptchaNeededException) {
-                      _errorText = S.of(context)!.captcha_needed;
+                      _errorText = S.of(context).captcha_needed;
                     } else if (e is GeneralLoginFailedException) {
-                      _errorText = S.of(context)!.weak_password;
+                      _errorText = S.of(context).weak_password;
                     } else {
-                      _errorText = S.of(context)!.connection_failed;
+                      _errorText = S.of(context).connection_failed;
                     }
                     // _pwdController.text = "";
                     refreshSelf();
@@ -236,19 +236,19 @@ class _LoginDialogState extends State<LoginDialog> {
                   text: TextSpan(children: [
                 TextSpan(
                   style: defaultText,
-                  text: S.of(context)!.terms_and_conditions_content,
+                  text: S.of(context).terms_and_conditions_content,
                 ),
                 TextSpan(
                     style: linkText,
-                    text: S.of(context)!.privacy_policy,
+                    text: S.of(context).privacy_policy,
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
                         await BrowserUtil.openUrl(
-                            S.of(context)!.privacy_policy_url, context);
+                            S.of(context).privacy_policy_url, context);
                       }),
                 TextSpan(
                   style: defaultText,
-                  text: S.of(context)!.terms_and_conditions_content_end,
+                  text: S.of(context).terms_and_conditions_content_end,
                 ),
               ])),
             ],
@@ -258,23 +258,23 @@ class _LoginDialogState extends State<LoginDialog> {
       actions: [
         if (widget.dismissible)
           TextButton(
-              child: Text(S.of(context)!.cancel),
+              child: Text(S.of(context).cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
         TextButton(
-          child: Text(S.of(context)!.login),
+          child: Text(S.of(context).login),
           onPressed: () {
             _tryLogin(_nameController.text, _pwdController.text)
                 .catchError((e) {
               if (e is CredentialsInvalidException) {
-                _errorText = S.of(context)!.credentials_invalid;
+                _errorText = S.of(context).credentials_invalid;
               } else if (e is CaptchaNeededException) {
-                _errorText = S.of(context)!.captcha_needed;
+                _errorText = S.of(context).captcha_needed;
               } else if (e is GeneralLoginFailedException) {
-                _errorText = S.of(context)!.weak_password;
+                _errorText = S.of(context).weak_password;
               } else {
-                _errorText = S.of(context)!.connection_failed;
+                _errorText = S.of(context).connection_failed;
               }
               _pwdController.text = "";
               refreshSelf();

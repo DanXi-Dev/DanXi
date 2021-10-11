@@ -57,7 +57,7 @@ class _BBSHiddenTagsPreferencePageState
       iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context)!.fduhole_hidden_tags_title),
+        title: Text(S.of(context).fduhole_hidden_tags_title),
       ),
       body: MediaQuery.removePadding(
         removeTop: true,
@@ -72,13 +72,13 @@ class _BBSHiddenTagsPreferencePageState
                 emptyBuilder: (context) => Wrap(
                       alignment: WrapAlignment.spaceAround,
                       children: [
-                        Text(S.of(context)!.no_data),
+                        Text(S.of(context).no_data),
                       ],
                     ),
                 textFieldConfiguration: TextFieldConfiguration(
                   decoration: InputDecoration(
                     labelStyle: TextStyle(fontSize: 12),
-                    labelText: S.of(context)!.select_tags,
+                    labelText: S.of(context).select_tags,
                   ),
                 ),
                 findSuggestions: (String filter) async {
@@ -122,7 +122,7 @@ class _BBSHiddenTagsPreferencePageState
                           Icons.add_circle,
                           color: Colors.white,
                         ),
-                        label: Text(S.of(context)!.add_new_tag),
+                        label: Text(S.of(context).add_new_tag),
                         labelStyle: TextStyle(
                           color: Colors.white,
                           fontSize: 14.0,

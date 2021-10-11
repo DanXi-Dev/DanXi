@@ -33,15 +33,15 @@ class WelcomeFeature extends Feature {
     _info = StateProvider.personInfo.value;
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
-      _helloQuote = S.of(context!)!.late_night;
+      _helloQuote = S.of(context!).late_night;
     } else if (time >= 5 && time <= 8) {
-      _helloQuote = S.of(context!)!.good_morning;
+      _helloQuote = S.of(context!).good_morning;
     } else if (time >= 9 && time <= 11) {
-      _helloQuote = S.of(context!)!.good_noon;
+      _helloQuote = S.of(context!).good_noon;
     } else if (time >= 12 && time <= 16) {
-      _helloQuote = S.of(context!)!.good_afternoon;
+      _helloQuote = S.of(context!).good_afternoon;
     } else if (time >= 17 && time <= 22) {
-      _helloQuote = S.of(context!)!.good_night;
+      _helloQuote = S.of(context!).good_night;
     }
   }
 

@@ -39,5 +39,4 @@ bool checkFeature(Feature feature, UserGroup group) {
 }
 
 bool checkGroup(List<UserGroup> groups, [PersonInfo? info]) =>
-    groups != null &&
     groups.contains((info ?? StateProvider.personInfo.value)?.group);

@@ -25,10 +25,10 @@ import 'package:flutter/widgets.dart';
 
 class EmptyClassroomFeature extends Feature {
   @override
-  String get mainTitle => S.of(context!)!.empty_classrooms;
+  String get mainTitle => S.of(context!).empty_classrooms;
 
   @override
-  String get subTitle => S.of(context!)!.tap_to_view;
+  String get subTitle => S.of(context!).tap_to_view;
 
   @override
   Widget get icon => PlatformX.isAndroid

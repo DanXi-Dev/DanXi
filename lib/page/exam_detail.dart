@@ -90,8 +90,8 @@ class _ExamListState extends State<ExamList> {
           ));
         } catch (ignored) {
           Noticing.showNotice(
-              context, S.of(context)!.error_adding_exam(element.name),
-              title: S.of(context)!.fatal_error);
+              context, S.of(context).error_adding_exam(element.name),
+              title: S.of(context).fatal_error);
         }
     });
     Directory documentDir = await getApplicationDocumentsDirectory();
@@ -116,7 +116,7 @@ class _ExamListState extends State<ExamList> {
         iosContentPadding: true,
         appBar: PlatformAppBarX(
           title: Text(
-            S.of(context)!.exam_schedule,
+            S.of(context).exam_schedule,
           ),
           trailingActions: [
             PlatformIconButton(
@@ -143,19 +143,19 @@ class _ExamListState extends State<ExamList> {
                         children: [
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_left),
-                            onPressed: _showingSemester! > 0
+                            onPressed: _showingSemester> 0
                                 ? () => setState(() => --_showingSemester)
                                 : null,
                           ),
-                          Text(S.of(context)!.semester(
-                              _unpackedSemester![_showingSemester!]
+                          Text(S.of(context).semester(
+                              _unpackedSemester![_showingSemester]
                                       .schoolYear ??
                                   "?",
-                              _unpackedSemester![_showingSemester!].name ??
+                              _unpackedSemester![_showingSemester].name ??
                                   "?")),
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_right),
-                            onPressed: _showingSemester! <
+                            onPressed: _showingSemester<
                                     _unpackedSemester!.length - 1
                                 ? () => setState(() => ++_showingSemester)
                                 : null,
@@ -202,7 +202,7 @@ class _ExamListState extends State<ExamList> {
       child: FutureWidget<List<ExamScore>>(
           future: EduServiceRepository.getInstance().loadExamScoreRemotely(
               _info,
-              semesterId: _unpackedSemester![_showingSemester!].semesterId),
+              semesterId: _unpackedSemester![_showingSemester].semesterId),
           successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
           loadingBuilder: Center(
             child: PlatformCircularProgressIndicator(),
@@ -213,7 +213,7 @@ class _ExamListState extends State<ExamList> {
               return Padding(
                 child: Center(
                   child: Text(
-                    S.of(context)!.no_data,
+                    S.of(context).no_data,
                   ),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 32),
@@ -264,8 +264,8 @@ class _ExamListState extends State<ExamList> {
         },
         child: Padding(
           child: Center(
-            child: Text(S.of(context)!.failed +
-                '\n${S.of(context)!.need_campus_network}\n\nThe error was:\n' +
+            child: Text(S.of(context).failed +
+                '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
                 snapshot.error.toString()),
           ),
           padding: EdgeInsets.symmetric(horizontal: 32),
@@ -291,10 +291,10 @@ class _ExamListState extends State<ExamList> {
       child: ListTile(
         visualDensity: VisualDensity.comfortable,
         title: Text(
-          S.of(context)!.limited_mode_title,
+          S.of(context).limited_mode_title,
           style: TextStyle(color: Colors.white),
         ),
-        subtitle: Text(S.of(context)!.limited_mode_description,
+        subtitle: Text(S.of(context).limited_mode_description,
             style: TextStyle(color: Colors.white)),
       ));
 
@@ -303,7 +303,7 @@ class _ExamListState extends State<ExamList> {
         child: ListTile(
           visualDensity: VisualDensity.comfortable,
           title: Text(
-            S.of(context)!.your_gpa,
+            S.of(context).your_gpa,
             style: TextStyle(color: Colors.white),
           ),
           trailing: FutureWidget<List<GPAListItem>?>(
@@ -332,14 +332,14 @@ class _ExamListState extends State<ExamList> {
               GPAListItem myGPA = snapShot.data!
                   .firstWhere((element) => element.id == _info!.id);
               return Text(
-                  S.of(context)!.your_gpa_subtitle(myGPA.rank, myGPA.credits),
+                  S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
                   style: TextStyle(color: ThemeData.dark().hintColor));
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>> snapShot) {
-              return Text(S.of(context)!.failed);
+              return Text(S.of(context).failed);
             },
-            loadingBuilder: (_, __) => Text(S.of(context)!.loading),
+            loadingBuilder: (_, __) => Text(S.of(context).loading),
           ),
           onTap: () => smartNavigatorPush(context, "/exam/gpa", arguments: {
             "gpalist": _gpa,
@@ -350,7 +350,7 @@ class _ExamListState extends State<ExamList> {
   List<Widget> _getListWidgetsHybrid() {
     List<Widget> widgets = [_buildGPACard()];
     List<Widget> secondaryWidgets = [
-      _buildDividerWithText(S.of(context)!.other_types_exam,
+      _buildDividerWithText(S.of(context).other_types_exam,
           Theme.of(context).textTheme.bodyText1!.color)
     ]; //These widgets are displayed after the ones above
     if (_data == null) return widgets;
@@ -425,7 +425,7 @@ class _ExamListState extends State<ExamList> {
                   child: FutureWidget<List<ExamScore>>(
                     future: EduServiceRepository.getInstance()
                         .loadExamScoreRemotely(_info,
-                            semesterId: _unpackedSemester![_showingSemester!]
+                            semesterId: _unpackedSemester![_showingSemester]
                                 .semesterId),
                     loadingBuilder: PlatformCircularProgressIndicator(),
                     errorBuilder: Container(),

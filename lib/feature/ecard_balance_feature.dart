@@ -74,21 +74,21 @@ class EcardBalanceFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.ecard_balance;
+  String get mainTitle => S.of(context!).ecard_balance;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context!)!.loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
         return Constant.yuanSymbol(_lastTransaction?.payment) +
             " " +
             (_lastTransaction?.location ?? "");
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context!)!.failed;
+        return S.of(context!).failed;
     }
   }
 

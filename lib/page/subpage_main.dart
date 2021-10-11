@@ -64,12 +64,12 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   String get debugTag => "HomePage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt)!.app_name;
+  Create<String> get title => (cxt) => S.of(cxt).app_name;
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt)!.developer_announcement(''),
+            S.of(cxt).developer_announcement(''),
             Icon(PlatformX.isMaterial(cxt)
                 ? Icons.notifications
                 : CupertinoIcons.bell_circle),
@@ -79,9 +79,9 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt)!.dashboard_layout,
+            S.of(cxt).dashboard_layout,
             Text(
-              S.of(cxt)!.edit,
+              S.of(cxt).edit,
               textScaleFactor: 1.2,
             ),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(

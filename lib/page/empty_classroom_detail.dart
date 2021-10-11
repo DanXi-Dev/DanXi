@@ -128,7 +128,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         appBar: PlatformAppBarX(
             title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: Text(S.of(context)!.empty_classrooms),
+          child: Text(S.of(context).empty_classrooms),
         )),
         body: SafeArea(
             bottom: false,
@@ -208,7 +208,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   cupertino: (_, __) => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(S.of(context)!.current_date),
+                      Text(S.of(context).current_date),
                       TextButton(
                         onPressed: () {
                           showCupertinoModalPopup(
@@ -231,7 +231,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            S.of(context)!.classroom,
+                            S.of(context).classroom,
                             style: TextStyle(fontSize: 18),
                           ),
                           Row(
@@ -246,7 +246,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                         5 +
                                     7,
                                 child: Text(
-                                  "| " + S.of(context)!.morning,
+                                  "| " + S.of(context).morning,
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -259,7 +259,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                         5 +
                                     7,
                                 child: Text(
-                                  "| " + S.of(context)!.afternoon,
+                                  "| " + S.of(context).afternoon,
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -271,7 +271,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                         4) *
                                     3,
                                 child: Text(
-                                  "| " + S.of(context)!.evening,
+                                  "| " + S.of(context).evening,
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -327,7 +327,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         textScaleFactor: 1,
                       ),
                       Text(
-                        S.of(context)!.seats(element.seats ?? "?"),
+                        S.of(context).seats(element.seats ?? "?"),
                         textScaleFactor: 0.8,
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
@@ -440,7 +440,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   Widget _buildErrorWidget() {
     return GestureDetector(
       child: Center(
-        child: Text(S.of(context)!.failed),
+        child: Text(S.of(context).failed),
       ),
       onTap: () {
         refreshSelf();

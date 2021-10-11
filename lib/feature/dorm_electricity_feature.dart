@@ -58,23 +58,21 @@ class DormElectricityFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!)!.dorm_electricity;
+  String get mainTitle => S.of(context!).dorm_electricity;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context!)!.loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        return S.of(context!)!.dorm_electricity_subtitle(
+        return S.of(context!).dorm_electricity_subtitle(
             _electricity!.available, _electricity!.used);
-        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context!)!.failed;
+        return S.of(context!).failed;
     }
-    return '';
   }
 
   @override
@@ -103,12 +101,12 @@ class DormElectricityFeature extends Feature {
     if (_status == ConnectionStatus.DONE) {
       final String body = _electricity!.dormName +
           '\n' +
-          S.of(context!)!.dorm_electricity_subtitle(
+          S.of(context!).dorm_electricity_subtitle(
               _electricity!.available, _electricity!.used) +
           '\n\n' +
-          S.of(context!)!.last_updated(_electricity!.updateTime.toString());
+          S.of(context!).last_updated(_electricity!.updateTime.toString());
       Noticing.showNotice(context!, body,
-          title: S.of(context!)!.dorm_electricity, useSnackBar: false);
+          title: S.of(context!).dorm_electricity, useSnackBar: false);
     } else {
       refreshData();
     }

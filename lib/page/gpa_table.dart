@@ -47,7 +47,7 @@ class _GpaTablePageState extends State<GpaTablePage> {
         iosContentPadding: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
-          title: Text(S.of(context)!.your_gpa),
+          title: Text(S.of(context).your_gpa),
         ),
         body: SafeArea(
             bottom: false,
@@ -63,22 +63,22 @@ class _GpaTablePageState extends State<GpaTablePage> {
     List<TableRow> widgets = [
       TableRow(children: [
         Text(
-          S.of(context)!.major,
+          S.of(context).major,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
-          S.of(context)!.gpa,
+          S.of(context).gpa,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
-          S.of(context)!.credits,
+          S.of(context).credits,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
-          S.of(context)!.rank,
+          S.of(context).rank,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         )

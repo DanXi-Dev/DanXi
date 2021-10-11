@@ -76,7 +76,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       appBar: PlatformAppBarX(
           title: TopController(
         controller: PrimaryScrollController.of(context),
-        child: Text(S.of(context)!.ecard_balance_log),
+        child: Text(S.of(context).ecard_balance_log),
       )),
       body: Column(children: [
         TagContainer(

@@ -149,16 +149,16 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt)!.sort_order,
+            S.of(cxt).sort_order,
             Icon(CupertinoIcons.sort_down_circle),
             () => showPlatformModalSheet(
                 context: cxt,
                 builder: (_) => PlatformWidget(
                       cupertino: (_, __) => CupertinoActionSheet(
-                        title: Text(S.of(cxt)!.sort_order),
+                        title: Text(S.of(cxt).sort_order),
                         actions: _buildSortOptionsList(cxt),
                         cancelButton: CupertinoActionSheetAction(
-                          child: Text(S.of(cxt)!.cancel),
+                          child: Text(S.of(cxt).cancel),
                           onPressed: () {
                             Navigator.of(cxt).pop();
                           },
@@ -172,20 +172,20 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
       ];
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt)!.forum;
+  Create<String> get title => (cxt) => S.of(cxt).forum;
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-        AppBarButtonItem(S.of(cxt)!.all_tags, Icon(PlatformIcons(cxt).tag),
+        AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag),
             () => smartNavigatorPush(cxt, '/bbs/tags')),
         AppBarButtonItem(
-            S.of(cxt)!.favorites,
+            S.of(cxt).favorites,
             Icon(CupertinoIcons.star),
             () => smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
                   'showFavoredDiscussion': true,
                 })),
         AppBarButtonItem(
-            S.of(cxt)!.new_post,
+            S.of(cxt).new_post,
             Icon(PlatformIcons(cxt).addCircled),
             () => AddNewPostEvent().fire()),
       ];
@@ -294,7 +294,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
         focusNode: _searchFocus,
-        placeholder: S.of(context)!.search_hint,
+        placeholder: S.of(context).search_hint,
         onSubmitted: (value) {
           value = value.trim();
           if (value.isEmpty) return;
@@ -340,16 +340,16 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   _goToPIDResultPage(int? pid) async {
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S.of(context)!.loading, context: context);
+        loadingText: S.of(context).loading, context: context);
     final BBSPost post = await PostRepository.getInstance()
         .loadSpecificDiscussion(pid)
         .onError((dynamic error, stackTrace) {
           if (error.response?.statusCode == HttpStatus.notFound)
-            Noticing.showNotice(context, S.of(context)!.post_does_not_exist,
-                title: S.of(context)!.fatal_error);
+            Noticing.showNotice(context, S.of(context).post_does_not_exist,
+                title: S.of(context).fatal_error);
           else
             Noticing.showNotice(context, error.toString(),
-                title: S.of(context)!.fatal_error);
+                title: S.of(context).fatal_error);
           progressDialog.dismiss();
           return null;
         } as FutureOr<BBSPost> Function(Error, StackTrace));
@@ -422,7 +422,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         iosContentBottomPadding: false,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
-          title: Text(S.of(context)!.favorites),
+          title: Text(S.of(context).favorites),
         ),
         body: _buildPageBody(),
       );
@@ -432,7 +432,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context)!.filtering_by_tag(_tagFilter ?? "?")),
+        title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
       ),
       body: _buildPageBody(),
     );
@@ -470,7 +470,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               endBuilder: (context) => Center(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(S.of(context)!.end_reached),
+                      child: Text(S.of(context).end_reached),
                     ),
                   ),
               emptyBuilder: (_) => _buildEmptyFavoritesPage(),
@@ -482,14 +482,14 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildEmptyFavoritesPage() => Container(
         padding: EdgeInsets.all(8),
-        child: Center(child: Text(S.of(context)!.no_favorites)),
+        child: Center(child: Text(S.of(context).no_favorites)),
       );
 
   _launchUrlWithNotice(LinkableElement link) async {
     if (await canLaunch(link.url)) {
       BrowserUtil.openUrl(link.url, context);
     } else {
-      Noticing.showNotice(context, S.of(context)!.cannot_launch_url);
+      Noticing.showNotice(context, S.of(context).cannot_launch_url);
     }
   }
 
@@ -501,7 +501,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       return Container();
     Linkify postContentWidget = Linkify(
       text: renderText(
-          postElement.first_post!.filteredContent!, S.of(context)!.image_tag),
+          postElement.first_post!.filteredContent!, S.of(context).image_tag),
       style: TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -536,7 +536,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                           childrenPadding: EdgeInsets.symmetric(vertical: 4),
                           tilePadding: EdgeInsets.zero,
                           title: Text(
-                            S.of(context)!.folded,
+                            S.of(context).folded,
                             style: infoStyle,
                           ),
                           children: [
@@ -600,7 +600,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildCommentView(BBSPost postElement, {bool useLeading = true}) {
     final String lastReplyContent = renderText(
-        postElement.last_post!.filteredContent!, S.of(context)!.image_tag);
+        postElement.last_post!.filteredContent!, S.of(context).image_tag);
     return ListTile(
         dense: true,
         minLeadingWidth: 16,
@@ -622,7 +622,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      S.of(context)!.latest_reply(
+                      S.of(context).latest_reply(
                           postElement.last_post!.username ?? "?",
                           HumanDuration.format(
                               context,
@@ -639,7 +639,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 padding: EdgeInsets.only(bottom: 8),
                 child: Linkify(
                     text: lastReplyContent.trim().isEmpty
-                        ? S.of(context)!.no_summary
+                        ? S.of(context).no_summary
                         : lastReplyContent,
                     style: TextStyle(fontSize: 14),
                     maxLines: 1,

@@ -41,7 +41,7 @@ class BusFeature extends Feature {
   Widget get icon => Icon(PlatformIcons(context!).bus);
 
   @override
-  String get mainTitle => S.of(context!)!.bus_query;
+  String get mainTitle => S.of(context!).bus_query;
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
@@ -75,14 +75,13 @@ class BusFeature extends Feature {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context!)!.loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        return S.of(context!)!.no_matching_bus;
+        return S.of(context!).no_matching_bus;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context!)!.failed;
+        return S.of(context!).failed;
     }
-    return '';
   }
 
   @override

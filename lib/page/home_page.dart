@@ -132,12 +132,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         barrierDismissible: false,
         context: context,
         builder: (_) => PlatformAlertDialog(
-              title: Text(S.of(context)!.fatal_error),
-              content: Text(S.of(context)!.login_issue_1),
+              title: Text(S.of(context).fatal_error),
+              content: Text(S.of(context).login_issue_1),
               actions: [
                 if (!LoginDialog.dialogShown)
                   PlatformDialogAction(
-                    child: Text(S.of(context)!.retry),
+                    child: Text(S.of(context).retry),
                     onPressed: () {
                       _isErrorDialogShown = false;
                       Navigator.of(context).pop();
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 if (!LoginDialog.dialogShown)
                   PlatformDialogAction(
-                    child: Text(S.of(context)!.re_login),
+                    child: Text(S.of(context).re_login),
                     onPressed: () {
                       _isErrorDialogShown = false;
                       Navigator.of(context).pop();
@@ -155,14 +155,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   )
                 else
                   PlatformDialogAction(
-                    child: Text(S.of(context)!.cancel),
+                    child: Text(S.of(context).cancel),
                     onPressed: () {
                       _isErrorDialogShown = false;
                       Navigator.of(context).pop();
                     },
                   ),
                 PlatformDialogAction(
-                  child: Text(S.of(context)!.login_issue_1_action),
+                  child: Text(S.of(context).login_issue_1_action),
                   onPressed: () =>
                       BrowserUtil.openUrl(Constant.UIS_URL, context),
                 ),
@@ -185,18 +185,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
               title: Text(
-                S.of(context)!.fatal_error,
+                S.of(context).fatal_error,
               ),
-              content: Text(S.of(context)!.login_issue_2),
+              content: Text(S.of(context).login_issue_2),
               actions: <Widget>[
                 PlatformDialogAction(
-                    child: PlatformText(S.of(context)!.retry),
+                    child: PlatformText(S.of(context).retry),
                     onPressed: () {
                       Navigator.pop(context);
                       _loadDataFromBmob();
                     }),
                 PlatformDialogAction(
-                    child: PlatformText(S.of(context)!.skip),
+                    child: PlatformText(S.of(context).skip),
                     onPressed: () => Navigator.pop(context)),
               ],
             ));
@@ -483,28 +483,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               icon: PlatformX.isAndroid
                   ? Icon(Icons.dashboard)
                   : Icon(CupertinoIcons.square_stack_3d_up_fill),
-              label: S.of(context)!.dashboard,
+              label: S.of(context).dashboard,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.indigo,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.forum)
                   : Icon(CupertinoIcons.text_bubble),
-              label: S.of(context)!.forum,
+              label: S.of(context).forum,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.blue,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.calendar_today)
                   : Icon(CupertinoIcons.calendar),
-              label: S.of(context)!.timetable,
+              label: S.of(context).timetable,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Theme.of(context).primaryColor,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.settings)
                   : Icon(CupertinoIcons.gear_alt),
-              label: S.of(context)!.settings,
+              label: S.of(context).settings,
             ),
           ],
           currentIndex: _pageIndex.value,
@@ -532,7 +532,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     _lastRefreshTime = DateTime.now();
     String title = _subpage.isEmpty
-        ? S.of(context)!.app_name
+        ? S.of(context).app_name
         : _subpage[_pageIndex.value].title.call(context);
     return StateProvider.personInfo.value == null || _subpage.isEmpty
         ? _buildDummyBody(title)
@@ -549,13 +549,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(
-                  S.of(context)!.new_update_title,
+                  S.of(context).new_update_title,
                 ),
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(S.of(context)!.new_update_description(
+                    Text(S.of(context).new_update_description(
                         FlutterApp.versionName,
                         updateInfo.latestVersion ?? "?")),
                     PostRenderWidget(
@@ -565,13 +565,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
-                      child: PlatformText(S.of(context)!.update_now),
+                      child: PlatformText(S.of(context).update_now),
                       onPressed: () {
                         Navigator.pop(context);
                         BrowserUtil.openUrl(Constant.updateUrl(), context);
                       }),
                   PlatformDialogAction(
-                      child: PlatformText(S.of(context)!.skip),
+                      child: PlatformText(S.of(context).skip),
                       onPressed: () => Navigator.pop(context)),
                 ],
               ));
@@ -587,8 +587,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(
                   S
-                      .of(context)!
-                      .developer_announcement(announcement.createdAt ?? "?"),
+                      .of(context).developer_announcement(announcement.createdAt ?? "?"),
                 ),
                 content: Linkify(
                   text: announcement.content!,
@@ -597,7 +596,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
-                      child: PlatformText(S.of(context)!.i_see),
+                      child: PlatformText(S.of(context).i_see),
                       onPressed: () => Navigator.pop(context)),
                 ],
               ));
@@ -616,8 +615,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .loadTimeTableLocally(StateProvider.personInfo.value,
               forceLoadFromRemote: true)
           .onError((dynamic error, stackTrace) => Noticing.showNotice(
-              context, S.of(context)!.timetable_refresh_error,
-              title: S.of(context)!.fatal_error, useSnackBar: false));
+              context, S.of(context).timetable_refresh_error,
+              title: S.of(context).fatal_error, useSnackBar: false));
 
       SettingsProvider.getInstance().lastSemesterStartTime =
           TimeTable.defaultStartTime.toIso8601String();

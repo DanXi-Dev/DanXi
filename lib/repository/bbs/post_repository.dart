@@ -906,8 +906,9 @@ extension StringRepresentation on PushNotificationServiceType? {
         return 'apns';
       case PushNotificationServiceType.MIPUSH:
         return 'mipush';
+      case null:
+        return null;
     }
-    return null;
   }
 }
 
@@ -921,7 +922,6 @@ extension FavoredDiscussionEx on SetFavoredDiscussionMode {
       case SetFavoredDiscussionMode.DELETE:
         return "deleteFavoredDiscussion";
     }
-    return null;
   }
 }
 

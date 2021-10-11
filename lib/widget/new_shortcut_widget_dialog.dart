@@ -62,7 +62,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
       RefreshHomepageEvent(queueRefresh: true).fire();
       Navigator.of(context).pop();
     } catch (e) {
-      _errorText = S.of(context)!.unable_to_access_url;
+      _errorText = S.of(context).unable_to_access_url;
       refreshSelf();
     }
   }
@@ -70,11 +70,11 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
   @override
   Widget build(BuildContext context) {
     return PlatformAlertDialog(
-      title: Text(S.of(context)!.new_shortcut_card),
+      title: Text(S.of(context).new_shortcut_card),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(S.of(context)!.new_shortcut_description),
+          Text(S.of(context).new_shortcut_description),
           Text(
             _errorText,
             textAlign: TextAlign.start,
@@ -85,28 +85,28 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
               alignment: Alignment.topLeft,
               child: Padding(
                 padding: EdgeInsets.fromLTRB(4, 8, 0, 4),
-                child: Text(S.of(context)!.name),
+                child: Text(S.of(context).name),
               ),
             ),
           PlatformTextField(
             controller: _nameTextFieldController,
             material: (_, __) => MaterialTextFieldData(
               decoration: InputDecoration(
-                labelText: S.of(context)!.name,
+                labelText: S.of(context).name,
                 icon: PlatformX.isAndroid
                     ? Icon(Icons.lock_outline)
                     : Icon(CupertinoIcons.lock_circle),
               ),
             ),
             cupertino: (_, __) =>
-                CupertinoTextFieldData(placeholder: S.of(context)!.school_bus),
+                CupertinoTextFieldData(placeholder: S.of(context).school_bus),
           ),
           if (PlatformX.isCupertino(context))
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
                 padding: EdgeInsets.fromLTRB(4, 8, 0, 4),
-                child: Text(S.of(context)!.link),
+                child: Text(S.of(context).link),
               ),
             ),
           PlatformTextField(
@@ -115,14 +115,14 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
               autocorrect: false,
               material: (_, __) => MaterialTextFieldData(
                     decoration: InputDecoration(
-                      labelText: S.of(context)!.link,
+                      labelText: S.of(context).link,
                       icon: PlatformX.isAndroid
                           ? Icon(Icons.lock_outline)
                           : Icon(CupertinoIcons.lock_circle),
                     ),
                   ),
               cupertino: (_, __) => CupertinoTextFieldData(
-                  placeholder: S.of(context)!.project_url),
+                  placeholder: S.of(context).project_url),
               onSubmitted: (_) {
                 _save();
               }),
@@ -130,12 +130,12 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
       ),
       actions: [
         PlatformDialogAction(
-            child: Text(S.of(context)!.cancel),
+            child: Text(S.of(context).cancel),
             onPressed: () {
               Navigator.of(context).pop();
             }),
         PlatformDialogAction(
-          child: Text(S.of(context)!.add),
+          child: Text(S.of(context).add),
           onPressed: () {
             _save();
           },
