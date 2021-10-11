@@ -58,18 +58,18 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
-  HomeSubpage({Key key});
+  HomeSubpage({Key? key});
 
   @override
   String get debugTag => "HomePage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).app_name;
+  Create<String> get title => (cxt) => S.of(cxt)!.app_name;
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt).developer_announcement(''),
+            S.of(cxt)!.developer_announcement(''),
             Icon(PlatformX.isMaterial(cxt)
                 ? Icons.notifications
                 : CupertinoIcons.bell_circle),
@@ -79,9 +79,9 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt).dashboard_layout,
+            S.of(cxt)!.dashboard_layout,
             Text(
-              S.of(cxt).edit,
+              S.of(cxt)!.edit,
               textScaleFactor: 1.2,
             ),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
@@ -99,11 +99,11 @@ class RefreshHomepageEvent {
 class _HomeSubpageState extends State<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
   static final StateStreamListener _refreshSubscription = StateStreamListener();
-  Map<String, Widget> widgetMap;
+  late Map<String, Widget> widgetMap;
   bool isRefreshQueued = false;
   List<Feature> _notifications = [];
 
-  BannerAd bannerAd;
+  BannerAd? bannerAd;
 
   @override
   void initState() {
@@ -216,14 +216,14 @@ class _HomeSubpageState extends State<HomeSubpage>
           feature: e,
           onDismissed: () => _notifications.remove(e),
         )));
-    List<Widget> _currentCardChildren = [];
+    List<Widget?> _currentCardChildren = [];
     widgetSequence.forEach((element) {
-      if (!element.enabled) return;
+      if (!element.enabled!) return;
       if (element.internalString == 'new_card') {
         if (_currentCardChildren.isEmpty) return;
         _widgets.add(Card(
           child: Column(
-            children: _currentCardChildren,
+            children: _currentCardChildren as List<Widget>,
           ),
         ));
         _currentCardChildren = [];
@@ -234,21 +234,21 @@ class _HomeSubpageState extends State<HomeSubpage>
         ));
       } else {
         // Skip incompatible items
-        if (widgetMap[element.internalString] is FeatureContainer) {
+        if (widgetMap[element.internalString!] is FeatureContainer) {
           FeatureContainer container =
-              widgetMap[element.internalString] as FeatureContainer;
+              widgetMap[element.internalString!] as FeatureContainer;
           if (!checkFeature(
-              container.childFeature, StateProvider.personInfo.value.group)) {
+              container.childFeature, StateProvider.personInfo.value!.group)) {
             return;
           }
         }
-        _currentCardChildren.add(widgetMap[element.internalString]);
+        _currentCardChildren.add(widgetMap[element.internalString!]);
       }
     });
     if (_currentCardChildren.isNotEmpty) {
       _widgets.add(Card(
         child: Column(
-          children: _currentCardChildren,
+          children: _currentCardChildren as List<Widget>,
         ),
       ));
     }

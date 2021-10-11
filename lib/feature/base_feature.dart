@@ -37,25 +37,25 @@ abstract class Feature {
 
   bool get clickable => false;
 
-  Widget get icon => null;
+  Widget? get icon => null;
 
-  String get mainTitle;
+  String? get mainTitle;
 
-  String get subTitle => null;
+  String? get subTitle => null;
 
-  String get tertiaryTitle => null;
+  String? get tertiaryTitle => null;
 
-  Widget get customSubtitle => null;
+  Widget? get customSubtitle => null;
 
-  Widget get trailing => null;
+  Widget? get trailing => null;
 
   bool get removable => false;
 
-  FeatureContainerState container;
+  late FeatureContainerState container;
 
-  BuildContext context;
+  BuildContext? context;
 
-  void buildFeature([Map<String, dynamic> arguments]) {}
+  void buildFeature([Map<String, dynamic>? arguments]) {}
 
   /// Called when FeatureContainer invokes [initState].
   void initFeature() {}

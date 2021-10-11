@@ -40,15 +40,15 @@ const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
 ///
 /// Also contains the logic to process logging in.
 class LoginDialog extends StatefulWidget {
-  final SharedPreferences sharedPreferences;
-  final ValueNotifier<PersonInfo> personInfo;
+  final SharedPreferences? sharedPreferences;
+  final ValueNotifier<PersonInfo?> personInfo;
   final bool dismissible;
   static bool _isShown = false;
 
   static bool get dialogShown => _isShown;
 
-  static showLoginDialog(BuildContext context, SharedPreferences _preferences,
-      ValueNotifier<PersonInfo> personInfo, bool dismissible) async {
+  static showLoginDialog(BuildContext context, SharedPreferences? _preferences,
+      ValueNotifier<PersonInfo?> personInfo, bool dismissible) async {
     if (_isShown) return;
     _isShown = true;
     await showPlatformDialog(
@@ -62,10 +62,10 @@ class LoginDialog extends StatefulWidget {
   }
 
   const LoginDialog(
-      {Key key,
-      @required this.sharedPreferences,
-      @required this.personInfo,
-      @required this.dismissible})
+      {Key? key,
+      required this.sharedPreferences,
+      required this.personInfo,
+      required this.dismissible})
       : super(key: key);
 
   @override
@@ -78,7 +78,7 @@ class _LoginDialogState extends State<LoginDialog> {
   String _errorText = "";
   UserGroup _group = UserGroup.FUDAN_STUDENT;
 
-  Future<bool> _deleteAllData() async => await widget.sharedPreferences.clear();
+  Future<bool> _deleteAllData() async => await widget.sharedPreferences!.clear();
 
   /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {
@@ -86,13 +86,13 @@ class _LoginDialogState extends State<LoginDialog> {
       return;
     }
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S.of(context).logining, context: context);
+        loadingText: S.of(context)!.logining, context: context);
     switch (_group) {
       case UserGroup.VISITOR:
         PersonInfo newInfo =
             PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
         _deleteAllData().then((value) async {
-          await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
+          await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
@@ -105,7 +105,7 @@ class _LoginDialogState extends State<LoginDialog> {
             (StudentInfo stuInfo) async {
           newInfo.name = stuInfo.name;
           await _deleteAllData();
-          await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
+          await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
@@ -138,10 +138,10 @@ class _LoginDialogState extends State<LoginDialog> {
         widgets.add(PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () => _switchLoginGroup(e),
-            child: Text(kUserGroupDescription[e](context)),
+            child: Text(kUserGroupDescription[e]!(context)),
           ),
           material: (_, __) => ListTile(
-            title: Text(kUserGroupDescription[e](context)),
+            title: Text(kUserGroupDescription[e]!(context)),
             onTap: () => _switchLoginGroup(e),
           ),
         ));
@@ -153,10 +153,10 @@ class _LoginDialogState extends State<LoginDialog> {
   @override
   Widget build(BuildContext context) {
     var defaultText =
-        Theme.of(context).textTheme.bodyText2.copyWith(fontSize: 12);
+        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12);
     var linkText = Theme.of(context)
         .textTheme
-        .bodyText2
+        .bodyText2!
         .copyWith(color: Theme.of(context).accentColor, fontSize: 12);
 
     //Tackle #25
@@ -167,14 +167,14 @@ class _LoginDialogState extends State<LoginDialog> {
     final scrollController = PrimaryScrollController.of(context);
 
     return AlertDialog(
-      title: Text(kUserGroupDescription[_group](context)),
+      title: Text(kUserGroupDescription[_group]!(context)),
       content: WithScrollbar(
         controller: scrollController,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(S.of(context).login_uis_description),
+              Text(S.of(context)!.login_uis_description),
               Text(
                 _errorText,
                 textAlign: TextAlign.start,
@@ -186,7 +186,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 keyboardType: TextInputType.number,
                 //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
-                    labelText: S.of(context).login_uis_uid,
+                    labelText: S.of(context)!.login_uis_uid,
                     icon: PlatformX.isAndroid
                         ? Icon(Icons.perm_identity)
                         : Icon(CupertinoIcons.person_crop_circle)),
@@ -201,7 +201,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 enabled: _group != UserGroup.VISITOR,
                 //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
-                  labelText: S.of(context).login_uis_pwd,
+                  labelText: S.of(context)!.login_uis_pwd,
                   icon: PlatformX.isAndroid
                       ? Icon(Icons.lock_outline)
                       : Icon(CupertinoIcons.lock_circle),
@@ -215,13 +215,13 @@ class _LoginDialogState extends State<LoginDialog> {
                       .catchError((e) {
                     if (e is CredentialsInvalidException) {
                       _pwdController.text = "";
-                      _errorText = S.of(context).credentials_invalid;
+                      _errorText = S.of(context)!.credentials_invalid;
                     } else if (e is CaptchaNeededException) {
-                      _errorText = S.of(context).captcha_needed;
+                      _errorText = S.of(context)!.captcha_needed;
                     } else if (e is GeneralLoginFailedException) {
-                      _errorText = S.of(context).weak_password;
+                      _errorText = S.of(context)!.weak_password;
                     } else {
-                      _errorText = S.of(context).connection_failed;
+                      _errorText = S.of(context)!.connection_failed;
                     }
                     // _pwdController.text = "";
                     refreshSelf();
@@ -236,19 +236,19 @@ class _LoginDialogState extends State<LoginDialog> {
                   text: TextSpan(children: [
                 TextSpan(
                   style: defaultText,
-                  text: S.of(context).terms_and_conditions_content,
+                  text: S.of(context)!.terms_and_conditions_content,
                 ),
                 TextSpan(
                     style: linkText,
-                    text: S.of(context).privacy_policy,
+                    text: S.of(context)!.privacy_policy,
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
                         await BrowserUtil.openUrl(
-                            S.of(context).privacy_policy_url, context);
+                            S.of(context)!.privacy_policy_url, context);
                       }),
                 TextSpan(
                   style: defaultText,
-                  text: S.of(context).terms_and_conditions_content_end,
+                  text: S.of(context)!.terms_and_conditions_content_end,
                 ),
               ])),
             ],
@@ -258,23 +258,23 @@ class _LoginDialogState extends State<LoginDialog> {
       actions: [
         if (widget.dismissible)
           TextButton(
-              child: Text(S.of(context).cancel),
+              child: Text(S.of(context)!.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
         TextButton(
-          child: Text(S.of(context).login),
+          child: Text(S.of(context)!.login),
           onPressed: () {
             _tryLogin(_nameController.text, _pwdController.text)
                 .catchError((e) {
               if (e is CredentialsInvalidException) {
-                _errorText = S.of(context).credentials_invalid;
+                _errorText = S.of(context)!.credentials_invalid;
               } else if (e is CaptchaNeededException) {
-                _errorText = S.of(context).captcha_needed;
+                _errorText = S.of(context)!.captcha_needed;
               } else if (e is GeneralLoginFailedException) {
-                _errorText = S.of(context).weak_password;
+                _errorText = S.of(context)!.weak_password;
               } else {
-                _errorText = S.of(context).connection_failed;
+                _errorText = S.of(context)!.connection_failed;
               }
               _pwdController.text = "";
               refreshSelf();

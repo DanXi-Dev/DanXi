@@ -23,16 +23,16 @@ import 'package:flutter/cupertino.dart';
 /// However, the key may not be used as a "true" key to pass to a widget's initializer,
 /// since it is not immutable and not reliable.
 class StateKey<T> extends ValueKey<T> {
-  BuildContext currentContext;
+  late BuildContext currentContext;
 
   StateKey(T value) : super(value);
 }
 
 class WithStateKey<T> extends StatefulWidget {
-  final StateKey<T> childKey;
-  final Widget child;
+  final StateKey<T>? childKey;
+  final Widget? child;
 
-  const WithStateKey({Key key, this.childKey, this.child}) : super(key: key);
+  const WithStateKey({Key? key, this.childKey, this.child}) : super(key: key);
 
   @override
   _WithStateKeyState<T> createState() => _WithStateKeyState<T>();
@@ -43,14 +43,14 @@ class _WithStateKeyState<T> extends State<WithStateKey<T>>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    widget.childKey.currentContext = context;
-    return widget.child;
+    widget.childKey!.currentContext = context;
+    return widget.child!;
   }
 
   @override
   void initState() {
     super.initState();
-    widget.childKey.currentContext = context;
+    widget.childKey!.currentContext = context;
   }
 
   @override

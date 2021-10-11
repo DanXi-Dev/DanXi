@@ -36,25 +36,25 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
 class CardDetailPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _CardDetailPageState createState() => _CardDetailPageState();
 
-  CardDetailPage({Key key, this.arguments});
+  CardDetailPage({Key? key, this.arguments});
 }
 
 class _CardDetailPageState extends State<CardDetailPage> {
-  CardInfo _cardInfo;
-  PersonInfo _personInfo; // ignore: unused_field
-  List<Tag> _tags;
-  List<int> _tagDays;
+  CardInfo? _cardInfo;
+  PersonInfo? _personInfo; // ignore: unused_field
+  List<Tag>? _tags;
+  late List<int> _tagDays;
   bool _selectable = true;
 
   @override
   void initState() {
     super.initState();
-    _cardInfo = widget.arguments['cardInfo'];
+    _cardInfo = widget.arguments!['cardInfo'];
     _personInfo = StateProvider.personInfo.value;
     _tags = [
       Tag(S.current.last_7_days,
@@ -76,7 +76,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       appBar: PlatformAppBarX(
           title: TopController(
         controller: PrimaryScrollController.of(context),
-        child: Text(S.of(context).ecard_balance_log),
+        child: Text(S.of(context)!.ecard_balance_log),
       )),
       body: Column(children: [
         TagContainer(
@@ -87,7 +87,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
             singleChoice: true,
             defaultChoice: -1,
             onChoice: (Tag tag, list) async {
-              int index = _tags.indexOf(tag);
+              int index = _tags!.indexOf(tag);
               if (index >= 0) {
                 // Make the tags not clickable when data's being retrieved
                 setState(() {
@@ -96,7 +96,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                       : CupertinoIcons.hourglass;
                   _selectable = false;
                 });
-                _cardInfo.records = await Retrier.runAsyncWithRetryForever(() =>
+                _cardInfo!.records = await Retrier.runAsyncWithRetryForever(() =>
                     CardRepository.getInstance()
                         .loadCardRecord(_tagDays[index]));
                 setState(() {
@@ -125,8 +125,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    if (_cardInfo.records != null)
-      _cardInfo.records.forEach((element) {
+    if (_cardInfo!.records != null)
+      _cardInfo!.records!.forEach((element) {
         widgets.add(Material(
             child: ListTile(
           // leading: PlatformX.isAndroid

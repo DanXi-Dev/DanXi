@@ -47,8 +47,8 @@ class BrowserUtil {
                     javaScriptEnabled: true, useOnDownloadStart: true),
               ));
 
-  static openUrl(String url, BuildContext context,
-      [NonpersistentCookieJar cookieJar]) async {
+  static openUrl(String url, BuildContext? context,
+      [NonpersistentCookieJar? cookieJar]) async {
     // Sanitize URL
     url = Uri.encodeFull(Uri.decodeFull(url));
 
@@ -67,7 +67,7 @@ class BrowserUtil {
             CookieManager.instance().setCookie(
                 url: uri,
                 name: name,
-                path: cookie.cookie.path,
+                path: cookie.cookie.path!,
                 value: cookie.cookie.value,
                 domain: cookie.cookie.domain);
           });
@@ -79,7 +79,7 @@ class BrowserUtil {
             CookieManager.instance().setCookie(
                 url: uri,
                 name: name,
-                path: cookie.cookie.path,
+                path: cookie.cookie.path!,
                 value: cookie.cookie.value,
                 domain: cookie.cookie.domain);
           });
@@ -91,14 +91,14 @@ class BrowserUtil {
         CookieManager.instance().setCookie(
             url: uri,
             name: cookie.name,
-            path: cookie.path,
+            path: cookie.path!,
             value: cookie.value,
             domain: cookie.domain);
       });
     }
     CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)),
-        options: getOptions(context));
+        options: getOptions(context!));
   }
 }
 

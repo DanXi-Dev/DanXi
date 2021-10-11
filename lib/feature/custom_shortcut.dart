@@ -26,25 +26,25 @@ import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomShortcutFeature extends Feature {
-  final String title;
-  final String link;
+  final String? title;
+  final String? link;
   CustomShortcutFeature({this.title, this.link});
 
   @override
-  String get mainTitle => title;
+  String? get mainTitle => title;
 
   @override
-  String get subTitle => link;
+  String? get subTitle => link;
 
   @override
   Widget get icon => Icon(CupertinoIcons.bookmark);
 
   @override
   void onTap() async {
-    if (await canLaunch(link)) {
-      BrowserUtil.openUrl(link, context);
+    if (await canLaunch(link!)) {
+      BrowserUtil.openUrl(link!, context);
     } else {
-      Noticing.showNotice(context, S.of(context).cannot_launch_url);
+      Noticing.showNotice(context!, S.of(context!)!.cannot_launch_url);
     }
   }
 

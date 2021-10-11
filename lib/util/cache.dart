@@ -27,8 +27,8 @@ class Cache {
   ///
   /// Finally, return the cached data.
   static Future<T> get<T>(String key, Future<T> fetch(),
-      T decode(String cachedValue), String encode(T object),
-      {bool validate(String cachedValue)}) async {
+      T decode(String? cachedValue), String encode(T object),
+      {bool validate(String cachedValue)?}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     if (validate == null) {
       validate = (v) => v != null;
@@ -40,8 +40,8 @@ class Cache {
         preferences.setString(key, encode(newValue));
       return newValue;
     }
-    String result = preferences.getString(key);
-    if (validate(result)) {
+    String? result = preferences.getString(key);
+    if (validate(result!)) {
       return decode(result);
     } else {
       T newValue = await fetch();
@@ -54,8 +54,8 @@ class Cache {
   ///
   /// But network goes first.
   static Future<T> getRemotely<T>(String key, Future<T> fetch(),
-      T decode(String cachedValue), String encode(T object),
-      {bool validate(T value)}) async {
+      T decode(String? cachedValue), String encode(T object),
+      {bool validate(T value)?}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     if (validate == null) {
       validate = (v) => v != null;
@@ -67,7 +67,7 @@ class Cache {
     } else {
       // Fall back to local cache.
       return get(key, fetch, decode, encode,
-          validate: (v) => v != null && validate(decode(v)));
+          validate: (v) => v != null && validate!(decode(v)));
     }
   }
 }

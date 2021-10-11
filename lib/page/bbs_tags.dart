@@ -28,16 +28,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class BBSTagsPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _BBSTagsPageState createState() => _BBSTagsPageState();
 
-  BBSTagsPage({Key key, this.arguments});
+  BBSTagsPage({Key? key, this.arguments});
 }
 
 class _BBSTagsPageState extends State<BBSTagsPage> {
-  Future<List<PostTag>> _content;
+  Future<List<PostTag>?>? _content;
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
       iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).all_tags),
+        title: Text(S.of(context)!.all_tags),
       ),
       body: MediaQuery.removePadding(
         removeTop: true,
@@ -59,7 +59,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
           primary: true,
-          child: FutureWidget<List<PostTag>>(
+          child: FutureWidget<List<PostTag>?>(
             future: _content,
             successBuilder: (context, snapshot) => BBSTagsContainer(
               tags: snapshot.data,
@@ -70,7 +70,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
             ),
             errorBuilder: GestureDetector(
               child: Center(
-                child: Text(S.of(context).failed),
+                child: Text(S.of(context)!.failed),
               ),
               onTap: () {
                 setState(() => _content =

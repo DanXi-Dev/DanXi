@@ -19,13 +19,13 @@ import 'package:flutter/widgets.dart';
 
 /// A helper class to convert [String],[WidgetBuilder],[List<Widget>] or something similar into [Widget].
 class SmartWidget {
-  static Widget toWidget<T>(dynamic object, BuildContext context,
-      {Widget fallback,
-      AsyncSnapshot<T> snapshot,
-      int index,
-      Widget child,
-      VoidCallback onStepContinue,
-      VoidCallback onStepCancel}) {
+  static Widget? toWidget<T>(dynamic object, BuildContext context,
+      {Widget? fallback,
+      AsyncSnapshot<T>? snapshot,
+      int? index,
+      Widget? child,
+      VoidCallback? onStepContinue,
+      VoidCallback? onStepCancel}) {
     if (fallback == null) fallback = Container();
     if (object == null) return fallback;
 
@@ -39,7 +39,7 @@ class SmartWidget {
     } else if (object is TransitionBuilder) {
       return object(context, child);
     } else if (object is AsyncWidgetBuilder<T>) {
-      return object(context, snapshot);
+      return object(context, snapshot!);
     } else if (object is ControlsWidgetBuilder) {
       return object(context,
           onStepContinue: onStepContinue, onStepCancel: onStepCancel);
@@ -49,7 +49,7 @@ class SmartWidget {
       return object;
     } else if (object is List) {
       return ListView(
-        children: object.map((e) => toWidget(e, context)),
+        children: object.map((e) => toWidget(e, context)) as List<Widget>,
       );
     }
     return fallback;

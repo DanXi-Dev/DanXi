@@ -30,7 +30,7 @@ class ScheduleView extends StatefulWidget {
   final TimetableStyle timetableStyle;
   final TimeNow today;
   final int showingWeek;
-  final ScrollController controller;
+  final ScrollController? controller;
 
   ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
       this.showingWeek, this.controller);
@@ -58,7 +58,7 @@ class _ScheduleViewState extends State<ScheduleView> {
   List<Widget> _buildTable() {
     widget.laneEventsList.forEach((element) {
       element.events.forEach((element) {
-        _maxSlot = max(_maxSlot, element.time.slot);
+        _maxSlot = max(_maxSlot, element.time.slot!);
       });
     });
     int cols = widget.laneEventsList.length + 1, rows = _maxSlot + 2;
@@ -153,12 +153,12 @@ class _ScheduleViewState extends State<ScheduleView> {
       widget.laneEventsList[day].events.forEach((Event event) {
         // Build course blocks
         bool notFirstCourse = widget.laneEventsList[day].events.any((element) =>
-            element.time.slot == event.time.slot - 1 &&
+            element.time.slot == event.time.slot! - 1 &&
             element.course.courseName == event.course.courseName);
         bool notLastCourse = widget.laneEventsList[day].events.any((element) =>
-            element.time.slot == event.time.slot + 1 &&
+            element.time.slot == event.time.slot! + 1 &&
             element.course.courseName == event.course.courseName);
-        result[1 + day + cols * (event.time.slot + 1)] =
+        result[1 + day + cols * (event.time.slot! + 1)] =
             _buildCourse(event.course, !notFirstCourse, !notLastCourse);
       });
     }
@@ -177,7 +177,7 @@ class _ScheduleViewState extends State<ScheduleView> {
   Widget _buildCourse(Course course, bool isFirst, bool isLast) {
     bool noBottomSpace = (isFirst && !isLast) || (!isFirst && !isLast);
     bool noTopSpace = (!isFirst && isLast) || (!isFirst && !isLast);
-    final TextStyle textStyle = Theme.of(context).textTheme.overline.copyWith(
+    final TextStyle textStyle = Theme.of(context).textTheme.overline!.copyWith(
         color: Theme.of(context).accentColorBrightness == Brightness.light
             ? Colors.black
             : Colors.white);
@@ -197,13 +197,13 @@ class _ScheduleViewState extends State<ScheduleView> {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AutoSizeText(course.courseName,
+                  AutoSizeText(course.courseName!,
                       minFontSize: 6,
                       style: textStyle.copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(
                     height: 4,
                   ),
-                  AutoSizeText(course.roomName,
+                  AutoSizeText(course.roomName!,
                       minFontSize: 6, style: textStyle),
                 ],
               )
@@ -214,7 +214,7 @@ class _ScheduleViewState extends State<ScheduleView> {
 }
 
 class TimetableStyle {
-  final int startHour;
+  final int? startHour;
 
   final int endHour;
 

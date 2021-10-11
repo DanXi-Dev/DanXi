@@ -32,12 +32,12 @@ void registerFeature(Feature feature,
 
 bool checkFeature(Feature feature, UserGroup group) {
   if (_kRegister.containsKey(feature.runtimeType.toString())) {
-    return _kRegister[feature.runtimeType.toString()].contains(group);
+    return _kRegister[feature.runtimeType.toString()]!.contains(group);
   } else {
     return false;
   }
 }
 
-bool checkGroup(List<UserGroup> groups, [PersonInfo info]) =>
+bool checkGroup(List<UserGroup> groups, [PersonInfo? info]) =>
     groups != null &&
     groups.contains((info ?? StateProvider.personInfo.value)?.group);

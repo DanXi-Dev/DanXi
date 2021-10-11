@@ -46,7 +46,7 @@ class AdManager {
   /// ... and later in UI, use
   /// AdWidget(ad: bannerAd)
   ///
-  static BannerAd loadBannerAd(int index) {
+  static BannerAd? loadBannerAd(int index) {
     if (!PlatformX.isMobile) return null;
 
     BannerAd bannerAd;
@@ -80,24 +80,24 @@ class AdManager {
 /// A widget that automatically returns a AdWidget placed in a container
 /// or nothing if user has not opted-in to Ads or [bannerAd] is [null]
 class AutoBannerAdWidget extends StatelessWidget {
-  final BannerAd bannerAd;
+  final BannerAd? bannerAd;
 
-  const AutoBannerAdWidget({Key key, @required this.bannerAd})
+  const AutoBannerAdWidget({Key? key, required this.bannerAd})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (SettingsProvider.getInstance().isAdEnabled &&
         bannerAd != null &&
-        bannerAd.responseInfo?.responseId != null) {
+        bannerAd!.responseInfo?.responseId != null) {
       const double padding = 8.0;
       return Center(
         child: Container(
           padding: EdgeInsets.only(bottom: padding),
           alignment: Alignment.center,
-          child: AdWidget(ad: bannerAd),
-          width: bannerAd.size.width.toDouble(),
-          height: bannerAd.size.height.toDouble() + padding,
+          child: AdWidget(ad: bannerAd!),
+          width: bannerAd!.size.width.toDouble(),
+          height: bannerAd!.size.height.toDouble() + padding,
         ),
       );
     }

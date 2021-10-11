@@ -23,14 +23,14 @@ import 'package:flutter/widgets.dart';
 ///
 /// Usually wrap a [Text] widget in [PlatformAppBarX].
 class TopController extends StatefulWidget {
-  final Widget child;
-  final ScrollController controller;
-  final Function onDoubleTap;
+  final Widget? child;
+  final ScrollController? controller;
+  final Function? onDoubleTap;
 
-  const TopController({Key key, this.controller, this.onDoubleTap, this.child})
+  const TopController({Key? key, this.controller, this.onDoubleTap, this.child})
       : super(key: key);
 
-  static scrollToTop(ScrollController controller) => controller?.animateTo(0,
+  static scrollToTop(ScrollController? controller) => controller?.animateTo(0,
       duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
 
   @override
@@ -44,7 +44,7 @@ class _TopControllerState extends State<TopController> {
       onDoubleTap: () {
         TopController.scrollToTop(widget.controller);
         if (widget.onDoubleTap != null) {
-          widget.onDoubleTap();
+          widget.onDoubleTap!();
         }
       },
       child: widget.child,

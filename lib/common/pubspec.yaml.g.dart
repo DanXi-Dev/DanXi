@@ -1,5 +1,8 @@
 // ignore_for_file: unnecessary_raw_strings
 /// Current app version
+
+// @dart=2.9
+
 const String version = r'1.2.6+59';
 
 /// The major version number: "1" in "1.2.3".

@@ -36,12 +36,12 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   factory FudanEhallRepository.getInstance() => _instance;
 
   Future<StudentInfo> getStudentInfo(PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true);
+    await UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true);
     return _getStudentInfo();
   }
 
   Future<StudentInfo> _getStudentInfo() async {
-    Response rep = await dio.get(_INFO_URL);
+    Response rep = await dio!.get(_INFO_URL);
     debugPrint("Login Student info: ${rep.data}");
     Map rawJson = rep.data is Map ? rep.data : jsonDecode(rep.data.toString());
     if (rawJson['data']['userName'] == null)
@@ -55,9 +55,9 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
 }
 
 class StudentInfo {
-  final String name;
-  final String userTypeName;
-  final String userDepartment;
+  final String? name;
+  final String? userTypeName;
+  final String? userDepartment;
 
   StudentInfo(this.name, this.userTypeName, this.userDepartment);
 }

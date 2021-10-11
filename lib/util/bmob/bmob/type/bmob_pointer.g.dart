@@ -8,9 +8,9 @@ part of 'bmob_pointer.dart';
 
 BmobPointer _$BmobPointerFromJson(Map<String, dynamic> json) {
   return BmobPointer()
-    ..type = json['__type'] as String
-    ..className = json['className'] as String
-    ..objectId = json['objectId'] as String;
+    ..type = json['__type'] as String?
+    ..className = json['className'] as String?
+    ..objectId = json['objectId'] as String?;
 }
 
 Map<String, dynamic> _$BmobPointerToJson(BmobPointer instance) =>

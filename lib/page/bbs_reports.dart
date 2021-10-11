@@ -110,9 +110,9 @@ String preprocessContentForDisplay(String content,
 /// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
 ///
 class BBSReportDetail extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
-  const BBSReportDetail({Key key, this.arguments});
+  const BBSReportDetail({Key? key, this.arguments});
 
   @override
   _BBSReportDetailState createState() => _BBSReportDetailState();
@@ -122,7 +122,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<Report>> _loadContent(int page) {
+  Future<List<Report>?> _loadContent(int page) {
     return PostRepository.getInstance().adminGetReports(page);
   }
 
@@ -178,7 +178,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             endBuilder: (context) => Center(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context).end_reached),
+                child: Text(S.of(context)!.end_reached),
               ),
             ),
           )),
@@ -209,7 +209,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
   Widget _getListItems(BuildContext context, ListProvider<Report> dataProvider,
       int index, Report e) {
     LinkTapCallback onLinkTap = (url) {
-      BrowserUtil.openUrl(url, context);
+      BrowserUtil.openUrl(url!, context);
     };
     ImageTapCallback onImageTap = (url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
@@ -222,7 +222,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   cupertino: (_, __) => CupertinoActionSheet(
                     actions: _buildContextMenu(e),
                     cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
+                      child: Text(S.of(context)!.cancel),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -244,12 +244,12 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               children: [
                 Align(
                     alignment: Alignment.topLeft,
-                    child: smartRender(e.reason, onLinkTap, onImageTap)),
+                    child: smartRender(e.reason!, onLinkTap, onImageTap)),
                 Divider(),
                 Align(
                     alignment: Alignment.topLeft,
                     child: Text(e
-                        .content)), //smartRender(e.content, onLinkTap, onImageTap)),
+                        .content!)), //smartRender(e.content, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: Column(children: [
@@ -263,7 +263,8 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 Text(
-                  HumanDuration.format(context, DateTime.parse(e.date_created)),
+                  HumanDuration.format(
+                      context, DateTime.parse(e.date_created!)),
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
@@ -279,20 +280,19 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             ]),
             onTap: () async {
               ProgressFuture progressDialog = showProgressDialog(
-                  loadingText: S.of(context).loading, context: context);
+                  loadingText: S.of(context)!.loading, context: context);
               final BBSPost post = await PostRepository.getInstance()
                   .loadSpecificDiscussion(e.discussion)
-                  .onError((error, stackTrace) {
-                Noticing.showNotice(context, error.toString(),
-                    title: S.of(context).fatal_error);
-                progressDialog.dismiss();
-                return null;
-              });
+                  .onError((dynamic error, stackTrace) {
+                    Noticing.showNotice(context, error.toString(),
+                        title: S.of(context)!.fatal_error);
+                    progressDialog.dismiss();
+                    return null;
+                  } as FutureOr<BBSPost> Function(Error, StackTrace));
 
-              if (post != null)
-                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                  "post": post,
-                });
+              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                "post": post,
+              });
               progressDialog.dismiss();
             }),
       ),

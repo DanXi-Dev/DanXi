@@ -31,7 +31,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class NextCourseFeature extends Feature {
-  LiveCourseModel _data;
+  LiveCourseModel? _data;
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   Future<void> _loadCourse() async {
@@ -49,15 +49,15 @@ class NextCourseFeature extends Feature {
   }
 
   LiveCourseModel getNextCourse(TimeTable table) {
-    Event thisCourse;
-    Event nextCourse;
+    Event? thisCourse;
+    Event? nextCourse;
     int courseLeft = 0;
     TimeNow now = table.now();
     DayEvents dayEvents = table.toDayEvents(now.week,
         compact: TableDisplayType.FULL)[now.weekday];
-    dayEvents.events.sort((a, b) => a.time.slot.compareTo(b.time.slot));
+    dayEvents.events.sort((a, b) => a.time.slot!.compareTo(b.time.slot!));
     for (var element in dayEvents.events) {
-      VagueTime startTime = TimeTable.kCourseSlotStartTime[element.time.slot];
+      VagueTime startTime = TimeTable.kCourseSlotStartTime[element.time.slot!];
       DateTime exactStartTime = startTime.toExactTime();
       if (exactStartTime.isBefore(DateTime.now()) &&
           exactStartTime
@@ -75,7 +75,7 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -88,22 +88,22 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context).today_course;
+  String get mainTitle => S.of(context!)!.today_course;
 
   @override
-  Widget get customSubtitle {
+  Widget? get customSubtitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return Text(S.of(context).loading);
+        return Text(S.of(context!)!.loading);
       case ConnectionStatus.DONE:
         if (_data != null) {
-          if (_data.nextCourse?.course?.courseName != null) {
+          if (_data!.nextCourse?.course?.courseName != null) {
             // TODO make it more readable (like adding a [SmallTag], etc.)
-            return Text(S.of(context).next_course_is(
-                _data.nextCourse?.course?.courseName, _data.courseLeft));
+            return Text(S.of(context!)!.next_course_is(
+                _data!.nextCourse?.course?.courseName, _data!.courseLeft));
           } else {
-            return Text(S.of(context).next_course_none);
+            return Text(S.of(context!)!.next_course_none);
           }
         } else {
           return null;
@@ -111,7 +111,7 @@ class NextCourseFeature extends Feature {
         break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return Text(S.of(context).failed);
+        return Text(S.of(context!)!.failed);
     }
     return null;
   }
@@ -147,12 +147,12 @@ class NextCourseFeature extends Feature {
               height: 2,
             ),
             Text(
-              S.of(context).exam_schedule,
+              S.of(context!)!.exam_schedule,
               textScaleFactor: 0.8,
             ),
           ],
         ),
-        onTap: () => smartNavigatorPush(context, '/exam/detail'),
+        onTap: () => smartNavigatorPush(context!, '/exam/detail'),
       );
 
   @override
@@ -160,8 +160,8 @@ class NextCourseFeature extends Feature {
 }
 
 class LiveCourseModel {
-  Event nowCourse;
-  Event nextCourse;
+  Event? nowCourse;
+  Event? nextCourse;
   int courseLeft;
 
   LiveCourseModel(this.nowCourse, this.nextCourse, this.courseLeft);

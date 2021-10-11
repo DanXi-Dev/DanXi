@@ -23,15 +23,15 @@ class HumanDuration {
   static String format(BuildContext context, DateTime dateTime) {
     Duration duration = DateTime.now().difference(dateTime);
     if (duration.inSeconds < 1) {
-      return S.of(context).moment_ago;
+      return S.of(context)!.moment_ago;
     } else if (duration.inMinutes < 1) {
-      return S.of(context).second_ago(duration.inSeconds);
+      return S.of(context)!.second_ago(duration.inSeconds);
     } else if (duration.inHours < 1) {
-      return S.of(context).minute_ago(duration.inMinutes);
+      return S.of(context)!.minute_ago(duration.inMinutes);
     } else if (duration.inDays < 1) {
-      return S.of(context).hour_ago(duration.inHours);
+      return S.of(context)!.hour_ago(duration.inHours);
     } else if (duration.inDays <= 30) {
-      return S.of(context).day_ago(duration.inDays);
+      return S.of(context)!.day_ago(duration.inDays);
     } else {
       return DateFormat("yyyy/MM/dd").format(dateTime);
     }

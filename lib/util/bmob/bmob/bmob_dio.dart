@@ -14,16 +14,16 @@ import 'package:crypto/crypto.dart';
 //		md5(url + timeStamp + safeToken + noncestr+ sdkVersion)
 class BmobDio {
   ///网络请求框架
-  Dio dio;
+  late Dio dio;
 
   ///网络请求元素
-  BaseOptions options;
+  BaseOptions? options;
 
   ///单例
-  static BmobDio instance;
+  static BmobDio? instance;
 
   void setSessionToken(bmobSessionToken) {
-    options.headers["X-Bmob-Session-Token"] = bmobSessionToken;
+    options!.headers["X-Bmob-Session-Token"] = bmobSessionToken;
   }
 
   ///无参构造方法
@@ -83,7 +83,7 @@ class BmobDio {
   }
 
   ///单例模式
-  static BmobDio getInstance() {
+  static BmobDio? getInstance() {
     if (instance == null) {
       instance = BmobDio();
     }
@@ -92,9 +92,9 @@ class BmobDio {
 
   ///GET请求
   Future<dynamic> get(path, {data, cancelToken}) async {
-    options.headers.addAll(getHeaders(path, ""));
+    options!.headers.addAll(getHeaders(path, ""));
 
-    var requestUrl = options.baseUrl + path;
+    var requestUrl = options!.baseUrl + path;
     Response response = await dio.get(
       requestUrl,
       queryParameters: data,
@@ -105,10 +105,10 @@ class BmobDio {
   }
 
   ///POST请求
-  Future<dynamic> upload(path, {Future<List<int>> data, cancelToken}) async {
-    options.headers.addAll(getHeaders(path, data));
+  Future<dynamic> upload(path, {required Future<List<int>> data, cancelToken}) async {
+    options!.headers.addAll(getHeaders(path, data));
 
-    var requestUrl = options.baseUrl + path;
+    var requestUrl = options!.baseUrl + path;
     Response response = await dio.post(
       requestUrl,
       data: Stream.fromFuture(data),
@@ -120,9 +120,9 @@ class BmobDio {
 
   ///POST请求
   Future<dynamic> post(path, {data, cancelToken}) async {
-    options.headers.addAll(getHeaders(path, data));
+    options!.headers.addAll(getHeaders(path, data));
 
-    var requestUrl = options.baseUrl + path;
+    var requestUrl = options!.baseUrl + path;
     Response response = await dio.post(
       requestUrl,
       data: data,
@@ -137,9 +137,9 @@ class BmobDio {
     data,
     cancelToken,
   }) async {
-    options.headers.addAll(getHeaders(path, ""));
+    options!.headers.addAll(getHeaders(path, ""));
 
-    var requestUrl = options.baseUrl + path;
+    var requestUrl = options!.baseUrl + path;
     Response response =
         await dio.delete(requestUrl, data: data, cancelToken: cancelToken);
     return response.data;
@@ -147,9 +147,9 @@ class BmobDio {
 
   ///Put请求
   Future<dynamic> put(path, {data, cancelToken}) async {
-    options.headers.addAll(getHeaders(path, data));
+    options!.headers.addAll(getHeaders(path, data));
 
-    var requestUrl = options.baseUrl + path;
+    var requestUrl = options!.baseUrl + path;
     Response response =
         await dio.put(requestUrl, data: data, cancelToken: cancelToken);
     return response.data;
@@ -157,7 +157,7 @@ class BmobDio {
 
   ///GET请求，自带请求路径，数据监听
   Future<dynamic> getByUrl(requestUrl, {data, cancelToken}) async {
-    options.headers.addAll(getHeaders(requestUrl, data));
+    options!.headers.addAll(getHeaders(requestUrl, data));
 
     Response response = await dio.get(
       requestUrl,
@@ -177,7 +177,7 @@ class BmobDio {
       map["X-Bmob-REST-API-Key"] = Bmob.bmobRestApiKey;
     } else if (Bmob.bmobSecretKey.isNotEmpty) {
       //加密
-      int indexQuestion = path.indexOf("?");
+      int? indexQuestion = path.indexOf("?");
 
       if (indexQuestion != -1) {
         path = path.substring(0, indexQuestion);

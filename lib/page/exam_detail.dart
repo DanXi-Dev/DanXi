@@ -41,24 +41,24 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
 class ExamList extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _ExamListState createState() => _ExamListState();
 
-  ExamList({Key key, this.arguments});
+  ExamList({Key? key, this.arguments});
 }
 
 class _ExamListState extends State<ExamList> {
-  List<Exam> _data = [];
-  PersonInfo _info;
-  Future<List<Exam>> _examList;
-  Future<List<GPAListItem>> _gpaList;
-  List<GPAListItem> _gpa;
+  List<Exam>? _data = [];
+  PersonInfo? _info;
+  Future<List<Exam>?>? _examList;
+  Future<List<GPAListItem>?>? _gpaList;
+  List<GPAListItem>? _gpa;
 
-  Future<List<SemesterInfo>> _semester;
-  List<SemesterInfo> _unpackedSemester;
-  int _showingSemester;
+  Future<List<SemesterInfo>?>? _semester;
+  List<SemesterInfo>? _unpackedSemester;
+  int _showingSemester = 0;
 
   @override
   void initState() {
@@ -90,8 +90,8 @@ class _ExamListState extends State<ExamList> {
           ));
         } catch (ignored) {
           Noticing.showNotice(
-              context, S.of(context).error_adding_exam(element.name),
-              title: S.of(context).fatal_error);
+              context, S.of(context)!.error_adding_exam(element.name),
+              title: S.of(context)!.fatal_error);
         }
     });
     Directory documentDir = await getApplicationDocumentsDirectory();
@@ -116,7 +116,7 @@ class _ExamListState extends State<ExamList> {
         iosContentPadding: true,
         appBar: PlatformAppBarX(
           title: Text(
-            S.of(context).exam_schedule,
+            S.of(context)!.exam_schedule,
           ),
           trailingActions: [
             PlatformIconButton(
@@ -129,13 +129,13 @@ class _ExamListState extends State<ExamList> {
           ],
         ),
         body: Material(
-            child: FutureWidget<List<SemesterInfo>>(
+            child: FutureWidget<List<SemesterInfo>?>(
                 future: _semester,
                 successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<SemesterInfo>> snapshot) {
+                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
                   _unpackedSemester = snapshot.data;
                   if (_showingSemester == null)
-                    _showingSemester = _unpackedSemester.length - 5;
+                    _showingSemester = _unpackedSemester!.length - 5;
                   return Column(
                     children: [
                       Row(
@@ -143,19 +143,19 @@ class _ExamListState extends State<ExamList> {
                         children: [
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_left),
-                            onPressed: _showingSemester > 0
+                            onPressed: _showingSemester! > 0
                                 ? () => setState(() => --_showingSemester)
                                 : null,
                           ),
-                          Text(S.of(context).semester(
-                              _unpackedSemester[_showingSemester].schoolYear,
-                              _unpackedSemester[_showingSemester].name)),
+                          Text(S.of(context)!.semester(
+                              _unpackedSemester![_showingSemester!].schoolYear,
+                              _unpackedSemester![_showingSemester!].name)),
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_right),
-                            onPressed:
-                                _showingSemester < _unpackedSemester.length - 1
-                                    ? () => setState(() => ++_showingSemester)
-                                    : null,
+                            onPressed: _showingSemester! <
+                                    _unpackedSemester!.length - 1
+                                ? () => setState(() => ++_showingSemester)
+                                : null,
                           )
                         ],
                       ),
@@ -170,7 +170,7 @@ class _ExamListState extends State<ExamList> {
                 errorBuilder: _loadGradeViewFromDataCenter)));
   }
 
-  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
+  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>?>(
         future: _examList,
         successBuilder: (_, snapShot) {
           _data = snapShot.data;
@@ -199,7 +199,7 @@ class _ExamListState extends State<ExamList> {
       child: FutureWidget<List<ExamScore>>(
           future: EduServiceRepository.getInstance().loadExamScoreRemotely(
               _info,
-              semesterId: _unpackedSemester[_showingSemester].semesterId),
+              semesterId: _unpackedSemester![_showingSemester!].semesterId),
           successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
           loadingBuilder: Center(
             child: PlatformCircularProgressIndicator(),
@@ -210,7 +210,7 @@ class _ExamListState extends State<ExamList> {
               return Padding(
                 child: Center(
                   child: Text(
-                    S.of(context).no_data,
+                    S.of(context)!.no_data,
                   ),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 32),
@@ -230,7 +230,7 @@ class _ExamListState extends State<ExamList> {
                       controller: PrimaryScrollController.of(context),
                       child: ListView(
                         primary: true,
-                        children: _getListWidgetsGrade(snapshot.data,
+                        children: _getListWidgetsGrade(snapshot.data!,
                             isFallback: isFallback),
                       ))))
         ],
@@ -261,8 +261,8 @@ class _ExamListState extends State<ExamList> {
         },
         child: Padding(
           child: Center(
-            child: Text(S.of(context).failed +
-                '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
+            child: Text(S.of(context)!.failed +
+                '\n${S.of(context)!.need_campus_network}\n\nThe error was:\n' +
                 snapshot.error.toString()),
           ),
           padding: EdgeInsets.symmetric(horizontal: 32),
@@ -288,10 +288,10 @@ class _ExamListState extends State<ExamList> {
       child: ListTile(
         visualDensity: VisualDensity.comfortable,
         title: Text(
-          S.of(context).limited_mode_title,
+          S.of(context)!.limited_mode_title,
           style: TextStyle(color: Colors.white),
         ),
-        subtitle: Text(S.of(context).limited_mode_description,
+        subtitle: Text(S.of(context)!.limited_mode_description,
             style: TextStyle(color: Colors.white)),
       ));
 
@@ -300,17 +300,17 @@ class _ExamListState extends State<ExamList> {
         child: ListTile(
           visualDensity: VisualDensity.comfortable,
           title: Text(
-            S.of(context).your_gpa,
+            S.of(context)!.your_gpa,
             style: TextStyle(color: Colors.white),
           ),
-          trailing: FutureWidget<List<GPAListItem>>(
+          trailing: FutureWidget<List<GPAListItem>?>(
             future: _gpaList,
             successBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>> snapShot) {
+                AsyncSnapshot<List<GPAListItem>?> snapShot) {
               _gpa = snapShot.data;
               return Text(
-                snapShot.data
-                    .firstWhere((element) => element.id == _info.id)
+                snapShot.data!
+                    .firstWhere((element) => element.id == _info!.id)
                     .gpa,
                 textScaleFactor: 1.25,
                 style: TextStyle(color: Colors.white),
@@ -322,21 +322,21 @@ class _ExamListState extends State<ExamList> {
             },
             loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
           ),
-          subtitle: FutureWidget<List<GPAListItem>>(
+          subtitle: FutureWidget<List<GPAListItem>?>(
             future: _gpaList,
             successBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>> snapShot) {
-              GPAListItem myGPA =
-                  snapShot.data.firstWhere((element) => element.id == _info.id);
+                AsyncSnapshot<List<GPAListItem>?> snapShot) {
+              GPAListItem myGPA = snapShot.data!
+                  .firstWhere((element) => element.id == _info!.id);
               return Text(
-                  S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
+                  S.of(context)!.your_gpa_subtitle(myGPA.rank, myGPA.credits),
                   style: TextStyle(color: ThemeData.dark().hintColor));
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>> snapShot) {
-              return Text(S.of(context).failed);
+              return Text(S.of(context)!.failed);
             },
-            loadingBuilder: (_, __) => Text(S.of(context).loading),
+            loadingBuilder: (_, __) => Text(S.of(context)!.loading),
           ),
           onTap: () => smartNavigatorPush(context, "/exam/gpa", arguments: {
             "gpalist": _gpa,
@@ -347,11 +347,11 @@ class _ExamListState extends State<ExamList> {
   List<Widget> _getListWidgetsHybrid() {
     List<Widget> widgets = [_buildGPACard()];
     List<Widget> secondaryWidgets = [
-      _buildDividerWithText(S.of(context).other_types_exam,
-          Theme.of(context).textTheme.bodyText1.color)
+      _buildDividerWithText(S.of(context)!.other_types_exam,
+          Theme.of(context).textTheme.bodyText1!.color)
     ]; //These widgets are displayed after the ones above
     if (_data == null) return widgets;
-    _data.forEach((Exam value) {
+    _data!.forEach((Exam value) {
       if (value.testCategory.trim() == "论文" ||
           value.testCategory.trim() == "其他")
         secondaryWidgets.add(_buildCardHybrid(value, context));
@@ -362,7 +362,7 @@ class _ExamListState extends State<ExamList> {
     return widgets + secondaryWidgets;
   }
 
-  Widget _buildDividerWithText(String text, Color color) => Padding(
+  Widget _buildDividerWithText(String text, Color? color) => Padding(
       padding: EdgeInsets.symmetric(horizontal: 8),
       child: Row(children: <Widget>[
         Expanded(child: Divider(color: color)),
@@ -422,8 +422,8 @@ class _ExamListState extends State<ExamList> {
                   child: FutureWidget<List<ExamScore>>(
                     future: EduServiceRepository.getInstance()
                         .loadExamScoreRemotely(_info,
-                            semesterId:
-                                _unpackedSemester[_showingSemester].semesterId),
+                            semesterId: _unpackedSemester![_showingSemester!]
+                                .semesterId),
                     loadingBuilder: PlatformCircularProgressIndicator(),
                     errorBuilder: Container(),
                     successBuilder: (context, snapshot) {
@@ -441,7 +441,7 @@ class _ExamListState extends State<ExamList> {
                               ),
                               child: Center(
                                 child: Text(
-                                  snapshot.data
+                                  snapshot.data!
                                       .firstWhere((element) =>
                                           element.name == value.name)
                                       .level,

@@ -36,9 +36,9 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FudanDailyFeature extends Feature {
-  PersonInfo _info;
+  PersonInfo? _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
-  String _subTitle;
+  String? _subTitle;
   bool _hasTicked = true;
 
   //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
@@ -52,12 +52,12 @@ class FudanDailyFeature extends Feature {
       _status = ConnectionStatus.DONE;
 
       if (ticked) {
-        _subTitle = S.of(context).fudan_daily_ticked;
+        _subTitle = S.of(context!)!.fudan_daily_ticked;
       } else {
         if (SettingsProvider.getInstance().debugMode)
-          _subTitle = S.of(context).fudan_daily_tick;
+          _subTitle = S.of(context!)!.fudan_daily_tick;
         else
-          _subTitle = S.of(context).fudan_daily_tick_link;
+          _subTitle = S.of(context!)!.fudan_daily_tick_link;
       }
       _hasTicked = ticked;
       notifyUpdate();
@@ -72,9 +72,9 @@ class FudanDailyFeature extends Feature {
         if (e is NotTickYesterdayException) {
           _processForgetTickIssue();
         } else {
-          _subTitle = S.of(context).tick_failed;
+          _subTitle = S.of(context!)!.tick_failed;
           notifyUpdate();
-          Noticing.showNotice(context, S.of(context).tick_failed);
+          Noticing.showNotice(context!, S.of(context!)!.tick_failed);
         }
       });
     }
@@ -98,33 +98,33 @@ class FudanDailyFeature extends Feature {
   }*/
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     _info = StateProvider.personInfo.value;
 
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _subTitle = S.of(context).loading;
+      _subTitle = S.of(context!)!.loading;
       _loadTickStatus().catchError((error) {
         _status = ConnectionStatus.FAILED;
-        _subTitle = S.of(context).failed;
+        _subTitle = S.of(context!)!.failed;
         notifyUpdate();
       });
     }
   }
 
   @override
-  String get mainTitle => S.of(context).fudan_daily;
+  String get mainTitle => S.of(context!)!.fudan_daily;
 
   @override
-  String get subTitle => _subTitle;
+  String? get subTitle => _subTitle;
 
   @override
-  Widget get customSubtitle => _hasTicked
+  Widget? get customSubtitle => _hasTicked
       ? null
       : Text(
-          S.of(context).fudan_daily_tick_link,
+          S.of(context!)!.fudan_daily_tick_link,
           style: TextStyle(color: Colors.red),
         );
 
@@ -138,14 +138,14 @@ class FudanDailyFeature extends Feature {
 
   void _processForgetTickIssue() {
     showPlatformDialog(
-        context: context,
+        context: context!,
         builder: (_) => PlatformAlertDialog(
-              title: Text(S.of(context).fatal_error),
-              content: Text(S.of(context).tick_issue_1),
+              title: Text(S.of(context!)!.fatal_error),
+              content: Text(S.of(context!)!.tick_issue_1),
               actions: [
                 PlatformDialogAction(
-                    child: Text(S.of(context).i_see),
-                    onPressed: () => Navigator.of(context).pop())
+                    child: Text(S.of(context!)!.i_see),
+                    onPressed: () => Navigator.of(context!).pop())
               ],
             ));
   }
@@ -171,7 +171,7 @@ class FudanDailyFeature extends Feature {
   /// Restart the loading process
   void refreshData() {
     _status = ConnectionStatus.NONE;
-    _subTitle = S.of(context).loading;
+    _subTitle = S.of(context!)!.loading;
     notifyUpdate();
   }
 
@@ -197,7 +197,7 @@ class FudanDailyFeature extends Feature {
             if (await Permission.locationWhenInUse.request() !=
                 PermissionStatus.granted) {
               Noticing.showNotice(
-                  context, S.of(context).location_permission_denied_promot);
+                  context!, S.of(context!)!.location_permission_denied_promot);
               return;
             }
           }
@@ -216,10 +216,10 @@ class FudanDailyFeature extends Feature {
   }
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }

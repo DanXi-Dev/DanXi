@@ -8,8 +8,8 @@ part of 'bmob_saved.dart';
 
 BmobSaved _$BmobSavedFromJson(Map<String, dynamic> json) {
   return BmobSaved()
-    ..createdAt = json['createdAt'] as String
-    ..objectId = json['objectId'] as String;
+    ..createdAt = json['createdAt'] as String?
+    ..objectId = json['objectId'] as String?;
 }
 
 Map<String, dynamic> _$BmobSavedToJson(BmobSaved instance) => <String, dynamic>{

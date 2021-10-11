@@ -43,16 +43,16 @@ class DataCenterRepository extends BaseRepositoryWithDio {
 
   /// Divide canteens into different zones.
   /// e.g. 光华，南区，南苑，枫林，张江（枫林和张江无明显划分）
-  Map<String, Map<String, TrafficInfo>> toZoneList(
-      String areaName, Map<String, TrafficInfo> trafficInfo) {
-    Map<String, Map<String, TrafficInfo>> zoneTraffic = {};
+  Map<String?, Map<String, TrafficInfo>> toZoneList(
+      String? areaName, Map<String, TrafficInfo>? trafficInfo) {
+    Map<String?, Map<String, TrafficInfo>> zoneTraffic = {};
     if (trafficInfo == null) return zoneTraffic;
 
     // Divide canteens into different zones.
     // e.g. 光华，南区，南苑，枫林，张江（枫林和张江无明显划分）
     trafficInfo.forEach((key, value) {
       List<String> locations = key.split("\n");
-      String zone, canteenName;
+      String? zone, canteenName;
       if (locations.length == 1) {
         zone = areaName;
       } else {
@@ -63,43 +63,43 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       if (!zoneTraffic.containsKey(zone)) {
         zoneTraffic[zone] = {};
       }
-      zoneTraffic[zone][canteenName] = value;
+      zoneTraffic[zone]![canteenName] = value;
     });
     return zoneTraffic;
   }
 
   Future<Map<String, TrafficInfo>> getCrowdednessInfo(
-          PersonInfo info, int areaCode) async =>
+          PersonInfo? info, int areaCode) async =>
       Retrier.tryAsyncWithFix(() => _getCrowdednessInfo(areaCode),
           (exception) async {
         if (exception is! UnsuitableTimeException) {
-          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true);
+          await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true);
         }
       });
 
   Future<Map<String, TrafficInfo>> _getCrowdednessInfo(int areaCode) async {
     var result = Map<String, TrafficInfo>();
-    var response = await dio.get(DINING_DETAIL_URL);
+    var response = await dio!.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
     if (response.data.toString().contains("仅")) {
       throw UnsuitableTimeException();
     }
     var dataString =
-        response.data.toString().between("}", "</script>", headGreedy: false);
+        response.data.toString().between("}", "</script>", headGreedy: false)!;
     var jsonExtraction = new RegExp(r'\[.+\]').allMatches(dataString);
     List names = jsonDecode(
-        jsonExtraction.elementAt(areaCode * 3).group(0).replaceAll("\'", "\""));
-    List cur = jsonDecode(jsonExtraction
+        jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("\'", "\""));
+    List? cur = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 1)
-        .group(0)
+        .group(0)!
         .replaceAll("\'", "\""));
-    List max = jsonDecode(jsonExtraction
+    List? max = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 2)
-        .group(0)
+        .group(0)!
         .replaceAll("\'", "\""));
     for (int i = 0; i < names.length; i++) {
-      result[names[i]] = TrafficInfo(int.parse(cur[i]), int.parse(max[i]));
+      result[names[i]] = TrafficInfo(int.parse(cur![i]), int.parse(max![i]));
     }
 
     return result;
@@ -112,14 +112,14 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   ///
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
-  Future<List<ExamScore>> loadAllExamScore(PersonInfo info) =>
+  Future<List<ExamScore>> loadAllExamScore(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadAllExamScore(),
           (exception) =>
-              UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
+              UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
 
   Future<List<ExamScore>> _loadAllExamScore() async {
-    Response r = await dio.get(SCORE_DETAIL_URL);
+    Response r = await dio!.get(SCORE_DETAIL_URL);
     Beautifulsoup soup = Beautifulsoup(r.data.toString());
     DOM.Element tableBody = soup.find(id: "tbody");
     return tableBody

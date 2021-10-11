@@ -5,8 +5,8 @@ part 'bmob_results.g.dart';
 
 @JsonSerializable()
 class BmobResults {
-  List<dynamic> results;
-  int count;
+  List<dynamic>? results;
+  int? count;
 
   BmobResults();
 

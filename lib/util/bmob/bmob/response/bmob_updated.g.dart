@@ -7,7 +7,7 @@ part of 'bmob_updated.dart';
 // **************************************************************************
 
 BmobUpdated _$BmobUpdatedFromJson(Map<String, dynamic> json) {
-  return BmobUpdated()..updatedAt = json['updatedAt'] as String;
+  return BmobUpdated()..updatedAt = json['updatedAt'] as String?;
 }
 
 Map<String, dynamic> _$BmobUpdatedToJson(BmobUpdated instance) =>

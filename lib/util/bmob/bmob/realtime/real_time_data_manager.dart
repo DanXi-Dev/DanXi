@@ -6,12 +6,12 @@ import 'client.dart';
 import 'dart:async';
 
 class RealTimeDataManager {
-  static RealTimeDataManager instance;
+  static RealTimeDataManager? instance;
 
   RealTimeDataManager();
 
   ///单例
-  static RealTimeDataManager getInstance() {
+  static RealTimeDataManager? getInstance() {
     if (instance == null) {
       instance = new RealTimeDataManager();
     }

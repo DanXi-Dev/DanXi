@@ -39,23 +39,23 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomDetailPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _EmptyClassroomDetailPageState createState() =>
       _EmptyClassroomDetailPageState();
 
-  EmptyClassroomDetailPage({Key key, this.arguments});
+  EmptyClassroomDetailPage({Key? key, this.arguments});
 }
 
 class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
-  PersonInfo _personInfo;
+  PersonInfo? _personInfo;
 
-  List<Tag> _campusTags;
-  int _selectCampusIndex = 0;
+  List<Tag>? _campusTags;
+  int? _selectCampusIndex = 0;
 
-  List<Tag> _buildingTags;
-  Map<int, Text> _buildingList;
+  List<Tag>? _buildingTags;
+  late Map<int, Text> _buildingList;
   int __selectBuildingIndex = 0;
 
   int get _selectBuildingIndex => __selectBuildingIndex;
@@ -70,7 +70,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   _loadDefaultRoom() async {
     _selectCampusIndex = SettingsProvider.getInstance().campus.index;
     _selectBuildingIndex =
-        SettingsProvider.getInstance().lastECBuildingChoiceRepresentation ?? 0;
+        SettingsProvider.getInstance().lastECBuildingChoiceRepresentation;
     refreshSelf();
   }
 
@@ -81,7 +81,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     _loadDefaultRoom();
   }
 
-  DateTime selectDate;
+  DateTime? selectDate;
 
   Widget _buildCupertinoDatePicker() => Container(
       height: ViewportUtils.getMainNavigatorHeight(context) / 3,
@@ -105,13 +105,13 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .map((e) => Tag(e.displayTitle(context),
             PlatformX.isAndroid ? Icons.location_on : CupertinoIcons.location))
         .toList();
-    _buildingTags = Constant.CAMPUS_VALUES[_selectCampusIndex]
-        .getTeachingBuildings()
+    _buildingTags = Constant.CAMPUS_VALUES[_selectCampusIndex!]
+        .getTeachingBuildings()!
         .map((e) => Tag(
             e, PlatformX.isAndroid ? Icons.home_work : CupertinoIcons.location))
         .toList();
-    _buildingList = Constant.CAMPUS_VALUES[_selectCampusIndex]
-        .getTeachingBuildings()
+    _buildingList = Constant.CAMPUS_VALUES[_selectCampusIndex!]
+        .getTeachingBuildings()!
         .map((e) => Text(e))
         .toList()
         .asMap();
@@ -128,7 +128,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         appBar: PlatformAppBarX(
             title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: Text(S.of(context).empty_classrooms),
+          child: Text(S.of(context)!.empty_classrooms),
         )),
         body: SafeArea(
             bottom: false,
@@ -149,7 +149,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         singleChoice: true,
                         defaultChoice: _selectCampusIndex,
                         onChoice: (Tag tag, list) {
-                          int index = _campusTags.indexWhere(
+                          int index = _campusTags!.indexWhere(
                               (element) => element.tagTitle == tag.tagTitle);
                           if (index >= 0 && index != _selectCampusIndex) {
                             _selectCampusIndex = index;
@@ -159,14 +159,14 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         },
                         tagList: _campusTags),
                     cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                          onValueChanged: (int value) {
+                          onValueChanged: (int? value) {
                             _selectCampusIndex = value;
                             _selectBuildingIndex = 0;
                             refreshSelf();
                           },
                           groupValue: _selectCampusIndex,
                           children: Constant.CAMPUS_VALUES
-                              .map((e) => Text(e.displayTitle(context)))
+                              .map((e) => Text(e.displayTitle(context)!))
                               .toList()
                               .asMap(),
                         )),
@@ -184,7 +184,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         singleChoice: true,
                         defaultChoice: _selectBuildingIndex,
                         onChoice: (Tag tag, list) {
-                          int index = _buildingTags.indexWhere(
+                          int index = _buildingTags!.indexWhere(
                               (element) => element.tagTitle == tag.tagTitle);
                           if (index >= 0 && index != _selectBuildingIndex) {
                             _selectBuildingIndex = index;
@@ -193,8 +193,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         },
                         tagList: _buildingTags),
                     cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                          onValueChanged: (int value) {
-                            if (value >= 0 && value != _selectBuildingIndex) {
+                          onValueChanged: (int? value) {
+                            if (value! >= 0 && value != _selectBuildingIndex) {
                               _selectBuildingIndex = value;
                               refreshSelf();
                             }
@@ -208,7 +208,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                   cupertino: (_, __) => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(S.of(context).current_date),
+                      Text(S.of(context)!.current_date),
                       TextButton(
                         onPressed: () {
                           showCupertinoModalPopup(
@@ -216,12 +216,12 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                               builder: (BuildContext context) =>
                                   _buildCupertinoDatePicker());
                         },
-                        child: Text("${selectDate.month}/${selectDate.day}"),
+                        child: Text("${selectDate!.month}/${selectDate!.day}"),
                       ),
                     ],
                   ),
                   material: (_, __) =>
-                      _buildSlider(DateFormat("MM/dd").format(selectDate)),
+                      _buildSlider(DateFormat("MM/dd").format(selectDate!)),
                 ),
 
                 Container(
@@ -231,7 +231,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            S.of(context).classroom,
+                            S.of(context)!.classroom,
                             style: TextStyle(fontSize: 18),
                           ),
                           Row(
@@ -246,7 +246,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                         5 +
                                     7,
                                 child: Text(
-                                  "| " + S.of(context).morning,
+                                  "| " + S.of(context)!.morning,
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -259,7 +259,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                         5 +
                                     7,
                                 child: Text(
-                                  "| " + S.of(context).afternoon,
+                                  "| " + S.of(context)!.afternoon,
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -271,7 +271,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                         4) *
                                     3,
                                 child: Text(
-                                  "| " + S.of(context).evening,
+                                  "| " + S.of(context)!.evening,
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -288,8 +288,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                       future: EmptyClassroomRepository.getInstance()
                           .getBuildingRoomInfo(
                               _personInfo,
-                              _buildingList[_selectBuildingIndex].data[0],
-                              _buildingList[_selectBuildingIndex].data,
+                              _buildingList[_selectBuildingIndex]!.data![0],
+                              _buildingList[_selectBuildingIndex]!.data,
                               selectDate),
                       successBuilder: (BuildContext context,
                               AsyncSnapshot<dynamic> snapshot) =>
@@ -308,7 +308,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             )));
   }
 
-  List<Widget> _getListWidgets(List<RoomInfo> data) {
+  List<Widget> _getListWidgets(List<RoomInfo>? data) {
     List<Widget> widgets = [];
     if (data != null)
       data.forEach((element) {
@@ -323,11 +323,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        element.roomName,
+                        element.roomName!,
                         textScaleFactor: 1,
                       ),
                       Text(
-                        S.of(context).seats(element.seats),
+                        S.of(context)!.seats(element.seats),
                         textScaleFactor: 0.8,
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
@@ -388,21 +388,21 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     final accessiblityColoring =
         SettingsProvider.getInstance().useAccessibilityColoring;
 
-    roomInfo.busy.forEach((element) {
+    roomInfo.busy!.forEach((element) {
       if (accessiblityColoring) {
         _list.add(Container(
           decoration: BoxDecoration(
               border: _slot == _time
                   ? Border.all(
-                      color: Theme.of(context).textTheme.bodyText1.color,
+                      color: Theme.of(context).textTheme.bodyText1!.color!,
                       width: 2.5,
                     )
                   : Border.all(
-                      color: Theme.of(context).textTheme.bodyText1.color,
+                      color: Theme.of(context).textTheme.bodyText1!.color!,
                       width: 0.75,
                     ),
               color:
-                  element ? Theme.of(context).textTheme.bodyText1.color : null,
+                  element ? Theme.of(context).textTheme.bodyText1!.color : null,
               borderRadius: BorderRadius.all(Radius.circular(5.0))),
           width: ViewportUtils.getMainNavigatorWidth(context) / 32,
           margin: EdgeInsets.symmetric(horizontal: 2),
@@ -413,7 +413,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           decoration: BoxDecoration(
               border: _slot == _time
                   ? Border.all(
-                      color: Theme.of(context).textTheme.bodyText1.color,
+                      color: Theme.of(context).textTheme.bodyText1!.color!,
                       width: 1.5,
                     )
                   : null,
@@ -440,7 +440,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   Widget _buildErrorWidget() {
     return GestureDetector(
       child: Center(
-        child: Text(S.of(context).failed),
+        child: Text(S.of(context)!.failed),
       ),
       onTap: () {
         refreshSelf();

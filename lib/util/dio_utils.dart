@@ -25,7 +25,7 @@ class DioUtils {
         contentType: Headers.formUrlEncodedContentType,
         followRedirects: false,
         validateStatus: (status) {
-          return status < 400;
+          return status! < 400;
         });
   }
 
@@ -37,15 +37,15 @@ class DioUtils {
           contentType: Headers.formUrlEncodedContentType,
           followRedirects: false,
           validateStatus: (status) {
-            return status < 400;
+            return status! < 400;
           });
 
   static Future<Response> processRedirect(Dio dio, Response response) async {
     //Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&
-        response.headers['location'].length > 0) {
-      String location = response.headers['location'][0];
+        response.headers['location']!.length > 0) {
+      String location = response.headers['location']![0];
       if (location == null || location.isEmpty) return response;
       if (!Uri.parse(location).isAbsolute) {
         location = response.requestOptions.uri.origin + '/' + location;

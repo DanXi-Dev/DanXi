@@ -34,12 +34,12 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A list page showing announcement from developers.
 class AnnouncementList extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _AnnouncementListState createState() => _AnnouncementListState();
 
-  AnnouncementList({Key key, this.arguments});
+  AnnouncementList({Key? key, this.arguments});
 }
 
 class _AnnouncementListState extends State<AnnouncementList> {
@@ -59,15 +59,15 @@ class _AnnouncementListState extends State<AnnouncementList> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(
-          S.of(context).developer_announcement(''),
+          S.of(context)!.developer_announcement(''),
         ),
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: Text(
               _showingLatest
-                  ? S.of(context).older_announcement
-                  : S.of(context).latest_announcement,
+                  ? S.of(context)!.older_announcement
+                  : S.of(context)!.latest_announcement,
               softWrap: true,
               textScaleFactor: 1.2,
             ),
@@ -103,7 +103,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
             refreshSelf();
           },
           child: Center(
-            child: Text(S.of(context).failed),
+            child: Text(S.of(context)!.failed),
           ),
         ),
       ),
@@ -120,24 +120,24 @@ class _AnnouncementListState extends State<AnnouncementList> {
             ? Icon(Icons.info)
             : Icon(CupertinoIcons.info_circle_fill),
         title: Text(
-          value.content,
+          value.content!,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-            HumanDuration.format(context, DateTime.tryParse(value.updatedAt))),
+            HumanDuration.format(context, DateTime.tryParse(value.updatedAt!)!)),
         onTap: () => showPlatformDialog(
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
                   title: Text(
-                      S.of(context).developer_announcement(value.createdAt)),
+                      S.of(context)!.developer_announcement(value.createdAt)),
                   content: Linkify(
-                      text: value.content,
+                      text: value.content!,
                       onOpen: (element) =>
                           BrowserUtil.openUrl(element.url, context)),
                   actions: <Widget>[
                     PlatformDialogAction(
-                        child: PlatformText(S.of(context).i_see),
+                        child: PlatformText(S.of(context)!.i_see),
                         onPressed: () => Navigator.pop(context)),
                   ],
                 )),

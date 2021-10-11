@@ -568,14 +568,14 @@ class PostRepository extends BaseRepositoryWithDio {
   ];
 
   /// The token used for session authentication.
-  String _token;
+  String? _token;
 
   /// Current user profile, stored as cache by the repository
-  FduholeProfile _profile;
+  FduholeProfile? _profile;
 
   /// Push Notification Registeration Cache
-  String _deviceId, _pushNotificationToken;
-  PushNotificationServiceType _pushNotificationService;
+  String? _deviceId, _pushNotificationToken;
+  PushNotificationServiceType? _pushNotificationService;
 
   clearCache() {
     _token = null;
@@ -587,20 +587,20 @@ class PostRepository extends BaseRepositoryWithDio {
 
   PostRepository._() {
     // Override the options set in parent class.
-    dio.options = BaseOptions(receiveDataWhenStatusError: true);
+    dio!.options = BaseOptions(receiveDataWhenStatusError: true);
   }
 
-  initializeUser(PersonInfo info) async {
+  initializeUser(PersonInfo? info) async {
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
-      _token = await requestToken(info);
+      _token = await requestToken(info!);
       PlatformBridge.requestNotificationPermission();
       updatePushNotificationToken();
     }
   }
 
-  Future<String> requestToken(PersonInfo info) async {
+  Future<String?> requestToken(PersonInfo info) async {
     Dio secureDio = Dio();
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
@@ -634,7 +634,7 @@ class PostRepository extends BaseRepositoryWithDio {
       'email': "${info.id}@fudan.edu.cn",
       // Temporarily disable v2 API until the protocol is ready.
       //'ID': base64.encode(utf8.encode(encrypt(info.id, publicKey)))
-    }).onError((error, stackTrace) {
+    }).onError((dynamic error, stackTrace) {
       return Future.error(error);
     });
     try {
@@ -647,36 +647,36 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Map<String, String> get _tokenHeader {
     if (_token == null) throw NotLoginError("Null Token");
-    return {"Authorization": "Token " + _token};
+    return {"Authorization": "Token " + _token!};
   }
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<BBSPost>> loadDiscussions(int page, SortOrder sortBy) async {
-    final Response response = await dio
+  Future<List<BBSPost>> loadDiscussions(int page, SortOrder? sortBy) async {
+    final Response response = await dio!
         .get(_BASE_URL + "/discussions/",
             queryParameters: {
               "page": page,
               "order": sortBy.getInternalString()
             },
             options: Options(headers: _tokenHeader))
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       return Future.error(error);
     });
     final List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
 
-  Future<BBSPost> loadSpecificDiscussion(int disscussionId) async {
-    Response response = await dio.get(_BASE_URL + "/discussions/",
+  Future<BBSPost> loadSpecificDiscussion(int? disscussionId) async {
+    Response response = await dio!.get(_BASE_URL + "/discussions/",
         queryParameters: {"discussion_id": disscussionId.toString()},
         options: Options(headers: _tokenHeader));
     return BBSPost.fromJson(response.data);
   }
 
   Future<List<BBSPost>> loadTagFilteredDiscussions(
-      String tag, SortOrder sortBy, int page) async {
-    Response response = await dio
+      String? tag, SortOrder? sortBy, int page) async {
+    Response response = await dio!
         .get(_BASE_URL + "/discussions/",
             queryParameters: {
               "order": sortBy.getInternalString(),
@@ -684,7 +684,7 @@ class PostRepository extends BaseRepositoryWithDio {
               "page": page,
             },
             options: Options(headers: _tokenHeader))
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       if (error.response?.statusCode == 401) {
         _token = null;
         throw LoginExpiredError;
@@ -696,22 +696,22 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<Reply>> loadReplies(BBSPost post, int page) async {
-    final Response response = await dio
+    final Response response = await dio!
         .get(_BASE_URL + "/posts/",
             queryParameters: {"page": page, "id": post.id},
             options: Options(headers: _tokenHeader))
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       return Future.error(error);
     });
     final List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
   }
 
-  Future<List<Reply>> loadSearchResults(String searchString, int page) async {
+  Future<List<Reply>> loadSearchResults(String? searchString, int page) async {
     // Search results only have a single page.
     // Return nothing if [page] > 1.
     if (page > 1) return Future.value([]);
-    Response response = await dio.get(_BASE_URL + "/posts/",
+    Response response = await dio!.get(_BASE_URL + "/posts/",
         queryParameters: {"search": searchString, "page": page},
         options: Options(headers: _tokenHeader));
     List result = response.data;
@@ -719,17 +719,17 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<PostTag>> loadTags() async {
-    Response response = await dio.get(_BASE_URL + "/tags/",
-        options: Options(headers: _tokenHeader));
+    Response response = await dio!
+        .get(_BASE_URL + "/tags/", options: Options(headers: _tokenHeader));
     List result = response.data;
     return result.map((e) => PostTag.fromJson(e)).toList();
   }
 
-  Future<int> newPost(String content, {List<PostTag> tags}) async {
+  Future<int?> newPost(String? content, {List<PostTag>? tags}) async {
     if (content == null) return 0;
     if (tags == null) tags = [];
     // Suppose user is logged in. He should be.
-    Response response = await dio.post(_BASE_URL + "/discussions/",
+    Response response = await dio!.post(_BASE_URL + "/discussions/",
         data: {
           "content": content,
           "tags": tags.map((e) => e.toJson()).toList()
@@ -738,22 +738,22 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
-  Future<String> uploadImage(File file) async {
+  Future<String?> uploadImage(File file) async {
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
-    Response response = await dio
+    Response response = await dio!
         .post(_BASE_URL + "/images/",
             data: FormData.fromMap({
               "img": await MultipartFile.fromFile(path, filename: fileName)
             }),
             options: Options(headers: _tokenHeader))
-        .onError((error, stackTrace) => throw ImageUploadError());
-    return response?.data['url'];
+        .onError(((dynamic error, stackTrace) => throw ImageUploadError()));
+    return response.data['url'];
   }
 
-  Future<int> newReply(int discussionId, int postId, String content) async {
+  Future<int?> newReply(int? discussionId, int? postId, String content) async {
     // Suppose user is logged in. He should be.
-    Response response = await dio.post(_BASE_URL + "/posts/",
+    Response response = await dio!.post(_BASE_URL + "/posts/",
         data: {
           "content": content,
           "discussion_id": discussionId,
@@ -763,25 +763,25 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
-  Future<int> reportPost(int postId, String reason) async {
+  Future<int?> reportPost(int? postId, String reason) async {
     // Suppose user is logged in. He should be.
-    Response response = await dio.post(_BASE_URL + "/reports/",
+    Response response = await dio!.post(_BASE_URL + "/reports/",
         data: {"post_id": postId, "reason": reason},
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
-  Future<FduholeProfile> getUserProfile({bool forceUpdate = false}) async {
+  Future<FduholeProfile?> getUserProfile({bool forceUpdate = false}) async {
     if (_profile == null || forceUpdate) {
-      final Response response = await dio.get(_BASE_URL + "/profile/",
+      final Response response = await dio!.get(_BASE_URL + "/profile/",
           options: Options(headers: _tokenHeader));
       _profile = FduholeProfile.fromJson(response.data);
     }
     return _profile;
   }
 
-  Future<bool> isUserAdmin() async {
-    return (await getUserProfile()).user.is_staff;
+  Future<bool?> isUserAdmin() async {
+    return (await getUserProfile())!.user!.is_staff;
   }
 
   /// Non-async version of [isUserAdmin], will return false if data is not yet ready
@@ -789,13 +789,13 @@ class PostRepository extends BaseRepositoryWithDio {
     return _profile?.user?.is_staff ?? false;
   }
 
-  Future<List<BBSPost>> getFavoredDiscussions() async {
-    return (await getUserProfile()).favored_discussion;
+  Future<List<BBSPost>?> getFavoredDiscussions() async {
+    return (await getUserProfile())!.favored_discussion;
   }
 
   Future<void> setFavoredDiscussion(
-      SetFavoredDiscussionMode mode, int discussionId) async {
-    final Response response = await dio.put(_BASE_URL + "/profile/",
+      SetFavoredDiscussionMode mode, int? discussionId) async {
+    final Response response = await dio!.put(_BASE_URL + "/profile/",
         data: {
           'mode': mode.getInternalString(),
           'favoredDiscussion': discussionId
@@ -807,8 +807,8 @@ class PostRepository extends BaseRepositoryWithDio {
   /// Modify a post, requires Admin privilege
   /// Throws on failure.
   Future<void> adminModifyPost(
-      String content, int discussionId, int postId) async {
-    await dio.post(_BASE_URL + "/admin/",
+      String content, int? discussionId, int? postId) async {
+    await dio!.post(_BASE_URL + "/admin/",
         data: {
           "content": content,
           "operation": "modify",
@@ -820,8 +820,8 @@ class PostRepository extends BaseRepositoryWithDio {
 
   /// Disable a post, requires Admin privilege
   /// Throws on failure.
-  Future<void> adminDisablePost(int discussionId, int postId) async {
-    await dio.post(_BASE_URL + "/admin/",
+  Future<void> adminDisablePost(int? discussionId, int? postId) async {
+    await dio!.post(_BASE_URL + "/admin/",
         data: {
           "operation": "disable",
           "discussion_id": discussionId,
@@ -832,8 +832,8 @@ class PostRepository extends BaseRepositoryWithDio {
 
   /// Disable a discussion, requires Admin privilege
   /// Throws on failure.
-  Future<void> adminDisableDiscussion(int discussionId) async {
-    await dio.post(_BASE_URL + "/admin/",
+  Future<void> adminDisableDiscussion(int? discussionId) async {
+    await dio!.post(_BASE_URL + "/admin/",
         data: {
           "operation": "disable_discussion",
           "discussion_id": discussionId,
@@ -842,8 +842,8 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   /// Get sender username of a post, requires Admin privilege
-  Future<String> adminGetUser(int discussionId, int postId) async {
-    final response = await dio.post(_BASE_URL + "/admin/",
+  Future<String> adminGetUser(int? discussionId, int? postId) async {
+    final response = await dio!.post(_BASE_URL + "/admin/",
         data: {
           "operation": "get_user",
           "discussion_id": discussionId,
@@ -853,16 +853,16 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.data.toString();
   }
 
-  Future<List<Report>> adminGetReports(int page) async {
-    final response = await dio.get(_BASE_URL + "/admin/",
+  Future<List<Report>?> adminGetReports(int page) async {
+    final response = await dio!.get(_BASE_URL + "/admin/",
         queryParameters: {"page": page, "show_only_undealt": true},
         options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<Report>((e) => Report.fromJson(e)).toList();
   }
 
-  Future<String> adminSetReportDealt(int reportId) async {
-    final response = await dio.post(_BASE_URL + "/admin/",
+  Future<String> adminSetReportDealt(int? reportId) async {
+    final response = await dio!.post(_BASE_URL + "/admin/",
         data: {
           "operation": "set_report_dealed",
           "report_id": reportId,
@@ -876,9 +876,9 @@ class PostRepository extends BaseRepositoryWithDio {
   /// Upload or update Push Notification token to server
   /// API Version: v2
   Future<void> updatePushNotificationToken(
-      [String token, String id, PushNotificationServiceType service]) async {
+      [String? token, String? id, PushNotificationServiceType? service]) async {
     if (isUserInitialized) {
-      await dio.post(_BASE_URL + "/users",
+      await dio!.post(_BASE_URL + "/users",
           data: {
             "service":
                 (service ?? _pushNotificationService).toStringRepresentation(),
@@ -899,8 +899,8 @@ class PostRepository extends BaseRepositoryWithDio {
 
 enum PushNotificationServiceType { APNS, MIPUSH }
 
-extension StringRepresentation on PushNotificationServiceType {
-  String toStringRepresentation() {
+extension StringRepresentation on PushNotificationServiceType? {
+  String? toStringRepresentation() {
     switch (this) {
       case PushNotificationServiceType.APNS:
         return 'apns';
@@ -914,7 +914,7 @@ extension StringRepresentation on PushNotificationServiceType {
 enum SetFavoredDiscussionMode { ADD, DELETE }
 
 extension FavoredDiscussionEx on SetFavoredDiscussionMode {
-  String getInternalString() {
+  String? getInternalString() {
     switch (this) {
       case SetFavoredDiscussionMode.ADD:
         return "addFavoredDiscussion";

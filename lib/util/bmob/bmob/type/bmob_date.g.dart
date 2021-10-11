@@ -8,8 +8,8 @@ part of 'bmob_date.dart';
 
 BmobDate _$BmobDateFromJson(Map<String, dynamic> json) {
   return BmobDate()
-    ..iso = json['iso'] as String
-    ..type = json['__type'] as String;
+    ..iso = json['iso'] as String?
+    ..type = json['__type'] as String?;
 }
 
 Map<String, dynamic> _$BmobDateToJson(BmobDate instance) => <String, dynamic>{

@@ -76,7 +76,7 @@ class Registry {
   ///
   /// If the [index]-th pair is not a String ([REG_SZ])
   /// or the value length is more than [MAX_ITEMLENGTH], throw an exception.
-  static RegistryKeyValuePair enumerateKey(int hKey, int index) {
+  static RegistryKeyValuePair? enumerateKey(int hKey, int index) {
     final lpValueName = wsalloc(MAX_PATH);
     final lpcchValueName = calloc<DWORD>()..value = MAX_PATH;
     final lpType = calloc<DWORD>();

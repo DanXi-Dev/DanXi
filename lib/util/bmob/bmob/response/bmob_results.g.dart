@@ -8,8 +8,8 @@ part of 'bmob_results.dart';
 
 BmobResults _$BmobResultsFromJson(Map<String, dynamic> json) {
   return BmobResults()
-    ..results = json['results'] as List
-    ..count = json['count'] as int;
+    ..results = json['results'] as List?
+    ..count = json['count'] as int?;
 }
 
 Map<String, dynamic> _$BmobResultsToJson(BmobResults instance) =>

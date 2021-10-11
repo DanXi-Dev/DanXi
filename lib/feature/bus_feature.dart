@@ -33,18 +33,18 @@ import 'package:intl/intl.dart';
 
 class BusFeature extends Feature {
   ConnectionStatus _status = ConnectionStatus.NONE;
-  List<BusScheduleItem> _busList;
+  List<BusScheduleItem>? _busList;
 
-  bool isHoliday;
-
-  @override
-  Widget get icon => Icon(PlatformIcons(context).bus);
+  bool? isHoliday;
 
   @override
-  String get mainTitle => S.of(context).bus_query;
+  Widget get icon => Icon(PlatformIcons(context!).bus);
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  String get mainTitle => S.of(context!)!.bus_query;
+
+  @override
+  void buildFeature([Map<String, dynamic>? arguments]) {
     isHoliday = isTodayHoliday();
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
@@ -62,7 +62,7 @@ class BusFeature extends Feature {
     return (today == DateTime.sunday) || (today == DateTime.saturday);
   }
 
-  _loadBusList(PersonInfo personInfo) async {
+  _loadBusList(PersonInfo? personInfo) async {
     _status = ConnectionStatus.CONNECTING;
     _busList = await FudanBusRepository.getInstance()
         .loadBusList(personInfo, holiday: isHoliday);
@@ -75,18 +75,18 @@ class BusFeature extends Feature {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
+        return S.of(context!)!.loading;
       case ConnectionStatus.DONE:
-        return S.of(context).no_matching_bus;
+        return S.of(context!)!.no_matching_bus;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
+        return S.of(context!)!.failed;
     }
     return '';
   }
 
   @override
-  Widget get customSubtitle {
+  Widget? get customSubtitle {
     if (_status == ConnectionStatus.DONE && _busList != null) {
       return buildSubtitle(
           nextBusForCampus(SettingsProvider.getInstance().campus));
@@ -94,9 +94,9 @@ class BusFeature extends Feature {
     return null;
   }
 
-  Widget buildSubtitle(BusScheduleItem element) {
+  Widget? buildSubtitle(BusScheduleItem? element) {
     if (element == null) return null;
-    Campus from, to;
+    Campus? from, to;
     switch (element.direction) {
       case BusDirection.NONE:
         break;
@@ -122,7 +122,7 @@ class BusFeature extends Feature {
           width: 6,
         ),*/
         Text(
-          "${DateFormat("HH:mm").format(element.realStartTime.toExactTime())} "
+          "${DateFormat("HH:mm").format(element.realStartTime!.toExactTime())} "
           "${from.displayTitle(context)}"
           "$connectChar"
           "${to.displayTitle(context)}",
@@ -134,14 +134,14 @@ class BusFeature extends Feature {
     );
   }
 
-  BusScheduleItem nextBusForCampus(Campus campus) {
-    final filteredBusList = _busList
+  BusScheduleItem? nextBusForCampus(Campus campus) {
+    final filteredBusList = _busList!
         .where((element) => element.start == campus || element.end == campus)
         .toList();
     // Get the next bus time
     filteredBusList.sort();
     for (var element in filteredBusList) {
-      VagueTime startTime = element.realStartTime;
+      VagueTime? startTime = element.realStartTime;
       if (startTime != null &&
           startTime.toExactTime().isAfter(DateTime.now())) {
         return element;
@@ -159,7 +159,7 @@ class BusFeature extends Feature {
   @override
   void onTap() {
     if (_busList != null) {
-      smartNavigatorPush(context, "/bus/detail",
+      smartNavigatorPush(context!, "/bus/detail",
           arguments: {"busList": _busList, "dataIsHoliday": isHoliday});
     } else {
       refreshData();
@@ -167,10 +167,10 @@ class BusFeature extends Feature {
   }
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }

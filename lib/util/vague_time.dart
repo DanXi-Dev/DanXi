@@ -18,7 +18,7 @@
 /// VagueTime is a data class of time & date, which contains incomplete time fields so that
 /// they could be filled later. It is useful to represent some schedule(e.g. 8:00 everyday).
 class VagueTime implements Comparable<VagueTime> {
-  int year, month, day, hour, minute, second, millisecond, microsecond;
+  int? year, month, day, hour, minute, second, millisecond, microsecond;
 
   VagueTime(
       {this.year,
@@ -37,7 +37,7 @@ class VagueTime implements Comparable<VagueTime> {
   }
 
   /// Merge the unfilled field with [exactDate], and return the filled time.
-  DateTime toExactTime([DateTime exactDate]) {
+  DateTime toExactTime([DateTime? exactDate]) {
     if (exactDate == null) exactDate = DateTime.now();
     return DateTime(
         year ?? exactDate.year,

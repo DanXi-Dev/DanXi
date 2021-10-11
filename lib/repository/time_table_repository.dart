@@ -47,29 +47,29 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   factory TimeTableRepository.getInstance() => _instance;
 
-  String _getIds(String html) {
+  String? _getIds(String html) {
     RegExp idMatcher = RegExp(r'(?<=ids",").+(?="\);)');
-    return idMatcher.firstMatch(html).group(0);
+    return idMatcher.firstMatch(html)!.group(0);
   }
 
-  Future<TimeTable> loadTimeTableRemotely(PersonInfo info,
-      {DateTime startTime}) {
+  Future<TimeTable> loadTimeTableRemotely(PersonInfo? info,
+      {DateTime? startTime}) {
     return Retrier.tryAsyncWithFix(
         () => _loadTimeTableRemotely(startTime: startTime),
         (exception) async =>
-            await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
+            await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
-  Future<TimeTable> _loadTimeTableRemotely({DateTime startTime}) async {
-    Response idPage = await dio.get(ID_URL);
-    String termId = _getIds(idPage.data.toString());
-    Response tablePage = await dio.post(TIME_TABLE_URL,
+  Future<TimeTable> _loadTimeTableRemotely({DateTime? startTime}) async {
+    Response idPage = await dio!.get(ID_URL);
+    String? termId = _getIds(idPage.data.toString());
+    Response tablePage = await dio!.post(TIME_TABLE_URL,
         data: {
           "ignoreHead": "1",
           "setting.kind": "std",
           "startWeek": "1",
           "ids": termId,
-          "semester.id": (await cookieJar.loadForRequest(Uri.parse(HOST)))
+          "semester.id": (await cookieJar!.loadForRequest(Uri.parse(HOST)))
               .firstWhere((element) => element.name == "semester.id")
               .value
         },
@@ -77,13 +77,13 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     return TimeTable.fromHtml(startTime, tablePage.data.toString());
   }
 
-  Future<TimeTable> loadTimeTableLocally(PersonInfo info,
-      {DateTime startTime, bool forceLoadFromRemote = false}) async {
+  Future<TimeTable> loadTimeTableLocally(PersonInfo? info,
+      {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     if (startTime == null) startTime = TimeTable.defaultStartTime;
     return await Cache.get(
         KEY_TIMETABLE_CACHE,
         () => loadTimeTableRemotely(info, startTime: startTime),
-        (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue)),
+        (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
         (object) => jsonEncode(object.toJson()),
         validate: (value) => value != null && !forceLoadFromRemote);
   }

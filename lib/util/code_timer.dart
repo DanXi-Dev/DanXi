@@ -17,10 +17,10 @@
 
 /// A timer for codes.
 class CodeTimer {
-  static int lastStartTime;
+  static late int lastStartTime;
 
   static start() => lastStartTime = DateTime.now().millisecondsSinceEpoch;
 
-  static tick({String info}) => print(
+  static tick({String? info}) => print(
       "[$info] Use ${DateTime.now().millisecondsSinceEpoch - lastStartTime} ms.");
 }

@@ -38,7 +38,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
   static const String GET_INFO_URL =
       "https://zlapp.fudan.edu.cn/ncov/wap/fudan/get-info";
   static const String _KEY_PREF = "daily_payload_cache";
-  PersonInfo _info;
+  PersonInfo? _info;
 
   FudanCOVID19Repository._();
 
@@ -49,12 +49,12 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
 
   factory FudanCOVID19Repository.getInstance() => _instance;
 
-  NonpersistentCookieJar get thisCookies => cookieJar;
+  NonpersistentCookieJar? get thisCookies => cookieJar;
 
-  Future<dynamic> _getHistoryInfo(PersonInfo info) async {
+  Future<dynamic> _getHistoryInfo(PersonInfo? info) async {
     _info = info;
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, _info, true);
-    var res = await dio.get(GET_INFO_URL);
+    await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, _info, true);
+    var res = await dio!.get(GET_INFO_URL);
     try {
       return res.data is Map
           ? res.data['d']
@@ -63,7 +63,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
     return null;
   }
 
-  Future<bool> hasTick(PersonInfo info) async {
+  Future<bool> hasTick(PersonInfo? info) async {
     _historyData = await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
     if (_historyData['info'] is! Map) {
       return false;
@@ -75,7 +75,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
   /// Build a payload from [_historyData].
   ///
   /// If failed, return null.
-  Map _buildPayloadFromHistory() {
+  Map? _buildPayloadFromHistory() {
     if (_historyData == null || _historyData['oldInfo'] is! Map) {
       return null;
     }
@@ -106,7 +106,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
     return payload;
   }
 
-  Future<void> tick(PersonInfo info) async {
+  Future<void> tick(PersonInfo? info) async {
     if (_historyData == null) {
       _historyData =
           await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
@@ -117,15 +117,15 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };
-    Map payload = await Cache.getRemotely<Map>(
+    Map? payload = await Cache.getRemotely<Map?>(
         _KEY_PREF,
         () async => _buildPayloadFromHistory(),
-        (cachedValue) => jsonDecode(cachedValue),
+        (cachedValue) => jsonDecode(cachedValue!),
         (object) => jsonEncode(object));
     if (payload == null) {
       throw NotTickYesterdayException();
     }
-    await dio.post(SAVE_URL,
+    await dio!.post(SAVE_URL,
         data: payload.encodeMap(),
         options:
             DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));

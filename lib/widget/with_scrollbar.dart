@@ -24,10 +24,10 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A widget that will add a scroll bar for its child.
 class WithScrollbar extends StatefulWidget {
-  final ScrollController controller;
-  final Widget child;
+  final ScrollController? controller;
+  final Widget? child;
 
-  const WithScrollbar({Key key, this.controller, this.child}) : super(key: key);
+  const WithScrollbar({Key? key, this.controller, this.child}) : super(key: key);
 
   @override
   _WithScrollbarState createState() => _WithScrollbarState();
@@ -41,11 +41,11 @@ class _WithScrollbarState extends State<WithScrollbar> {
         material: (_, __) => Scrollbar(
           controller: widget.controller,
               interactive: PlatformX.isDesktop,
-              child: widget.child,
+              child: widget.child!,
             ),
         cupertino: (_, __) => CupertinoScrollbar(
               controller: widget.controller,
-              child: widget.child,
+              child: widget.child!,
             ));
   }
 }

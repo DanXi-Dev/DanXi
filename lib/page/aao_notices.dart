@@ -36,23 +36,23 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Arguments:
 /// [List<Notice>] initialData: the initial data to be shown as soon as the page's displayed.
 class AAONoticesList extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _AAONoticesListState createState() => _AAONoticesListState();
 
-  AAONoticesList({Key key, this.arguments});
+  AAONoticesList({Key? key, this.arguments});
 }
 
 class _AAONoticesListState extends State<AAONoticesList> {
-  List<Notice> _data;
-  ScrollController _controller;
-  PersonInfo _info;
+  List<Notice>? _data;
+  ScrollController? _controller;
+  PersonInfo? _info;
 
   @override
   void initState() {
     super.initState();
-    _data = widget.arguments['initialData'];
+    _data = widget.arguments!['initialData'];
     _info = StateProvider.personInfo.value;
   }
 
@@ -64,7 +64,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
-        child: Text(S.of(context).fudan_aao_notices),
+        child: Text(S.of(context)!.fudan_aao_notices),
         controller: _controller,
       )),
       body: Column(
@@ -96,7 +96,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
             endBuilder: (_) => Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Text(S.of(context).end_reached),
+                Text(S.of(context)!.end_reached),
                 const SizedBox(
                   height: 16,
                 )

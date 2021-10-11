@@ -28,22 +28,22 @@ abstract class BaseRepositoryWithDio {
   String get linkHost;
 
   @protected
-  Dio get dio {
+  Dio? get dio {
     if (!_dios.containsKey(linkHost)) {
       _dios[linkHost] = Dio();
-      _dios[linkHost].options = BaseOptions(
+      _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
           connectTimeout: 5000,
           receiveTimeout: 5000,
           sendTimeout: 5000);
-      _dios[linkHost].interceptors.add(CookieManager(cookieJar));
-      _dios[linkHost].interceptors.add(DioLogInterceptor());
+      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      _dios[linkHost]!.interceptors.add(DioLogInterceptor());
   }
     return _dios[linkHost];
   }
 
   @protected
-  NonpersistentCookieJar get cookieJar {
+  NonpersistentCookieJar? get cookieJar {
     if (!_cookieJars.containsKey(linkHost)) {
       _cookieJars[linkHost] = NonpersistentCookieJar();
     }

@@ -62,13 +62,13 @@ class SettingsSubpage extends PlatformSubpage
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 
-  SettingsSubpage({Key key});
+  SettingsSubpage({Key? key});
 
   @override
   String get debugTag => "SettingsPage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).settings;
+  Create<String> get title => (cxt) => S.of(cxt)!.settings;
 }
 
 class _SettingsSubpageState extends State<SettingsSubpage>
@@ -157,7 +157,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     LicenseItem(
         "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
   ];
-  BannerAd myBanner;
+  BannerAd? myBanner;
 
   @override
   void initState() {
@@ -165,7 +165,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     myBanner = AdManager.loadBannerAd(3); // 3 for settings page
   }
 
-  String _clearCacheSubtitle;
+  String? _clearCacheSubtitle;
 
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -178,7 +178,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   /// Pop up a dialog where user can give his name & password.
   void _showLoginDialog({bool forceLogin = false}) {
-    ValueNotifier<PersonInfo> _infoNotifier = StateProvider.personInfo;
+    ValueNotifier<PersonInfo?> _infoNotifier = StateProvider.personInfo;
     showPlatformDialog(
         context: context,
         barrierDismissible: false,
@@ -200,10 +200,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)),
+          child: Text(value.displayTitle(context)!),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)),
+          title: Text(value.displayTitle(context)!),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -223,10 +223,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)),
+          child: Text(value.displayTitle(context)!),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)),
+          title: Text(value.displayTitle(context)!),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -263,12 +263,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         Card(
                           child: Column(children: <Widget>[
                             ListTile(
-                              title: Text(S.of(context).account),
+                              title: Text(S.of(context)!.account),
                               leading: PlatformX.isMaterial(context)
                                   ? const Icon(Icons.account_circle)
                                   : const Icon(CupertinoIcons.person_circle),
                               subtitle: Text(
-                                  "${StateProvider.personInfo.value.name} (${StateProvider.personInfo.value.id})"),
+                                  "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
                               onTap: () {
                                 showPlatformDialog(
                                   context: context,
@@ -276,19 +276,19 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   builder: (BuildContext context) =>
                                       PlatformAlertDialog(
                                     title: Text(S
-                                        .of(context)
+                                        .of(context)!
                                         .logout_question_prompt_title),
                                     content: Text(
-                                        S.of(context).logout_question_prompt),
+                                        S.of(context)!.logout_question_prompt),
                                     actions: [
                                       PlatformDialogAction(
-                                        child: Text(S.of(context).cancel),
+                                        child: Text(S.of(context)!.cancel),
                                         onPressed: () =>
                                             Navigator.of(context).pop(),
                                       ),
                                       PlatformDialogAction(
                                           child: Text(
-                                            S.of(context).i_see,
+                                            S.of(context)!.i_see,
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .errorColor),
@@ -305,13 +305,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
                             // Campus
                             ListTile(
-                              title: Text(S.of(context).default_campus),
+                              title: Text(S.of(context)!.default_campus),
                               leading: PlatformX.isMaterial(context)
                                   ? const Icon(Icons.location_on)
                                   : const Icon(CupertinoIcons.location_fill),
                               subtitle: Text(SettingsProvider.getInstance()
                                   .campus
-                                  .displayTitle(context)),
+                                  .displayTitle(context)!),
                               onTap: () {
                                 showPlatformModalSheet(
                                     context: context,
@@ -319,11 +319,11 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                           cupertino: (_, __) =>
                                               CupertinoActionSheet(
                                             title: Text(
-                                                S.of(context).select_campus),
+                                                S.of(context)!.select_campus),
                                             actions: _buildCampusAreaList(),
                                             cancelButton:
                                                 CupertinoActionSheetAction(
-                                              child: Text(S.of(context).cancel),
+                                              child: Text(S.of(context)!.cancel),
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                               },
@@ -344,12 +344,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         // Accessibility
                         Card(
                           child: ListTile(
-                            title: Text(S.of(context).accessibility_coloring),
+                            title: Text(S.of(context)!.accessibility_coloring),
                             leading: Icon(Icons.accessibility_new_rounded),
                             subtitle: Text(SettingsProvider.getInstance()
                                     .useAccessibilityColoring
-                                ? S.of(context).enabled
-                                : S.of(context).disabled),
+                                ? S.of(context)!.enabled
+                                : S.of(context)!.disabled),
                             onTap: () {
                               SettingsProvider.getInstance()
                                       .useAccessibilityColoring =
@@ -368,10 +368,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               if (PlatformX.isWindows)
                                 SwitchListTile(
                                   title: Text(
-                                      S.of(context).windows_auto_start_title),
+                                      S.of(context)!.windows_auto_start_title),
                                   secondary: const Icon(Icons.settings_power),
                                   subtitle: Text(S
-                                      .of(context)
+                                      .of(context)!
                                       .windows_auto_start_description),
                                   value: WindowsAutoStart.autoStart,
                                   onChanged: (bool value) async {
@@ -379,10 +379,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     await Noticing.showNotice(
                                         context,
                                         S
-                                            .of(context)
+                                            .of(context)!
                                             .windows_auto_start_wait_dialog_message,
                                         title: S
-                                            .of(context)
+                                            .of(context)!
                                             .windows_auto_start_wait_dialog_title,
                                         useSnackBar: false);
                                     refreshSelf();
@@ -390,13 +390,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 ),
                               ListTile(
                                 title:
-                                    Text(S.of(context).fduhole_nsfw_behavior),
+                                    Text(S.of(context)!.fduhole_nsfw_behavior),
                                 leading: PlatformX.isMaterial(context)
                                     ? const Icon(Icons.hide_image)
                                     : const Icon(CupertinoIcons.eye_slash),
                                 subtitle: Text(SettingsProvider.getInstance()
                                     .fduholeFoldBehavior
-                                    .displayTitle(context)),
+                                    .displayTitle(context)!),
                                 onTap: () {
                                   showPlatformModalSheet(
                                       context: context,
@@ -404,13 +404,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                             cupertino: (_, __) =>
                                                 CupertinoActionSheet(
                                               title: Text(S
-                                                  .of(context)
+                                                  .of(context)!
                                                   .fduhole_nsfw_behavior),
                                               actions: _buildFoldBehaviorList(),
                                               cancelButton:
                                                   CupertinoActionSheetAction(
                                                 child:
-                                                    Text(S.of(context).cancel),
+                                                    Text(S.of(context)!.cancel),
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
                                                 },
@@ -427,10 +427,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 },
                               ),
                               SwitchListTile(
-                                title: Text(S.of(context).fduhole_clean_mode),
+                                title: Text(S.of(context)!.fduhole_clean_mode),
                                 secondary: const Icon(Icons.ac_unit),
                                 subtitle: Text(S
-                                    .of(context)
+                                    .of(context)!
                                     .fduhole_clean_mode_description),
                                 value: SettingsProvider.getInstance().cleanMode,
                                 onChanged: (bool value) {
@@ -443,9 +443,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               ListTile(
                                 leading: Icon(PlatformIcons(context).tag),
-                                title: Text(S.of(context).fduhole_hidden_tags),
+                                title: Text(S.of(context)!.fduhole_hidden_tags),
                                 subtitle: Text(S
-                                    .of(context)
+                                    .of(context)!
                                     .fduhole_hidden_tags_description),
                                 onTap: () async {
                                   await smartNavigatorPush(
@@ -457,14 +457,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ListTile(
                                 leading:
                                     Icon(PlatformIcons(context).photoLibrary),
-                                title: Text(S.of(context).clear_cache),
+                                title: Text(S.of(context)!.clear_cache),
                                 subtitle: Text(_clearCacheSubtitle ??
-                                    S.of(context).clear_cache_description),
+                                    S.of(context)!.clear_cache_description),
                                 onTap: () async {
                                   await DefaultCacheManager().emptyCache();
                                   setState(() {
                                     _clearCacheSubtitle =
-                                        S.of(context).cache_cleared;
+                                        S.of(context)!.cache_cleared;
                                   });
                                 },
                               ),
@@ -476,18 +476,18 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           //Theme Selection
                           Card(
                             child: ListTile(
-                              title: Text(S.of(context).theme),
+                              title: Text(S.of(context)!.theme),
                               leading: PlatformX.isMaterial(context)
                                   ? const Icon(Icons.color_lens)
                                   : const Icon(CupertinoIcons.color_filter),
                               subtitle: Text(PlatformX.isMaterial(context)
-                                  ? S.of(context).material
-                                  : S.of(context).cupertino),
+                                  ? S.of(context)!.material
+                                  : S.of(context)!.cupertino),
                               onTap: () {
                                 PlatformX.isMaterial(context)
-                                    ? PlatformProvider.of(context)
+                                    ? PlatformProvider.of(context)!
                                         .changeToCupertinoPlatform()
-                                    : PlatformProvider.of(context)
+                                    : PlatformProvider.of(context)!
                                         .changeToMaterialPlatform();
                               },
                             ),
@@ -501,11 +501,11 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             leading: Icon(
                               PlatformIcons(context).heartSolid,
                             ),
-                            title: Text(S.of(context).sponsor_us),
+                            title: Text(S.of(context)!.sponsor_us),
                             subtitle: Text(
                                 SettingsProvider.getInstance().isAdEnabled
-                                    ? S.of(context).sponsor_us_enabled
-                                    : S.of(context).sponsor_us_disabled),
+                                    ? S.of(context)!.sponsor_us_enabled
+                                    : S.of(context)!.sponsor_us_disabled),
                             onTap: () async {
                               if (SettingsProvider.getInstance().isAdEnabled) {
                                 _toggleAdDisplay();
@@ -536,23 +536,23 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
-  Future<bool> _showAdsDialog() => showPlatformDialog<bool>(
+  Future<bool?> _showAdsDialog() => showPlatformDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-            title: Text(S.of(context).sponsor_us),
+            title: Text(S.of(context)!.sponsor_us),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(S.of(context).sponsor_us_detail),
+                Text(S.of(context)!.sponsor_us_detail),
               ],
             ),
             actions: [
               TextButton(
-                child: Text(S.of(context).cancel),
+                child: Text(S.of(context)!.cancel),
                 onPressed: () => Navigator.of(context).pop(false),
               ),
               TextButton(
-                child: Text(S.of(context).i_see),
+                child: Text(S.of(context)!.i_see),
                 onPressed: () => Navigator.of(context).pop(true),
               ),
             ],
@@ -565,7 +565,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(S.of(context).thankyouforenablingads),
+                Text(S.of(context)!.thankyouforenablingads),
               ],
             ),
           ));
@@ -573,15 +573,15 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
       builder: (_) => AlertDialog(
-            title: Text(S.of(context).fduhole_clean_mode),
+            title: Text(S.of(context)!.fduhole_clean_mode),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(S.of(context).fduhole_clean_mode_detail),
+                Text(S.of(context)!.fduhole_clean_mode_detail),
                 SizedBox(
                   height: 8,
                 ),
-                Text(S.of(context).before_enabled),
+                Text(S.of(context)!.before_enabled),
                 SizedBox(
                   height: 4,
                 ),
@@ -592,7 +592,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 SizedBox(
                   height: 8,
                 ),
-                Text(S.of(context).after_enabled),
+                Text(S.of(context)!.after_enabled),
                 SizedBox(
                   height: 4,
                 ),
@@ -604,7 +604,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             ),
             actions: [
               TextButton(
-                child: Text(S.of(context).i_see),
+                child: Text(S.of(context)!.i_see),
                 onPressed: () => Navigator.of(context).pop(),
               )
             ],
@@ -616,10 +616,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     double _avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
     const double _avatarNameSpacing = 4;
-    TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
+    TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)
         .textTheme
-        .bodyText2
+        .bodyText2!
         .copyWith(color: Theme.of(context).accentColor);
     return Card(
         child: Theme(
@@ -629,7 +629,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 leading: PlatformX.isMaterial(context)
                     ? const Icon(Icons.info)
                     : const Icon(CupertinoIcons.info_circle),
-                title: Text(S.of(context).about),
+                title: Text(S.of(context)!.about),
                 children: <Widget>[
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -642,20 +642,20 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             children: <Widget>[
                               //Description
                               Text(
-                                S.of(context).app_description_title,
+                                S.of(context)!.app_description_title,
                                 textScaleFactor: 1.1,
                               ),
                               Divider(
                                 color: _originalDividerColor,
                               ),
-                              Text(S.of(context).app_description),
+                              Text(S.of(context)!.app_description),
                               const SizedBox(
                                 height: 16,
                               ),
 
                               //Terms and Conditions
                               Text(
-                                S.of(context).terms_and_conditions_title,
+                                S.of(context)!.terms_and_conditions_title,
                                 textScaleFactor: 1.1,
                               ),
                               Divider(
@@ -666,32 +666,32 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 TextSpan(
                                   style: defaultText,
                                   text: S
-                                      .of(context)
+                                      .of(context)!
                                       .terms_and_conditions_content,
                                 ),
                                 TextSpan(
                                     style: linkText,
-                                    text: S.of(context).privacy_policy,
+                                    text: S.of(context)!.privacy_policy,
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () async {
                                         await BrowserUtil.openUrl(
-                                            S.of(context).privacy_policy_url,
+                                            S.of(context)!.privacy_policy_url,
                                             context);
                                       }),
                                 TextSpan(
                                   style: defaultText,
                                   text: S
-                                      .of(context)
+                                      .of(context)!
                                       .terms_and_conditions_content_end,
                                 ),
                                 TextSpan(
                                   style: defaultText,
-                                  text: S.of(context).view_ossl,
+                                  text: S.of(context)!.view_ossl,
                                 ),
                                 TextSpan(
                                     style: linkText,
                                     text: S
-                                        .of(context)
+                                        .of(context)!
                                         .open_source_software_licenses,
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
@@ -709,7 +709,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
                               //Acknowledgement
                               Text(
-                                S.of(context).acknowledgements,
+                                S.of(context)!.acknowledgements,
                                 textScaleFactor: 1.1,
                               ),
                               Divider(
@@ -719,22 +719,22 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   text: TextSpan(children: [
                                 TextSpan(
                                   style: defaultText,
-                                  text: S.of(context).acknowledgements_1,
+                                  text: S.of(context)!.acknowledgements_1,
                                 ),
                                 TextSpan(
                                     style: linkText,
-                                    text: S.of(context).acknowledgement_name_1,
+                                    text: S.of(context)!.acknowledgement_name_1,
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () async {
                                         await BrowserUtil.openUrl(
                                             S
-                                                .of(context)
+                                                .of(context)!
                                                 .acknowledgement_link_1,
                                             context);
                                       }),
                                 TextSpan(
                                   style: defaultText,
-                                  text: S.of(context).acknowledgements_2,
+                                  text: S.of(context)!.acknowledgements_2,
                                 ),
                               ])),
 
@@ -744,7 +744,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
                               // Authors
                               Text(
-                                S.of(context).authors,
+                                S.of(context)!.authors,
                                 textScaleFactor: 1.1,
                               ),
                               Divider(
@@ -771,15 +771,15 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context)
+                                                        .of(context)!
                                                         .dev_image_url_1)))),
                                         onTap: () => BrowserUtil.openUrl(
-                                            S.of(context).dev_page_1, context),
+                                            S.of(context)!.dev_page_1, context),
                                       ),
                                       const SizedBox(
                                           height: _avatarNameSpacing),
                                       Text(
-                                        S.of(context).dev_name_1,
+                                        S.of(context)!.dev_name_1,
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
@@ -798,15 +798,15 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context)
+                                                        .of(context)!
                                                         .dev_image_url_2)))),
                                         onTap: () => BrowserUtil.openUrl(
-                                            S.of(context).dev_page_2, context),
+                                            S.of(context)!.dev_page_2, context),
                                       ),
                                       const SizedBox(
                                           height: _avatarNameSpacing),
                                       Text(
-                                        S.of(context).dev_name_2,
+                                        S.of(context)!.dev_name_2,
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
@@ -825,18 +825,18 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context)
+                                                        .of(context)!
                                                         .dev_image_url_3)))),
                                         onTap: () {
                                           BrowserUtil.openUrl(
-                                              S.of(context).dev_page_3,
+                                              S.of(context)!.dev_page_3,
                                               context);
                                         },
                                       ),
                                       const SizedBox(
                                           height: _avatarNameSpacing),
                                       Text(
-                                        S.of(context).dev_name_3,
+                                        S.of(context)!.dev_name_3,
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
@@ -855,18 +855,18 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 image: new DecorationImage(
                                                     fit: BoxFit.fill,
                                                     image: new AssetImage(S
-                                                        .of(context)
+                                                        .of(context)!
                                                         .dev_image_url_4)))),
                                         onTap: () {
                                           BrowserUtil.openUrl(
-                                              S.of(context).dev_page_4,
+                                              S.of(context)!.dev_page_4,
                                               context);
                                         },
                                       ),
                                       const SizedBox(
                                           height: _avatarNameSpacing),
                                       Text(
-                                        S.of(context).dev_name_4,
+                                        S.of(context)!.dev_name_4,
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
@@ -878,7 +878,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  '${S.of(context).version} ${Pubspec.major}.${Pubspec.minor}.${Pubspec.patch} build ${Pubspec.build.first}',
+                                  '${S.of(context)!.version} ${Pubspec.major}.${Pubspec.minor}.${Pubspec.patch} build ${Pubspec.build.first}',
                                   textScaleFactor: 0.7,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
@@ -888,7 +888,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
                                   Text(
-                                    S.of(context).author_descriptor,
+                                    S.of(context)!.author_descriptor,
                                     textScaleFactor: 0.7,
                                     textAlign: TextAlign.right,
                                   )
@@ -902,9 +902,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         children: <Widget>[
                           FutureWidget<bool>(
                             successBuilder: (context, snapshot) {
-                              if (snapshot.data)
+                              if (snapshot.data!)
                                 return TextButton(
-                                  child: Text(S.of(context).rate),
+                                  child: Text(S.of(context)!.rate),
                                   onPressed: () {
                                     inAppReview.openStoreListing(
                                       appStoreId: Constant.APPSTORE_APPID,
@@ -920,12 +920,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           ),
                           const SizedBox(width: 8),
                           TextButton(
-                            child: Text(S.of(context).contact_us),
+                            child: Text(S.of(context)!.contact_us),
                             onPressed: () async {
                               final Email email = Email(
                                 body: '',
-                                subject: S.of(context).app_feedback,
-                                recipients: [S.of(context).feedback_email],
+                                subject: S.of(context)!.app_feedback,
+                                recipients: [S.of(context)!.feedback_email],
                                 isHTML: false,
                               );
                               await FlutterEmailSender.send(email);
@@ -933,10 +933,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           ),
                           const SizedBox(width: 8),
                           TextButton(
-                            child: Text(S.of(context).project_page),
+                            child: Text(S.of(context)!.project_page),
                             onPressed: () {
                               BrowserUtil.openUrl(
-                                  S.of(context).project_url, context);
+                                  S.of(context)!.project_url, context);
                             },
                           ),
                           const SizedBox(width: 8),

@@ -31,19 +31,19 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class BBSHiddenTagsPreferencePage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _BBSHiddenTagsPreferencePageState createState() =>
       _BBSHiddenTagsPreferencePageState();
 
-  BBSHiddenTagsPreferencePage({Key key, this.arguments});
+  BBSHiddenTagsPreferencePage({Key? key, this.arguments});
 }
 
 class _BBSHiddenTagsPreferencePageState
     extends State<BBSHiddenTagsPreferencePage> {
-  List<PostTag> tags;
-  List<PostTag> _allTags;
+  List<PostTag>? tags;
+  List<PostTag>? _allTags;
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _BBSHiddenTagsPreferencePageState
       iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).fduhole_hidden_tags_title),
+        title: Text(S.of(context)!.fduhole_hidden_tags_title),
       ),
       body: MediaQuery.removePadding(
         removeTop: true,
@@ -68,24 +68,24 @@ class _BBSHiddenTagsPreferencePageState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: FlutterTagging<PostTag>(
-                initialItems: tags,
+                initialItems: tags ?? [],
                 emptyBuilder: (context) => Wrap(
                       alignment: WrapAlignment.spaceAround,
                       children: [
-                        Text(S.of(context).no_data),
+                        Text(S.of(context)!.no_data),
                       ],
                     ),
                 textFieldConfiguration: TextFieldConfiguration(
                   decoration: InputDecoration(
                     labelStyle: TextStyle(fontSize: 12),
-                    labelText: S.of(context).select_tags,
+                    labelText: S.of(context)!.select_tags,
                   ),
                 ),
                 findSuggestions: (String filter) async {
                   if (_allTags == null)
                     _allTags = await PostRepository.getInstance().loadTags();
-                  return _allTags
-                      .where((value) => value.name
+                  return _allTags!
+                      .where((value) => value.name!
                           .toLowerCase()
                           .contains(filter.toLowerCase()))
                       .toList();
@@ -95,7 +95,7 @@ class _BBSHiddenTagsPreferencePageState
                 onAdded: (tag) => tag,
                 configureSuggestion: (tag) => SuggestionConfiguration(
                       title: Text(
-                        tag.name,
+                        tag.name!,
                         style: TextStyle(
                             color: Constant.getColorFromString(tag.color)),
                       ),
@@ -122,7 +122,7 @@ class _BBSHiddenTagsPreferencePageState
                           Icons.add_circle,
                           color: Colors.white,
                         ),
-                        label: Text(S.of(context).add_new_tag),
+                        label: Text(S.of(context)!.add_new_tag),
                         labelStyle: TextStyle(
                           color: Colors.white,
                           fontSize: 14.0,
@@ -132,7 +132,7 @@ class _BBSHiddenTagsPreferencePageState
                       ),
                     ),
                 configureChip: (tag) => ChipConfiguration(
-                      label: Text(tag.name),
+                      label: Text(tag.name!),
                       backgroundColor: Constant.getColorFromString(tag.color),
                       labelStyle: TextStyle(
                           color: Constant.getColorFromString(tag.color)

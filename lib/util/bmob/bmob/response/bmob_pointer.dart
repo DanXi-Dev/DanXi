@@ -5,9 +5,9 @@ part 'bmob_pointer.g.dart';
 
 @JsonSerializable()
 class BmobPointer {
-  String __type;
-  String className;
-  String objectId;
+  String? __type;
+  String? className;
+  String? objectId;
 
   BmobPointer();
 

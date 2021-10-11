@@ -7,7 +7,7 @@ part of 'bmob_handled.dart';
 // **************************************************************************
 
 BmobHandled _$BmobHandledFromJson(Map<String, dynamic> json) {
-  return BmobHandled()..msg = json['msg'] as String;
+  return BmobHandled()..msg = json['msg'] as String?;
 }
 
 Map<String, dynamic> _$BmobHandledToJson(BmobHandled instance) =>

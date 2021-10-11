@@ -26,8 +26,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
-BaseRender kHtmlRender = (BuildContext context, String content,
-    ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
+BaseRender kHtmlRender = (BuildContext context, String? content,
+    ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
   Style noPaddingStyle = Style(
     margin: EdgeInsets.zero,
@@ -72,18 +72,18 @@ MarkdownStyleSheet _fontSizeOverride(
   );
 }
 
-BaseRender kMarkdownRender = (BuildContext context, String content,
-    ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
+BaseRender kMarkdownRender = (BuildContext context, String? content,
+    ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
   return MarkdownBody(
     softLineBreak: true,
-    data: content,
+    data: content!,
     styleSheet: _fontSizeOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
-    onTapLink: (String text, String href, String title) =>
+    onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    imageBuilder: (Uri uri, String title, String alt) {
+    imageBuilder: (Uri uri, String? title, String? alt) {
       if (uri != null && uri.toString() != null) {
         return Center(
           child: AutoBBSImage(
@@ -97,16 +97,16 @@ BaseRender kMarkdownRender = (BuildContext context, String content,
   );
 };
 
-BaseRender kMarkdownSelectorRender = (BuildContext context, String content,
-    ImageTapCallback onTapImage, LinkTapCallback onTapLink) {
+BaseRender kMarkdownSelectorRender = (BuildContext context, String? content,
+    ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   return Markdown(
     softLineBreak: true,
     selectable: true,
-    data: content,
+    data: content!,
     styleSheet: _fontSizeOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
-    onTapLink: (String text, String href, String title) =>
+    onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    imageBuilder: (Uri uri, String title, String alt) => Container(),
+    imageBuilder: (Uri uri, String? title, String? alt) => Container(),
   );
 };

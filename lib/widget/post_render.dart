@@ -19,15 +19,15 @@ import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:flutter/widgets.dart';
 
 class PostRenderWidget extends StatelessWidget {
-  final String content;
+  final String? content;
   final BaseRender render;
-  final ImageTapCallback onTapImage;
-  final LinkTapCallback onTapLink;
+  final ImageTapCallback? onTapImage;
+  final LinkTapCallback? onTapLink;
 
   const PostRenderWidget(
-      {Key key,
-      @required this.content,
-      @required this.render,
+      {Key? key,
+      required this.content,
+      required this.render,
       this.onTapImage,
       this.onTapLink})
       : super(key: key);

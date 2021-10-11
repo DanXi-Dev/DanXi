@@ -21,30 +21,30 @@ import 'package:ical/serializer.dart';
 class ICSConverter extends TimetableConverter {
   /// Convert [table] to .ics format string
   @override
-  String convertTo(TimeTable table) {
+  String convertTo(TimeTable? table) {
     ICalendar calendar = ICalendar(company: 'DanXi', lang: "CN");
     for (int weekNum = 0; weekNum <= 24; weekNum++) {
-      Map<int, List<Event>> weekTable = table.toWeekCourses(weekNum);
+      Map<int, List<Event>> weekTable = table!.toWeekCourses(weekNum);
       for (int day = 0; day < 7; day++) {
-        weekTable[day].forEach((event) {
+        weekTable[day]!.forEach((event) {
           calendar.addElement(IEvent(
               status: IEventStatus.CONFIRMED,
               classification: IClass.PUBLIC,
-              description: event.course.teacherNames.join(","),
-              location: event.course.roomName,
-              summary: event.course.courseName,
-              start: table.startTime.add(Duration(
+              description: event.course.teacherNames!.join(","),
+              location: event.course.roomName!,
+              summary: event.course.courseName!,
+              start: table.startTime!.add(Duration(
                   days: 7 * (weekNum - 1) + day,
-                  hours: TimeTable.kCourseSlotStartTime[event.time.slot].hour,
+                  hours: TimeTable.kCourseSlotStartTime[event.time.slot!].hour!,
                   minutes:
-                      TimeTable.kCourseSlotStartTime[event.time.slot].minute)),
-              end: table.startTime
+                      TimeTable.kCourseSlotStartTime[event.time.slot!].minute!)),
+              end: table.startTime!
                   .add(Duration(
                       days: 7 * (weekNum - 1) + day,
                       hours:
-                          TimeTable.kCourseSlotStartTime[event.time.slot].hour,
+                          TimeTable.kCourseSlotStartTime[event.time.slot!].hour!,
                       minutes: TimeTable
-                          .kCourseSlotStartTime[event.time.slot].minute))
+                          .kCourseSlotStartTime[event.time.slot!].minute!))
                   .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE))));
         });
       }

@@ -21,7 +21,7 @@ class EditorObject {
   /// The post id or discussion id.
   ///
   /// Set to 0 if creating a new post.
-  final int id;
+  final int? id;
   final EditorObjectType type;
 
   @override

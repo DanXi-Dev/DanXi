@@ -29,7 +29,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class FudanAAONoticesFeature extends Feature {
-  List<Notice> _initialData;
+  List<Notice>? _initialData;
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   Future<void> _loadNotices() async {
@@ -43,7 +43,7 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -56,26 +56,24 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context).fudan_aao_notices;
+  String get mainTitle => S.of(context!)!.fudan_aao_notices;
 
   @override
-  String get subTitle {
+  String? get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
+        return S.of(context!)!.loading;
       case ConnectionStatus.DONE:
         if (_initialData != null) {
-          return _initialData.length > 0 ? _initialData.first?.title : null;
+          return _initialData!.length > 0 ? _initialData!.first.title : null;
         } else {
           return null;
         }
-        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
+        return S.of(context!)!.failed;
     }
-    return '';
   }
 
   void refreshData() {
@@ -91,7 +89,7 @@ class FudanAAONoticesFeature extends Feature {
   @override
   void onTap() {
     if (_initialData != null) {
-      smartNavigatorPush(context, "/notice/aao/list",
+      smartNavigatorPush(context!, "/notice/aao/list",
           arguments: {"initialData": _initialData});
     } else {
       refreshData();
@@ -99,10 +97,10 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }

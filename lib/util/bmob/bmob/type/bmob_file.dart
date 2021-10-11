@@ -6,10 +6,10 @@ part 'bmob_file.g.dart';
 @JsonSerializable()
 class BmobFile {
   @JsonKey(name: "__type")
-  String type;
-  String cdn;
-  String url;
-  String filename;
+  String? type;
+  String? cdn;
+  String? url;
+  String? filename;
 
   BmobFile() {
     type = "File";

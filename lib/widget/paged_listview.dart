@@ -42,13 +42,13 @@ class PagedListView<T> extends StatefulWidget {
   /// continue to the next one.
   ///
   /// [noneItem] only come into effect when it is NOT null.
-  final T noneItem;
+  final T? noneItem;
 
   /// Use the PagedListViewController to control its behaviour, e.g. refreshing
-  final PagedListViewController pagedController;
+  final PagedListViewController? pagedController;
 
   /// The data that will be used as preloaded data before loading.
-  final List<T> initialData;
+  final List<T>? initialData;
 
   /// The builder to build every list item.
   final IndexedDataWidgetBuilder<T> builder;
@@ -60,10 +60,10 @@ class PagedListView<T> extends StatefulWidget {
   final WidgetBuilder endBuilder;
 
   /// The builder to build head widget.
-  final WidgetBuilder headBuilder;
+  final WidgetBuilder? headBuilder;
 
   /// The builder to build empty widget.
-  final WidgetBuilder emptyBuilder;
+  final WidgetBuilder? emptyBuilder;
 
   /// The start number of page index, usually zero to say that the first page is Page 0.
   final int startPage;
@@ -75,29 +75,29 @@ class PagedListView<T> extends StatefulWidget {
   final DataReceiver<T> dataReceiver;
 
   /// The scrollController of the ListView. If not set, it will be PrimaryScrollController.
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   /// Should add a scrollbar or not. If true, [scrollController] may not be null.
   final bool withScrollbar;
 
   /// If not null, will use this data source instead. Using this will turn PagedListView into a regular ListView with customizations.
-  final Future<List<T>> allDataReceiver;
+  final Future<List<T>>? allDataReceiver;
 
   /// Whether this should scroll to end upon loading complete
   /// Will be executed only once
-  final bool shouldScrollToEnd;
+  final bool? shouldScrollToEnd;
 
   const PagedListView(
-      {Key key,
+      {Key? key,
       this.pagedController,
       this.initialData = const [],
-      @required this.builder,
-      @required this.loadingBuilder,
+      required this.builder,
+      required this.loadingBuilder,
       this.headBuilder,
       this.emptyBuilder,
       this.startPage = 0,
-      @required this.endBuilder,
-      @required this.dataReceiver,
+      required this.endBuilder,
+      required this.dataReceiver,
       this.scrollController,
       this.withScrollbar = false,
       this.allDataReceiver,
@@ -118,7 +118,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   /// Whether the ListView should load anymore after reaching the bottom.
   bool _shouldLoad = true;
-  int pageIndex;
+  int pageIndex = 1;
   bool _isRefreshing = false;
   bool _isEnded = false;
   bool _hasHeadWidget = false;
@@ -126,9 +126,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _hasError = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
-  Future<List<T>> _futureData;
+  Future<List<T>?>? _futureData;
 
-  ScrollController get currentController =>
+  ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
 
   @override
@@ -165,16 +165,16 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   _buildListBody() {
-    return FutureWidget<List<T>>(
+    return FutureWidget<List<T>?>(
         future: _futureData,
         successBuilder: (_, snapshot) {
           // Handle Scroll To End Requests
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
+          WidgetsBinding.instance!.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
-              while (currentController.position.pixels <
-                  currentController.position.maxScrollExtent) {
-                currentController
-                    .jumpTo(currentController.position.maxScrollExtent);
+              while (currentController!.position.pixels <
+                  currentController!.position.maxScrollExtent) {
+                currentController!
+                    .jumpTo(currentController!.position.maxScrollExtent);
 
                 // TODO: Evil hack to wait for new contents to load
                 await Future.delayed(Duration(milliseconds: 100));
@@ -186,21 +186,21 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           _hasError = false;
 
           // Process with [noneItem]
-          if (snapshot.data.length == 1 &&
+          if (snapshot.data!.length == 1 &&
               widget.noneItem != null &&
-              snapshot.data.single == widget.noneItem) {
+              snapshot.data!.single == widget.noneItem) {
             return _buildListView();
           }
 
-          if (snapshot.data.isEmpty ||
+          if (snapshot.data!.isEmpty ||
               _data.isEmpty ||
-              snapshot.data.last != _data.last) {
-            _data.addAll(snapshot.data);
+              snapshot.data!.last != _data.last) {
+            _data.addAll(snapshot.data!);
             // Update value keys
-            valueKeys.addAll(List.generate(snapshot.data.length,
-                (index) => StateKey(snapshot.data[index])));
+            valueKeys.addAll(List.generate(snapshot.data!.length,
+                (index) => StateKey(snapshot.data![index])));
           }
-          if (snapshot.data.isEmpty) _isEnded = true;
+          if (snapshot.data!.isEmpty) _isEnded = true;
           return _buildListView();
         },
         errorBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
@@ -213,7 +213,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         });
   }
 
-  Widget _errorBuilder(AsyncSnapshot<List<T>> snapshot) {
+  Widget _errorBuilder(AsyncSnapshot<List<T>>? snapshot) {
     String error;
 
     if (snapshot == null)
@@ -228,7 +228,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       else if (snapshot.error is DioError)
         error = (snapshot.error as DioError).message.trim() +
             '\n' +
-            ((snapshot.error as DioError).response?.data?.toString()?.trim() ??
+            ((snapshot.error as DioError).response?.data?.toString().trim() ??
                 "");
       else
         error = snapshot.error.toString().trim();
@@ -242,7 +242,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                S.of(context).failed,
+                S.of(context)!.failed,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               const SizedBox(
@@ -250,10 +250,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
               ),
               Text(
                 error,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2
-                    .copyWith(color: Theme.of(context).textTheme.caption.color),
+                style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                    color: Theme.of(context).textTheme.caption!.color),
               ),
             ],
           ),
@@ -267,7 +265,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  Widget _buildListView({AsyncSnapshot<List<T>> snapshot}) {
+  Widget _buildListView({AsyncSnapshot<List<T>>? snapshot}) {
     // Show an empty indicator if there's no data at all.
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
       // Tell the listView not to try to load anymore.
@@ -277,9 +275,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         controller: widget.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          if (_hasHeadWidget) widget.headBuilder(context),
+          if (_hasHeadWidget) widget.headBuilder!(context),
           if (!_hasError && widget.emptyBuilder != null)
-            widget.emptyBuilder(context),
+            widget.emptyBuilder!(context),
         ],
       );
     }
@@ -298,10 +296,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  _getListItemAt(int index, AsyncSnapshot<List<T>> snapshot) {
+  _getListItemAt(int index, AsyncSnapshot<List<T>>? snapshot) {
     if (_hasHeadWidget) {
       if (index == 0) {
-        return widget.headBuilder(context);
+        return widget.headBuilder!(context);
       }
       index--;
     }
@@ -323,12 +321,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   // Move things into a separate function to control reload more easily
-  Future<List<T>> _setFuture({useInitialData = true}) {
+  Future<List<T>?> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
       if (widget.initialData != null &&
-          widget.initialData.isNotEmpty &&
+          widget.initialData!.isNotEmpty &&
           useInitialData) {
         _isRefreshing = true;
         return Future.value(widget.initialData);
@@ -340,7 +338,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       _shouldLoad = false;
       _isRefreshing = false;
       _isEnded = true;
-      return LazyFuture.pack(widget.allDataReceiver);
+      return LazyFuture.pack(widget.allDataReceiver!.then((value) => value));
     }
   }
 
@@ -381,20 +379,21 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     final double itemTop =
         valueKeys.getRange(0, index).fold<double>(0.0, (value, element) {
-      final RenderBox box = element.currentContext?.findRenderObject();
+      final RenderBox box =
+          element.currentContext.findRenderObject() as RenderBox;
       return value + box.size.height;
     });
-    await currentController.animateTo(itemTop,
-        duration: duration, curve: curve);
+    await currentController!
+        .animateTo(itemTop, duration: duration, curve: curve);
   }
 
   Future<void> scrollDelta(double pixels,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    await currentController.animateTo(currentController.offset + pixels,
+    await currentController!.animateTo(currentController!.offset + pixels,
         duration: duration, curve: curve);
   }
 
-  ScrollController getScrollController() {
+  ScrollController? getScrollController() {
     return currentController;
   }
 
@@ -415,15 +414,15 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   @override
   T getElementFirstWhere(bool Function(dynamic) test,
-          {dynamic Function() orElse}) =>
-      _data.firstWhere(test, orElse: orElse);
+          {dynamic Function()? orElse}) =>
+      _data.firstWhere(test, orElse: orElse as T Function()?);
 
   @override
   int getIndexOf(T element, [int start = 0]) => _data.indexOf(element, start);
 }
 
 class PagedListViewController<T> {
-  _PagedListViewState<T> _state;
+  _PagedListViewState<T>? _state;
 
   PagedListViewController();
 
@@ -459,7 +458,7 @@ class PagedListViewController<T> {
     await _state?.scrollDelta(pixels, duration, curve);
   }
 
-  ScrollController getScrollController() {
+  ScrollController? getScrollController() {
     return _state?.getScrollController();
   }
 
@@ -478,7 +477,7 @@ mixin ListProvider<T> {
   T getElementAt(int index);
 
   T getElementFirstWhere(bool Function(dynamic) test,
-      {dynamic Function() orElse});
+      {dynamic Function()? orElse});
 
   int getIndexOf(T element, [int start = 0]);
 }
@@ -488,7 +487,7 @@ typedef IndexedDataWidgetBuilder<T> = Widget Function(
     BuildContext context, ListProvider<T> dataProvider, int index, T data);
 
 /// Retrieve data function
-typedef DataReceiver<T> = Future<List<T>> Function(int pageIndex);
+typedef DataReceiver<T> = Future<List<T>?> Function(int pageIndex);
 
 /// Notify refreshing callback
 typedef RefreshListener = void Function();

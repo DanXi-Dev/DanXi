@@ -23,13 +23,13 @@ import 'package:flutter/material.dart';
 /// A simple implementation of [FeatureContainerState] to show the feature as a [Card].
 class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   final Feature feature;
-  final Map<String, dynamic> arguments;
-  final Function onDismissed;
+  final Map<String, dynamic>? arguments;
+  final Function? onDismissed;
 
   @override
   _FeatureCardItemState createState() => _FeatureCardItemState();
 
-  FeatureCardItem({@required this.feature, this.arguments, this.onDismissed});
+  FeatureCardItem({required this.feature, this.arguments, this.onDismissed});
 
   @override
   Feature get childFeature => feature;
@@ -37,7 +37,7 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
 
 class _FeatureCardItemState extends State<FeatureCardItem>
     with FeatureContainerState {
-  Key _key;
+  late Key _key;
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
       ..container = this
       ..buildFeature(widget.arguments);
 
-    List<String> summary = [];
+    List<String?> summary = [];
     summary.add(widget.feature.subTitle ?? "");
     if (widget.feature.tertiaryTitle != null)
       summary.add(widget.feature.tertiaryTitle);
@@ -68,12 +68,12 @@ class _FeatureCardItemState extends State<FeatureCardItem>
                   width: 8,
                 ),
                 Text(
-                  widget.feature.mainTitle,
+                  widget.feature.mainTitle!,
                   style: TextStyle(fontSize: 16),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 )
-              ].takeWhile((value) => value != null).toList(),
+              ].takeWhile((value) => value != null).toList() as List<Widget>,
             ),
             SizedBox(
               height: 8,
@@ -83,12 +83,12 @@ class _FeatureCardItemState extends State<FeatureCardItem>
                     summary.join("\n"),
               style: PlatformX.getTheme(context)
                         .textTheme
-                        .headline1
+                        .headline1!
                         .copyWith(fontSize: 12),
                   )
                 : widget.feature.customSubtitle,
             widget.feature.trailing
-          ].takeWhile((value) => value != null).toList(),
+          ].takeWhile((value) => value != null).toList() as List<Widget>,
         ),
       ),
     );

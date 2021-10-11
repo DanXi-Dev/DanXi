@@ -37,30 +37,30 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   static const String TYPE_NOTICE_ANNOUNCEMENT = "9397";
   static final _instance = FudanAAORepository._();
 
-  PersonInfo _info;
+  PersonInfo? _info;
 
   factory FudanAAORepository.getInstance() => _instance;
 
-  Future<NonpersistentCookieJar> get thisCookies async {
+  Future<NonpersistentCookieJar?> get thisCookies async {
     // Log in before getting cookies.
     await Retrier.runAsyncWithRetry(
-        () => UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, _info, true),
+        () => UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, _info, true),
         retryTimes: 3);
     return cookieJar;
   }
 
   Future<List<Notice>> getNotices(
-      String type, int page, PersonInfo info) async {
+      String type, int page, PersonInfo? info) async {
     _info = info;
     return Retrier.tryAsyncWithFix(
         () => _getNotices(type, page),
         (exception) async => await UISLoginTool.loginUIS(
-            dio, _LOGIN_URL, cookieJar, info, true));
+            dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<List<Notice>> _getNotices(String type, int page) async {
     List<Notice> notices = [];
-    Response response = await dio.get(_listUrl(type, page));
+    Response response = await dio!.get(_listUrl(type, page));
     if (response.data.toString().contains("Under Maintenance")) {
       throw NotConnectedToLANError();
     }
@@ -69,16 +69,16 @@ class FudanAAORepository extends BaseRepositoryWithDio {
         .find_all(".wp_article_list_table > tbody > tr > td > table > tbody");
     for (Element noticeNode in noticeNodes) {
       List<Element> noticeInfo =
-          noticeNode.querySelector("tr").querySelectorAll("td");
+          noticeNode.querySelector("tr")!.querySelectorAll("td");
       notices.add(Notice(
           noticeInfo[0].text.trim(),
-          _BASE_URL + noticeInfo[0].querySelector("a").attributes["href"],
+          _BASE_URL + noticeInfo[0].querySelector("a")!.attributes["href"]!,
           noticeInfo[1].text.trim()));
     }
     return notices;
   }
 
-  Future<bool> checkConnection(PersonInfo info) =>
+  Future<bool> checkConnection(PersonInfo? info) =>
       getNotices(TYPE_NOTICE_ANNOUNCEMENT, 1, info)
           .then((value) => true, onError: (e) => false);
 

@@ -61,12 +61,12 @@ class TimetableSubPage extends PlatformSubpage
   String get debugTag => "TimetablePage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).timetable;
+  Create<String> get title => (cxt) => S.of(cxt)!.timetable;
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt).share,
+            S.of(cxt)!.share,
             Icon(PlatformX.isAndroid
                 ? Icons.share
                 : CupertinoIcons.square_arrow_up),
@@ -87,19 +87,19 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   /// A map of all converters.
   ///
   /// A converter is to export the time table as a single file, e.g. .ics.
-  Map<String, TimetableConverter> converters;
+  late Map<String, TimetableConverter> converters;
 
   /// The time table it fetched.
-  TimeTable _table;
+  TimeTable? _table;
 
   ///The week it's showing on the time table.
-  TimeNow _showingTime;
+  TimeNow? _showingTime;
 
-  Future _content;
+  Future? _content;
 
   bool _loadFromRemote = false;
 
-  BannerAd bannerAd;
+  BannerAd? bannerAd;
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup))
@@ -162,7 +162,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                     cupertino: (_, __) => CupertinoActionSheet(
                       actions: _buildShareList(),
                       cancelButton: CupertinoActionSheetAction(
-                        child: Text(S.of(context).cancel),
+                        child: Text(S.of(context)!.cancel),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -221,7 +221,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           refreshSelf();
         },
         child: Center(
-          child: Text(S.of(context).failed),
+          child: Text(S.of(context)!.failed),
         ),
       ),
       loadingBuilder: Center(
@@ -232,17 +232,17 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   goToPrev() {
     setState(() {
-      _showingTime.week--;
+      _showingTime!.week--;
     });
   }
 
   goToNext() {
     setState(() {
-      _showingTime.week++;
+      _showingTime!.week++;
     });
   }
 
-  Widget _buildPage(TimeTable table) {
+  Widget _buildPage(TimeTable? table) {
     final TimetableStyle style = TimetableStyle(
         startHour: TimeTable.kCourseSlotStartTime[0].hour,
         laneHeight: 16,
@@ -250,8 +250,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemWidth: 16,
         timeItemHeight: 140);
     _table = table;
-    if (_showingTime == null) _showingTime = _table.now();
-    final List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
+    if (_showingTime == null) _showingTime = _table!.now();
+    final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
         compact: TableDisplayType.STANDARD);
     return SafeArea(
       child: RefreshIndicator(
@@ -273,17 +273,17 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               children: [
                 PlatformIconButton(
                   icon: Icon(Icons.chevron_left),
-                  onPressed: _showingTime.week > 0 ? goToPrev : null,
+                  onPressed: _showingTime!.week > 0 ? goToPrev : null,
                 ),
-                Text(S.of(context).week(_showingTime.week)),
+                Text(S.of(context)!.week(_showingTime!.week)),
                 PlatformIconButton(
                   icon: Icon(Icons.chevron_right),
                   onPressed:
-                      _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
+                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
                 )
               ],
             ),
-            ScheduleView(scheduleData, style, _table.now(), _showingTime.week,
+            ScheduleView(scheduleData, style, _table!.now(), _showingTime!.week,
                 widget.primaryScrollController(context)),
           ],
         ),

@@ -8,8 +8,8 @@ part of 'bmob_error.dart';
 
 BmobError _$BmobErrorFromJson(Map<String, dynamic> json) {
   return BmobError(
-    json['code'] as int,
-    json['error'] as String,
+    json['code'] as int?,
+    json['error'] as String?,
   );
 }
 

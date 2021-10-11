@@ -30,8 +30,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class PEFeature extends Feature {
-  PersonInfo _info;
-  List<ExerciseItem> _exercises;
+  PersonInfo? _info;
+  List<ExerciseItem>? _exercises;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -40,7 +40,7 @@ class PEFeature extends Feature {
     _status = ConnectionStatus.CONNECTING;
     _exercises = await FudanPERepository.getInstance()
         .loadExerciseRecords(_info)
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       _status = ConnectionStatus.FAILED;
       return null;
     });
@@ -49,7 +49,7 @@ class PEFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     _info = StateProvider.personInfo.value;
 
     // Only load data once.
@@ -62,54 +62,54 @@ class PEFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context).pe_exercises;
+  String get mainTitle => S.of(context!)!.pe_exercises;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
+        return S.of(context!)!.loading;
       case ConnectionStatus.DONE:
-        if (_exercises.isEmpty)
-          return S.of(context).no_data;
+        if (_exercises!.isEmpty)
+          return S.of(context!)!.no_data;
         else {
           // 1 Morning, 2 Must-do, 3 Select-do
           List<int> exerciseCategory = [0, 0, 0];
-          _exercises.forEach((element) {
+          _exercises!.forEach((element) {
             switch (element.title) {
               case '早操':
-                exerciseCategory[0] += element.times;
+                exerciseCategory[0] += element.times!;
                 break;
               case '课外活动':
-                exerciseCategory[2] += element.times;
+                exerciseCategory[2] += element.times!;
                 break;
               case '晚锻炼':
-                exerciseCategory[2] += element.times;
+                exerciseCategory[2] += element.times!;
                 break;
               case '仰卧起坐':
-                exerciseCategory[1] += element.times;
+                exerciseCategory[1] += element.times!;
                 break;
               case '引体向上':
-                exerciseCategory[1] += element.times;
+                exerciseCategory[1] += element.times!;
                 break;
               case '中长跑':
-                exerciseCategory[1] += element.times;
+                exerciseCategory[1] += element.times!;
                 break;
               case '立定跳远':
-                exerciseCategory[1] += element.times;
+                exerciseCategory[1] += element.times!;
                 break;
               case '周末上午':
-                exerciseCategory[2] += element.times;
+                exerciseCategory[2] += element.times!;
                 break;
               case '加章1':
-                exerciseCategory[0] += element.times;
+                exerciseCategory[0] += element.times!;
                 break;
               case '加章2':
-                exerciseCategory[1] += element.times;
+                exerciseCategory[1] += element.times!;
                 break;
               case '加章3':
-                exerciseCategory[2] += element.times;
+                exerciseCategory[2] += element.times!;
                 break;
             }
           });
@@ -118,16 +118,16 @@ class PEFeature extends Feature {
         break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
+        return S.of(context!)!.failed;
     }
     return '';
   }
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }
@@ -146,13 +146,13 @@ class PEFeature extends Feature {
 
   @override
   void onTap() {
-    if (_exercises != null && _exercises.isNotEmpty) {
+    if (_exercises != null && _exercises!.isNotEmpty) {
       String body = "";
-      _exercises.forEach((element) {
+      _exercises!.forEach((element) {
         body += "\n${element.title}: ${element.times}";
       });
-      Noticing.showNotice(context, body,
-          title: S.of(context).pe_exercises, useSnackBar: false);
+      Noticing.showNotice(context!, body,
+          title: S.of(context!)!.pe_exercises, useSnackBar: false);
     } else {
       refreshData();
     }

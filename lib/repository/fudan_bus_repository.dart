@@ -40,17 +40,17 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
   factory FudanBusRepository.getInstance() => _instance;
 
-  Future<List<BusScheduleItem>> loadBusList(PersonInfo info,
-      {bool holiday = false}) {
+  Future<List<BusScheduleItem>> loadBusList(PersonInfo? info,
+      {bool? holiday = false}) {
     return Retrier.tryAsyncWithFix(
-        () => _loadBusList(holiday: holiday),
+        () => _loadBusList(holiday: holiday!),
         (exception) =>
-            UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true));
+            UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<List<BusScheduleItem>> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];
-    Response r = await dio.post(_INFO_URL,
+    Response r = await dio!.post(_INFO_URL,
         data: FormData.fromMap(
             {"holiday": holiday.toRequestParamStringRepresentation()}));
     Map json = r.data is Map ? r.data : jsonDecode(r.data.toString());
@@ -68,15 +68,15 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 }
 
 class BusScheduleItem implements Comparable<BusScheduleItem> {
-  final String id;
+  final String? id;
   Campus start;
   Campus end;
-  VagueTime startTime;
-  VagueTime endTime;
+  VagueTime? startTime;
+  VagueTime? endTime;
   BusDirection direction;
   final bool holidayRun;
 
-  VagueTime get realStartTime => startTime ?? endTime;
+  VagueTime? get realStartTime => startTime ?? endTime;
 
   BusScheduleItem(this.id, this.start, this.end, this.startTime, this.endTime,
       this.direction, this.holidayRun);
@@ -96,7 +96,7 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
 
   @override
   int compareTo(BusScheduleItem other) =>
-      realStartTime.compareTo(other.realStartTime);
+      realStartTime!.compareTo(other.realStartTime!);
 }
 
 enum BusDirection {
@@ -115,7 +115,7 @@ extension busDirectionExtension on BusDirection {
   static const BACKWARD_ARROW = " ← ";
   static const DUAL_ARROW = " ↔ ";
 
-  String toText() {
+  String? toText() {
     switch (this) {
       case BusDirection.FORWARD:
         return FORWARD_ARROW;

@@ -34,13 +34,13 @@ class FudanLibraryRepository extends BaseRepositoryWithDio {
   ///
   /// Return a list of 4, respectively referring to 文图，理图，张江，枫林,
   /// but I do not know the order.
-  Future<List<int>> getLibraryRawData() async {
+  Future<List<int?>> getLibraryRawData() async {
     RegExp dataMatcher = RegExp(r'(?<=当前在馆人数：)[0-9]+');
-    Response r = await dio.get(_INFO_URL);
+    Response r = await dio!.get(_INFO_URL);
     String rawHtml = r.data.toString();
     return dataMatcher
         .allMatches(rawHtml)
-        .map((e) => int.tryParse(e.group(0)))
+        .map((e) => int.tryParse(e.group(0)!))
         .toList();
   }
   @override

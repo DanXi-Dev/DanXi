@@ -26,13 +26,13 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Simple helper class to show a [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
 class Noticing {
   static showNotice(BuildContext context, String message,
-      {String confirmText, String title, bool useSnackBar = true}) async {
+      {String? confirmText, String? title, bool useSnackBar = true}) async {
     if (PlatformX.isMaterial(context) && useSnackBar) {
       // Override Linkify's default text style.
       final bool isThemeDark = Theme.of(context).brightness == Brightness.dark;
       final Brightness invertBrightness =
           isThemeDark ? Brightness.light : Brightness.dark;
-      final TextStyle contentTextStyle =
+      final TextStyle? contentTextStyle =
           Theme.of(context).snackBarTheme.contentTextStyle ??
               ThemeData(brightness: invertBrightness).textTheme.subtitle1;
 
@@ -54,7 +54,7 @@ class Noticing {
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
-                      child: PlatformText(confirmText ?? S.of(context).i_see),
+                      child: PlatformText(confirmText ?? S.of(context)!.i_see),
                       onPressed: () => Navigator.pop(context)),
                 ],
               ));

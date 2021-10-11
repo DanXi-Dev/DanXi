@@ -22,21 +22,21 @@ class ScreenProxy {
   static const MethodChannel _channel =
       const MethodChannel('github.com/clovisnicolas/flutter_screen');
 
-  static Future<double> get brightness async {
+  static Future<double?> get brightness async {
     if (PlatformX.isMobile)
-      return (await _channel.invokeMethod('brightness')) as double;
+      return (await _channel.invokeMethod('brightness')) as double?;
     else
       return 1.0;
   }
 
-  static setBrightness(double brightness) async {
+  static setBrightness(double? brightness) async {
     if (PlatformX.isMobile)
       await _channel.invokeMethod('setBrightness', {"brightness": brightness});
   }
 
-  static Future<bool> get isKeptOn async {
+  static Future<bool?> get isKeptOn async {
     if (PlatformX.isMobile)
-      return (await _channel.invokeMethod('isKeptOn')) as bool;
+      return (await _channel.invokeMethod('isKeptOn')) as bool?;
     else
       return true;
   }
