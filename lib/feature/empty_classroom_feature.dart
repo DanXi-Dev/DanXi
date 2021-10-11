@@ -25,10 +25,10 @@ import 'package:flutter/widgets.dart';
 
 class EmptyClassroomFeature extends Feature {
   @override
-  String get mainTitle => S.of(context).empty_classrooms;
+  String get mainTitle => S.of(context!).empty_classrooms;
 
   @override
-  String get subTitle => S.of(context).tap_to_view;
+  String get subTitle => S.of(context!).tap_to_view;
 
   @override
   Widget get icon => PlatformX.isAndroid
@@ -36,7 +36,7 @@ class EmptyClassroomFeature extends Feature {
       : const Icon(CupertinoIcons.building_2_fill);
 
   @override
-  void onTap() async => smartNavigatorPush(context, '/room/detail');
+  void onTap() async => smartNavigatorPush(context!, '/room/detail');
 
   @override
   bool get clickable => true;

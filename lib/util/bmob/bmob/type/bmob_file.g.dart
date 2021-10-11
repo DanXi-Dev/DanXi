@@ -8,10 +8,10 @@ part of 'bmob_file.dart';
 
 BmobFile _$BmobFileFromJson(Map<String, dynamic> json) {
   return BmobFile()
-    ..type = json['__type'] as String
-    ..cdn = json['cdn'] as String
-    ..url = json['url'] as String
-    ..filename = json['filename'] as String;
+    ..type = json['__type'] as String?
+    ..cdn = json['cdn'] as String?
+    ..url = json['url'] as String?
+    ..filename = json['filename'] as String?;
 }
 
 Map<String, dynamic> _$BmobFileToJson(BmobFile instance) => <String, dynamic>{

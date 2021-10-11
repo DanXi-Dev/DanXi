@@ -159,7 +159,7 @@ class DanxiApp extends StatelessWidget {
                         textStyle: TextStyle(
                             color: PlatformX.getTheme(context)
                                 .textTheme
-                                .bodyText1
+                                .bodyText1!
                                 .color)))),
             // Configure i18n delegates
             localizationsDelegates: [
@@ -174,8 +174,8 @@ class DanxiApp extends StatelessWidget {
             ),
             // Configure the page route behaviour of the whole app
             onGenerateRoute: (settings) {
-              final Function pageContentBuilder =
-                  DanxiApp.routes[settings.name];
+              final Function? pageContentBuilder =
+                  DanxiApp.routes[settings.name!];
               if (pageContentBuilder != null) {
                 return platformPageRoute(
                     context: context,

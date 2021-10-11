@@ -32,38 +32,38 @@ class AnnouncementRepository {
   static final _instance = AnnouncementRepository._();
 
   factory AnnouncementRepository.getInstance() => _instance;
-  List<Announcement> _announcementCache;
+  List<Announcement>? _announcementCache;
 
   Future<void> loadData() async {
-    BmobQuery<Announcement> query =
-        BmobQuery<Announcement>().setOrder("-createdAt");
-    _announcementCache = (await query.queryObjects())
+    BmobQuery<Announcement?> query = BmobQuery<Announcement>()
+        .setOrder("-createdAt") as BmobQuery<Announcement?>;
+    _announcementCache = (await query.queryObjects())!
         .map<Announcement>((e) => Announcement.fromJson(e))
         .toList();
   }
 
-  Future<Announcement> getLastNewAnnouncement() async {
-    Announcement announcement = getLastAnnouncement();
+  Future<Announcement?> getLastNewAnnouncement() async {
+    Announcement? announcement = getLastAnnouncement();
     if (announcement == null) return null;
     SharedPreferences pre = await SharedPreferences.getInstance();
-    List<String> list = [];
+    List<String?>? list = [];
     if (pre.containsKey(KEY_SEEN_ANNOUNCEMENT)) {
       list = pre.getStringList(KEY_SEEN_ANNOUNCEMENT);
-      if (list.any((element) => element == announcement.objectId)) {
+      if (list!.any(((element) => element == announcement.objectId))) {
         return null;
       } else {
         list.add(announcement.objectId);
-        pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list);
+        pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list as List<String>);
         return announcement;
       }
     } else {
       list.add(announcement.objectId);
-      pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list);
+      pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list as List<String>);
       return announcement;
     }
   }
 
-  Announcement getLastAnnouncement() {
+  Announcement? getLastAnnouncement() {
     List<Announcement> list = getAnnouncements();
     return list.length > 0 ? list[0] : null;
   }
@@ -71,28 +71,28 @@ class AnnouncementRepository {
   List<Announcement> getAnnouncements() {
     final version = int.tryParse(build.first) ?? 0;
     return _announcementCache
-        .filter((element) => element.maxVersion >= version);
+        .filter((element) => element.maxVersion! >= version);
   }
 
   List<Announcement> getAllAnnouncements() =>
-      _announcementCache.filter((element) => element.maxVersion >= 0);
+      _announcementCache.filter((element) => element.maxVersion! >= 0);
 
-  DateTime getStartDate() => DateTime.parse(_announcementCache
+  DateTime getStartDate() => DateTime.parse(_announcementCache!
       .firstWhere((element) => element.maxVersion == _ID_START_DATE)
-      .content);
+      .content!);
 
   UpdateInfo checkVersion() => UpdateInfo(
-      _announcementCache
+      _announcementCache!
           .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
           .content,
-      _announcementCache
+      _announcementCache!
           .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
           .content);
 }
 
 class UpdateInfo {
-  final String latestVersion;
-  final String changeLog;
+  final String? latestVersion;
+  final String? changeLog;
 
   @override
   String toString() {
@@ -102,17 +102,17 @@ class UpdateInfo {
   UpdateInfo(this.latestVersion, this.changeLog);
 
   bool isAfter(int major, int minor, int patch) {
-    List<int> versions =
-        latestVersion.split(".").map((e) => int.tryParse(e)).toList();
-    if (versions[0] > major)
+    List<int?> versions =
+        latestVersion!.split(".").map((e) => int.tryParse(e)).toList();
+    if (versions[0]! > major)
       return true;
-    else if (versions[0] < major) return false;
+    else if (versions[0]! < major) return false;
 
-    if (versions[1] > minor)
+    if (versions[1]! > minor)
       return true;
-    else if (versions[1] < minor) return false;
+    else if (versions[1]! < minor) return false;
 
-    if (versions[2] > patch) return true;
+    if (versions[2]! > patch) return true;
 
     return false;
   }

@@ -32,10 +32,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 /// Also contains methods to send qr code to Apple Watch.
 class QRHelper {
   static Future<void> showQRCode(
-      BuildContext context, PersonInfo personInfo) async {
-    double _brightness = await ScreenProxy.brightness;
+      BuildContext context, PersonInfo? personInfo) async {
     //Set screen brightness for displaying QR Code
-    ScreenProxy.keepOn(true);
+    //ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
 
     showPlatformDialog(
@@ -43,7 +42,6 @@ class QRHelper {
         barrierDismissible: false,
         builder: (BuildContext context) => QRDialog(
               personInfo: personInfo,
-              originBrightness: _brightness,
             ));
   }
 
@@ -51,18 +49,16 @@ class QRHelper {
   static const channel = const MethodChannel('watchQRValue');
 
   static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
-    String qr = await QRCodeRepository.getInstance().getQRCode(personInfo);
+    String? qr = await QRCodeRepository.getInstance().getQRCode(personInfo);
 
     channel.invokeMethod("sendStringToNative", qr.toString());
   }
 }
 
 class QRDialog extends StatefulWidget {
-  final PersonInfo personInfo;
-  final double originBrightness;
+  final PersonInfo? personInfo;
 
-  const QRDialog({Key key, this.personInfo, this.originBrightness})
-      : super(key: key);
+  const QRDialog({Key? key, this.personInfo}) : super(key: key);
 
   @override
   _QRDialogState createState() => _QRDialogState();
@@ -85,17 +81,16 @@ class _QRDialogState extends State<QRDialog> {
                 width: double.maxFinite,
                 height: 200.0,
                 child: Center(
-                    child: FutureBuilder<String>(
+                    child: FutureBuilder<String?>(
                         future: QRCodeRepository.getInstance()
                             .getQRCode(widget.personInfo),
                         builder: (BuildContext context,
-                            AsyncSnapshot<String> snapshot) {
+                            AsyncSnapshot<String?> snapshot) {
                           switch (snapshot.connectionState) {
                             case ConnectionState.none:
                             case ConnectionState.waiting:
                             case ConnectionState.active:
                               return Text(S.of(context).loading_qr_code);
-                              break;
                             case ConnectionState.done:
                               if (snapshot.hasError) {
                                 _status = ConnectionStatus.FAILED;
@@ -103,22 +98,20 @@ class _QRDialogState extends State<QRDialog> {
                               } else {
                                 _status = ConnectionStatus.DONE;
                                 return QrImage(
-                                  data: snapshot.data,
+                                  data: snapshot.data!,
                                   size: 200.0,
                                   foregroundColor: Colors.black,
                                   backgroundColor: Colors.white,
                                 );
                               }
-                              break;
                           }
-                          return null;
                         })))),
         actions: <Widget>[
           TextButton(
               child: PlatformText(S.of(context).i_see),
               onPressed: () async {
-                ScreenProxy.setBrightness(widget.originBrightness);
-                ScreenProxy.keepOn(false);
+                ScreenProxy.resetBrightness();
+                //ScreenProxy.keepOn(false);
                 Navigator.pop(context);
               }),
         ],

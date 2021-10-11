@@ -8,10 +8,9 @@ part of 'time_table.dart';
 
 TimeTable _$TimeTableFromJson(Map<String, dynamic> json) {
   return TimeTable()
-    ..courses = (json['courses'] as List)
-        ?.map((e) =>
-            e == null ? null : Course.fromJson(e as Map<String, dynamic>))
-        ?.toList()
+    ..courses = (json['courses'] as List<dynamic>?)
+        ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
+        .toList()
     ..startTime = json['startTime'] == null
         ? null
         : DateTime.parse(json['startTime'] as String);
@@ -25,19 +24,20 @@ Map<String, dynamic> _$TimeTableToJson(TimeTable instance) => <String, dynamic>{
 Course _$CourseFromJson(Map<String, dynamic> json) {
   return Course()
     ..teacherIds =
-        (json['teacherIds'] as List)?.map((e) => e as String)?.toList()
-    ..teacherNames =
-        (json['teacherNames'] as List)?.map((e) => e as String)?.toList()
-    ..courseId = json['courseId'] as String
-    ..courseName = json['courseName'] as String
-    ..roomId = json['roomId'] as String
-    ..roomName = json['roomName'] as String
-    ..availableWeeks =
-        (json['availableWeeks'] as List)?.map((e) => e as int)?.toList()
-    ..times = (json['times'] as List)
-        ?.map((e) =>
-            e == null ? null : CourseTime.fromJson(e as Map<String, dynamic>))
-        ?.toList();
+        (json['teacherIds'] as List<dynamic>?)?.map((e) => e as String).toList()
+    ..teacherNames = (json['teacherNames'] as List<dynamic>?)
+        ?.map((e) => e as String)
+        .toList()
+    ..courseId = json['courseId'] as String?
+    ..courseName = json['courseName'] as String?
+    ..roomId = json['roomId'] as String?
+    ..roomName = json['roomName'] as String?
+    ..availableWeeks = (json['availableWeeks'] as List<dynamic>?)
+        ?.map((e) => e as int)
+        .toList()
+    ..times = (json['times'] as List<dynamic>?)
+        ?.map((e) => CourseTime.fromJson(e as Map<String, dynamic>))
+        .toList();
 }
 
 Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
@@ -53,8 +53,8 @@ Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
 
 CourseTime _$CourseTimeFromJson(Map<String, dynamic> json) {
   return CourseTime(
-    json['weekDay'] as int,
-    json['slot'] as int,
+    json['weekDay'] as int?,
+    json['slot'] as int?,
   );
 }
 

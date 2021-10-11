@@ -31,19 +31,19 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class BBSHiddenTagsPreferencePage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _BBSHiddenTagsPreferencePageState createState() =>
       _BBSHiddenTagsPreferencePageState();
 
-  BBSHiddenTagsPreferencePage({Key key, this.arguments});
+  BBSHiddenTagsPreferencePage({Key? key, this.arguments});
 }
 
 class _BBSHiddenTagsPreferencePageState
     extends State<BBSHiddenTagsPreferencePage> {
-  List<PostTag> tags;
-  List<PostTag> _allTags;
+  List<PostTag>? tags;
+  List<PostTag>? _allTags;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _BBSHiddenTagsPreferencePageState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: FlutterTagging<PostTag>(
-                initialItems: tags,
+                initialItems: tags ?? [],
                 emptyBuilder: (context) => Wrap(
                       alignment: WrapAlignment.spaceAround,
                       children: [
@@ -84,8 +84,8 @@ class _BBSHiddenTagsPreferencePageState
                 findSuggestions: (String filter) async {
                   if (_allTags == null)
                     _allTags = await PostRepository.getInstance().loadTags();
-                  return _allTags
-                      .where((value) => value.name
+                  return _allTags!
+                      .where((value) => value.name!
                           .toLowerCase()
                           .contains(filter.toLowerCase()))
                       .toList();
@@ -95,7 +95,7 @@ class _BBSHiddenTagsPreferencePageState
                 onAdded: (tag) => tag,
                 configureSuggestion: (tag) => SuggestionConfiguration(
                       title: Text(
-                        tag.name,
+                        tag.name!,
                         style: TextStyle(
                             color: Constant.getColorFromString(tag.color)),
                       ),
@@ -132,7 +132,7 @@ class _BBSHiddenTagsPreferencePageState
                       ),
                     ),
                 configureChip: (tag) => ChipConfiguration(
-                      label: Text(tag.name),
+                      label: Text(tag.name!),
                       backgroundColor: Constant.getColorFromString(tag.color),
                       labelStyle: TextStyle(
                           color: Constant.getColorFromString(tag.color)

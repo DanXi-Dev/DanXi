@@ -33,34 +33,34 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class CardCrowdData extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _CardCrowdDataState createState() => _CardCrowdDataState();
 
-  CardCrowdData({Key key, this.arguments});
+  CardCrowdData({Key? key, this.arguments});
 }
 
 class _CardCrowdDataState extends State<CardCrowdData> {
-  PersonInfo _personInfo;
-  Map<String, TrafficInfo> _trafficInfos;
-  Campus _selectItem = Campus.NONE;
-  int _sliding;
+  PersonInfo? _personInfo;
+  Map<String, TrafficInfo>? _trafficInfos;
+  Campus? _selectItem = Campus.NONE;
+  int? _sliding;
 
   @override
   void initState() {
     super.initState();
     _personInfo = StateProvider.personInfo.value;
     _selectItem = SettingsProvider.getInstance().campus;
-    _sliding = _selectItem.index;
+    _sliding = _selectItem!.index;
     _onSelectedItemChanged(_selectItem);
   }
 
   /// Load dining hall data
-  Future<void> _onSelectedItemChanged(Campus e) async {
+  Future<void> _onSelectedItemChanged(Campus? e) async {
     setState(() => {_selectItem = e, _trafficInfos = null});
     _trafficInfos = await DataCenterRepository.getInstance()
-        .getCrowdednessInfo(_personInfo, _selectItem.index)
+        .getCrowdednessInfo(_personInfo, _selectItem!.index)
         .catchError((e) {
       // If it's not time for a meal
       if (e is UnsuitableTimeException) {
@@ -87,16 +87,16 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           ),
           PlatformWidget(
               material: (_, __) => DropdownButton<Campus>(
-                    items: _getItems(),
+                    items: _getItems() as List<DropdownMenuItem<Campus>>?,
                     // Don't select anything if _selectItem == Campus.NONE
                     value: _selectItem == Campus.NONE ? null : _selectItem,
-                    hint: Text(_selectItem.displayTitle(context)),
-                    onChanged: (Campus e) => _onSelectedItemChanged(e),
+                    hint: Text(_selectItem.displayTitle(context)!),
+                    onChanged: (Campus? e) => _onSelectedItemChanged(e),
                   ),
               cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                    onValueChanged: (int value) {
+                    onValueChanged: (int? value) {
                       _sliding = value;
-                      _onSelectedItemChanged(Campus.values[_sliding]);
+                      _onSelectedItemChanged(Campus.values[_sliding!]);
                     },
                     groupValue: _sliding,
                     children: _getCupertinoItems(),
@@ -118,11 +118,11 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   }
 
   List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
-        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
+        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)!));
       }).toList(growable: false);
 
   Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
-      .map((e) => Text(e.displayTitle(context)))
+      .map((e) => Text(e.displayTitle(context)!))
       .toList(growable: false)
       .asMap();
 
@@ -133,7 +133,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     DataCenterRepository.getInstance()
         .toZoneList(_selectItem.displayTitle(context), _trafficInfos)
         .forEach((key, value) {
-      widgets.add(_buildZoneCard(key, value));
+      widgets.add(_buildZoneCard(key!, value));
     });
     return widgets;
   }

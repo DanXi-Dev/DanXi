@@ -8,13 +8,15 @@ part of 'announcement.dart';
 
 Announcement _$AnnouncementFromJson(Map<String, dynamic> json) {
   return Announcement(
-    json['content'] as String,
+    json['content'] as String?,
   )
-    ..createdAt = json['createdAt'] as String
-    ..updatedAt = json['updatedAt'] as String
-    ..objectId = json['objectId'] as String
-    ..ACL = json['ACL'] as Map<String, dynamic>
-    ..maxVersion = json['maxVersion'] as int;
+    ..createdAt = json['createdAt'] as String?
+    ..updatedAt = json['updatedAt'] as String?
+    ..objectId = json['objectId'] as String?
+    ..ACL = (json['ACL'] as Map<String, dynamic>?)?.map(
+      (k, e) => MapEntry(k, e as Object),
+    )
+    ..maxVersion = json['maxVersion'] as int?;
 }
 
 Map<String, dynamic> _$AnnouncementToJson(Announcement instance) =>

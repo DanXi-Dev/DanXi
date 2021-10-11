@@ -36,23 +36,23 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Arguments:
 /// [List<Notice>] initialData: the initial data to be shown as soon as the page's displayed.
 class AAONoticesList extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _AAONoticesListState createState() => _AAONoticesListState();
 
-  AAONoticesList({Key key, this.arguments});
+  AAONoticesList({Key? key, this.arguments});
 }
 
 class _AAONoticesListState extends State<AAONoticesList> {
-  List<Notice> _data;
-  ScrollController _controller;
-  PersonInfo _info;
+  List<Notice>? _data;
+  ScrollController? _controller;
+  PersonInfo? _info;
 
   @override
   void initState() {
     super.initState();
-    _data = widget.arguments['initialData'];
+    _data = widget.arguments!['initialData'];
     _info = StateProvider.personInfo.value;
   }
 

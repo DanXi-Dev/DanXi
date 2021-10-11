@@ -29,7 +29,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class DormElectricityFeature extends Feature {
-  ElectricityItem _electricity;
+  ElectricityItem? _electricity;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -38,7 +38,7 @@ class DormElectricityFeature extends Feature {
     _status = ConnectionStatus.CONNECTING;
     _electricity = await FudanDormRepository.getInstance()
         .loadElectricityInfo(StateProvider.personInfo.value)
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       _status = ConnectionStatus.FAILED;
       return null;
     });
@@ -47,7 +47,7 @@ class DormElectricityFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -58,30 +58,28 @@ class DormElectricityFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context).dorm_electricity;
+  String get mainTitle => S.of(context!).dorm_electricity;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        return S.of(context).dorm_electricity_subtitle(
-            _electricity.available, _electricity.used);
-        break;
+        return S.of(context!).dorm_electricity_subtitle(
+            _electricity!.available, _electricity!.used);
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
+        return S.of(context!).failed;
     }
-    return '';
   }
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }
@@ -89,7 +87,7 @@ class DormElectricityFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isMaterial(context)
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.bolt)
       : const Icon(CupertinoIcons.bolt);
 
@@ -101,14 +99,14 @@ class DormElectricityFeature extends Feature {
   @override
   void onTap() {
     if (_status == ConnectionStatus.DONE) {
-      final String body = _electricity.dormName +
+      final String body = _electricity!.dormName +
           '\n' +
-          S.of(context).dorm_electricity_subtitle(
-              _electricity.available, _electricity.used) +
+          S.of(context!).dorm_electricity_subtitle(
+              _electricity!.available, _electricity!.used) +
           '\n\n' +
-          S.of(context).last_updated(_electricity.updateTime.toString());
-      Noticing.showNotice(context, body,
-          title: S.of(context).dorm_electricity, useSnackBar: false);
+          S.of(context!).last_updated(_electricity!.updateTime.toString());
+      Noticing.showNotice(context!, body,
+          title: S.of(context!).dorm_electricity, useSnackBar: false);
     } else {
       refreshData();
     }

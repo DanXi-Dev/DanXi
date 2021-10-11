@@ -50,22 +50,22 @@ SOFTWARE.
 
 /// A container of [ChoiceChip], allowing users to choose from a list of [Tag]s.
 class TagContainer extends StatefulWidget {
-  final List<Tag> tagList;
+  final List<Tag>? tagList;
   final bool fillRandomColor;
-  final int defaultChoice;
+  final int? defaultChoice;
   final bool singleChoice;
-  final Color fixedColor;
-  final Color iconColor;
-  final double iconSize;
-  final double fontSize;
-  final Function onChoice;
+  final Color? fixedColor;
+  final Color? iconColor;
+  final double? iconSize;
+  final double? fontSize;
+  final Function? onChoice;
   final bool enabled;
   final bool wrapped;
 
   TagContainer(
-      {Key key,
-      @required this.tagList,
-      @required this.fillRandomColor,
+      {Key? key,
+      required this.tagList,
+      required this.fillRandomColor,
       this.singleChoice = false,
       this.defaultChoice = 0,
       this.onChoice,
@@ -84,9 +84,9 @@ class TagContainer extends StatefulWidget {
 }
 
 class _TagContainerState extends State<TagContainer> {
-  List<Tag> tagList;
-  bool fillRandomColor;
-  List<String> selectedCategories = [];
+  List<Tag>? tagList;
+  late bool fillRandomColor;
+  List<String?> selectedCategories = [];
   static const List<Color> _RANDOM_COLORS = [
     Colors.orangeAccent,
     Colors.redAccent,
@@ -96,9 +96,9 @@ class _TagContainerState extends State<TagContainer> {
     Colors.blueGrey,
     Colors.lightGreen,
   ];
-  double iconSize;
-  double fontSize;
-  Color iconColor = Colors.white;
+  double? iconSize;
+  double? fontSize;
+  Color? iconColor = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +112,9 @@ class _TagContainerState extends State<TagContainer> {
     widget.iconSize == null
         ? this.iconSize = 22
         : this.iconSize = widget.iconSize;
-    if (widget.defaultChoice >= 0 &&
-        this.tagList.length > widget.defaultChoice) {
-      tagList[widget.defaultChoice].isSelected = true;
+    if (widget.defaultChoice! >= 0 &&
+        this.tagList!.length > widget.defaultChoice!) {
+      tagList![widget.defaultChoice!].isSelected = true;
     }
     this.fillRandomColor = widget.fillRandomColor;
     fillRandomColor
@@ -127,7 +127,7 @@ class _TagContainerState extends State<TagContainer> {
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
               child: Wrap(
                 spacing: 8,
-                children: tagList.map((e) => _buildTag(e)).toList(),
+                children: tagList!.map((e) => _buildTag(e)).toList(),
               )));
     } else
       return ThemedMaterial(
@@ -137,14 +137,14 @@ class _TagContainerState extends State<TagContainer> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: tagList.map((e) => _buildTag(e)).toList(),
+                  children: tagList!.map((e) => _buildTag(e)).toList(),
                 ),
               )));
   }
 
   Widget _buildTag(Tag data) {
     return ChoiceChip(
-        label: Text(data.tagTitle),
+        label: Text(data.tagTitle!),
         selected: data.isSelected,
         avatar: Icon(data.icon),
         // When [widget.enabled] is false, set [onSelected] to null so that this chip will act as disabled.
@@ -156,7 +156,7 @@ class _TagContainerState extends State<TagContainer> {
                   data.isSelected = !data.isSelected;
                   if (data.isSelected && widget.singleChoice) {
                     selectedCategories.clear();
-                    tagList.forEach((element) => element.isSelected = false);
+                    tagList!.forEach((element) => element.isSelected = false);
                     data.isSelected = true;
                   }
                   data.isSelected
@@ -164,7 +164,7 @@ class _TagContainerState extends State<TagContainer> {
                       : selectedCategories.remove(data.tagTitle);
                 });
                 if (data.isSelected && widget.onChoice != null) {
-                  widget.onChoice(data, selectedCategories);
+                  widget.onChoice!(data, selectedCategories);
                 }
               }
             : null);
@@ -180,16 +180,16 @@ class _TagContainerState extends State<TagContainer> {
 
   void randomColorApplier() {
     int temp = _RANDOM_COLORS.length + 1;
-    for (int i = 0; i <= tagList.length - 1; i++) {
+    for (int i = 0; i <= tagList!.length - 1; i++) {
       temp = generateRandom(temp);
-      tagList[i].tagColor = (_RANDOM_COLORS[temp]);
+      tagList![i].tagColor = (_RANDOM_COLORS[temp]);
     }
   }
 
-  fixedColorApplier(Color fixedColor) {
+  fixedColorApplier(Color? fixedColor) {
     // for (int i = 0; i <= tagList.length - 1; i++) {
     //   tagList[i].tagColor = fixedColor;
     // }
-    tagList.forEach((element) => element.tagColor = fixedColor);
+    tagList!.forEach((element) => element.tagColor = fixedColor);
   }
 }

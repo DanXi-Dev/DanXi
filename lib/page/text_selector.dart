@@ -28,12 +28,12 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Arguments:
 /// [String] text: the text to display.
 class TextSelectorPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _TextSelectorPageState createState() => _TextSelectorPageState();
 
-  TextSelectorPage({Key key, this.arguments});
+  TextSelectorPage({Key? key, this.arguments});
 }
 
 class _TextSelectorPageState extends State<TextSelectorPage> {
@@ -52,7 +52,7 @@ class _TextSelectorPageState extends State<TextSelectorPage> {
         ),
         body: PostRenderWidget(
           render: kMarkdownSelectorRender,
-          content: widget.arguments['text'],
+          content: widget.arguments!['text'],
         ));
   }
 }

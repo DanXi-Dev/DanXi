@@ -40,15 +40,15 @@ const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
 ///
 /// Also contains the logic to process logging in.
 class LoginDialog extends StatefulWidget {
-  final SharedPreferences sharedPreferences;
-  final ValueNotifier<PersonInfo> personInfo;
+  final SharedPreferences? sharedPreferences;
+  final ValueNotifier<PersonInfo?> personInfo;
   final bool dismissible;
   static bool _isShown = false;
 
   static bool get dialogShown => _isShown;
 
-  static showLoginDialog(BuildContext context, SharedPreferences _preferences,
-      ValueNotifier<PersonInfo> personInfo, bool dismissible) async {
+  static showLoginDialog(BuildContext context, SharedPreferences? _preferences,
+      ValueNotifier<PersonInfo?> personInfo, bool dismissible) async {
     if (_isShown) return;
     _isShown = true;
     await showPlatformDialog(
@@ -62,10 +62,10 @@ class LoginDialog extends StatefulWidget {
   }
 
   const LoginDialog(
-      {Key key,
-      @required this.sharedPreferences,
-      @required this.personInfo,
-      @required this.dismissible})
+      {Key? key,
+      required this.sharedPreferences,
+      required this.personInfo,
+      required this.dismissible})
       : super(key: key);
 
   @override
@@ -78,7 +78,7 @@ class _LoginDialogState extends State<LoginDialog> {
   String _errorText = "";
   UserGroup _group = UserGroup.FUDAN_STUDENT;
 
-  Future<bool> _deleteAllData() async => await widget.sharedPreferences.clear();
+  Future<bool> _deleteAllData() async => await widget.sharedPreferences!.clear();
 
   /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {
@@ -92,7 +92,7 @@ class _LoginDialogState extends State<LoginDialog> {
         PersonInfo newInfo =
             PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
         _deleteAllData().then((value) async {
-          await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
+          await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
@@ -105,7 +105,7 @@ class _LoginDialogState extends State<LoginDialog> {
             (StudentInfo stuInfo) async {
           newInfo.name = stuInfo.name;
           await _deleteAllData();
-          await newInfo.saveAsSharedPreferences(widget.sharedPreferences);
+          await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
@@ -138,10 +138,10 @@ class _LoginDialogState extends State<LoginDialog> {
         widgets.add(PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () => _switchLoginGroup(e),
-            child: Text(kUserGroupDescription[e](context)),
+            child: Text(kUserGroupDescription[e]!(context)),
           ),
           material: (_, __) => ListTile(
-            title: Text(kUserGroupDescription[e](context)),
+            title: Text(kUserGroupDescription[e]!(context)),
             onTap: () => _switchLoginGroup(e),
           ),
         ));
@@ -153,10 +153,10 @@ class _LoginDialogState extends State<LoginDialog> {
   @override
   Widget build(BuildContext context) {
     var defaultText =
-        Theme.of(context).textTheme.bodyText2.copyWith(fontSize: 12);
+        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12);
     var linkText = Theme.of(context)
         .textTheme
-        .bodyText2
+        .bodyText2!
         .copyWith(color: Theme.of(context).accentColor, fontSize: 12);
 
     //Tackle #25
@@ -167,7 +167,7 @@ class _LoginDialogState extends State<LoginDialog> {
     final scrollController = PrimaryScrollController.of(context);
 
     return AlertDialog(
-      title: Text(kUserGroupDescription[_group](context)),
+      title: Text(kUserGroupDescription[_group]!(context)),
       content: WithScrollbar(
         controller: scrollController,
         child: SingleChildScrollView(

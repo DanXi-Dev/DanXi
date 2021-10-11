@@ -59,7 +59,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart';
 
-void sendFduholeTokenToWatch(String token) {
+void sendFduholeTokenToWatch(String? token) {
   const channel = const MethodChannel('fduhole');
   channel.invokeMethod("send_token", token);
 }
@@ -68,14 +68,14 @@ GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 final QuickActions quickActions = QuickActions();
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  SharedPreferences _preferences;
+  SharedPreferences? _preferences;
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     _captchaSubscription.cancel();
     super.dispose();
   }
@@ -173,7 +173,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Deal with login issue described at [CredentialsInvalidException].
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
-      PersonInfo.removeFromSharedPreferences(_preferences);
+      // TODO: Can [_preferences] be null when this is called?
+      PersonInfo.removeFromSharedPreferences(_preferences!);
       FlutterApp.restartApp(context);
     }
   }
@@ -210,7 +211,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }, onError: (e) => _dealWithBmobError());
   }
 
-  DateTime _lastRefreshTime;
+  DateTime? _lastRefreshTime;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -221,7 +222,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         // To keep the data up-to-date.
         if (_lastRefreshTime != null &&
             DateTime.now()
-                    .difference(_lastRefreshTime)
+                    .difference(_lastRefreshTime!)
                     .compareTo(Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
@@ -250,7 +251,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .path,
         toolTip: "DanXi is here~");
     List<MenuItemBase> showingMenu;
-    List<MenuItemBase> hidingMenu;
+    late List<MenuItemBase> hidingMenu;
     showingMenu = [
       MenuItem(
         label: 'Hide',
@@ -301,14 +302,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
     initSystemTray().catchError((ignored) {});
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
+    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance!.platformDispatcher.onPlatformBrightnessChanged =
         () {
       // This callback gets invoked every time brightness changes
       // What's wrong with this code? why does the app refresh on every launch?
       // The timer below is a workaround to the issue.
       Timer(Duration(milliseconds: 500), () {
-        if (WidgetsBinding.instance.platformDispatcher.platformBrightness !=
+        if (WidgetsBinding.instance!.platformDispatcher.platformBrightness !=
             Theme.of(context).brightness) FlutterApp.restartApp(context);
       });
     };
@@ -336,9 +337,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     // Configure watch listeners on iOS.
     if (_needSendToWatch &&
-        _preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+        _preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
       sendFduholeTokenToWatch(
-          _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
       // Only send once.
       _needSendToWatch = false;
     }
@@ -356,9 +357,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     channel_a.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'get_token') {
         // If we haven't loaded [StateProvider.personInfo]
-        if (_preferences.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+        if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
           sendFduholeTokenToWatch(
-              _preferences.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+              _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
         } else {
           // Notify that we should send the token to watch later
           _needSendToWatch = true;
@@ -373,7 +374,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // We have to load personInfo after [initState] and [build], since it may pop up a dialog,
     // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
     // Also, otherwise it will call [setState] before the frame is completed.
-    WidgetsBinding.instance
+    WidgetsBinding.instance!
         .addPostFrameCallback((_) => _loadOrInitPersonInfo());
   }
 
@@ -383,9 +384,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _loadOrInitPersonInfo() {
     _preferences = SettingsProvider.getInstance().preferences;
 
-    if (PersonInfo.verifySharedPreferences(_preferences)) {
+    if (PersonInfo.verifySharedPreferences(_preferences!)) {
       StateProvider.personInfo.value =
-          PersonInfo.fromSharedPreferences(_preferences);
+          PersonInfo.fromSharedPreferences(_preferences!);
       TestLifeCycle.onStart(context);
     } else {
       LoginDialog.showLoginDialog(
@@ -406,7 +407,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildBody(String title) {
     // Build action buttons.
-    PlatformIconButton leadingButton;
+    PlatformIconButton? leadingButton;
     List<PlatformIconButton> trailingButtons = [];
     List<AppBarButtonItem> leadingItems =
         _subpage[_pageIndex.value].leading.call(context);
@@ -555,7 +556,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(S.of(context).new_update_description(
-                        FlutterApp.versionName, updateInfo.latestVersion)),
+                        FlutterApp.versionName,
+                        updateInfo.latestVersion ?? "?")),
                     PostRenderWidget(
                         content: "```\n${updateInfo.changeLog}\n```",
                         render: kMarkdownRender)
@@ -577,17 +579,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadAnnouncement() async {
-    final Announcement announcement =
+    final Announcement? announcement =
         await AnnouncementRepository.getInstance().getLastNewAnnouncement();
     if (announcement != null) {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(
-                  S.of(context).developer_announcement(announcement.createdAt),
+                  S
+                      .of(context).developer_announcement(announcement.createdAt ?? "?"),
                 ),
                 content: Linkify(
-                  text: announcement.content,
+                  text: announcement.content!,
                   onOpen: (element) =>
                       BrowserUtil.openUrl(element.url, context),
                 ),
@@ -611,7 +614,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       TimeTableRepository.getInstance()
           .loadTimeTableLocally(StateProvider.personInfo.value,
               forceLoadFromRemote: true)
-          .onError((error, stackTrace) => Noticing.showNotice(
+          .onError((dynamic error, stackTrace) => Noticing.showNotice(
               context, S.of(context).timetable_refresh_error,
               title: S.of(context).fatal_error, useSnackBar: false));
 

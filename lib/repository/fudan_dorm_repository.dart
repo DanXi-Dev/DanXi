@@ -36,15 +36,15 @@ class FudanDormRepository extends BaseRepositoryWithDio {
 
   factory FudanDormRepository.getInstance() => _instance;
 
-  Future<ElectricityItem> loadElectricityInfo(PersonInfo info) {
+  Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
     return Retrier.tryAsyncWithFix(
         () => _loadElectricityInfo(),
         (exception) =>
-            UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar, info, true));
+            UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<ElectricityItem> _loadElectricityInfo() async {
-    final Response r = await dio.get(electricityUrl);
+    final Response r = await dio!.get(electricityUrl);
     final Map json = r.data is Map ? r.data : jsonDecode(r.data.toString());
 
     final data = json['d'];

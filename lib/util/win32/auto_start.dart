@@ -27,7 +27,7 @@ class WindowsAutoStart {
 
   static bool get autoStart {
     int hKey = Registry.getRegistryKeyHandle(HKEY_CURRENT_USER, KEY_PATH);
-    String path;
+    String? path;
     try {
       path = Registry.getStringKey(hKey, KEY_NAME);
     } catch (ignored) {} finally {

@@ -26,7 +26,7 @@ class Win32Shell {
   /// Notes: It WON'T wait the process to finish.
   static int executeShell(String filePath,
       {int showCmd = SW_HIDE,
-      String dir,
+      String? dir,
       String param = '',
       bool runAsAdmin = false}) {
     return ShellExecute(

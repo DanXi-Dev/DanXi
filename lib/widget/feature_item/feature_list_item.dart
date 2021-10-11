@@ -23,12 +23,12 @@ import 'package:flutter/widgets.dart';
 /// A simple implementation of [FeatureContainerState] to show the feature as a [ListTile].
 class FeatureListItem extends StatefulWidget implements FeatureContainer {
   final Feature feature;
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _FeatureListItemState createState() => _FeatureListItemState();
 
-  FeatureListItem({@required this.feature, this.arguments});
+  FeatureListItem({required this.feature, this.arguments});
 
   @override
   Feature get childFeature => feature;
@@ -43,7 +43,7 @@ class _FeatureListItemState extends State<FeatureListItem>
       ..container = this
       ..buildFeature(widget.arguments);
 
-    List<String> summary = [];
+    List<String?> summary = [];
     summary.add(widget.feature.subTitle ?? "");
     if (widget.feature.tertiaryTitle != null)
       summary.add(widget.feature.tertiaryTitle);
@@ -53,7 +53,7 @@ class _FeatureListItemState extends State<FeatureListItem>
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
       title: Text(
-        widget.feature.mainTitle,
+        widget.feature.mainTitle!,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),

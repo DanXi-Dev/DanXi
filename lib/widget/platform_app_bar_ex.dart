@@ -31,19 +31,19 @@ const Border _kDefaultNavBarBorder = const Border(
 
 /// A copy of [PlatformAppBar], solving the issue "iOS navigationBar animation glitch" in commit a540b4f4.
 class PlatformAppBarX extends PlatformAppBar {
-  final Key widgetKey;
+  final Key? widgetKey;
 
-  final Widget title;
-  final Color backgroundColor;
-  final Widget leading;
-  final List<Widget> trailingActions;
-  final bool automaticallyImplyLeading;
+  final Widget? title;
+  final Color? backgroundColor;
+  final Widget? leading;
+  final List<Widget>? trailingActions;
+  final bool? automaticallyImplyLeading;
 
-  final PlatformBuilder<MaterialAppBarData> material;
-  final PlatformBuilder<CupertinoNavigationBarData> cupertino;
+  final PlatformBuilder<MaterialAppBarData>? material;
+  final PlatformBuilder<CupertinoNavigationBarData>? cupertino;
 
   PlatformAppBarX({
-    Key key,
+    Key? key,
     this.widgetKey,
     this.title,
     this.backgroundColor,
@@ -108,14 +108,14 @@ class PlatformAppBarX extends PlatformAppBar {
       title: MediaQuery(
           data: MediaQueryData(
               textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-          child: data?.title ?? title),
+          child: data?.title ?? title!),
     );
     var trailing = trailingActions?.isEmpty ?? true
         ? null
         : Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: trailingActions,
+            children: trailingActions!,
           );
 
     final heroTag = data?.heroTag;

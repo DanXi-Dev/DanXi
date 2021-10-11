@@ -1,3 +1,5 @@
+
+
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -62,10 +64,10 @@ class TimeTable {
     VagueTime(hour: 21, minute: 15),
     VagueTime(hour: 22, minute: 10),
   ];
-  List<Course> courses = [];
+  List<Course>? courses = [];
 
   //First day of the term
-  DateTime startTime;
+  DateTime? startTime;
 
   TimeTable();
 
@@ -74,7 +76,7 @@ class TimeTable {
     RegExp courseMatcher =
         RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
     for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
-      newTable.courses.add(Course.fromHtmlPart(matchedCourse.group(0)));
+      newTable.courses!.add(Course.fromHtmlPart(matchedCourse.group(0)!));
     }
     return newTable;
   }
@@ -86,7 +88,7 @@ class TimeTable {
 
   TimeNow now() {
     DateTime now = DateTime.now();
-    Duration diff = now.difference(startTime);
+    Duration diff = now.difference(startTime!);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {
       if (now.isAfter(kCourseSlotStartTime[i].toExactTime())) {
@@ -112,10 +114,10 @@ class TimeTable {
     Map<int, List<Event>> table = Map();
     for (int i = 0; i < 7; i++) table[i] = [];
 
-    courses.forEach((course) {
-      if (course.availableWeeks.contains(week)) {
-        course.times.forEach((courseTime) =>
-            table[courseTime.weekDay].add(Event(course, courseTime)));
+    courses!.forEach((course) {
+      if (course.availableWeeks!.contains(week)) {
+        course.times!.forEach((courseTime) =>
+            table[courseTime.weekDay!]!.add(Event(course, courseTime)));
       }
     });
     return table;
@@ -129,19 +131,19 @@ class TimeTable {
     for (int i = 0; i < DateTime.daysPerWeek; i++) {
       table[i] = [];
     }
-    courses.forEach((course) {
-      if (course.availableWeeks.contains(week)) {
-        course.times.forEach((courseTime) =>
-            table[courseTime.weekDay].add(Event(course, courseTime)));
+    courses!.forEach((course) {
+      if (course.availableWeeks!.contains(week)) {
+        course.times!.forEach((courseTime) =>
+            table[courseTime.weekDay!]!.add(Event(course, courseTime)));
       }
     });
     for (int i = 0; i < DateTime.daysPerWeek; i++) {
       if ((compact == TableDisplayType.FULL) ||
           (compact == TableDisplayType.STANDARD && i <= DateTime.friday - 1) ||
-          table[i].isNotEmpty)
+          table[i]!.isNotEmpty)
         result.add(DayEvents(
             day: DateFormat.E().format(kMonday.add(Duration(days: i))),
-            events: table[i],
+            events: table[i]!,
             weekday: i));
     }
     return result;
@@ -162,14 +164,14 @@ enum TableDisplayType {
 
 @JsonSerializable()
 class Course {
-  List<String> teacherIds;
-  List<String> teacherNames;
-  String courseId;
-  String courseName;
-  String roomId;
-  String roomName;
-  List<int> availableWeeks;
-  List<CourseTime> times;
+  List<String>? teacherIds;
+  List<String>? teacherNames;
+  String? courseId;
+  String? courseName;
+  String? roomId;
+  String? roomName;
+  List<int>? availableWeeks;
+  List<CourseTime>? times;
 
   Course();
 
@@ -186,7 +188,7 @@ class Course {
   static List<CourseTime> _parseSlotFromStrings(Iterable<RegExpMatch> times) {
     List<CourseTime> courseTimes = [];
     courseTimes.addAll(times.map((RegExpMatch e) {
-      List<String> daySlot = e.group(0).trim().split("*unitCount+");
+      List<String> daySlot = e.group(0)!.trim().split("*unitCount+");
       return CourseTime(int.parse(daySlot[0]), int.parse(daySlot[1]));
     }));
     return courseTimes;
@@ -202,7 +204,7 @@ class Course {
     Course newCourse = new Course();
     RegExp infoMatcher = RegExp(r'(?<=TaskActivity\(").*(?="\))');
     RegExp timeMatcher = RegExp(r'[0-9]+\*unitCount\+[0-9]+');
-    String info = infoMatcher.firstMatch(htmlPart).group(0);
+    String info = infoMatcher.firstMatch(htmlPart)!.group(0)!;
 
     List<String> infoVarList = info.split('","');
     return newCourse
@@ -224,7 +226,7 @@ class Course {
 @JsonSerializable()
 class CourseTime {
   //Monday is 0, Morning lesson is 0
-  int weekDay, slot;
+  int? weekDay, slot;
 
   CourseTime(this.weekDay, this.slot);
 

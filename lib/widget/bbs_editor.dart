@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
@@ -50,46 +51,44 @@ enum BBSEditorType { DIALOG, PAGE }
 
 class BBSEditor {
   static Future<bool> createNewPost(BuildContext context,
-      {BBSEditorType editorType}) async {
+      {BBSEditorType? editorType}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
-    final PostEditorText content = await _showEditor(
+    final PostEditorText? content = await _showEditor(
         context, S.of(context).new_post,
         allowTags: true, editorType: editorType, object: object);
     if (content?.text == null) return false;
-    final success = await PostRepository.getInstance()
-        .newPost(content.text, tags: content.tags)
-        .onError((error, stackTrace) {
+    final success = await (PostRepository.getInstance()
+        .newPost(content!.text, tags: content.tags)
+        .onError((dynamic error, stackTrace) {
       if (error is DioError)
-        error = (error as DioError).message +
-            '\n' +
-            ((error as DioError).response?.data?.toString() ?? "");
+        error = error.message + '\n' + (error.response?.data?.toString() ?? "");
       Noticing.showNotice(context, error.toString(),
           title: S.of(context).post_failed, useSnackBar: false);
       return -1;
-    });
+    }) as FutureOr<int>);
     if (success == -1) return false;
     StateProvider.editorCache.remove(object);
     return true;
   }
 
   static Future<void> createNewReply(
-      BuildContext context, int discussionId, int postId,
-      {BBSEditorType editorType}) async {
+      BuildContext context, int? discussionId, int? postId,
+      {BBSEditorType? editorType}) async {
     final object = (discussionId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
         : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
-    final String content = (await _showEditor(
+    final String? content = (await _showEditor(
             context,
             postId == null
-                ? S.of(context).reply_to(discussionId)
+                ? S.of(context).reply_to(discussionId ?? "?")
                 : S.of(context).reply_to(postId),
             editorType: editorType,
             object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
-    final success = await PostRepository.getInstance()
+    final success = await (PostRepository.getInstance()
         .newReply(discussionId, postId, content)
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       if (error is DioError) {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
@@ -99,22 +98,22 @@ class BBSEditor {
             title: S.of(context).fatal_error, useSnackBar: false);
       }
       return -1;
-    });
+    }) as FutureOr<int>);
     if (success == -1) return;
     StateProvider.editorCache.remove(object);
   }
 
-  static Future<void> adminModifyReply(BuildContext context, int discussionId,
-      int postId, String originalContent,
-      {BBSEditorType editorType}) async {
+  static Future<void> adminModifyReply(BuildContext context, int? discussionId,
+      int? postId, String? originalContent,
+      {BBSEditorType? editorType}) async {
     // TODO: Show original content in the editor
     final object = (discussionId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
         : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
-    final String content = (await _showEditor(
+    final String? content = (await _showEditor(
             context,
             postId == null
-                ? S.of(context).reply_to(discussionId)
+                ? S.of(context).reply_to(discussionId ?? "?")
                 : S.of(context).reply_to(postId),
             editorType: editorType,
             object: object))
@@ -122,7 +121,7 @@ class BBSEditor {
     if (content == null || content.trim() == "") return;
     await PostRepository.getInstance()
         .adminModifyPost(content, discussionId, postId)
-        .onError((error, stackTrace) {
+        .onError((dynamic error, stackTrace) {
       if (error is DioError) {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
@@ -135,18 +134,19 @@ class BBSEditor {
     StateProvider.editorCache.remove(object);
   }
 
-  static Future<void> reportPost(BuildContext context, int postId) async {
+  static Future<void> reportPost(BuildContext context, int? postId) async {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
-    final String content = (await _showEditor(
-            context, S.of(context).reason_report_post(postId),
+    final String? content = (await _showEditor(
+            context, S.of(context).reason_report_post(postId ?? "?"),
             editorType: BBSEditorType.DIALOG, object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
 
-    int responseCode =
+    int? responseCode =
         await PostRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
-      Noticing.showNotice(context, S.of(context).report_failed(responseCode),
+      Noticing.showNotice(
+          context, S.of(context).report_failed(responseCode ?? "?"),
           title: S.of(context).fatal_error, useSnackBar: false);
     } else {
       StateProvider.editorCache.remove(object);
@@ -154,20 +154,20 @@ class BBSEditor {
     }
   }
 
-  static Future<PostEditorText> _showEditor(BuildContext context, String title,
+  static Future<PostEditorText?> _showEditor(BuildContext context, String title,
       {bool allowTags = false,
-      @required BBSEditorType editorType,
-      @required EditorObject object}) async {
+      required BBSEditorType? editorType,
+      required EditorObject object}) async {
     final BBSEditorType defaultType =
         isTablet(context) ? BBSEditorType.DIALOG : BBSEditorType.PAGE;
     switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
         if (!StateProvider.editorCache.containsKey(object))
           StateProvider.editorCache[object] = PostEditorText.newInstance();
-        final textController =
-            TextEditingController(text: StateProvider.editorCache[object].text);
-        textController.addListener(
-            () => StateProvider.editorCache[object].text = textController.text);
+        final textController = TextEditingController(
+            text: StateProvider.editorCache[object]!.text);
+        textController.addListener(() =>
+            StateProvider.editorCache[object]!.text = textController.text);
         return await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
             context: context,
@@ -182,7 +182,7 @@ class BBSEditor {
                     PlatformDialogAction(
                         child: Text(S.of(context).cancel),
                         onPressed: () {
-                          StateProvider.editorCache[object].text =
+                          StateProvider.editorCache[object]!.text =
                               textController.text;
                           Navigator.of(context).pop<PostEditorText>(null);
                         }),
@@ -194,7 +194,7 @@ class BBSEditor {
                         onPressed: () async {
                           Navigator.of(context).pop<PostEditorText>(
                               PostEditorText(textController.text,
-                                  StateProvider.editorCache[object].tags));
+                                  StateProvider.editorCache[object]!.tags!));
                         }),
                   ],
                 )).then((value) {
@@ -216,7 +216,7 @@ class BBSEditor {
   static Future<void> uploadImage(
       BuildContext context, TextEditingController _controller) async {
     final ImagePickerProxy _picker = ImagePickerProxy.createPicker();
-    final String _file = await _picker.pickImage();
+    final String? _file = await _picker.pickImage();
     if (_file == null) return;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
@@ -236,12 +236,12 @@ class BBSEditor {
 }
 
 class BBSEditorWidget extends StatefulWidget {
-  final TextEditingController controller;
-  final EditorObject editorObject;
-  final bool allowTags;
+  final TextEditingController? controller;
+  final EditorObject? editorObject;
+  final bool? allowTags;
 
   const BBSEditorWidget(
-      {Key key, this.controller, this.allowTags, this.editorObject})
+      {Key? key, this.controller, this.allowTags, this.editorObject})
       : super(key: key);
 
   @override
@@ -249,31 +249,32 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
-  List<PostTag> _allTags;
+  List<PostTag>? _allTags;
 
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(() {
+    widget.controller!.addListener(() {
       refreshSelf();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    StateProvider.editorCache[widget.editorObject].tags ??= [];
+    StateProvider.editorCache[widget.editorObject]!.tags ??= [];
     return SingleChildScrollView(
       child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.allowTags)
+            if (widget.allowTags!)
               Padding(
                 padding: EdgeInsets.only(bottom: 12),
                 child: ThemedMaterial(
                   child: FlutterTagging<PostTag>(
-                      initialItems:
-                          StateProvider.editorCache[widget.editorObject].tags,
+                      initialItems: StateProvider
+                              .editorCache[widget.editorObject]!.tags ??
+                          [],
                       emptyBuilder: (context) => Wrap(
                             alignment: WrapAlignment.spaceAround,
                             children: [
@@ -296,8 +297,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         if (_allTags == null)
                           _allTags =
                               await PostRepository.getInstance().loadTags();
-                        return _allTags
-                            .where((value) => value.name
+                        return _allTags!
+                            .where((value) => value.name!
                                 .toLowerCase()
                                 .contains(filter.toLowerCase()))
                             .toList();
@@ -307,7 +308,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
                             title: Text(
-                              tag.name,
+                              tag.name!,
                               style: TextStyle(
                                   color:
                                       Constant.getColorFromString(tag.color)),
@@ -346,7 +347,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                             ),
                           ),
                       configureChip: (tag) => ChipConfiguration(
-                            label: Text(tag.name),
+                            label: Text(tag.name!),
                             backgroundColor:
                                 Constant.getColorFromString(tag.color),
                             labelStyle: TextStyle(
@@ -417,7 +418,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: smartRender(widget.controller.text, null, null),
+              child: smartRender(widget.controller!.text, null, null),
             ),
           ]),
     );
@@ -425,12 +426,12 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
 }
 
 class PostEditorText {
-  String text;
+  String? text;
 
   /// Non-nullable
-  List<PostTag> tags;
+  List<PostTag>? tags;
 
-  PostEditorText(this.text, this.tags) : assert(tags != null);
+  PostEditorText(this.text, List<PostTag> this.tags) : assert(tags != null);
 
   PostEditorText.newInstance() {
     text = '';
@@ -447,9 +448,9 @@ class PostEditorText {
 /// Callback:
 /// [PostEditorText] The editor text.
 class BBSEditorPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
-  const BBSEditorPage({Key key, this.arguments});
+  const BBSEditorPage({Key? key, this.arguments});
 
   @override
   BBSEditorPageState createState() => BBSEditorPageState();
@@ -460,15 +461,15 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   /// Whether the send button is enabled
   bool _canSend = true;
-  bool _supportTags;
-  EditorObject _object;
-  String _title;
+  bool? _supportTags;
+  EditorObject? _object;
+  late String _title;
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(() {
-      StateProvider.editorCache[_object].text = _controller.text;
+      StateProvider.editorCache[_object]!.text = _controller.text;
     });
   }
 
@@ -480,12 +481,12 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   void didChangeDependencies() {
-    _supportTags = widget.arguments['tags'] ?? false;
+    _supportTags = widget.arguments!['tags'] ?? false;
     _title =
-        widget.arguments['title'] ?? S.of(context).forum_post_enter_content;
-    _object = widget.arguments['object'];
+        widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
+    _object = widget.arguments!['object'];
     if (StateProvider.editorCache.containsKey(_object))
-      _controller.text = StateProvider.editorCache[_object].text;
+      _controller.text = StateProvider.editorCache[_object]!.text!;
     else
       StateProvider.editorCache[_object] = PostEditorText.newInstance();
     super.didChangeDependencies();
@@ -527,10 +528,10 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     );
   }
 
-  Future<void> _sendDocument(EditorObject object) async {
+  Future<void> _sendDocument(EditorObject? object) async {
     String text = _controller.text;
     if (text.isEmpty) return;
-    Navigator.pop<PostEditorText>(
-        context, PostEditorText(text, StateProvider.editorCache[object].tags));
+    Navigator.pop<PostEditorText>(context,
+        PostEditorText(text, StateProvider.editorCache[object]!.tags!));
   }
 }

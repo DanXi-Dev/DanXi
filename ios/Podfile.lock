@@ -124,7 +124,7 @@ PODS:
   - PromisesObjC (2.0.0)
   - quick_actions (0.0.1):
     - Flutter
-  - screen (0.0.1):
+  - screen_brightness (0.0.1):
     - Flutter
   - SDWebImage (5.12.0):
     - SDWebImage/Core (= 5.12.0)
@@ -166,7 +166,7 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - quick_actions (from `.symlinks/plugins/quick_actions/ios`)
-  - screen (from `.symlinks/plugins/screen/ios`)
+  - screen_brightness (from `.symlinks/plugins/screen_brightness/ios`)
   - share (from `.symlinks/plugins/share/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
@@ -228,8 +228,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler/ios"
   quick_actions:
     :path: ".symlinks/plugins/quick_actions/ios"
-  screen:
-    :path: ".symlinks/plugins/screen/ios"
+  screen_brightness:
+    :path: ".symlinks/plugins/screen_brightness/ios"
   share:
     :path: ".symlinks/plugins/share/ios"
   shared_preferences:
@@ -274,7 +274,7 @@ SPEC CHECKSUMS:
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   quick_actions: 6cb2390c4dab0e737c94573c27e18d9666710720
-  screen: abd91ca7bf3426e1cc3646d27e9b2358d6bf07b0
+  screen_brightness: 994a74a8a983e319ff8a8e1e2380b1d7be899098
   SDWebImage: 4ea20cca2986adc5aacde07aa686742fd4c67a37
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d

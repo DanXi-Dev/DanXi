@@ -18,7 +18,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -77,21 +77,21 @@ String renderText(String content, String imagePlaceholder) {
   content =
       content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
 
-  var soup = Beautifulsoup(content);
-  var images = soup.find_all("img");
-  if (images.length > 0) return soup.get_text().trim() + imagePlaceholder;
-  return soup.get_text().trim();
+  var soup = BeautifulSoup(content);
+  var images = soup.findAll("img");
+  if (images.length > 0) return soup.getText().trim() + imagePlaceholder;
+  return soup.getText().trim();
 }
 
 const String KEY_NO_TAG = "默认";
 
 /// Turn tags into Widgets
-Widget generateTagWidgets(BuildContext context, BBSPost e,
-    void Function(String) onTap, bool useAccessibilityColoring) {
+Widget generateTagWidgets(BuildContext context, BBSPost? e,
+    void Function(String?) onTap, bool useAccessibilityColoring) {
   if (e == null || e.tag == null) return Container();
   List<Widget> _tags = [];
-  e.tag.forEach((element) {
-    if (element.name == KEY_NO_TAG) return [Container()];
+  e.tag!.forEach((element) {
+    if (element.name == KEY_NO_TAG) return;
     _tags.add(Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -100,7 +100,7 @@ Widget generateTagWidgets(BuildContext context, BBSPost e,
             onTap: () => onTap(element.name),
             label: element.name,
             color: useAccessibilityColoring
-                ? Theme.of(context).textTheme.bodyText1.color
+                ? Theme.of(context).textTheme.bodyText1!.color
                 : Constant.getColorFromString(element.color),
           ),
         ]));
@@ -114,12 +114,12 @@ Widget generateTagWidgets(BuildContext context, BBSPost e,
 }
 
 class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _BBSSubpageState createState() => _BBSSubpageState();
 
-  BBSSubpage({Key key, this.arguments});
+  BBSSubpage({Key? key, this.arguments});
 
   @override
   String get debugTag => "BBSPage";
@@ -135,10 +135,10 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(cxt)),
+          child: Text(value.displayTitle(cxt)!),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(cxt)),
+          title: Text(value.displayTitle(cxt)!),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -222,34 +222,33 @@ class _BBSSubpageState extends State<BBSSubpage>
   final StateStreamListener _searchSubscription = StateStreamListener();
   final StateStreamListener _sortOrderChangedSubscription =
       StateStreamListener();
-  String _tagFilter;
+  String? _tagFilter;
   FocusNode _searchFocus = FocusNode();
 
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Fields related to the display states.
-  SortOrder _sortOrder;
-  FoldBehavior _foldBehavior;
+  SortOrder? _sortOrder;
+  FoldBehavior? _foldBehavior;
 
-  BannerAd bannerAd;
+  BannerAd? bannerAd;
 
   /// This is to prevent the entire page being rebuilt on iOS when the keyboard pops up
-  bool _fieldInitComplete;
+  late bool _fieldInitComplete;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
-  Future<List<BBSPost>> _loadContent(int page) async {
+  Future<List<BBSPost>?> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
       try {
         _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
             SortOrder.LAST_REPLIED;
-        _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior ??
-            FoldBehavior.FOLD;
+        _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior;
         if (_tagFilter != null)
           return await PostRepository.getInstance()
               .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
         else if (widget.arguments != null &&
-            widget.arguments.containsKey('showFavoredDiscussion')) {
+            widget.arguments!.containsKey('showFavoredDiscussion')) {
           if (page > 1) return Future.value([]);
           return await PostRepository.getInstance().getFavoredDiscussions();
         } else {
@@ -261,7 +260,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               .loadDiscussions(page, _sortOrder);
           List<PostTag> hiddenTags =
               SettingsProvider.getInstance().hiddenTags ?? [];
-          loadedPost.removeWhere((element) => element.tag.any((thisTag) =>
+          loadedPost.removeWhere((element) => element.tag!.any((thisTag) =>
               hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
           // About this line, see [PagedListView].
           return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
@@ -305,7 +304,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             // We needn't deal with the situation that "id = null" here.
             // If so, it will turn into a 404 http error.
             _goToPIDResultPage(
-                int.tryParse(pidPattern.firstMatch(value)[0].substring(1)));
+                int.tryParse(pidPattern.firstMatch(value)![0]!.substring(1)));
           } else
             smartNavigatorPush(context, "/bbs/postDetail",
                 arguments: {"searchKeyword": value});
@@ -318,7 +317,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     return FutureWidget(
       future: PostRepository.getInstance().isUserAdmin(),
       successBuilder: (context, snapshot) {
-        if (snapshot.data) {
+        if (snapshot.data as bool) {
           return Card(
             child: ListTile(
               title: Text("FDUHole Administrative Interface"),
@@ -339,25 +338,24 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
   }
 
-  _goToPIDResultPage(int pid) async {
+  _goToPIDResultPage(int? pid) async {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     final BBSPost post = await PostRepository.getInstance()
         .loadSpecificDiscussion(pid)
-        .onError((error, stackTrace) {
-      if (error.response?.statusCode == HttpStatus.notFound)
-        Noticing.showNotice(context, S.of(context).post_does_not_exist,
-            title: S.of(context).fatal_error);
-      else
-        Noticing.showNotice(context, error.toString(),
-            title: S.of(context).fatal_error);
-      progressDialog.dismiss();
-      return null;
+        .onError((dynamic error, stackTrace) {
+          if (error.response?.statusCode == HttpStatus.notFound)
+            Noticing.showNotice(context, S.of(context).post_does_not_exist,
+                title: S.of(context).fatal_error);
+          else
+            Noticing.showNotice(context, error.toString(),
+                title: S.of(context).fatal_error);
+          progressDialog.dismiss();
+          return null;
+        } as FutureOr<BBSPost> Function(Error, StackTrace));
+    smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+      "post": post,
     });
-    if (post != null)
-      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-        "post": post,
-      });
     progressDialog.dismiss();
   }
 
@@ -396,8 +394,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void didChangeDependencies() {
     if (!_fieldInitComplete) {
-      if (widget.arguments != null && widget.arguments.containsKey('tagFilter'))
-        _tagFilter = widget.arguments['tagFilter'];
+      if (widget.arguments != null &&
+          widget.arguments!.containsKey('tagFilter'))
+        _tagFilter = widget.arguments!['tagFilter'];
       _fieldInitComplete = true;
     }
     super.didChangeDependencies();
@@ -417,7 +416,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     super.build(context);
     if (widget.arguments == null)
       return _buildPageBody();
-    else if (widget.arguments.containsKey('showFavoredDiscussion')) {
+    else if (widget.arguments!.containsKey('showFavoredDiscussion')) {
       return PlatformScaffold(
         iosContentPadding: false,
         iosContentBottomPadding: false,
@@ -433,7 +432,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).filtering_by_tag(_tagFilter)),
+        title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
       ),
       body: _buildPageBody(),
     );
@@ -496,13 +495,13 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildListItem(BuildContext context, ListProvider<BBSPost> _,
       int index, BBSPost postElement) {
-    if (postElement?.first_post == null ||
-        postElement?.last_post == null ||
-        (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
+    if (postElement.first_post == null ||
+        postElement.last_post == null ||
+        (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded!))
       return Container();
     Linkify postContentWidget = Linkify(
       text: renderText(
-          postElement.first_post.filteredContent, S.of(context).image_tag),
+          postElement.first_post!.filteredContent!, S.of(context).image_tag),
       style: TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -519,7 +518,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                generateTagWidgets(context, postElement, (String tagname) {
+                generateTagWidgets(context, postElement, (String? tagname) {
                   smartNavigatorPush(context, '/bbs/discussions', arguments: {
                     "tagFilter": tagname,
                   });
@@ -527,7 +526,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 const SizedBox(
                   height: 10,
                 ),
-                (postElement.is_folded && _foldBehavior == FoldBehavior.FOLD)
+                (postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD)
                     ? Theme(
                         data: Theme.of(context)
                             .copyWith(dividerColor: Colors.transparent),
@@ -562,7 +561,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     ),
                     Text(
                       HumanDuration.format(
-                          context, DateTime.parse(postElement.date_created)),
+                          context, DateTime.parse(postElement.date_created!)),
                       style: infoStyle,
                     ),
                     Row(
@@ -587,13 +586,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "post": postElement,
               });
             }),
-        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
-            postElement.last_post.id != postElement.first_post.id)
+        if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
+            postElement.last_post!.id != postElement.first_post!.id)
           Divider(
             height: 4,
           ),
-        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
-            postElement.last_post.id != postElement.first_post.id)
+        if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
+            postElement.last_post!.id != postElement.first_post!.id)
           _buildCommentView(postElement),
       ])),
     );
@@ -601,7 +600,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildCommentView(BBSPost postElement, {bool useLeading = true}) {
     final String lastReplyContent = renderText(
-        postElement.last_post.filteredContent, S.of(context).image_tag);
+        postElement.last_post!.filteredContent!, S.of(context).image_tag);
     return ListTile(
         dense: true,
         minLeadingWidth: 16,
@@ -624,11 +623,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                   children: [
                     Text(
                       S.of(context).latest_reply(
-                          postElement.last_post.username,
+                          postElement.last_post!.username ?? "?",
                           HumanDuration.format(
                               context,
                               DateTime.parse(
-                                  postElement.last_post.date_created))),
+                                  postElement.last_post!.date_created!))),
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Icon(CupertinoIcons.search,

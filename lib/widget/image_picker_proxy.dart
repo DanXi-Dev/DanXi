@@ -20,7 +20,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 abstract class ImagePickerProxy {
-  Future<String> pickImage();
+  Future<String?> pickImage();
 
   factory ImagePickerProxy.createPicker() {
     if (PlatformX.isMobile) {
@@ -37,17 +37,17 @@ class _ImagePickerMobile extends ImagePickerProxy {
   final ImagePicker _picker = ImagePicker();
 
   @override
-  Future<String> pickImage() async {
-    XFile image = await _picker.pickImage(source: ImageSource.gallery);
+  Future<String?> pickImage() async {
+    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     return image?.path;
   }
 }
 
 class _ImagePickerUniversal extends ImagePickerProxy {
   @override
-  Future<String> pickImage() async {
-    FilePickerResult result =
+  Future<String?> pickImage() async {
+    FilePickerResult? result =
         await FilePicker.platform.pickFiles(type: FileType.image);
-    return result?.files?.single?.path;
+    return result?.files.single.path;
   }
 }

@@ -14,7 +14,7 @@ import 'taggable.dart';
 class FlutterTagging<T extends Taggable> extends StatefulWidget {
   /// Called every time the value changes.
   ///  i.e. when items are selected or removed.
-  final VoidCallback onChanged;
+  final VoidCallback? onChanged;
 
   /// The configuration of the [TextField] that the [FlutterTagging] widget displays.
   final TextFieldConfiguration textFieldConfiguration;
@@ -49,28 +49,28 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
   /// Defines an object for search pattern.
   ///
   /// If null, tag addition feature is disabled.
-  final T Function(String) additionCallback;
+  final T Function(String)? additionCallback;
 
   /// Called when add to tag button is pressed.
   ///
   /// Api Calls to add the tag can be called here.
-  final FutureOr<T> Function(T) onAdded;
+  final FutureOr<T> Function(T)? onAdded;
 
   /// Called when waiting for [findSuggestions] to return.
-  final Widget Function(BuildContext) loadingBuilder;
+  final Widget Function(BuildContext)? loadingBuilder;
 
   /// Called when [findSuggestions] returns an empty list.
-  final Widget Function(BuildContext) emptyBuilder;
+  final Widget Function(BuildContext)? emptyBuilder;
 
   /// Called when [findSuggestions] throws an exception.
-  final Widget Function(BuildContext, Object) errorBuilder;
+  final Widget Function(BuildContext, Object?)? errorBuilder;
 
   /// Called to display animations when [findSuggestions] returns suggestions.
   ///
   /// It is provided with the suggestions box instance and the animation
   /// controller, and expected to return some animation that uses the controller
   /// to display the suggestion box.
-  final dynamic Function(BuildContext, Widget, AnimationController)
+  final Widget Function(BuildContext, Widget, AnimationController?)?
       transitionBuilder;
 
   /// The configuration of suggestion box.
@@ -134,10 +134,10 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
 
   /// Creates a [FlutterTagging] widget.
   FlutterTagging({
-    @required this.initialItems,
-    @required this.findSuggestions,
-    @required this.configureChip,
-    @required this.configureSuggestion,
+    required this.initialItems,
+    required this.findSuggestions,
+    required this.configureChip,
+    required this.configureSuggestion,
     this.onChanged,
     this.additionCallback,
     this.enableImmediateSuggestion = false,
@@ -163,9 +163,9 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
 
 class _FlutterTaggingState<T extends Taggable>
     extends State<FlutterTagging<T>> {
-  TextEditingController _textController;
-  FocusNode _focusNode;
-  T _additionItem;
+  late final TextEditingController _textController;
+  late final FocusNode _focusNode;
+  T? _additionItem;
 
   @override
   void initState() {
@@ -229,7 +229,7 @@ class _FlutterTaggingState<T extends Taggable>
             final suggestions = await widget.findSuggestions(query);
             suggestions.removeWhere(widget.initialItems.contains);
             if (widget.additionCallback != null && query.isNotEmpty) {
-              final additionItem = widget.additionCallback(query);
+              final additionItem = widget.additionCallback!(query);
               if (!suggestions.contains(additionItem) &&
                   !widget.initialItems.contains(additionItem)) {
                 _additionItem = additionItem;
@@ -252,7 +252,7 @@ class _FlutterTaggingState<T extends Taggable>
                 borderRadius: conf.splashRadius,
                 onTap: () async {
                   if (widget.onAdded != null) {
-                    final _item = await widget.onAdded(item);
+                    final _item = await widget.onAdded!(item);
                     widget.initialItems.add(_item);
                   } else {
                     widget.initialItems.add(item);
@@ -265,7 +265,7 @@ class _FlutterTaggingState<T extends Taggable>
                 child: Builder(
                   builder: (context) {
                     if (conf.additionWidget != null && _additionItem == item) {
-                      return conf.additionWidget;
+                      return conf.additionWidget!;
                     } else {
                       return SizedBox(width: 0);
                     }

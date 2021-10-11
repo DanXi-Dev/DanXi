@@ -31,24 +31,24 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class EcardBalanceFeature extends Feature {
-  PersonInfo _info;
-  String _balance;
-  CardInfo _cardInfo;
-  CardRecord _lastTransaction;
+  PersonInfo? _info;
+  String? _balance;
+  CardInfo? _cardInfo;
+  CardRecord? _lastTransaction;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
 
-  Future<void> _loadCard(PersonInfo info) async {
+  Future<void> _loadCard(PersonInfo? info) async {
     _status = ConnectionStatus.CONNECTING;
     _cardInfo = await Retrier.tryAsyncWithFix(
         () => CardRepository.getInstance().loadCardInfo(0),
         (exception) => CardRepository.getInstance().init(info));
-    _balance = _cardInfo.cash;
+    _balance = _cardInfo!.cash;
 
     // If there's any transaction, we'll show it in the subtitle
-    if (_cardInfo.records.isNotEmpty)
-      _lastTransaction = _cardInfo.records.first;
+    if (_cardInfo!.records!.isNotEmpty)
+      _lastTransaction = _cardInfo!.records!.first;
     if (_balance == null) {
       _status = ConnectionStatus.FAILED;
     } else {
@@ -58,7 +58,7 @@ class EcardBalanceFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     _info = StateProvider.personInfo.value;
 
     // Only load card data once.
@@ -74,37 +74,32 @@ class EcardBalanceFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context).ecard_balance;
+  String get mainTitle => S.of(context!).ecard_balance;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        if (_lastTransaction == null)
-          return "";
-        else
-          return Constant.yuanSymbol(_lastTransaction?.payment) +
-              " " +
-              _lastTransaction?.location;
-        break;
+        return Constant.yuanSymbol(_lastTransaction?.payment) +
+            " " +
+            (_lastTransaction?.location ?? "");
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).failed;
+        return S.of(context!).failed;
     }
-    return '';
   }
 
   //@override
   //String get tertiaryTitle => _lastTransaction?.location;
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     } else if (_status == ConnectionStatus.DONE)
@@ -112,10 +107,10 @@ class EcardBalanceFeature extends Feature {
         Constant.yuanSymbol(_balance),
         textScaleFactor: 1.2,
         style: TextStyle(
-            color: num.tryParse(_balance) == null
+            color: num.tryParse(_balance!) == null
                 ? null
-                : num.tryParse(_balance) < 20.0
-                    ? Theme.of(context).errorColor
+                : num.tryParse(_balance!)! < 20.0
+                    ? Theme.of(context!).errorColor
                     : null),
       );
     return null;
@@ -134,7 +129,7 @@ class EcardBalanceFeature extends Feature {
   @override
   void onTap() {
     if (_cardInfo != null) {
-      smartNavigatorPush(context, "/card/detail",
+      smartNavigatorPush(context!, "/card/detail",
           arguments: {"cardInfo": _cardInfo});
     } else {
       refreshData();

@@ -24,14 +24,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class MasterDetailController extends StatelessWidget {
-  final Widget masterPage;
+  final Widget? masterPage;
 
-  MasterDetailController({Key key, this.masterPage}) : super(key: key);
+  MasterDetailController({Key? key, this.masterPage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (!isTablet(context)) {
-      return masterPage;
+      return masterPage!;
     }
     return Container(
       color: Theme.of(context).backgroundColor,
@@ -56,8 +56,8 @@ class MasterDetailController extends StatelessWidget {
               child: Navigator(
                 key: detailNavigatorKey,
                 onGenerateRoute: (settings) {
-                  final Function pageContentBuilder =
-                      DanxiApp.routes[settings.name];
+                  final Function? pageContentBuilder =
+                      DanxiApp.routes[settings.name!];
                   if (pageContentBuilder != null) {
                     return platformPageRoute(
                         context: context,
@@ -74,12 +74,12 @@ class MasterDetailController extends StatelessWidget {
   }
 }
 
-Future<T> smartNavigatorPush<T extends Object>(
+Future<T?> smartNavigatorPush<T extends Object>(
     BuildContext context, String routeName,
-    {Object arguments, bool forcePushOnMainNavigator = false}) {
+    {Object? arguments, bool forcePushOnMainNavigator = false}) {
   if (isTablet(context) && !forcePushOnMainNavigator) {
-    return detailNavigatorKey.currentState
-        .pushNamed<T>(routeName, arguments: arguments);
+    return detailNavigatorKey.currentState!
+        .pushNamed<T?>(routeName, arguments: arguments);
   }
-  return Navigator.of(context).pushNamed<T>(routeName, arguments: arguments);
+  return Navigator.of(context).pushNamed<T?>(routeName, arguments: arguments);
 }

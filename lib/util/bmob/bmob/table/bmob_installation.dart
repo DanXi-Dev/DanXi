@@ -7,10 +7,10 @@ part 'bmob_installation.g.dart';
 
 @JsonSerializable()
 class BmobInstallation extends BmobObject {
-  String deviceType = "android";
-  String installationId;
-  String timeZone;
-  String deviceToken;
+  String? deviceType = "android";
+  String? installationId;
+  String? timeZone;
+  String? deviceToken;
 
   BmobInstallation() {
     timeZone = "";

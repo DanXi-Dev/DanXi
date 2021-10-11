@@ -31,10 +31,10 @@ class StateProvider {
   }
 
   /// The user's basic information.
-  static final ValueNotifier<PersonInfo> personInfo = ValueNotifier(null);
+  static final ValueNotifier<PersonInfo?> personInfo = ValueNotifier(null);
 
   /// Caches of [BBSEditor].
-  static final Map<EditorObject, PostEditorText> editorCache = {};
+  static final Map<EditorObject?, PostEditorText> editorCache = {};
 
   static void initialize() {
     personInfo.value = null;

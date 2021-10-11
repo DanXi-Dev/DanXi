@@ -62,7 +62,7 @@ class SettingsSubpage extends PlatformSubpage
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 
-  SettingsSubpage({Key key});
+  SettingsSubpage({Key? key});
 
   @override
   String get debugTag => "SettingsPage";
@@ -157,7 +157,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     LicenseItem(
         "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
   ];
-  BannerAd myBanner;
+  BannerAd? myBanner;
 
   @override
   void initState() {
@@ -165,7 +165,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     myBanner = AdManager.loadBannerAd(3); // 3 for settings page
   }
 
-  String _clearCacheSubtitle;
+  String? _clearCacheSubtitle;
 
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -178,7 +178,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   /// Pop up a dialog where user can give his name & password.
   void _showLoginDialog({bool forceLogin = false}) {
-    ValueNotifier<PersonInfo> _infoNotifier = StateProvider.personInfo;
+    ValueNotifier<PersonInfo?> _infoNotifier = StateProvider.personInfo;
     showPlatformDialog(
         context: context,
         barrierDismissible: false,
@@ -200,10 +200,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)),
+          child: Text(value.displayTitle(context)!),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)),
+          title: Text(value.displayTitle(context)!),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -223,10 +223,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)),
+          child: Text(value.displayTitle(context)!),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)),
+          title: Text(value.displayTitle(context)!),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -268,7 +268,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   ? const Icon(Icons.account_circle)
                                   : const Icon(CupertinoIcons.person_circle),
                               subtitle: Text(
-                                  "${StateProvider.personInfo.value.name} (${StateProvider.personInfo.value.id})"),
+                                  "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
                               onTap: () {
                                 showPlatformDialog(
                                   context: context,
@@ -311,7 +311,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   : const Icon(CupertinoIcons.location_fill),
                               subtitle: Text(SettingsProvider.getInstance()
                                   .campus
-                                  .displayTitle(context)),
+                                  .displayTitle(context)!),
                               onTap: () {
                                 showPlatformModalSheet(
                                     context: context,
@@ -396,7 +396,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     : const Icon(CupertinoIcons.eye_slash),
                                 subtitle: Text(SettingsProvider.getInstance()
                                     .fduholeFoldBehavior
-                                    .displayTitle(context)),
+                                    .displayTitle(context)!),
                                 onTap: () {
                                   showPlatformModalSheet(
                                       context: context,
@@ -485,9 +485,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   : S.of(context).cupertino),
                               onTap: () {
                                 PlatformX.isMaterial(context)
-                                    ? PlatformProvider.of(context)
+                                    ? PlatformProvider.of(context)!
                                         .changeToCupertinoPlatform()
-                                    : PlatformProvider.of(context)
+                                    : PlatformProvider.of(context)!
                                         .changeToMaterialPlatform();
                               },
                             ),
@@ -536,7 +536,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
-  Future<bool> _showAdsDialog() => showPlatformDialog<bool>(
+  Future<bool?> _showAdsDialog() => showPlatformDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
             title: Text(S.of(context).sponsor_us),
@@ -616,10 +616,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     double _avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
     const double _avatarNameSpacing = 4;
-    TextStyle defaultText = Theme.of(context).textTheme.bodyText2;
+    TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
     TextStyle linkText = Theme.of(context)
         .textTheme
-        .bodyText2
+        .bodyText2!
         .copyWith(color: Theme.of(context).accentColor);
     return Card(
         child: Theme(
@@ -900,22 +900,20 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          FutureWidget<bool>(
-                            successBuilder: (context, snapshot) {
-                              if (snapshot.data)
-                                return TextButton(
-                                  child: Text(S.of(context).rate),
-                                  onPressed: () {
-                                    inAppReview.openStoreListing(
-                                      appStoreId: Constant.APPSTORE_APPID,
-                                    );
-                                  },
-                                );
-                              else
+                          FutureBuilder<bool>(
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.hasError || snapshot.data == false)
                                 return Container();
+                              return TextButton(
+                                child: Text(S.of(context).rate),
+                                onPressed: () {
+                                  inAppReview.openStoreListing(
+                                    appStoreId: Constant.APPSTORE_APPID,
+                                  );
+                                },
+                              );
                             },
-                            loadingBuilder: PlatformCircularProgressIndicator(),
-                            errorBuilder: Container(),
                             future: inAppReview.isAvailable(),
                           ),
                           const SizedBox(width: 8),

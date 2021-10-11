@@ -1,3 +1,5 @@
+
+
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -25,8 +27,8 @@ class Announcement extends BmobObject {
   // ignore: unused_field
   String __type = "Announcement";
 
-  String content;
-  int maxVersion;
+  String? content;
+  int? maxVersion;
 
   factory Announcement.fromJson(Map<String, dynamic> json) =>
       _$AnnouncementFromJson(json);

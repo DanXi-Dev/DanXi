@@ -28,7 +28,7 @@ extension StringEx on String {
   ///
   /// e.g.
   /// "I love flutter".between("l","t",headGreedy = false) == "ove flut"
-  String between(String a, String b, {bool headGreedy = true}) {
+  String? between(String a, String b, {bool headGreedy = true}) {
     // a = RegExp.escape(a);
     // b = RegExp.escape(b);
     if (indexOf(a) < 0) return null;
@@ -93,7 +93,7 @@ extension ToStr on bool {
   }
 }
 
-extension ListEx<T> on List<T> {
+extension ListEx<T> on List<T>? {
   /// Remove any element in list which [filter] returns false.
   List<T> filter(FilterFunction<T> filter) {
     List<T> newList = [];

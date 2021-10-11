@@ -27,9 +27,9 @@ class DayEvents {
   final List<Event> events;
 
   DayEvents({
-    @required this.weekday,
-    @required this.day,
-    @required this.events,
+    required this.weekday,
+    required this.day,
+    required this.events,
   })  : assert(day != null),
         assert(events != null),
         assert(weekday != null);

@@ -34,12 +34,12 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A list page showing announcement from developers.
 class AnnouncementList extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _AnnouncementListState createState() => _AnnouncementListState();
 
-  AnnouncementList({Key key, this.arguments});
+  AnnouncementList({Key? key, this.arguments});
 }
 
 class _AnnouncementListState extends State<AnnouncementList> {
@@ -120,19 +120,19 @@ class _AnnouncementListState extends State<AnnouncementList> {
             ? Icon(Icons.info)
             : Icon(CupertinoIcons.info_circle_fill),
         title: Text(
-          value.content,
+          value.content!,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text(
-            HumanDuration.format(context, DateTime.tryParse(value.updatedAt))),
+        subtitle: Text(HumanDuration.format(
+            context, DateTime.tryParse(value.updatedAt!)!)),
         onTap: () => showPlatformDialog(
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
-                  title: Text(
-                      S.of(context).developer_announcement(value.createdAt)),
+                  title: Text(S
+                      .of(context).developer_announcement(value.createdAt ?? "")),
                   content: Linkify(
-                      text: value.content,
+                      text: value.content!,
                       onOpen: (element) =>
                           BrowserUtil.openUrl(element.url, context)),
                   actions: <Widget>[

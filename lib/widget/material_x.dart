@@ -22,9 +22,9 @@ import 'package:flutter/widgets.dart';
 ///
 /// Use it anywhere you need a [Material].
 class ThemedMaterial extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
 
-  const ThemedMaterial({Key key, this.child}) : super(key: key);
+  const ThemedMaterial({Key? key, this.child}) : super(key: key);
 
   @override
   _ThemedMaterialState createState() => _ThemedMaterialState();

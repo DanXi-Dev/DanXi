@@ -8,13 +8,13 @@ part of 'reply.dart';
 
 Reply _$ReplyFromJson(Map<String, dynamic> json) {
   return Reply(
-    json['id'] as int,
-    json['content'] as String,
-    json['username'] as String,
-    json['reply_to'] as int,
-    json['date_created'] as String,
-    json['discussion'] as int,
-    json['is_me'] as bool,
+    json['id'] as int?,
+    json['content'] as String?,
+    json['username'] as String?,
+    json['reply_to'] as int?,
+    json['date_created'] as String?,
+    json['discussion'] as int?,
+    json['is_me'] as bool?,
   );
 }
 

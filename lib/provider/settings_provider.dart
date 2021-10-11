@@ -30,7 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
 /// Only return [null] when there is no default value.
 class SettingsProvider {
-  SharedPreferences preferences;
+  SharedPreferences? preferences;
   static final _instance = SettingsProvider._();
   static const String KEY_PREFERRED_CAMPUS = "campus";
 
@@ -79,55 +79,55 @@ class SettingsProvider {
   factory SettingsProvider.of(_) => SettingsProvider.getInstance();
 
   bool get useAccessibilityColoring {
-    if (preferences.containsKey(KEY_ACCESSIBILITY_COLORING)) {
-      return preferences.getBool(KEY_ACCESSIBILITY_COLORING);
+    if (preferences!.containsKey(KEY_ACCESSIBILITY_COLORING)) {
+      return preferences!.getBool(KEY_ACCESSIBILITY_COLORING)!;
     }
     return false;
   }
 
   set useAccessibilityColoring(bool value) {
-    preferences.setBool(KEY_ACCESSIBILITY_COLORING, value);
+    preferences!.setBool(KEY_ACCESSIBILITY_COLORING, value);
   }
 
   /// Whether user has opted-in to Ads
   bool get isAdEnabled {
-    if (preferences.containsKey(KEY_AD_ENABLED)) {
-      return preferences.getBool(KEY_AD_ENABLED);
+    if (preferences!.containsKey(KEY_AD_ENABLED)) {
+      return preferences!.getBool(KEY_AD_ENABLED)!;
     }
     return false;
   }
 
   set isAdEnabled(bool value) {
-    preferences.setBool(KEY_AD_ENABLED, value);
+    preferences!.setBool(KEY_AD_ENABLED, value);
   }
 
   int get lastECBuildingChoiceRepresentation {
-    if (preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
-      return preferences.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE);
+    if (preferences!.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
+      return preferences!.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)!;
     }
-    return null;
+    return 0;
   }
 
   set lastECBuildingChoiceRepresentation(int value) {
-    preferences.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
+    preferences!.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
   }
 
-  String get lastSemesterStartTime {
-    if (preferences.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
-      return preferences.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME);
+  String? get lastSemesterStartTime {
+    if (preferences!.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
+      return preferences!.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME)!;
     }
     return null;
   }
 
-  set lastSemesterStartTime(String value) =>
-      preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
+  set lastSemesterStartTime(String? value) =>
+      preferences!.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value!);
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting
   List<DashboardCard> get dashboardWidgetsSequence {
-    if (preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
+    if (preferences!.containsKey(KEY_DASHBOARD_WIDGETS)) {
       var rawCardList =
-          (json.decode(preferences.getString(KEY_DASHBOARD_WIDGETS)) as List)
+          (json.decode(preferences!.getString(KEY_DASHBOARD_WIDGETS)!) as List)
               .map((i) => DashboardCard.fromJson(i))
               .toList();
       // Merge new features which are added in the new version.
@@ -143,12 +143,12 @@ class SettingsProvider {
     return _kDefaultDashboardCardList;
   }
 
-  set dashboardWidgetsSequence(List<DashboardCard> value) =>
-      preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+  set dashboardWidgetsSequence(List<DashboardCard>? value) =>
+      preferences!.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
 
   Campus get campus {
-    if (preferences.containsKey(KEY_PREFERRED_CAMPUS)) {
-      String value = preferences.getString(KEY_PREFERRED_CAMPUS);
+    if (preferences!.containsKey(KEY_PREFERRED_CAMPUS)) {
+      String? value = preferences!.getString(KEY_PREFERRED_CAMPUS);
       return Constant.CAMPUS_VALUES
           .firstWhere((element) => element.toString() == value, orElse: () {
         campus = Campus.HANDAN_CAMPUS;
@@ -160,7 +160,7 @@ class SettingsProvider {
   }
 
   set campus(Campus campus) {
-    preferences.setString(KEY_PREFERRED_CAMPUS, campus.toString());
+    preferences!.setString(KEY_PREFERRED_CAMPUS, campus.toString());
   }
 
   //FudanDaily AutoTick
@@ -190,33 +190,33 @@ class SettingsProvider {
   }*/
 
   //Token
-  String get fduholeToken {
-    if (preferences.containsKey(KEY_FDUHOLE_TOKEN)) {
-      return preferences.getString(KEY_FDUHOLE_TOKEN);
+  String? get fduholeToken {
+    if (preferences!.containsKey(KEY_FDUHOLE_TOKEN)) {
+      return preferences!.getString(KEY_FDUHOLE_TOKEN)!;
     }
     return null;
   }
 
-  set fduholeToken(String value) =>
-      preferences.setString(KEY_FDUHOLE_TOKEN, value);
+  set fduholeToken(String? value) =>
+      preferences!.setString(KEY_FDUHOLE_TOKEN, value!);
 
-  void deleteSavedFduholeToken() => preferences.remove(KEY_FDUHOLE_TOKEN);
+  void deleteSavedFduholeToken() => preferences!.remove(KEY_FDUHOLE_TOKEN);
 
   //Debug Mode
   bool get debugMode {
-    if (preferences.containsKey(KEY_DEBUG_MODE)) {
-      return preferences.getBool(KEY_DEBUG_MODE);
+    if (preferences!.containsKey(KEY_DEBUG_MODE)) {
+      return preferences!.getBool(KEY_DEBUG_MODE)!;
     } else {
       return false;
     }
   }
 
-  set debugMode(bool mode) => preferences.setBool(KEY_DEBUG_MODE, mode);
+  set debugMode(bool mode) => preferences!.setBool(KEY_DEBUG_MODE, mode);
 
   //FDUHOLE Default Sorting Order
-  SortOrder get fduholeSortOrder {
-    if (preferences.containsKey(KEY_FDUHOLE_SORTORDER)) {
-      String str = preferences.getString(KEY_FDUHOLE_SORTORDER);
+  SortOrder? get fduholeSortOrder {
+    if (preferences!.containsKey(KEY_FDUHOLE_SORTORDER)) {
+      String? str = preferences!.getString(KEY_FDUHOLE_SORTORDER);
       if (str == SortOrder.LAST_CREATED.getInternalString())
         return SortOrder.LAST_CREATED;
       else if (str == SortOrder.LAST_REPLIED.getInternalString())
@@ -225,15 +225,15 @@ class SettingsProvider {
     return null;
   }
 
-  set fduholeSortOrder(SortOrder value) =>
-      preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
+  set fduholeSortOrder(SortOrder? value) =>
+      preferences!.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString()!);
 
   /// FDUHOLE Folded Post Behavior
 
   /// NOTE: This getter defaults to a FOLD and won't return [null]
   FoldBehavior get fduholeFoldBehavior {
-    if (preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
-      int savedPref = preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
+    if (preferences!.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
+      int? savedPref = preferences!.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
       return FoldBehavior.values.firstWhere(
         (element) => element.index == savedPref,
         orElse: () => FoldBehavior.FOLD,
@@ -243,23 +243,23 @@ class SettingsProvider {
   }
 
   set fduholeFoldBehavior(FoldBehavior value) =>
-      preferences.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+      preferences!.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
 
   /// Clean Mode
   bool get cleanMode {
-    if (preferences.containsKey(KEY_CLEAN_MODE)) {
-      return preferences.getBool(KEY_CLEAN_MODE);
+    if (preferences!.containsKey(KEY_CLEAN_MODE)) {
+      return preferences!.getBool(KEY_CLEAN_MODE)!;
     } else {
       return false;
     }
   }
 
-  set cleanMode(bool mode) => preferences.setBool(KEY_CLEAN_MODE, mode);
+  set cleanMode(bool mode) => preferences!.setBool(KEY_CLEAN_MODE, mode);
 
   /// Hidden tags
-  List<PostTag> get hiddenTags {
+  List<PostTag>? get hiddenTags {
     try {
-      var json = jsonDecode(preferences.getString(KEY_HIDDEN_TAGS));
+      var json = jsonDecode(preferences!.getString(KEY_HIDDEN_TAGS)!);
       if (json is Iterable) {
         return json.map((e) => PostTag.fromJson(e)).toList();
       }
@@ -267,37 +267,35 @@ class SettingsProvider {
     return null;
   }
 
-  set hiddenTags(List<PostTag> tags) {
+  set hiddenTags(List<PostTag>? tags) {
     if (tags == null) return;
-    preferences.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
+    preferences!.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
   }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }
 
-extension SortOrderEx on SortOrder {
-  String displayTitle(BuildContext context) {
+extension SortOrderEx on SortOrder? {
+  String? displayTitle(BuildContext context) {
     switch (this) {
       case SortOrder.LAST_REPLIED:
         return S.of(context).last_replied;
-        break;
       case SortOrder.LAST_CREATED:
         return S.of(context).last_created;
-        break;
+      case null:
+        return null;
     }
-    return null;
   }
 
-  String getInternalString() {
+  String? getInternalString() {
     switch (this) {
       case SortOrder.LAST_REPLIED:
         return "last_updated";
-        break;
       case SortOrder.LAST_CREATED:
         return "last_created";
-        break;
+      case null:
+        return null;
     }
-    return null;
   }
 }
 
@@ -305,18 +303,14 @@ extension SortOrderEx on SortOrder {
 enum FoldBehavior { SHOW, FOLD, HIDE }
 
 extension FoldBehaviorEx on FoldBehavior {
-  String displayTitle(BuildContext context) {
+  String? displayTitle(BuildContext context) {
     switch (this) {
       case FoldBehavior.FOLD:
         return S.of(context).fold;
-        break;
       case FoldBehavior.HIDE:
         return S.of(context).hide;
-        break;
       case FoldBehavior.SHOW:
         return S.of(context).show;
-        break;
     }
-    return null;
   }
 }

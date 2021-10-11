@@ -1,3 +1,5 @@
+
+
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -22,21 +24,21 @@ part 'fduhole_user.g.dart';
 
 @JsonSerializable()
 class FduholeUser {
-  final String username;
+  final String? username;
   // ignore: non_constant_identifier_names
-  final bool is_active;
+  final bool? is_active;
 
   // ignore: non_constant_identifier_names
-  final bool is_staff;
+  final bool? is_staff;
 
   // ignore: non_constant_identifier_names
-  final bool is_superuser;
+  final bool? is_superuser;
 
   // ignore: non_constant_identifier_names
-  final List<BBSPost> favored_discussion;
+  final List<BBSPost>? favored_discussion;
 
   // ignore: non_constant_identifier_names
-  final String encrypted_email;
+  final String? encrypted_email;
 
   factory FduholeUser.fromJson(Map<String, dynamic> json) =>
       _$FduholeUserFromJson(json);

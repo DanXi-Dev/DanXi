@@ -34,42 +34,42 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
 class BusPage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _BusPageState createState() => _BusPageState();
 
-  BusPage({Key key, this.arguments});
+  BusPage({Key? key, this.arguments});
 }
 
 class _BusPageState extends State<BusPage> {
-  Future<List<BusScheduleItem>> _busListWeekday;
-  Future<List<BusScheduleItem>> _busListHoliday;
-  List<BusScheduleItem> _busListWeekdayLoaded;
-  List<BusScheduleItem> _busListHolidayLoaded;
+  Future<List<BusScheduleItem>?>? _busListWeekday;
+  Future<List<BusScheduleItem>?>? _busListHoliday;
+  List<BusScheduleItem>? _busListWeekdayLoaded;
+  List<BusScheduleItem>? _busListHolidayLoaded;
 
-  int _holidaySliding;
+  int? _holidaySliding;
 
   // Start Location
-  Campus _startSelectItem = Campus.NONE;
-  int _startSliding;
+  Campus? _startSelectItem = Campus.NONE;
+  int? _startSliding;
 
   // End Location
-  Campus _endSelectItem = Campus.NONE;
-  int _endSliding;
+  Campus? _endSelectItem = Campus.NONE;
+  int? _endSliding;
 
   // By default, only buses after DateTime.now() is displayed
   // Set this to true to display all buses
   bool _showAll = false;
 
   Future<List<BusScheduleItem>> _setContent() async {
-    List<BusScheduleItem> content;
+    List<BusScheduleItem>? content;
     if (_holidaySliding == 1) {
       content = _busListHolidayLoaded = await _busListHoliday;
     } else {
       content = _busListWeekdayLoaded = await _busListWeekday;
     }
-    return _filterBus(content);
+    return _filterBus(content!);
   }
 
   Widget _buildFutureWidget() => FutureWidget(
@@ -78,7 +78,7 @@ class _BusPageState extends State<BusPage> {
         return ListView(
           physics: AlwaysScrollableScrollPhysics(),
           primary: true,
-          children: _getListWidgets(snapshot.data),
+          children: _getListWidgets(snapshot.data as List<BusScheduleItem>),
         );
       },
       errorBuilder: (context, snapshot) {
@@ -103,7 +103,7 @@ class _BusPageState extends State<BusPage> {
         return ListView(
           physics: AlwaysScrollableScrollPhysics(),
           primary: true,
-          children: _getListWidgets(_filterBus(_busListHolidayLoaded)),
+          children: _getListWidgets(_filterBus(_busListHolidayLoaded!)),
         );
       }
     } else {
@@ -113,7 +113,7 @@ class _BusPageState extends State<BusPage> {
         return ListView(
           physics: AlwaysScrollableScrollPhysics(),
           primary: true,
-          children: _getListWidgets(_filterBus(_busListWeekdayLoaded)),
+          children: _getListWidgets(_filterBus(_busListWeekdayLoaded!)),
         );
       }
     }
@@ -122,35 +122,35 @@ class _BusPageState extends State<BusPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.arguments['dataIsHoliday']) {
+    if (widget.arguments!['dataIsHoliday']) {
       _busListWeekday = LazyFuture.pack(FudanBusRepository.getInstance()
           .loadBusList(StateProvider.personInfo.value, holiday: false));
-      _busListHolidayLoaded = widget.arguments['busList'];
+      _busListHolidayLoaded = widget.arguments!['busList'];
       _holidaySliding = 1;
     } else {
       _busListHoliday = LazyFuture.pack(FudanBusRepository.getInstance()
           .loadBusList(StateProvider.personInfo.value, holiday: true));
-      _busListWeekdayLoaded = widget.arguments['busList'];
+      _busListWeekdayLoaded = widget.arguments!['busList'];
       _holidaySliding = 0;
     }
 
     // Default to Handan
     _startSelectItem = Campus.HANDAN_CAMPUS;
-    _startSliding = _startSelectItem.index;
+    _startSliding = _startSelectItem!.index;
     _onStartLocationChanged(_startSelectItem);
 
     _endSelectItem = SettingsProvider.getInstance().campus;
-    _endSliding = _endSelectItem.index;
+    _endSliding = _endSelectItem!.index;
     _onEndLocationChanged(_endSelectItem);
   }
 
-  void _onStartLocationChanged(Campus e) {
+  void _onStartLocationChanged(Campus? e) {
     setState(() {
       _startSelectItem = e;
     });
   }
 
-  void _onEndLocationChanged(Campus e) {
+  void _onEndLocationChanged(Campus? e) {
     setState(() {
       _endSelectItem = e;
     });
@@ -180,11 +180,12 @@ class _BusPageState extends State<BusPage> {
   }
 
   List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
-        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
+        return DropdownMenuItem(
+            value: e, child: Text(e.displayTitle(context)!));
       }).toList(growable: false);
 
   Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
-      .map((e) => Text(e.displayTitle(context)))
+      .map((e) => Text(e.displayTitle(context)!))
       .toList(growable: false)
       .asMap();
 
@@ -205,7 +206,7 @@ class _BusPageState extends State<BusPage> {
               Padding(
                 padding: EdgeInsets.only(top: 8, bottom: 4),
                 child: CupertinoSlidingSegmentedControl<int>(
-                  onValueChanged: (int value) {
+                  onValueChanged: (int? value) {
                     setState(() {
                       _holidaySliding = value;
                     });
@@ -223,20 +224,21 @@ class _BusPageState extends State<BusPage> {
                   Text(S.of(context).bus_start),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
-                      items: _getItems(),
+                      items: _getItems() as List<DropdownMenuItem<Campus>>?,
                       // Don't select anything if _selectItem == Campus.NONE
                       value: _startSelectItem == Campus.NONE
                           ? null
                           : _startSelectItem,
-                      hint: Text(_startSelectItem.displayTitle(context)),
-                      onChanged: (Campus e) => _onStartLocationChanged(e),
+                      hint: Text(_startSelectItem.displayTitle(context)!),
+                      onChanged: (Campus? e) => _onStartLocationChanged(e),
                     ),
                     cupertino: (_, __) => Padding(
                       padding: EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
-                        onValueChanged: (int value) {
+                        onValueChanged: (int? value) {
                           _startSliding = value;
-                          _onStartLocationChanged(Campus.values[_startSliding]);
+                          _onStartLocationChanged(
+                              Campus.values[_startSliding!]);
                         },
                         groupValue: _startSliding,
                         children: _getCupertinoItems(),
@@ -251,19 +253,19 @@ class _BusPageState extends State<BusPage> {
                   Text(S.of(context).bus_dest),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
-                      items: _getItems(),
+                      items: _getItems() as List<DropdownMenuItem<Campus>>?,
                       // Don't select anything if _selectItem == Campus.NONE
                       value:
                           _endSelectItem == Campus.NONE ? null : _endSelectItem,
-                      hint: Text(_endSelectItem.displayTitle(context)),
-                      onChanged: (Campus e) => _onEndLocationChanged(e),
+                      hint: Text(_endSelectItem.displayTitle(context)!),
+                      onChanged: (Campus? e) => _onEndLocationChanged(e),
                     ),
                     cupertino: (_, __) => Padding(
                       padding: EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
-                        onValueChanged: (int value) {
+                        onValueChanged: (int? value) {
                           _endSliding = value;
-                          _onEndLocationChanged(Campus.values[_endSliding]);
+                          _onEndLocationChanged(Campus.values[_endSliding!]);
                         },
                         groupValue: _endSliding,
                         children: _getCupertinoItems(),
@@ -282,7 +284,7 @@ class _BusPageState extends State<BusPage> {
         ));
   }
 
-  List<Widget> _getListWidgets(List<BusScheduleItem> _filteredBusList) {
+  List<Widget> _getListWidgets(List<BusScheduleItem>? _filteredBusList) {
     final currentTime = DateTime.now();
     final format = NumberFormat("00");
     List<Widget> widgets = [
@@ -309,7 +311,7 @@ class _BusPageState extends State<BusPage> {
     _filteredBusList.forEach((value) {
       if (_showAll ||
           value.realStartTime == null ||
-          value.realStartTime.toExactTime().isAfter(currentTime))
+          value.realStartTime!.toExactTime().isAfter(currentTime))
         widgets.add(_buildBusCard(value));
     });
     return widgets;
@@ -330,7 +332,7 @@ class _BusPageState extends State<BusPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      item.start.displayTitle(context),
+                      item.start.displayTitle(context)!,
                       textScaleFactor: 1.2,
                     ),
                     const SizedBox(
@@ -340,14 +342,14 @@ class _BusPageState extends State<BusPage> {
                   ],
                 ),
                 Text(
-                  item.direction.toText(),
+                  item.direction.toText()!,
                   textScaleFactor: 1.5,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      item.end.displayTitle(context),
+                      item.end.displayTitle(context)!,
                       textScaleFactor: 1.2,
                     ),
                     const SizedBox(

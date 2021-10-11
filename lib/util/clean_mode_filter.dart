@@ -37,10 +37,10 @@ class CleanModeFilter {
     '批'
   ];
 
-  static String cleanText(String content) {
-    String newContent = content;
+  static String? cleanText(String? content) {
+    String? newContent = content;
     DELETE_EMOJI
-        .forEach((element) => newContent = newContent.replaceAll(element, ' '));
+        .forEach((element) => newContent = newContent!.replaceAll(element, ' '));
 
     /* CN_FILTER_TEXT.forEach((element) {
       final filterRegex = RegExp(

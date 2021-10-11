@@ -19,12 +19,12 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/widgets.dart';
 
 class MirrorScrollController extends ScrollController {
-  final ScrollController originController;
-  ScrollPosition _oldPosition;
-  String debugTag;
+  final ScrollController? originController;
+  ScrollPosition? _oldPosition;
+  String? debugTag;
   final BuildContext context;
   List<AttachInterceptor> _interceptors = [];
-  bool _isMaterial;
+  late bool _isMaterial;
 
   MirrorScrollController(this.originController, this.context, {this.debugTag})
       : assert(originController is! MirrorScrollController) {
@@ -33,18 +33,17 @@ class MirrorScrollController extends ScrollController {
   }
 
   @override
-  double get initialScrollOffset => originController.initialScrollOffset;
+  double get initialScrollOffset => originController!.initialScrollOffset;
 
   @override
   void attach(ScrollPosition position) {
     // debugPrint("tryAttach: $debugTag");
     bool noClients = !hasClients;
-    bool intercepted =
-        _interceptors.every((element) => element?.call() ?? true);
+    bool intercepted = _interceptors.every((element) => element.call());
     if (noClients && intercepted) {
       // detachPosition();
       // debugPrint("attach!!: $debugTag");
-      originController.attach(position);
+      originController!.attach(position);
     } else {
       // debugPrint(
       //     "$debugTag Attach failed, judgement(Should be true): noClients: $noClients, intercepted: $intercepted");
@@ -61,30 +60,32 @@ class MirrorScrollController extends ScrollController {
   }
 
   @override
-  Iterable<ScrollPosition> get positions => originController.positions;
+  Iterable<ScrollPosition> get positions => originController!.positions;
 
   @override
-  bool get hasClients => originController.hasClients;
+  bool get hasClients => originController!.hasClients;
 
   @override
-  ScrollPosition get position => originController.position;
+  ScrollPosition get position => originController!.position;
 
   @override
-  double get offset => originController.offset;
+  double get offset => originController!.offset;
 
   @override
-  Future<Function> animateTo(double offset,
-          {@required Duration duration, @required Curve curve}) =>
-      originController.animateTo(offset, duration: duration, curve: curve);
+  Future<Function?> animateTo(double offset,
+          {required Duration duration, required Curve curve}) =>
+      originController!
+          .animateTo(offset, duration: duration, curve: curve)
+          .then((value) => value as Function?);
 
   @override
-  void jumpTo(double value) => originController.jumpTo(value);
+  void jumpTo(double value) => originController!.jumpTo(value);
 
   @override
   void detach(ScrollPosition position) {
     // debugPrint("tryDetach: $debugTag");
     if (positions.contains(position)) {
-      originController.detach(position);
+      originController!.detach(position);
       // debugPrint("detached!!: $debugTag");
     }
   }
@@ -96,7 +97,7 @@ class MirrorScrollController extends ScrollController {
     tempPos.forEach((element) {
       if (positions.contains(element)) {
         try {
-          originController.detach(element);
+          originController!.detach(element);
           // We should catch errors from [ChangeNotifier._debugAssertNotDisposed] and omit them, since they will
           // be always thrown after offline notification from [_HomePageState._loadStartDate] in debug profile.
           //
@@ -109,9 +110,9 @@ class MirrorScrollController extends ScrollController {
   void reattachPosition() {
     if (_isMaterial &&
         _oldPosition != null &&
-        !originController.positions.contains(_oldPosition)) {
+        !originController!.positions.contains(_oldPosition)) {
       try {
-        originController.attach(_oldPosition);
+        originController!.attach(_oldPosition!);
         // We should catch errors from [ChangeNotifier._debugAssertNotDisposed] and omit them, since they will
         // be always thrown after offline notification from [_HomePageState._loadStartDate] in debug profile.
         //
@@ -123,19 +124,19 @@ class MirrorScrollController extends ScrollController {
 
   @override
   void dispose() {
-    originController.dispose();
+    originController!.dispose();
     super.dispose();
   }
 
   @override
   ScrollPosition createScrollPosition(ScrollPhysics physics,
-          ScrollContext context, ScrollPosition oldPosition) =>
-      originController.createScrollPosition(physics, context, oldPosition);
+          ScrollContext context, ScrollPosition? oldPosition) =>
+      originController!.createScrollPosition(physics, context, oldPosition);
 
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    originController.debugFillDescription(description);
+    originController!.debugFillDescription(description);
   }
 }
 

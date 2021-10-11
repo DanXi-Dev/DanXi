@@ -8,10 +8,10 @@ part of 'dashboard_card.dart';
 
 DashboardCard _$DashboardCardFromJson(Map<String, dynamic> json) {
   return DashboardCard(
-    json['internalString'] as String,
-    json['title'] as String,
-    json['link'] as String,
-    json['enabled'] as bool,
+    json['internalString'] as String?,
+    json['title'] as String?,
+    json['link'] as String?,
+    json['enabled'] as bool?,
   );
 }
 

@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -33,11 +33,11 @@ class UISLoginTool {
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if having logged in, return null.
-  static Future<Response> loginUIS(
-      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
+  static Future<Response?> loginUIS(
+      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     dio.interceptors.requestLock.lock();
-    Response result =
+    Response? result =
         await _loginUIS(dio, serviceUrl, jar, info).whenComplete(() {
       if (dio.interceptors.requestLock.locked) {
         dio.interceptors.requestLock.unlock();
@@ -46,8 +46,8 @@ class UISLoginTool {
     return result;
   }
 
-  static Future<Response> _loginUIS(
-      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo info,
+  static Future<Response?> _loginUIS(
+      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
@@ -62,26 +62,26 @@ class UISLoginTool {
 
     // If we has logged in, return null.
     if (!forceRelogin &&
-        (await workJar.loadForRequest(Uri.tryParse(serviceUrl))).isNotEmpty) {
+        (await workJar.loadForRequest(Uri.tryParse(serviceUrl)!)).isNotEmpty) {
       Response res = await workDio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
       if (res.statusCode == 302 &&
           !res.headers.map.containsKey('set-cookie') &&
-          !res.headers.value("location").startsWith(Constant.UIS_URL)) {
+          !res.headers.value("location")!.startsWith(Constant.UIS_URL)) {
         return null;
       }
     }
 
     // Remove old cookies.
     workJar.deleteAll();
-    Map<String, String> data = {};
+    Map<String?, String?> data = {};
     Response res = await workDio.get(serviceUrl);
-    Beautifulsoup(res.data.toString()).find_all("input").forEach((element) {
+    BeautifulSoup(res.data.toString()).findAll("input").forEach((element) {
       if (element.attributes['type'] != "button") {
         data[element.attributes['name']] = element.attributes['value'];
       }
     });
-    data['username'] = info.id;
+    data['username'] = info!.id;
     data["password"] = info.password;
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),

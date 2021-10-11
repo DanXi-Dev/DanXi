@@ -32,9 +32,9 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class DashboardReorderPage extends StatefulWidget {
   /// 'items': A list of [LicenseItem] to display on the page
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
-  const DashboardReorderPage({Key key, this.arguments}) : super(key: key);
+  const DashboardReorderPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   _DashboardReorderPage createState() => _DashboardReorderPage();
@@ -43,7 +43,7 @@ class DashboardReorderPage extends StatefulWidget {
 const List<String> NONFUNCTIONAL_WIDGET_LIST = ['divider', 'new_card'];
 
 class _DashboardReorderPage extends State<DashboardReorderPage> {
-  List<DashboardCard> sequence;
+  List<DashboardCard>? sequence;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                         leading: Icon(PlatformIcons(context).addCircled),
                         title: Text(S.of(context).add_new_card),
                         onTap: () {
-                          sequence
+                          sequence!
                               .add(DashboardCard("new_card", null, null, true));
                           SettingsProvider.getInstance()
                               .dashboardWidgetsSequence = sequence;
@@ -87,7 +87,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                         leading: Icon(PlatformIcons(context).addCircled),
                         title: Text(S.of(context).add_new_divider),
                         onTap: () {
-                          sequence.add(
+                          sequence!.add(
                             DashboardCard("divider", null, null, true),
                           );
                           SettingsProvider.getInstance()
@@ -126,7 +126,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                         title: Text(S.of(context).reset_layout),
                         onTap: () async {
                           await SettingsProvider.getInstance()
-                              .preferences
+                              .preferences!
                               .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
                           RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
@@ -135,14 +135,14 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                     ),
                   ],
               onReorder: (oldIndex, newIndex) {
-                if (oldIndex >= sequence.length) {
+                if (oldIndex >= sequence!.length) {
                   Noticing.showNotice(context, S.of(context).unmovable_widget);
                   return;
                 }
                 if (newIndex > oldIndex) --newIndex;
-                DashboardCard tmp = sequence[oldIndex];
-                sequence.removeAt(oldIndex);
-                sequence.insert(newIndex, tmp);
+                DashboardCard tmp = sequence![oldIndex];
+                sequence!.removeAt(oldIndex);
+                sequence!.insert(newIndex, tmp);
                 SettingsProvider.getInstance().dashboardWidgetsSequence =
                     sequence;
                 RefreshHomepageEvent(queueRefresh: true).fire();
@@ -174,9 +174,9 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
     };
     List<Widget> _widgets = [];
 
-    for (int index = 0; index < sequence.length; ++index) {
+    for (int index = 0; index < sequence!.length; ++index) {
       // Nonfunctional Widgets
-      if (NONFUNCTIONAL_WIDGET_LIST.contains(sequence[index].internalString)) {
+      if (NONFUNCTIONAL_WIDGET_LIST.contains(sequence![index].internalString)) {
         _widgets.add(Dismissible(
           key: UniqueKey(),
           // Show a red background as the item is swiped away.
@@ -184,13 +184,13 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
             child: ListTile(
-              title: Text(widgetName[sequence[index].internalString]),
+              title: Text(widgetName[sequence![index].internalString!]!),
               trailing: Icon(Icons.drag_handle_rounded),
               //leading: Icon(CupertinoIcons.arrow_left_right_circle),
             ),
           ),
           onDismissed: (direction) {
-            sequence.removeAt(index);
+            sequence!.removeAt(index);
             SettingsProvider.getInstance().dashboardWidgetsSequence = sequence;
             RefreshHomepageEvent(queueRefresh: true).fire();
             setState(() {});
@@ -199,7 +199,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       }
 
       // Custom Widgets
-      else if (sequence[index].internalString == 'custom_card') {
+      else if (sequence![index].internalString == 'custom_card') {
         _widgets.add(
           Dismissible(
             key: UniqueKey(),
@@ -208,24 +208,24 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(
-                title: Text(sequence[index].title),
-                subtitle: Text(sequence[index].link),
+                title: Text(sequence![index].title!),
+                subtitle: Text(sequence![index].link!),
                 secondary: PlatformX.isDesktop
                     ? null
                     : Icon(Icons.drag_handle_rounded),
                 controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool value) {
-                  sequence[index].enabled = value;
+                onChanged: (bool? value) {
+                  sequence![index].enabled = value;
                   SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
                   RefreshHomepageEvent(queueRefresh: true).fire();
                   setState(() {});
                 },
-                value: sequence[index].enabled,
+                value: sequence![index].enabled,
               ),
             ),
             onDismissed: (direction) {
-              sequence.removeAt(index);
+              sequence!.removeAt(index);
               SettingsProvider.getInstance().dashboardWidgetsSequence =
                   sequence;
               RefreshHomepageEvent(queueRefresh: true).fire();
@@ -245,17 +245,17 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(
-                title: Text(widgetName[sequence[index].internalString]),
+                title: Text(widgetName[sequence![index].internalString!]!),
                 controlAffinity: ListTileControlAffinity.leading,
                 secondary: Icon(Icons.drag_handle_rounded),
-                onChanged: (bool value) {
-                  sequence[index].enabled = value;
+                onChanged: (bool? value) {
+                  sequence![index].enabled = value;
                   SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
                   RefreshHomepageEvent(queueRefresh: true).fire();
                   refreshSelf();
                 },
-                value: sequence[index].enabled,
+                value: sequence![index].enabled,
               ),
             ),
           ),

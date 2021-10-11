@@ -21,11 +21,11 @@ import 'package:flutter/widgets.dart';
 
 /// A round chip, usually used as a tag, to match the tag widget of fduhole's web style.
 class RoundChip extends StatefulWidget {
-  final String label;
-  final VoidCallback onTap;
-  final Color color;
+  final String? label;
+  final VoidCallback? onTap;
+  final Color? color;
 
-  const RoundChip({Key key, this.label, this.onTap, this.color})
+  const RoundChip({Key? key, this.label, this.onTap, this.color})
       : super(key: key);
 
   @override
@@ -45,16 +45,16 @@ class _RoundChipState extends State<RoundChip> {
             height: 24,
             decoration: BoxDecoration(
               border: Border.all(
-                color: widget.color,
+                color: widget.color!,
                 width: 1,
               ),
               color:
-                  PlatformX.isDarkMode ? widget.color.withOpacity(0.3) : null,
+                  PlatformX.isDarkMode ? widget.color!.withOpacity(0.3) : null,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
-                widget.label,
+                widget.label!,
                 style: TextStyle(
                     fontSize: 14,
                     color: PlatformX.isDarkMode ? Colors.white : widget.color),

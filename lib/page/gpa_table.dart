@@ -22,22 +22,22 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class GpaTablePage extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _GpaTablePageState createState() => _GpaTablePageState();
 
-  GpaTablePage({Key key, this.arguments});
+  GpaTablePage({Key? key, this.arguments});
 }
 
 class _GpaTablePageState extends State<GpaTablePage> {
-  List<GPAListItem> gpaList;
+  List<GPAListItem>? gpaList;
   static const String NAME_HIDDEN = "****";
 
   @override
   void initState() {
     super.initState();
-    gpaList = widget.arguments['gpalist'];
+    gpaList = widget.arguments!['gpalist'];
   }
 
   @override
@@ -84,8 +84,8 @@ class _GpaTablePageState extends State<GpaTablePage> {
         )
       ])
     ];
-    gpaList.forEach((element) {
-      TextStyle textColorStyle = element.name == NAME_HIDDEN
+    gpaList!.forEach((element) {
+      TextStyle? textColorStyle = element.name == NAME_HIDDEN
           ? null
           : TextStyle(color: Theme.of(context).accentColor);
       widgets.add(TableRow(children: [

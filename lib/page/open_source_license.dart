@@ -30,16 +30,16 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class OpenSourceLicenseList extends StatefulWidget {
   /// 'items': A list of [LicenseItem] to display on the page
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
-  const OpenSourceLicenseList({Key key, this.arguments}) : super(key: key);
+  const OpenSourceLicenseList({Key? key, this.arguments}) : super(key: key);
 
   @override
   _OpenSourceListState createState() => _OpenSourceListState();
 }
 
 class _OpenSourceListState extends State<OpenSourceLicenseList> {
-  List<LicenseItem> _items;
+  List<LicenseItem>? _items;
 
   int debugModeEnableStatus = 0;
 
@@ -83,7 +83,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
     if (_items != null)
-      _items.forEach((element) {
+      _items!.forEach((element) {
         widgets.add(Material(
             child: ListTile(
           title: Text(element.name),
@@ -97,7 +97,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
   @override
   void initState() {
     super.initState();
-    _items = widget.arguments['items'];
+    _items = widget.arguments!['items'];
   }
 }
 
@@ -105,7 +105,7 @@ class License {
   final String licenseName;
 
   /// unused
-  final String licenseText;
+  final String? licenseText;
 
   const License(this.licenseName, {this.licenseText});
 }

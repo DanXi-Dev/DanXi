@@ -17,7 +17,7 @@
 
 import 'dart:convert';
 
-import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -63,56 +63,56 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>> loadExamListRemotely(PersonInfo info) =>
+  Future<List<Exam>> loadExamListRemotely(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamList(),
           (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
+              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<Exam>> _loadExamList() async {
-    final Response r = await dio.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    final DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r = await dio!
+        .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
         .toList();
   }
 
-  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo info,
-          {String semesterId}) =>
+  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
+          {String? semesterId}) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamScore(semesterId),
           (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
+              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
-  Future<List<ExamScore>> _loadExamScore([String semesterId]) async {
-    final Response r = await dio.get(
+  Future<List<ExamScore>> _loadExamScore([String? semesterId]) async {
+    final Response r = await dio!.get(
         kExamScoreUrl(semesterId ??
-            (await cookieJar.loadForRequest(Uri.parse(HOST)))
+            (await cookieJar!.loadForRequest(Uri.parse(HOST)))
                 .firstWhere((element) => element.name == "semester.id")
                 .value),
         options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    final DOM.Element tableBody = soup.find(id: "tbody");
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromEduServiceHtml(e))
         .toList();
   }
 
-  Future<List<GPAListItem>> loadGPARemotely(PersonInfo info) =>
+  Future<List<GPAListItem>> loadGPARemotely(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadGPA(),
           (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
+              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<GPAListItem>> _loadGPA() async {
-    final Response r =
-        await dio.get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Beautifulsoup soup = Beautifulsoup(r.data.toString());
-    final DOM.Element tableBody = soup.find(id: "tbody");
+    final Response r = await dio!
+        .get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => GPAListItem.fromHtml(e))
@@ -122,21 +122,21 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load the semesters id & name, etc.
   ///
   /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>> loadSemesters(PersonInfo info) =>
+  Future<List<SemesterInfo>> loadSemesters(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadSemesters(),
           (exception) => UISLoginTool.loginUIS(
-              dio, EXAM_TABLE_LOGIN_URL, cookieJar, info, true));
+              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<SemesterInfo>> _loadSemesters() async {
-    await dio.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Response semesterResponse = await dio.post(SEMESTER_DATA_URL,
+    await dio!
+        .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+    final Response semesterResponse = await dio!.post(SEMESTER_DATA_URL,
         data: "dataType=semesterCalendar&empty=false",
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    final Beautifulsoup soup = Beautifulsoup(semesterResponse.data.toString());
+    final BeautifulSoup soup = BeautifulSoup(semesterResponse.data.toString());
 
-    final jsonText = _normalizeJson(soup.get_text().trim());
+    final jsonText = _normalizeJson(soup.getText().trim());
     final json = jsonDecode(jsonText);
     final Map semesters = json['semesters'];
     List<SemesterInfo> sems = [];
@@ -180,9 +180,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 }
 
 class SemesterInfo {
-  final String semesterId;
-  final String schoolYear;
-  final String name;
+  final String? semesterId;
+  final String? schoolYear;
+  final String? name;
 
   SemesterInfo(this.semesterId, this.schoolYear, this.name);
 
@@ -232,7 +232,7 @@ class ExamScore {
   final String type;
   final String credit;
   final String level;
-  final String score;
+  final String? score;
   static const MAP_LEVEL_SCORE = {
     "A": "4.0",
     "A-": "3.7",

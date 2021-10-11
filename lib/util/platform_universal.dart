@@ -52,7 +52,7 @@ class PlatformX {
         : Constant.lightTheme(PlatformX.isCupertino(context));
   }
 
-  static Color backgroundColor(BuildContext context) {
+  static Color? backgroundColor(BuildContext context) {
     return isMaterial(context) ? null : Theme.of(context).cardColor;
   }
 
@@ -96,7 +96,7 @@ class PlatformX {
       platformImpl.isCupertino(context);
 
   static bool get isDarkMode =>
-      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+      WidgetsBinding.instance!.window.platformBrightness == Brightness.dark;
 
   static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode;
 }

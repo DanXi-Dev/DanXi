@@ -22,10 +22,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 /// A wrapped container for [PostTag].
 class BBSTagsContainer extends StatefulWidget {
-  final List<PostTag> tags;
-  final OnTapTag onTap;
+  final List<PostTag>? tags;
+  final OnTapTag? onTap;
 
-  const BBSTagsContainer({Key key, @required this.tags, this.onTap})
+  const BBSTagsContainer({Key? key, required this.tags, this.onTap})
       : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class BBSTagsContainer extends StatefulWidget {
 
 class _BBSTagsContainerState extends State<BBSTagsContainer> {
   FocusNode _searchFocus = FocusNode();
-  List<PostTag> filteredTags;
+  List<PostTag>? filteredTags;
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +49,15 @@ class _BBSTagsContainerState extends State<BBSTagsContainer> {
             focusNode: _searchFocus,
             onChanged: (filter) {
               setState(() {
-                filteredTags = widget.tags
+                filteredTags = widget.tags!
                     .where((value) =>
-                        value.name.toLowerCase().contains(filter.toLowerCase()))
+                        value.name!.toLowerCase().contains(filter.toLowerCase()))
                     .toList();
               });
             },
           ),
           Wrap(
-              children: (filteredTags ?? widget.tags)
+              children: (filteredTags ?? widget.tags)!
                   .map(
                     (e) => Padding(
                         padding: EdgeInsets.only(top: 16, right: 12),

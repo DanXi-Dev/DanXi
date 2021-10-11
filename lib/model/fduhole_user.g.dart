@@ -8,15 +8,14 @@ part of 'fduhole_user.dart';
 
 FduholeUser _$FduholeUserFromJson(Map<String, dynamic> json) {
   return FduholeUser(
-    json['username'] as String,
-    json['is_active'] as bool,
-    json['is_staff'] as bool,
-    json['is_superuser'] as bool,
-    (json['favored_discussion'] as List)
-        ?.map((e) =>
-            e == null ? null : BBSPost.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-    json['encrypted_email'] as String,
+    json['username'] as String?,
+    json['is_active'] as bool?,
+    json['is_staff'] as bool?,
+    json['is_superuser'] as bool?,
+    (json['favored_discussion'] as List<dynamic>?)
+        ?.map((e) => BBSPost.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    json['encrypted_email'] as String?,
   );
 }
 

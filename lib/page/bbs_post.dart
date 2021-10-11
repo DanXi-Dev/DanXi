@@ -109,9 +109,9 @@ String preprocessContentForDisplay(String content,
 /// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
 ///
 class BBSPostDetail extends StatefulWidget {
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
-  const BBSPostDetail({Key key, this.arguments});
+  const BBSPostDetail({Key? key, this.arguments});
 
   @override
   _BBSPostDetailState createState() => _BBSPostDetailState();
@@ -120,11 +120,11 @@ class BBSPostDetail extends StatefulWidget {
 class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
-  BBSPost _post;
-  String _searchKeyword;
+  BBSPost? _post;
+  String? _searchKeyword;
 
   /// Fields related to the display states.
-  bool _isFavored;
+  bool? _isFavored;
   bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
@@ -137,31 +137,32 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       return PostRepository.getInstance()
           .loadSearchResults(_searchKeyword, page);
     else
-      return PostRepository.getInstance().loadReplies(_post, page);
+      return PostRepository.getInstance().loadReplies(_post!, page);
   }
 
-  Future<bool> _isDiscussionFavored() async {
+  Future<bool?> _isDiscussionFavored() async {
     if (_isFavored != null) return _isFavored;
-    final List<BBSPost> favorites =
-        await PostRepository.getInstance().getFavoredDiscussions();
-    return favorites.any((element) {
-      if (element?.id == null) return false;
-      return element.id == _post.id;
+    final List<BBSPost>? favorites =
+        await (PostRepository.getInstance().getFavoredDiscussions());
+    print(favorites);
+    return favorites!.any((element) {
+      if (element.id == null) return false;
+      return element.id == _post!.id;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.arguments.containsKey('post')) {
-      _post = widget.arguments['post'];
-    } else if (widget.arguments.containsKey('searchKeyword')) {
-      _searchKeyword = widget.arguments['searchKeyword'];
+    if (widget.arguments!.containsKey('post')) {
+      _post = widget.arguments!['post'];
+    } else if (widget.arguments!.containsKey('searchKeyword')) {
+      _searchKeyword = widget.arguments!['searchKeyword'];
       // Create a dummy post for displaying search result
       _post = BBSPost.dummy();
     }
-    shouldScrollToEnd = widget.arguments.containsKey('scroll_to_end') &&
-        widget.arguments['scroll_to_end'] == true;
+    shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
+        widget.arguments!['scroll_to_end'] == true;
   }
 
   /// Rebuild everything and refresh itself.
@@ -196,7 +197,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () {
-                BBSEditor.createNewReply(context, _post.id, null)
+                BBSEditor.createNewReply(context, _post!.id, null)
                     .then((_) => refreshSelf(scrollToEnd: true));
               },
             ),
@@ -220,8 +221,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               scrollController: PrimaryScrollController.of(context),
               dataReceiver: _loadContent,
               // Load all data if user instructed us to scroll to end
-              allDataReceiver: (shouldScrollToEnd && _post.count > 10)
-                  ? PostRepository.getInstance().loadReplies(_post, -1)
+              allDataReceiver: (shouldScrollToEnd && _post!.count! > 10)
+                  ? PostRepository.getInstance().loadReplies(_post!, -1)
                   : null,
               shouldScrollToEnd: shouldScrollToEnd,
               builder: _getListItems,
@@ -244,12 +245,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   Widget _buildFavoredActionButton() => PlatformIconButton(
         padding: EdgeInsets.zero,
-        icon: FutureWidget<bool>(
+        icon: FutureWidget<bool?>(
           future: _isDiscussionFavored(),
           loadingBuilder: PlatformCircularProgressIndicator(),
-          successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          successBuilder:
+              (BuildContext context, AsyncSnapshot<bool?> snapshot) {
             _isFavored = snapshot.data;
-            return _isFavored
+            return _isFavored!
                 ? Icon(CupertinoIcons.star_fill)
                 : Icon(CupertinoIcons.star);
           },
@@ -260,17 +262,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         onPressed: () async {
           if (_isFavored == null) return;
-          setState(() => _isFavored = !_isFavored);
+          setState(() => _isFavored = !_isFavored!);
           await PostRepository.getInstance()
               .setFavoredDiscussion(
-                  _isFavored
+                  _isFavored!
                       ? SetFavoredDiscussionMode.ADD
                       : SetFavoredDiscussionMode.DELETE,
-                  _post.id)
-              .onError((error, stackTrace) {
+                  _post!.id)
+              .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
                 title: S.of(context).operation_failed, useSnackBar: false);
-            setState(() => _isFavored = !_isFavored);
+            setState(() => _isFavored = !_isFavored!);
             return null;
           });
         },
@@ -306,7 +308,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 Navigator.of(context).pop();
                 PostRepository.getInstance()
                     .adminDisablePost(e.discussion, e.id)
-                    .onError((error, stackTrace) {
+                    .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
                         context,
@@ -329,7 +331,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 Navigator.of(context).pop();
                 PostRepository.getInstance()
                     .adminDisablePost(e.discussion, e.id)
-                    .onError((error, stackTrace) {
+                    .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
                         context,
@@ -354,7 +356,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 Navigator.of(context).pop();
                 PostRepository.getInstance()
                     .adminDisableDiscussion(e.discussion)
-                    .onError((error, stackTrace) {
+                    .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
                         context,
@@ -377,7 +379,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 Navigator.of(context).pop();
                 PostRepository.getInstance()
                     .adminDisableDiscussion(e.discussion)
-                    .onError((error, stackTrace) {
+                    .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
                         context,
@@ -420,7 +422,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           ),
 
         // Standard Operations
-        if (!isHtml(e.filteredContent))
+        if (!isHtml(e.filteredContent!))
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               onPressed: () {
@@ -443,7 +445,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
-              FlutterClipboard.copy(renderText(e.filteredContent, ''));
+              FlutterClipboard.copy(renderText(e.filteredContent!, ''));
             },
             child: Text(S.of(context).copy),
           ),
@@ -451,7 +453,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             title: Text(S.of(context).copy),
             onTap: () {
               Navigator.of(context).pop();
-              FlutterClipboard.copy(renderText(e.filteredContent, '')).then(
+              FlutterClipboard.copy(renderText(e.filteredContent!, '')).then(
                   (value) =>
                       Noticing.showNotice(context, S.of(context).copy_success));
             },
@@ -479,14 +481,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _opLeadingTag() => Container(
         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
         decoration: BoxDecoration(
-            color: Constant.getColorFromString(_post.tag.first.color)
+            color: Constant.getColorFromString(_post!.tag!.first.color)
                 .withOpacity(0.8),
             borderRadius: BorderRadius.all(Radius.circular(4.0))),
         child: Text(
           "OP",
           style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Constant.getColorFromString(_post.tag.first.color)
+              color: Constant.getColorFromString(_post!.tag!.first.color)
                           .withOpacity(0.8)
                           .computeLuminance() <=
                       0.5
@@ -501,7 +503,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       {bool isNested = false}) {
     final bool generateTags = (index == 0);
     LinkTapCallback onLinkTap = (url) {
-      BrowserUtil.openUrl(url, context);
+      BrowserUtil.openUrl(url!, context);
     };
     ImageTapCallback onImageTap = (url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
@@ -541,7 +543,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: generateTagWidgets(context, _post,
-                          (String tagName) {
+                          (String? tagName) {
                         smartNavigatorPush(context, '/bbs/discussions',
                             arguments: {"tagFilter": tagName});
                       },
@@ -551,9 +553,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
                   child: Row(
                     children: [
-                      if (e.username == _post.first_post.username)
+                      if (e.username == _post!.first_post!.username)
                         _opLeadingTag(),
-                      if (e.username == _post.first_post.username)
+                      if (e.username == _post!.first_post!.username)
                         const SizedBox(
                           width: 2,
                         ),
@@ -599,7 +601,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         // If content is being quoted, limit its height so that the view won't be too long.
                         ? Linkify(
                             text: renderText(
-                                    e.filteredContent, S.of(context).image_tag)
+                                    e.filteredContent!, S.of(context).image_tag)
                                 .trim(),
                             textScaleFactor: 0.8,
                             maxLines: 2,
@@ -614,7 +616,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                             },
                           )
                         : smartRender(
-                            e.filteredContent, onLinkTap, onImageTap)),
+                            e.filteredContent!, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: isNested
@@ -648,7 +650,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           ),
                           Text(
                             HumanDuration.format(
-                                context, DateTime.parse(e.date_created)),
+                                context, DateTime.parse(e.date_created!)),
                             style: TextStyle(
                                 color: Theme.of(context).hintColor,
                                 fontSize: 12),
@@ -669,7 +671,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 if (isNested) {
                   // Scroll to the corrosponding post
                   while (!(await _listViewController.scrollToItem(e))) {
-                    if (_listViewController.getScrollController().offset < 10)
+                    if (_listViewController.getScrollController()!.offset < 10)
                       break; // Prevent deadlock
                     await _listViewController.scrollDelta(
                         -100, Duration(milliseconds: 1), Curves.linear);
@@ -677,12 +679,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   return;
                 }
 
-                int replyId;
+                int? replyId;
                 // Set the replyId to null when tapping on the first reply.
-                if (_post.first_post.id != e.id) {
+                if (_post!.first_post!.id != e.id) {
                   replyId = e.id;
                 }
-                BBSEditor.createNewReply(context, _post.id, replyId)
+                BBSEditor.createNewReply(context, _post!.id, replyId)
                     .then((value) => refreshSelf(scrollToEnd: true));
               } else {
                 ProgressFuture progressDialog = showProgressDialog(
@@ -699,8 +701,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 }
 
-PostRenderWidget smartRender(String content, LinkTapCallback onTapLink,
-        ImageTapCallback onTapImage) =>
+PostRenderWidget smartRender(String content, LinkTapCallback? onTapLink,
+        ImageTapCallback? onTapImage) =>
     isHtml(content)
         ? PostRenderWidget(
             render: kHtmlRender,

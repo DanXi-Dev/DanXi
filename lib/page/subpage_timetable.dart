@@ -87,19 +87,19 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   /// A map of all converters.
   ///
   /// A converter is to export the time table as a single file, e.g. .ics.
-  Map<String, TimetableConverter> converters;
+  late Map<String, TimetableConverter> converters;
 
   /// The time table it fetched.
-  TimeTable _table;
+  TimeTable? _table;
 
   ///The week it's showing on the time table.
-  TimeNow _showingTime;
+  TimeNow? _showingTime;
 
-  Future _content;
+  Future? _content;
 
   bool _loadFromRemote = false;
 
-  BannerAd bannerAd;
+  BannerAd? bannerAd;
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup))
@@ -115,8 +115,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   void _startShare(TimetableConverter converter) async {
     // Close the dialog
     Navigator.of(context).pop();
-
-    String converted = converter.convertTo(_table);
+    if (_table == null) {
+      // TODO: Handle null
+      Noticing.showNotice(context, S.of(context).fatal_error);
+      return;
+    }
+    String converted = converter.convertTo(_table!);
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
@@ -232,17 +236,17 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   goToPrev() {
     setState(() {
-      _showingTime.week--;
+      _showingTime!.week--;
     });
   }
 
   goToNext() {
     setState(() {
-      _showingTime.week++;
+      _showingTime!.week++;
     });
   }
 
-  Widget _buildPage(TimeTable table) {
+  Widget _buildPage(TimeTable? table) {
     final TimetableStyle style = TimetableStyle(
         startHour: TimeTable.kCourseSlotStartTime[0].hour,
         laneHeight: 16,
@@ -250,9 +254,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         timeItemWidth: 16,
         timeItemHeight: 140);
     _table = table;
-    if (_showingTime == null) _showingTime = _table.now();
-    final List<DayEvents> scheduleData = _table.toDayEvents(_showingTime.week,
-        compact: TableDisplayType.STANDARD);
+    if (_showingTime == null) _showingTime = _table!.now();
+    final List<DayEvents> scheduleData = _table!
+        .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return SafeArea(
       child: RefreshIndicator(
         color: Theme.of(context).accentColor,
@@ -273,17 +277,17 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               children: [
                 PlatformIconButton(
                   icon: Icon(Icons.chevron_left),
-                  onPressed: _showingTime.week > 0 ? goToPrev : null,
+                  onPressed: _showingTime!.week > 0 ? goToPrev : null,
                 ),
-                Text(S.of(context).week(_showingTime.week)),
+                Text(S.of(context).week(_showingTime!.week)),
                 PlatformIconButton(
                   icon: Icon(Icons.chevron_right),
                   onPressed:
-                      _showingTime.week < TimeTable.MAX_WEEK ? goToNext : null,
+                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
                 )
               ],
             ),
-            ScheduleView(scheduleData, style, _table.now(), _showingTime.week,
+            ScheduleView(scheduleData, style, _table!.now(), _showingTime!.week,
                 widget.primaryScrollController(context)),
           ],
         ),

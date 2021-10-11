@@ -28,7 +28,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanzlfreeclass%252Fwap%252Fmobile%252Findex%253Fxqdm%253D%2526amp%253Bfloor%253D%2526amp%253Bdate%253D%2526amp%253Bpage%253D1%2526amp%253Bflag%253D3%2526amp%253Broomnum%253D%2526amp%253Bpagesize%253D10000%26from%3Dwap";
 
-  static String detailUrl(String areaName, String buildingName, DateTime date) {
+  static String detailUrl(String areaName, String? buildingName, DateTime date) {
     return "https://zlapp.fudan.edu.cn/fudanzlfreeclass/wap/mobile/index?xqdm=$areaName&floor=$buildingName&date=${DateFormat("yyyy-MM-dd").format(date)}&page=1&flag=3&roomnum=&pagesize=10000";
   }
 
@@ -41,21 +41,21 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   /// Get [RoomInfo]s at [buildingName] on [date].
   ///
   /// Request [PersonInfo] for logging in, if necessary.
-  Future<List<RoomInfo>> getBuildingRoomInfo(PersonInfo info, String areaName,
-      String buildingName, DateTime date) async {
+  Future<List<RoomInfo>> getBuildingRoomInfo(PersonInfo? info, String areaName,
+      String? buildingName, DateTime? date) async {
     // To accelerate the retrieval of RoomInfo,
     // only execute logging in when necessary.
     return Retrier.tryAsyncWithFix(
-        () => _getBuildingRoomInfo(areaName, buildingName, date),
+        () => _getBuildingRoomInfo(areaName, buildingName, date!),
         (exception) async =>
-            await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar, info, true));
+            await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<List<RoomInfo>> _getBuildingRoomInfo(
-      String areaName, String buildingName, DateTime date) async {
+      String areaName, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final Response response =
-        await dio.get(detailUrl(areaName, buildingName, date));
+        await dio!.get(detailUrl(areaName, buildingName, date));
     final Map json = response.data is Map
         ? response.data
         : jsonDecode(response.data.toString());
@@ -68,7 +68,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
           if (element['kxsds'] is Map) {
             element['kxsds']
                 .values
-                .forEach((element) => info.busy.add(element != "闲"));
+                .forEach((element) => info.busy!.add(element != "闲"));
             result.add(info);
           }
         });
@@ -82,12 +82,12 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
 }
 
 class RoomInfo {
-  String roomName;
+  String? roomName;
   DateTime date;
-  String seats;
+  String? seats;
 
   /// the x-th item of busy refers to whether the room is busy at x-th slot.
-  List<bool> busy;
+  List<bool>? busy;
 
   RoomInfo(this.roomName, this.date, this.seats, {this.busy});
 }

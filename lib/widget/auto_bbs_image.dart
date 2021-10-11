@@ -23,10 +23,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class BBSImagePlaceholder extends StatelessWidget {
-  final Widget child;
-  final double size;
+  final Widget? child;
+  final double? size;
 
-  const BBSImagePlaceholder({Key key, this.child, this.size}) : super(key: key);
+  const BBSImagePlaceholder({Key? key, this.child, this.size}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +49,11 @@ class BBSImagePlaceholder extends StatelessWidget {
 class AutoBBSImage extends StatefulWidget {
   @protected
   final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
-  final String src;
-  final double maxWidth;
-  final ImageTapCallback onTapImage;
+  final String? src;
+  final double? maxWidth;
+  final ImageTapCallback? onTapImage;
 
-  AutoBBSImage({Key key, this.src, this.maxWidth, this.onTapImage})
+  AutoBBSImage({Key? key, this.src, this.maxWidth, this.onTapImage})
       : super(key: key);
 
   @override
@@ -71,10 +71,10 @@ class _AutoBBSImageState extends State<AutoBBSImage> {
     return Center(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 8),
-        constraints: BoxConstraints(maxHeight: widget.maxWidth),
+        constraints: BoxConstraints(maxHeight: widget.maxWidth!),
         child: GestureDetector(
           child: CachedNetworkImage(
-              imageUrl: widget.src,
+              imageUrl: widget.src!,
               width: widget.maxWidth,
               height: widget
                   .maxWidth, // Ensure shape is the same as the loading indicator
@@ -94,7 +94,7 @@ class _AutoBBSImageState extends State<AutoBBSImage> {
                         ),
                 );
               }),
-          onTap: () => widget.onTapImage(widget.src),
+          onTap: () => widget.onTapImage!(widget.src),
         ),
       ),
     );

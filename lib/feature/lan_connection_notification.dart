@@ -25,13 +25,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 class LanConnectionNotification extends Feature {
   @override
-  String get mainTitle => S.of(context).lan_connection_issue_1;
+  String get mainTitle => S.of(context!).lan_connection_issue_1;
 
   @override
   bool get removable => true;
 
   @override
-  String get subTitle => S.of(context).lan_connection_issue_1_description;
+  String get subTitle => S.of(context!).lan_connection_issue_1_description;
 
   @override
   Widget get icon => Icon(Icons.signal_wifi_connected_no_internet_4);
@@ -43,18 +43,18 @@ class LanConnectionNotification extends Feature {
       children: [
         TextButton(
           child: Text(
-            S.of(context).lan_connection_issue_1_action,
+            S.of(context!).lan_connection_issue_1_action,
             textScaleFactor: 0.8,
           ),
           // User needs to download the vpn software. Open an external browser.
           onPressed: () => showPlatformDialog(
-              context: context,
+              context: context!,
               builder: (_) => PlatformAlertDialog(
                     title:
-                        Text(S.of(context).lan_connection_issue_1_guide_title),
+                        Text(S.of(context!).lan_connection_issue_1_guide_title),
                     content: Html(
                         data:
-                            S.of(context).lan_connection_issue_1_guide_content,
+                            S.of(context!).lan_connection_issue_1_guide_content,
                         style: {
                           "body": Style(
                             margin: EdgeInsets.zero,
@@ -67,11 +67,11 @@ class LanConnectionNotification extends Feature {
                             fontSize: FontSize(16),
                           ),
                         },
-                        onLinkTap: (url, _, __, ___) => launch(url)),
+                        onLinkTap: (url, _, __, ___) => launch(url!)),
                     actions: [
                       PlatformDialogAction(
-                        child: Text(S.of(context).i_see),
-                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(S.of(context!).i_see),
+                        onPressed: () => Navigator.of(context!).pop(),
                       )
                     ],
                   )),

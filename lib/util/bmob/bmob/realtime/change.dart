@@ -10,11 +10,11 @@ class Change {
 
   Map<String, dynamic> toJson() => _$ChangeToJson(this);
 
-  String appKey;
-  String tableName;
-  String objectId;
-  String action;
-  Map<String, dynamic> data;
+  String? appKey;
+  String? tableName;
+  String? objectId;
+  String? action;
+  Map<String, dynamic>? data;
 
   Change();
 }

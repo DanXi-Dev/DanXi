@@ -32,7 +32,7 @@ class ImageUtils {
         ImageStreamListener((ImageInfo image, bool synchronousCall) async {
       // Recode the image into png format.
       ByteData byteData =
-          await image.image.toByteData(format: ImageByteFormat.png);
+          await (image.image.toByteData(format: ImageByteFormat.png) as FutureOr<ByteData>);
 
       // Important: Must call dispose after use
       image.dispose();

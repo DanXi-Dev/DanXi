@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'bmob_dio.dart';
 import 'bmob.dart';
@@ -33,8 +34,9 @@ class BmobFileManager {
 
     //获取所上传文件的二进制流
     Map responseData =
-        await BmobDio.getInstance().upload(path, data: file.readAsBytes());
-    BmobFile bmobFile = BmobFile.fromJson(responseData);
+        await (BmobDio.getInstance()!.upload(path, data: file.readAsBytes())
+            as FutureOr<Map<dynamic, dynamic>>);
+    BmobFile bmobFile = BmobFile.fromJson(responseData as Map<String, dynamic>);
     return bmobFile;
   }
 
@@ -57,8 +59,10 @@ class BmobFileManager {
     String path =
         "${Bmob.BMOB_API_FILE_VERSION}${Bmob.BMOB_API_FILE}/upyun$fileUrl";
 
-    Map responseData = await BmobDio.getInstance().delete(path);
-    BmobHandled bmobHandled = BmobHandled.fromJson(responseData);
+    Map responseData = await (BmobDio.getInstance()!.delete(path)
+        as FutureOr<Map<dynamic, dynamic>>);
+    BmobHandled bmobHandled =
+        BmobHandled.fromJson(responseData as Map<String, dynamic>);
 
     return bmobHandled;
   }

@@ -8,8 +8,8 @@ part of servertime;
 
 ServerTime _$ServerTimeFromJson(Map<String, dynamic> json) {
   return ServerTime()
-    ..timestamp = json['timestamp'] as int
-    ..datetime = json['datetime'] as String;
+    ..timestamp = json['timestamp'] as int?
+    ..datetime = json['datetime'] as String?;
 }
 
 Map<String, dynamic> _$ServerTimeToJson(ServerTime instance) =>
