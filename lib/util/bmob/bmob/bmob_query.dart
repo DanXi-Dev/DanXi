@@ -171,7 +171,8 @@ class BmobQuery<T> {
     if (where!.isNotEmpty) {
       url = url + "where=" + json.encode(where);
     }
-    Map map = await (BmobDio.getInstance()!.get(url, data: getParams()) as FutureOr<Map<dynamic, dynamic>>);
+    Map map = await (BmobDio.getInstance()!.get(url, data: getParams())
+        as FutureOr<Map<dynamic, dynamic>>);
     BmobResults bmobResults = BmobResults.fromJson(map as Map<String, dynamic>);
     return bmobResults.count;
   }
@@ -346,7 +347,7 @@ class BmobQuery<T> {
       url = url + "where=" + json.encode(where);
     }
     url = url + getStatistics();
-    Map map = await (BmobDio.getInstance()!.get(url, data: getParams()) as FutureOr<Map<dynamic, dynamic>>);
+    Map map = await (BmobDio.getInstance()!.get(url, data: getParams()));
     BmobResults bmobResults = BmobResults.fromJson(map as Map<String, dynamic>);
     return bmobResults.results;
   }

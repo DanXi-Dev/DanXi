@@ -105,7 +105,8 @@ class BmobDio {
   }
 
   ///POST请求
-  Future<dynamic> upload(path, {required Future<List<int>> data, cancelToken}) async {
+  Future<dynamic> upload(path,
+      {required Future<List<int>> data, cancelToken}) async {
     options!.headers.addAll(getHeaders(path, data));
 
     var requestUrl = options!.baseUrl + path;
