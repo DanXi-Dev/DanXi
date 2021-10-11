@@ -53,8 +53,8 @@ Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
 
 CourseTime _$CourseTimeFromJson(Map<String, dynamic> json) {
   return CourseTime(
-    json['weekDay'] as int?,
-    json['slot'] as int?,
+    json['weekDay'] as int,
+    json['slot'] as int,
   );
 }
 

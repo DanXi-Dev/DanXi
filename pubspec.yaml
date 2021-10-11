@@ -33,7 +33,7 @@ dependencies:
   auto_size_text: ^3.0.0-nullsafety.0
   ical:
     git:
-      url: https://github.com/julisanchez/ical.git
+      url: git://github.com/julisanchez/ical.git
       ref: null-safety
   url_launcher: ^6.0.3
   desktop_window: ^0.4.0

@@ -69,7 +69,7 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   List<Widget> _buildTable(int cols, int rows) {
-    List<Widget> result = List.generate(
+    List<Widget?> result = List.generate(
         cols * rows,
         (index) => Container(
               margin: EdgeInsets.all(2),
@@ -179,11 +179,11 @@ class _ScheduleViewState extends State<ScheduleView> {
       }
     }
     result.removeWhere((element) => element == null);
-    return result;
+    return result.map((e) => e!).toList();
   }
 
   Widget _buildCourse(Course course) {
-    final TextStyle textStyle = Theme.of(context).textTheme.overline.copyWith(
+    final TextStyle? textStyle = Theme.of(context).textTheme.overline?.copyWith(
         color: Theme.of(context).accentColorBrightness == Brightness.light
             ? Colors.black
             : Colors.white);
@@ -197,13 +197,13 @@ class _ScheduleViewState extends State<ScheduleView> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AutoSizeText(course.courseName,
+          AutoSizeText(course.courseName!,
               minFontSize: 8,
-              style: textStyle.copyWith(fontWeight: FontWeight.bold)),
+              style: textStyle?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(
             height: 4,
           ),
-          AutoSizeText(course.roomName, minFontSize: 8, style: textStyle),
+          AutoSizeText(course.roomName!, minFontSize: 8, style: textStyle),
         ],
       ),
     );

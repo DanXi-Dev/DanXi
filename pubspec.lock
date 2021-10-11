@@ -640,7 +640,7 @@ packages:
       path: "."
       ref: null-safety
       resolved-ref: "3a866420780e7cb3fa2d20b61fbd87c40f3b289f"
-      url: "https://github.com/julisanchez/ical.git"
+      url: "git://github.com/julisanchez/ical.git"
     source: git
     version: "0.1.4"
   image_picker:

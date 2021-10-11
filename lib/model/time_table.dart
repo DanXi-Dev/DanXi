@@ -226,7 +226,7 @@ class Course {
 @JsonSerializable()
 class CourseTime {
   //Monday is 0, Morning lesson is 0
-  int? weekDay, slot;
+  int weekDay, slot;
 
   CourseTime(this.weekDay, this.slot);
 

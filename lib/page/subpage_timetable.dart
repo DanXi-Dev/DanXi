@@ -248,7 +248,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   Widget _buildPage(TimeTable? table) {
     final TimetableStyle style = TimetableStyle(
-        startHour: TimeTable.kCourseSlotStartTime[0].hour,
+        startHour: TimeTable.kCourseSlotStartTime[0].hour!,
         laneHeight: 16,
         laneWidth: (ViewportUtils.getMainNavigatorWidth(context) - 50) / 5,
         timeItemWidth: 16,
