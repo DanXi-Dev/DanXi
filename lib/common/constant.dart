@@ -35,6 +35,9 @@ class Constant {
   static const String ADMOB_APP_ID_IOS =
       "ca-app-pub-4420475240805528~1122982272";
 
+  // ignore: non_constant_identifier_names
+  static get DEFAULT_SEMESTER_START_TIME => DateTime(2021, 9, 13);
+
   static EventBus eventBus = EventBus();
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";

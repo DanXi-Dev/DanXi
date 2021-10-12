@@ -17,6 +17,7 @@
 
 import 'dart:convert';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -79,7 +80,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().lastSemesterStartTime ?? "") ??
-            DateTime(2021, 9, 13), //TODO: Default value?
+            Constant.DEFAULT_SEMESTER_START_TIME,
         tablePage.data.toString());
   }
 

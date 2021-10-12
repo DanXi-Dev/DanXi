@@ -55,9 +55,9 @@ class NextCourseFeature extends Feature {
     TimeNow now = table.now();
     DayEvents dayEvents = table.toDayEvents(now.week,
         compact: TableDisplayType.FULL)[now.weekday];
-    dayEvents.events.sort((a, b) => a.time.slot!.compareTo(b.time.slot!));
+    dayEvents.events.sort((a, b) => a.time.slot.compareTo(b.time.slot));
     for (var element in dayEvents.events) {
-      VagueTime startTime = TimeTable.kCourseSlotStartTime[element.time.slot!];
+      VagueTime startTime = TimeTable.kCourseSlotStartTime[element.time.slot];
       DateTime exactStartTime = startTime.toExactTime();
       if (exactStartTime.isBefore(DateTime.now()) &&
           exactStartTime

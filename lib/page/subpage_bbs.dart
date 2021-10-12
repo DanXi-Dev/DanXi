@@ -50,7 +50,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';

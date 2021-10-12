@@ -1,5 +1,3 @@
-
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -117,7 +115,7 @@ class TimeTable {
     courses!.forEach((course) {
       if (course.availableWeeks!.contains(week)) {
         course.times!.forEach((courseTime) =>
-            table[courseTime.weekDay!]!.add(Event(course, courseTime)));
+            table[courseTime.weekDay]!.add(Event(course, courseTime)));
       }
     });
     return table;
@@ -134,7 +132,7 @@ class TimeTable {
     courses!.forEach((course) {
       if (course.availableWeeks!.contains(week)) {
         course.times!.forEach((courseTime) =>
-            table[courseTime.weekDay!]!.add(Event(course, courseTime)));
+            table[courseTime.weekDay]!.add(Event(course, courseTime)));
       }
     });
     for (int i = 0; i < DateTime.daysPerWeek; i++) {

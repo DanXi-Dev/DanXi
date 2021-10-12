@@ -115,12 +115,10 @@ class PEFeature extends Feature {
           });
           return "早锻: ${exerciseCategory[0]} 必锻: ${exerciseCategory[1]} 选锻: ${exerciseCategory[2]}";
         }
-        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context!).failed;
     }
-    return '';
   }
 
   @override

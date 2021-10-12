@@ -112,7 +112,6 @@ class _AnnouncementListState extends State<AnnouncementList> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    if (_data == null) return widgets;
     _data.forEach((Announcement value) {
       widgets.add(ThemedMaterial(
           child: ListTile(
@@ -130,7 +129,8 @@ class _AnnouncementListState extends State<AnnouncementList> {
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
                   title: Text(S
-                      .of(context).developer_announcement(value.createdAt ?? "")),
+                      .of(context)
+                      .developer_announcement(value.createdAt ?? "")),
                   content: Linkify(
                       text: value.content!,
                       onOpen: (element) =>
