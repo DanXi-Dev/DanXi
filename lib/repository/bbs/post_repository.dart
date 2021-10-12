@@ -591,11 +591,11 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   initializeUser(PersonInfo? info) async {
+    PlatformBridge.requestNotificationPermission();
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
       _token = await requestToken(info!);
-      PlatformBridge.requestNotificationPermission();
       updatePushNotificationToken();
     }
   }

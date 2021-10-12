@@ -149,26 +149,28 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt).sort_order,
-            Icon(CupertinoIcons.sort_down_circle),
-            () => showPlatformModalSheet(
-                context: cxt,
-                builder: (_) => PlatformWidget(
-                      cupertino: (_, __) => CupertinoActionSheet(
-                        title: Text(S.of(cxt).sort_order),
-                        actions: _buildSortOptionsList(cxt),
-                        cancelButton: CupertinoActionSheetAction(
-                          child: Text(S.of(cxt).cancel),
-                          onPressed: () {
-                            Navigator.of(cxt).pop();
-                          },
-                        ),
-                      ),
-                      material: (_, __) => Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildSortOptionsList(cxt),
-                      ),
-                    )))
+          S.of(cxt).sort_order,
+          Icon(CupertinoIcons.sort_down_circle),
+          () => showPlatformModalSheet(
+            context: cxt,
+            builder: (BuildContext context) => PlatformWidget(
+              cupertino: (_, __) => CupertinoActionSheet(
+                title: Text(S.of(cxt).sort_order),
+                actions: _buildSortOptionsList(context),
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              material: (_, __) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildSortOptionsList(context),
+              ),
+            ),
+          ),
+        )
       ];
 
   @override

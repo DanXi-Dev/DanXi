@@ -187,7 +187,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     );
   }
 
-  _buildContextMenu(Report e) => [
+  _buildContextMenu(BuildContext context, Report e) => [
         PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
@@ -218,9 +218,9 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
-            builder: (_) => PlatformWidget(
+            builder: (BuildContext context) => PlatformWidget(
                   cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(e),
+                    actions: _buildContextMenu(context, e),
                     cancelButton: CupertinoActionSheetAction(
                       child: Text(S.of(context).cancel),
                       onPressed: () {
@@ -231,7 +231,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   material: (_, __) => Container(
                     height: 300,
                     child: Column(
-                      children: _buildContextMenu(e),
+                      children: _buildContextMenu(context, e),
                     ),
                   ),
                 ));

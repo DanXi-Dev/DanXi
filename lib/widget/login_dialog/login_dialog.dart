@@ -78,7 +78,8 @@ class _LoginDialogState extends State<LoginDialog> {
   String _errorText = "";
   UserGroup _group = UserGroup.FUDAN_STUDENT;
 
-  Future<bool> _deleteAllData() async => await widget.sharedPreferences!.clear();
+  Future<bool> _deleteAllData() async =>
+      await widget.sharedPreferences!.clear();
 
   /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {

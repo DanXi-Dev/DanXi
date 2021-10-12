@@ -136,7 +136,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     }
   }
 
-  List<Widget> _buildShareList() {
+  List<Widget> _buildShareList(BuildContext context) {
     return converters.entries
         .map<Widget>((MapEntry<String, TimetableConverter> e) {
       return PlatformWidget(
@@ -162,9 +162,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           if (_table == null) return;
           showPlatformModalSheet(
               context: context,
-              builder: (_) => PlatformWidget(
+              builder: (BuildContext context) => PlatformWidget(
                     cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildShareList(),
+                      actions: _buildShareList(context),
                       cancelButton: CupertinoActionSheetAction(
                         child: Text(S.of(context).cancel),
                         onPressed: () {
@@ -174,7 +174,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                     ),
                     material: (_, __) => Container(
                       height: 200,
-                      child: Column(children: _buildShareList()),
+                      child: Column(children: _buildShareList(context)),
                     ),
                   ));
         }),
