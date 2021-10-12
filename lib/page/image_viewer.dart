@@ -61,8 +61,8 @@ class ImageViewerPage extends StatefulWidget {
   ImageViewerPage({Key? key, this.arguments});
 
   static bool isImage(String url) {
-    if (url == null || url.isEmpty || Uri.tryParse(url) == null) return false;
-    String path = Uri.parse(url).path.toLowerCase();
+    if (url.isEmpty || Uri.tryParse(url) == null) return false;
+    String? path = Uri.tryParse(url)?.path.toLowerCase();
     if (path == null) return false;
     return IMAGE_SUFFIX.any((element) => path.endsWith(element));
   }

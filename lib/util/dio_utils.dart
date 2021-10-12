@@ -46,7 +46,7 @@ class DioUtils {
         response.headers['location'] != null &&
         response.headers['location']!.length > 0) {
       String location = response.headers['location']![0];
-      if (location == null || location.isEmpty) return response;
+      if (location.isEmpty) return response;
       if (!Uri.parse(location).isAbsolute) {
         location = response.requestOptions.uri.origin + '/' + location;
       }

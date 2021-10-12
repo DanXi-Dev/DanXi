@@ -55,5 +55,5 @@ class Tag {
 
   Tag(this.tagTitle, this.developerDefinedIcon,
       {this.checkedIcon = Icons.check})
-      : assert(tagTitle != null && developerDefinedIcon != null);
+      : assert(tagTitle != null);
 }

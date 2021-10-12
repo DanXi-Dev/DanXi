@@ -84,15 +84,10 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
     imageBuilder: (Uri uri, String? title, String? alt) {
-      if (uri != null && uri.toString() != null) {
-        return Center(
-          child: AutoBBSImage(
-              src: uri.toString(),
-              maxWidth: imageWidth,
-              onTapImage: onTapImage),
-        );
-      }
-      return Container();
+      return Center(
+        child: AutoBBSImage(
+            src: uri.toString(), maxWidth: imageWidth, onTapImage: onTapImage),
+      );
     },
   );
 };

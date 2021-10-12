@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'60'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1633925327;
+const int timestamp = 1634006950;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -116,7 +116,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'auto_size_text': r'^3.0.0-nullsafety.0',
   'ical': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://github.com/julisanchez/ical.git',
+      'url': r'git://github.com/julisanchez/ical.git',
       'ref': r'null-safety',
     },
   },
@@ -152,6 +152,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_typeahead': r'>=3.1.0 <4.0.0',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
+  'flutter_layout_grid': r'^1.0.3',
 };
 
 /// Developer dependencies

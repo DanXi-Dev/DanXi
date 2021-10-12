@@ -103,8 +103,7 @@ class PagedListView<T> extends StatefulWidget {
       this.allDataReceiver,
       this.shouldScrollToEnd,
       this.noneItem})
-      : assert(withScrollbar != null),
-        assert((!withScrollbar) || (withScrollbar && scrollController != null)),
+      : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         super(key: key);
 
   @override

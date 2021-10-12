@@ -31,7 +31,6 @@ import 'package:dan_xi/util/platform_bridge.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:win32/win32.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();

@@ -21,14 +21,14 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
-import 'package:dio/src/response.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanzlfreeclass%252Fwap%252Fmobile%252Findex%253Fxqdm%253D%2526amp%253Bfloor%253D%2526amp%253Bdate%253D%2526amp%253Bpage%253D1%2526amp%253Bflag%253D3%2526amp%253Broomnum%253D%2526amp%253Bpagesize%253D10000%26from%3Dwap";
 
-  static String detailUrl(String areaName, String? buildingName, DateTime date) {
+  static String detailUrl(
+      String areaName, String? buildingName, DateTime date) {
     return "https://zlapp.fudan.edu.cn/fudanzlfreeclass/wap/mobile/index?xqdm=$areaName&floor=$buildingName&date=${DateFormat("yyyy-MM-dd").format(date)}&page=1&flag=3&roomnum=&pagesize=10000";
   }
 
@@ -47,15 +47,14 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
     // only execute logging in when necessary.
     return Retrier.tryAsyncWithFix(
         () => _getBuildingRoomInfo(areaName, buildingName, date!),
-        (exception) async =>
-            await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+        (exception) async => await UISLoginTool.loginUIS(
+            dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<List<RoomInfo>> _getBuildingRoomInfo(
       String areaName, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
-    final Response response =
-        await dio!.get(detailUrl(areaName, buildingName, date));
+    final response = await dio!.get(detailUrl(areaName, buildingName, date));
     final Map json = response.data is Map
         ? response.data
         : jsonDecode(response.data.toString());

@@ -91,7 +91,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         () => loadTimeTableRemotely(info, startTime: startTime),
         (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
         (object) => jsonEncode(object.toJson()),
-        validate: (value) => value != null && !forceLoadFromRemote);
+        validate: (value) => !forceLoadFromRemote);
   }
 
   @override

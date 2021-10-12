@@ -31,7 +31,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
@@ -127,9 +126,9 @@ class _LoginDialogState extends State<LoginDialog> {
 
   void requestInternetAccess() async {
     //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
-    await Dio()
-        .head('http://captive.apple.com')
-        .catchError((ignoredError) => null);
+    try {
+      await Dio().head('http://captive.apple.com');
+    } catch (ignored) {}
   }
 
   List<Widget> _buildLoginAsList() {
