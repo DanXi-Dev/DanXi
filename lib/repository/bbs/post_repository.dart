@@ -788,8 +788,8 @@ class PostRepository extends BaseRepositoryWithDio {
     return _profile?.user?.is_staff ?? false;
   }
 
-  Future<List<BBSPost>?> getFavoredDiscussions() async {
-    return (await getUserProfile())!.favored_discussion;
+  Future<List<BBSPost>> getFavoredDiscussions() async {
+    return (await getUserProfile())!.favored_discussion!;
   }
 
   Future<void> setFavoredDiscussion(
@@ -852,7 +852,7 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.data.toString();
   }
 
-  Future<List<Report>?> adminGetReports(int page) async {
+  Future<List<Report>> adminGetReports(int page) async {
     final response = await dio!.get(_BASE_URL + "/admin/",
         queryParameters: {"page": page, "show_only_undealt": true},
         options: Options(headers: _tokenHeader));

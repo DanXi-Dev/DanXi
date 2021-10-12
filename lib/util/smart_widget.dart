@@ -29,6 +29,8 @@ class SmartWidget {
     if (fallback == null) fallback = Container();
     if (object == null) return fallback;
 
+    print(object.runtimeType);
+    print(T.runtimeType);
     if (object is String) {
       return Text(object);
     } else if (object is WidgetBuilder) {

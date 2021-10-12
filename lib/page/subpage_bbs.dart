@@ -238,7 +238,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   late bool _fieldInitComplete;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
-  Future<List<BBSPost>?> _loadContent(int page) async {
+  Future<List<BBSPost>> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
       try {

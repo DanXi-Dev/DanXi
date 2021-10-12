@@ -125,7 +125,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _hasError = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
-  Future<List<T>?>? _futureData;
+  Future<List<T>>? _futureData;
 
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
@@ -164,7 +164,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   _buildListBody() {
-    return FutureWidget<List<T>?>(
+    return FutureWidget<List<T>>(
         future: _futureData,
         successBuilder: (_, snapshot) {
           // Handle Scroll To End Requests
@@ -320,7 +320,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   // Move things into a separate function to control reload more easily
-  Future<List<T>?> _setFuture({useInitialData = true}) {
+  Future<List<T>> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
@@ -486,7 +486,7 @@ typedef IndexedDataWidgetBuilder<T> = Widget Function(
     BuildContext context, ListProvider<T> dataProvider, int index, T data);
 
 /// Retrieve data function
-typedef DataReceiver<T> = Future<List<T>?> Function(int pageIndex);
+typedef DataReceiver<T> = Future<List<T>> Function(int pageIndex);
 
 /// Notify refreshing callback
 typedef RefreshListener = void Function();
