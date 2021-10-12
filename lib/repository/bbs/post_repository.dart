@@ -675,23 +675,23 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Future<List<BBSPost>> loadTagFilteredDiscussions(
       String? tag, SortOrder? sortBy, int page) async {
-    Response response = await dio!
-        .get(_BASE_URL + "/discussions/",
-            queryParameters: {
-              "order": sortBy.getInternalString(),
-              "tag_name": tag,
-              "page": page,
-            },
-            options: Options(headers: _tokenHeader))
-        .onError((dynamic error, stackTrace) {
-      if (error.response?.statusCode == 401) {
+    try {
+      final response = await dio!.get(_BASE_URL + "/discussions/",
+          queryParameters: {
+            "order": sortBy.getInternalString(),
+            "tag_name": tag,
+            "page": page,
+          },
+          options: Options(headers: _tokenHeader));
+      final result = response.data;
+      return result.map((e) => BBSPost.fromJson(e)).toList();
+    } catch (error) {
+      if (error is DioError && error.response?.statusCode == 401) {
         _token = null;
         throw LoginExpiredError;
       }
-      throw error;
-    });
-    List result = response.data;
-    return result.map((e) => BBSPost.fromJson(e)).toList();
+      rethrow;
+    }
   }
 
   Future<List<Reply>> loadReplies(BBSPost post, int page) async {

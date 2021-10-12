@@ -18,6 +18,7 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/repository/card_repository.dart';
 import 'package:dan_xi/repository/fudan_ehall_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -101,21 +102,31 @@ class _LoginDialogState extends State<LoginDialog> {
       case UserGroup.FUDAN_STUDENT:
         PersonInfo newInfo =
             PersonInfo.createNewInfo(id, password, UserGroup.FUDAN_STUDENT);
-        await FudanEhallRepository.getInstance().getStudentInfo(newInfo).then(
-            (StudentInfo stuInfo) async {
+        try {
+          final stuInfo =
+              await FudanEhallRepository.getInstance().getStudentInfo(newInfo);
           newInfo.name = stuInfo.name;
           await _deleteAllData();
           await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
-        }, onError: (e, st) {
-          progressDialog.dismiss(showAnim: false);
-          debugPrint("Error occurred when attempting to log in:");
-          debugPrint(e.toString());
-          debugPrint(st.toString());
-          throw e;
-        });
+        } catch (e) {
+          try {
+            await CardRepository.getInstance().init(newInfo);
+            newInfo.name = await CardRepository.getInstance().getName();
+            if (newInfo.name?.isNotEmpty == true)
+              throw GeneralLoginFailedException();
+            await _deleteAllData();
+            await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
+            widget.personInfo.value = newInfo;
+            progressDialog.dismiss(showAnim: false);
+            Navigator.of(context).pop();
+          } catch (error) {
+            progressDialog.dismiss(showAnim: false);
+            rethrow;
+          }
+        }
         break;
       case UserGroup.FUDAN_STAFF:
       case UserGroup.SJTU_STUDENT:
