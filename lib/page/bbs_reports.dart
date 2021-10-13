@@ -271,19 +271,18 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             onTap: () async {
               ProgressFuture progressDialog = showProgressDialog(
                   loadingText: S.of(context).loading, context: context);
-              final BBSPost post = await PostRepository.getInstance()
-                  .loadSpecificDiscussion(e.discussion)
-                  .onError((dynamic error, stackTrace) {
-                    Noticing.showNotice(context, error.toString(),
-                        title: S.of(context).fatal_error);
-                    progressDialog.dismiss();
-                    return null;
-                  } as FutureOr<BBSPost> Function(Error, StackTrace));
-
-              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                "post": post,
-              });
-              progressDialog.dismiss();
+              try {
+                final BBSPost post = await PostRepository.getInstance()
+                    .loadSpecificDiscussion(e.discussion);
+                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                  "post": post,
+                });
+                progressDialog.dismiss();
+              } catch (error) {
+                progressDialog.dismiss();
+                Noticing.showNotice(context, error.toString(),
+                    title: S.of(context).fatal_error);
+              }
             }),
       ),
     );

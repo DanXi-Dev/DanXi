@@ -38,13 +38,13 @@ class PEFeature extends Feature {
 
   void _loadExercises() async {
     _status = ConnectionStatus.CONNECTING;
-    _exercises = await FudanPERepository.getInstance()
-        .loadExerciseRecords(_info)
-        .onError((dynamic error, stackTrace) {
+    try {
+      _exercises =
+          await FudanPERepository.getInstance().loadExerciseRecords(_info);
+      _status = ConnectionStatus.DONE;
+    } catch (error) {
       _status = ConnectionStatus.FAILED;
-      return null;
-    });
-    if (_exercises != null) _status = ConnectionStatus.DONE;
+    }
     notifyUpdate();
   }
 

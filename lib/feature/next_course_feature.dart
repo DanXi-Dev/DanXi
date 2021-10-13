@@ -37,9 +37,7 @@ class NextCourseFeature extends Feature {
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
     TimeTable timetable = await Retrier.runAsyncWithRetry(() async {
-      // TODO: Sometimes the server returns a 500 error.
-      // Put a delay before retrying.
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 500));
       return await TimeTableRepository.getInstance()
           .loadTimeTableLocally(StateProvider.personInfo.value);
     });
@@ -99,7 +97,6 @@ class NextCourseFeature extends Feature {
       case ConnectionStatus.DONE:
         if (_data != null) {
           if (_data!.nextCourse?.course.courseName != null) {
-            // TODO make it more readable (like adding a [SmallTag], etc.)
             return Text(S.of(context!).next_course_is(
                 _data!.nextCourse?.course.courseName ?? "", _data!.courseLeft));
           } else {
@@ -125,15 +122,9 @@ class NextCourseFeature extends Feature {
 
   @override
   void onTap() {
-    if (_data != null) {
-      // Navigator.of(context)
-      //     .pushNamed("/notice/aao/list", arguments: {"initialData": _data});
-    } else {
-      refreshData();
-    }
+    refreshData();
   }
 
-  //TODO: Show this trailing only when exams are available.
   @override
   Widget get trailing => InkWell(
         child: Column(
