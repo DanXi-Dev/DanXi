@@ -26,7 +26,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Ftac.fudan.edu.cn%2Fthirds%2Ftjb.act%3Fredir%3DsportScore";
   static const String _INFO_URL =
-      "http://www.fdty.fudan.edu.cn/SportScore/stScore.aspx";
+      "https://fdtyjw.fudan.edu.cn/sportScore/stScore.aspx";
 
   FudanPERepository._();
 
@@ -34,7 +34,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<ExerciseItem>?> loadExerciseRecords(PersonInfo? info) {
+  Future<List<ExerciseItem>> loadExerciseRecords(PersonInfo? info) {
     return Retrier.tryAsyncWithFix(
         () => _loadExerciseRecords(info),
         (exception) =>
@@ -43,9 +43,9 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   Future<List<ExerciseItem>> _loadExerciseRecords(PersonInfo? info) async {
     List<ExerciseItem> items = [];
-    Response r = await dio!.get(_INFO_URL);
-    BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    Iterable<DOM.Element> tableLines = soup
+    final r = await dio!.get(_INFO_URL);
+    final soup = BeautifulSoup(r.data.toString());
+    final Iterable<DOM.Element> tableLines = soup
         .findAll(
             "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
         .map((e) => e.element!);
@@ -59,7 +59,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "www.fdty.fudan.edu.cn";
+  String get linkHost => "fdtyjw.fudan.edu.cn";
 }
 
 class ExerciseItem {
