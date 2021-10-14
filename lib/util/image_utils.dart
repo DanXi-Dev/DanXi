@@ -30,18 +30,26 @@ class ImageUtils {
     var stream = provider.resolve(createLocalImageConfiguration(context));
     stream.addListener(
         ImageStreamListener((ImageInfo image, bool synchronousCall) async {
-      // Recode the image into png format.
-      ByteData byteData =
-          await (image.image.toByteData(format: ImageByteFormat.png) as FutureOr<ByteData>);
+      try {
+        // Recode the image into png format.
+        ByteData? byteData =
+            await image.image.toByteData(format: ImageByteFormat.png);
 
-      // Important: Must call dispose after use
-      image.dispose();
+        // Important: Must call dispose after use
+        image.dispose();
 
-      // TODO: does the [buffer] represent the WHOLE image's byte array,
-      //  or just a fixed-size (e.g. 512 Bytes) buffer array
-      //  that should be filled with data for multiple times to read in the image?
-      //  We need more inspection.
-      completer.complete(byteData.buffer.asUint8List());
+        // TODO: does the [buffer] represent the WHOLE image's byte array,
+        //  or just a fixed-size (e.g. 512 Bytes) buffer array
+        //  that should be filled with data for multiple times to read in the image?
+        //  We need more inspection.
+        if (byteData == null) {
+          completer.completeError("Image byte Data returned null");
+          return;
+        }
+        completer.complete(byteData.buffer.asUint8List());
+      } catch (e) {
+        completer.completeError(e);
+      }
     }));
     return completer.future;
   }

@@ -143,7 +143,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_isFavored != null) return _isFavored;
     final List<BBSPost>? favorites =
         await (PostRepository.getInstance().getFavoredDiscussions());
-    print(favorites);
     return favorites!.any((element) {
       if (element.id == null) return false;
       return element.id == _post!.id;
