@@ -31,7 +31,6 @@ import 'package:dan_xi/util/platform_bridge.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:win32/win32.dart';
 
 class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
@@ -591,11 +590,11 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   initializeUser(PersonInfo? info) async {
+    PlatformBridge.requestNotificationPermission();
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
       _token = await requestToken(info!);
-      PlatformBridge.requestNotificationPermission();
       updatePushNotificationToken();
     }
   }
@@ -676,23 +675,23 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Future<List<BBSPost>> loadTagFilteredDiscussions(
       String? tag, SortOrder? sortBy, int page) async {
-    Response response = await dio!
-        .get(_BASE_URL + "/discussions/",
-            queryParameters: {
-              "order": sortBy.getInternalString(),
-              "tag_name": tag,
-              "page": page,
-            },
-            options: Options(headers: _tokenHeader))
-        .onError((dynamic error, stackTrace) {
-      if (error.response?.statusCode == 401) {
+    try {
+      final response = await dio!.get(_BASE_URL + "/discussions/",
+          queryParameters: {
+            "order": sortBy.getInternalString(),
+            "tag_name": tag,
+            "page": page,
+          },
+          options: Options(headers: _tokenHeader));
+      final result = response.data;
+      return result.map((e) => BBSPost.fromJson(e)).toList();
+    } catch (error) {
+      if (error is DioError && error.response?.statusCode == 401) {
         _token = null;
         throw LoginExpiredError;
       }
-      throw error;
-    });
-    List result = response.data;
-    return result.map((e) => BBSPost.fromJson(e)).toList();
+      rethrow;
+    }
   }
 
   Future<List<Reply>> loadReplies(BBSPost post, int page) async {
@@ -789,8 +788,8 @@ class PostRepository extends BaseRepositoryWithDio {
     return _profile?.user?.is_staff ?? false;
   }
 
-  Future<List<BBSPost>?> getFavoredDiscussions() async {
-    return (await getUserProfile())!.favored_discussion;
+  Future<List<BBSPost>> getFavoredDiscussions() async {
+    return (await getUserProfile())!.favored_discussion!;
   }
 
   Future<void> setFavoredDiscussion(
@@ -853,7 +852,7 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.data.toString();
   }
 
-  Future<List<Report>?> adminGetReports(int page) async {
+  Future<List<Report>> adminGetReports(int page) async {
     final response = await dio!.get(_BASE_URL + "/admin/",
         queryParameters: {"page": page, "show_only_undealt": true},
         options: Options(headers: _tokenHeader));

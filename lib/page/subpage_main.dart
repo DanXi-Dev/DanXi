@@ -248,7 +248,7 @@ class _HomeSubpageState extends State<HomeSubpage>
     if (_currentCardChildren.isNotEmpty) {
       _widgets.add(Card(
         child: Column(
-          children: _currentCardChildren as List<Widget>,
+          children: _currentCardChildren,
         ),
       ));
     }

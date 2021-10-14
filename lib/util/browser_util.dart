@@ -53,8 +53,11 @@ class BrowserUtil {
     url = Uri.encodeFull(Uri.decodeFull(url));
 
     if (cookieJar == null || PlatformX.isDesktop) {
-      launch(url, enableJavaScript: true);
-      return;
+      if (await canLaunch(url)) {
+        launch(url, enableJavaScript: true);
+        return;
+      }
+      throw "This URL cannot be launched.";
     }
 
     Uri uri = Uri.parse(url);

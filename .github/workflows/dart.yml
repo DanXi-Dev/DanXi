@@ -20,11 +20,11 @@ jobs:
         #Testing is still useless at the moment.
         #- run: flutter test
         # iOS build is not implemented yet.
-        #      - run: flutter build ios --no-codesign
       - run: flutter pub global activate intl_utils 1.9.0
       - run: flutter pub global run intl_utils:generate
 #      - run: flutter pub run build_runner build --delete-conflicting-outputs
         # Use debug profile to sign with no specific keystore
-      - run: flutter build apk --debug
+      #- run: flutter build apk --debug
+      - run: flutter build ios --no-codesign
 
 

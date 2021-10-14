@@ -17,29 +17,21 @@
 
 import 'dart:async';
 
-import 'package:clipboard/clipboard.dart';
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/bbs_editor.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/top_controller.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -48,9 +40,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:linkify/linkify.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -122,7 +112,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<Report>?> _loadContent(int page) {
+  Future<List<Report>> _loadContent(int page) {
     return PostRepository.getInstance().adminGetReports(page);
   }
 
@@ -187,7 +177,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     );
   }
 
-  _buildContextMenu(Report e) => [
+  _buildContextMenu(BuildContext context, Report e) => [
         PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
@@ -218,9 +208,9 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
-            builder: (_) => PlatformWidget(
+            builder: (BuildContext context) => PlatformWidget(
                   cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(e),
+                    actions: _buildContextMenu(context, e),
                     cancelButton: CupertinoActionSheetAction(
                       child: Text(S.of(context).cancel),
                       onPressed: () {
@@ -231,7 +221,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   material: (_, __) => Container(
                     height: 300,
                     child: Column(
-                      children: _buildContextMenu(e),
+                      children: _buildContextMenu(context, e),
                     ),
                   ),
                 ));
@@ -281,19 +271,18 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             onTap: () async {
               ProgressFuture progressDialog = showProgressDialog(
                   loadingText: S.of(context).loading, context: context);
-              final BBSPost post = await PostRepository.getInstance()
-                  .loadSpecificDiscussion(e.discussion)
-                  .onError((dynamic error, stackTrace) {
-                    Noticing.showNotice(context, error.toString(),
-                        title: S.of(context).fatal_error);
-                    progressDialog.dismiss();
-                    return null;
-                  } as FutureOr<BBSPost> Function(Error, StackTrace));
-
-              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                "post": post,
-              });
-              progressDialog.dismiss();
+              try {
+                final BBSPost post = await PostRepository.getInstance()
+                    .loadSpecificDiscussion(e.discussion);
+                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                  "post": post,
+                });
+                progressDialog.dismiss();
+              } catch (error) {
+                progressDialog.dismiss();
+                Noticing.showNotice(context, error.toString(),
+                    title: S.of(context).fatal_error);
+              }
             }),
       ),
     );

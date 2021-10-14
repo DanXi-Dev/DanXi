@@ -25,7 +25,6 @@ import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/src/response.dart';
 import 'package:intl/intl.dart';
 
 class FudanBusRepository extends BaseRepositoryWithDio {

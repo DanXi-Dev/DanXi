@@ -73,7 +73,10 @@ class _FeatureCardItemState extends State<FeatureCardItem>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 )
-              ].takeWhile((value) => value != null).toList() as List<Widget>,
+              ]
+                  .takeWhile((value) => value != null)
+                  .map((e) => e!)
+                  .toList(growable: false),
             ),
             SizedBox(
               height: 8,
@@ -81,14 +84,17 @@ class _FeatureCardItemState extends State<FeatureCardItem>
             widget.feature.customSubtitle == null
                 ? Text(
                     summary.join("\n"),
-              style: PlatformX.getTheme(context)
+                    style: PlatformX.getTheme(context)
                         .textTheme
                         .headline1!
                         .copyWith(fontSize: 12),
                   )
                 : widget.feature.customSubtitle,
             widget.feature.trailing
-          ].takeWhile((value) => value != null).toList() as List<Widget>,
+          ]
+              .takeWhile((value) => value != null)
+              .map((e) => e!)
+              .toList(growable: false),
         ),
       ),
     );

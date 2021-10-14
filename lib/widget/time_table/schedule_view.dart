@@ -194,11 +194,14 @@ class _ScheduleViewState extends State<ScheduleView> {
           color: Theme.of(context).accentColor,
           borderRadius: BorderRadius.circular(2)),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          SizedBox(
+            height: 2,
+          ),
           AutoSizeText(course.courseName!,
-              minFontSize: 8,
+              minFontSize: 10,
               style: textStyle?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(
             height: 4,

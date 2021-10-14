@@ -1,5 +1,3 @@
-
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -62,6 +60,7 @@ class BBSPost {
   factory BBSPost.dummy() => BBSPost(
       -1, Reply.dummy(), -1, [PostTag.dummy()], null, false, "", "", []);
 
+  // ignore: non_constant_identifier_names
   static final DUMMY_POST = BBSPost.dummy();
 
   @override

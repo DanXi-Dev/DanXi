@@ -59,7 +59,6 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   void generateSummary(Campus preferredCampus) {
-    //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
     if (_trafficInfos != null) {
       if (preferredCampus == Campus.HANDAN_CAMPUS) {
         var crowdednessSum = List<num>.filled(5, 0);

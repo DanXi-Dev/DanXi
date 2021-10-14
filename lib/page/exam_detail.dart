@@ -58,7 +58,7 @@ class _ExamListState extends State<ExamList> {
 
   Future<List<SemesterInfo>?>? _semester;
   List<SemesterInfo>? _unpackedSemester;
-  int _showingSemester = 0;
+  int? _showingSemester;
 
   @override
   void initState() {
@@ -143,21 +143,23 @@ class _ExamListState extends State<ExamList> {
                         children: [
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_left),
-                            onPressed: _showingSemester> 0
-                                ? () => setState(() => --_showingSemester)
+                            onPressed: _showingSemester! > 0
+                                ? () => setState(() =>
+                                    _showingSemester = _showingSemester! - 1)
                                 : null,
                           ),
                           Text(S.of(context).semester(
-                              _unpackedSemester![_showingSemester]
+                              _unpackedSemester![_showingSemester!]
                                       .schoolYear ??
                                   "?",
-                              _unpackedSemester![_showingSemester].name ??
+                              _unpackedSemester![_showingSemester!].name ??
                                   "?")),
                           PlatformIconButton(
                             icon: Icon(Icons.chevron_right),
-                            onPressed: _showingSemester<
+                            onPressed: _showingSemester! <
                                     _unpackedSemester!.length - 1
-                                ? () => setState(() => ++_showingSemester)
+                                ? () => setState(() =>
+                                    _showingSemester = _showingSemester! + 1)
                                 : null,
                           )
                         ],
@@ -202,7 +204,7 @@ class _ExamListState extends State<ExamList> {
       child: FutureWidget<List<ExamScore>>(
           future: EduServiceRepository.getInstance().loadExamScoreRemotely(
               _info,
-              semesterId: _unpackedSemester![_showingSemester].semesterId),
+              semesterId: _unpackedSemester![_showingSemester!].semesterId),
           successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
           loadingBuilder: Center(
             child: PlatformCircularProgressIndicator(),
@@ -425,7 +427,7 @@ class _ExamListState extends State<ExamList> {
                   child: FutureWidget<List<ExamScore>>(
                     future: EduServiceRepository.getInstance()
                         .loadExamScoreRemotely(_info,
-                            semesterId: _unpackedSemester![_showingSemester]
+                            semesterId: _unpackedSemester![_showingSemester!]
                                 .semesterId),
                     loadingBuilder: PlatformCircularProgressIndicator(),
                     errorBuilder: Container(),

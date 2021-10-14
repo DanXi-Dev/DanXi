@@ -47,7 +47,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -278,7 +277,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu(Reply e) => [
+  List<Widget> _buildContextMenu(BuildContext context, Reply e) => [
         // Admin Operations
         if (PostRepository.getInstance().isUserAdminNonAsync())
           PlatformWidget(
@@ -512,9 +511,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
-            builder: (_) => PlatformWidget(
+            // IMPORTANT:
+            // This BuildContext below is exclusive to this builder and must be passed
+            // to its children. Otherwise, context of bbs_post will be used, which
+            // will result in incorrect Navigator.pop() behavior.
+            builder: (BuildContext context) => PlatformWidget(
                   cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(e),
+                    actions: _buildContextMenu(context, e),
                     cancelButton: CupertinoActionSheetAction(
                       child: Text(S.of(context).cancel),
                       onPressed: () {
@@ -525,7 +528,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   material: (_, __) => Container(
                     height: 300,
                     child: Column(
-                      children: _buildContextMenu(e),
+                      children: _buildContextMenu(context, e),
                     ),
                   ),
                 ));

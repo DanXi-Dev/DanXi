@@ -39,7 +39,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
-import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
 import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
@@ -188,7 +187,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             dismissible: forceLogin));
   }
 
-  List<Widget> _buildCampusAreaList() {
+  List<Widget> _buildCampusAreaList(BuildContext context) {
     List<Widget> list = [];
     Function onTapListener = (Campus campus) {
       SettingsProvider.getInstance().campus = campus;
@@ -211,7 +210,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     return list;
   }
 
-  List<Widget> _buildFoldBehaviorList() {
+  List<Widget> _buildFoldBehaviorList(BuildContext context) {
     List<Widget> list = [];
     Function onTapListener = (FoldBehavior value) {
       SettingsProvider.getInstance().fduholeFoldBehavior = value;
@@ -315,12 +314,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               onTap: () {
                                 showPlatformModalSheet(
                                     context: context,
-                                    builder: (_) => PlatformWidget(
+                                    builder: (BuildContext context) =>
+                                        PlatformWidget(
                                           cupertino: (_, __) =>
                                               CupertinoActionSheet(
                                             title: Text(
                                                 S.of(context).select_campus),
-                                            actions: _buildCampusAreaList(),
+                                            actions:
+                                                _buildCampusAreaList(context),
                                             cancelButton:
                                                 CupertinoActionSheetAction(
                                               child: Text(S.of(context).cancel),
@@ -332,7 +333,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                           material: (_, __) => Container(
                                             height: 300,
                                             child: Column(
-                                              children: _buildCampusAreaList(),
+                                              children:
+                                                  _buildCampusAreaList(context),
                                             ),
                                           ),
                                         ));
@@ -400,13 +402,15 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 onTap: () {
                                   showPlatformModalSheet(
                                       context: context,
-                                      builder: (_) => PlatformWidget(
+                                      builder: (BuildContext context) =>
+                                          PlatformWidget(
                                             cupertino: (_, __) =>
                                                 CupertinoActionSheet(
                                               title: Text(S
                                                   .of(context)
                                                   .fduhole_nsfw_behavior),
-                                              actions: _buildFoldBehaviorList(),
+                                              actions: _buildFoldBehaviorList(
+                                                  context),
                                               cancelButton:
                                                   CupertinoActionSheetAction(
                                                 child:
@@ -420,7 +424,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               height: 300,
                                               child: Column(
                                                 children:
-                                                    _buildFoldBehaviorList(),
+                                                    _buildFoldBehaviorList(
+                                                        context),
                                               ),
                                             ),
                                           ));

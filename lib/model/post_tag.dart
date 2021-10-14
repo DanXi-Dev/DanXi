@@ -48,5 +48,8 @@ class PostTag extends Taggable {
   factory PostTag.dummy() => PostTag("默认", "red", 0);
 
   @override
-  List<Object> get props => [name ?? ""]; //TODO: What default should we give?
+  List<Object> get props {
+    if (name == null) return [];
+    return [name!];
+  }
 }

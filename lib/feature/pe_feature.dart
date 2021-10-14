@@ -38,13 +38,13 @@ class PEFeature extends Feature {
 
   void _loadExercises() async {
     _status = ConnectionStatus.CONNECTING;
-    _exercises = await FudanPERepository.getInstance()
-        .loadExerciseRecords(_info)
-        .onError((dynamic error, stackTrace) {
+    try {
+      _exercises =
+          await FudanPERepository.getInstance().loadExerciseRecords(_info);
+      _status = ConnectionStatus.DONE;
+    } catch (error) {
       _status = ConnectionStatus.FAILED;
-      return null;
-    });
-    if (_exercises != null) _status = ConnectionStatus.DONE;
+    }
     notifyUpdate();
   }
 
@@ -115,12 +115,10 @@ class PEFeature extends Feature {
           });
           return "早锻: ${exerciseCategory[0]} 必锻: ${exerciseCategory[1]} 选锻: ${exerciseCategory[2]}";
         }
-        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context!).failed;
     }
-    return '';
   }
 
   @override

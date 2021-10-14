@@ -42,7 +42,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_progress_dialog/src/progress_dialog.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import 'flutter_tagging/tagging.dart';
@@ -201,7 +200,6 @@ class BBSEditor {
           textController.dispose();
           return value;
         });
-        break;
       case BBSEditorType.PAGE:
         // Receive the value with **dynamic** variable to prevent automatic type inference
         dynamic result = await smartNavigatorPush(
@@ -209,7 +207,6 @@ class BBSEditor {
             arguments: {"title": title, "tags": allowTags, 'object': object});
         return result;
     }
-    return null;
   }
 
   @protected
@@ -431,7 +428,7 @@ class PostEditorText {
   /// Non-nullable
   List<PostTag>? tags;
 
-  PostEditorText(this.text, List<PostTag> this.tags) : assert(tags != null);
+  PostEditorText(this.text, List<PostTag> this.tags);
 
   PostEditorText.newInstance() {
     text = '';
