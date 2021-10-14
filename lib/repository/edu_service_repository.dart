@@ -95,7 +95,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
                 .value),
         options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
+    final DOM.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromEduServiceHtml(e))
@@ -112,7 +112,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     final Response r = await dio!
         .get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    final DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
+    final DOM.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => GPAListItem.fromHtml(e))
