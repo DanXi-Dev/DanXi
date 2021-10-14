@@ -43,18 +43,16 @@ class DiningHallCrowdednessFeature extends Feature {
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   Future<void> _loadCrowdednessSummary(PersonInfo? info) async {
-    _status = ConnectionStatus.CONNECTING;
     Campus preferredCampus = SettingsProvider.getInstance().campus;
-    _trafficInfos = await DataCenterRepository.getInstance()
-        .getCrowdednessInfo(info, preferredCampus.index)
-        .catchError((e) {
-      if (e is UnsuitableTimeException) {
-        // If it's not time for a meal
-        _status = ConnectionStatus.FATAL_ERROR;
-      }
-    });
-    if (_status != ConnectionStatus.FATAL_ERROR)
+    try {
+      _trafficInfos = await DataCenterRepository.getInstance()
+          .getCrowdednessInfo(info, preferredCampus.index);
       generateSummary(preferredCampus);
+    } on UnsuitableTimeException {
+      _status = ConnectionStatus.FATAL_ERROR;
+    } catch (e) {
+      _status = ConnectionStatus.FAILED;
+    }
     notifyUpdate();
   }
 
@@ -168,13 +166,11 @@ class DiningHallCrowdednessFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
+      _status = ConnectionStatus.CONNECTING;
       _trafficInfos = null;
       _mostCrowdedCanteen = "";
       _leastCrowdedCanteen = "";
-      _loadCrowdednessSummary(_info).catchError((error, st) {
-        _status = ConnectionStatus.FAILED;
-        notifyUpdate();
-      });
+      _loadCrowdednessSummary(_info);
     }
   }
 
