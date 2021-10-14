@@ -37,8 +37,8 @@ class UISLoginTool {
       Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     dio.interceptors.requestLock.lock();
-    Response? result =
-        await _loginUIS(dio, serviceUrl, jar, info).whenComplete(() {
+    Response? result = await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
+        .whenComplete(() {
       if (dio.interceptors.requestLock.locked) {
         dio.interceptors.requestLock.unlock();
       }
