@@ -123,7 +123,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   Future<List<ExamScore>> _loadAllExamScore() async {
     Response r = await dio!.get(SCORE_DETAIL_URL);
     BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    DOM.Element tableBody = soup.find("*", id: "tbody")!.element!;
+    DOM.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromDataCenterHtml(e))

@@ -41,7 +41,7 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   Future<String?> _getQRCode() async {
     final res = await dio!.get(QR_URL);
     BeautifulSoup soup = BeautifulSoup(res.data.toString());
-    return soup.find("*", id: "#myText")!.attributes['value'];
+    return soup.find("#myText")!.attributes['value'];
   }
 
   @override
