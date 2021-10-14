@@ -36,7 +36,7 @@ class FudanDormRepository extends BaseRepositoryWithDio {
 
   factory FudanDormRepository.getInstance() => _instance;
 
-  Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
+  Future<ElectricityItem> loadElectricityInfo(PersonInfo? info) {
     return Retrier.tryAsyncWithFix(
         () => _loadElectricityInfo(),
         (exception) =>

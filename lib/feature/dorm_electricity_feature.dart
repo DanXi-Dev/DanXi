@@ -36,13 +36,13 @@ class DormElectricityFeature extends Feature {
 
   void _loadData() async {
     _status = ConnectionStatus.CONNECTING;
-    _electricity = await FudanDormRepository.getInstance()
-        .loadElectricityInfo(StateProvider.personInfo.value)
-        .onError((dynamic error, stackTrace) {
+    try {
+      _electricity = await FudanDormRepository.getInstance()
+          .loadElectricityInfo(StateProvider.personInfo.value);
+      _status = ConnectionStatus.DONE;
+    } catch (e) {
       _status = ConnectionStatus.FAILED;
-      return null;
-    });
-    if (_electricity != null) _status = ConnectionStatus.DONE;
+    }
     notifyUpdate();
   }
 

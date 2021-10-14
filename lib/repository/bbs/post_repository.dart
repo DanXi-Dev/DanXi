@@ -590,7 +590,9 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   initializeUser(PersonInfo? info) async {
-    PlatformBridge.requestNotificationPermission();
+    try {
+      PlatformBridge.requestNotificationPermission();
+    } catch (ignored) {}
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
@@ -604,16 +606,17 @@ class PostRepository extends BaseRepositoryWithDio {
     //Pin HTTPS cert
     (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
-      SecurityContext sc = SecurityContext(withTrustedRoots: false);
+      final SecurityContext sc = SecurityContext(withTrustedRoots: false);
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
         // This badCertificateCallback will always be called since we have no trusted certificate.
-        ASN1Parser p = ASN1Parser(certificate.der);
-        ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
-        ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
-        ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
-        ASN1BitString pubKeyBits = pubKeyElement.elements[1] as ASN1BitString;
+        final ASN1Parser p = ASN1Parser(certificate.der);
+        final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
+        final ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
+        final ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
+        final ASN1BitString pubKeyBits =
+            pubKeyElement.elements[1] as ASN1BitString;
 
         if (listEquals(pubKeyBits.stringValue, PINNED_CERTIFICATE)) {
           return true;
@@ -652,16 +655,9 @@ class PostRepository extends BaseRepositoryWithDio {
   bool get isUserInitialized => _token != null;
 
   Future<List<BBSPost>> loadDiscussions(int page, SortOrder? sortBy) async {
-    final Response response = await dio!
-        .get(_BASE_URL + "/discussions/",
-            queryParameters: {
-              "page": page,
-              "order": sortBy.getInternalString()
-            },
-            options: Options(headers: _tokenHeader))
-        .onError((dynamic error, stackTrace) {
-      return Future.error(error);
-    });
+    final Response response = await dio!.get(_BASE_URL + "/discussions/",
+        queryParameters: {"page": page, "order": sortBy.getInternalString()},
+        options: Options(headers: _tokenHeader));
     final List result = response.data;
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }

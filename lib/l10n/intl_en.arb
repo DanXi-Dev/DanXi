@@ -235,7 +235,7 @@
     "sponsor_us_enabled": "Thank you :) You may opt out at any time.",
     "thankyouforenablingads": "Thank you for enabling Ads!",
 
-    "accessibility_coloring": "Accessibility: High Contrast Coloring",
+    "accessibility_coloring": "Accessibility: High Contrast Color",
     "enabled": "Enabled",
     "disabled": "Disabled",
 
@@ -263,7 +263,7 @@
     "weak_password": "Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again.",
     "fail_to_acquire_qr": "Failed to obtain QR code. Please make sure you have activated the QR code in eHall.",
 
-    "project_url": "https://danxi-dev.github.io",
+    "project_url": "https://danxi.fduhole.com",
     "dev_name_1": "w568w",
     "dev_name_2": "kavinzhao",
     "dev_name_3": "KYLN24",
@@ -280,7 +280,7 @@
     "acknowledgement_link_1": "https://github.com/ivanfei-1",
 
     "feedback_email": "danxi_dev@protonmail.com",
-    "privacy_policy_url" : "https://danxi-dev.github.io/privacy",
+    "privacy_policy_url" : "https://danxi.fduhole.com/privacy",
 
     "moment_ago":"A moment ago",
     "second_ago":"{num} sec ago",
