@@ -15,12 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/services.dart';
 
 class PlatformBridge {
   static const FDUHOLE_CHANNEL = const MethodChannel('fduhole');
 
   static void requestNotificationPermission() {
-    FDUHOLE_CHANNEL.invokeMethod("request_notification_permission");
+    if (PlatformX.isIOS)
+      FDUHOLE_CHANNEL.invokeMethod("request_notification_permission");
   }
 }

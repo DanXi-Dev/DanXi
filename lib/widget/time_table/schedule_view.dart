@@ -45,6 +45,11 @@ class _ScheduleViewState extends State<ScheduleView> {
   int _maxSlot = 0;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget table;
     widget.laneEventsList.forEach((element) {
@@ -143,43 +148,48 @@ class _ScheduleViewState extends State<ScheduleView> {
           ],
         ),
       ).withRatio(0.8).withGridPlacement(columnStart: day + 1, rowStart: 0);
-
-      // widget.laneEventsList[day].events.forEach((Event event) {
-      //   // Build course blocks
-      //   bool notFirstCourse = widget.laneEventsList[day].events.any((element) =>
-      //       element.time.slot == event.time.slot - 1 &&
-      //       element.course.courseName == event.course.courseName);
-      //   bool notLastCourse = widget.laneEventsList[day].events.any((element) =>
-      //       element.time.slot == event.time.slot + 1 &&
-      //       element.course.courseName == event.course.courseName);
-      //   result[1 + day + cols * (event.time.slot + 1)] =
-      //       _buildCourse(event.course, !notFirstCourse, !notLastCourse);
-      // });
-      for (int i = 0; i < widget.laneEventsList[day].events.length;) {
-        int slotSpan = 0;
-        Event firstCourse = widget.laneEventsList[day].events[i];
-        while (i < widget.laneEventsList[day].events.length &&
-            widget.laneEventsList[day].events[i].course.courseName ==
-                firstCourse.course.courseName) {
-          if (widget.laneEventsList[day].events[i].time.slot <
-              firstCourse.time.slot) {
-            firstCourse = widget.laneEventsList[day].events[i];
-          }
-          i++;
-          slotSpan++;
-        }
-        result[1 + day + cols * (firstCourse.time.slot + 1)] =
-            _buildCourse(firstCourse.course).withGridPlacement(
+      convertToBlock(widget.laneEventsList[day].events).forEach((element) {
+        result[1 + day + cols * (element.firstSlot + 1)] =
+            _buildCourse(element.event.course).withGridPlacement(
                 columnStart: 1 + day,
-                rowStart: firstCourse.time.slot + 1,
-                rowSpan: slotSpan);
-        for (int j = 1; j < slotSpan; j++) {
-          result[1 + day + cols * (firstCourse.time.slot + 1 + j)] = null;
+                rowStart: element.firstSlot + 1,
+                rowSpan: element.slotSpan);
+        for (int j = 1; j < element.slotSpan; j++) {
+          result[1 + day + cols * (element.firstSlot + 1 + j)] = null;
         }
-      }
+      });
     }
     result.removeWhere((element) => element == null);
     return result.map((e) => e!).toList();
+  }
+
+  List<_ScheduleBlock> convertToBlock(List<Event> list) {
+    List<_ScheduleBlock> result = list.map((e) => _ScheduleBlock(e)).toList();
+    bool flag = true;
+    while (flag) {
+      flag = false;
+      for (int i = 0; i < result.length;) {
+        try {
+          _ScheduleBlock neighboringBlock = result.firstWhere((element) {
+            int startSlot = element.firstSlot;
+            int endSlot = startSlot + element.slotSpan;
+
+            return element.event.course.courseName ==
+                    result[i].event.course.courseName &&
+                ((result[i].firstSlot + result[i].slotSpan == startSlot) ||
+                    (result[i].firstSlot == endSlot));
+          });
+          flag = true;
+          _ScheduleBlock thisBlock = result.removeAt(i);
+          neighboringBlock.firstSlot =
+              min(thisBlock.firstSlot, neighboringBlock.firstSlot);
+          neighboringBlock.slotSpan += thisBlock.slotSpan;
+        } catch (e) {
+          ++i;
+        }
+      }
+    }
+    return result;
   }
 
   Widget _buildCourse(Course course) {
@@ -215,6 +225,17 @@ class _ScheduleViewState extends State<ScheduleView> {
 
 extension WidgetEx on Widget {
   Widget withRatio(double aspectRatio) => this;
+}
+
+class _ScheduleBlock {
+  int slotSpan = 1;
+  late int firstSlot;
+  late Event event;
+
+  _ScheduleBlock(Event event) {
+    this.event = event;
+    firstSlot = event.time.slot;
+  }
 }
 
 class TimetableStyle {
