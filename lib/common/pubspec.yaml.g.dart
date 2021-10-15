@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'60'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1634006950;
+const int timestamp = 1634269264;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -111,7 +111,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_platform_widgets': r'^1.1.0',
   'share': r'^2.0.1',
   'path_provider': r'^2.0.1',
-  'screen_brightness': r'^0.0.4',
+  'screen_brightness': <String, Object>{
+    'git': <String, Object>{
+      'url': r'git://github.com/kavinzhao/screen_brightness.git',
+      'ref': r'master',
+    },
+  },
   'flutter_email_sender': r'^5.0.0',
   'auto_size_text': r'^3.0.0-nullsafety.0',
   'ical': <String, Object>{
@@ -178,7 +183,6 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
       'ref': r'master',
     },
   },
-  'html': r'^0.15.0',
 };
 
 /// Executables
