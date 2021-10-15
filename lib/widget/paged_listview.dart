@@ -123,6 +123,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _hasHeadWidget = false;
   bool _scrollToEndQueued = false;
   bool _hasError = false;
+  bool _dataClearQueued = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
   Future<List<T>>? _futureData;
@@ -167,6 +168,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     return FutureWidget<List<T>>(
         future: _futureData,
         successBuilder: (_, snapshot) {
+          if (_dataClearQueued) _clearData();
           // Handle Scroll To End Requests
           WidgetsBinding.instance!.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
@@ -203,6 +205,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           return _buildListView();
         },
         errorBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
+          if (_dataClearQueued) _clearData();
           _hasError = true;
           _isRefreshing = false;
           return _buildListView(snapshot: snapshot);
@@ -341,18 +344,28 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     }
   }
 
-  initialize({useInitialData = true}) {
+  void initialize({useInitialData = true, queueDataClear = false}) {
     _hasHeadWidget = widget.headBuilder != null;
-    _data.clear();
-    valueKeys.clear();
-    _hasError = false;
+    if (queueDataClear) {
+      _dataClearQueued = true;
+    } else {
+      _clearData();
+    }
     pageIndex = widget.startPage;
     _futureData = _setFuture(useInitialData: useInitialData);
   }
 
-  notifyUpdate({useInitialData = true}) {
-    initialize(useInitialData: useInitialData);
+  void _clearData() {
+    _data.clear();
+    valueKeys.clear();
+    _hasError = false;
+    _dataClearQueued = false;
+  }
+
+  Future<void> notifyUpdate({useInitialData = true}) async {
+    initialize(useInitialData: useInitialData, queueDataClear: true);
     refreshSelf();
+    await _futureData;
   }
 
   /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
@@ -421,7 +434,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 }
 
 class PagedListViewController<T> {
-  _PagedListViewState<T>? _state;
+  late _PagedListViewState<T> _state;
 
   PagedListViewController();
 
@@ -430,8 +443,8 @@ class PagedListViewController<T> {
     this._state = state;
   }
 
-  notifyUpdate({useInitialData = true}) {
-    _state?.notifyUpdate(useInitialData: useInitialData);
+  Future<void> notifyUpdate({useInitialData = true}) {
+    return _state.notifyUpdate(useInitialData: useInitialData);
   }
 
   /// Returns whether the scroll was successful or not
@@ -440,7 +453,7 @@ class PagedListViewController<T> {
   Future<bool> scrollToItem(T item,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     try {
-      await _state?.scrollToItem(item, duration, curve);
+      await _state.scrollToItem(item, duration, curve);
     } catch (ignored) {
       return false;
     }
@@ -449,26 +462,26 @@ class PagedListViewController<T> {
 
   Future<void> scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    await _state?.scrollToIndex(index, duration, curve);
+    await _state.scrollToIndex(index, duration, curve);
   }
 
   Future<void> scrollDelta(double pixels,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    await _state?.scrollDelta(pixels, duration, curve);
+    await _state.scrollDelta(pixels, duration, curve);
   }
 
   ScrollController? getScrollController() {
-    return _state?.getScrollController();
+    return _state.getScrollController();
   }
 
   queueScrollToEnd() {
-    _state?.queueScrollToEnd();
+    _state.queueScrollToEnd();
   }
 
   /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
   /// Will no longer load content on scroll after this is called.
   replaceDataWith(List<T> data) {
-    _state?.replaceDataWith(data);
+    _state.replaceDataWith(data);
   }
 }
 

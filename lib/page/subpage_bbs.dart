@@ -248,8 +248,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         if (_tagFilter != null)
           return await PostRepository.getInstance()
               .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
-        else if (widget.arguments != null &&
-            widget.arguments!.containsKey('showFavoredDiscussion')) {
+        else if (widget.arguments?.containsKey('showFavoredDiscussion') ==
+            true) {
           if (page > 1) return Future.value([]);
           return await PostRepository.getInstance().getFavoredDiscussions();
         } else {
@@ -275,11 +275,12 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
-  void refreshSelf() {
-    if (mounted) {
-      // ignore: invalid_use_of_protected_member
-      _listViewController.notifyUpdate();
+  Future<void> refreshSelf() async {
+    if (widget.arguments?.containsKey('showFavoredDiscussion') == true) {
+      await PostRepository.getInstance()
+          .getFavoredDiscussions(forceUpdate: true);
     }
+    await _listViewController.notifyUpdate();
   }
 
   Widget _buildSearchTextField() {
@@ -448,7 +449,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            refreshSelf();
+            await refreshSelf();
           },
           child: PagedListView<BBSPost>(
               noneItem: BBSPost.DUMMY_POST,

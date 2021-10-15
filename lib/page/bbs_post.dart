@@ -164,9 +164,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Rebuild everything and refresh itself.
-  void refreshSelf({scrollToEnd = false}) {
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
-    _listViewController.notifyUpdate(useInitialData: false);
+  Future<void> refreshSelf({scrollToEnd = false}) async {
+    //if (scrollToEnd) _listViewController.queueScrollToEnd();
+    await _listViewController.notifyUpdate(useInitialData: false);
   }
 
   @override
@@ -208,7 +208,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            refreshSelf();
+            await refreshSelf();
           },
           child: Material(
             child: PagedListView<Reply>(

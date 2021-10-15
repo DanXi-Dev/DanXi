@@ -102,12 +102,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   BannerAd? bannerAd;
 
   void _setContent() {
-    if (checkGroup(kCompatibleUserGroup))
+    if (checkGroup(kCompatibleUserGroup)) {
       _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
           TimeTableRepository.getInstance().loadTimeTableLocally(
               StateProvider.personInfo.value,
               forceLoadFromRemote: _loadFromRemote)));
-    else
+      _loadFromRemote = false;
+    } else
       _content = LazyFuture.pack(Future<TimeTable>.error(
           NotLoginError("Haven't logged in as FDU student.")));
   }
@@ -187,10 +188,10 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
-  void refreshSelf() {
-    setState(() {
-      _setContent();
-    });
+  Future<void> refreshSelf() async {
+    _setContent();
+    await _content;
+    setState(() {});
   }
 
   @override
@@ -208,7 +209,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   void dispose() {
     super.dispose();
-    if (_shareSubscription != null) _shareSubscription.cancel();
+    _shareSubscription.cancel();
   }
 
   @override
@@ -264,7 +265,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         onRefresh: () async {
           _loadFromRemote = true;
           HapticFeedback.mediumImpact();
-          refreshSelf();
+          await refreshSelf();
         },
         child: ListView(
           // This ListView is a workaround, so that we can apply a custom scroll physics to it.
