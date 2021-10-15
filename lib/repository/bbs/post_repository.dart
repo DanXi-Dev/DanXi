@@ -784,8 +784,10 @@ class PostRepository extends BaseRepositoryWithDio {
     return _profile?.user?.is_staff ?? false;
   }
 
-  Future<List<BBSPost>> getFavoredDiscussions() async {
-    return (await getUserProfile())!.favored_discussion!;
+  Future<List<BBSPost>> getFavoredDiscussions(
+      {bool forceUpdate = false}) async {
+    return (await getUserProfile(forceUpdate: forceUpdate))!
+        .favored_discussion!;
   }
 
   Future<void> setFavoredDiscussion(
