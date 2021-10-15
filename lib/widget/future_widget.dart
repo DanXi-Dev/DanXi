@@ -32,8 +32,8 @@ class FutureWidget<T> extends StatefulWidget {
       : super(key: key);
   final dynamic errorBuilder;
   final dynamic loadingBuilder;
-  final Future<T>? future;
-  final AsyncWidgetBuilder<T> successBuilder;
+  final Future<T?>? future;
+  final AsyncWidgetBuilder<T?> successBuilder;
   final T? initialData;
 
   /// Decide how the widget respond to the situation that snapshot.data is null
@@ -53,14 +53,14 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
   /// calling setState from stale callbacks, e.g. after disposal of this state,
   /// or after widget reconfiguration to a new Future.
   Object? _activeCallbackIdentity;
-  AsyncSnapshot<T>? _snapshot;
+  AsyncSnapshot<T?>? _snapshot;
 
   @override
   void initState() {
     super.initState();
     _snapshot = widget.initialData == null
-        ? AsyncSnapshot<T>.nothing()
-        : AsyncSnapshot<T>.withData(ConnectionState.none, widget.initialData!);
+        ? AsyncSnapshot<T?>.nothing()
+        : AsyncSnapshot<T?>.withData(ConnectionState.none, widget.initialData!);
     _subscribe();
   }
 
@@ -82,14 +82,15 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
       case ConnectionState.none:
       case ConnectionState.waiting:
       case ConnectionState.active:
-        return SmartWidget.toWidget<T>(widget.loadingBuilder, context,
+        return SmartWidget.toWidget<T?>(widget.loadingBuilder, context,
             snapshot: _snapshot);
       case ConnectionState.done:
         if (_snapshot!.hasError || (!_snapshot!.hasData && !widget.nullable)) {
-          return SmartWidget.toWidget<T>(widget.errorBuilder, context,
+          print(_snapshot);
+          return SmartWidget.toWidget<T?>(widget.errorBuilder, context,
               snapshot: _snapshot);
         } else {
-          return SmartWidget.toWidget<T>(widget.successBuilder, context,
+          return SmartWidget.toWidget<T?>(widget.successBuilder, context,
               snapshot: _snapshot);
         }
     }
@@ -105,16 +106,17 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
     if (widget.future != null) {
       final Object callbackIdentity = Object();
       _activeCallbackIdentity = callbackIdentity;
-      widget.future!.then<void>((T data) {
+      widget.future!.then<void>((T? data) {
         if (_activeCallbackIdentity == callbackIdentity) {
           setState(() {
-            _snapshot = AsyncSnapshot<T>.withData(ConnectionState.done, data);
+            _snapshot = AsyncSnapshot<T?>.withData(ConnectionState.done, data);
           });
         }
       }, onError: (Object error, StackTrace stackTrace) {
         if (_activeCallbackIdentity == callbackIdentity) {
           setState(() {
-            _snapshot = AsyncSnapshot<T>.withError(
+            print(error);
+            _snapshot = AsyncSnapshot<T?>.withError(
                 ConnectionState.done, error, stackTrace);
           });
         }

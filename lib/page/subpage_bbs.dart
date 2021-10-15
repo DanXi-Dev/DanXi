@@ -238,40 +238,37 @@ class _BBSSubpageState extends State<BBSSubpage>
   late bool _fieldInitComplete;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
-  Future<List<BBSPost>> _loadContent(int page) async {
+  Future<List<BBSPost>?> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
-      try {
-        _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
-            SortOrder.LAST_REPLIED;
-        _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior;
-        if (_tagFilter != null)
-          return await PostRepository.getInstance()
-              .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
-        else if (widget.arguments?.containsKey('showFavoredDiscussion') ==
-            true) {
-          if (page > 1) return Future.value([]);
-          return await PostRepository.getInstance().getFavoredDiscussions();
-        } else {
-          if (!PostRepository.getInstance().isUserInitialized)
-            await PostRepository.getInstance()
-                .initializeUser(StateProvider.personInfo.value);
-          // Filter blocked posts
-          List<BBSPost> loadedPost = await PostRepository.getInstance()
-              .loadDiscussions(page, _sortOrder);
-          List<PostTag> hiddenTags =
-              SettingsProvider.getInstance().hiddenTags ?? [];
-          loadedPost.removeWhere((element) => element.tag!.any((thisTag) =>
-              hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
-          // About this line, see [PagedListView].
-          return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
-        }
-      } catch (e) {
-        return Future.error(e);
+      _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
+          SortOrder.LAST_REPLIED;
+      _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior;
+      if (_tagFilter != null)
+        return await PostRepository.getInstance()
+            .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
+      else if (widget.arguments?.containsKey('showFavoredDiscussion') == true) {
+        if (page > 1) return Future.value([]);
+        return await PostRepository.getInstance().getFavoredDiscussions();
+      } else {
+        if (!PostRepository.getInstance().isUserInitialized)
+          await PostRepository.getInstance()
+              .initializeUser(StateProvider.personInfo.value);
+        // Filter blocked posts
+        List<BBSPost>? loadedPost = await PostRepository.getInstance()
+            .loadDiscussions(page, _sortOrder);
+        print("load successful");
+        List<PostTag> hiddenTags =
+            SettingsProvider.getInstance().hiddenTags ?? [];
+        loadedPost.removeWhere((element) => element.tag!.any((thisTag) =>
+            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+        // About this line, see [PagedListView].
+        return loadedPost.isNotEmpty == false
+            ? [BBSPost.DUMMY_POST]
+            : loadedPost;
       }
     } else {
-      return Future<List<BBSPost>>.error(
-          NotLoginError("Logged in as Visitor."));
+      throw NotLoginError("Logged in as Visitor.");
     }
   }
 
@@ -288,7 +285,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_tagFilter != null ||
         (widget.arguments?.containsKey('showFavoredDiscussion') ?? false))
       return Container();
-
+    final RegExp pidPattern = new RegExp(r'#[0-9]+');
     return Container(
       color: Theme.of(context).canvasColor,
       padding: Theme.of(context)
@@ -301,7 +298,6 @@ class _BBSSubpageState extends State<BBSSubpage>
           value = value.trim();
           if (value.isEmpty) return;
           // Determine if user is using #PID pattern to reach a specific post
-          RegExp pidPattern = new RegExp(r'#[0-9]+');
           if (value.startsWith(pidPattern)) {
             // We needn't deal with the situation that "id = null" here.
             // If so, it will turn into a 404 http error.

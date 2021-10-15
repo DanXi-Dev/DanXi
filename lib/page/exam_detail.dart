@@ -223,7 +223,7 @@ class _ExamListState extends State<ExamList> {
             return _loadGradeViewFromDataCenter();
           }));
 
-  Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>> snapshot,
+  Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
           {bool isFallback = false}) =>
       Column(
         children: [
