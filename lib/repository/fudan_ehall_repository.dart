@@ -25,7 +25,7 @@ import 'package:flutter/cupertino.dart';
 
 class FudanEhallRepository extends BaseRepositoryWithDio {
   static const String _INFO_URL =
-      "http://ehall.fudan.edu.cn/jsonp/ywtb/info/getUserInfoAndSchoolInfo.json";
+      "https://ehall.fudan.edu.cn/jsonp/ywtb/info/getUserInfoAndSchoolInfo.json";
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fehall.fudan.edu.cn%2Flogin%3Fservice%3Dhttp%3A%2F%2Fehall.fudan.edu.cn%2Fywtb-portal%2Ffudan%2Findex.html";
 
