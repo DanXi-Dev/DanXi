@@ -525,8 +525,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ),
                   ),
                   material: (_, __) => Container(
-                    height: 300,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: _buildContextMenu(context, e),
                     ),
                   ),
