@@ -165,7 +165,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Rebuild everything and refresh itself.
   Future<void> refreshSelf({scrollToEnd = false}) async {
-    //if (scrollToEnd) _listViewController.queueScrollToEnd();
     await _listViewController.notifyUpdate(useInitialData: false);
   }
 
