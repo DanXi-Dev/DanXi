@@ -60,15 +60,9 @@ class _ScheduleViewState extends State<ScheduleView> {
     int cols = widget.laneEventsList.length + 1, rows = _maxSlot + 2;
     table = LayoutGrid(
       columnSizes: List.filled(cols, 1.fr),
-      rowSizes: List.filled(rows, (MediaQuery.of(context).size.height / 8).px),
+      rowSizes: List.filled(rows, auto),
       children: _buildTable(cols, rows),
     );
-    // table = GridView.count(
-    //     crossAxisCount: widget.laneEventsList.length + 1,
-    //     children: _buildTable(),
-    //     controller: widget.controller,
-    //     childAspectRatio: 0.8,
-    //     shrinkWrap: true);
     return MediaQuery.removePadding(
         context: context, removeTop: true, child: table);
   }
@@ -150,10 +144,12 @@ class _ScheduleViewState extends State<ScheduleView> {
       ).withRatio(0.8).withGridPlacement(columnStart: day + 1, rowStart: 0);
       convertToBlock(widget.laneEventsList[day].events).forEach((element) {
         result[1 + day + cols * (element.firstSlot + 1)] =
-            _buildCourse(element.event.course).withGridPlacement(
-                columnStart: 1 + day,
-                rowStart: element.firstSlot + 1,
-                rowSpan: element.slotSpan);
+            _buildCourse(element.event.course)
+                .withRatio(0.8 / element.slotSpan)
+                .withGridPlacement(
+                    columnStart: 1 + day,
+                    rowStart: element.firstSlot + 1,
+                    rowSpan: element.slotSpan);
         for (int j = 1; j < element.slotSpan; j++) {
           result[1 + day + cols * (element.firstSlot + 1 + j)] = null;
         }
@@ -224,7 +220,10 @@ class _ScheduleViewState extends State<ScheduleView> {
 }
 
 extension WidgetEx on Widget {
-  Widget withRatio(double aspectRatio) => this;
+  Widget withRatio(double aspectRatio) => AspectRatio(
+        aspectRatio: aspectRatio,
+        child: this,
+      );
 }
 
 class _ScheduleBlock {
