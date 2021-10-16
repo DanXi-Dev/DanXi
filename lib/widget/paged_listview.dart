@@ -136,7 +136,6 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Paged ListView build()");
     NotificationListenerCallback<ScrollNotification> scrollToEnd =
         (ScrollNotification scrollInfo) {
       if (scrollInfo.metrics.extentAfter < 500 &&
@@ -146,7 +145,6 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           _shouldLoad) {
         pageIndex++;
         _isRefreshing = true;
-        debugPrint("load Next");
         setState(() {
           _futureData = LazyFuture.pack(widget.dataReceiver(pageIndex));
         });
