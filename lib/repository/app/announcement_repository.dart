@@ -35,8 +35,7 @@ class AnnouncementRepository {
   List<Announcement>? _announcementCache;
 
   Future<bool> loadData() async {
-    BmobQuery<Announcement?> query = BmobQuery<Announcement>()
-        .setOrder("-createdAt") as BmobQuery<Announcement?>;
+    BmobQuery query = BmobQuery<Announcement>().setOrder("-createdAt");
     _announcementCache = (await query.queryObjects())!
         .map<Announcement>((e) => Announcement.fromJson(e))
         .toList();
@@ -47,10 +46,10 @@ class AnnouncementRepository {
     Announcement? announcement = getLastAnnouncement();
     if (announcement == null) return null;
     SharedPreferences pre = await SharedPreferences.getInstance();
-    List<String?>? list = [];
+    List<String?> list = [];
     if (pre.containsKey(KEY_SEEN_ANNOUNCEMENT)) {
-      list = pre.getStringList(KEY_SEEN_ANNOUNCEMENT);
-      if (list!.any(((element) => element == announcement.objectId))) {
+      list = pre.getStringList(KEY_SEEN_ANNOUNCEMENT)!;
+      if (list.any(((element) => element == announcement.objectId))) {
         return null;
       } else {
         list.add(announcement.objectId);

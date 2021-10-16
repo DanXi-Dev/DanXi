@@ -208,7 +208,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
       _loadStartDate().catchError((ignored) {});
-    }, onError: (e) => _dealWithBmobError());
+    }, onError: (e) {
+      _dealWithBmobError();
+    });
   }
 
   DateTime? _lastRefreshTime;

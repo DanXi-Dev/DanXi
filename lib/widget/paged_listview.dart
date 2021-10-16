@@ -123,24 +123,30 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _hasHeadWidget = false;
   bool _scrollToEndQueued = false;
   bool _hasError = false;
+
+  /// Whether the ListView should clear old data after refreshing.
   bool _dataClearQueued = false;
+
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
-  Future<List<T>>? _futureData;
+  Future<List<T>?>? _futureData;
 
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("Paged ListView build()");
     NotificationListenerCallback<ScrollNotification> scrollToEnd =
         (ScrollNotification scrollInfo) {
       if (scrollInfo.metrics.extentAfter < 500 &&
           !_isRefreshing &&
           !_isEnded &&
+          !_hasError &&
           _shouldLoad) {
         pageIndex++;
         _isRefreshing = true;
+        debugPrint("load Next");
         setState(() {
           _futureData = LazyFuture.pack(widget.dataReceiver(pageIndex));
         });
@@ -165,9 +171,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   _buildListBody() {
-    return FutureWidget<List<T>>(
+    return FutureWidget<List<T>?>(
         future: _futureData,
-        successBuilder: (_, snapshot) {
+        successBuilder: (_, AsyncSnapshot<List<T>?> snapshot) {
           if (_dataClearQueued) _clearData();
           // Handle Scroll To End Requests
           WidgetsBinding.instance!.addPostFrameCallback((_) async {
@@ -193,6 +199,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
             return _buildListView();
           }
 
+          // Process with probably duplicated data
           if (snapshot.data!.isEmpty ||
               _data.isEmpty ||
               snapshot.data!.last != _data.last) {
@@ -204,20 +211,20 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           if (snapshot.data!.isEmpty) _isEnded = true;
           return _buildListView();
         },
-        errorBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
+        errorBuilder: (BuildContext context, AsyncSnapshot<List<T>?> snapshot) {
           if (_dataClearQueued) _clearData();
           _hasError = true;
           _isRefreshing = false;
           return _buildListView(snapshot: snapshot);
         },
         loadingBuilder: (BuildContext context) {
+          _hasError = false;
           return _buildListView();
         });
   }
 
-  Widget _errorBuilder(AsyncSnapshot<List<T>>? snapshot) {
+  Widget _errorBuilder(AsyncSnapshot<List<T>?>? snapshot) {
     String error;
-
     if (snapshot == null)
       error = "Unknown Error";
     else {
@@ -267,7 +274,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  Widget _buildListView({AsyncSnapshot<List<T>>? snapshot}) {
+  Widget _buildListView({AsyncSnapshot<List<T>?>? snapshot}) {
     // Show an empty indicator if there's no data at all.
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
       // Tell the listView not to try to load anymore.
@@ -298,7 +305,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  _getListItemAt(int index, AsyncSnapshot<List<T>>? snapshot) {
+  _getListItemAt(int index, AsyncSnapshot<List<T>?>? snapshot) {
     if (_hasHeadWidget) {
       if (index == 0) {
         return widget.headBuilder!(context);
@@ -323,7 +330,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   // Move things into a separate function to control reload more easily
-  Future<List<T>> _setFuture({useInitialData = true}) {
+  Future<List<T>?> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
@@ -499,7 +506,7 @@ typedef IndexedDataWidgetBuilder<T> = Widget Function(
     BuildContext context, ListProvider<T> dataProvider, int index, T data);
 
 /// Retrieve data function
-typedef DataReceiver<T> = Future<List<T>> Function(int pageIndex);
+typedef DataReceiver<T> = Future<List<T>?> Function(int pageIndex);
 
 /// Notify refreshing callback
 typedef RefreshListener = void Function();

@@ -25,6 +25,8 @@ class LazyFuture<T> implements Future<T> {
   dynamic _error;
   dynamic _stackTrace;
 
+  dynamic get error => _error;
+
   LazyFuture.pack(Future<T> future) {
     _thisFuture = future.catchError((error, stackTrace) {
       _error = error;
@@ -36,21 +38,19 @@ class LazyFuture<T> implements Future<T> {
   Stream<T> asStream() => _thisFuture.asStream();
 
   @override
-  Future<T> catchError(Function onErr, {bool Function(Object error)? test}) =>
-      _error != null
-          ? Future<T>.error(_error, _stackTrace).onError(
-              onErr as FutureOr<T> Function(Error, StackTrace),
-              test: test)
-          : _thisFuture.onError(
-              onErr as FutureOr<T> Function(Error, StackTrace),
-              test: test);
+  Future<T> catchError(Function onErr, {bool Function(Object error)? test}) {
+    return _error != null
+        ? Future<T>.error(_error, _stackTrace).catchError(onErr, test: test)
+        : _thisFuture.catchError(onErr, test: test);
+  }
 
   @override
   Future<R> then<R>(FutureOr<R> Function(T value) onValue,
-          {Function? onError}) =>
-      _error != null
-          ? Future<T>.error(_error, _stackTrace).then(onValue, onError: onError)
-          : _thisFuture.then(onValue, onError: onError);
+      {Function? onError}) {
+    return _error != null
+        ? Future<T>.error(_error, _stackTrace).then(onValue, onError: onError)
+        : _thisFuture.then(onValue, onError: onError);
+  }
 
   @override
   Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) =>
@@ -59,4 +59,6 @@ class LazyFuture<T> implements Future<T> {
   @override
   Future<T> whenComplete(FutureOr<void> Function() action) =>
       _thisFuture.whenComplete(action);
+
+  dynamic get stackTrace => _stackTrace;
 }

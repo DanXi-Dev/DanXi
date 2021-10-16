@@ -256,18 +256,17 @@ class _BBSSubpageState extends State<BBSSubpage>
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value);
 
-        List<BBSPost>? loadedPost = await PostRepository.getInstance()
+        List<BBSPost> loadedPost = await PostRepository.getInstance()
             .loadDiscussions(page, _sortOrder);
-        print("load successful");
+        debugPrint("Loaded");
         // Filter blocked posts
         List<PostTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
         loadedPost.removeWhere((element) => element.tag!.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+
         // About this line, see [PagedListView].
-        return loadedPost.isNotEmpty == false
-            ? [BBSPost.DUMMY_POST]
-            : loadedPost;
+        return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
       }
     } else {
       throw NotLoginError("Logged in as Visitor.");

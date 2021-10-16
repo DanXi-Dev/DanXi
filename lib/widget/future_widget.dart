@@ -15,19 +15,21 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/smart_widget.dart';
 import 'package:flutter/widgets.dart';
 
 /// [FutureWidget] is a variation of [FutureBuilder],
 /// which will build different widgets depending on different states: See [ConnectionState.values].
 class FutureWidget<T> extends StatefulWidget {
-  const FutureWidget({Key? key,
-    this.initialData,
-    required this.future,
-    required this.successBuilder,
-    required this.errorBuilder,
-    required this.loadingBuilder,
-    this.nullable = false})
+  const FutureWidget(
+      {Key? key,
+      this.initialData,
+      required this.future,
+      required this.successBuilder,
+      required this.errorBuilder,
+      required this.loadingBuilder,
+      this.nullable = false})
       : super(key: key);
   final dynamic errorBuilder;
   final dynamic loadingBuilder;
@@ -105,20 +107,33 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
       final Object callbackIdentity = Object();
       _activeCallbackIdentity = callbackIdentity;
       widget.future!.then<void>((T data) {
+        // Process the situation that [widget.future] is LazyFuture
+        if (data == null && widget.future is LazyFuture<T>) {
+          LazyFuture<T> lazyImpl = widget.future as LazyFuture<T>;
+          if (lazyImpl.error != null) {
+            _onError(callbackIdentity, lazyImpl.error, lazyImpl.stackTrace);
+            return;
+          }
+        }
+
         if (_activeCallbackIdentity == callbackIdentity) {
           setState(() {
             _snapshot = AsyncSnapshot<T>.withData(ConnectionState.done, data);
           });
         }
       }, onError: (Object error, StackTrace stackTrace) {
-        if (_activeCallbackIdentity == callbackIdentity) {
-          setState(() {
-            _snapshot = AsyncSnapshot<T>.withError(
-                ConnectionState.done, error, stackTrace);
-          });
-        }
+        _onError(callbackIdentity, error, stackTrace);
       });
       _snapshot = _snapshot!.inState(ConnectionState.waiting);
+    }
+  }
+
+  void _onError(Object callbackIdentity, Object error, StackTrace stackTrace) {
+    if (_activeCallbackIdentity == callbackIdentity) {
+      setState(() {
+        _snapshot =
+            AsyncSnapshot<T>.withError(ConnectionState.done, error, stackTrace);
+      });
     }
   }
 
