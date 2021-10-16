@@ -126,7 +126,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   bool _dataClearQueued = false;
   List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
-  Future<List<T>?>? _futureData;
+  Future<List<T>>? _futureData;
 
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
@@ -165,58 +165,59 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   _buildListBody() {
-    return FutureBuilder<List<T>?>(
+    return FutureWidget<List<T>>(
         future: _futureData,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            if (_dataClearQueued) _clearData();
-            _hasError = true;
-            _isRefreshing = false;
-            return _buildListView(snapshot: snapshot);
-          } else if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
-            if (_dataClearQueued) _clearData();
-            // Handle Scroll To End Requests
-            WidgetsBinding.instance!.addPostFrameCallback((_) async {
-              if (_scrollToEndQueued) {
-                while (currentController!.position.pixels <
-                    currentController!.position.maxScrollExtent) {
-                  currentController!
-                      .jumpTo(currentController!.position.maxScrollExtent);
+        successBuilder: (_, snapshot) {
+          if (_dataClearQueued) _clearData();
+          // Handle Scroll To End Requests
+          WidgetsBinding.instance!.addPostFrameCallback((_) async {
+            if (_scrollToEndQueued) {
+              while (currentController!.position.pixels <
+                  currentController!.position.maxScrollExtent) {
+                currentController!
+                    .jumpTo(currentController!.position.maxScrollExtent);
 
-                  // TODO: Evil hack to wait for new contents to load
-                  await Future.delayed(Duration(milliseconds: 100));
-                }
-                if (_isEnded) _scrollToEndQueued = false;
+                // TODO: Evil hack to wait for new contents to load
+                await Future.delayed(Duration(milliseconds: 100));
               }
-            });
-            _isRefreshing = false;
-            _hasError = false;
-
-            // Process with [noneItem]
-            if (snapshot.data!.length == 1 &&
-                widget.noneItem != null &&
-                snapshot.data!.single == widget.noneItem) {
-              return _buildListView();
+              if (_isEnded) _scrollToEndQueued = false;
             }
+          });
+          _isRefreshing = false;
+          _hasError = false;
 
-            if (snapshot.data!.isEmpty ||
-                _data.isEmpty ||
-                snapshot.data!.last != _data.last) {
-              _data.addAll(snapshot.data!);
-              // Update value keys
-              valueKeys.addAll(List.generate(snapshot.data!.length,
-                  (index) => StateKey(snapshot.data![index])));
-            }
-            if (snapshot.data!.isEmpty) _isEnded = true;
-            return _buildListView(snapshot: snapshot);
+          // Process with [noneItem]
+          if (snapshot.data!.length == 1 &&
+              widget.noneItem != null &&
+              snapshot.data!.single == widget.noneItem) {
+            return _buildListView();
           }
+
+          if (snapshot.data!.isEmpty ||
+              _data.isEmpty ||
+              snapshot.data!.last != _data.last) {
+            _data.addAll(snapshot.data!);
+            // Update value keys
+            valueKeys.addAll(List.generate(snapshot.data!.length,
+                (index) => StateKey(snapshot.data![index])));
+          }
+          if (snapshot.data!.isEmpty) _isEnded = true;
+          return _buildListView();
+        },
+        errorBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
+          if (_dataClearQueued) _clearData();
+          _hasError = true;
+          _isRefreshing = false;
           return _buildListView(snapshot: snapshot);
+        },
+        loadingBuilder: (BuildContext context) {
+          return _buildListView();
         });
   }
 
-  Widget _errorBuilder(AsyncSnapshot<List<T>?>? snapshot) {
+  Widget _errorBuilder(AsyncSnapshot<List<T>>? snapshot) {
     String error;
+
     if (snapshot == null)
       error = "Unknown Error";
     else {
@@ -234,6 +235,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       else
         error = snapshot.error.toString().trim();
     }
+
     return Card(
       child: GestureDetector(
         child: Padding(
@@ -265,7 +267,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  Widget _buildListView({AsyncSnapshot<List<T>?>? snapshot}) {
+  Widget _buildListView({AsyncSnapshot<List<T>>? snapshot}) {
     // Show an empty indicator if there's no data at all.
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
       // Tell the listView not to try to load anymore.
@@ -296,7 +298,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  _getListItemAt(int index, AsyncSnapshot<List<T>?>? snapshot) {
+  _getListItemAt(int index, AsyncSnapshot<List<T>>? snapshot) {
     if (_hasHeadWidget) {
       if (index == 0) {
         return widget.headBuilder!(context);
@@ -321,7 +323,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   // Move things into a separate function to control reload more easily
-  Future<List<T>?> _setFuture({useInitialData = true}) {
+  Future<List<T>> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
@@ -497,7 +499,7 @@ typedef IndexedDataWidgetBuilder<T> = Widget Function(
     BuildContext context, ListProvider<T> dataProvider, int index, T data);
 
 /// Retrieve data function
-typedef DataReceiver<T> = Future<List<T>?> Function(int pageIndex);
+typedef DataReceiver<T> = Future<List<T>> Function(int pageIndex);
 
 /// Notify refreshing callback
 typedef RefreshListener = void Function();
