@@ -42,6 +42,7 @@ import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -342,21 +343,21 @@ class _BBSSubpageState extends State<BBSSubpage>
   _goToPIDResultPage(int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
-    final BBSPost post = await PostRepository.getInstance()
-        .loadSpecificDiscussion(pid)
-        .onError((dynamic error, stackTrace) {
-          if (error.response?.statusCode == HttpStatus.notFound)
-            Noticing.showNotice(context, S.of(context).post_does_not_exist,
-                title: S.of(context).fatal_error);
-          else
-            Noticing.showNotice(context, error.toString(),
-                title: S.of(context).fatal_error);
-          progressDialog.dismiss();
-          return null;
-        } as FutureOr<BBSPost> Function(Error, StackTrace));
-    smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-      "post": post,
-    });
+    try {
+      final BBSPost post =
+          await PostRepository.getInstance().loadSpecificDiscussion(pid);
+      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+        "post": post,
+      });
+    } catch (error) {
+      if (error is DioError &&
+          error.response?.statusCode == HttpStatus.notFound)
+        Noticing.showNotice(context, S.of(context).post_does_not_exist,
+            title: S.of(context).fatal_error);
+      else
+        Noticing.showNotice(context, error.toString(),
+            title: S.of(context).fatal_error);
+    }
     progressDialog.dismiss();
   }
 

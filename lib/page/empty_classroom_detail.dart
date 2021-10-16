@@ -247,7 +247,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                     7,
                                 child: Text(
                                   "| " + S.of(context).morning,
-                                  overflow: TextOverflow.fade,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               Container(
@@ -260,7 +261,8 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                     7,
                                 child: Text(
                                   "| " + S.of(context).afternoon,
-                                  overflow: TextOverflow.fade,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               Container(
@@ -272,16 +274,15 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                     3,
                                 child: Text(
                                   "| " + S.of(context).evening,
-                                  overflow: TextOverflow.fade,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
                         ]),
                     Divider(),
-                  ]
-                      //subtitle: Divider(height: 5,),
-                      ),
+                  ]),
                 ),
                 Expanded(
                   child: FutureWidget<List<RoomInfo>?>(
@@ -293,14 +294,12 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                               selectDate),
                       successBuilder: (BuildContext context,
                               AsyncSnapshot<dynamic> snapshot) =>
-                          Expanded(
-                              child: WithScrollbar(
-                            controller: PrimaryScrollController.of(context),
-                            child: ListView(
-                              primary: true,
-                              children: _getListWidgets(snapshot.data),
-                            ),
-                          )),
+                          WithScrollbar(
+                              controller: PrimaryScrollController.of(context),
+                              child: ListView(
+                                primary: true,
+                                children: _getListWidgets(snapshot.data),
+                              )),
                       errorBuilder: (_, snapShot) => _buildErrorWidget(),
                       loadingBuilder: _buildLoadingWidget()),
                 )
