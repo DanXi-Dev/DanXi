@@ -114,13 +114,13 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   ///
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
-  Future<List<ExamScore>> loadAllExamScore(PersonInfo? info) =>
+  Future<List<ExamScore>?> loadAllExamScore(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadAllExamScore(),
           (exception) =>
               UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
 
-  Future<List<ExamScore>> _loadAllExamScore() async {
+  Future<List<ExamScore>?> _loadAllExamScore() async {
     Response r = await dio!.get(SCORE_DETAIL_URL);
     BeautifulSoup soup = BeautifulSoup(r.data.toString());
     DOM.Element tableBody = soup.find("tbody")!.element!;

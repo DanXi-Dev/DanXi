@@ -80,14 +80,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
+  Future<List<ExamScore>?> loadExamScoreRemotely(PersonInfo? info,
           {String? semesterId}) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamScore(semesterId),
           (exception) => UISLoginTool.loginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
-  Future<List<ExamScore>> _loadExamScore([String? semesterId]) async {
+  Future<List<ExamScore>?> _loadExamScore([String? semesterId]) async {
     final Response r = await dio!.get(
         kExamScoreUrl(semesterId ??
             (await cookieJar!.loadForRequest(Uri.parse(HOST)))

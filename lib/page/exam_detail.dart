@@ -180,7 +180,7 @@ class _ExamListState extends State<ExamList> {
                 errorBuilder: _loadGradeViewFromDataCenter)));
   }
 
-  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
+  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>?>(
         future: _examList,
         successBuilder: (_, snapShot) {
           _data = snapShot.data!;
@@ -215,7 +215,7 @@ class _ExamListState extends State<ExamList> {
             child: PlatformCircularProgressIndicator(),
           ),
           errorBuilder:
-              (BuildContext context, AsyncSnapshot<List<ExamScore>> snapshot) {
+              (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
             if (snapshot.error is RangeError)
               return Padding(
                 child: Center(
@@ -327,7 +327,7 @@ class _ExamListState extends State<ExamList> {
               );
             },
             errorBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>> snapShot) {
+                AsyncSnapshot<List<GPAListItem>?> snapShot) {
               return Container();
             },
             loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
@@ -343,7 +343,7 @@ class _ExamListState extends State<ExamList> {
                   style: TextStyle(color: ThemeData.dark().hintColor));
             },
             errorBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>> snapShot) {
+                AsyncSnapshot<List<GPAListItem>?> snapShot) {
               return Text(S.of(context).failed);
             },
             loadingBuilder: (_, __) => Text(S.of(context).loading),

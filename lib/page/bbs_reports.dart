@@ -112,8 +112,8 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<Report>> _loadContent(int page) {
-    return PostRepository.getInstance().adminGetReports(page);
+  Future<List<Report>?> _loadContent(int page) async {
+    return await PostRepository.getInstance().adminGetReports(page);
   }
 
   @override
