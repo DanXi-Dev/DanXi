@@ -204,7 +204,7 @@
     "clear_cache": "FDUHole: Clear Image Cache",
     "clear_cache_description": "Images will reload next time you view them",
     "cache_cleared": "Cached cleared",
-
+    "exam_unavailable": "Exam Data Unavailable",
 
     "fold": "Fold",
     "hide": "Hide",

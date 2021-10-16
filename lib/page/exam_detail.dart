@@ -50,9 +50,9 @@ class ExamList extends StatefulWidget {
 }
 
 class _ExamListState extends State<ExamList> {
-  List<Exam>? _data = [];
+  List<Exam> _data = [];
   PersonInfo? _info;
-  Future<List<Exam>?>? _examList;
+  Future<List<Exam>>? _examList;
   Future<List<GPAListItem>?>? _gpaList;
   List<GPAListItem>? _gpa;
 
@@ -73,8 +73,13 @@ class _ExamListState extends State<ExamList> {
   }
 
   void _exportICal() async {
+    if (_data.isEmpty) {
+      Noticing.showNotice(context, S.of(context).exam_unavailable,
+          title: S.of(context).fatal_error);
+      return;
+    }
     ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
-    _data?.forEach((element) {
+    _data.forEach((element) {
       if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty)
         try {
           cal.addElement(IEvent(
@@ -175,10 +180,10 @@ class _ExamListState extends State<ExamList> {
                 errorBuilder: _loadGradeViewFromDataCenter)));
   }
 
-  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>?>(
+  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>>(
         future: _examList,
         successBuilder: (_, snapShot) {
-          _data = snapShot.data;
+          _data = snapShot.data!;
           return Column(
             children: [
               Expanded(

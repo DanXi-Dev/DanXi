@@ -95,7 +95,6 @@ class UISLoginTool {
       CaptchaNeededException().fire();
       throw CaptchaNeededException();
     } else if (response.data.toString().contains(WEAK_PASSWORD)) {
-      //TODO: Actually, the response (looks like) always contains Weak Password Warning if login is unsuccessful. We should modify this later.
       throw GeneralLoginFailedException();
     }
 

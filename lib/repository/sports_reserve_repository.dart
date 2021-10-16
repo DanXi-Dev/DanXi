@@ -23,7 +23,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/src/response.dart';
 import 'package:html/dom.dart' as DOM;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

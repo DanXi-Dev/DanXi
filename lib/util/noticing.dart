@@ -47,10 +47,12 @@ class Noticing {
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: title == null ? null : Text(title),
-                content: Linkify(
-                  text: message,
-                  onOpen: (element) =>
-                      BrowserUtil.openUrl(element.url, context),
+                content: Center(
+                  child: Linkify(
+                    text: message,
+                    onOpen: (element) =>
+                        BrowserUtil.openUrl(element.url, context),
+                  ),
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(

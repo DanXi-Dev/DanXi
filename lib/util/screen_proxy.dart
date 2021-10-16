@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:flutter/services.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class ScreenProxy {

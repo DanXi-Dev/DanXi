@@ -258,7 +258,6 @@ class _BBSSubpageState extends State<BBSSubpage>
 
         List<BBSPost> loadedPost = await PostRepository.getInstance()
             .loadDiscussions(page, _sortOrder);
-        debugPrint("Loaded");
         // Filter blocked posts
         List<PostTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
