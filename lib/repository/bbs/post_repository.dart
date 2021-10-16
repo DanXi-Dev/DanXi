@@ -662,15 +662,15 @@ class PostRepository extends BaseRepositoryWithDio {
     return result.map((e) => BBSPost.fromJson(e)).toList();
   }
 
-  Future<BBSPost> loadSpecificDiscussion(int? disscussionId) async {
+  Future<BBSPost> loadSpecificDiscussion(int? discussionId) async {
     Response response = await dio!.get(_BASE_URL + "/discussions/",
-        queryParameters: {"discussion_id": disscussionId.toString()},
+        queryParameters: {"discussion_id": discussionId.toString()},
         options: Options(headers: _tokenHeader));
     return BBSPost.fromJson(response.data);
   }
 
   Future<List<BBSPost>> loadTagFilteredDiscussions(
-      String? tag, SortOrder? sortBy, int page) async {
+      String tag, SortOrder sortBy, int page) async {
     try {
       final response = await dio!.get(_BASE_URL + "/discussions/",
           queryParameters: {

@@ -246,18 +246,20 @@ class _BBSSubpageState extends State<BBSSubpage>
       _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior;
       if (_tagFilter != null)
         return await PostRepository.getInstance()
-            .loadTagFilteredDiscussions(_tagFilter, _sortOrder, page);
-      else if (widget.arguments?.containsKey('showFavoredDiscussion') == true) {
+            .loadTagFilteredDiscussions(_tagFilter!, _sortOrder!, page);
+      else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
+          false) {
         if (page > 1) return Future.value([]);
         return await PostRepository.getInstance().getFavoredDiscussions();
       } else {
         if (!PostRepository.getInstance().isUserInitialized)
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value);
-        // Filter blocked posts
+
         List<BBSPost>? loadedPost = await PostRepository.getInstance()
             .loadDiscussions(page, _sortOrder);
         print("load successful");
+        // Filter blocked posts
         List<PostTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
         loadedPost.removeWhere((element) => element.tag!.any((thisTag) =>
@@ -301,11 +303,14 @@ class _BBSSubpageState extends State<BBSSubpage>
           if (value.startsWith(pidPattern)) {
             // We needn't deal with the situation that "id = null" here.
             // If so, it will turn into a 404 http error.
-            _goToPIDResultPage(
-                int.tryParse(pidPattern.firstMatch(value)![0]!.substring(1)));
-          } else
-            smartNavigatorPush(context, "/bbs/postDetail",
-                arguments: {"searchKeyword": value});
+            try {
+              _goToPIDResultPage(
+                  int.parse(pidPattern.firstMatch(value)![0]!.substring(1)));
+              return;
+            } catch (ignored) {}
+          }
+          smartNavigatorPush(context, "/bbs/postDetail",
+              arguments: {"searchKeyword": value});
         },
       ),
     );
@@ -336,7 +341,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
   }
 
-  _goToPIDResultPage(int? pid) async {
+  _goToPIDResultPage(int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     final BBSPost post = await PostRepository.getInstance()

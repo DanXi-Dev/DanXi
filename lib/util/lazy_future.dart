@@ -20,12 +20,12 @@ import 'dart:async';
 /// [LazyFuture] will NEVER throw an unhandled error when it is thrown by the async method but not caught.
 /// Instead, [LazyFuture] will throw the error immediately after having an error handler
 /// (i.e. .then() and .catchError()).
-class LazyFuture<T> implements Future<T?> {
-  late Future<T?> _thisFuture;
+class LazyFuture<T> implements Future<T> {
+  late Future<T> _thisFuture;
   dynamic _error;
   dynamic _stackTrace;
 
-  LazyFuture.pack(Future<T?> future) {
+  LazyFuture.pack(Future<T> future) {
     _thisFuture = future.catchError((error, stackTrace) {
       _error = error;
       _stackTrace = stackTrace;
@@ -33,10 +33,10 @@ class LazyFuture<T> implements Future<T?> {
   }
 
   @override
-  Stream<T?> asStream() => _thisFuture.asStream();
+  Stream<T> asStream() => _thisFuture.asStream();
 
   @override
-  Future<T?> catchError(Function onErr, {bool Function(Object error)? test}) =>
+  Future<T> catchError(Function onErr, {bool Function(Object error)? test}) =>
       _error != null
           ? Future<T>.error(_error, _stackTrace).onError(
               onErr as FutureOr<T> Function(Error, StackTrace),
@@ -46,19 +46,17 @@ class LazyFuture<T> implements Future<T?> {
               test: test);
 
   @override
-  Future<R> then<R>(FutureOr<R> Function(T? value) onValue,
+  Future<R> then<R>(FutureOr<R> Function(T value) onValue,
           {Function? onError}) =>
       _error != null
-          ? Future<T?>.error(_error, _stackTrace)
-              .then(onValue, onError: onError)
+          ? Future<T>.error(_error, _stackTrace).then(onValue, onError: onError)
           : _thisFuture.then(onValue, onError: onError);
 
   @override
-  Future<T?> timeout(Duration timeLimit,
-          {FutureOr<T?> Function()? onTimeout}) =>
+  Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) =>
       _thisFuture.timeout(timeLimit, onTimeout: onTimeout);
 
   @override
-  Future<T?> whenComplete(FutureOr<void> Function() action) =>
+  Future<T> whenComplete(FutureOr<void> Function() action) =>
       _thisFuture.whenComplete(action);
 }
