@@ -62,7 +62,7 @@ class _BusPageState extends State<BusPage> {
   // Set this to true to display all buses
   bool _showAll = false;
 
-  Future<List<BusScheduleItem>> _setContent() async {
+  Future<List<BusScheduleItem>?> _setContent() async {
     List<BusScheduleItem>? content;
     if (_holidaySliding == 1) {
       content = _busListHolidayLoaded = await _busListHoliday;
@@ -72,7 +72,7 @@ class _BusPageState extends State<BusPage> {
     return _filterBus(content!);
   }
 
-  Widget _buildFutureWidget() => FutureWidget(
+  Widget _buildFutureWidget() => FutureWidget<List<BusScheduleItem>?>(
       future: _setContent(),
       successBuilder: (context, snapshot) {
         return ListView(

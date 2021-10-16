@@ -315,7 +315,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _autoAdminNotice() {
-    return FutureWidget(
+    return FutureWidget<bool?>(
       future: PostRepository.getInstance().isUserAdmin(),
       successBuilder: (context, snapshot) {
         if (snapshot.data as bool) {

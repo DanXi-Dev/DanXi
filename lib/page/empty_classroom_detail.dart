@@ -284,7 +284,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                       ),
                 ),
                 Expanded(
-                  child: FutureWidget(
+                  child: FutureWidget<List<RoomInfo>?>(
                       future: EmptyClassroomRepository.getInstance()
                           .getBuildingRoomInfo(
                               _personInfo,

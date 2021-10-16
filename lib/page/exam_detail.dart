@@ -206,7 +206,7 @@ class _ExamListState extends State<ExamList> {
       );
 
   Widget _loadGradeView() => GestureDetector(
-      child: FutureWidget<List<ExamScore>>(
+      child: FutureWidget<List<ExamScore>?>(
           future: EduServiceRepository.getInstance().loadExamScoreRemotely(
               _info,
               semesterId: _unpackedSemester![_showingSemester!].semesterId),
@@ -228,7 +228,7 @@ class _ExamListState extends State<ExamList> {
             return _loadGradeViewFromDataCenter();
           }));
 
-  Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>> snapshot,
+  Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
           {bool isFallback = false}) =>
       Column(
         children: [
@@ -248,7 +248,7 @@ class _ExamListState extends State<ExamList> {
 
   Widget _loadGradeViewFromDataCenter() {
     return GestureDetector(
-        child: FutureWidget<List<ExamScore>>(
+        child: FutureWidget<List<ExamScore>?>(
             future: DataCenterRepository.getInstance().loadAllExamScore(_info),
             successBuilder: (_, snapShot) =>
                 _buildGradeLayout(snapShot, isFallback: true),
@@ -360,8 +360,8 @@ class _ExamListState extends State<ExamList> {
       _buildDividerWithText(S.of(context).other_types_exam,
           Theme.of(context).textTheme.bodyText1!.color)
     ]; //These widgets are displayed after the ones above
-    if (_data == null) return widgets;
-    _data!.forEach((Exam value) {
+    if (_data.isEmpty) return widgets;
+    _data.forEach((Exam value) {
       if (value.testCategory.trim() == "论文" ||
           value.testCategory.trim() == "其他")
         secondaryWidgets.add(_buildCardHybrid(value, context));
@@ -429,7 +429,7 @@ class _ExamListState extends State<ExamList> {
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: FutureWidget<List<ExamScore>>(
+                  child: FutureWidget<List<ExamScore>?>(
                     future: EduServiceRepository.getInstance()
                         .loadExamScoreRemotely(_info,
                             semesterId: _unpackedSemester![_showingSemester!]

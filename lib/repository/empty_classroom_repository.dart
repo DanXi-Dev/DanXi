@@ -41,7 +41,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   /// Get [RoomInfo]s at [buildingName] on [date].
   ///
   /// Request [PersonInfo] for logging in, if necessary.
-  Future<List<RoomInfo>> getBuildingRoomInfo(PersonInfo? info, String areaName,
+  Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
       String? buildingName, DateTime? date) async {
     // To accelerate the retrieval of RoomInfo,
     // only execute logging in when necessary.

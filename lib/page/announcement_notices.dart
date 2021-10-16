@@ -75,7 +75,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
           )
         ],
       ),
-      body: FutureWidget(
+      body: FutureWidget<bool?>(
         future: AnnouncementRepository.getInstance().loadData(),
         successBuilder: (_, snapShot) {
           _data = _showingLatest

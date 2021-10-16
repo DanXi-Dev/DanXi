@@ -95,7 +95,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   ///The week it's showing on the time table.
   TimeNow? _showingTime;
 
-  Future? _content;
+  Future<TimeTable?>? _content;
 
   bool _loadFromRemote = false;
 
@@ -215,7 +215,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return FutureWidget(
+    return FutureWidget<TimeTable?>(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return _buildPage(snapshot.data);
       },

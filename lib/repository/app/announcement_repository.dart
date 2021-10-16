@@ -34,7 +34,7 @@ class AnnouncementRepository {
   factory AnnouncementRepository.getInstance() => _instance;
   List<Announcement>? _announcementCache;
 
-  Future<bool> loadData() async {
+  Future<bool?> loadData() async {
     BmobQuery query = BmobQuery<Announcement>().setOrder("-createdAt");
     _announcementCache = (await query.queryObjects())!
         .map<Announcement>((e) => Announcement.fromJson(e))
