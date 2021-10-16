@@ -679,7 +679,7 @@ class PostRepository extends BaseRepositoryWithDio {
             "page": page,
           },
           options: Options(headers: _tokenHeader));
-      final result = response.data;
+      final List result = response.data;
       return result.map((e) => BBSPost.fromJson(e)).toList();
     } catch (error) {
       if (error is DioError && error.response?.statusCode == 401) {
@@ -706,17 +706,17 @@ class PostRepository extends BaseRepositoryWithDio {
     // Search results only have a single page.
     // Return nothing if [page] > 1.
     if (page > 1) return Future.value([]);
-    Response response = await dio!.get(_BASE_URL + "/posts/",
+    final Response response = await dio!.get(_BASE_URL + "/posts/",
         queryParameters: {"search": searchString, "page": page},
         options: Options(headers: _tokenHeader));
-    List result = response.data;
+    final List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
   }
 
   Future<List<PostTag>> loadTags() async {
-    Response response = await dio!
+    final Response response = await dio!
         .get(_BASE_URL + "/tags/", options: Options(headers: _tokenHeader));
-    List result = response.data;
+    final List result = response.data;
     return result.map((e) => PostTag.fromJson(e)).toList();
   }
 
@@ -724,7 +724,7 @@ class PostRepository extends BaseRepositoryWithDio {
     if (content == null) return 0;
     if (tags == null) tags = [];
     // Suppose user is logged in. He should be.
-    Response response = await dio!.post(_BASE_URL + "/discussions/",
+    final Response response = await dio!.post(_BASE_URL + "/discussions/",
         data: {
           "content": content,
           "tags": tags.map((e) => e.toJson()).toList()
@@ -748,7 +748,7 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Future<int?> newReply(int? discussionId, int? postId, String content) async {
     // Suppose user is logged in. He should be.
-    Response response = await dio!.post(_BASE_URL + "/posts/",
+    final Response response = await dio!.post(_BASE_URL + "/posts/",
         data: {
           "content": content,
           "discussion_id": discussionId,
@@ -760,7 +760,7 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Future<int?> reportPost(int? postId, String reason) async {
     // Suppose user is logged in. He should be.
-    Response response = await dio!.post(_BASE_URL + "/reports/",
+    final Response response = await dio!.post(_BASE_URL + "/reports/",
         data: {"post_id": postId, "reason": reason},
         options: Options(headers: _tokenHeader));
     return response.statusCode;
