@@ -81,26 +81,13 @@ import WatchConnectivity
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             switch (call.method) {
             case "request_notification_permission":
-                if #available(iOS 10.0, *) {
-                    let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-                    UNUserNotificationCenter.current().requestAuthorization(
-                        options: authOptions,
-                        completionHandler: {_, _ in })
-                    UNUserNotificationCenter.current().delegate = self
-                } else {
-                    let settings: UIUserNotificationSettings =
-                    UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-                    application.registerUserNotificationSettings(settings)
-                }
+                break
             case "send_token":
                 self.sendString(text: call.arguments as! String)
             default:
                 break
             }
         })
-        
-        /* APNS support */
-        application.registerForRemoteNotifications()
         
         /* watchOS Support */
         if(WCSession.isSupported()){
