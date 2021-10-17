@@ -29,7 +29,7 @@ import 'package:flutter/widgets.dart';
 /// 2. Add it to [_HomeSubpageState.widgetMap] in [HomeSubpage],
 ///   whose initialization you will find at [_HomeSubpageState._rebuild].
 /// 3. Insert it at a appropriate position to [SettingsProvider._kDefaultDashboardCardList] in [SettingsProvider].
-///
+/// 4. Also add it to [DashboardReorderPage._getListWidgets].
 abstract class Feature {
   /// Request FeatureContainer to update the content text/icon since they're changed
   @nonVirtual

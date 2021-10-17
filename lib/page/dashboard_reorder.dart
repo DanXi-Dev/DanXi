@@ -193,7 +193,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             sequence!.removeAt(index);
             SettingsProvider.getInstance().dashboardWidgetsSequence = sequence;
             RefreshHomepageEvent(queueRefresh: true).fire();
-            setState(() {});
+            refreshSelf();
           },
         ));
       }
@@ -219,7 +219,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                   SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
                   RefreshHomepageEvent(queueRefresh: true).fire();
-                  setState(() {});
+                  refreshSelf();
                 },
                 value: sequence![index].enabled,
               ),

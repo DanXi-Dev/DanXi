@@ -142,7 +142,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 PlatformWidget(
                     material: (_, __) => TagContainer(
                         fillRandomColor: false,
-                        fixedColor: Colors.purple,
+                        fixedColor: Theme.of(context).accentColor,
                         fontSize: 12,
                         enabled: true,
                         wrapped: false,
@@ -177,7 +177,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 PlatformWidget(
                     material: (_, __) => TagContainer(
                         fillRandomColor: false,
-                        fixedColor: Colors.blue,
+                        fixedColor: Theme.of(context).accentColor,
                         fontSize: 16,
                         wrapped: false,
                         enabled: true,

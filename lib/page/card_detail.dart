@@ -32,7 +32,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:intl/intl.dart';
 
 class CardDetailPage extends StatefulWidget {
@@ -81,7 +80,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       body: Column(children: [
         TagContainer(
             fillRandomColor: false,
-            fixedColor: Colors.purple,
+            fixedColor: Theme.of(context).accentColor,
             fontSize: 16,
             enabled: _selectable,
             singleChoice: true,
@@ -91,7 +90,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
               if (index >= 0) {
                 // Make the tags not clickable when data's being retrieved
                 setState(() {
-                  tag.checkedIcon = PlatformX.isAndroid
+                  tag.checkedIcon = PlatformX.isMaterial(context)
                       ? Icons.pending
                       : CupertinoIcons.hourglass;
                   _selectable = false;
@@ -100,7 +99,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                     CardRepository.getInstance()
                         .loadCardRecord(_tagDays[index]));
                 setState(() {
-                  tag.checkedIcon = PlatformX.isAndroid
+                  tag.checkedIcon = PlatformX.isMaterial(context)
                       ? Icons.check
                       : CupertinoIcons.checkmark;
                   _selectable = true;

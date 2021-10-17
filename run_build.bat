@@ -35,17 +35,17 @@ cd ..\..\..\..\
 echo.
 
 :build_app_bundle
-echo Build for App Bundle (Google Play Distribution)...
-echo.
-echo Ensure that you have choose your signing key in android/key.properties.
-echo.
-echo Press any key to continue.
-pause
-echo Clean old files...
-del /Q build\app\DanXi-%version_code%-release.android.aab
-start /WAIT cmd /C flutter build appbundle
-echo Move file...
-move build\app\outputs\bundle\release\app-release.aab build\app\DanXi-%version_code%-release.android.aab
+REM echo Build for App Bundle (Google Play Distribution)...
+REM echo.
+REM echo Ensure that you have choose your signing key in android/key.properties.
+REM echo.
+REM echo Press any key to continue.
+REM pause
+REM echo Clean old files...
+REM del /Q build\app\DanXi-%version_code%-release.android.aab
+REM start /WAIT cmd /C flutter build appbundle
+REM echo Move file...
+REM move build\app\outputs\bundle\release\app-release.aab build\app\DanXi-%version_code%-release.android.aab
 
 :end_success
 echo Build success.
