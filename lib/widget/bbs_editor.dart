@@ -56,7 +56,7 @@ class BBSEditor {
         context, S.of(context).new_post,
         allowTags: true, editorType: editorType, object: object);
     if (content?.text == null) return false;
-    final success = await (PostRepository.getInstance()
+    final int? success = await PostRepository.getInstance()
         .newPost(content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
       if (error is DioError)
@@ -64,7 +64,7 @@ class BBSEditor {
       Noticing.showNotice(context, error.toString(),
           title: S.of(context).post_failed, useSnackBar: false);
       return -1;
-    }) as FutureOr<int>);
+    });
     if (success == -1) return false;
     StateProvider.editorCache.remove(object);
     return true;
@@ -73,7 +73,7 @@ class BBSEditor {
   static Future<void> createNewReply(
       BuildContext context, int? discussionId, int? postId,
       {BBSEditorType? editorType}) async {
-    final object = (discussionId == null
+    final object = (postId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
         : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
     final String? content = (await _showEditor(
@@ -94,9 +94,7 @@ class BBSEditor {
             title: S.of(context).reply_failed(error.type), useSnackBar: false);
       } else {
         Noticing.showNotice(context, S.of(context).reply_failed(error),
-            title: S
-                .of(context)
-                .fatal_error, useSnackBar: false);
+            title: S.of(context).fatal_error, useSnackBar: false);
       }
       return -1;
     });
