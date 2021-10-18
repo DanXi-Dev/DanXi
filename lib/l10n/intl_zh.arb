@@ -260,6 +260,14 @@
     "weak_password": "登录失败，未知错误\n请注意：目前旦夕不支持弱密码登录，如果UIS在登录时提示弱密码，请修改密码后重试。",
     "fail_to_acquire_qr": "无法获取复活码，请确保您已在eHall中开通复活码。",
 
+    "w568w_description":"旦夕创建者 & 开发者",
+    "kavinzhao_description":"旦夕开发者 & 树洞后端",
+    "KYLN24_description":"树洞前端",
+    "hasbai_description":"树洞创建者 & 开发者",
+    "Dest1n1_description":"树洞前端",
+    "Frankstein73_description":"旦夕开发者",
+    "ivanfei_description":"树洞前端",
+
     "moment_ago":"刚刚",
     "second_ago":"{num}秒前",
     "minute_ago":"{num}分钟前",

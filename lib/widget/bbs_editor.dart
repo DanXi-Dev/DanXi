@@ -85,7 +85,7 @@ class BBSEditor {
             object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
-    final success = await (PostRepository.getInstance()
+    final success = await PostRepository.getInstance()
         .newReply(discussionId, postId, content)
         .onError((dynamic error, stackTrace) {
       if (error is DioError) {
@@ -94,10 +94,13 @@ class BBSEditor {
             title: S.of(context).reply_failed(error.type), useSnackBar: false);
       } else {
         Noticing.showNotice(context, S.of(context).reply_failed(error),
-            title: S.of(context).fatal_error, useSnackBar: false);
+            title: S
+                .of(context)
+                .fatal_error, useSnackBar: false);
       }
       return -1;
-    }) as FutureOr<int>);
+    });
+    debugPrint("Success: $success");
     if (success == -1) return;
     StateProvider.editorCache.remove(object);
   }

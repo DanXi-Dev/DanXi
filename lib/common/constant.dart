@@ -18,6 +18,7 @@
 import 'dart:math';
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,8 +44,45 @@ class Constant {
   static const String UIS_HOST = "uis.fudan.edu.cn";
   static const FUDAN_DAILY_COUNTDOWN_SECONDS = 5;
 
+  static List<Developer> getDevelopers(BuildContext context) {
+    return [
+      Developer(
+          "w568w", "assets/graphics/w568w.jpeg", "https://github.com/w568w", S
+          .of(context)
+          .w568w_description),
+      Developer("kavinzhao", "assets/graphics/kavinzhao.jpeg",
+          "https://github.com/kavinzhao", S
+              .of(context)
+              .kavinzhao_description),
+      Developer(
+          "KYLN24", "assets/graphics/kyln24.jpeg", "https://github.com/KYLN24",
+          S
+              .of(context)
+              .KYLN24_description),
+      Developer(
+          "hasbai", "assets/graphics/hasbai.jpeg", "https://github.com/hasbai",
+          S
+              .of(context)
+              .hasbai_description),
+      Developer("Dest1n1", "assets/graphics/Dest1n1.jpg",
+          "https://github.com/dest1n1s", S
+              .of(context)
+              .Dest1n1_description),
+      Developer("Frankstein73", "assets/graphics/Frankstein73.jpg",
+          "https://github.com/Frankstein73", S
+              .of(context)
+              .Frankstein73_description),
+      Developer("Ivan Fei", "assets/graphics/ivanfei.jpg",
+          "https://github.com/ivanfei-1", S
+              .of(context)
+              .ivanfei_description),
+    ];
+  }
+
   static String yuanSymbol(String? num) {
-    if (num == null || num.trim().isEmpty) return "";
+    if (num == null || num
+        .trim()
+        .isEmpty) return "";
     return '\u00A5' + num;
   }
 

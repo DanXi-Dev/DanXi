@@ -617,15 +617,22 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   Card _buildAboutCard() {
     final inAppReview = InAppReview.instance;
-    final Color _originalDividerColor = Theme.of(context).dividerColor;
+    final Color _originalDividerColor = Theme
+        .of(context)
+        .dividerColor;
     double _avatarSize =
-        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 4;
-    const double _avatarNameSpacing = 4;
-    TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
-    TextStyle linkText = Theme.of(context)
+        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 5;
+    TextStyle? defaultText = Theme
+        .of(context)
+        .textTheme
+        .bodyText2;
+    TextStyle linkText = Theme
+        .of(context)
         .textTheme
         .bodyText2!
-        .copyWith(color: Theme.of(context).accentColor);
+        .copyWith(color: Theme
+        .of(context)
+        .accentColor);
     return Card(
         child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -668,45 +675,49 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               RichText(
                                   text: TextSpan(children: [
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S
-                                      .of(context)
-                                      .terms_and_conditions_content,
-                                ),
-                                TextSpan(
-                                    style: linkText,
-                                    text: S.of(context).privacy_policy,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () async {
-                                        await BrowserUtil.openUrl(
-                                            S.of(context).privacy_policy_url,
-                                            context);
-                                      }),
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S
-                                      .of(context)
-                                      .terms_and_conditions_content_end,
-                                ),
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S.of(context).view_ossl,
-                                ),
-                                TextSpan(
-                                    style: linkText,
-                                    text: S
-                                        .of(context)
-                                        .open_source_software_licenses,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        smartNavigatorPush(
-                                            context, "/about/openLicense",
-                                            arguments: {
-                                              "items": _LICENSE_ITEMS
-                                            });
-                                      }),
-                              ])),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S
+                                          .of(context)
+                                          .terms_and_conditions_content,
+                                    ),
+                                    TextSpan(
+                                        style: linkText,
+                                        text: S
+                                            .of(context)
+                                            .privacy_policy,
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () =>
+                                              BrowserUtil.openUrl(
+                                                  S
+                                                      .of(context)
+                                                      .privacy_policy_url,
+                                                  context)),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S
+                                          .of(context)
+                                          .terms_and_conditions_content_end,
+                                    ),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S
+                                          .of(context)
+                                          .view_ossl,
+                                    ),
+                                    TextSpan(
+                                        style: linkText,
+                                        text: S
+                                            .of(context)
+                                            .open_source_software_licenses,
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () =>
+                                              smartNavigatorPush(
+                                                  context, "/about/openLicense",
+                                                  arguments: {
+                                                    "items": _LICENSE_ITEMS
+                                                  })),
+                                  ])),
 
                               const SizedBox(
                                 height: 16,
@@ -722,26 +733,31 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               RichText(
                                   text: TextSpan(children: [
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S.of(context).acknowledgements_1,
-                                ),
-                                TextSpan(
-                                    style: linkText,
-                                    text: S.of(context).acknowledgement_name_1,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () async {
-                                        await BrowserUtil.openUrl(
-                                            S
-                                                .of(context)
-                                                .acknowledgement_link_1,
-                                            context);
-                                      }),
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S.of(context).acknowledgements_2,
-                                ),
-                              ])),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S
+                                          .of(context)
+                                          .acknowledgements_1,
+                                    ),
+                                    TextSpan(
+                                        style: linkText,
+                                        text: S
+                                            .of(context)
+                                            .acknowledgement_name_1,
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () =>
+                                              BrowserUtil.openUrl(
+                                                  S
+                                                      .of(context)
+                                                      .acknowledgement_link_1,
+                                                  context)),
+                                    TextSpan(
+                                      style: defaultText,
+                                      text: S
+                                          .of(context)
+                                          .acknowledgements_2,
+                                    ),
+                                  ])),
 
                               const SizedBox(
                                 height: 16,
@@ -749,141 +765,49 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
                               // Authors
                               Text(
-                                S.of(context).authors,
+                                S
+                                    .of(context)
+                                    .authors,
                                 textScaleFactor: 1.1,
                               ),
                               Divider(
                                 color: _originalDividerColor,
                               ),
                               const SizedBox(
-                                height: 5,
+                                height: 4,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new AssetImage(S
-                                                        .of(context)
-                                                        .dev_image_url_1)))),
-                                        onTap: () => BrowserUtil.openUrl(
-                                            S.of(context).dev_page_1, context),
-                                      ),
-                                      const SizedBox(
-                                          height: _avatarNameSpacing),
-                                      Text(
-                                        S.of(context).dev_name_1,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new AssetImage(S
-                                                        .of(context)
-                                                        .dev_image_url_2)))),
-                                        onTap: () => BrowserUtil.openUrl(
-                                            S.of(context).dev_page_2, context),
-                                      ),
-                                      const SizedBox(
-                                          height: _avatarNameSpacing),
-                                      Text(
-                                        S.of(context).dev_name_2,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new AssetImage(S
-                                                        .of(context)
-                                                        .dev_image_url_3)))),
-                                        onTap: () {
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: Constant.getDevelopers(context)
+                                    .map((e) =>
+                                    ListTile(
+                                      leading: Container(
+                                          width: _avatarSize,
+                                          height: _avatarSize,
+                                          decoration: new BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: new DecorationImage(
+                                                  fit: BoxFit.fill,
+                                                  image: new AssetImage(
+                                                      e.imageUrl)))),
+                                      title: Text(e.name),
+                                      subtitle: Text(e.description),
+                                      onTap: () =>
                                           BrowserUtil.openUrl(
-                                              S.of(context).dev_page_3,
-                                              context);
-                                        },
-                                      ),
-                                      const SizedBox(
-                                          height: _avatarNameSpacing),
-                                      Text(
-                                        S.of(context).dev_name_3,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        child: Container(
-                                            width: _avatarSize,
-                                            height: _avatarSize,
-                                            decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image: new AssetImage(S
-                                                        .of(context)
-                                                        .dev_image_url_4)))),
-                                        onTap: () {
-                                          BrowserUtil.openUrl(
-                                              S.of(context).dev_page_4,
-                                              context);
-                                        },
-                                      ),
-                                      const SizedBox(
-                                          height: _avatarNameSpacing),
-                                      Text(
-                                        S.of(context).dev_name_4,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                              e.url, context),
+                                    ))
+                                    .toList(),
                               ),
                               const SizedBox(height: 16),
                               //Version
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  '${S.of(context).version} ${Pubspec.major}.${Pubspec.minor}.${Pubspec.patch} build ${Pubspec.build.first}',
+                                  '${S
+                                      .of(context)
+                                      .version} ${Pubspec.major}.${Pubspec
+                                      .minor}.${Pubspec.patch} build ${Pubspec
+                                      .build.first}',
                                   textScaleFactor: 0.7,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
@@ -952,4 +876,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class Developer {
+  String name;
+  String imageUrl;
+  String description;
+  String url;
+
+  Developer(this.name, this.imageUrl, this.url, this.description);
 }
