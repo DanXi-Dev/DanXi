@@ -174,8 +174,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                       ),
                     ),
                     material: (_, __) => Container(
-                      height: 200,
-                      child: Column(children: _buildShareList(context)),
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _buildShareList(context)),
                     ),
                   ));
         }),
