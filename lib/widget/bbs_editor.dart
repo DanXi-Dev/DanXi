@@ -56,15 +56,19 @@ class BBSEditor {
         context, S.of(context).new_post,
         allowTags: true, editorType: editorType, object: object);
     if (content?.text == null) return false;
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).posting, context: context);
     final int? success = await PostRepository.getInstance()
         .newPost(content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
+      progressDialog.dismiss(showAnim: false);
       if (error is DioError)
         error = error.message + '\n' + (error.response?.data?.toString() ?? "");
       Noticing.showNotice(context, error.toString(),
           title: S.of(context).post_failed, useSnackBar: false);
       return -1;
     });
+    progressDialog.dismiss(showAnim: false);
     if (success == -1) return false;
     StateProvider.editorCache.remove(object);
     return true;
@@ -85,9 +89,12 @@ class BBSEditor {
             object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
-    final success = await PostRepository.getInstance()
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).posting, context: context);
+    final int? success = await PostRepository.getInstance()
         .newReply(discussionId, postId, content)
         .onError((dynamic error, stackTrace) {
+      progressDialog.dismiss(showAnim: false);
       if (error is DioError) {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
@@ -98,7 +105,7 @@ class BBSEditor {
       }
       return -1;
     });
-    debugPrint("Success: $success");
+    progressDialog.dismiss(showAnim: false);
     if (success == -1) return;
     StateProvider.editorCache.remove(object);
   }
