@@ -1,7 +1,7 @@
 name: dan_xi
 description: Maybe the best all-rounded service app for Fudan University students.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.2.6+62
+version: 1.2.6+65
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -104,18 +104,3 @@ flutter:
     - family: iconfont
       fonts:
         - asset: assets/fonts/iconfont.ttf
-
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
