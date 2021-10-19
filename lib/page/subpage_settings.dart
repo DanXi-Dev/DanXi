@@ -616,23 +616,16 @@ class _SettingsSubpageState extends State<SettingsSubpage>
           ));
 
   Card _buildAboutCard() {
+    final developers = Constant.getDevelopers(context);
     final inAppReview = InAppReview.instance;
-    final Color _originalDividerColor = Theme
-        .of(context)
-        .dividerColor;
-    double _avatarSize =
-        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 5;
-    TextStyle? defaultText = Theme
-        .of(context)
-        .textTheme
-        .bodyText2;
-    TextStyle linkText = Theme
-        .of(context)
+    final Color _originalDividerColor = Theme.of(context).dividerColor;
+    final double _avatarSize =
+        (ViewportUtils.getMainNavigatorWidth(context) - 120) / 8;
+    final TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
+    final TextStyle linkText = Theme.of(context)
         .textTheme
         .bodyText2!
-        .copyWith(color: Theme
-        .of(context)
-        .accentColor);
+        .copyWith(color: Theme.of(context).accentColor);
     return Card(
         child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -675,49 +668,41 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               RichText(
                                   text: TextSpan(children: [
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S
-                                          .of(context)
-                                          .terms_and_conditions_content,
-                                    ),
-                                    TextSpan(
-                                        style: linkText,
-                                        text: S
-                                            .of(context)
-                                            .privacy_policy,
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () =>
-                                              BrowserUtil.openUrl(
-                                                  S
-                                                      .of(context)
-                                                      .privacy_policy_url,
-                                                  context)),
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S
-                                          .of(context)
-                                          .terms_and_conditions_content_end,
-                                    ),
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S
-                                          .of(context)
-                                          .view_ossl,
-                                    ),
-                                    TextSpan(
-                                        style: linkText,
-                                        text: S
-                                            .of(context)
-                                            .open_source_software_licenses,
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () =>
-                                              smartNavigatorPush(
-                                                  context, "/about/openLicense",
-                                                  arguments: {
-                                                    "items": _LICENSE_ITEMS
-                                                  })),
-                                  ])),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S
+                                      .of(context)
+                                      .terms_and_conditions_content,
+                                ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S.of(context).privacy_policy,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => BrowserUtil.openUrl(
+                                          S.of(context).privacy_policy_url,
+                                          context)),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S
+                                      .of(context)
+                                      .terms_and_conditions_content_end,
+                                ),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S.of(context).view_ossl,
+                                ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S
+                                        .of(context)
+                                        .open_source_software_licenses,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => smartNavigatorPush(
+                                              context, "/about/openLicense",
+                                              arguments: {
+                                                "items": _LICENSE_ITEMS
+                                              })),
+                              ])),
 
                               const SizedBox(
                                 height: 16,
@@ -733,31 +718,22 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               RichText(
                                   text: TextSpan(children: [
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S
-                                          .of(context)
-                                          .acknowledgements_1,
-                                    ),
-                                    TextSpan(
-                                        style: linkText,
-                                        text: S
-                                            .of(context)
-                                            .acknowledgement_name_1,
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () =>
-                                              BrowserUtil.openUrl(
-                                                  S
-                                                      .of(context)
-                                                      .acknowledgement_link_1,
-                                                  context)),
-                                    TextSpan(
-                                      style: defaultText,
-                                      text: S
-                                          .of(context)
-                                          .acknowledgements_2,
-                                    ),
-                                  ])),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S.of(context).acknowledgements_1,
+                                ),
+                                TextSpan(
+                                    style: linkText,
+                                    text: S.of(context).acknowledgement_name_1,
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => BrowserUtil.openUrl(
+                                          S.of(context).acknowledgement_link_1,
+                                          context)),
+                                TextSpan(
+                                  style: defaultText,
+                                  text: S.of(context).acknowledgements_2,
+                                ),
+                              ])),
 
                               const SizedBox(
                                 height: 16,
@@ -765,9 +741,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
                               // Authors
                               Text(
-                                S
-                                    .of(context)
-                                    .authors,
+                                S.of(context).authors,
                                 textScaleFactor: 1.1,
                               ),
                               Divider(
@@ -776,38 +750,77 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               const SizedBox(
                                 height: 4,
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: Constant.getDevelopers(context)
-                                    .map((e) =>
-                                    ListTile(
-                                      leading: Container(
-                                          width: _avatarSize,
-                                          height: _avatarSize,
-                                          decoration: new BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: new DecorationImage(
-                                                  fit: BoxFit.fill,
-                                                  image: new AssetImage(
-                                                      e.imageUrl)))),
-                                      title: Text(e.name),
-                                      subtitle: Text(e.description),
-                                      onTap: () =>
-                                          BrowserUtil.openUrl(
-                                              e.url, context),
-                                    ))
-                                    .toList(),
-                              ),
+                              Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: developers
+                                            .sublist(
+                                                0, (developers.length + 1) ~/ 2)
+                                            .map((e) => ListTile(
+                                                  minLeadingWidth: 0,
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                  leading: Container(
+                                                      width: _avatarSize,
+                                                      height: _avatarSize,
+                                                      decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          image: DecorationImage(
+                                                              fit: BoxFit.fill,
+                                                              image: AssetImage(
+                                                                  e.imageUrl)))),
+                                                  title: Text(e.name),
+                                                  //subtitle: Text(e.description),
+                                                  onTap: () =>
+                                                      BrowserUtil.openUrl(
+                                                          e.url, context),
+                                                ))
+                                            .toList(),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: developers
+                                            .sublist(
+                                                (developers.length + 1) ~/ 2,
+                                                developers.length)
+                                            .map((e) => ListTile(
+                                                  minLeadingWidth: 0,
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                  leading: Container(
+                                                      width: _avatarSize,
+                                                      height: _avatarSize,
+                                                      decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          image: DecorationImage(
+                                                              fit: BoxFit.fill,
+                                                              image: AssetImage(
+                                                                  e.imageUrl)))),
+                                                  title: Text(e.name),
+                                                  //subtitle: Text(e.description),
+                                                  onTap: () =>
+                                                      BrowserUtil.openUrl(
+                                                          e.url, context),
+                                                ))
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ]),
                               const SizedBox(height: 16),
                               //Version
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  '${S
-                                      .of(context)
-                                      .version} ${Pubspec.major}.${Pubspec
-                                      .minor}.${Pubspec.patch} build ${Pubspec
-                                      .build.first}',
+                                  '${S.of(context).version} ${Pubspec.major}.${Pubspec.minor}.${Pubspec.patch} build ${Pubspec.build.first}',
                                   textScaleFactor: 0.7,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
@@ -875,14 +888,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }
 
 class Developer {
-  String name;
-  String imageUrl;
-  String description;
-  String url;
+  final String name;
+  final String imageUrl;
+  final String description;
+  final String url;
 
-  Developer(this.name, this.imageUrl, this.url, this.description);
+  const Developer(this.name, this.imageUrl, this.url, this.description);
 }
