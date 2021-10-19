@@ -131,12 +131,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<Reply>> _loadContent(int page) {
+  Future<List<Reply>?> _loadContent(int page) async {
     if (_searchKeyword != null)
-      return PostRepository.getInstance()
+      return await PostRepository.getInstance()
           .loadSearchResults(_searchKeyword, page);
     else
-      return PostRepository.getInstance().loadReplies(_post!, page);
+      return await PostRepository.getInstance().loadReplies(_post!, page);
   }
 
   Future<bool?> _isDiscussionFavored() async {
