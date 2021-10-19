@@ -691,13 +691,9 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<Reply>> loadReplies(BBSPost post, int page) async {
-    final Response response = await dio!
-        .get(_BASE_URL + "/posts/",
-            queryParameters: {"page": page, "id": post.id},
-            options: Options(headers: _tokenHeader))
-        .onError((dynamic error, stackTrace) {
-      return Future.error(error);
-    });
+    final Response response = await dio!.get(_BASE_URL + "/posts/",
+        queryParameters: {"page": page, "id": post.id},
+        options: Options(headers: _tokenHeader));
     final List result = response.data;
     return result.map((e) => Reply.fromJson(e)).toList();
   }

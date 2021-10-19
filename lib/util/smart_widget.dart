@@ -38,7 +38,8 @@ class SmartWidget {
       return object(context, index);
     } else if (object is TransitionBuilder) {
       return object(context, child);
-    } else if (object is AsyncWidgetBuilder<T>) {
+    } else if (object is AsyncWidgetBuilder<T> ||
+        object is AsyncWidgetBuilder<T?>) {
       return object(context, snapshot!);
     } else if (object is ControlsWidgetBuilder) {
       return object(context,

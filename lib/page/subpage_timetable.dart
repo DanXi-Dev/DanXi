@@ -35,7 +35,6 @@ import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -248,13 +247,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     });
   }
 
-  Widget _buildPage(TimeTable? table) {
-    final TimetableStyle style = TimetableStyle(
-        startHour: TimeTable.kCourseSlotStartTime[0].hour!,
-        laneHeight: 16,
-        laneWidth: (ViewportUtils.getMainNavigatorWidth(context) - 50) / 5,
-        timeItemWidth: 16,
-        timeItemHeight: 140);
+  Widget _buildPage(TimeTable table) {
+    final TimetableStyle style = TimetableStyle();
     _table = table;
     if (_showingTime == null) _showingTime = _table!.now();
     final List<DayEvents> scheduleData = _table!

@@ -50,23 +50,6 @@ class SettingsProvider {
   static const String KEY_AD_ENABLED = "ad_enabled";
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
-  static List<DashboardCard> _kDefaultDashboardCardList = [
-    DashboardCard("new_card", null, null, true),
-    DashboardCard("welcome_feature", null, null, true),
-    DashboardCard("next_course_feature", null, null, true),
-    DashboardCard("divider", null, null, true),
-    DashboardCard("ecard_balance_feature", null, null, true),
-    DashboardCard("dining_hall_crowdedness_feature", null, null, true),
-    DashboardCard("aao_notice_feature", null, null, true),
-    DashboardCard("empty_classroom_feature", null, null, true),
-    DashboardCard("dorm_electricity_feature", null, null, true),
-    DashboardCard("bus_feature", null, null, true),
-    DashboardCard("pe_feature", null, null, true),
-    DashboardCard("new_card", null, null, true),
-    DashboardCard("fudan_daily_feature", null, null, true),
-    DashboardCard("new_card", null, null, true),
-    DashboardCard("qr_feature", null, null, true),
-  ];
 
   SettingsProvider._();
 
@@ -131,7 +114,7 @@ class SettingsProvider {
               .map((i) => DashboardCard.fromJson(i))
               .toList();
       // Merge new features which are added in the new version.
-      _kDefaultDashboardCardList.forEach((element) {
+      Constant.defaultDashboardCardList.forEach((element) {
         if (!element.isSpecialCard &&
             !rawCardList
                 .any((card) => card.internalString == element.internalString)) {
@@ -140,7 +123,7 @@ class SettingsProvider {
       });
       return rawCardList;
     }
-    return _kDefaultDashboardCardList;
+    return Constant.defaultDashboardCardList;
   }
 
   set dashboardWidgetsSequence(List<DashboardCard>? value) =>

@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_main.dart';
@@ -157,21 +158,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
   }
 
   List<Widget> _getListWidgets() {
-    Map<String, String> widgetName = {
-      'welcome_feature': S.of(context).welcome_feature,
-      'next_course_feature': S.of(context).today_course,
-      'divider': S.of(context).divider,
-      'ecard_balance_feature': S.of(context).ecard_balance,
-      'dining_hall_crowdedness_feature': S.of(context).dining_hall_crowdedness,
-      'aao_notice_feature': S.of(context).fudan_aao_notices,
-      'empty_classroom_feature': S.of(context).empty_classrooms,
-      'fudan_daily_feature': S.of(context).fudan_daily,
-      'new_card': S.of(context).add_new_card,
-      'qr_feature': S.of(context).fudan_qr_code,
-      'pe_feature': S.of(context).pe_exercises,
-      'bus_feature': S.of(context).bus_query,
-      'dorm_electricity_feature': S.of(context).dorm_electricity,
-    };
+    Map<String, String> widgetName = Constant.getFeatureName(context);
     List<Widget> _widgets = [];
 
     for (int index = 0; index < sequence!.length; ++index) {
