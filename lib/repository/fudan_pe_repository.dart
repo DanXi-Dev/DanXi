@@ -26,7 +26,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Ftac.fudan.edu.cn%2Fthirds%2Ftjb.act%3Fredir%3DsportScore";
   static const String _INFO_URL =
-      "https://fdtyjw.fudan.edu.cn/sportScore/login.aspx";
+      "https://fdtyjw.fudan.edu.cn/sportScore/stScore.aspx";
 
   FudanPERepository._();
 
@@ -50,9 +50,9 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
     });
     final List<ExerciseItem> items = [];
-    Response r = await dio!.get(_INFO_URL + "?token=" + token);
-    BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    Iterable<DOM.Element> tableLines = soup
+    final Response r = await dio!.get(_INFO_URL + "?token=" + token);
+    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final Iterable<DOM.Element> tableLines = soup
         .findAll(
             "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
         .map((e) => e.element!);
