@@ -17,7 +17,9 @@ OTHole _$OTHoleFromJson(Map<String, dynamic> json) {
         .toList(),
     json['view'] as int?,
     json['reply'] as int?,
-    OTFloors.fromJson(json['floors'] as Map<String, dynamic>),
+    json['floors'] == null
+        ? null
+        : OTFloors.fromJson(json['floors'] as Map<String, dynamic>),
   );
 }
 

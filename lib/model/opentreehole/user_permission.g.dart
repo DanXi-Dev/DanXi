@@ -8,8 +8,10 @@ part of 'user_permission.dart';
 
 OTUserPermission _$OTUserPermissionFromJson(Map<String, dynamic> json) {
   return OTUserPermission(
-    OTUserPermissionSilentConfig.fromJson(
-        json['silent'] as Map<String, dynamic>),
+    json['silent'] == null
+        ? null
+        : OTUserPermissionSilentConfig.fromJson(
+            json['silent'] as Map<String, dynamic>),
     json['admin'] as String?,
   );
 }

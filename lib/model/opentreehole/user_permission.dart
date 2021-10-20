@@ -22,7 +22,7 @@ part 'user_permission.g.dart';
 
 @JsonSerializable()
 class OTUserPermission {
-  OTUserPermissionSilentConfig silent;
+  OTUserPermissionSilentConfig? silent;
   String? admin;
 
   factory OTUserPermission.fromJson(Map<String, dynamic> json) =>

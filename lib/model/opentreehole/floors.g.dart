@@ -8,10 +8,14 @@ part of 'floors.dart';
 
 OTFloors _$OTFloorsFromJson(Map<String, dynamic> json) {
   return OTFloors(
-    OTFloor.fromJson(json['first_floor'] as Map<String, dynamic>),
-    OTFloor.fromJson(json['last_floor'] as Map<String, dynamic>),
-    (json['prefetch'] as List<dynamic>)
-        .map((e) => OTFloor.fromJson(e as Map<String, dynamic>))
+    json['first_floor'] == null
+        ? null
+        : OTFloor.fromJson(json['first_floor'] as Map<String, dynamic>),
+    json['last_floor'] == null
+        ? null
+        : OTFloor.fromJson(json['last_floor'] as Map<String, dynamic>),
+    (json['prefetch'] as List<dynamic>?)
+        ?.map((e) => OTFloor.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 }

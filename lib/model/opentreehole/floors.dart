@@ -22,9 +22,9 @@ part 'floors.g.dart';
 
 @JsonSerializable()
 class OTFloors {
-  OTFloor first_floor;
-  OTFloor last_floor;
-  List<OTFloor> prefetch;
+  OTFloor? first_floor;
+  OTFloor? last_floor;
+  List<OTFloor>? prefetch;
 
   factory OTFloors.fromJson(Map<String, dynamic> json) =>
       _$OTFloorsFromJson(json);

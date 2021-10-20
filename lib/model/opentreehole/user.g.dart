@@ -13,8 +13,12 @@ OTUser _$OTUserFromJson(Map<String, dynamic> json) {
     (json['favorites'] as List<dynamic>?)?.map((e) => e as int).toList(),
     json['is_admin'] as bool?,
     json['joined_time'] as String?,
-    OTUserConfig.fromJson(json['config'] as Map<String, dynamic>),
-    OTUserPermission.fromJson(json['permission'] as Map<String, dynamic>),
+    json['config'] == null
+        ? null
+        : OTUserConfig.fromJson(json['config'] as Map<String, dynamic>),
+    json['permission'] == null
+        ? null
+        : OTUserPermission.fromJson(json['permission'] as Map<String, dynamic>),
   );
 }
 

@@ -30,7 +30,7 @@ class OTHole {
   List<OTTag>? tags;
   int? view;
   int? reply;
-  OTFloors floors;
+  OTFloors? floors;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 

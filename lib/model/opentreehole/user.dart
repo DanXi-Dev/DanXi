@@ -26,8 +26,8 @@ class OTUser {
   int? user_id;
   String? nickname;
   List<int>? favorites;
-  OTUserPermission permission;
-  OTUserConfig config;
+  OTUserPermission? permission;
+  OTUserConfig? config;
   String? joined_time;
   bool? is_admin;
 
