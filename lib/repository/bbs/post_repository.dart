@@ -36,7 +36,7 @@ class PostRepository extends BaseRepositoryWithDio {
   static final _instance = PostRepository._();
 
   factory PostRepository.getInstance() => _instance;
-  static const String _BASE_URL = "https://www.fduhole.com/v1";
+  static const String _BASE_URL = "https://hole.hath.top";
   static const List<int> PINNED_CERTIFICATE = [
     48,
     130,
@@ -590,6 +590,8 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   initializeUser(PersonInfo? info) async {
+    print(
+        "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
     try {
       PlatformBridge.requestNotificationPermission();
     } catch (ignored) {}
@@ -610,6 +612,7 @@ class PostRepository extends BaseRepositoryWithDio {
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
+        return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
         final ASN1Parser p = ASN1Parser(certificate.der);
         final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
