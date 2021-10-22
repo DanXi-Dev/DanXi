@@ -276,25 +276,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu(BuildContext context, Reply e) => [
+  List<Widget> _buildContextMenu(BuildContext menuContext, Reply e) => [
         // Admin Operations
         if (PostRepository.getInstance().isUserAdminNonAsync())
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 BBSEditor.adminModifyReply(
-                    context, e.discussion, e.id, e.content);
+                    menuContext, e.discussion, e.id, e.content);
               },
               child: Text("Modify Post"),
             ),
             material: (_, __) => ListTile(
               title: Text("Modify Post"),
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 BBSEditor.adminModifyReply(
-                    context, e.discussion, e.id, e.content);
+                    menuContext, e.discussion, e.id, e.content);
               },
             ),
           ),
@@ -303,7 +303,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
                     .adminDisablePost(e.discussion, e.id)
                     .onError((dynamic error, stackTrace) {
@@ -317,7 +317,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context).fatal_error, useSnackBar: false);
+                        title: S.of(menuContext).fatal_error,
+                        useSnackBar: false);
                   return -1;
                 });
               },
@@ -326,7 +327,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             material: (_, __) => ListTile(
               title: Text("Disable Post"),
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
                     .adminDisablePost(e.discussion, e.id)
                     .onError((dynamic error, stackTrace) {
@@ -340,7 +341,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context).fatal_error, useSnackBar: false);
+                        title: S.of(menuContext).fatal_error,
+                        useSnackBar: false);
                   return -1;
                 });
               },
@@ -351,7 +353,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
                     .adminDisableDiscussion(e.discussion)
                     .onError((dynamic error, stackTrace) {
@@ -365,7 +367,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context).fatal_error, useSnackBar: false);
+                        title: S.of(menuContext).fatal_error,
+                        useSnackBar: false);
                   return -1;
                 });
               },
@@ -374,7 +377,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             material: (_, __) => ListTile(
               title: Text("Disable Discussion"),
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
                     .adminDisableDiscussion(e.discussion)
                     .onError((dynamic error, stackTrace) {
@@ -388,7 +391,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         useSnackBar: false);
                   } else
                     Noticing.showNotice(context, error.toString(),
-                        title: S.of(context).fatal_error, useSnackBar: false);
+                        title: S.of(menuContext).fatal_error,
+                        useSnackBar: false);
                   return -1;
                 });
               },
@@ -399,7 +403,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
                     .adminGetUser(e.discussion, e.id)
                     .then((value) => Noticing.showNotice(context, value,
@@ -410,11 +414,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             material: (_, __) => ListTile(
               title: Text("Get Username"),
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
                     .adminGetUser(e.discussion, e.id)
-                    .then((value) => Noticing.showNotice(context, value,
-                        useSnackBar: false));
+                    .then((value) {
+                  debugPrint(value);
+                  Noticing.showNotice(context, value, useSnackBar: false);
+                });
               },
             ),
           ),
@@ -424,17 +430,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               onPressed: () {
-                Navigator.of(context).pop();
-                smartNavigatorPush(context, "/text/detail",
+                Navigator.of(menuContext).pop();
+                smartNavigatorPush(menuContext, "/text/detail",
                     arguments: {"text": e.filteredContent});
               },
-              child: Text(S.of(context).free_select),
+              child: Text(S.of(menuContext).free_select),
             ),
             material: (_, __) => ListTile(
-              title: Text(S.of(context).free_select),
+              title: Text(S.of(menuContext).free_select),
               onTap: () {
-                Navigator.of(context).pop();
-                smartNavigatorPush(context, "/text/detail",
+                Navigator.of(menuContext).pop();
+                smartNavigatorPush(menuContext, "/text/detail",
                     arguments: {"text": e.filteredContent});
               },
             ),
@@ -442,18 +448,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(menuContext).pop();
               FlutterClipboard.copy(renderText(e.filteredContent!, ''));
             },
-            child: Text(S.of(context).copy),
+            child: Text(S.of(menuContext).copy),
           ),
           material: (_, __) => ListTile(
-            title: Text(S.of(context).copy),
+            title: Text(S.of(menuContext).copy),
             onTap: () {
-              Navigator.of(context).pop();
+              Navigator.of(menuContext).pop();
               FlutterClipboard.copy(renderText(e.filteredContent!, '')).then(
-                  (value) =>
-                      Noticing.showNotice(context, S.of(context).copy_success));
+                  (value) => Noticing.showNotice(
+                      menuContext, S.of(menuContext).copy_success));
             },
           ),
         ),
@@ -461,16 +467,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           cupertino: (_, __) => CupertinoActionSheetAction(
             isDestructiveAction: true,
             onPressed: () {
-              Navigator.of(context).pop();
-              BBSEditor.reportPost(context, e.id);
+              Navigator.of(menuContext).pop();
+              BBSEditor.reportPost(menuContext, e.id);
             },
-            child: Text(S.of(context).report),
+            child: Text(S.of(menuContext).report),
           ),
           material: (_, __) => ListTile(
-            title: Text(S.of(context).report),
+            title: Text(S.of(menuContext).report),
             onTap: () {
-              Navigator.of(context).pop();
-              BBSEditor.reportPost(context, e.id);
+              Navigator.of(menuContext).pop();
+              BBSEditor.reportPost(menuContext, e.id);
             },
           ),
         ),
