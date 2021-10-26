@@ -42,6 +42,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       'https://jwfw.fudan.edu.cn/eams/stdExamTable!examTable.action';
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
+  static const String TIME_TABLE_UG_URL =
+      'http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
 
   TimeTableRepository._();
 
@@ -83,6 +85,29 @@ class TimeTableRepository extends BaseRepositoryWithDio {
             Constant.DEFAULT_SEMESTER_START_TIME,
         tablePage.data.toString());
   }
+
+  Future<TimeTable> loadTimeTableRemotely_UG(PersonInfo info,
+      {DateTime? startTime}) {
+    return Retrier.tryAsyncWithFix(
+            () => _loadTimeTableRemotely_UG(startTime: startTime),
+            (exception) async =>
+        await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+  }
+
+  Future<TimeTable> _loadTimeTableRemotely_UG({DateTime? startTime}) async {
+    Response CoursePage = await dio!.get(
+        TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
+        options: Options(headers: {
+          "cookie":
+          "_WEU=SolVi4ACz6rxpfa2JcVUAAvOxL7iI93*fiykEwCvaHUhQGXB27QR8s7nPsPId3S6; "
+              "route=8a542d7b60bacf00efa73ca063da1ec1; "
+              "JSESSIONID=8rKja6gL-LO1SoDkzot8Z5HQIkQ89eVqKKt3FIsaFB-LSQaPxKbU!-704678476; "
+              "XK_TOKEN=30ca044e-b1de-42ec-909c-8d89e7743305; "
+              "iPlanetDirectoryPro=AQIC5wM2LY4Sfcz2dvSn2iu0K%2BZwtjKjKDC33ryPuSX94OM%3D%40AAJTSQACMDI%3D%23"
+        }));
+    return TimeTable.fromUGjson(startTime, CoursePage.data);
+  }
+
 
   Future<TimeTable> loadTimeTableLocally(PersonInfo? info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {

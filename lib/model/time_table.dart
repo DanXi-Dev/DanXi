@@ -19,6 +19,7 @@ import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'dart:convert';
 
 part 'time_table.g.dart';
 
@@ -75,6 +76,15 @@ class TimeTable {
         RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
     for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
       newTable.courses!.add(Course.fromHtmlPart(matchedCourse.group(0)!));
+    }
+    return newTable;
+  }
+
+
+  factory TimeTable.fromUGjson(DateTime? startTime, dynamic Coursejson) {
+    TimeTable newTable = new TimeTable()..startTime = startTime;
+    for (dynamic course in Coursejson["results"]) {
+      newTable.courses!.add(Course.fromUGPart(course));
     }
     return newTable;
   }
@@ -215,6 +225,17 @@ class Course {
       ..availableWeeks = _parseWeeksFromString(infoVarList[6])
       ..times = _parseSlotFromStrings(timeMatcher.allMatches(htmlPart));
   }
+
+  factory Course.fromUGPart(dynamic UGPart) {
+    Course newCourse = new Course();
+    return newCourse
+      ..courseName = UGPart["KCMC"]
+      ..roomName = UGPart["JASMC"]
+      ..availableWeeks = _parseWeeksFromString(UGPart["ZCBH"])
+      ..times = [CourseTime(UGPart["XQ"]-1, UGPart["KSJCDM"]-1)]
+      ..teacherNames = [UGPart["JSMC"]];
+  }
+
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
