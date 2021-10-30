@@ -23,6 +23,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:markdown/markdown.dart' as md;
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
@@ -83,6 +85,10 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
+    inlineSyntaxes: [LatexSyntax()],
+    builders: {
+      'tex': MarkdownLatexSupport(),
+    },
     imageBuilder: (Uri uri, String? title, String? alt) {
       return Center(
         child: AutoBBSImage(
@@ -91,6 +97,14 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
     },
   );
 };
+
+class MarkdownLatexSupport extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    print(element.textContent);
+    return Math.tex(element.textContent);
+  }
+}
 
 BaseRender kMarkdownSelectorRender = (BuildContext context, String? content,
     ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
@@ -105,3 +119,14 @@ BaseRender kMarkdownSelectorRender = (BuildContext context, String? content,
     imageBuilder: (Uri uri, String? title, String? alt) => Container(),
   );
 };
+
+class LatexSyntax extends md.InlineSyntax {
+  LatexSyntax() : super(r'\$(.*?)\$');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    var tex = match[1]!;
+    parser.addNode(md.Element.text("tex", tex));
+    return true;
+  }
+}

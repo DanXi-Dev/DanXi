@@ -233,7 +233,7 @@ class Course {
       ..roomName = UGPart["JASMC"]
       ..availableWeeks = _parseWeeksFromString(UGPart["ZCBH"])
       ..times = [CourseTime(UGPart["XQ"]-1, UGPart["KSJCDM"]-1)]
-      ..teacherNames = [UGPart["JSMC"]];
+      ..teacherNames = [UGPart["JSXM"]];
   }
 
 

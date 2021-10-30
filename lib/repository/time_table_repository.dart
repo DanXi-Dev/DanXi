@@ -89,9 +89,9 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   Future<TimeTable> loadTimeTableRemotely_UG(PersonInfo info,
       {DateTime? startTime}) {
     return Retrier.tryAsyncWithFix(
-            () => _loadTimeTableRemotely_UG(startTime: startTime),
-            (exception) async =>
-        await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+        () => _loadTimeTableRemotely_UG(startTime: startTime),
+        (exception) async => await UISLoginTool.loginUIS(
+            dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<TimeTable> _loadTimeTableRemotely_UG({DateTime? startTime}) async {
@@ -99,15 +99,15 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
         options: Options(headers: {
           "cookie":
-          "_WEU=SolVi4ACz6rxpfa2JcVUAAvOxL7iI93*fiykEwCvaHUhQGXB27QR8s7nPsPId3S6; "
-              "route=8a542d7b60bacf00efa73ca063da1ec1; "
-              "JSESSIONID=8rKja6gL-LO1SoDkzot8Z5HQIkQ89eVqKKt3FIsaFB-LSQaPxKbU!-704678476; "
-              "XK_TOKEN=30ca044e-b1de-42ec-909c-8d89e7743305; "
-              "iPlanetDirectoryPro=AQIC5wM2LY4Sfcz2dvSn2iu0K%2BZwtjKjKDC33ryPuSX94OM%3D%40AAJTSQACMDI%3D%23"
+              "_WEU=*ei6pSMhkYpOAYG*6lV_B7OJvdc8KDxtKzamjJcBQmHYWeTScLOQn6oks9Y1kJcu; route=2ccbaced29a3fbe08def935b8ed5d6b8; JSESSIONID=6bK7LT6aRadVUEaDYYYc6WXcXlPyalsXr2ZigFFEH5cHH53Slv3G!-1590798951; XK_TOKEN=5314cd64-dd71-4aee-a057-fcf840e21053"
         }));
-    return TimeTable.fromUGjson(startTime, CoursePage.data);
+    print(CoursePage.data);
+    return TimeTable.fromUGjson(
+        startTime,
+        CoursePage.data is Map
+            ? CoursePage.data
+            : jsonDecode(CoursePage.data.toString()));
   }
-
 
   Future<TimeTable> loadTimeTableLocally(PersonInfo? info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
