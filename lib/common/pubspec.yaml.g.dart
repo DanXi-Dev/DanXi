@@ -58,13 +58,14 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1634736736;
+const int timestamp = 1635587255;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description = r'Maybe the best all-rounded service app for Fudan University students.';
+const String description =
+    r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -158,6 +159,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
+  'flutter_math_fork': r'^0.4.2+2',
 };
 
 /// Developer dependencies
