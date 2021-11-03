@@ -26,6 +26,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:intl/intl.dart';
 
+double kRatio = 1.25;
+
 /// A time table widget, usually used to show student's course schedule table.
 class ScheduleView extends StatefulWidget {
   final List<DayEvents> laneEventsList;
@@ -76,12 +78,12 @@ class _ScheduleViewState extends State<ScheduleView> {
               decoration: BoxDecoration(
                   color: Theme.of(context).hintColor.withOpacity(0.14),
                   borderRadius: BorderRadius.circular(4)),
-            ).withRatio(0.8).withGridPlacement(
+            ).withRatio(kRatio).withGridPlacement(
                 rowStart: index ~/ cols, columnStart: index % cols));
 
     // Build corner
     result[0] = Container()
-        .withRatio(0.8)
+        .withRatio(kRatio)
         .withGridPlacement(columnStart: 0, rowStart: 0);
 
     // Build time indicator
@@ -93,7 +95,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           .toExactTime()
           .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
       result[cols * (slot + 1)] = Center(
-          child: Column(
+              child: Column(
         children: [
           Text((slot + 1).toString()),
           Padding(
@@ -101,15 +103,17 @@ class _ScheduleViewState extends State<ScheduleView> {
             child: Text(
               startTime,
               style:
-                  TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+                  TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
             ),
           ),
           Text(
             endTime,
-            style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+            style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
           )
         ],
-      )).withRatio(0.8).withGridPlacement(columnStart: 0, rowStart: slot + 1);
+      ))
+          .withRatio(kRatio)
+          .withGridPlacement(columnStart: 0, rowStart: slot + 1);
     }
 
     // Build day indicator & courses
@@ -141,11 +145,11 @@ class _ScheduleViewState extends State<ScheduleView> {
                 : Text(DateFormat.Md().format(date))
           ],
         ),
-      ).withRatio(0.8).withGridPlacement(columnStart: day + 1, rowStart: 0);
+      ).withRatio(kRatio).withGridPlacement(columnStart: day + 1, rowStart: 0);
       convertToBlock(widget.laneEventsList[day].events).forEach((element) {
         result[1 + day + cols * (element.firstSlot + 1)] =
             _buildCourse(element.event.course)
-                .withRatio(0.8 / element.slotSpan)
+                .withRatio(kRatio / element.slotSpan)
                 .withGridPlacement(
                     columnStart: 1 + day,
                     rowStart: element.firstSlot + 1,
@@ -207,12 +211,14 @@ class _ScheduleViewState extends State<ScheduleView> {
             height: 2,
           ),
           AutoSizeText(course.courseName!,
-              minFontSize: 10,
+              minFontSize: 12,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
               style: textStyle?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(
             height: 4,
           ),
-          AutoSizeText(course.roomName!, minFontSize: 8, style: textStyle),
+          AutoSizeText(course.roomName!, minFontSize: 10, style: textStyle),
         ],
       ),
     );

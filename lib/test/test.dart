@@ -19,8 +19,11 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/time_table_repository.dart';
+import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// This is an app-specific test class.
 /// You can write your feature-testing codes here, without worrying about whether
@@ -29,13 +32,18 @@ class _TestLifeCycle {
   /// When app completes initialization of [StateProvider] and [SettingsProvider],
   /// the [context] is from [HomePage].
   static void onStart(BuildContext context) {
-
     /// TEST CODE
+    // showPlatformDialog(
+    //     context: context,
+    //     builder: (cxt) => PlatformAlertDialog(
+    //           content: PostRenderWidget(
+    //             content: 'this is a text\n\n\$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}\$\n\naaa',
+    //             render: kMarkdownRender,
+    //           ),
+    //         ));
   }
 
-   static void onStartAsync(BuildContext context) async {
-  //   TimeTableRepository.getInstance().loadTimeTableRemotely_UG(StateProvider.personInfo.value!);
-   }
+  static void onStartAsync(BuildContext context) async {}
 }
 
 /// Don't modify this class. It should be invoked only by the app.
