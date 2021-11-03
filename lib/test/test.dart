@@ -18,6 +18,7 @@
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/time_table_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -28,10 +29,13 @@ class _TestLifeCycle {
   /// When app completes initialization of [StateProvider] and [SettingsProvider],
   /// the [context] is from [HomePage].
   static void onStart(BuildContext context) {
+
     /// TEST CODE
   }
 
-  static void onStartAsync(BuildContext context) async {}
+   static void onStartAsync(BuildContext context) async {
+  //   TimeTableRepository.getInstance().loadTimeTableRemotely_UG(StateProvider.personInfo.value!);
+   }
 }
 
 /// Don't modify this class. It should be invoked only by the app.

@@ -28,6 +28,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/repository/time_table_repository.dart';
+import 'package:dan_xi/repository/undergraduate_timetable_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -102,10 +103,38 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup)) {
+      if()
       _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
           TimeTableRepository.getInstance().loadTimeTableLocally(
               StateProvider.personInfo.value,
               forceLoadFromRemote: _loadFromRemote)));
+      else
+        _content= UGTimetable.getInstance().loadTimeTableRemotely_UG(StateProvider.personInfo.value!, (imageUrl) async {
+          TextEditingController controller=new TextEditingController();
+          await showPlatformDialog(context: context, builder: (cxt){
+
+
+            return PlatformAlertDialog(
+              title:Text("请输入验证码"),
+              content: Column(
+                children: [
+                  Image.network(imageUrl),
+                  TextField(controller: controller)
+
+                ],
+              ),
+              actions: [
+                PlatformDialogAction(
+                  child: Text("确认"),
+                  onPressed: () {
+                    Navigator.of(cxt).pop();
+                  },
+                )
+              ],
+            );
+          });
+          return controller.text;
+        });
       _loadFromRemote = false;
     } else
       _content = LazyFuture.pack(Future<TimeTable>.error(
@@ -293,4 +322,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   @override
   bool get wantKeepAlive => true;
+
+
+
 }
