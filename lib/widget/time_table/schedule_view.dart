@@ -18,6 +18,7 @@
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,9 +36,11 @@ class ScheduleView extends StatefulWidget {
   final TimeNow today;
   final int showingWeek;
   final ScrollController controller;
+  final OnTapCourseCallback? tapCallback;
 
   ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
-      this.showingWeek, this.controller);
+      this.showingWeek, this.controller,
+      {this.tapCallback});
 
   @override
   _ScheduleViewState createState() => _ScheduleViewState();
@@ -148,7 +151,7 @@ class _ScheduleViewState extends State<ScheduleView> {
       ).withRatio(kRatio).withGridPlacement(columnStart: day + 1, rowStart: 0);
       convertToBlock(widget.laneEventsList[day].events).forEach((element) {
         result[1 + day + cols * (element.firstSlot + 1)] =
-            _buildCourse(element.event.course)
+            _buildScheduleBlock(element)
                 .withRatio(kRatio / element.slotSpan)
                 .withGridPlacement(
                     columnStart: 1 + day,
@@ -163,24 +166,24 @@ class _ScheduleViewState extends State<ScheduleView> {
     return result.map((e) => e!).toList();
   }
 
-  List<_ScheduleBlock> convertToBlock(List<Event> list) {
-    List<_ScheduleBlock> result = list.map((e) => _ScheduleBlock(e)).toList();
+  List<ScheduleBlock> convertToBlock(List<Event> list) {
+    List<ScheduleBlock> result = list.map((e) => ScheduleBlock(e)).toList();
     bool flag = true;
     while (flag) {
       flag = false;
       for (int i = 0; i < result.length;) {
         try {
-          _ScheduleBlock neighboringBlock = result.firstWhere((element) {
+          ScheduleBlock neighboringBlock = result.firstWhere((element) {
             int startSlot = element.firstSlot;
             int endSlot = startSlot + element.slotSpan;
 
-            return element.event.course.courseName ==
-                    result[i].event.course.courseName &&
+            return element.event.first.course.courseName ==
+                    result[i].event.first.course.courseName &&
                 ((result[i].firstSlot + result[i].slotSpan == startSlot) ||
                     (result[i].firstSlot == endSlot));
           });
           flag = true;
-          _ScheduleBlock thisBlock = result.removeAt(i);
+          ScheduleBlock thisBlock = result.removeAt(i);
           neighboringBlock.firstSlot =
               min(thisBlock.firstSlot, neighboringBlock.firstSlot);
           neighboringBlock.slotSpan += thisBlock.slotSpan;
@@ -189,10 +192,39 @@ class _ScheduleViewState extends State<ScheduleView> {
         }
       }
     }
+
+    // Merge courses at the same time
+    for (int i = 0; i < result.length;) {
+      try {
+        ScheduleBlock overlapBlock = result.firstWhere((element) {
+          return element.slotSpan == result[i].slotSpan &&
+              element.firstSlot == result[i].firstSlot;
+        });
+        ScheduleBlock thisBlock = result.removeAt(i);
+        overlapBlock.event.addAll(thisBlock.event);
+      } catch (e) {
+        ++i;
+      }
+    }
     return result;
   }
 
-  Widget _buildCourse(Course course) {
+  Widget _buildScheduleBlock(ScheduleBlock block) {
+    Widget body;
+    if (block.event.length > 1) {
+      Course copiedCourse = Course.fromJson(block.event.first.course.toJson());
+      copiedCourse.courseName = copiedCourse.courseName! + S.current.and_more;
+      body = _buildCourseBody(copiedCourse);
+    } else {
+      body = _buildCourseBody(block.event.first.course);
+    }
+    return GestureDetector(
+      onTap: () => widget.tapCallback?.call(block),
+      child: body,
+    );
+  }
+
+  Widget _buildCourseBody(Course course) {
     final TextStyle? textStyle = Theme.of(context).textTheme.overline?.copyWith(
         color: Theme.of(context).accentColorBrightness == Brightness.light
             ? Colors.black
@@ -232,13 +264,13 @@ extension WidgetEx on Widget {
       );
 }
 
-class _ScheduleBlock {
+class ScheduleBlock {
   int slotSpan = 1;
   late int firstSlot;
-  late Event event;
+  late List<Event> event;
 
-  _ScheduleBlock(Event event) {
-    this.event = event;
+  ScheduleBlock(Event event) {
+    this.event = [event];
     firstSlot = event.time.slot;
   }
 }
@@ -304,3 +336,5 @@ class TimetableStyle {
     this.visibleDecorationBorder: false,
   });
 }
+
+typedef OnTapCourseCallback = void Function(ScheduleBlock block);

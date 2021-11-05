@@ -100,7 +100,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   Future<TimeTable?>? _content;
 
-  bool _loadFromRemote = false;
+  bool _manualLoad = false;
 
   BannerAd? bannerAd;
 
@@ -111,8 +111,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTableLocally(
                 StateProvider.personInfo.value,
-                forceLoadFromRemote: _loadFromRemote)));
-      } else {
+                forceLoadFromRemote: _manualLoad)));
+      } else if (_manualLoad) {
         _content = PostgraduateTimetableRepository.getInstance()
             .loadTimeTableRemotely(StateProvider.personInfo.value!,
                 (imageUrl) async {
@@ -141,11 +141,15 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               });
           return controller.text;
         });
+      } else {
+        _content = LazyFuture.pack(Future<TimeTable>.error(
+            NotLoginError("Pull down to load timetable.")));
       }
-      _loadFromRemote = false;
-    } else
+      _manualLoad = false;
+    } else {
       _content = LazyFuture.pack(Future<TimeTable>.error(
           NotLoginError("Haven't logged in as FDU student.")));
+    }
   }
 
   void _startShare(TimetableConverter converter) async {
@@ -256,13 +260,15 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         return _buildPage(snapshot.data);
       },
       future: _content,
-      errorBuilder: (_, snapShot) => GestureDetector(
+      errorBuilder:
+          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
+              GestureDetector(
         onTap: () {
-          _loadFromRemote = true;
+          _manualLoad = true;
           refreshSelf();
         },
         child: Center(
-          child: Text(S.of(context).failed),
+          child: Text(S.of(context).failed + "\n" + snapshot.error.toString()),
         ),
       ),
       loadingBuilder: Center(
@@ -294,7 +300,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         color: Theme.of(context).accentColor,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
-          _loadFromRemote = true;
+          _manualLoad = true;
           HapticFeedback.mediumImpact();
           await refreshSelf();
         },
