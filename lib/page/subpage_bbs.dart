@@ -57,7 +57,8 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const kCompatibleUserGroup = [
-  UserGroup.FUDAN_STUDENT,
+  UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
+  UserGroup.FUDAN_POSTGRADUATE_STUDENT,
   UserGroup.FUDAN_STAFF,
   UserGroup.SJTU_STUDENT
 ];

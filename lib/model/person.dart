@@ -23,8 +23,11 @@ enum UserGroup {
   /// Not logged in
   VISITOR,
 
-  /// Log in as Fudan student
-  FUDAN_STUDENT,
+  /// Log in as Fudan undergraduate student
+  FUDAN_UNDERGRADUATE_STUDENT,
+
+  /// Log in as Fudan postgraduate student
+  FUDAN_POSTGRADUATE_STUDENT,
 
   /// Log in as Fudan staff (Not implemented)
   FUDAN_STAFF,
@@ -35,7 +38,10 @@ enum UserGroup {
 
 Map<UserGroup, Function> kUserGroupDescription = {
   UserGroup.VISITOR: (BuildContext context) => S.of(context).visitor,
-  UserGroup.FUDAN_STUDENT: (BuildContext context) => S.of(context).login_uis,
+  UserGroup.FUDAN_UNDERGRADUATE_STUDENT: (BuildContext context) =>
+      S.of(context).login_uis,
+  UserGroup.FUDAN_POSTGRADUATE_STUDENT: (BuildContext context) =>
+      S.of(context).fudan_postgraduate_student,
   UserGroup.FUDAN_STAFF: (BuildContext context) => S.of(context).fudan_staff,
   UserGroup.SJTU_STUDENT: (BuildContext context) => S.of(context).sjtu_student,
 };
@@ -65,9 +71,11 @@ class PersonInfo {
         preferences.getString("password"),
         preferences.getString("name"),
         preferences.containsKey("user_group")
-            ? UserGroup.values.firstWhere((element) =>
-                element.toString() == preferences.getString("user_group"))
-            : UserGroup.FUDAN_STUDENT);
+            ? UserGroup.values.firstWhere(
+                (element) =>
+                    element.toString() == preferences.getString("user_group"),
+                orElse: () => UserGroup.FUDAN_UNDERGRADUATE_STUDENT)
+            : UserGroup.FUDAN_UNDERGRADUATE_STUDENT);
   }
 
   Future<void> saveAsSharedPreferences(SharedPreferences preferences) async {

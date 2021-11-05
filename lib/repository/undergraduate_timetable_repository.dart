@@ -17,64 +17,92 @@
 
 import 'dart:convert';
 
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_js/flutter_js.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 
-class UGTimetable extends BaseRepositoryWithDio {
+class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
+  static const String TIME_TABLE_UG_URL =
+      'http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
+  static const String HOMEPAGE_URL =
+      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/*default/index.do";
+  static const String GET_TOKEN_URL =
+      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/4/vcode.do?";
+  static const String GET_CAPTCHA_URL =
+      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/vcode/image.do?vtoken=";
+  static const String LOGIN_URL =
+      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/check/login.do?";
 
-  static const String TIME_TABLE_UG_URL = 'http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
-  static const String UGxk_URL = "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/*default/index.do";
-  static const String Token_Get_URL = "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/4/vcode.do?";
-  static const String Yzm_Get_URL = "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/vcode/image.do?vtoken=";
-  static const String UG_Login_URL = "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/check/login.do?";
+  PostgraduateTimetableRepository._();
 
-  UGTimetable._();
+  static final _instance = PostgraduateTimetableRepository._();
 
-  static final _instance = UGTimetable._();
+  factory PostgraduateTimetableRepository.getInstance() => _instance;
 
-  factory UGTimetable.getInstance() => _instance;
-
-  Future<String> token_get() async {
-    Response tokendata = await dio!.get(Token_Get_URL);
-    var temp = tokendata.data is Map?tokendata.data:jsonDecode(tokendata.data.toString());
+  Future<String> _loadToken() async {
+    Response tokenData = await dio!.get(GET_TOKEN_URL);
+    var temp = tokenData.data is Map
+        ? tokenData.data
+        : jsonDecode(tokenData.data.toString());
     return temp['data']['token'];
   }
 
-  Future<String> DES_pwd(String pwd) async {
+  Future<String> encryptDES(String pwd) async {
     var flutterJs = getJavascriptRuntime();
-    JsEvalResult jsResult = flutterJs.evaluate(DESJS.replaceFirst("PASSWORD", pwd));
+    JsEvalResult jsResult =
+        flutterJs.evaluate(DES_JS.replaceFirst("PASSWORD", pwd));
     return jsResult.stringResult;
   }
 
-  Future<void> UGRequest(String id,String pwd,String yzm,String token) async {
-    Response temp = await dio!.post(UG_Login_URL,data: {"loginName":id,"loginPwd":pwd,"verifyCode":yzm,"vtoken":token}.encodeMap());
+  Future<void> _requestLogin(
+      String id, String pwd, String yzm, String token) async {
+    var result = await dio!.post(LOGIN_URL,
+        data: {
+          "loginName": id,
+          "loginPwd": pwd,
+          "verifyCode": yzm,
+          "vtoken": token
+        }.encodeMap(),
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ));
+    debugPrint(result.toString());
   }
 
-  Future<void> UGLogin(PersonInfo ug,OnCaptchaCallback callback) async {
-    String yzmtoken = await token_get();
-    String yzm = await callback(Yzm_Get_URL+yzmtoken);
-    await UGRequest(ug.id!,await DES_pwd(ug.password!), yzm,yzmtoken);
+  Future<void> _login(PersonInfo ug, OnCaptchaCallback callback) async {
+    String yzmToken = await _loadToken();
+    String yzm = await callback(GET_CAPTCHA_URL + yzmToken);
+    await _requestLogin(ug.id!, await encryptDES(ug.password!), yzm, yzmToken);
   }
-  Future<TimeTable> loadTimeTableRemotely_UG(PersonInfo info,OnCaptchaCallback callback,
+
+  Future<TimeTable> loadTimeTableRemotely(
+      PersonInfo info, OnCaptchaCallback callback,
       {DateTime? startTime}) {
     return Retrier.tryAsyncWithFix(
-            () => _loadTimeTableRemotely_UG(callback,startTime: startTime),
-            (exception) async =>
-        await UGLogin(info,callback));
+        () => _loadTimeTableRemotely(callback, startTime: startTime),
+        (exception) async => await _login(info, callback));
   }
 
-  Future<TimeTable> _loadTimeTableRemotely_UG(OnCaptchaCallback callback,{DateTime? startTime}) async {
-    Response CoursePage = await dio!.get(
+  Future<TimeTable> _loadTimeTableRemotely(OnCaptchaCallback callback,
+      {DateTime? startTime}) async {
+    Response coursePage = await dio!.get(
         TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
         options: Options());
-    return TimeTable.fromUGjson(startTime, CoursePage.data);
+    return TimeTable.fromUGjson(
+        startTime ??
+            DateTime.tryParse(
+                SettingsProvider.getInstance().lastSemesterStartTime ?? "") ??
+            Constant.DEFAULT_SEMESTER_START_TIME,
+        coursePage.data is Map
+            ? coursePage.data
+            : jsonDecode(coursePage.data.toString()));
   }
 
   @override
@@ -83,10 +111,7 @@ class UGTimetable extends BaseRepositoryWithDio {
 
 typedef OnCaptchaCallback = Future<String> Function(String imageUrl);
 
-
-
-
-const String DESJS = '''
+const String DES_JS = '''
 function d(X, Q, B, E) {
     var H = X.length;
     var I = "";
@@ -1017,4 +1042,3 @@ function w(D) {
 }
 o("PASSWORD")
 ''';
-

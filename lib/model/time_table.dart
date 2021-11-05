@@ -14,12 +14,12 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
 
 part 'time_table.g.dart';
 
@@ -81,7 +81,7 @@ class TimeTable {
   }
 
 
-  factory TimeTable.fromUGjson(DateTime? startTime, dynamic Coursejson) {
+  factory TimeTable.fromUGjson(DateTime startTime, dynamic Coursejson) {
     TimeTable newTable = new TimeTable()..startTime = startTime;
     for (dynamic course in Coursejson["results"]) {
       newTable.courses!.add(Course.fromUGPart(course));

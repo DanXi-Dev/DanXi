@@ -86,13 +86,6 @@ class TimeTableRepository extends BaseRepositoryWithDio {
             Constant.DEFAULT_SEMESTER_START_TIME,
         tablePage.data.toString());
   }
-
-
-
-
-
-
-
   Future<TimeTable> loadTimeTableLocally(PersonInfo? info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     if (startTime == null) startTime = TimeTable.defaultStartTime;

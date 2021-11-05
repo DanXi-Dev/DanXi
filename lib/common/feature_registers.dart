@@ -24,7 +24,8 @@ Map<String, List<UserGroup>> _kRegister = {};
 
 void registerFeature(Feature feature,
     {List<UserGroup> groups = const [
-      UserGroup.FUDAN_STUDENT,
+      UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
+      UserGroup.FUDAN_POSTGRADUATE_STUDENT,
       UserGroup.FUDAN_STAFF
     ]}) {
   _kRegister[feature.runtimeType.toString()] = groups;

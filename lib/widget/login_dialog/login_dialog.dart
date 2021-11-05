@@ -34,7 +34,11 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT, UserGroup.VISITOR];
+const kCompatibleUserGroup = [
+  UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
+  UserGroup.FUDAN_POSTGRADUATE_STUDENT,
+  UserGroup.VISITOR
+];
 
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
 ///
@@ -76,7 +80,7 @@ class _LoginDialogState extends State<LoginDialog> {
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _pwdController = new TextEditingController();
   String _errorText = "";
-  UserGroup _group = UserGroup.FUDAN_STUDENT;
+  UserGroup _group = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
 
   Future<bool> _deleteAllData() async =>
       await widget.sharedPreferences!.clear();
@@ -99,9 +103,9 @@ class _LoginDialogState extends State<LoginDialog> {
           Navigator.of(context).pop();
         });
         break;
-      case UserGroup.FUDAN_STUDENT:
-        PersonInfo newInfo =
-            PersonInfo.createNewInfo(id, password, UserGroup.FUDAN_STUDENT);
+      case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
+      case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
+        PersonInfo newInfo = PersonInfo.createNewInfo(id, password, _group);
         try {
           final stuInfo =
               await FudanEhallRepository.getInstance().getStudentInfo(newInfo);
@@ -292,7 +296,6 @@ class _LoginDialogState extends State<LoginDialog> {
             });
           },
         ),
-        /*
         TextButton(
             onPressed: () {
               showPlatformModalSheet(
@@ -314,7 +317,7 @@ class _LoginDialogState extends State<LoginDialog> {
                         ),
                       ));
             },
-            child: Text(S.of(context).login_as_others))*/
+            child: Text(S.of(context).login_as_others))
       ],
     );
   }

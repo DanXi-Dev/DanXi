@@ -50,7 +50,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
-const kCompatibleUserGroup = [UserGroup.FUDAN_STUDENT];
+const kCompatibleUserGroup = [
+  UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
+  UserGroup.FUDAN_POSTGRADUATE_STUDENT
+];
 
 class TimetableSubPage extends PlatformSubpage
     with PageWithPrimaryScrollController {
@@ -103,38 +106,42 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup)) {
-      if()
-      _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
-          TimeTableRepository.getInstance().loadTimeTableLocally(
-              StateProvider.personInfo.value,
-              forceLoadFromRemote: _loadFromRemote)));
-      else
-        _content= UGTimetable.getInstance().loadTimeTableRemotely_UG(StateProvider.personInfo.value!, (imageUrl) async {
-          TextEditingController controller=new TextEditingController();
-          await showPlatformDialog(context: context, builder: (cxt){
-
-
-            return PlatformAlertDialog(
-              title:Text("请输入验证码"),
-              content: Column(
-                children: [
-                  Image.network(imageUrl),
-                  TextField(controller: controller)
-
-                ],
-              ),
-              actions: [
-                PlatformDialogAction(
-                  child: Text("确认"),
-                  onPressed: () {
-                    Navigator.of(cxt).pop();
-                  },
-                )
-              ],
-            );
-          });
+      if (StateProvider.personInfo.value!.group ==
+          UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
+        _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
+            TimeTableRepository.getInstance().loadTimeTableLocally(
+                StateProvider.personInfo.value,
+                forceLoadFromRemote: _loadFromRemote)));
+      } else {
+        _content = PostgraduateTimetableRepository.getInstance()
+            .loadTimeTableRemotely(StateProvider.personInfo.value!,
+                (imageUrl) async {
+          TextEditingController controller = new TextEditingController();
+          await showPlatformDialog(
+              context: context,
+              builder: (cxt) {
+                return PlatformAlertDialog(
+                  title: Text("请输入课程表系统验证码"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.network(imageUrl),
+                      TextField(controller: controller)
+                    ],
+                  ),
+                  actions: [
+                    PlatformDialogAction(
+                      child: Text("确认"),
+                      onPressed: () {
+                        Navigator.of(cxt).pop();
+                      },
+                    )
+                  ],
+                );
+              });
           return controller.text;
         });
+      }
       _loadFromRemote = false;
     } else
       _content = LazyFuture.pack(Future<TimeTable>.error(
@@ -322,7 +329,4 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   @override
   bool get wantKeepAlive => true;
-
-
-
 }
