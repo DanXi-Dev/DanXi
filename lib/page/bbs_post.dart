@@ -530,11 +530,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       },
                     ),
                   ),
-                  material: (_, __) => Container(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: _buildContextMenu(context, e),
-                    ),
+                  material: (_, __) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _buildContextMenu(context, e),
                   ),
                 ));
       },

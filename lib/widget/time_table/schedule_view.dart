@@ -223,7 +223,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     } else {
       body = _buildCourseBody(block.event.first.course);
     }
-    return GestureDetector(
+    return InkWell(
       onTap: () => widget.tapCallback?.call(block),
       child: body,
     );

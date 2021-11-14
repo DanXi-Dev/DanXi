@@ -97,7 +97,9 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
   @override
   void initState() {
     super.initState();
-    _items = widget.arguments!['items'];
+    _items = List.from(widget.arguments!['items']);
+    _items!
+        .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 }
 
@@ -112,6 +114,7 @@ class License {
 
 const License LICENSE_APACHE_2_0 = License("Apache License 2.0");
 const License LICENSE_BSD = License("BSD License");
+const License LICENSE_BSD_2_0_CLAUSE = License("BSD 2-Clause License");
 const License LICENSE_BSD_3_0_CLAUSE = License("BSD 3-Clause License");
 const License LICENSE_LGPL_3_0 =
     License("GNU Lesser General Public License v3.0");

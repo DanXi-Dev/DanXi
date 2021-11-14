@@ -75,10 +75,40 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
+    LicenseItem("cached_network_image", LICENSE_MIT,
+        "https://github.com/Baseflow/flutter_cached_network_image"),
+    LicenseItem(
+        "system_tray", LICENSE_MIT, "https://github.com/antler119/system_tray"),
+    LicenseItem(
+        "win32", LICENSE_BSD_3_0_CLAUSE, "https://github.com/timsneath/win32"),
+    LicenseItem("collection", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/dart-lang/collection"),
+    LicenseItem(
+        "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
+    LicenseItem("bitsdojo_window", LICENSE_MIT,
+        "https://github.com/bitsdojo/bitsdojo_window"),
+    LicenseItem("flutter_layout_grid", LICENSE_MIT,
+        "https://github.com/madewithfelt/flutter_layout_grid"),
+    LicenseItem(
+        "flutter_js", LICENSE_MIT, "https://github.com/abner/flutter_js"),
+    LicenseItem("fluttertoast", LICENSE_MIT,
+        "https://github.com/PonnamKarthik/FlutterToast"),
+    LicenseItem("markdown", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/dart-lang/markdown"),
+    LicenseItem("flutter_typeahead", LICENSE_BSD_2_0_CLAUSE,
+        "https://github.com/AbdulRahmanAlHamali/flutter_typeahead"),
+    LicenseItem("flutter_markdown", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/flutter/packages/tree/master/packages/flutter_markdown"),
+    LicenseItem("image_picker", LICENSE_APACHE_2_0,
+        "https://github.com/flutter/plugins/tree/master/packages/image_picker/image_picker"),
+    LicenseItem("Kotlin Stdlib Jdk7", LICENSE_APACHE_2_0,
+        "https://github.com/JetBrains/kotlin"),
+    LicenseItem("google_mobile_ads", LICENSE_APACHE_2_0,
+        "https://github.com/googleads/googleads-mobile-flutter"),
     LicenseItem("auto_size_text", LICENSE_MIT,
         "https://github.com/leisim/auto_size_text"),
-    LicenseItem("beautifulsoup", LICENSE_APACHE_2_0,
-        "https://github.com/Sach97/beautifulsoup.dart"),
+    LicenseItem("beautiful_soup_dart", LICENSE_MIT,
+        "https://github.com/mzdm/beautiful_soup"),
     LicenseItem("build_runner", LICENSE_BSD,
         "https://github.com/dart-lang/build/tree/master/build_runner"),
     LicenseItem(
@@ -125,13 +155,16 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     LicenseItem("gallery_saver", LICENSE_APACHE_2_0,
         "https://github.com/CarnegieTechnologies/gallery_saver"),
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
-    LicenseItem("ical", LICENSE_BSD, "https://github.com/dartclub/ical"),
+    LicenseItem(
+        "ical", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dartclub/ical"),
     LicenseItem("in_app_review", LICENSE_MIT,
         "https://github.com/britannio/in_app_review"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
     LicenseItem("json_serializable", LICENSE_BSD,
         "https://github.com/google/json_serializable.dart/tree/master/json_serializable"),
     LicenseItem("linkify", LICENSE_MIT, "https://github.com/Cretezy/linkify"),
+    LicenseItem("pubspec_generator", LICENSE_MIT,
+        "https://github.com/PlugFox/pubspec_generator"),
     LicenseItem(
         "open_file", LICENSE_BSD, "https://github.com/crazecoder/open_file"),
     LicenseItem(
@@ -155,6 +188,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         "https://github.com/flutter/plugins"),
     LicenseItem(
         "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
+    LicenseItem("screen_brightness", LICENSE_MIT,
+        "https://github.com/aaassseee/screen_brightness"),
   ];
   BannerAd? myBanner;
 
@@ -499,30 +534,31 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           ),
 
                         // Sponsor Option
-                        Card(
-                          child: ListTile(
-                            isThreeLine:
-                                !SettingsProvider.getInstance().isAdEnabled,
-                            leading: Icon(
-                              PlatformIcons(context).heartSolid,
+                        if (PlatformX.isMobile)
+                          Card(
+                            child: ListTile(
+                              isThreeLine:
+                                  !SettingsProvider.getInstance().isAdEnabled,
+                              leading: Icon(
+                                PlatformIcons(context).heartSolid,
+                              ),
+                              title: Text(S.of(context).sponsor_us),
+                              subtitle: Text(
+                                  SettingsProvider.getInstance().isAdEnabled
+                                      ? S.of(context).sponsor_us_enabled
+                                      : S.of(context).sponsor_us_disabled),
+                              onTap: () async {
+                                if (SettingsProvider.getInstance().isAdEnabled) {
+                                  _toggleAdDisplay();
+                                } else {
+                                  //if (await _showAdsDialog()) {
+                                  _toggleAdDisplay();
+                                  await _showAdsThankyouDialog();
+                                  //}
+                                }
+                              },
                             ),
-                            title: Text(S.of(context).sponsor_us),
-                            subtitle: Text(
-                                SettingsProvider.getInstance().isAdEnabled
-                                    ? S.of(context).sponsor_us_enabled
-                                    : S.of(context).sponsor_us_disabled),
-                            onTap: () async {
-                              if (SettingsProvider.getInstance().isAdEnabled) {
-                                _toggleAdDisplay();
-                              } else {
-                                //if (await _showAdsDialog()) {
-                                _toggleAdDisplay();
-                                await _showAdsThankyouDialog();
-                                //}
-                              }
-                            },
                           ),
-                        ),
 
                         // About
                         _buildAboutCard()
