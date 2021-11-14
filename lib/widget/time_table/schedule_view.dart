@@ -192,18 +192,23 @@ class _ScheduleViewState extends State<ScheduleView> {
         }
       }
     }
-
     // Merge courses at the same time
-    for (int i = 0; i < result.length;) {
-      try {
-        ScheduleBlock overlapBlock = result.firstWhere((element) {
-          return element.slotSpan == result[i].slotSpan &&
-              element.firstSlot == result[i].firstSlot;
-        });
-        ScheduleBlock thisBlock = result.removeAt(i);
-        overlapBlock.event.addAll(thisBlock.event);
-      } catch (e) {
-        ++i;
+    flag = true;
+    while (flag) {
+      flag = false;
+      for (int i = 0; i < result.length;) {
+        try {
+          ScheduleBlock overlapBlock =
+              result.sublist(i + 1).firstWhere((element) {
+            return element.slotSpan == result[i].slotSpan &&
+                element.firstSlot == result[i].firstSlot;
+          });
+          flag = true;
+          ScheduleBlock thisBlock = result.removeAt(i);
+          overlapBlock.event.addAll(thisBlock.event);
+        } catch (e) {
+          ++i;
+        }
       }
     }
     return result;

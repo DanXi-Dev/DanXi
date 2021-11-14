@@ -289,6 +289,34 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     });
   }
 
+  Widget _buildCourseItem(Event event) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                event.course.courseName!,
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              Text((event.course.teacherNames ?? []).join(",")),
+              Text(event.course.roomName!),
+              Text(event.course.courseId!),
+            ],
+          ),
+        ),
+      );
+
+  void _onTapCourse(ScheduleBlock block) {
+    showPlatformModalSheet(
+        context: context,
+        builder: (BuildContext context) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: block.event.map((e) => _buildCourseItem(e)).toList(),
+            ));
+  }
+
   Widget _buildPage(TimeTable table) {
     final TimetableStyle style = TimetableStyle();
     _table = table;
@@ -325,8 +353,14 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                 )
               ],
             ),
-            ScheduleView(scheduleData, style, _table!.now(), _showingTime!.week,
-                widget.primaryScrollController(context)),
+            ScheduleView(
+              scheduleData,
+              style,
+              _table!.now(),
+              _showingTime!.week,
+              widget.primaryScrollController(context),
+              tapCallback: _onTapCourse,
+            ),
           ],
         ),
       ),
