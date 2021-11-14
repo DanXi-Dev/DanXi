@@ -16,6 +16,7 @@
  */
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 /// Useful utils when processing network requests by dio.
 class DioUtils {
@@ -41,6 +42,10 @@ class DioUtils {
           });
 
   static Future<Response> processRedirect(Dio dio, Response response) async {
+    print("=============Redirect processing=============");
+    debugPrint(
+        "[Redirect] request to ${response.requestOptions.uri} and get a code ${response.statusCode}.");
+    debugPrint("[Redirect] response body is \n${response.data}");
     //Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&

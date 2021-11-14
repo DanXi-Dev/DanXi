@@ -260,7 +260,7 @@
 
     "share_as_ics":"Export as ICS",
 
-    "connection_failed":"Login failed. Check your Internet connection.\nMake sure to grant WLAN & Celluar permission when prompted.",
+    "connection_failed":"Connection failed. Check your Internet connection and try again.\nIf using iOS, make sure to grant WLAN & Cellular permission when prompted.",
     "credentials_invalid": "Invalid username or password",
     "captcha_needed": "Captcha needed, please following the on-screen instructions.",
     "weak_password": "Login failed. Unknown error.\nNote: Danxi does not support weak passwords. If UIS warns of weak password at login, please change your password at UIS Portal and try again.",

@@ -56,6 +56,11 @@ class PersonInfo {
     name = "";
   }
 
+  @override
+  String toString() {
+    return 'PersonInfo{group: $group, id: $id, password: $password, name: $name}';
+  }
+
   static bool verifySharedPreferences(SharedPreferences preferences) {
     return preferences.containsKey("id") &&
         preferences.containsKey("password") &&
