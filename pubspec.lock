@@ -542,7 +542,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: fc761f071cad94824314131651bc71f6f8bd028b
-      url: "git://github.com/kavinzhao/flutter_progress_dialog.git"
+      url: "git://github.com/singularity-s0/flutter_progress_dialog.git"
     source: git
     version: "0.1.0"
   flutter_svg:
@@ -726,7 +726,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: ada15684ac89603681cec54bb07b05b191a05a1a
-      url: "git://github.com/kavinzhao/linkify.git"
+      url: "git://github.com/singularity-s0/linkify.git"
     source: git
     version: "4.0.0"
   logging:
@@ -1050,7 +1050,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: b8880fb19a1d54a91dfdffd88ba84dec80a71088
-      url: "git://github.com/kavinzhao/screen_brightness.git"
+      url: "git://github.com/singularity-s0/screen_brightness.git"
     source: git
     version: "0.0.4"
   sentry:

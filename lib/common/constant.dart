@@ -85,8 +85,11 @@ class Constant {
     return [
       Developer("w568w", "assets/graphics/w568w.jpeg",
           "https://github.com/w568w", S.of(context).w568w_description),
-      Developer("kavinzhao", "assets/graphics/kavinzhao.jpeg",
-          "https://github.com/kavinzhao", S.of(context).kavinzhao_description),
+      Developer(
+          "singularity-s0",
+          "assets/graphics/kavinzhao.jpeg",
+          "https://github.com/singularity-s0",
+          S.of(context).singularity_s0_description),
       Developer("KYLN24", "assets/graphics/kyln24.jpeg",
           "https://github.com/KYLN24", S.of(context).KYLN24_description),
       Developer("hasbai", "assets/graphics/hasbai.jpeg",

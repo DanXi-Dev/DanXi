@@ -183,7 +183,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? S.of(context).forum
+              ? "#${_post?.id}"
               : S.of(context).search_result),
         ),
         trailingActions: [

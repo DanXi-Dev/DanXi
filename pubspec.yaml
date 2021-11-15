@@ -17,7 +17,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
     git:
-      url: git://github.com/kavinzhao/flutter_progress_dialog.git
+      url: git://github.com/singularity-s0/flutter_progress_dialog.git
       ref: master
   beautiful_soup_dart: ^0.2.0
   quick_actions: ^0.6.0+1
@@ -30,7 +30,7 @@ dependencies:
   path_provider: ^2.0.1
   screen_brightness:
     git:
-      url: git://github.com/kavinzhao/screen_brightness.git
+      url: git://github.com/singularity-s0/screen_brightness.git
       ref: master
   flutter_email_sender: ^5.0.0
   auto_size_text: ^3.0.0-nullsafety.0
@@ -85,7 +85,7 @@ dependency_overrides:
       ref: master
   linkify:
     git:
-      url: git://github.com/kavinzhao/linkify.git
+      url: git://github.com/singularity-s0/linkify.git
       ref: master
 
 dev_dependencies:

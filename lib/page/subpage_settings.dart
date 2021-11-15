@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021 kavinzhao
+ *     Copyright (C) 2021 DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -548,7 +548,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       ? S.of(context).sponsor_us_enabled
                                       : S.of(context).sponsor_us_disabled),
                               onTap: () async {
-                                if (SettingsProvider.getInstance().isAdEnabled) {
+                                if (SettingsProvider.getInstance()
+                                    .isAdEnabled) {
                                   _toggleAdDisplay();
                                 } else {
                                   //if (await _showAdsDialog()) {
