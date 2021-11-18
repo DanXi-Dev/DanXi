@@ -149,8 +149,8 @@ class PEFeature extends Feature {
       _exercises!.forEach((element) {
         body += "\n${element.title}: ${element.times}";
       });
-      Noticing.showNotice(context!, body,
-          title: S.of(context!).pe_exercises, useSnackBar: false);
+      Noticing.showModalNotice(context!,
+          message: body, title: S.of(context!).pe_exercises);
     } else {
       refreshData();
     }
