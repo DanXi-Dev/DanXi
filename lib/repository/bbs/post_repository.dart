@@ -85,6 +85,7 @@ class PostRepository extends BaseRepositoryWithDio {
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
+        return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
         final ASN1Parser p = ASN1Parser(certificate.der);
         final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;

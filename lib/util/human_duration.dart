@@ -20,20 +20,24 @@ import 'package:flutter/cupertino.dart';
 
 /// Create human-readable duration, e.g.: 1 hour ago, 2 days ago
 class HumanDuration {
-  static String format(BuildContext context, DateTime dateTime) {
-    Duration duration = DateTime.now().difference(dateTime);
-    if (duration.inSeconds < 1) {
-      return S.of(context).moment_ago;
-    } else if (duration.inMinutes < 1) {
-      return S.of(context).second_ago(duration.inSeconds);
-    } else if (duration.inHours < 1) {
-      return S.of(context).minute_ago(duration.inMinutes);
-    } else if (duration.inDays < 1) {
-      return S.of(context).hour_ago(duration.inHours);
-    } else if (duration.inDays <= 30) {
-      return S.of(context).day_ago(duration.inDays);
-    } else {
-      return DateFormat("yyyy/MM/dd").format(dateTime);
+  static String format(BuildContext context, DateTime? dateTime) {
+    try {
+      final Duration duration = DateTime.now().difference(dateTime!);
+      if (duration.inSeconds < 1) {
+        return S.of(context).moment_ago;
+      } else if (duration.inMinutes < 1) {
+        return S.of(context).second_ago(duration.inSeconds);
+      } else if (duration.inHours < 1) {
+        return S.of(context).minute_ago(duration.inMinutes);
+      } else if (duration.inDays < 1) {
+        return S.of(context).hour_ago(duration.inHours);
+      } else if (duration.inDays <= 30) {
+        return S.of(context).day_ago(duration.inDays);
+      } else {
+        return DateFormat("yyyy/MM/dd").format(dateTime);
+      }
+    } catch (e) {
+      return "";
     }
   }
 }

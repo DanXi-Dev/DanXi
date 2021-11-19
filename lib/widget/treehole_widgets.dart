@@ -34,6 +34,7 @@ import 'package:dan_xi/widget/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OTLeadingTag extends StatelessWidget {
@@ -131,6 +132,7 @@ class OTFloorWidget extends StatelessWidget {
           dense: true,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (generateTags)
                 Padding(
@@ -156,7 +158,7 @@ class OTFloorWidget extends StatelessWidget {
                         width: 2,
                       ),
                     Text(
-                      "[${floor.anonyname}]",
+                      "${floor.anonyname}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(
@@ -195,60 +197,56 @@ class OTFloorWidget extends StatelessWidget {
                           floor.filteredContent!, onLinkTap, onImageTap)),
             ],
           ),
-          subtitle: isNested
-              ? null
-              : Column(children: [
-                  const SizedBox(
-                    height: 8,
+          subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(
+              height: 8,
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              if (index == null)
+                Text(
+                  "#${floor.floor_id}",
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
                   ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (index == null)
-                          Text(
-                            "#${floor.floor_id}",
-                            style: TextStyle(
-                              color: Theme.of(context).hintColor,
-                            ),
-                          ),
-                        if (index != null)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "${index! + 1}F",
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "  (#${floor.floor_id})",
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        Text(
-                          HumanDuration.format(
-                              context, DateTime.parse(floor.time_created!)),
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor, fontSize: 12),
-                        ),
-                        GestureDetector(
-                          child: Text(S.of(context).report,
-                              style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 12)),
-                          onTap: () {
-                            BBSEditor.reportPost(context, floor.floor_id);
-                          },
-                        ),
-                      ]),
-                ]),
+                ),
+              if (index != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "${index! + 1}F",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "  (#${floor.floor_id})",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              Text(
+                HumanDuration.format(
+                    context, DateTime.tryParse(floor.time_created!)),
+                style:
+                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+              ),
+              if (!isNested)
+                GestureDetector(
+                  child: Text(S.of(context).report,
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12)),
+                  onTap: () {
+                    BBSEditor.reportPost(context, floor.floor_id);
+                  },
+                ),
+            ]),
+          ]),
           onTap: onTap,
         ),
       ),
@@ -258,20 +256,26 @@ class OTFloorWidget extends StatelessWidget {
 
 class OTFloorWidgetLazy extends StatelessWidget {
   final Future<OTFloor> future;
-  final bool isNested;
-  final OTHole? parentHole;
-  final int? index;
-  final void Function()? onTap;
-  final void Function()? onLongPress;
 
   OTFloorWidgetLazy({
     required this.future,
-    this.isNested = true,
-    this.index,
-    this.onTap,
-    this.onLongPress,
-    this.parentHole,
   });
+
+  void showFloorDetail(BuildContext context, OTFloor floor) {
+    showPlatformModalSheet(
+      context: context,
+      builder: (BuildContext context) => SafeArea(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: OTFloorWidget(
+              floor: floor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -281,11 +285,8 @@ class OTFloorWidgetLazy extends StatelessWidget {
             (BuildContext context, AsyncSnapshot<OTFloor> snapshot) {
           return OTFloorWidget(
             floor: snapshot.data!,
-            isNested: isNested,
-            index: index,
-            onTap: onTap,
-            onLongPress: onLongPress,
-            parentHole: parentHole,
+            isNested: true,
+            onTap: () => showFloorDetail(context, snapshot.data!),
           );
         },
         errorBuilder: OTFloorWidget(
