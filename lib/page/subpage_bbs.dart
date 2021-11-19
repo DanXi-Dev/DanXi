@@ -23,6 +23,8 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/post_tag.dart';
@@ -87,11 +89,11 @@ String renderText(String content, String imagePlaceholder) {
 const String KEY_NO_TAG = "默认";
 
 /// Turn tags into Widgets
-Widget generateTagWidgets(BuildContext context, BBSPost? e,
+Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
-  if (e == null || e.tag == null) return Container();
+  if (e == null || e.tags == null) return Container();
   List<Widget> _tags = [];
-  e.tag!.forEach((element) {
+  e.tags!.forEach((element) {
     if (element.name == KEY_NO_TAG) return;
     _tags.add(Flex(
         direction: Axis.horizontal,
@@ -102,7 +104,7 @@ Widget generateTagWidgets(BuildContext context, BBSPost? e,
             label: element.name,
             color: useAccessibilityColoring
                 ? Theme.of(context).textTheme.bodyText1!.color
-                : Constant.getColorFromString(element.color),
+                : Constant.getColorFromString(color),
           ),
         ]));
   });
@@ -240,7 +242,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   late bool _fieldInitComplete;
 
   ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
-  Future<List<BBSPost>?> _loadContent(int page) async {
+  Future<List<OTHole>?> _loadContent(int page) async {
     // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
       _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
@@ -252,25 +254,28 @@ class _BBSSubpageState extends State<BBSSubpage>
       else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
           false) {
         if (page > 1) return Future.value([]);
-        return await PostRepository.getInstance().getFavoredDiscussions();
+        // TODO: It is too ineffective.
+        return Future.wait<OTHole>(
+            (await PostRepository.getInstance().getFavoredDiscussions()).map(
+                (e) => PostRepository.getInstance().loadSpecificDiscussion(e)));
       } else {
         if (!PostRepository.getInstance().isUserInitialized)
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value);
 
-        List<BBSPost> loadedPost = await PostRepository.getInstance()
+        List<OTHole> loadedPost = await PostRepository.getInstance()
             .loadDiscussions(page, _sortOrder);
         // Filter blocked posts
-        List<PostTag> hiddenTags =
+        List<OTTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
-        loadedPost.removeWhere((element) => element.tag!.any((thisTag) =>
+        loadedPost.removeWhere((element) => element.tags!.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
 
         // About this line, see [PagedListView].
-        return loadedPost.isEmpty ? [BBSPost.DUMMY_POST] : loadedPost;
+        return loadedPost.isEmpty ? [OTHole.DUMMY_POST] : loadedPost;
       }
     } else {
-      throw NotLoginError("Logged in as Visitor.");
+      throw NotLoginError("Logged in as a visitor.");
     }
   }
 
@@ -345,7 +350,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      final BBSPost post =
+      final OTHole post =
           await PostRepository.getInstance().loadSpecificDiscussion(pid);
       smartNavigatorPush(context, "/bbs/postDetail", arguments: {
         "post": post,
@@ -452,8 +457,8 @@ class _BBSSubpageState extends State<BBSSubpage>
             HapticFeedback.mediumImpact();
             await refreshSelf();
           },
-          child: PagedListView<BBSPost>(
-              noneItem: BBSPost.DUMMY_POST,
+          child: PagedListView<OTHole>(
+              noneItem: OTHole.DUMMY_POST,
               pagedController: _listViewController,
               withScrollbar: true,
               scrollController: widget.primaryScrollController(context),
@@ -496,15 +501,15 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
-  Widget _buildListItem(BuildContext context, ListProvider<BBSPost> _,
-      int index, BBSPost postElement) {
-    if (postElement.first_post == null ||
-        postElement.last_post == null ||
+  Widget _buildListItem(BuildContext context, ListProvider<OTHole> _, int index,
+      OTHole postElement) {
+    if (postElement.floors?.first_floor == null ||
+        postElement.floors?.last_floor == null ||
         (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded!))
       return Container();
     Linkify postContentWidget = Linkify(
-      text: renderText(
-          postElement.first_post!.filteredContent!, S.of(context).image_tag),
+      text: renderText(postElement.floors!.first_floor!.filteredContent!,
+          S.of(context).image_tag),
       style: TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -559,18 +564,18 @@ class _BBSSubpageState extends State<BBSSubpage>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "#${postElement.id}",
+                      "#${postElement.hole_id}",
                       style: infoStyle,
                     ),
                     Text(
                       HumanDuration.format(
-                          context, DateTime.parse(postElement.date_created!)),
+                          context, DateTime.parse(postElement.time_created!)),
                       style: infoStyle,
                     ),
                     Row(
                       children: [
                         Text(
-                          "${postElement.count} ",
+                          "${postElement.reply} ",
                           style: infoStyle,
                         ),
                         Icon(
@@ -589,21 +594,24 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "post": postElement,
               });
             }),
-        if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
-            postElement.last_post!.id != postElement.first_post!.id)
+            if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
+            postElement.floors?.last_floor!.hole_id !=
+                postElement.floors?.first_floor!.hole_id)
           Divider(
             height: 4,
           ),
-        if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
-            postElement.last_post!.id != postElement.first_post!.id)
+            if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
+            postElement.floors?.last_floor!.hole_id !=
+                postElement.floors?.first_floor!.hole_id)
           _buildCommentView(postElement),
       ])),
     );
   }
 
-  Widget _buildCommentView(BBSPost postElement, {bool useLeading = true}) {
+  Widget _buildCommentView(OTHole postElement, {bool useLeading = true}) {
     final String lastReplyContent = renderText(
-        postElement.last_post!.filteredContent!, S.of(context).image_tag);
+        postElement.floors!.last_floor!.filteredContent!,
+        S.of(context).image_tag);
     return ListTile(
         dense: true,
         minLeadingWidth: 16,
@@ -626,11 +634,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                   children: [
                     Text(
                       S.of(context).latest_reply(
-                          postElement.last_post!.username ?? "?",
+                          postElement.floors!.last_floor!.anonyname ?? "?",
                           HumanDuration.format(
                               context,
-                              DateTime.parse(
-                                  postElement.last_post!.date_created!))),
+                              DateTime.parse(postElement
+                                  .floors!.last_floor!.time_created!))),
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Icon(CupertinoIcons.search,

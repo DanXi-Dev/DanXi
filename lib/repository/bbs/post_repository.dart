@@ -19,11 +19,13 @@ import 'dart:io';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
-import 'package:dan_xi/model/fduhole_profile.dart';
+import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/opentreehole/floor.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/post_tag.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -37,540 +39,12 @@ class PostRepository extends BaseRepositoryWithDio {
 
   factory PostRepository.getInstance() => _instance;
   static const String _BASE_URL = "https://hole.hath.top";
-  static const List<int> PINNED_CERTIFICATE = [
-    48,
-    130,
-    2,
-    10,
-    2,
-    130,
-    2,
-    1,
-    0,
-    128,
-    18,
-    101,
-    23,
-    54,
-    14,
-    195,
-    219,
-    8,
-    179,
-    208,
-    172,
-    87,
-    13,
-    118,
-    237,
-    205,
-    39,
-    211,
-    76,
-    173,
-    80,
-    131,
-    97,
-    226,
-    170,
-    32,
-    77,
-    9,
-    45,
-    100,
-    9,
-    220,
-    206,
-    137,
-    159,
-    204,
-    61,
-    169,
-    236,
-    246,
-    207,
-    193,
-    220,
-    241,
-    211,
-    177,
-    214,
-    123,
-    55,
-    40,
-    17,
-    43,
-    71,
-    218,
-    57,
-    198,
-    188,
-    58,
-    25,
-    180,
-    95,
-    166,
-    189,
-    125,
-    157,
-    163,
-    99,
-    66,
-    182,
-    118,
-    242,
-    169,
-    59,
-    43,
-    145,
-    248,
-    226,
-    111,
-    208,
-    236,
-    22,
-    32,
-    144,
-    9,
-    62,
-    226,
-    232,
-    116,
-    201,
-    24,
-    180,
-    145,
-    212,
-    98,
-    100,
-    219,
-    127,
-    163,
-    6,
-    241,
-    136,
-    24,
-    106,
-    144,
-    34,
-    60,
-    188,
-    254,
-    19,
-    240,
-    135,
-    20,
-    123,
-    246,
-    228,
-    31,
-    142,
-    212,
-    228,
-    81,
-    198,
-    17,
-    103,
-    70,
-    8,
-    81,
-    203,
-    134,
-    20,
-    84,
-    63,
-    188,
-    51,
-    254,
-    126,
-    108,
-    156,
-    255,
-    22,
-    157,
-    24,
-    189,
-    81,
-    142,
-    53,
-    166,
-    167,
-    102,
-    200,
-    114,
-    103,
-    219,
-    33,
-    102,
-    177,
-    212,
-    155,
-    120,
-    3,
-    192,
-    80,
-    58,
-    232,
-    204,
-    240,
-    220,
-    188,
-    158,
-    76,
-    254,
-    175,
-    5,
-    150,
-    53,
-    31,
-    87,
-    90,
-    183,
-    255,
-    206,
-    249,
-    61,
-    183,
-    44,
-    182,
-    246,
-    84,
-    221,
-    200,
-    231,
-    18,
-    58,
-    77,
-    174,
-    76,
-    138,
-    183,
-    92,
-    154,
-    180,
-    183,
-    32,
-    61,
-    202,
-    127,
-    34,
-    52,
-    174,
-    126,
-    59,
-    104,
-    102,
-    1,
-    68,
-    231,
-    1,
-    78,
-    70,
-    83,
-    155,
-    51,
-    96,
-    247,
-    148,
-    190,
-    83,
-    55,
-    144,
-    115,
-    67,
-    243,
-    50,
-    195,
-    83,
-    239,
-    219,
-    170,
-    254,
-    116,
-    78,
-    105,
-    199,
-    107,
-    140,
-    96,
-    147,
-    222,
-    196,
-    199,
-    12,
-    223,
-    225,
-    50,
-    174,
-    204,
-    147,
-    59,
-    81,
-    120,
-    149,
-    103,
-    139,
-    238,
-    61,
-    86,
-    254,
-    12,
-    208,
-    105,
-    15,
-    27,
-    15,
-    243,
-    37,
-    38,
-    107,
-    51,
-    109,
-    247,
-    110,
-    71,
-    250,
-    115,
-    67,
-    229,
-    126,
-    14,
-    165,
-    102,
-    177,
-    41,
-    124,
-    50,
-    132,
-    99,
-    85,
-    137,
-    196,
-    13,
-    193,
-    147,
-    84,
-    48,
-    25,
-    19,
-    172,
-    211,
-    125,
-    55,
-    167,
-    235,
-    93,
-    58,
-    108,
-    53,
-    92,
-    219,
-    65,
-    215,
-    18,
-    218,
-    169,
-    73,
-    11,
-    223,
-    216,
-    128,
-    138,
-    9,
-    147,
-    98,
-    142,
-    181,
-    102,
-    207,
-    37,
-    136,
-    205,
-    132,
-    184,
-    177,
-    63,
-    164,
-    57,
-    15,
-    217,
-    2,
-    158,
-    235,
-    18,
-    76,
-    149,
-    124,
-    243,
-    107,
-    5,
-    169,
-    94,
-    22,
-    131,
-    204,
-    184,
-    103,
-    226,
-    232,
-    19,
-    157,
-    204,
-    91,
-    130,
-    211,
-    76,
-    179,
-    237,
-    91,
-    255,
-    222,
-    229,
-    115,
-    172,
-    35,
-    59,
-    45,
-    0,
-    191,
-    53,
-    85,
-    116,
-    9,
-    73,
-    216,
-    73,
-    88,
-    26,
-    127,
-    146,
-    54,
-    230,
-    81,
-    146,
-    14,
-    243,
-    38,
-    125,
-    28,
-    77,
-    23,
-    188,
-    201,
-    236,
-    67,
-    38,
-    208,
-    191,
-    65,
-    95,
-    64,
-    169,
-    68,
-    68,
-    244,
-    153,
-    231,
-    87,
-    135,
-    158,
-    80,
-    31,
-    87,
-    84,
-    168,
-    62,
-    253,
-    116,
-    99,
-    47,
-    177,
-    80,
-    101,
-    9,
-    230,
-    88,
-    66,
-    46,
-    67,
-    26,
-    76,
-    180,
-    240,
-    37,
-    71,
-    89,
-    250,
-    4,
-    30,
-    147,
-    212,
-    38,
-    70,
-    74,
-    80,
-    129,
-    178,
-    222,
-    190,
-    120,
-    183,
-    252,
-    103,
-    21,
-    225,
-    201,
-    87,
-    132,
-    30,
-    15,
-    99,
-    214,
-    233,
-    98,
-    186,
-    214,
-    95,
-    85,
-    46,
-    234,
-    92,
-    198,
-    40,
-    8,
-    4,
-    37,
-    57,
-    184,
-    14,
-    43,
-    169,
-    242,
-    76,
-    151,
-    28,
-    7,
-    63,
-    13,
-    82,
-    245,
-    237,
-    239,
-    47,
-    130,
-    15,
-    2,
-    3,
-    1,
-    0,
-    1
-  ];
 
   /// The token used for session authentication.
   String? _token;
 
   /// Current user profile, stored as cache by the repository
-  FduholeProfile? _profile;
+  OTUser? _profile;
 
   /// Push Notification Registeration Cache
   String? _deviceId, _pushNotificationToken;
@@ -612,7 +86,7 @@ class PostRepository extends BaseRepositoryWithDio {
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
-        return true;
+            return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
         final ASN1Parser p = ASN1Parser(certificate.der);
         final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
@@ -621,7 +95,8 @@ class PostRepository extends BaseRepositoryWithDio {
         final ASN1BitString pubKeyBits =
             pubKeyElement.elements[1] as ASN1BitString;
 
-        if (listEquals(pubKeyBits.stringValue, PINNED_CERTIFICATE)) {
+        if (listEquals(
+            pubKeyBits.stringValue, SecureConstant.PINNED_CERTIFICATE)) {
           return true;
         }
         // Allow connection when public key matches
@@ -657,22 +132,33 @@ class PostRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<BBSPost>> loadDiscussions(int page, SortOrder? sortBy) async {
-    final Response response = await dio!.get(_BASE_URL + "/discussions/",
-        queryParameters: {"page": page, "order": sortBy.getInternalString()},
+  Future<List<OTHole>> loadDiscussions(
+    DateTime startTime,
+    int divisionId, {
+    int length = 10,
+    int prefetchLength = 10,
+  }) async {
+    final Response response = await dio!.get(_BASE_URL + "/holes",
+        queryParameters: {
+          "start_time": startTime.toIso8601String(),
+          "division_id": divisionId,
+          "length": length,
+          "prefetch_length": prefetchLength
+        },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
-    return result.map((e) => BBSPost.fromJson(e)).toList();
+    return result.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  Future<BBSPost> loadSpecificDiscussion(int? discussionId) async {
-    Response response = await dio!.get(_BASE_URL + "/discussions/",
-        queryParameters: {"discussion_id": discussionId.toString()},
+  /// Migrated
+  Future<OTHole> loadSpecificDiscussion(int? discussionId) async {
+    Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
         options: Options(headers: _tokenHeader));
-    return BBSPost.fromJson(response.data);
+    return OTHole.fromJson(response.data);
   }
 
-  Future<List<BBSPost>> loadTagFilteredDiscussions(
+  /// Do we have such an API?
+  Future<List<OTHole>> loadTagFilteredDiscussions(
       String tag, SortOrder sortBy, int page) async {
     try {
       final response = await dio!.get(_BASE_URL + "/discussions/",
@@ -683,7 +169,7 @@ class PostRepository extends BaseRepositoryWithDio {
           },
           options: Options(headers: _tokenHeader));
       final List result = response.data;
-      return result.map((e) => BBSPost.fromJson(e)).toList();
+      return result.map((e) => OTHole.fromJson(e)).toList();
     } catch (error) {
       if (error is DioError && error.response?.statusCode == 401) {
         _token = null;
@@ -693,40 +179,52 @@ class PostRepository extends BaseRepositoryWithDio {
     }
   }
 
-  Future<List<Reply>> loadReplies(BBSPost post, int page) async {
-    final Response response = await dio!.get(_BASE_URL + "/posts/",
-        queryParameters: {"page": page, "id": post.id},
+  /// Migrated
+  Future<List<OTFloor>> loadReplies(
+      BBSPost post, int startFloor, int length) async {
+    final Response response = await dio!.get(_BASE_URL + "/floors",
+        queryParameters: {
+          "start_floor": startFloor,
+          "hole_id": post.id,
+          "length": length
+        },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
-    return result.map((e) => Reply.fromJson(e)).toList();
+    return result.map((e) => OTFloor.fromJson(e)).toList();
   }
 
-  Future<List<Reply>> loadSearchResults(String? searchString, int page) async {
+  /// Migrated
+  Future<List<OTFloor>> loadSearchResults(
+      String? searchString, int page) async {
     // Search results only have a single page.
     // Return nothing if [page] > 1.
     if (page > 1) return Future.value([]);
-    final Response response = await dio!.get(_BASE_URL + "/posts/",
-        queryParameters: {"search": searchString, "page": page},
+    final Response response = await dio!.get(_BASE_URL + "/floors",
+        queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
         options: Options(headers: _tokenHeader));
     final List result = response.data;
-    return result.map((e) => Reply.fromJson(e)).toList();
+    return result.map((e) => OTFloor.fromJson(e)).toList();
   }
 
-  Future<List<PostTag>> loadTags() async {
+  /// Migrated
+  Future<List<OTTag>> loadTags() async {
     final Response response = await dio!
-        .get(_BASE_URL + "/tags/", options: Options(headers: _tokenHeader));
+        .get(_BASE_URL + "/tags", options: Options(headers: _tokenHeader));
     final List result = response.data;
-    return result.map((e) => PostTag.fromJson(e)).toList();
+    return result.map((e) => OTTag.fromJson(e)).toList();
   }
 
-  Future<int?> newPost(String? content, {List<PostTag>? tags}) async {
+  /// Migrated
+  Future<int?> newPost(String divisionId, String? content,
+      {List<OTTag>? tags}) async {
     if (content == null) return 0;
     if (tags == null) tags = [];
     // Suppose user is logged in. He should be.
-    final Response response = await dio!.post(_BASE_URL + "/discussions/",
+    final Response response = await dio!.post(_BASE_URL + "/holes",
         data: {
+          "division_id": divisionId,
           "content": content,
-          "tags": tags.map((e) => e.toJson()).toList()
+          "tag_names": tags.map((e) => e.name).toList()
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;
@@ -745,59 +243,71 @@ class PostRepository extends BaseRepositoryWithDio {
     return response.data['url'];
   }
 
-  Future<int?> newReply(int? discussionId, int? postId, String content) async {
-    // Suppose user is logged in. He should be.
-    final Response response = await dio!.post(_BASE_URL + "/posts/",
+  /// Partly migrated. What does [mention] means?
+  Future<int?> newReply(int? discussionId, int? replyTo, String content) async {
+    final Response response = await dio!.post(_BASE_URL + "/floors",
         data: {
           "content": content,
-          "discussion_id": discussionId,
-          "post_id": postId
+          "hole_id": discussionId,
+          "reply_to": replyTo
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
+  /// Migrated
   Future<int?> reportPost(int? postId, String reason) async {
     // Suppose user is logged in. He should be.
-    final Response response = await dio!.post(_BASE_URL + "/reports/",
-        data: {"post_id": postId, "reason": reason},
+    final Response response = await dio!.post(_BASE_URL + "/reports",
+        data: {"floor_id": postId, "reason": reason},
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
-  Future<FduholeProfile?> getUserProfile({bool forceUpdate = false}) async {
+  /// Migrated
+  Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (_profile == null || forceUpdate) {
-      final Response response = await dio!.get(_BASE_URL + "/profile/",
-          options: Options(headers: _tokenHeader));
-      _profile = FduholeProfile.fromJson(response.data);
+      final Response response = await dio!
+          .get(_BASE_URL + "/users", options: Options(headers: _tokenHeader));
+      _profile = OTUser.fromJson(response.data);
     }
     return _profile;
   }
 
+  /// Migrated
   Future<bool?> isUserAdmin() async {
-    return (await getUserProfile())!.user!.is_staff;
+    return (await getUserProfile())!.is_admin;
   }
 
+  /// Migrated
   /// Non-async version of [isUserAdmin], will return false if data is not yet ready
   bool isUserAdminNonAsync() {
-    return _profile?.user?.is_staff ?? false;
+    return _profile?.is_admin ?? false;
   }
 
-  Future<List<BBSPost>> getFavoredDiscussions(
-      {bool forceUpdate = false}) async {
-    return (await getUserProfile(forceUpdate: forceUpdate))!
-        .favored_discussion!;
+  /// Migrated
+  Future<List<int>> getFavoredDiscussions({bool forceUpdate = false}) async {
+    return (await getUserProfile(forceUpdate: forceUpdate))!.favorites!;
   }
 
+  /// Partially migrated. Does the server return a [OTUser]?
   Future<void> setFavoredDiscussion(
       SetFavoredDiscussionMode mode, int? discussionId) async {
-    final Response response = await dio!.put(_BASE_URL + "/profile/",
-        data: {
-          'mode': mode.getInternalString(),
-          'favoredDiscussion': discussionId
-        },
-        options: Options(headers: _tokenHeader));
-    _profile = FduholeProfile.fromJson(response.data);
+    Response response;
+    switch (mode) {
+      case SetFavoredDiscussionMode.ADD:
+        response = await dio!.post(_BASE_URL + "/user/favorites",
+            data: {'hole_id': discussionId},
+            options: Options(headers: _tokenHeader));
+        break;
+      case SetFavoredDiscussionMode.DELETE:
+        response = await dio!.delete(_BASE_URL + "/user/favorites",
+            data: {'hole_id': discussionId},
+            options: Options(headers: _tokenHeader));
+        break;
+    }
+
+    _profile = OTUser.fromJson(response.data);
   }
 
   /// Modify a post, requires Admin privilege
@@ -909,17 +419,6 @@ extension StringRepresentation on PushNotificationServiceType? {
 }
 
 enum SetFavoredDiscussionMode { ADD, DELETE }
-
-extension FavoredDiscussionEx on SetFavoredDiscussionMode {
-  String? getInternalString() {
-    switch (this) {
-      case SetFavoredDiscussionMode.ADD:
-        return "addFavoredDiscussion";
-      case SetFavoredDiscussionMode.DELETE:
-        return "deleteFavoredDiscussion";
-    }
-  }
-}
 
 class NotLoginError implements Exception {
   final String errorMessage;

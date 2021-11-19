@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/clean_mode_filter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'floor.g.dart';
@@ -56,6 +58,10 @@ class OTFloor {
       this.is_me,
       this.liked,
       this.mention);
+
+  String? get filteredContent => SettingsProvider.getInstance().cleanMode
+      ? CleanModeFilter.cleanText(content)
+      : content;
 
   @override
   int get hashCode => floor_id!;

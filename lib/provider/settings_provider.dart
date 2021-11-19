@@ -20,7 +20,7 @@ import 'dart:convert';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
-import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -240,17 +240,17 @@ class SettingsProvider {
   set cleanMode(bool mode) => preferences!.setBool(KEY_CLEAN_MODE, mode);
 
   /// Hidden tags
-  List<PostTag>? get hiddenTags {
+  List<OTTag>? get hiddenTags {
     try {
       var json = jsonDecode(preferences!.getString(KEY_HIDDEN_TAGS)!);
       if (json is Iterable) {
-        return json.map((e) => PostTag.fromJson(e)).toList();
+        return json.map((e) => OTTag.fromJson(e)).toList();
       }
     } catch (ignored) {}
     return null;
   }
 
-  set hiddenTags(List<PostTag>? tags) {
+  set hiddenTags(List<OTTag>? tags) {
     if (tags == null) return;
     preferences!.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
   }
