@@ -45,7 +45,7 @@ class PostRepository extends BaseRepositoryWithDio {
   /// Current user profile, stored as cache by the repository
   OTUser? _profile;
 
-  /// Push Notification Registeration Cache
+  /// Push Notification Registration Cache
   String? _deviceId, _pushNotificationToken;
   PushNotificationServiceType? _pushNotificationService;
 

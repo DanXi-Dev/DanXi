@@ -24,7 +24,6 @@ import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
