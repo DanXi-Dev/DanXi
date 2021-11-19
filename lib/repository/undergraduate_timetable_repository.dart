@@ -73,7 +73,6 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
         ));
-    debugPrint(result.toString());
   }
 
   Future<void> _login(PersonInfo ug, OnCaptchaCallback callback) async {

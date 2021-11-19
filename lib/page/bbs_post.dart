@@ -419,7 +419,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 PostRepository.getInstance()
                     .adminGetUser(e.hole_id, e.floor_id)
                     .then((value) {
-                  debugPrint(value);
                   Noticing.showNotice(context, value, useSnackBar: false);
                 });
               },

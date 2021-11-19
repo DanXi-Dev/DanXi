@@ -35,7 +35,6 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   factory FudanEhallRepository.getInstance() => _instance;
 
   Future<StudentInfo> getStudentInfo(PersonInfo info) async {
-    print("Start login with info $info}");
     await UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true);
     return _getStudentInfo();
   }

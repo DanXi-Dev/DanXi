@@ -120,7 +120,6 @@ class _LoginDialogState extends State<LoginDialog> {
             progressDialog.dismiss(showAnim: false);
             rethrow;
           }
-          debugPrint("Meet with error! $e");
           try {
             await CardRepository.getInstance().init(newInfo);
             newInfo.name = await CardRepository.getInstance().getName();

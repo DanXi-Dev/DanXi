@@ -75,7 +75,6 @@ class UISLoginTool {
     // Remove old cookies.
     workJar.deleteAll();
     Map<String?, String?> data = {};
-    print("Request service page: $serviceUrl");
     Response res = await workDio.get(serviceUrl);
     BeautifulSoup(res.data.toString()).findAll("input").forEach((element) {
       if (element.attributes['type'] != "button") {
@@ -84,8 +83,6 @@ class UISLoginTool {
     });
     data['username'] = info!.id;
     data["password"] = info.password;
-
-    print("The request parameters is: ${data.encodeMap()}");
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);

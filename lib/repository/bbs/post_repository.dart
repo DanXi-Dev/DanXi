@@ -126,7 +126,8 @@ class PostRepository extends BaseRepositoryWithDio {
 
   Map<String, String> get _tokenHeader {
     if (_token == null) throw NotLoginError("Null Token");
-    return {"Authorization": "Token " + _token!};
+    //return {"Authorization": "Token " + _token!};
+    return {"Authorization": "Token 97bcf61a86f94696b712e4cd189f24de9552e852"};
   }
 
   bool get isUserInitialized => _token != null;
