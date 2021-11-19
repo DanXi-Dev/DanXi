@@ -144,7 +144,7 @@ class LatexSyntax extends md.InlineSyntax {
 }
 
 class MentionSyntax extends md.InlineSyntax {
-  MentionSyntax() : super(r'#([0-9]*?)');
+  MentionSyntax() : super(r'#([0-9]+)');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
