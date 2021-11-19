@@ -455,13 +455,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 },
                                               ),
                                             ),
-                                            material: (_, __) => Container(
-                                              height: 300,
-                                              child: Column(
-                                                children:
-                                                    _buildFoldBehaviorList(
-                                                        context),
-                                              ),
+                                            material: (_, __) => Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: _buildFoldBehaviorList(
+                                                  context),
                                             ),
                                           ));
                                 },
@@ -548,13 +545,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       ? S.of(context).sponsor_us_enabled
                                       : S.of(context).sponsor_us_disabled),
                               onTap: () async {
-                                if (SettingsProvider.getInstance().isAdEnabled) {
+                                if (SettingsProvider.getInstance()
+                                    .isAdEnabled) {
                                   _toggleAdDisplay();
                                 } else {
-                                  //if (await _showAdsDialog()) {
                                   _toggleAdDisplay();
-                                  await _showAdsThankyouDialog();
-                                  //}
+                                  await _showAdsThankDialog();
                                 }
                               },
                             ),
@@ -599,7 +595,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             ],
           ));
 
-  _showAdsThankyouDialog() => showPlatformDialog(
+  _showAdsThankDialog() => showPlatformDialog(
       context: context,
       barrierDismissible: true,
       builder: (_) => AlertDialog(
@@ -652,7 +648,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
           ));
 
   Card _buildAboutCard() {
-    final developers = Constant.getDevelopers(context);
     final inAppReview = InAppReview.instance;
     final Color _originalDividerColor = Theme.of(context).dividerColor;
     final double _avatarSize =
@@ -662,6 +657,23 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         .textTheme
         .bodyText2!
         .copyWith(color: Theme.of(context).accentColor);
+
+    final developersIcons = Constant.getDevelopers(context)
+        .map((e) => ListTile(
+              minLeadingWidth: 0,
+              contentPadding: EdgeInsets.zero,
+              leading: Container(
+                  width: _avatarSize,
+                  height: _avatarSize,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          fit: BoxFit.fill, image: AssetImage(e.imageUrl)))),
+              title: Text(e.name),
+              //subtitle: Text(e.description),
+              onTap: () => BrowserUtil.openUrl(e.url, context),
+            ))
+        .toList();
     return Card(
         child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -693,7 +705,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               const SizedBox(
                                 height: 16,
                               ),
-
                               //Terms and Conditions
                               Text(
                                 S.of(context).terms_and_conditions_title,
@@ -739,11 +750,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                                 "items": _LICENSE_ITEMS
                                               })),
                               ])),
-
                               const SizedBox(
                                 height: 16,
                               ),
-
                               //Acknowledgement
                               Text(
                                 S.of(context).acknowledgements,
@@ -791,65 +800,20 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: developers
-                                            .sublist(
-                                                0, (developers.length + 1) ~/ 2)
-                                            .map((e) => ListTile(
-                                                  minLeadingWidth: 0,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                  leading: Container(
-                                                      width: _avatarSize,
-                                                      height: _avatarSize,
-                                                      decoration: BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          image: DecorationImage(
-                                                              fit: BoxFit.fill,
-                                                              image: AssetImage(
-                                                                  e.imageUrl)))),
-                                                  title: Text(e.name),
-                                                  //subtitle: Text(e.description),
-                                                  onTap: () =>
-                                                      BrowserUtil.openUrl(
-                                                          e.url, context),
-                                                ))
-                                            .toList(),
-                                      ),
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: developersIcons.sublist(
+                                              0,
+                                              (developersIcons.length + 1) ~/
+                                                  2)),
                                     ),
                                     Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: developers
-                                            .sublist(
-                                                (developers.length + 1) ~/ 2,
-                                                developers.length)
-                                            .map((e) => ListTile(
-                                                  minLeadingWidth: 0,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                  leading: Container(
-                                                      width: _avatarSize,
-                                                      height: _avatarSize,
-                                                      decoration: BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          image: DecorationImage(
-                                                              fit: BoxFit.fill,
-                                                              image: AssetImage(
-                                                                  e.imageUrl)))),
-                                                  title: Text(e.name),
-                                                  //subtitle: Text(e.description),
-                                                  onTap: () =>
-                                                      BrowserUtil.openUrl(
-                                                          e.url, context),
-                                                ))
-                                            .toList(),
-                                      ),
-                                    ),
+                                        child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: developersIcons.sublist(
+                                          (developersIcons.length + 1) ~/ 2),
+                                    )),
                                   ]),
                               const SizedBox(height: 16),
                               //Version
