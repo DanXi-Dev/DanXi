@@ -135,6 +135,7 @@ class Constant {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
+          color: ThemeData.light().cardColor.withOpacity(0.8),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
@@ -161,7 +162,7 @@ class Constant {
         backgroundColor: Colors.black,
         cardTheme: CardTheme(
           margin: EdgeInsets.fromLTRB(7, 8, 7, 8),
-          color: Color.fromRGBO(28, 28, 30, 1),
+          color: Color.fromRGBO(30, 30, 33, 0.8),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
