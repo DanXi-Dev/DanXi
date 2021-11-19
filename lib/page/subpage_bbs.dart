@@ -279,7 +279,6 @@ class _BBSSubpageState extends State<BBSSubpage>
       return Container();
     final RegExp pidPattern = new RegExp(r'#[0-9]+');
     return Container(
-      color: Theme.of(context).canvasColor,
       padding: Theme.of(context)
           .cardTheme
           .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -434,41 +433,49 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildPageBody() {
     return Material(
-      child: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
-          color: Theme.of(context).accentColor,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            await refreshSelf();
-          },
-          child: PagedListView<OTHole>(
-              noneItem: OTHole.DUMMY_POST,
-              pagedController: _listViewController,
-              withScrollbar: true,
-              scrollController: widget.primaryScrollController(context),
-              startPage: 1,
-              builder: _buildListItem,
-              headBuilder: (_) => Column(
-                    children: [
-                      AutoBannerAdWidget(bannerAd: bannerAd),
-                      _buildSearchTextField(),
-                      _autoAdminNotice()
-                    ],
-                  ),
-              loadingBuilder: (BuildContext context) => Container(
-                    padding: EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
-                  ),
-              endBuilder: (context) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(S.of(context).end_reached),
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/graphics/kavinzhao.jpeg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: RefreshIndicator(
+            color: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              await refreshSelf();
+            },
+            child: PagedListView<OTHole>(
+                noneItem: OTHole.DUMMY_POST,
+                pagedController: _listViewController,
+                withScrollbar: true,
+                scrollController: widget.primaryScrollController(context),
+                startPage: 1,
+                builder: _buildListItem,
+                headBuilder: (_) => Column(
+                      children: [
+                        AutoBannerAdWidget(bannerAd: bannerAd),
+                        _buildSearchTextField(),
+                        _autoAdminNotice()
+                      ],
                     ),
-                  ),
-              emptyBuilder: (_) => _buildEmptyFavoritesPage(),
-              dataReceiver: _loadContent),
+                loadingBuilder: (BuildContext context) => Container(
+                      padding: EdgeInsets.all(8),
+                      child: Center(child: PlatformCircularProgressIndicator()),
+                    ),
+                endBuilder: (context) => Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(S.of(context).end_reached),
+                      ),
+                    ),
+                emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+                dataReceiver: _loadContent),
+          ),
         ),
       ),
     );
@@ -503,9 +510,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
-    return Material(
-      child: Card(
-          child: Column(children: [
+    return Card(
+      child: Column(children: [
         ListTile(
             contentPadding: EdgeInsets.fromLTRB(16, 4, 10, 0),
             dense: false,
@@ -590,7 +596,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           _buildCommentView(postElement),
-      ])),
+      ]),
     );
   }
 

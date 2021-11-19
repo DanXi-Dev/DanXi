@@ -185,7 +185,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? S.of(context).forum
+              ? "#${_post?.hole_id}"
               : S.of(context).search_result),
         ),
         trailingActions: [
@@ -203,36 +203,44 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             ),
         ],
       ),
-      body: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
-          color: Theme.of(context).accentColor,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            await refreshSelf();
-          },
-          child: Material(
-            child: PagedListView<OTFloor>(
-              initialData: _post?.floors?.prefetch ?? [],
-              pagedController: _listViewController,
-              withScrollbar: true,
-              scrollController: PrimaryScrollController.of(context),
-              dataReceiver: _loadContent,
-              // Load all data if user instructed us to scroll to end
-              allDataReceiver: (shouldScrollToEnd && _post!.reply! > 10)
-                  ? PostRepository.getInstance().loadReplies(_post!, 0, 0)
-                  : null,
-              shouldScrollToEnd: shouldScrollToEnd,
-              builder: _getListItems,
-              loadingBuilder: (BuildContext context) => Container(
-                padding: EdgeInsets.all(8),
-                child: Center(child: PlatformCircularProgressIndicator()),
-              ),
-              endBuilder: (context) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(S.of(context).end_reached),
+      body: Material(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/graphics/kavinzhao.jpeg"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: RefreshIndicator(
+              color: Theme.of(context).accentColor,
+              backgroundColor: Theme.of(context).dialogBackgroundColor,
+              onRefresh: () async {
+                HapticFeedback.mediumImpact();
+                await refreshSelf();
+              },
+              child: PagedListView<OTFloor>(
+                initialData: _post?.floors?.prefetch ?? [],
+                pagedController: _listViewController,
+                withScrollbar: true,
+                scrollController: PrimaryScrollController.of(context),
+                dataReceiver: _loadContent,
+                // Load all data if user instructed us to scroll to end
+                allDataReceiver: (shouldScrollToEnd && _post!.reply! > 10)
+                    ? PostRepository.getInstance().loadReplies(_post!, 0, 0)
+                    : null,
+                shouldScrollToEnd: shouldScrollToEnd,
+                builder: _getListItems,
+                loadingBuilder: (BuildContext context) => Container(
+                  padding: EdgeInsets.all(8),
+                  child: Center(child: PlatformCircularProgressIndicator()),
+                ),
+                endBuilder: (context) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(S.of(context).end_reached),
+                  ),
                 ),
               ),
             ),

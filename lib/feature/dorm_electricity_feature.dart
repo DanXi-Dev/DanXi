@@ -105,8 +105,8 @@ class DormElectricityFeature extends Feature {
               _electricity!.available, _electricity!.used) +
           '\n\n' +
           S.of(context!).last_updated(_electricity!.updateTime.toString());
-      Noticing.showNotice(context!, body,
-          title: S.of(context!).dorm_electricity, useSnackBar: false);
+      Noticing.showModalNotice(context!,
+          message: body, title: S.of(context!).dorm_electricity);
     } else {
       refreshData();
     }

@@ -121,7 +121,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               context: context,
               builder: (cxt) {
                 return PlatformAlertDialog(
-                  title: Text("请输入课程表系统验证码"),
+                  title: Text("请输入课程表系统验证码"), //TODO: Localize
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -131,7 +131,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                   ),
                   actions: [
                     PlatformDialogAction(
-                      child: Text("确认"),
+                      child: Text("确认"), //TODO: Localize
                       onPressed: () {
                         Navigator.of(cxt).pop();
                       },
@@ -156,7 +156,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     // Close the dialog
     Navigator.of(context).pop();
     if (_table == null) {
-      // TODO: Handle null
       Noticing.showNotice(context, S.of(context).fatal_error);
       return;
     }
@@ -291,7 +290,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   Widget _buildCourseItem(Event event) => Card(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -309,12 +308,15 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   void _onTapCourse(ScheduleBlock block) {
     showPlatformModalSheet(
-        context: context,
-        builder: (BuildContext context) => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: block.event.map((e) => _buildCourseItem(e)).toList(),
-            ));
+      context: context,
+      builder: (BuildContext context) => SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: block.event.map((e) => _buildCourseItem(e)).toList(),
+        ),
+      ),
+    );
   }
 
   Widget _buildPage(TimeTable table) {
@@ -324,44 +326,47 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     final List<DayEvents> scheduleData = _table!
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return SafeArea(
-      child: RefreshIndicator(
-        color: Theme.of(context).accentColor,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          _manualLoad = true;
-          HapticFeedback.mediumImpact();
-          await refreshSelf();
-        },
-        child: ListView(
-          // This ListView is a workaround, so that we can apply a custom scroll physics to it.
-          controller: _dummyScrollController,
-          physics: AlwaysScrollableScrollPhysics(),
-          children: [
-            AutoBannerAdWidget(bannerAd: bannerAd),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PlatformIconButton(
-                  icon: Icon(Icons.chevron_left),
-                  onPressed: _showingTime!.week > 0 ? goToPrev : null,
-                ),
-                Text(S.of(context).week(_showingTime!.week)),
-                PlatformIconButton(
-                  icon: Icon(Icons.chevron_right),
-                  onPressed:
-                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
-                )
-              ],
-            ),
-            ScheduleView(
-              scheduleData,
-              style,
-              _table!.now(),
-              _showingTime!.week,
-              widget.primaryScrollController(context),
-              tapCallback: _onTapCourse,
-            ),
-          ],
+      child: Material(
+        child: RefreshIndicator(
+          color: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          onRefresh: () async {
+            _manualLoad = true;
+            HapticFeedback.mediumImpact();
+            await refreshSelf();
+          },
+          child: ListView(
+            // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+            controller: _dummyScrollController,
+            physics: AlwaysScrollableScrollPhysics(),
+            children: [
+              AutoBannerAdWidget(bannerAd: bannerAd),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  PlatformIconButton(
+                    icon: Icon(Icons.chevron_left),
+                    onPressed: _showingTime!.week > 0 ? goToPrev : null,
+                  ),
+                  Text(S.of(context).week(_showingTime!.week)),
+                  PlatformIconButton(
+                    icon: Icon(Icons.chevron_right),
+                    onPressed: _showingTime!.week < TimeTable.MAX_WEEK
+                        ? goToNext
+                        : null,
+                  )
+                ],
+              ),
+              ScheduleView(
+                scheduleData,
+                style,
+                _table!.now(),
+                _showingTime!.week,
+                widget.primaryScrollController(context),
+                tapCallback: _onTapCourse,
+              ),
+            ],
+          ),
         ),
       ),
     );

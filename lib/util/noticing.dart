@@ -26,7 +26,11 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Simple helper class to show a [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
 class Noticing {
   static showNotice(BuildContext context, String message,
-      {String? confirmText, String? title, bool useSnackBar = true}) async {
+      {String? confirmText,
+      String? title,
+      bool useSnackBar = true,
+      bool? centerContent}) async {
+    centerContent ??= !PlatformX.isMaterial(context);
     if (PlatformX.isMaterial(context) && useSnackBar) {
       // Override Linkify's default text style.
       final bool isThemeDark = Theme.of(context).brightness == Brightness.dark;
@@ -47,13 +51,18 @@ class Noticing {
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: title == null ? null : Text(title),
-                content: Center(
-                  child: Linkify(
-                    text: message,
-                    onOpen: (element) =>
-                        BrowserUtil.openUrl(element.url, context),
-                  ),
-                ),
+                content: centerContent!
+                    ? Center(
+                        child: Linkify(
+                        text: message,
+                        onOpen: (element) =>
+                            BrowserUtil.openUrl(element.url, context),
+                      ))
+                    : Linkify(
+                        text: message,
+                        onOpen: (element) =>
+                            BrowserUtil.openUrl(element.url, context),
+                      ),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(confirmText ?? S.of(context).i_see),
@@ -61,5 +70,25 @@ class Noticing {
                 ],
               ));
     }
+  }
+
+  static showModalNotice(BuildContext context,
+      {String? confirmText, String title = "", String message = ""}) async {
+    if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
+    showPlatformModalSheet(
+      context: context,
+      builder: (BuildContext context) => SafeArea(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListTile(
+                title: Text(title),
+                subtitle: Linkify(
+                  text: message,
+                )),
+          ),
+        ),
+      ),
+    );
   }
 }
