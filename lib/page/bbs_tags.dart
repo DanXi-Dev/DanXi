@@ -16,7 +16,7 @@
  */
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
-import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/widget/bbs_tags_container.dart';
@@ -37,7 +37,7 @@ class BBSTagsPage extends StatefulWidget {
 }
 
 class _BBSTagsPageState extends State<BBSTagsPage> {
-  Future<List<PostTag>?>? _content;
+  Future<List<OTTag>?>? _content;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
           primary: true,
-          child: FutureWidget<List<PostTag>?>(
+          child: FutureWidget<List<OTTag>?>(
             future: _content,
             successBuilder: (context, snapshot) => BBSTagsContainer(
               tags: snapshot.data,

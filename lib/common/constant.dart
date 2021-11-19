@@ -203,7 +203,6 @@ class Constant {
 
   static String get randomColor =>
       TAG_COLOR_LIST[Random().nextInt(TAG_COLOR_LIST.length)];
-
   /// Get the [Color] from a color string.
   static Color getColorFromString(String? color) {
     switch (color) {

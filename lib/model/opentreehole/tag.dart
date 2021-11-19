@@ -15,12 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/widget/flutter_tagging/taggable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'tag.g.dart';
 
 @JsonSerializable()
-class OTTag {
+class OTTag extends Taggable {
   int? tag_id;
   int? temperature;
   String? name;
@@ -36,4 +38,13 @@ class OTTag {
 
   @override
   int get hashCode => tag_id!;
+
+  String get color => Constant
+      .TAG_COLOR_LIST[name.hashCode.abs() % Constant.TAG_COLOR_LIST.length];
+
+  @override
+  List<Object> get props {
+    if (name == null) return [];
+    return [name!];
+  }
 }

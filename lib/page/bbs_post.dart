@@ -21,6 +21,8 @@ import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/model/opentreehole/floor.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
@@ -119,7 +121,7 @@ class BBSPostDetail extends StatefulWidget {
 class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
-  BBSPost? _post;
+  OTHole? _post;
   String? _searchKeyword;
 
   /// Fields related to the display states.
@@ -131,21 +133,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<Reply>?> _loadContent(int page) async {
+  Future<List<OTFloor>?> _loadContent(int page) async {
     if (_searchKeyword != null)
       return await PostRepository.getInstance()
           .loadSearchResults(_searchKeyword, page);
     else
-      return await PostRepository.getInstance().loadReplies(_post!, page);
+      return await PostRepository.getInstance()
+          .loadReplies(_post!, page * 10, 10);
   }
 
   Future<bool?> _isDiscussionFavored() async {
     if (_isFavored != null) return _isFavored;
-    final List<BBSPost>? favorites =
+    final List<int>? favorites =
         await (PostRepository.getInstance().getFavoredDiscussions());
     return favorites!.any((element) {
-      if (element.id == null) return false;
-      return element.id == _post!.id;
+      return element == _post!.hole_id;
     });
   }
 
@@ -157,7 +159,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     } else if (widget.arguments!.containsKey('searchKeyword')) {
       _searchKeyword = widget.arguments!['searchKeyword'];
       // Create a dummy post for displaying search result
-      _post = BBSPost.dummy();
+      _post = OTHole.dummy();
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
@@ -195,7 +197,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () {
-                BBSEditor.createNewReply(context, _post!.id, null)
+                BBSEditor.createNewReply(context, _post!.hole_id, null)
                     .then((_) => refreshSelf(scrollToEnd: true));
               },
             ),
@@ -211,16 +213,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             await refreshSelf();
           },
           child: Material(
-            child: PagedListView<Reply>(
-              initialData: _post?.posts ?? [],
-              startPage: 1,
+            child: PagedListView<OTFloor>(
+              initialData: _post?.floors?.prefetch ?? [],
               pagedController: _listViewController,
               withScrollbar: true,
               scrollController: PrimaryScrollController.of(context),
               dataReceiver: _loadContent,
               // Load all data if user instructed us to scroll to end
-              allDataReceiver: (shouldScrollToEnd && _post!.count! > 10)
-                  ? PostRepository.getInstance().loadReplies(_post!, -1)
+              allDataReceiver: (shouldScrollToEnd && _post!.reply! > 10)
+                  ? PostRepository.getInstance().loadReplies(_post!, 0, 0)
                   : null,
               shouldScrollToEnd: shouldScrollToEnd,
               builder: _getListItems,
@@ -266,7 +267,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   _isFavored!
                       ? SetFavoredDiscussionMode.ADD
                       : SetFavoredDiscussionMode.DELETE,
-                  _post!.id)
+                  _post!.hole_id)
               .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
                 title: S.of(context).operation_failed, useSnackBar: false);
@@ -276,7 +277,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, Reply e) => [
+  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) => [
         // Admin Operations
         if (PostRepository.getInstance().isUserAdminNonAsync())
           PlatformWidget(
@@ -285,7 +286,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () {
                 Navigator.of(menuContext).pop();
                 BBSEditor.adminModifyReply(
-                    menuContext, e.discussion, e.id, e.content);
+                    menuContext, e.hole_id, e.floor_id, e.content);
               },
               child: Text("Modify Post"),
             ),
@@ -294,7 +295,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTap: () {
                 Navigator.of(menuContext).pop();
                 BBSEditor.adminModifyReply(
-                    menuContext, e.discussion, e.id, e.content);
+                    menuContext, e.hole_id, e.floor_id, e.content);
               },
             ),
           ),
@@ -305,7 +306,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () {
                 Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
-                    .adminDisablePost(e.discussion, e.id)
+                    .adminDisablePost(e.hole_id, e.floor_id)
                     .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
@@ -329,7 +330,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTap: () {
                 Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
-                    .adminDisablePost(e.discussion, e.id)
+                    .adminDisablePost(e.hole_id, e.floor_id)
                     .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
@@ -355,7 +356,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () {
                 Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
-                    .adminDisableDiscussion(e.discussion)
+                    .adminDisableDiscussion(e.hole_id)
                     .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
@@ -379,7 +380,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTap: () {
                 Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
-                    .adminDisableDiscussion(e.discussion)
+                    .adminDisableDiscussion(e.hole_id)
                     .onError((dynamic error, stackTrace) {
                   if (error is DioError) {
                     Noticing.showNotice(
@@ -405,7 +406,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () {
                 Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
-                    .adminGetUser(e.discussion, e.id)
+                    .adminGetUser(e.hole_id, e.floor_id)
                     .then((value) => Noticing.showNotice(context, value,
                         useSnackBar: false));
               },
@@ -416,7 +417,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onTap: () {
                 Navigator.of(menuContext).pop();
                 PostRepository.getInstance()
-                    .adminGetUser(e.discussion, e.id)
+                    .adminGetUser(e.hole_id, e.floor_id)
                     .then((value) {
                   debugPrint(value);
                   Noticing.showNotice(context, value, useSnackBar: false);
@@ -468,7 +469,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             isDestructiveAction: true,
             onPressed: () {
               Navigator.of(menuContext).pop();
-              BBSEditor.reportPost(menuContext, e.id);
+              BBSEditor.reportPost(menuContext, e.floor_id);
             },
             child: Text(S.of(menuContext).report),
           ),
@@ -476,7 +477,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             title: Text(S.of(menuContext).report),
             onTap: () {
               Navigator.of(menuContext).pop();
-              BBSEditor.reportPost(menuContext, e.id);
+              BBSEditor.reportPost(menuContext, e.floor_id);
             },
           ),
         ),
@@ -485,14 +486,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _opLeadingTag() => Container(
         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
         decoration: BoxDecoration(
-            color: Constant.getColorFromString(_post!.tag!.first.color)
+            color: Constant.getColorFromString(_post!.tags!.first.color)
                 .withOpacity(0.8),
             borderRadius: BorderRadius.all(Radius.circular(4.0))),
         child: Text(
           "OP",
           style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Constant.getColorFromString(_post!.tag!.first.color)
+              color: Constant.getColorFromString(_post!.tags!.first.color)
                           .withOpacity(0.8)
                           .computeLuminance() <=
                       0.5
@@ -502,8 +503,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       );
 
-  Widget _getListItems(BuildContext context, ListProvider<Reply> dataProvider,
-      int index, Reply e,
+  Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
+      int index, OTFloor e,
       {bool isNested = false}) {
     final bool generateTags = (index == 0);
     LinkTapCallback onLinkTap = (url) {
@@ -559,14 +560,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
                   child: Row(
                     children: [
-                      if (e.username == _post!.first_post!.username)
+                      if (e.anonyname == _post!.floors!.first_floor!.anonyname)
                         _opLeadingTag(),
-                      if (e.username == _post!.first_post!.username)
+                      if (e.anonyname == _post!.floors!.first_floor!.anonyname)
                         const SizedBox(
                           width: 2,
                         ),
                       Text(
-                        "[${e.username}]",
+                        "[${e.anonyname}]",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
@@ -582,7 +583,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ],
                   ),
                 ),
-                if (e.reply_to != null && !isNested && _searchKeyword == null)
+                if (e.mention!.isNotEmpty &&
+                    !isNested &&
+                    _searchKeyword == null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
                     child: _getListItems(
@@ -591,11 +594,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         -1,
                         dataProvider.getElementFirstWhere(
                             (element) => element.id == e.reply_to,
-                            orElse: () => Reply(
+                            orElse: () => OTFloor(
+                                -1,
                                 -1,
                                 S.of(context).unable_to_find_quote,
                                 S.of(context).fatal_error,
-                                null,
+                                DateTime.now().toIso8601String(),
                                 DateTime.now().toIso8601String(),
                                 -1,
                                 null)),
@@ -646,7 +650,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                 ),
                               ),
                               Text(
-                                "  (#${e.id})",
+                                "  (#${e.floor_id})",
                                 style: TextStyle(
                                   color: Theme.of(context).hintColor,
                                   fontSize: 10,
@@ -656,7 +660,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                           ),
                           Text(
                             HumanDuration.format(
-                                context, DateTime.parse(e.date_created!)),
+                                context, DateTime.parse(e.time_created!)),
                             style: TextStyle(
                                 color: Theme.of(context).hintColor,
                                 fontSize: 12),
@@ -667,7 +671,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                     color: Theme.of(context).hintColor,
                                     fontSize: 12)),
                             onTap: () {
-                              BBSEditor.reportPost(context, e.id);
+                              BBSEditor.reportPost(context, e.floor_id);
                             },
                           ),
                         ]),
@@ -687,17 +691,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
                 int? replyId;
                 // Set the replyId to null when tapping on the first reply.
-                if (_post!.first_post!.id != e.id) {
-                  replyId = e.id;
+                if (_post!.floors!.first_floor!.floor_id != e.floor_id) {
+                  replyId = e.floor_id;
                 }
-                BBSEditor.createNewReply(context, _post!.id, replyId)
+                BBSEditor.createNewReply(context, _post!.hole_id, replyId)
                     .then((value) => refreshSelf(scrollToEnd: true));
               } else {
                 ProgressFuture progressDialog = showProgressDialog(
                     loadingText: S.of(context).loading, context: context);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": await PostRepository.getInstance()
-                      .loadSpecificDiscussion(e.discussion)
+                      .loadSpecificDiscussion(e.hole_id)
                 });
                 progressDialog.dismiss();
               }

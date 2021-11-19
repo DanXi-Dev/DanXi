@@ -26,8 +26,6 @@ import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/post_tag.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -104,7 +102,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
             label: element.name,
             color: useAccessibilityColoring
                 ? Theme.of(context).textTheme.bodyText1!.color
-                : Constant.getColorFromString(color),
+                : Constant.getColorFromString(element.color),
           ),
         ]));
   });
@@ -230,9 +228,14 @@ class _BBSSubpageState extends State<BBSSubpage>
   String? _tagFilter;
   FocusNode _searchFocus = FocusNode();
 
-  final PagedListViewController _listViewController = PagedListViewController();
+  final PagedListViewController<OTHole> _listViewController =
+      PagedListViewController();
+
+  final TimeBasedLoadAdaptLayer<OTHole> adaptLayer =
+      new TimeBasedLoadAdaptLayer(10, 1);
 
   /// Fields related to the display states.
+  int _divisionId = 0;
   SortOrder? _sortOrder;
   FoldBehavior? _foldBehavior;
 
@@ -263,16 +266,25 @@ class _BBSSubpageState extends State<BBSSubpage>
           await PostRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value);
 
-        List<OTHole> loadedPost = await PostRepository.getInstance()
-            .loadDiscussions(page, _sortOrder);
+        List<OTHole>? loadedPost = await adaptLayer
+            .generateReceiver(_listViewController, (lastElement) {
+          DateTime time = DateTime.now();
+          if (lastElement != null) {
+            time = DateTime.parse(lastElement.time_created!);
+          }
+          return PostRepository.getInstance()
+              .loadDiscussions(time, _divisionId);
+        }).call(page);
         // Filter blocked posts
         List<OTTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
-        loadedPost.removeWhere((element) => element.tags!.any((thisTag) =>
+        loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
 
         // About this line, see [PagedListView].
-        return loadedPost.isEmpty ? [OTHole.DUMMY_POST] : loadedPost;
+        return loadedPost == null || loadedPost.isEmpty
+            ? [OTHole.DUMMY_POST]
+            : loadedPost;
       }
     } else {
       throw NotLoginError("Logged in as a visitor.");
@@ -373,7 +385,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     _fieldInitComplete = false;
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
-          final bool success = await BBSEditor.createNewPost(context);
+          final bool success =
+              await BBSEditor.createNewPost(context, _divisionId);
           if (success) refreshSelf();
         }),
         hashCode);
@@ -505,7 +518,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       OTHole postElement) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
-        (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded!))
+        (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
       return Container();
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
@@ -534,7 +547,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 const SizedBox(
                   height: 10,
                 ),
-                (postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD)
+                (postElement.is_folded && _foldBehavior == FoldBehavior.FOLD)
                     ? Theme(
                         data: Theme.of(context)
                             .copyWith(dividerColor: Colors.transparent),
@@ -594,13 +607,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "post": postElement,
               });
             }),
-            if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
+            if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           Divider(
             height: 4,
           ),
-            if (!(postElement.is_folded! && _foldBehavior == FoldBehavior.FOLD) &&
+            if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           _buildCommentView(postElement),
@@ -667,3 +680,33 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   bool get wantKeepAlive => true;
 }
+
+/// This class is a workaround between Open Tree Hole's time-based content retrieval
+/// and [PagedListView]'s page-based loading style.
+class TimeBasedLoadAdaptLayer<T> {
+  final int pageSize;
+  final int startPage;
+
+  TimeBasedLoadAdaptLayer(this.pageSize, this.startPage);
+
+  DataReceiver<T> generateReceiver(PagedListViewController<T> controller,
+      TimeBasedDataReceiver<T> receiver) {
+    return (int pageIndex) async {
+      int nextPageEnd = pageSize * (pageIndex - startPage + 1);
+      if (controller.length() == 0 || pageIndex == startPage) {
+        // If this is the first page, call with nothing.
+        return receiver.call(null);
+      } else if (nextPageEnd < controller.length()) {
+        // If this is not the first page, and we have loaded beyond [pageIndex],
+        // we should loaded it again with the last item of previous page.
+        return receiver
+            .call(controller.getElementAt(nextPageEnd - startPage - 1));
+      } else {
+        // If requesting a brand new page, just loaded it with info of the last item.
+        return receiver.call(controller.getElementAt(controller.length() - 1));
+      }
+    };
+  }
+}
+
+typedef TimeBasedDataReceiver<T> = Future<List<T>?> Function(T? lastElement);

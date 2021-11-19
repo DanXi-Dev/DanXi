@@ -19,6 +19,7 @@ import 'dart:async';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
@@ -272,7 +273,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               ProgressFuture progressDialog = showProgressDialog(
                   loadingText: S.of(context).loading, context: context);
               try {
-                final BBSPost post = await PostRepository.getInstance()
+                final OTHole post = await PostRepository.getInstance()
                     .loadSpecificDiscussion(e.discussion);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": post,

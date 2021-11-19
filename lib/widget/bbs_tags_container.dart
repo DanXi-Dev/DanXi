@@ -16,13 +16,14 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/widget/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-/// A wrapped container for [PostTag].
+
+/// A wrapped container for [OTTag].
 class BBSTagsContainer extends StatefulWidget {
-  final List<PostTag>? tags;
+  final List<OTTag>? tags;
   final OnTapTag? onTap;
 
   const BBSTagsContainer({Key? key, required this.tags, this.onTap})
@@ -34,7 +35,7 @@ class BBSTagsContainer extends StatefulWidget {
 
 class _BBSTagsContainerState extends State<BBSTagsContainer> {
   FocusNode _searchFocus = FocusNode();
-  List<PostTag>? filteredTags;
+  List<OTTag>? filteredTags;
 
   @override
   Widget build(BuildContext context) {
@@ -73,4 +74,4 @@ class _BBSTagsContainerState extends State<BBSTagsContainer> {
   }
 }
 
-typedef OnTapTag = void Function(PostTag tag);
+typedef OnTapTag = void Function(OTTag tag);

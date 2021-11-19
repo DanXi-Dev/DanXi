@@ -25,7 +25,6 @@ import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -181,11 +180,11 @@ class PostRepository extends BaseRepositoryWithDio {
 
   /// Migrated
   Future<List<OTFloor>> loadReplies(
-      BBSPost post, int startFloor, int length) async {
+      OTHole post, int startFloor, int length) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         queryParameters: {
           "start_floor": startFloor,
-          "hole_id": post.id,
+          "hole_id": post.hole_id,
           "length": length
         },
         options: Options(headers: _tokenHeader));
@@ -215,7 +214,7 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   /// Migrated
-  Future<int?> newPost(String divisionId, String? content,
+  Future<int?> newPost(int divisionId, String? content,
       {List<OTTag>? tags}) async {
     if (content == null) return 0;
     if (tags == null) tags = [];

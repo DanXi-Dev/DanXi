@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/widget/flutter_tagging/configurations.dart';
@@ -42,8 +42,8 @@ class BBSHiddenTagsPreferencePage extends StatefulWidget {
 
 class _BBSHiddenTagsPreferencePageState
     extends State<BBSHiddenTagsPreferencePage> {
-  List<PostTag>? tags;
-  List<PostTag>? _allTags;
+  List<OTTag>? tags;
+  List<OTTag>? _allTags;
 
   @override
   void initState() {
@@ -67,7 +67,7 @@ class _BBSHiddenTagsPreferencePageState
         child: ThemedMaterial(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: FlutterTagging<PostTag>(
+            child: FlutterTagging<OTTag>(
                 initialItems: tags ?? [],
                 emptyBuilder: (context) => Wrap(
                       alignment: WrapAlignment.spaceAround,
@@ -90,8 +90,7 @@ class _BBSHiddenTagsPreferencePageState
                           .contains(filter.toLowerCase()))
                       .toList();
                 },
-                additionCallback: (value) =>
-                    PostTag(value, Constant.randomColor, 0),
+                additionCallback: (value) => OTTag(0, 0, value),
                 onAdded: (tag) => tag,
                 configureSuggestion: (tag) => SuggestionConfiguration(
                       title: Text(
@@ -110,7 +109,7 @@ class _BBSHiddenTagsPreferencePageState
                             width: 2,
                           ),
                           Text(
-                            tag.count.toString(),
+                            tag.temperature.toString(),
                             style: TextStyle(
                                 fontSize: 13,
                                 color: Constant.getColorFromString(tag.color)),

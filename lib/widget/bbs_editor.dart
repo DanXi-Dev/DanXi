@@ -24,7 +24,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/master_detail/editor_object.dart';
 import 'package:dan_xi/master_detail/master_detail_utils.dart';
 import 'package:dan_xi/master_detail/master_detail_view.dart';
-import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/bbs_post.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/public_extension_methods.dart';
@@ -49,7 +49,7 @@ import 'flutter_tagging/tagging.dart';
 enum BBSEditorType { DIALOG, PAGE }
 
 class BBSEditor {
-  static Future<bool> createNewPost(BuildContext context,
+  static Future<bool> createNewPost(BuildContext context, int divisionId,
       {BBSEditorType? editorType}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText? content = await _showEditor(
@@ -59,7 +59,7 @@ class BBSEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     final int? success = await PostRepository.getInstance()
-        .newPost(content!.text, tags: content.tags)
+        .newPost(divisionId, content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
       if (error is DioError)
@@ -254,7 +254,7 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
-  List<PostTag>? _allTags;
+  List<OTTag>? _allTags;
 
   @override
   void initState() {
@@ -276,7 +276,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
               Padding(
                 padding: EdgeInsets.only(bottom: 12),
                 child: ThemedMaterial(
-                  child: FlutterTagging<PostTag>(
+                  child: FlutterTagging<OTTag>(
                       initialItems: StateProvider
                               .editorCache[widget.editorObject]!.tags ??
                           [],
@@ -308,8 +308,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 .contains(filter.toLowerCase()))
                             .toList();
                       },
-                      additionCallback: (value) =>
-                          PostTag(value, Constant.randomColor, 0),
+                      additionCallback: (value) => OTTag(0, 0, value),
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
                             title: Text(
@@ -329,7 +328,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                                   width: 2,
                                 ),
                                 Text(
-                                  tag.count.toString(),
+                                  tag.temperature.toString(),
                                   style: TextStyle(
                                       fontSize: 13,
                                       color: Constant.getColorFromString(
@@ -434,9 +433,9 @@ class PostEditorText {
   String? text;
 
   /// Non-nullable
-  List<PostTag>? tags;
+  List<OTTag>? tags;
 
-  PostEditorText(this.text, List<PostTag> this.tags);
+  PostEditorText(this.text, List<OTTag> this.tags);
 
   PostEditorText.newInstance() {
     text = '';
