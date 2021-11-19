@@ -24,7 +24,6 @@ import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/post.dart';
-import 'package:dan_xi/model/reply.dart';
 import 'package:dan_xi/page/subpage_bbs.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
@@ -583,28 +582,28 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     ],
                   ),
                 ),
-                if (e.mention!.isNotEmpty &&
-                    !isNested &&
-                    _searchKeyword == null)
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child: _getListItems(
-                        context,
-                        dataProvider,
-                        -1,
-                        dataProvider.getElementFirstWhere(
-                            (element) => element.id == e.reply_to,
-                            orElse: () => OTFloor(
-                                -1,
-                                -1,
-                                S.of(context).unable_to_find_quote,
-                                S.of(context).fatal_error,
-                                DateTime.now().toIso8601String(),
-                                DateTime.now().toIso8601String(),
-                                -1,
-                                null)),
-                        isNested: true),
-                  ),
+                // if (e.mention!.isNotEmpty &&
+                //     !isNested &&
+                //     _searchKeyword == null)
+                //   Padding(
+                //     padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                //     child: _getListItems(
+                //         context,
+                //         dataProvider,
+                //         -1,
+                //         dataProvider.getElementFirstWhere(
+                //             (element) => element.id == e.reply_to,
+                //             orElse: () => OTFloor(
+                //                 -1,
+                //                 -1,
+                //                 S.of(context).unable_to_find_quote,
+                //                 S.of(context).fatal_error,
+                //                 DateTime.now().toIso8601String(),
+                //                 DateTime.now().toIso8601String(),
+                //                 -1,
+                //                 null)),
+                //         isNested: true),
+                //   ),
                 Align(
                     alignment: Alignment.topLeft,
                     child: isNested
