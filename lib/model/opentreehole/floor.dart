@@ -41,6 +41,12 @@ class OTFloor {
 
   Map<String, dynamic> toJson() => _$OTFloorToJson(this);
 
+  /// Generate an empty BBSPost for special sakes.
+  factory OTFloor.dummy() =>
+      OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, []);
+  factory OTFloor.special(String title, String content) =>
+      OTFloor(-1, -1, content, title, '', '', false, [], 0, false, false, []);
+
   @override
   bool operator ==(Object other) =>
       (other is OTFloor) && floor_id == other.floor_id;

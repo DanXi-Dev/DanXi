@@ -42,6 +42,7 @@ import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dan_xi/widget/treehole_widgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -85,34 +86,6 @@ String renderText(String content, String imagePlaceholder) {
 }
 
 const String KEY_NO_TAG = "默认";
-
-/// Turn tags into Widgets
-Widget generateTagWidgets(BuildContext context, OTHole? e,
-    void Function(String?) onTap, bool useAccessibilityColoring) {
-  if (e == null || e.tags == null) return Container();
-  List<Widget> _tags = [];
-  e.tags!.forEach((element) {
-    if (element.name == KEY_NO_TAG) return;
-    _tags.add(Flex(
-        direction: Axis.horizontal,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RoundChip(
-            onTap: () => onTap(element.name),
-            label: element.name,
-            color: useAccessibilityColoring
-                ? Theme.of(context).textTheme.bodyText1!.color
-                : Constant.getColorFromString(element.color),
-          ),
-        ]));
-  });
-  return Wrap(
-    direction: Axis.horizontal,
-    spacing: 4,
-    runSpacing: 4,
-    children: _tags,
-  );
-}
 
 class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   final Map<String, dynamic>? arguments;
@@ -607,13 +580,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "post": postElement,
               });
             }),
-            if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
+        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           Divider(
             height: 4,
           ),
-            if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
+        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           _buildCommentView(postElement),

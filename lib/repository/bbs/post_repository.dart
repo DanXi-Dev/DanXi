@@ -85,7 +85,7 @@ class PostRepository extends BaseRepositoryWithDio {
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
-            return true;
+        return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
         final ASN1Parser p = ASN1Parser(certificate.der);
         final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
@@ -150,10 +150,18 @@ class PostRepository extends BaseRepositoryWithDio {
   }
 
   /// Migrated
-  Future<OTHole> loadSpecificDiscussion(int? discussionId) async {
-    Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
+  Future<OTHole> loadSpecificDiscussion(int discussionId) async {
+    final Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
         options: Options(headers: _tokenHeader));
     return OTHole.fromJson(response.data);
+  }
+
+  Future<OTFloor> loadSpecificFloor(int floorId) async {
+    // TODO: This API should first check if the requested floor is already cached.
+    // Inside [Mention]
+    final Response response = await dio!.get(_BASE_URL + "/floors/$floorId",
+        options: Options(headers: _tokenHeader));
+    return OTFloor.fromJson(response.data);
   }
 
   /// Do we have such an API?

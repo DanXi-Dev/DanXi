@@ -90,7 +90,6 @@ class UISLoginTool {
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     final Response response = await DioUtils.processRedirect(workDio, res);
-    print("finally, we get a response like this: \n${response.data}");
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       CredentialsInvalidException().fire();
       throw CredentialsInvalidException();

@@ -274,7 +274,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   loadingText: S.of(context).loading, context: context);
               try {
                 final OTHole post = await PostRepository.getInstance()
-                    .loadSpecificDiscussion(e.discussion);
+                    .loadSpecificDiscussion(e.discussion!);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": post,
                 });

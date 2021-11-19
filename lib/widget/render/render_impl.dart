@@ -15,9 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/auto_bbs_image.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:dan_xi/widget/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -80,14 +82,16 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
 
   return MarkdownBody(
     softLineBreak: true,
+    selectable: true,
     data: content!,
     styleSheet: _fontSizeOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    inlineSyntaxes: [LatexSyntax()],
+    inlineSyntaxes: [LatexSyntax(), MentionSyntax()],
     builders: {
       'tex': MarkdownLatexSupport(),
+      'mention': MarkdownMentionSupport(),
     },
     imageBuilder: (Uri uri, String? title, String? alt) {
       return Center(
@@ -101,8 +105,16 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
 class MarkdownLatexSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    print(element.textContent);
     return Math.tex(element.textContent);
+  }
+}
+
+class MarkdownMentionSupport extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    return OTFloorWidgetLazy(
+        future: PostRepository.getInstance()
+            .loadSpecificFloor(int.parse(element.textContent)));
   }
 }
 
@@ -127,6 +139,17 @@ class LatexSyntax extends md.InlineSyntax {
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
     parser.addNode(md.Element.text("tex", tex));
+    return true;
+  }
+}
+
+class MentionSyntax extends md.InlineSyntax {
+  MentionSyntax() : super(r'#([0-9]*?)');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    var mention = match[1]!;
+    parser.addNode(md.Element.text("mention", mention));
     return true;
   }
 }

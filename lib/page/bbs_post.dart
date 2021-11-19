@@ -40,6 +40,7 @@ import 'package:dan_xi/widget/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/treehole_widgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -483,37 +484,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       ];
 
-  Widget _opLeadingTag() => Container(
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-        decoration: BoxDecoration(
-            color: Constant.getColorFromString(_post!.tags!.first.color)
-                .withOpacity(0.8),
-            borderRadius: BorderRadius.all(Radius.circular(4.0))),
-        child: Text(
-          "OP",
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Constant.getColorFromString(_post!.tags!.first.color)
-                          .withOpacity(0.8)
-                          .computeLuminance() <=
-                      0.5
-                  ? Colors.white
-                  : Colors.black,
-              fontSize: 12),
-        ),
-      );
-
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
-      int index, OTFloor e,
+      int index, OTFloor floor,
       {bool isNested = false}) {
     final bool generateTags = (index == 0);
-    LinkTapCallback onLinkTap = (url) {
+    final LinkTapCallback onLinkTap = (url) {
       BrowserUtil.openUrl(url!, context);
     };
-    ImageTapCallback onImageTap = (url) {
+    final ImageTapCallback onImageTap = (url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     };
-    return GestureDetector(
+    return OTFloorWidget(
+      floor: floor,
+      index: index,
+      isNested: isNested,
+      parentHole: _post,
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
@@ -523,7 +508,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             // will result in incorrect Navigator.pop() behavior.
             builder: (BuildContext context) => PlatformWidget(
                   cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(context, e),
+                    actions: _buildContextMenu(context, floor),
                     cancelButton: CupertinoActionSheetAction(
                       child: Text(S.of(context).cancel),
                       onPressed: () {
@@ -533,180 +518,40 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ),
                   material: (_, __) => Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: _buildContextMenu(context, e),
+                    children: _buildContextMenu(context, floor),
                   ),
                 ));
       },
-      child: Card(
-          color: isNested && PlatformX.isCupertino(context)
-              ? Theme.of(context).dividerColor.withOpacity(0.05)
-              : null,
-          child: ListTile(
-            dense: true,
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (generateTags)
-                  Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      child: generateTagWidgets(context, _post,
-                          (String? tagName) {
-                        smartNavigatorPush(context, '/bbs/discussions',
-                            arguments: {"tagFilter": tagName});
-                      },
-                          SettingsProvider.getInstance()
-                              .useAccessibilityColoring)),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
-                  child: Row(
-                    children: [
-                      if (e.anonyname == _post!.floors!.first_floor!.anonyname)
-                        _opLeadingTag(),
-                      if (e.anonyname == _post!.floors!.first_floor!.anonyname)
-                        const SizedBox(
-                          width: 2,
-                        ),
-                      Text(
-                        "[${e.anonyname}]",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        width: 2,
-                      ),
-                      if (isNested)
-                        Center(
-                          child: Icon(CupertinoIcons.search,
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.2),
-                              size: 12),
-                        ),
-                    ],
-                  ),
-                ),
-                if (e.mention!.isNotEmpty &&
-                    !isNested &&
-                    _searchKeyword == null)
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    child: _getListItems(
-                        context,
-                        dataProvider,
-                        -1,
-                        dataProvider.getElementFirstWhere(
-                            (element) => element.id == e.reply_to,
-                            orElse: () => OTFloor(
-                                -1,
-                                -1,
-                                S.of(context).unable_to_find_quote,
-                                S.of(context).fatal_error,
-                                DateTime.now().toIso8601String(),
-                                DateTime.now().toIso8601String(),
-                                -1,
-                                null)),
-                        isNested: true),
-                  ),
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: isNested
-                        // If content is being quoted, limit its height so that the view won't be too long.
-                        ? Linkify(
-                            text: renderText(
-                                    e.filteredContent!, S.of(context).image_tag)
-                                .trim(),
-                            textScaleFactor: 0.8,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            onOpen: (link) async {
-                              if (await canLaunch(link.url)) {
-                                BrowserUtil.openUrl(link.url, context);
-                              } else {
-                                Noticing.showNotice(
-                                    context, S.of(context).cannot_launch_url);
-                              }
-                            },
-                          )
-                        : smartRender(
-                            e.filteredContent!, onLinkTap, onImageTap)),
-              ],
-            ),
-            subtitle: isNested
-                ? null
-                : Column(children: [
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "${index + 1}F",
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "  (#${e.floor_id})",
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            HumanDuration.format(
-                                context, DateTime.parse(e.time_created!)),
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12),
-                          ),
-                          GestureDetector(
-                            child: Text(S.of(context).report,
-                                style: TextStyle(
-                                    color: Theme.of(context).hintColor,
-                                    fontSize: 12)),
-                            onTap: () {
-                              BBSEditor.reportPost(context, e.floor_id);
-                            },
-                          ),
-                        ]),
-                  ]),
-            onTap: () async {
-              if (_searchKeyword == null) {
-                if (isNested) {
-                  // Scroll to the corrosponding post
-                  while (!(await _listViewController.scrollToItem(e))) {
-                    if (_listViewController.getScrollController()!.offset < 10)
-                      break; // Prevent deadlock
-                    await _listViewController.scrollDelta(
-                        -100, Duration(milliseconds: 1), Curves.linear);
-                  }
-                  return;
-                }
+      onTap: () async {
+        if (_searchKeyword == null) {
+          if (isNested) {
+            // Scroll to the corrosponding post
+            while (!(await _listViewController.scrollToItem(floor))) {
+              if (_listViewController.getScrollController()!.offset < 10)
+                break; // Prevent deadlock
+              await _listViewController.scrollDelta(
+                  -100, Duration(milliseconds: 1), Curves.linear);
+            }
+            return;
+          }
 
-                int? replyId;
-                // Set the replyId to null when tapping on the first reply.
-                if (_post!.floors!.first_floor!.floor_id != e.floor_id) {
-                  replyId = e.floor_id;
-                }
-                BBSEditor.createNewReply(context, _post!.hole_id, replyId)
-                    .then((value) => refreshSelf(scrollToEnd: true));
-              } else {
-                ProgressFuture progressDialog = showProgressDialog(
-                    loadingText: S.of(context).loading, context: context);
-                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                  "post": await PostRepository.getInstance()
-                      .loadSpecificDiscussion(e.hole_id)
-                });
-                progressDialog.dismiss();
-              }
-            },
-          )),
+          int? replyId;
+          // Set the replyId to null when tapping on the first reply.
+          if (_post!.floors!.first_floor!.floor_id != floor.floor_id) {
+            replyId = floor.floor_id;
+          }
+          BBSEditor.createNewReply(context, _post!.hole_id, replyId)
+              .then((value) => refreshSelf(scrollToEnd: true));
+        } else {
+          ProgressFuture progressDialog = showProgressDialog(
+              loadingText: S.of(context).loading, context: context);
+          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+            "post": await PostRepository.getInstance()
+                .loadSpecificDiscussion(floor.hole_id!)
+          });
+          progressDialog.dismiss();
+        }
+      },
     );
   }
 }
