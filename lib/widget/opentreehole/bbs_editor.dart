@@ -59,7 +59,7 @@ class BBSEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     final int? success = await OpenTreeHoleRepository.getInstance()
-        .newPost(divisionId, content!.text, tags: content.tags)
+        .newHole(divisionId, content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
       if (error is DioError)
@@ -92,7 +92,7 @@ class BBSEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     final int? success = await OpenTreeHoleRepository.getInstance()
-        .newReply(discussionId, postId, content)
+        .newFloor(discussionId, postId, content)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
       if (error is DioError) {

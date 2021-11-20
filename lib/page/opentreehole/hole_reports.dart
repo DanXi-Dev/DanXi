@@ -275,7 +275,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   loadingText: S.of(context).loading, context: context);
               try {
                 final OTHole post = await OpenTreeHoleRepository.getInstance()
-                    .loadSpecificDiscussion(e.discussion!);
+                    .loadSpecificHole(e.discussion!);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": post,
                 });

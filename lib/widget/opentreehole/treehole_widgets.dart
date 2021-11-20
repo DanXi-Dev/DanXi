@@ -311,7 +311,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                               arguments: {
                                 "post":
                                     await OpenTreeHoleRepository.getInstance()
-                                        .loadSpecificDiscussion(floor.hole_id!),
+                                        .loadSpecificHole(floor.hole_id!),
                                 "locate": floor
                                     .floor_id!, // TODO: jump to specific floor after push
                               });

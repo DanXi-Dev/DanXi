@@ -35,23 +35,26 @@ import 'package:flutter/foundation.dart';
 
 class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final _instance = OpenTreeHoleRepository._();
-
   factory OpenTreeHoleRepository.getInstance() => _instance;
+
   static const String _BASE_URL = "https://hole.hath.top";
 
   /// The token used for session authentication.
   String? _token;
 
   /// Current user profile, stored as cache by the repository
-  OTUser? _profile;
+  OTUser? _userInfo;
+
+  /// Cached floors, used by [mentions]
+  List<OTFloor> _floorCache = [];
 
   /// Push Notification Registration Cache
   String? _deviceId, _pushNotificationToken;
   PushNotificationServiceType? _pushNotificationService;
 
-  clearCache() {
+  void clearCache() {
     _token = null;
-    _profile = null;
+    _userInfo = null;
     _deviceId = null;
     _pushNotificationService = null;
     _pushNotificationToken = null;
@@ -62,7 +65,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     dio!.options = BaseOptions(receiveDataWhenStatusError: true);
   }
 
-  initializeUser(PersonInfo? info) async {
+  Future<void> initializeUser(PersonInfo? info) async {
     print(
         "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
     try {
@@ -141,7 +144,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<OTHole>> loadDiscussions(
+  Future<List<OTHole>> loadHoles(
     DateTime startTime,
     int divisionId, {
     int length = 10,
@@ -160,7 +163,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Migrated
-  Future<OTHole> loadSpecificDiscussion(int discussionId) async {
+  Future<OTHole> loadSpecificHole(int discussionId) async {
     final Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
         options: Options(headers: _tokenHeader));
     return OTHole.fromJson(response.data);
@@ -198,7 +201,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Migrated
-  Future<List<OTFloor>> loadReplies(
+  Future<List<OTFloor>> loadFloors(
       OTHole post, int startFloor, int length) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         queryParameters: {
@@ -233,7 +236,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Migrated
-  Future<int?> newPost(int divisionId, String? content,
+  Future<int?> newHole(int divisionId, String? content,
       {List<OTTag>? tags}) async {
     if (content == null) return 0;
     if (tags == null) tags = [];
@@ -262,7 +265,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Partly migrated. What does [mention] means?
-  Future<int?> newReply(int? discussionId, int? replyTo, String content) async {
+  Future<int?> newFloor(int? discussionId, int? replyTo, String content) async {
     final Response response = await dio!.post(_BASE_URL + "/floors",
         data: {
           "content": content,
@@ -294,12 +297,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   // Migrated
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
-    if (_profile == null || forceUpdate) {
+    if (_userInfo == null || forceUpdate) {
       final Response response = await dio!
           .get(_BASE_URL + "/users", options: Options(headers: _tokenHeader));
-      _profile = OTUser.fromJson(response.data);
+      _userInfo = OTUser.fromJson(response.data);
     }
-    return _profile;
+    return _userInfo;
   }
 
   // Migrated
@@ -310,32 +313,43 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   // Migrated
   /// Non-async version of [isUserAdmin], will return false if data is not yet ready
   bool isUserAdminNonAsync() {
-    return _profile?.is_admin ?? false;
+    return _userInfo?.is_admin ?? false;
   }
 
   // Migrated
-  Future<List<int>> getFavoredDiscussions({bool forceUpdate = false}) async {
+  Future<List<int>> getFavoriteHoleId({bool forceUpdate = false}) async {
     return (await getUserProfile(forceUpdate: forceUpdate))!.favorites!;
   }
 
-  // Partially migrated. Does the server return a [OTUser]?
-  Future<void> setFavoredDiscussion(
-      SetFavoredDiscussionMode mode, int? discussionId) async {
+  // Migrated
+  Future<List<OTHole>> getFavoriteHoles({
+    int length = 10,
+    int prefetchLength = 10,
+  }) async {
+    final Response response = await dio!.get(_BASE_URL + "/user/favorites",
+        queryParameters: {"length": length, "prefetch_length": prefetchLength},
+        options: Options(headers: _tokenHeader));
+    final List result = response.data;
+    return result.map((e) => OTHole.fromJson(e)).toList();
+  }
+
+  // Migrated
+  Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {
     Response response;
     switch (mode) {
-      case SetFavoredDiscussionMode.ADD:
+      case SetFavoriteMode.ADD:
         response = await dio!.post(_BASE_URL + "/user/favorites",
-            data: {'hole_id': discussionId},
-            options: Options(headers: _tokenHeader));
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
-      case SetFavoredDiscussionMode.DELETE:
+      case SetFavoriteMode.DELETE:
         response = await dio!.delete(_BASE_URL + "/user/favorites",
-            data: {'hole_id': discussionId},
-            options: Options(headers: _tokenHeader));
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
-
-    _profile = OTUser.fromJson(response.data);
+    if (_userInfo?.favorites != null) {
+      final Map<String, dynamic> result = response.data;
+      _userInfo!.favorites = result["data"].cast<int>();
+    }
   }
 
   /// Modify a post, requires Admin privilege
@@ -405,10 +419,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data.toString();
   }
 
-  /* BEGIN v2 API */
-
+  // Migrated
   /// Upload or update Push Notification token to server
-  /// API Version: v2
   Future<void> updatePushNotificationToken(
       [String? token, String? id, PushNotificationServiceType? service]) async {
     if (isUserInitialized) {
@@ -446,7 +458,7 @@ extension StringRepresentation on PushNotificationServiceType? {
   }
 }
 
-enum SetFavoredDiscussionMode { ADD, DELETE }
+enum SetFavoriteMode { ADD, DELETE }
 
 class NotLoginError implements Exception {
   final String errorMessage;

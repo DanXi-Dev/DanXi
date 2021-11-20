@@ -230,16 +230,11 @@ class _BBSSubpageState extends State<BBSSubpage>
       else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
           false) {
         if (page > 1) return Future.value([]);
-        // TODO: It is too ineffective.
-        return Future.wait<OTHole>(
-            (await OpenTreeHoleRepository.getInstance().getFavoredDiscussions())
-                .map((e) => OpenTreeHoleRepository.getInstance()
-                    .loadSpecificDiscussion(e)));
+        return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
       } else {
         if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
           await OpenTreeHoleRepository.getInstance()
               .initializeUser(StateProvider.personInfo.value);
-
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(_listViewController, (lastElement) {
           DateTime time = DateTime.now();
@@ -247,7 +242,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             time = DateTime.parse(lastElement.time_created!);
           }
           return OpenTreeHoleRepository.getInstance()
-              .loadDiscussions(time, _divisionId);
+              .loadHoles(time, _divisionId);
         }).call(page);
         // Filter blocked posts
         List<OTTag> hiddenTags =
@@ -268,7 +263,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<void> refreshSelf() async {
     if (widget.arguments?.containsKey('showFavoredDiscussion') == true) {
       await OpenTreeHoleRepository.getInstance()
-          .getFavoredDiscussions(forceUpdate: true);
+          .getFavoriteHoleId(forceUpdate: true);
     }
     await _listViewController.notifyUpdate();
   }
@@ -335,8 +330,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      final OTHole post = await OpenTreeHoleRepository.getInstance()
-          .loadSpecificDiscussion(pid);
+      final OTHole post =
+          await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
       smartNavigatorPush(context, "/bbs/postDetail", arguments: {
         "post": post,
       });
