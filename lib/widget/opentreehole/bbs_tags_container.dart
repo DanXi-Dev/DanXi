@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
-import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -51,8 +51,9 @@ class _BBSTagsContainerState extends State<BBSTagsContainer> {
             onChanged: (filter) {
               setState(() {
                 filteredTags = widget.tags!
-                    .where((value) =>
-                        value.name!.toLowerCase().contains(filter.toLowerCase()))
+                    .where((value) => value.name!
+                        .toLowerCase()
+                        .contains(filter.toLowerCase()))
                     .toList();
               });
             },

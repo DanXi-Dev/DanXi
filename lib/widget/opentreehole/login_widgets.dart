@@ -17,7 +17,7 @@
 
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class OTLoginHelper {
     if (credentials == null) {
       return null;
     }
-    return PostRepository.getInstance()
+    return OpenTreeHoleRepository.getInstance()
         .loginWithUsernamePassword(credentials.username, credentials.password);
   }
 }

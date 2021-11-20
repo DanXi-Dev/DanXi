@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/feature/feature_map.dart';
-import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 

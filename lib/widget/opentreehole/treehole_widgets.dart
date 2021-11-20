@@ -17,20 +17,20 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
-import 'package:dan_xi/page/bbs_post.dart';
-import 'package:dan_xi/page/subpage_bbs.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
-import 'package:dan_xi/widget/future_widget.dart';
-import 'package:dan_xi/widget/render/base_render.dart';
-import 'package:dan_xi/widget/round_chip.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
+import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';

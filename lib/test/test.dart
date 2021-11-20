@@ -18,9 +18,9 @@
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/time_table_repository.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
-import 'package:dan_xi/widget/render/render_impl.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';

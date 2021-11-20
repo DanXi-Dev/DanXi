@@ -18,11 +18,11 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

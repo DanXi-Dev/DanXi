@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/widget/flutter_tagging/taggable.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/taggable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'post_tag.g.dart';

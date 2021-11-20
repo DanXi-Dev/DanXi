@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -16,7 +16,7 @@
  */
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -26,7 +26,8 @@ class BBSImagePlaceholder extends StatelessWidget {
   final Widget? child;
   final double? size;
 
-  const BBSImagePlaceholder({Key? key, this.child, this.size}) : super(key: key);
+  const BBSImagePlaceholder({Key? key, this.child, this.size})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

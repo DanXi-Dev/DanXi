@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/widget/render/base_render.dart';
+import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:flutter/widgets.dart';
 
 class PostRenderWidget extends StatelessWidget {

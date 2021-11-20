@@ -18,7 +18,7 @@
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/platform_universal.dart';

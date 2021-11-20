@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/widget/flutter_tagging/taggable.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/taggable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'tag.g.dart';

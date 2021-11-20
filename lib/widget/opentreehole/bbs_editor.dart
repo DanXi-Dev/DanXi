@@ -21,21 +21,21 @@ import 'dart:io';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/editor_object.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/util/editor_object.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
-import 'package:dan_xi/page/bbs_post.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/flutter_tagging/configurations.dart';
-import 'package:dan_xi/widget/image_picker_proxy.dart';
-import 'package:dan_xi/widget/material_x.dart';
-import 'package:dan_xi/widget/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
+import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
+import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +44,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import '../flutter_tagging/tagging.dart';
+import 'tag_selector/flutter_tagging/tagging.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
 
@@ -58,7 +58,7 @@ class BBSEditor {
     if (content?.text == null) return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
-    final int? success = await PostRepository.getInstance()
+    final int? success = await OpenTreeHoleRepository.getInstance()
         .newPost(divisionId, content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
@@ -91,7 +91,7 @@ class BBSEditor {
     if (content == null || content.trim() == "") return;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
-    final int? success = await PostRepository.getInstance()
+    final int? success = await OpenTreeHoleRepository.getInstance()
         .newReply(discussionId, postId, content)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
@@ -126,7 +126,7 @@ class BBSEditor {
             object: object))
         ?.text;
     if (content == null || content.trim() == "") return;
-    await PostRepository.getInstance()
+    await OpenTreeHoleRepository.getInstance()
         .adminModifyPost(content, discussionId, postId)
         .onError((dynamic error, stackTrace) {
       if (error is DioError) {
@@ -150,7 +150,7 @@ class BBSEditor {
     if (content == null || content.trim() == "") return;
 
     int? responseCode =
-        await PostRepository.getInstance().reportPost(postId, content);
+        await OpenTreeHoleRepository.getInstance().reportPost(postId, content);
     if (responseCode != 200) {
       Noticing.showNotice(
           context, S.of(context).report_failed(responseCode ?? "?"),
@@ -226,7 +226,8 @@ class BBSEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
     try {
-      await PostRepository.getInstance().uploadImage(File(_file)).then((value) {
+      await OpenTreeHoleRepository.getInstance().uploadImage(File(_file)).then(
+          (value) {
         if (value != null) _controller.text += "![]($value)";
         //"showAnim: true" makes it crash. Don't know the reason.
         progressDialog.dismiss(showAnim: false);
@@ -300,8 +301,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       ),
                       findSuggestions: (String filter) async {
                         if (_allTags == null)
-                          _allTags =
-                              await PostRepository.getInstance().loadTags();
+                          _allTags = await OpenTreeHoleRepository.getInstance()
+                              .loadTags();
                         return _allTags!
                             .where((value) => value.name!
                                 .toLowerCase()
