@@ -28,6 +28,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
@@ -125,7 +126,6 @@ class OTFloorWidget extends StatelessWidget {
     };
     return GestureDetector(
       onLongPress: onLongPress,
-      onTap: onTap,
       child: Card(
         color: isNested && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
@@ -256,14 +256,14 @@ class OTFloorWidget extends StatelessWidget {
   }
 }
 
-class OTFloorWidgetLazy extends StatelessWidget {
+class OTFloorMentionWidget extends StatelessWidget {
   final Future<OTFloor> future;
 
-  OTFloorWidgetLazy({
+  OTFloorMentionWidget({
     required this.future,
   });
 
-  void showFloorDetail(BuildContext context, OTFloor floor) {
+  static void showFloorDetail(BuildContext context, OTFloor floor) {
     showPlatformModalSheet(
       context: context,
       builder: (BuildContext cxt) => SafeArea(
@@ -284,6 +284,29 @@ class OTFloorWidgetLazy extends StatelessWidget {
                         // Note how this code use [cxt] for some context but [context] for others.
                         // This is to prevent looking up deactivated context after [pop].
                         Navigator.pop(cxt);
+                        try {
+                          // Find the PagedListViewController
+                          final pagedListViewController = context
+                              .findAncestorWidgetOfExactType<
+                                  PagedListView<OTFloor>>()!
+                              .pagedController!;
+                          // If this floor is directly in the hole
+                          if (pagedListViewController.getIndexOf(floor) != -1) {
+                            // Scroll to the corrosponding post
+                            while (!(await pagedListViewController
+                                .scrollToItem(floor))) {
+                              if (pagedListViewController
+                                      .getScrollController()!
+                                      .offset <
+                                  10) break; // Prevent deadlock
+                              await pagedListViewController.scrollDelta(-100,
+                                  Duration(milliseconds: 1), Curves.linear);
+                            }
+                            return;
+                          }
+                        } catch (ignored) {}
+
+                        // If this floor is in another hole
                         ProgressFuture progressDialog = showProgressDialog(
                             loadingText: S.of(context).loading,
                             context: context);

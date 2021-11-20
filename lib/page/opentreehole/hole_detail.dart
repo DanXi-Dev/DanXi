@@ -524,17 +524,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       },
       onTap: () async {
         if (_searchKeyword == null) {
-          if (isNested) {
-            // Scroll to the corrosponding post
-            while (!(await _listViewController.scrollToItem(floor))) {
-              if (_listViewController.getScrollController()!.offset < 10)
-                break; // Prevent deadlock
-              await _listViewController.scrollDelta(
-                  -100, Duration(milliseconds: 1), Curves.linear);
-            }
-            return;
-          }
-
           int? replyId;
           // Set the replyId to null when tapping on the first reply.
           if (_post!.floors!.first_floor!.floor_id != floor.floor_id) {

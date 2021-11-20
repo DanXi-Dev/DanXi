@@ -112,7 +112,7 @@ class MarkdownLatexSupport extends MarkdownElementBuilder {
 class MarkdownMentionSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return OTFloorWidgetLazy(
+    return OTFloorMentionWidget(
         future: OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(int.parse(element.textContent)));
   }
