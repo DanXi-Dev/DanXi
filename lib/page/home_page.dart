@@ -42,7 +42,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
-import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/top_controller.dart';
@@ -589,7 +589,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(
                   S
-                      .of(context).developer_announcement(announcement.createdAt ?? "?"),
+                      .of(context)
+                      .developer_announcement(announcement.createdAt ?? "?"),
                 ),
                 content: Linkify(
                   text: announcement.content!,

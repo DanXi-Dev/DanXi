@@ -41,7 +41,7 @@ import 'package:dan_xi/page/text_selector.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

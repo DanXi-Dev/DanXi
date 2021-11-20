@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';

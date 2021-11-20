@@ -17,9 +17,9 @@
 
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/auto_bbs_image.dart';
+import 'package:dan_xi/widget/opentreehole/auto_bbs_image.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
-import 'package:dan_xi/widget/treehole_widgets.dart';
+import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

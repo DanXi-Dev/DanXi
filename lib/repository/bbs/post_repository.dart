@@ -76,6 +76,15 @@ class PostRepository extends BaseRepositoryWithDio {
     }
   }
 
+  Future<String> loginWithUsernamePassword(
+      String username, String password) async {
+    final Response response = await dio!.post(_BASE_URL + "/login", data: {
+      'email': username,
+      'password': password,
+    });
+    return SettingsProvider.getInstance().fduholeToken = response.data["token"];
+  }
+
   Future<String?> requestToken(PersonInfo info) async {
     Dio secureDio = Dio();
     //Pin HTTPS cert

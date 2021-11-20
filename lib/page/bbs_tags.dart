@@ -19,7 +19,7 @@ import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/repository/bbs/post_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
-import 'package:dan_xi/widget/bbs_tags_container.dart';
+import 'package:dan_xi/widget/opentreehole/bbs_tags_container.dart';
 import 'package:dan_xi/widget/future_widget.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';

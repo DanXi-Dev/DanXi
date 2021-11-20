@@ -29,7 +29,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/paged_listview.dart';
 import 'package:dan_xi/widget/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/render/base_render.dart';
 import 'package:dan_xi/widget/render/render_impl.dart';
 import 'package:dan_xi/widget/top_controller.dart';

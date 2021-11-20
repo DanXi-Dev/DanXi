@@ -44,7 +44,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import 'flutter_tagging/tagging.dart';
+import '../flutter_tagging/tagging.dart';
 
 enum BBSEditorType { DIALOG, PAGE }
 
