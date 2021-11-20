@@ -29,6 +29,7 @@ import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
+import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -71,8 +72,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
-      //_token = await requestToken(info!);
-      updatePushNotificationToken();
+      throw NotLoginError("No token");
+      // _token = await requestToken(info!);
+      // updatePushNotificationToken();
     }
   }
 
@@ -134,9 +136,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Map<String, String> get _tokenHeader {
-    //if (_token == null) throw NotLoginError("Null Token");
-    //return {"Authorization": "Token " + _token!};
-    return {"Authorization": "Token 97bcf61a86f94696b712e4cd189f24de9552e852"};
+    if (_token == null) throw NotLoginError("Null Token");
+    return {"Authorization": "Token " + _token!};
+    // return {"Authorization": "Token 97bcf61a86f94696b712e4cd189f24de9552e852"};
   }
 
   bool get isUserInitialized => _token != null;
@@ -448,7 +450,7 @@ extension StringRepresentation on PushNotificationServiceType? {
 
 enum SetFavoredDiscussionMode { ADD, DELETE }
 
-class NotLoginError implements Exception {
+class NotLoginError implements FatalException {
   final String errorMessage;
 
   NotLoginError(this.errorMessage);

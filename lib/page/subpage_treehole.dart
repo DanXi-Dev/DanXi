@@ -37,11 +37,13 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -181,6 +183,8 @@ class SortOrderChangedEvent {
   SortOrderChangedEvent(this.newOrder);
 }
 
+enum PostsType { FAVORED_DISCUSSION, FILTER_BY_TAG, NORMAL_POSTS }
+
 /// A list page showing bbs posts.
 ///
 /// Arguments:
@@ -200,6 +204,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       StateStreamListener();
   String? _tagFilter;
   FocusNode _searchFocus = FocusNode();
+  PostsType _postsType = PostsType.NORMAL_POSTS;
 
   final PagedListViewController<OTHole> _listViewController =
       PagedListViewController();
@@ -224,41 +229,41 @@ class _BBSSubpageState extends State<BBSSubpage>
       _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
           SortOrder.LAST_REPLIED;
       _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior;
-      if (_tagFilter != null)
-        return await OpenTreeHoleRepository.getInstance()
-            .loadTagFilteredDiscussions(_tagFilter!, _sortOrder!, page);
-      else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
-          false) {
-        if (page > 1) return Future.value([]);
-        // TODO: It is too ineffective.
-        return Future.wait<OTHole>(
-            (await OpenTreeHoleRepository.getInstance().getFavoredDiscussions())
-                .map((e) => OpenTreeHoleRepository.getInstance()
-                    .loadSpecificDiscussion(e)));
-      } else {
-        if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
-          await OpenTreeHoleRepository.getInstance()
-              .initializeUser(StateProvider.personInfo.value);
+      switch (_postsType) {
+        case PostsType.FAVORED_DISCUSSION:
+          if (page > 1) return Future.value([]);
+          // TODO: It is too ineffective.
+          return Future.wait<OTHole>((await OpenTreeHoleRepository.getInstance()
+                  .getFavoredDiscussions())
+              .map((e) => OpenTreeHoleRepository.getInstance()
+                  .loadSpecificDiscussion(e)));
+        case PostsType.FILTER_BY_TAG:
+          return await OpenTreeHoleRepository.getInstance()
+              .loadTagFilteredDiscussions(_tagFilter!, _sortOrder!, page);
+        case PostsType.NORMAL_POSTS:
+          if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
+            await OpenTreeHoleRepository.getInstance()
+                .initializeUser(StateProvider.personInfo.value);
 
-        List<OTHole>? loadedPost = await adaptLayer
-            .generateReceiver(_listViewController, (lastElement) {
-          DateTime time = DateTime.now();
-          if (lastElement != null) {
-            time = DateTime.parse(lastElement.time_created!);
-          }
-          return OpenTreeHoleRepository.getInstance()
-              .loadDiscussions(time, _divisionId);
-        }).call(page);
-        // Filter blocked posts
-        List<OTTag> hiddenTags =
-            SettingsProvider.getInstance().hiddenTags ?? [];
-        loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
-            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+          List<OTHole>? loadedPost = await adaptLayer
+              .generateReceiver(_listViewController, (lastElement) {
+            DateTime time = DateTime.now();
+            if (lastElement != null) {
+              time = DateTime.parse(lastElement.time_created!);
+            }
+            return OpenTreeHoleRepository.getInstance()
+                .loadDiscussions(time, _divisionId);
+          }).call(page);
+          // Filter blocked posts
+          List<OTTag> hiddenTags =
+              SettingsProvider.getInstance().hiddenTags ?? [];
+          loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
+              hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
 
-        // About this line, see [PagedListView].
-        return loadedPost == null || loadedPost.isEmpty
-            ? [OTHole.DUMMY_POST]
-            : loadedPost;
+          // About this line, see [PagedListView].
+          return loadedPost == null || loadedPost.isEmpty
+              ? [OTHole.DUMMY_POST]
+              : loadedPost;
       }
     } else {
       throw NotLoginError("Logged in as a visitor.");
@@ -266,7 +271,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Future<void> refreshSelf() async {
-    if (widget.arguments?.containsKey('showFavoredDiscussion') == true) {
+    if (_postsType == PostsType.FAVORED_DISCUSSION) {
       await OpenTreeHoleRepository.getInstance()
           .getFavoredDiscussions(forceUpdate: true);
     }
@@ -275,9 +280,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildSearchTextField() {
     // If user is filtering by tag, do not build search text field.
-    if (_tagFilter != null ||
-        (widget.arguments?.containsKey('showFavoredDiscussion') ?? false))
-      return Container();
+    if (_postsType != PostsType.NORMAL_POSTS) return Container();
     final RegExp pidPattern = new RegExp(r'#[0-9]+');
     return Container(
       padding: Theme.of(context)
@@ -388,9 +391,14 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void didChangeDependencies() {
     if (!_fieldInitComplete) {
-      if (widget.arguments != null &&
-          widget.arguments!.containsKey('tagFilter'))
+      if (widget.arguments?.containsKey('tagFilter') ?? false)
         _tagFilter = widget.arguments!['tagFilter'];
+      if (_tagFilter != null) {
+        _postsType = PostsType.FILTER_BY_TAG;
+      } else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
+          false) {
+        _postsType = PostsType.FAVORED_DISCUSSION;
+      }
       _fieldInitComplete = true;
     }
     super.didChangeDependencies();
@@ -408,39 +416,41 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (widget.arguments == null)
-      return _buildPageBody();
-    else if (widget.arguments!.containsKey('showFavoredDiscussion')) {
-      return PlatformScaffold(
-        iosContentPadding: false,
-        iosContentBottomPadding: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: PlatformAppBarX(
-          title: Text(S.of(context).favorites),
-        ),
-        body: _buildPageBody(),
-      );
+    switch (_postsType) {
+      case PostsType.FAVORED_DISCUSSION:
+        return PlatformScaffold(
+          iosContentPadding: false,
+          iosContentBottomPadding: false,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: PlatformAppBarX(
+            title: Text(S.of(context).favorites),
+          ),
+          body: _buildPageBody(),
+        );
+      case PostsType.FILTER_BY_TAG:
+        return PlatformScaffold(
+          iosContentPadding: false,
+          iosContentBottomPadding: false,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: PlatformAppBarX(
+            title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
+          ),
+          body: _buildPageBody(),
+        );
+      case PostsType.NORMAL_POSTS:
+        return _buildPageBody();
     }
-    return PlatformScaffold(
-      iosContentPadding: false,
-      iosContentBottomPadding: false,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: PlatformAppBarX(
-        title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
-      ),
-      body: _buildPageBody(),
-    );
   }
 
   Widget _buildPageBody() {
     return Material(
       child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/graphics/kavinzhao.jpeg"),
-            fit: BoxFit.cover,
-          ),
-        ),
+        // decoration: BoxDecoration(
+        //   image: DecorationImage(
+        //     image: AssetImage("assets/graphics/kavinzhao.jpeg"),
+        //     fit: BoxFit.cover,
+        //   ),
+        // ),
         child: SafeArea(
           bottom: false,
           child: RefreshIndicator(
@@ -475,11 +485,52 @@ class _BBSSubpageState extends State<BBSSubpage>
                       ),
                     ),
                 emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+                fatalErrorBuilder: (_, e) {
+                  if (e is NotLoginError) {
+                    return ErrorPageWidget(
+                      buttonText: S.of(context).login,
+                      errorMessage: "You need log in now.",
+                      onTap: () {
+                        selectLoginMethod();
+                      },
+                    );
+                  }
+                  return Container();
+                },
                 dataReceiver: _loadContent),
           ),
         ),
       ),
     );
+  }
+
+  void selectLoginMethod() {
+    showPlatformDialog(
+        context: context,
+        builder: (cxt) {
+          return PlatformAlertDialog(
+            title: Text("选择登陆方式"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text("UIS 快捷注册/登录"),
+                  onTap: () async {
+                    Navigator.pop(cxt);
+                    await OTLoginHelper.getInstance().loginWithUIS(context);
+                  },
+                ),
+                ListTile(
+                  title: Text("邮箱密码登录"),
+                  onTap: () async {
+                    Navigator.pop(cxt);
+                    await OTLoginHelper.getInstance().loginWithPwd(context);
+                  },
+                )
+              ],
+            ),
+          );
+        });
   }
 
   Widget _buildEmptyFavoritesPage() => Container(
@@ -677,7 +728,7 @@ class TimeBasedLoadAdaptLayer<T> {
         // If this is the first page, call with nothing.
         return receiver.call(null);
       } else if (nextPageEnd < controller.length()) {
-        // If this is not the first page, and we have loaded beyond [pageIndex],
+        // If this is not the first page, and we have loaded far more than [pageIndex],
         // we should loaded it again with the last item of previous page.
         return receiver
             .call(controller.getElementAt(nextPageEnd - startPage - 1));

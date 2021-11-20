@@ -17,9 +17,9 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -65,6 +65,12 @@ class PagedListView<T> extends StatefulWidget {
   /// The builder to build empty widget.
   final WidgetBuilder? emptyBuilder;
 
+  /// The builder to build full-screen error widget.
+  /// It will be called only when a [FatalException] is thrown.
+  /// [PagedListView] will simply clear all the data, reset the state,
+  /// and show the widget returned by [fatalErrorBuilder].
+  final PureValueWidgetBuilder<dynamic>? fatalErrorBuilder;
+
   /// The start number of page index, usually zero to say that the first page is Page 0.
   final int startPage;
 
@@ -102,7 +108,8 @@ class PagedListView<T> extends StatefulWidget {
       this.withScrollbar = false,
       this.allDataReceiver,
       this.shouldScrollToEnd,
-      this.noneItem})
+      this.noneItem,
+      this.fatalErrorBuilder})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         super(key: key);
 
@@ -213,7 +220,15 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           if (_dataClearQueued) _clearData();
           _hasError = true;
           _isRefreshing = false;
-          return _buildListView(snapshot: snapshot);
+          if (snapshot.error != null &&
+              snapshot.error is FatalException &&
+              widget.fatalErrorBuilder != null) {
+            _clearData();
+            pageIndex = widget.startPage;
+            return widget.fatalErrorBuilder!.call(context, snapshot.error);
+          } else {
+            return _buildListView(snapshot: snapshot);
+          }
         },
         loadingBuilder: (BuildContext context) {
           _hasError = false;
@@ -516,6 +531,8 @@ class PagedListViewController<T> implements ListProvider<T> {
   }
 }
 
+class FatalException implements Exception {}
+
 mixin ListProvider<T> {
   T getElementAt(int index);
 
@@ -530,6 +547,10 @@ mixin ListProvider<T> {
 /// Build a widget with index & data. You must apply the key to the root widget of item.
 typedef IndexedDataWidgetBuilder<T> = Widget Function(
     BuildContext context, ListProvider<T> dataProvider, int index, T data);
+
+/// Build a widget with a value.
+typedef PureValueWidgetBuilder<T> = Widget Function(
+    BuildContext context, T value);
 
 /// Retrieve data function
 typedef DataReceiver<T> = Future<List<T>?> Function(int pageIndex);

@@ -25,27 +25,44 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class OTLoginHelper {
   static final _instance = OTLoginHelper._();
+
   factory OTLoginHelper.getInstance() => _instance;
+
   OTLoginHelper._();
 
   // This lock is to prevent repeated login dialog popping up.
   bool _loginLock = false;
 
-  Future login() async {
+  Future<void> loginWithUIS(BuildContext context) async {
     if (_loginLock) {
       return;
     }
     _loginLock = true;
     try {
-      return await loginWithUsernamePassword(
-          Catcher.navigatorKey!.currentContext!);
+      await _loginWithUsernamePassword(context);
+      _loginLock = false;
     } catch (e) {
       _loginLock = false;
       rethrow;
     }
   }
 
-  static Future<String?> loginWithUsernamePassword(BuildContext context) async {
+  Future<void> loginWithPwd(BuildContext context) async {
+    if (_loginLock) {
+      return;
+    }
+    _loginLock = true;
+    try {
+      await _loginWithUsernamePassword(context);
+      _loginLock = false;
+    } catch (e) {
+      _loginLock = false;
+      rethrow;
+    }
+  }
+
+  static Future<String?> _loginWithUsernamePassword(
+      BuildContext context) async {
     final Credentials? credentials = await showPlatformModalSheet(
       context: context,
       builder: (BuildContext context) {
