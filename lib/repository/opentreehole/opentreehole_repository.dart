@@ -159,13 +159,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  /// Migrated
+  // Migrated
   Future<OTHole> loadSpecificDiscussion(int discussionId) async {
     final Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
         options: Options(headers: _tokenHeader));
     return OTHole.fromJson(response.data);
   }
 
+  // Migrated
   Future<OTFloor> loadSpecificFloor(int floorId) async {
     // TODO: This API should first check if the requested floor is already cached.
     // Inside [Mention]
@@ -174,7 +175,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return OTFloor.fromJson(response.data);
   }
 
-  /// Do we have such an API?
+  // Do we have such an API?
   Future<List<OTHole>> loadTagFilteredDiscussions(
       String tag, SortOrder sortBy, int page) async {
     try {
@@ -196,7 +197,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  /// Migrated
+  // Migrated
   Future<List<OTFloor>> loadReplies(
       OTHole post, int startFloor, int length) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
@@ -210,7 +211,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTFloor.fromJson(e)).toList();
   }
 
-  /// Migrated
+  // Migrated
   Future<List<OTFloor>> loadSearchResults(
       String? searchString, int page) async {
     // Search results only have a single page.
@@ -223,7 +224,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTFloor.fromJson(e)).toList();
   }
 
-  /// Migrated
+  // Migrated
   Future<List<OTTag>> loadTags() async {
     final Response response = await dio!
         .get(_BASE_URL + "/tags", options: Options(headers: _tokenHeader));
@@ -231,7 +232,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTTag.fromJson(e)).toList();
   }
 
-  /// Migrated
+  // Migrated
   Future<int?> newPost(int divisionId, String? content,
       {List<OTTag>? tags}) async {
     if (content == null) return 0;
@@ -260,7 +261,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data['url'];
   }
 
-  /// Partly migrated. What does [mention] means?
+  // Partly migrated. What does [mention] means?
   Future<int?> newReply(int? discussionId, int? replyTo, String content) async {
     final Response response = await dio!.post(_BASE_URL + "/floors",
         data: {
@@ -272,7 +273,17 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
-  /// Migrated
+  // Migrated
+  Future<OTFloor> likeFloor(int floorId, bool like) async {
+    final Response response = await dio!.put(_BASE_URL + "/floors/$floorId",
+        data: {
+          "like": like ? "add" : "cancel",
+        },
+        options: Options(headers: _tokenHeader));
+    return OTFloor.fromJson(response.data);
+  }
+
+  // Migrated
   Future<int?> reportPost(int? postId, String reason) async {
     // Suppose user is logged in. He should be.
     final Response response = await dio!.post(_BASE_URL + "/reports",
@@ -281,7 +292,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
-  /// Migrated
+  // Migrated
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (_profile == null || forceUpdate) {
       final Response response = await dio!
@@ -291,23 +302,23 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _profile;
   }
 
-  /// Migrated
+  // Migrated
   Future<bool?> isUserAdmin() async {
     return (await getUserProfile())!.is_admin;
   }
 
-  /// Migrated
+  // Migrated
   /// Non-async version of [isUserAdmin], will return false if data is not yet ready
   bool isUserAdminNonAsync() {
     return _profile?.is_admin ?? false;
   }
 
-  /// Migrated
+  // Migrated
   Future<List<int>> getFavoredDiscussions({bool forceUpdate = false}) async {
     return (await getUserProfile(forceUpdate: forceUpdate))!.favorites!;
   }
 
-  /// Partially migrated. Does the server return a [OTUser]?
+  // Partially migrated. Does the server return a [OTUser]?
   Future<void> setFavoredDiscussion(
       SetFavoredDiscussionMode mode, int? discussionId) async {
     Response response;

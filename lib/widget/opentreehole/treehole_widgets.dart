@@ -106,7 +106,7 @@ class OTFloorWidget extends StatelessWidget {
   final void Function()? onTap;
   final void Function()? onLongPress;
 
-  OTFloorWidget({
+  const OTFloorWidget({
     required this.floor,
     this.isNested = false,
     this.index,
@@ -163,15 +163,6 @@ class OTFloorWidget extends StatelessWidget {
                       "${floor.anonyname}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(
-                      width: 2,
-                    ),
-                    if (isNested)
-                      Center(
-                        child: Icon(CupertinoIcons.search,
-                            color: Theme.of(context).hintColor.withOpacity(0.2),
-                            size: 12),
-                      ),
                   ],
                 ),
               ),
@@ -203,51 +194,56 @@ class OTFloorWidget extends StatelessWidget {
             const SizedBox(
               height: 8,
             ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              if (index == null)
-                Text(
-                  "#${floor.floor_id}",
-                  style: TextStyle(
-                    color: Theme.of(context).hintColor,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (index == null)
+                  Text(
+                    "#${floor.floor_id}",
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                    ),
                   ),
-                ),
-              if (index != null)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "${index! + 1}F",
-                      style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                if (index != null)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "${index! + 1}F",
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "  (#${floor.floor_id})",
-                      style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                        fontSize: 10,
+                      Text(
+                        "  (#${floor.floor_id})",
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 10,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                Text(
+                  HumanDuration.format(
+                      context, DateTime.tryParse(floor.time_created!)),
+                  style: TextStyle(
+                      color: Theme.of(context).hintColor, fontSize: 12),
                 ),
-              Text(
-                HumanDuration.format(
-                    context, DateTime.tryParse(floor.time_created!)),
-                style:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
-              ),
-              if (!isNested)
-                GestureDetector(
-                  child: Text(S.of(context).report,
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor, fontSize: 12)),
-                  onTap: () {
-                    BBSEditor.reportPost(context, floor.floor_id);
-                  },
-                ),
-            ]),
+                if (!isNested)
+                  GestureDetector(
+                    child: Text(S.of(context).modify,
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12)),
+                    onTap: () {
+                      // TODO: Modify post
+                      throw UnimplementedError();
+                    },
+                  ),
+              ],
+            ),
+            if (!isNested) OTFloorWidgetBottomBar(floor: floor),
           ]),
           onTap: onTap,
         ),
@@ -365,5 +361,105 @@ class OTFloorMentionWidget extends StatelessWidget {
           floor: OTFloor.special(S.of(context).loading, S.of(context).loading),
           isNested: true,
         ));
+  }
+}
+
+class OTFloorWidgetBottomBar extends StatefulWidget {
+  final OTFloor floor;
+  const OTFloorWidgetBottomBar({Key? key, required this.floor})
+      : super(key: key);
+
+  @override
+  _OTFloorWidgetBottomBarState createState() => _OTFloorWidgetBottomBarState();
+}
+
+class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
+  late OTFloor floor;
+  @override
+  void initState() {
+    super.initState();
+    floor = widget.floor;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Divider(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Expanded(
+              child: InkWell(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        (floor.liked ?? false)
+                            ? CupertinoIcons.heart_fill
+                            : CupertinoIcons.heart,
+                        color: Theme.of(context).hintColor,
+                        size: 12,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                          (floor.liked ?? false)
+                              ? S.of(context).liked(floor.like ?? "...")
+                              : S.of(context).like(floor.like ?? "..."),
+                          style: TextStyle(
+                              color: Theme.of(context).hintColor,
+                              fontSize: 12)),
+                    ],
+                  ),
+                ),
+                onTap: () async {
+                  try {
+                    floor.liked ??= false;
+                    setState(() {
+                      floor.liked = !floor.liked!;
+                    });
+                    floor = await OpenTreeHoleRepository.getInstance()
+                        .likeFloor(floor.floor_id!, floor.liked!);
+                    setState(() {});
+                  } catch (e) {
+                    Noticing.showNotice(context, e.toString(),
+                        title: S.of(context).fatal_error);
+                  }
+                },
+              ),
+            ),
+            VerticalDivider(width: 0),
+            Expanded(
+              child: InkWell(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.exclamationmark_octagon,
+                        color: Theme.of(context).hintColor,
+                        size: 12,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(S.of(context).report,
+                          style: TextStyle(
+                              color: Theme.of(context).hintColor,
+                              fontSize: 12)),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  BBSEditor.reportPost(context, floor.floor_id);
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

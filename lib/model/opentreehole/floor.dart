@@ -45,7 +45,7 @@ class OTFloor {
   factory OTFloor.dummy() =>
       OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, []);
   factory OTFloor.special(String title, String content) =>
-      OTFloor(-1, -1, content, title, '', '', false, [], 0, false, false, []);
+      OTFloor(0, 0, content, title, '', '', false, [], 0, false, false, []);
 
   @override
   bool operator ==(Object other) =>

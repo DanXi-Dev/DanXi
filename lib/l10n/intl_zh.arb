@@ -59,6 +59,9 @@
     "exam_unavailable": "考试数据不可用",
     "jump_to_hole": "定位",
     "ok": "好",
+    "modify": "修改",
+    "like": "点赞 ({likes})",
+    "liked": "已赞 ({likes})",
 
     "empty_classrooms": "空教室",
     "settings": "设置",
