@@ -57,6 +57,8 @@
     "semester": "{schoolYear}学年 {semName}学期",
     "all": "全部",
     "exam_unavailable": "考试数据不可用",
+    "jump_to_hole": "定位",
+    "ok": "好",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

@@ -71,7 +71,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
-      _token = await requestToken(info!);
+      //_token = await requestToken(info!);
       updatePushNotificationToken();
     }
   }
@@ -134,7 +134,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Map<String, String> get _tokenHeader {
-    if (_token == null) throw NotLoginError("Null Token");
+    //if (_token == null) throw NotLoginError("Null Token");
     //return {"Authorization": "Token " + _token!};
     return {"Authorization": "Token 97bcf61a86f94696b712e4cd189f24de9552e852"};
   }

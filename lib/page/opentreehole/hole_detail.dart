@@ -494,13 +494,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
-    final bool generateTags = (index == 0);
-    final LinkTapCallback onLinkTap = (url) {
-      BrowserUtil.openUrl(url!, context);
-    };
-    final ImageTapCallback onImageTap = (url) {
-      smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
-    };
     return OTFloorWidget(
       floor: floor,
       index: index,

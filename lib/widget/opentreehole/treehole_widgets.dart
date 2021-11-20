@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -35,6 +36,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OTLeadingTag extends StatelessWidget {
@@ -264,13 +266,55 @@ class OTFloorWidgetLazy extends StatelessWidget {
   void showFloorDetail(BuildContext context, OTFloor floor) {
     showPlatformModalSheet(
       context: context,
-      builder: (BuildContext context) => SafeArea(
+      builder: (BuildContext cxt) => SafeArea(
         child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: OTFloorWidget(
-              floor: floor,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OTFloorWidget(
+                floor: floor,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () async {
+                        // Note how this code use [cxt] for some context but [context] for others.
+                        // This is to prevent looking up deactivated context after [pop].
+                        Navigator.pop(cxt);
+                        ProgressFuture progressDialog = showProgressDialog(
+                            loadingText: S.of(context).loading,
+                            context: context);
+                        try {
+                          smartNavigatorPush(context, "/bbs/postDetail",
+                              arguments: {
+                                "post":
+                                    await OpenTreeHoleRepository.getInstance()
+                                        .loadSpecificDiscussion(floor.hole_id!),
+                                "locate": floor
+                                    .floor_id!, // TODO: jump to specific floor after push
+                              });
+                          progressDialog.dismiss();
+                        } catch (e) {
+                          progressDialog.dismiss();
+                          Noticing.showNotice(context, e.toString(),
+                              title: S.of(context).fatal_error);
+                        }
+                      },
+                      child: Text(S.of(cxt).jump_to_hole),
+                    ),
+                    TextButton(
+                      child: Text(S.of(cxt).ok),
+                      onPressed: () {
+                        Navigator.of(cxt).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

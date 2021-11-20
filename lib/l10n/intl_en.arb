@@ -153,6 +153,8 @@
     "bus_dest": "To    ",
     "unable_to_find_quote": "Unable to find the quoted reply.",
     "no_matching_bus": "There is no scheduled bus for your campus",
+    "jump_to_hole": "Locate",
+    "ok": "OK",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
