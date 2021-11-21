@@ -19,13 +19,8 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/feature/feature_map.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
 import 'package:dan_xi/page/dashboard/announcement_notices.dart';
-import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/page/opentreehole/hole_reports.dart';
-import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/dashboard/bus.dart';
 import 'package:dan_xi/page/dashboard/card_detail.dart';
 import 'package:dan_xi/page/dashboard/card_traffic.dart';
@@ -34,12 +29,18 @@ import 'package:dan_xi/page/dashboard/empty_classroom_detail.dart';
 import 'package:dan_xi/page/dashboard/exam_detail.dart';
 import 'package:dan_xi/page/dashboard/gpa_table.dart';
 import 'package:dan_xi/page/home_page.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/opentreehole/hole_login.dart';
+import 'package:dan_xi/page/opentreehole/hole_reports.dart';
+import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
+import 'package:dan_xi/page/opentreehole/text_selector.dart';
+import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/page/opentreehole/text_selector.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
@@ -139,6 +140,7 @@ class DanxiApp extends StatelessWidget {
     '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
     '/bbs/tags/blocklist': (context, {arguments}) =>
         BBSHiddenTagsPreferencePage(arguments: arguments),
+    '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
   };
 
   // This widget is the root of your application.

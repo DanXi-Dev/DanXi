@@ -491,7 +491,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                       buttonText: S.of(context).login,
                       errorMessage: "You need log in now.",
                       onTap: () {
-                        selectLoginMethod();
+                        smartNavigatorPush(context, "/bbs/login", arguments: {
+                          "info": StateProvider.personInfo.value!
+                        });
                       },
                     );
                   }
@@ -502,35 +504,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         ),
       ),
     );
-  }
-
-  void selectLoginMethod() {
-    showPlatformDialog(
-        context: context,
-        builder: (cxt) {
-          return PlatformAlertDialog(
-            title: Text("选择登陆方式"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text("UIS 快捷注册/登录"),
-                  onTap: () async {
-                    Navigator.pop(cxt);
-                    await OTLoginHelper.getInstance().loginWithUIS(context);
-                  },
-                ),
-                ListTile(
-                  title: Text("邮箱密码登录"),
-                  onTap: () async {
-                    Navigator.pop(cxt);
-                    await OTLoginHelper.getInstance().loginWithPwd(context);
-                  },
-                )
-              ],
-            ),
-          );
-        });
   }
 
   Widget _buildEmptyFavoritesPage() => Container(

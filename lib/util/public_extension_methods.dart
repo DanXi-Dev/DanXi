@@ -104,6 +104,19 @@ extension ListEx<T> on List<T>? {
     });
     return newList;
   }
+
+  /// Join [generator] between every element of this list.
+  List<T>? joinElement(T generator()) {
+    if (this == null) return null;
+    List<T> newList = [];
+    for (int i = 0; i < this!.length; i++) {
+      newList.add(this!.elementAt(i));
+      if (i != this!.length - 1) {
+        newList.add(generator.call());
+      }
+    }
+    return newList;
+  }
 }
 
 typedef FilterFunction<T> = bool Function(T element);

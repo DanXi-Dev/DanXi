@@ -24,6 +24,9 @@ class ViewportUtils {
   static double getViewportHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
 
+  static Size getMainNavigatorSize(BuildContext context) =>
+      Size(getMainNavigatorWidth(context), getMainNavigatorHeight(context));
+
   static double getMainNavigatorWidth(BuildContext context) => isTablet(context)
       ? kTabletMasterContainerWidth
       : getViewportWidth(context);

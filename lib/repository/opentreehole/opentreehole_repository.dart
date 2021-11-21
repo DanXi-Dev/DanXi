@@ -78,6 +78,17 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
+  Future<String?> getVerifyCode(String email) async {
+    final Response response = await dio!.get(_BASE_URL + "/verify/apikey",
+        queryParameters: {
+          "apikey": Secret.FDUHOLE_API_KEY,
+          "email": email,
+          "check_register": 1,
+        },
+        options: Options(validateStatus: (code) => code! <= 409));
+    return response.statusCode == 409 ? null : response.data.toString();
+  }
+
   Future<String> loginWithUsernamePassword(
       String username, String password) async {
     final Response response = await dio!.post(_BASE_URL + "/login", data: {

@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:catcher/catcher.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -32,20 +31,6 @@ class OTLoginHelper {
 
   // This lock is to prevent repeated login dialog popping up.
   bool _loginLock = false;
-
-  Future<void> loginWithUIS(BuildContext context) async {
-    if (_loginLock) {
-      return;
-    }
-    _loginLock = true;
-    try {
-      await _loginWithUsernamePassword(context);
-      _loginLock = false;
-    } catch (e) {
-      _loginLock = false;
-      rethrow;
-    }
-  }
 
   Future<void> loginWithPwd(BuildContext context) async {
     if (_loginLock) {
@@ -80,6 +65,50 @@ class OTLoginHelper {
 }
 
 class OTUsernamePasswordLoginWidget extends StatelessWidget {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        TextField(
+          controller: _usernameController,
+          decoration: InputDecoration(
+              labelText: S.of(context).login_uis_uid,
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.perm_identity)
+                  : Icon(CupertinoIcons.person_crop_circle)),
+        ),
+        TextField(
+          controller: _passwordController,
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: S.of(context).login_uis_pwd,
+            icon: PlatformX.isAndroid
+                ? Icon(Icons.lock_outline)
+                : Icon(CupertinoIcons.lock_circle),
+          ),
+        ),
+        ElevatedButton(
+          child: Text(S.of(context).login),
+          onPressed: () {
+            Navigator.of(context).pop(Credentials(
+                _usernameController.text, _passwordController.text));
+          },
+        ),
+        ElevatedButton(
+          child: Text(S.of(context).cancel),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class OTEmailSelectionWidget extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
