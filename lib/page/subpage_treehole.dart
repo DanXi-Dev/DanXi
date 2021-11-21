@@ -232,11 +232,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       switch (_postsType) {
         case PostsType.FAVORED_DISCUSSION:
           if (page > 1) return Future.value([]);
-          // TODO: It is too ineffective.
-          return Future.wait<OTHole>((await OpenTreeHoleRepository.getInstance()
-                  .getFavoredDiscussions())
-              .map((e) => OpenTreeHoleRepository.getInstance()
-                  .loadSpecificDiscussion(e)));
+          return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
         case PostsType.FILTER_BY_TAG:
           return await OpenTreeHoleRepository.getInstance()
               .loadTagFilteredDiscussions(_tagFilter!, _sortOrder!, page);
@@ -252,7 +248,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               time = DateTime.parse(lastElement.time_created!);
             }
             return OpenTreeHoleRepository.getInstance()
-                .loadDiscussions(time, _divisionId);
+                .loadHoles(time, _divisionId);
           }).call(page);
           // Filter blocked posts
           List<OTTag> hiddenTags =
@@ -273,7 +269,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   Future<void> refreshSelf() async {
     if (_postsType == PostsType.FAVORED_DISCUSSION) {
       await OpenTreeHoleRepository.getInstance()
-          .getFavoredDiscussions(forceUpdate: true);
+          .getFavoriteHoleId(forceUpdate: true);
     }
     await _listViewController.notifyUpdate();
   }
@@ -338,8 +334,8 @@ class _BBSSubpageState extends State<BBSSubpage>
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      final OTHole post = await OpenTreeHoleRepository.getInstance()
-          .loadSpecificDiscussion(pid);
+      final OTHole post =
+          await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
       smartNavigatorPush(context, "/bbs/postDetail", arguments: {
         "post": post,
       });

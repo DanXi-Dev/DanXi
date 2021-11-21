@@ -116,7 +116,7 @@ class BBSPostDetail extends StatefulWidget {
 class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
-  OTHole? _post;
+  late OTHole _post;
   String? _searchKeyword;
 
   /// Fields related to the display states.
@@ -134,15 +134,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           .loadSearchResults(_searchKeyword, page);
     else
       return await OpenTreeHoleRepository.getInstance()
-          .loadReplies(_post!, page * 10, 10);
+          .loadFloors(_post, page * 10, 10);
   }
 
-  Future<bool?> _isDiscussionFavored() async {
+  Future<bool?> _isHoleFavorited() async {
     if (_isFavored != null) return _isFavored;
     final List<int>? favorites =
-        await (OpenTreeHoleRepository.getInstance().getFavoredDiscussions());
+        await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
     return favorites!.any((element) {
-      return element == _post!.hole_id;
+      return element == _post.hole_id;
     });
   }
 
@@ -180,7 +180,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? "#${_post?.hole_id}"
+              ? "#${_post.hole_id}"
               : S.of(context).search_result),
         ),
         trailingActions: [
@@ -192,7 +192,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () {
-                BBSEditor.createNewReply(context, _post!.hole_id, null)
+                BBSEditor.createNewReply(context, _post.hole_id, null)
                     .then((_) => refreshSelf(scrollToEnd: true));
               },
             ),
@@ -216,15 +216,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 await refreshSelf();
               },
               child: PagedListView<OTFloor>(
-                initialData: _post?.floors?.prefetch ?? [],
+                initialData: _post.floors?.prefetch ?? [],
                 pagedController: _listViewController,
                 withScrollbar: true,
                 scrollController: PrimaryScrollController.of(context),
                 dataReceiver: _loadContent,
                 // Load all data if user instructed us to scroll to end
-                allDataReceiver: (shouldScrollToEnd && _post!.reply! > 10)
+                allDataReceiver: (shouldScrollToEnd && _post.reply! > 10)
                     ? OpenTreeHoleRepository.getInstance()
-                        .loadReplies(_post!, 0, 0)
+                        .loadFloors(_post, 0, 0)
                     : null,
                 shouldScrollToEnd: shouldScrollToEnd,
                 builder: _getListItems,
@@ -249,7 +249,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _buildFavoredActionButton() => PlatformIconButton(
         padding: EdgeInsets.zero,
         icon: FutureWidget<bool?>(
-          future: _isDiscussionFavored(),
+          future: _isHoleFavorited(),
           loadingBuilder: PlatformCircularProgressIndicator(),
           successBuilder:
               (BuildContext context, AsyncSnapshot<bool?> snapshot) {
@@ -267,11 +267,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           if (_isFavored == null) return;
           setState(() => _isFavored = !_isFavored!);
           await OpenTreeHoleRepository.getInstance()
-              .setFavoredDiscussion(
-                  _isFavored!
-                      ? SetFavoredDiscussionMode.ADD
-                      : SetFavoredDiscussionMode.DELETE,
-                  _post!.hole_id)
+              .setFavorite(
+                  _isFavored! ? SetFavoriteMode.ADD : SetFavoriteMode.DELETE,
+                  _post.hole_id)
               .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
                 title: S.of(context).operation_failed, useSnackBar: false);
@@ -521,17 +519,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         if (_searchKeyword == null) {
           int? replyId;
           // Set the replyId to null when tapping on the first reply.
-          if (_post!.floors!.first_floor!.floor_id != floor.floor_id) {
+          if (_post.floors!.first_floor!.floor_id != floor.floor_id) {
             replyId = floor.floor_id;
           }
-          BBSEditor.createNewReply(context, _post!.hole_id, replyId)
+          BBSEditor.createNewReply(context, _post.hole_id, replyId)
               .then((value) => refreshSelf(scrollToEnd: true));
         } else {
           ProgressFuture progressDialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": await OpenTreeHoleRepository.getInstance()
-                .loadSpecificDiscussion(floor.hole_id!)
+                .loadSpecificHole(floor.hole_id!)
           });
           progressDialog.dismiss();
         }

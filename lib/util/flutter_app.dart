@@ -40,7 +40,7 @@ class FlutterApp {
 
   static Future<void> restartApp(BuildContext context) async {
     await BaseRepositoryWithDio.clearAllCookies();
-    await OpenTreeHoleRepository.getInstance().clearCache();
+    OpenTreeHoleRepository.getInstance().clearCache();
     StateProvider.initialize();
     Phoenix.rebirth(context);
   }
