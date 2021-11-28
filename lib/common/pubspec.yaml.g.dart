@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1635225843;
+const int timestamp = 1637324299;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -98,7 +98,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/kavinzhao/flutter_progress_dialog.git',
+      'url': r'git://github.com/singularity-s0/flutter_progress_dialog.git',
       'ref': r'master',
     },
   },
@@ -111,20 +111,10 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_platform_widgets': r'^1.1.0',
   'share': r'^2.0.1',
   'path_provider': r'^2.0.1',
-  'screen_brightness': <String, Object>{
-    'git': <String, Object>{
-      'url': r'git://github.com/kavinzhao/screen_brightness.git',
-      'ref': r'master',
-    },
-  },
+  'screen_brightness': r'^0.1.1',
   'flutter_email_sender': r'^5.0.0',
   'auto_size_text': r'^3.0.0-nullsafety.0',
-  'ical': <String, Object>{
-    'git': <String, Object>{
-      'url': r'git://github.com/julisanchez/ical.git',
-      'ref': r'null-safety',
-    },
-  },
+  'ical': r'^0.2.0',
   'url_launcher': r'^6.0.3',
   'desktop_window': r'^0.4.0',
   'flutter_html': r'^2.0.0',
@@ -158,6 +148,8 @@ const Map<String, Object> dependencies = <String, Object>{
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
+  'flutter_js': r'^0.5.0+3',
+  'flutter_svg': r'0.22.0',
 };
 
 /// Developer dependencies
@@ -179,7 +171,7 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
   },
   'linkify': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/kavinzhao/linkify.git',
+      'url': r'git://github.com/singularity-s0/linkify.git',
       'ref': r'master',
     },
   },
