@@ -49,6 +49,7 @@ class SettingsProvider {
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
+  static const String KEY_HIDDEN_HOLE = "hidden_hole";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
 
   SettingsProvider._();
@@ -254,6 +255,17 @@ class SettingsProvider {
     if (tags == null) return;
     preferences!.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
   }
+
+  /// Hide FDUHole
+  bool get hideHole {
+    if (preferences!.containsKey(KEY_HIDDEN_HOLE)) {
+      return preferences!.getBool(KEY_HIDDEN_HOLE)!;
+    } else {
+      return false;
+    }
+  }
+
+  set hideHole(bool mode) => preferences!.setBool(KEY_HIDDEN_HOLE, mode);
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

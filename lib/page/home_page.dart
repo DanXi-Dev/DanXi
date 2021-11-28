@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _rebuildPage() {
     _subpage = [
       HomeSubpage(),
-      BBSSubpage(),
+      if (!SettingsProvider.getInstance().hideHole) BBSSubpage(),
       TimetableSubPage(),
       SettingsSubpage(),
     ];
@@ -487,13 +487,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   : Icon(CupertinoIcons.square_stack_3d_up_fill),
               label: S.of(context).dashboard,
             ),
-            BottomNavigationBarItem(
-              //backgroundColor: Colors.indigo,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.forum)
-                  : Icon(CupertinoIcons.text_bubble),
-              label: S.of(context).forum,
-            ),
+            if (!SettingsProvider.getInstance().hideHole)
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.indigo,
+                icon: PlatformX.isAndroid
+                    ? Icon(Icons.forum)
+                    : Icon(CupertinoIcons.text_bubble),
+                label: S.of(context).forum,
+              ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.blue,
               icon: PlatformX.isAndroid
