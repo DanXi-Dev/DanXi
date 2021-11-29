@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:asn1lib/asn1lib.dart';
@@ -36,6 +37,7 @@ import 'package:flutter/foundation.dart';
 
 class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final _instance = OpenTreeHoleRepository._();
+
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
   static const String _BASE_URL = "https://hole.hath.top";
@@ -89,7 +91,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "check_register": 1,
         },
         options: Options(validateStatus: (code) => code! <= 409));
-    return response.statusCode == 409 ? null : response.data.toString();
+    if (response.statusCode == 409) {
+      return null;
+    }
+
+    var json = response.data is Map ? response.data : jsonDecode(response.data);
+    return json["code"].toString();
   }
 
   Future<String> loginWithUsernamePassword(

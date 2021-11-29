@@ -43,6 +43,11 @@ class HoleLoginPage extends StatefulWidget {
 class _HoleLoginPageState extends State<HoleLoginPage> {
   late Widget _currentWidget;
   late PersonInfo info;
+  List<Widget> _widgetStack = [];
+
+  /// Indicate the next [_backwardRun] animation should run in the reverse direction,
+  /// since we are going back to the previous page.
+  int _backwardRun = 0;
 
   @override
   void initState() {
@@ -51,35 +56,59 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
     _currentWidget = OTLoginMethodSelectionWidget(
       state: this,
     );
+    _widgetStack.add(_currentWidget);
   }
 
-  void jumpTo(Widget nextWidget) {
+  void jumpTo(Widget nextWidget, {bool putInStack = true}) {
     setState(() {
       _currentWidget = nextWidget;
+      if (putInStack) {
+        _widgetStack.add(_currentWidget);
+      }
     });
+  }
+
+  bool jumpBack() {
+    if (_widgetStack.length <= 1) return false;
+    _widgetStack.removeLast();
+    setState(() {
+      _currentWidget = _widgetStack.last;
+      _backwardRun = 2;
+    });
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-        iosContentBottomPadding: false,
-        iosContentPadding: false,
-        body: SafeArea(
-          bottom: false,
-          child: AnimatedSwitcher(
-            switchInCurve: Curves.easeIn,
-            switchOutCurve: Curves.easeOut,
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              var tween = Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
-              return MySlideTransition(
-                position: tween.animate(animation),
-                child: child,
-              );
-            },
-            duration: Duration(milliseconds: 100),
-            child: _currentWidget,
-          ),
-        ));
+    return WillPopScope(
+      onWillPop: () async => !jumpBack(),
+      child: PlatformScaffold(
+          iosContentBottomPadding: false,
+          iosContentPadding: false,
+          body: SafeArea(
+            bottom: false,
+            child: AnimatedSwitcher(
+              switchInCurve: Curves.ease,
+              switchOutCurve: Curves.ease,
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                var tween =
+                    Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+                // reverse the animation if invoked jumpBack().
+                if (_backwardRun > 0) {
+                  tween =
+                      Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0));
+                  _backwardRun--;
+                }
+                return MySlideTransition(
+                  position: tween.animate(animation),
+                  child: child,
+                );
+              },
+              duration: Duration(milliseconds: 250),
+              child: _currentWidget,
+            ),
+          )),
+    );
   }
 }
 
@@ -99,7 +128,7 @@ abstract class SubStatelessWidget extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: size.width * 0.2, vertical: size.height * 0.2),
+              horizontal: size.width * 0.1, vertical: size.height * 0.1),
           child: Container(
             decoration: ShapeDecoration(
                 color: Colors.transparent,
@@ -161,9 +190,11 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       : super(key: key, state: state);
 
   Future<void> checkEmailInfo(BuildContext context, String email) async {
-    state.jumpTo(OTLoadingWidget(
-      state: state,
-    ));
+    state.jumpTo(
+        OTLoadingWidget(
+          state: state,
+        ),
+        putInStack: false);
     String? result =
         await OpenTreeHoleRepository.getInstance().getVerifyCode(email);
     if (result == null) {
@@ -172,7 +203,10 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
         state: state,
         initialEmail: email,
       ));
-    } else {}
+    } else {
+      // Not registered
+      state.jumpTo(OTRegisterLicenseWidget(result, state: state));
+    }
   }
 
   @override
@@ -317,8 +351,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
 }
 
 class OTLoadingWidget extends SubStatelessWidget {
-  OTLoadingWidget({Key? key, required _HoleLoginPageState state})
-      : super(key: key, state: state);
+  OTLoadingWidget({required _HoleLoginPageState state})
+      : super(key: UniqueKey(), state: state);
 
   @override
   Widget buildContent(BuildContext context) {
@@ -341,7 +375,10 @@ class OTLoadingWidget extends SubStatelessWidget {
 }
 
 class OTRegisterLicenseWidget extends SubStatelessWidget {
-  const OTRegisterLicenseWidget({Key? key, required _HoleLoginPageState state})
+  final String verifyCode;
+
+  const OTRegisterLicenseWidget(this.verifyCode,
+      {Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -364,8 +401,47 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
           SizedBox(
             height: 32,
           ),
+          OTLicenseBody(state: state)
         ],
       ),
+    );
+  }
+}
+
+class OTLicenseBody extends StatefulWidget {
+  final _HoleLoginPageState state;
+
+  const OTLicenseBody({Key? key, required this.state}) : super(key: key);
+
+  @override
+  _OTLicenseBodyState createState() => _OTLicenseBodyState();
+}
+
+class _OTLicenseBodyState extends State<OTLicenseBody> {
+  bool _agreed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CheckboxListTile(
+            title: Text(
+              "我已阅读并同意《FDUHole 社区公约》",
+              style: Theme.of(context).textTheme.subtitle2,
+            ),
+            controlAffinity: ListTileControlAffinity.leading,
+            value: _agreed,
+            onChanged: (newValue) => setState(() {
+                  _agreed = newValue!;
+                })),
+        PlatformElevatedButton(
+          material: (_, __) =>
+              MaterialElevatedButtonData(icon: Icon(Icons.app_registration)),
+          child: Text("注册"),
+          onPressed: _agreed ? () {} : null,
+        )
+      ],
     );
   }
 }
