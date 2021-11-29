@@ -20,6 +20,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/animation.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/password_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -28,6 +29,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:provider/provider.dart';
 
 /// OpenTreeHole Login Wizard UI
 ///
@@ -41,9 +43,10 @@ class HoleLoginPage extends StatefulWidget {
 }
 
 class _HoleLoginPageState extends State<HoleLoginPage> {
-  late Widget _currentWidget;
+  late SubStatelessWidget _currentWidget;
   late PersonInfo info;
-  List<Widget> _widgetStack = [];
+  LoginInfoModel model = new LoginInfoModel();
+  List<SubStatelessWidget> _widgetStack = [];
 
   /// Indicate the next [_backwardRun] animation should run in the reverse direction,
   /// since we are going back to the previous page.
@@ -59,7 +62,7 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
     _widgetStack.add(_currentWidget);
   }
 
-  void jumpTo(Widget nextWidget, {bool putInStack = true}) {
+  void jumpTo(SubStatelessWidget nextWidget, {bool putInStack = true}) {
     setState(() {
       _currentWidget = nextWidget;
       if (putInStack) {
@@ -68,9 +71,18 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
     });
   }
 
-  bool jumpBack() {
+  bool jumpBackIgnoringBackable() {
     if (_widgetStack.length <= 1) return false;
     _widgetStack.removeLast();
+    setState(() {
+      _currentWidget = _widgetStack.last;
+      _backwardRun = 2;
+    });
+    return true;
+  }
+
+  bool jumpBackFromLoadingPage() {
+    if (_widgetStack.isEmpty) return false;
     setState(() {
       _currentWidget = _widgetStack.last;
       _backwardRun = 2;
@@ -81,39 +93,47 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => !jumpBack(),
-      child: PlatformScaffold(
-          iosContentBottomPadding: false,
-          iosContentPadding: false,
-          body: SafeArea(
-            bottom: false,
-            child: AnimatedSwitcher(
-              switchInCurve: Curves.ease,
-              switchOutCurve: Curves.ease,
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                var tween =
-                    Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
-                // reverse the animation if invoked jumpBack().
-                if (_backwardRun > 0) {
-                  tween =
-                      Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0));
-                  _backwardRun--;
-                }
-                return MySlideTransition(
-                  position: tween.animate(animation),
-                  child: child,
-                );
-              },
-              duration: Duration(milliseconds: 250),
-              child: _currentWidget,
-            ),
-          )),
+      onWillPop: () async {
+        if (_widgetStack.isNotEmpty && !_widgetStack.last.backable)
+          return false;
+        return !jumpBackIgnoringBackable();
+      },
+      child: Provider<LoginInfoModel>(
+        create: (BuildContext context) => model,
+        child: PlatformScaffold(
+            iosContentBottomPadding: false,
+            iosContentPadding: false,
+            body: SafeArea(
+              bottom: false,
+              child: AnimatedSwitcher(
+                switchInCurve: Curves.ease,
+                switchOutCurve: Curves.ease,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  var tween =
+                      Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+                  // reverse the animation if invoked jumpBack().
+                  if (_backwardRun > 0) {
+                    tween =
+                        Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0));
+                    _backwardRun--;
+                  }
+                  return MySlideTransition(
+                    position: tween.animate(animation),
+                    child: child,
+                  );
+                },
+                duration: Duration(milliseconds: 250),
+                child: _currentWidget,
+              ),
+            )),
+      ),
     );
   }
 }
 
 abstract class SubStatelessWidget extends StatelessWidget {
   final _HoleLoginPageState state;
+  final bool backable = true;
 
   const SubStatelessWidget({Key? key, required this.state}) : super(key: key);
 
@@ -190,8 +210,9 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       : super(key: key, state: state);
 
   Future<void> checkEmailInfo(BuildContext context, String email) async {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(
-        OTLoadingWidget(
+        OTRegisterSuccessWidget(
           state: state,
         ),
         putInStack: false);
@@ -201,11 +222,11 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       // Registered
       state.jumpTo(OTEmailPasswordLoginWidget(
         state: state,
-        initialEmail: email,
       ));
     } else {
+      model.verifyCode = result;
       // Not registered
-      state.jumpTo(OTRegisterLicenseWidget(result, state: state));
+      state.jumpTo(OTRegisterLicenseWidget(state: state));
     }
   }
 
@@ -238,8 +259,9 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
             .map<Widget>((e) => ListTile(
                   title: Text(e),
                   onTap: () async {
+                    String? email = e;
                     if (e == "我的邮箱不在列表中") {
-                      String? email = await showPlatformDialog<String?>(
+                      email = await showPlatformDialog<String?>(
                           context: context,
                           builder: (cxt) {
                             TextEditingController controller =
@@ -266,15 +288,10 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                               ],
                             );
                           });
-                      if (email != null) {
-                        checkEmailInfo(context, email).catchError((e) {
-                          state.jumpTo(this);
-                          Noticing.showNotice(state.context, "当前无法连接到服务器，请重试。");
-                        });
-                      }
-                    } else {
-                      checkEmailInfo(context, e).catchError((e) {
-                        state.jumpTo(this);
+                    }
+                    if (email != null) {
+                      checkEmailInfo(context, email).catchError((e) {
+                        state.jumpBackFromLoadingPage();
                         Noticing.showNotice(state.context, "当前无法连接到服务器，请重试。");
                       });
                     }
@@ -291,14 +308,13 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  OTEmailPasswordLoginWidget(
-      {Key? key, required _HoleLoginPageState state, String initialEmail = ""})
-      : super(key: key, state: state) {
-    _usernameController.text = initialEmail;
-  }
+  OTEmailPasswordLoginWidget({Key? key, required _HoleLoginPageState state})
+      : super(key: key, state: state) {}
 
   @override
   Widget buildContent(BuildContext context) {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    _usernameController.text = model.selectedEmail ?? "";
     return Column(
       children: <Widget>[
         Text(
@@ -351,6 +367,9 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
 }
 
 class OTLoadingWidget extends SubStatelessWidget {
+  @override
+  final bool backable = false;
+
   OTLoadingWidget({required _HoleLoginPageState state})
       : super(key: UniqueKey(), state: state);
 
@@ -375,11 +394,22 @@ class OTLoadingWidget extends SubStatelessWidget {
 }
 
 class OTRegisterLicenseWidget extends SubStatelessWidget {
-  final String verifyCode;
-
-  const OTRegisterLicenseWidget(this.verifyCode,
-      {Key? key, required _HoleLoginPageState state})
+  const OTRegisterLicenseWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
+
+  Future<void> executeRegister(BuildContext context) async {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    state.jumpTo(
+        OTRegisterSuccessWidget(
+          state: state,
+        ),
+        putInStack: false);
+    String generatedPassword = PasswordUtil.generateNormalPassword(8);
+    model.password = generatedPassword;
+    await OpenTreeHoleRepository.getInstance()
+        .register(model.selectedEmail!, generatedPassword, model.verifyCode!);
+    state.jumpTo(OTRegisterSuccessWidget(state: state));
+  }
 
   @override
   Widget buildContent(BuildContext context) {
@@ -398,10 +428,15 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             style: Theme.of(context).textTheme.caption,
             textAlign: TextAlign.center,
           ),
-          SizedBox(
-            height: 32,
-          ),
-          OTLicenseBody(state: state)
+          SizedBox(height: 32),
+          OTLicenseBody(
+            registerCallback: () {
+              executeRegister(context).catchError((e) {
+                state.jumpTo(this);
+                Noticing.showNotice(state.context, "当前无法连接到服务器，请重试。");
+              });
+            },
+          )
         ],
       ),
     );
@@ -409,9 +444,10 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
 }
 
 class OTLicenseBody extends StatefulWidget {
-  final _HoleLoginPageState state;
+  final VoidCallback registerCallback;
 
-  const OTLicenseBody({Key? key, required this.state}) : super(key: key);
+  const OTLicenseBody({Key? key, required this.registerCallback})
+      : super(key: key);
 
   @override
   _OTLicenseBodyState createState() => _OTLicenseBodyState();
@@ -438,10 +474,64 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
         PlatformElevatedButton(
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.app_registration)),
-          child: Text("注册"),
-          onPressed: _agreed ? () {} : null,
+          child: Text("下一步"),
+          onPressed: _agreed ? widget.registerCallback : null,
         )
       ],
     );
   }
+}
+
+class OTRegisterSuccessWidget extends SubStatelessWidget {
+  @override
+  final bool backable = false;
+
+  OTRegisterSuccessWidget({Key? key, required _HoleLoginPageState state})
+      : super(key: key, state: state);
+
+  @override
+  Widget buildContent(BuildContext context) {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    return Column(
+      children: <Widget>[
+        Text(
+          "注册成功",
+          style: Theme.of(context).textTheme.headline6,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          "请妥善保存以下信息",
+          style: Theme.of(context).textTheme.caption,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 32),
+        Text(
+          "邮箱",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(model.selectedEmail!),
+        SizedBox(height: 8),
+        Text(
+          "密码",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(model.password!),
+        SizedBox(height: 16),
+        PlatformElevatedButton(
+          material: (_, __) =>
+              MaterialElevatedButtonData(icon: Icon(Icons.done)),
+          child: Text("完成"),
+          onPressed: () {
+            Navigator.pop(state.context);
+          },
+        )
+      ],
+    );
+  }
+}
+
+class LoginInfoModel {
+  String? selectedEmail;
+  String? password;
+  String? verifyCode;
 }

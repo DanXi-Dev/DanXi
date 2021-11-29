@@ -17,22 +17,22 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/libraries/paged_listview.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
+import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -184,8 +184,7 @@ class OTFloorWidget extends StatelessWidget {
                               Noticing.showNotice(
                                   context, S.of(context).cannot_launch_url);
                             }
-                          },
-                        )
+                          })
                       : smartRender(
                           floor.filteredContent!, onLinkTap, onImageTap)),
             ],
@@ -312,8 +311,8 @@ class OTFloorMentionWidget extends StatelessWidget {
                                 "post":
                                     await OpenTreeHoleRepository.getInstance()
                                         .loadSpecificHole(floor.hole_id!),
-                                "locate": floor
-                                    .floor_id!, // TODO: jump to specific floor after push
+                                "locate": floor.floor_id!,
+                                // TODO: jump to specific floor after push
                               });
                           progressDialog.dismiss();
                         } catch (e) {
@@ -366,6 +365,7 @@ class OTFloorMentionWidget extends StatelessWidget {
 
 class OTFloorWidgetBottomBar extends StatefulWidget {
   final OTFloor floor;
+
   const OTFloorWidgetBottomBar({Key? key, required this.floor})
       : super(key: key);
 
@@ -375,6 +375,7 @@ class OTFloorWidgetBottomBar extends StatefulWidget {
 
 class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   late OTFloor floor;
+
   @override
   void initState() {
     super.initState();

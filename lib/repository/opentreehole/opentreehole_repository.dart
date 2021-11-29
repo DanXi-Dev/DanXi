@@ -68,7 +68,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     dio!.options = BaseOptions(receiveDataWhenStatusError: true);
   }
 
-  Future<void> initializeUser(PersonInfo? info) async {
+  Future<void> initializeUser() async {
     print(
         "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
     try {
@@ -97,6 +97,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
     var json = response.data is Map ? response.data : jsonDecode(response.data);
     return json["code"].toString();
+  }
+
+  Future<String?> register(
+      String email, String password, String verifyCode) async {
+    final Response response = await dio!.post(_BASE_URL + "/register", data: {
+      "password": password,
+      "email": email,
+      "verification": verifyCode,
+    });
+    return SettingsProvider.getInstance().fduholeToken = response.data["token"];
   }
 
   Future<String> loginWithUsernamePassword(

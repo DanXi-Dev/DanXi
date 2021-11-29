@@ -15,12 +15,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/// A timer for codes.
-class CodeTimer {
-  static late int lastStartTime;
+import 'dart:math';
 
-  static start() => lastStartTime = DateTime.now().millisecondsSinceEpoch;
+class PasswordUtil {
+  static const String NORMAL_CHARACTERS =
+      "qwertyuiopasdfghjklzxcvbnm1234567890";
 
-  static tick({String? info}) => print(
-      "[$info] Use ${DateTime.now().millisecondsSinceEpoch - lastStartTime} ms.");
+  static String generateNormalPassword(int length) {
+    String result = "";
+    Random rand = Random.secure();
+    for (int i = 0; i < length; i++) {
+      result += NORMAL_CHARACTERS[rand.nextInt(NORMAL_CHARACTERS.length)];
+    }
+    return result;
+  }
 }

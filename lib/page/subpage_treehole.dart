@@ -22,7 +22,6 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
@@ -30,20 +29,19 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
+import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -222,9 +220,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   /// This is to prevent the entire page being rebuilt on iOS when the keyboard pops up
   late bool _fieldInitComplete;
 
-  ///Set the Future of the page to a single variable so that when the framework calls build(), the content is not reloaded every time.
+  ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
   Future<List<OTHole>?> _loadContent(int page) async {
-    // If PersonInfo is null, it means that the page is pushed with Navigator, and thus we shouldn't check for permission.
     if (checkGroup(kCompatibleUserGroup)) {
       _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
           SortOrder.LAST_REPLIED;
@@ -237,9 +234,10 @@ class _BBSSubpageState extends State<BBSSubpage>
           return await OpenTreeHoleRepository.getInstance()
               .loadTagFilteredDiscussions(_tagFilter!, _sortOrder!, page);
         case PostsType.NORMAL_POSTS:
+          // Initialize the user token from shared preferences.
+          // If no token, NotLoginError will be thrown.
           if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
-            await OpenTreeHoleRepository.getInstance()
-                .initializeUser(StateProvider.personInfo.value);
+            await OpenTreeHoleRepository.getInstance().initializeUser();
 
           List<OTHole>? loadedPost = await adaptLayer
               .generateReceiver(_listViewController, (lastElement) {
