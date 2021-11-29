@@ -151,14 +151,11 @@ class OTFloorWidget extends StatelessWidget {
                 child: Row(
                   children: [
                     if (floor.anonyname ==
-                        parentHole?.floors?.first_floor?.anonyname)
+                        parentHole?.floors?.first_floor?.anonyname) ...[
                       OTLeadingTag(
                           colorString: parentHole?.tags?.first.color ?? 'blue'),
-                    if (floor.anonyname ==
-                        parentHole?.floors?.first_floor?.anonyname)
-                      const SizedBox(
-                        width: 2,
-                      ),
+                      const SizedBox(width: 2),
+                    ],
                     Text(
                       "${floor.anonyname}",
                       style: TextStyle(fontWeight: FontWeight.bold),

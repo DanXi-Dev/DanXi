@@ -211,7 +211,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       new TimeBasedLoadAdaptLayer(10, 1);
 
   /// Fields related to the display states.
-  int _divisionId = 0;
+  int _divisionId = 1;
   SortOrder? _sortOrder;
   FoldBehavior? _foldBehavior;
 
@@ -484,10 +484,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                     return ErrorPageWidget(
                       buttonText: S.of(context).login,
                       errorMessage: "You need log in now.",
-                      onTap: () {
-                        smartNavigatorPush(context, "/bbs/login", arguments: {
-                          "info": StateProvider.personInfo.value!
-                        });
+                      onTap: () async {
+                        await smartNavigatorPush(context, "/bbs/login",
+                            arguments: {
+                              "info": StateProvider.personInfo.value!
+                            });
+                        refreshSelf();
                       },
                     );
                   }

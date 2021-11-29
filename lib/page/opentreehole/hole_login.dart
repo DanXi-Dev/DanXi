@@ -24,7 +24,6 @@ import 'package:dan_xi/util/password_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -212,7 +211,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
   Future<void> checkEmailInfo(BuildContext context, String email) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(
-        OTRegisterSuccessWidget(
+        OTLoadingWidget(
           state: state,
         ),
         putInStack: false);
@@ -289,6 +288,8 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                             );
                           });
                     }
+                    Provider.of<LoginInfoModel>(context, listen: false)
+                        .selectedEmail = email;
                     if (email != null) {
                       checkEmailInfo(context, email).catchError((e) {
                         state.jumpBackFromLoadingPage();
@@ -310,6 +311,14 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
 
   OTEmailPasswordLoginWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state) {}
+
+  Future<void> executeLogin(BuildContext context) async {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
+    await OpenTreeHoleRepository.getInstance()
+        .loginWithUsernamePassword(model.selectedEmail!, model.password!);
+    state.jumpTo(OTLoginSuccessWidget(state: state));
+  }
 
   @override
   Widget buildContent(BuildContext context) {
@@ -357,8 +366,15 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
             child: Text(S.of(context).login),
           ),
           onPressed: () {
-            Navigator.of(context).pop(Credentials(
-                _usernameController.text, _passwordController.text));
+            model.selectedEmail = _usernameController.text;
+            model.password = _passwordController.text;
+            if (_passwordController.text.length > 0 &&
+                _usernameController.text.length > 0) {
+              executeLogin(context).catchError((e, st) {
+                state.jumpBackFromLoadingPage();
+                Noticing.showNotice(state.context, "登录时发生了一些问题，请重试。");
+              });
+            }
           },
         )
       ],
@@ -399,11 +415,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
 
   Future<void> executeRegister(BuildContext context) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
-    state.jumpTo(
-        OTRegisterSuccessWidget(
-          state: state,
-        ),
-        putInStack: false);
+    state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
     String generatedPassword = PasswordUtil.generateNormalPassword(8);
     model.password = generatedPassword;
     await OpenTreeHoleRepository.getInstance()
@@ -431,8 +443,8 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
           SizedBox(height: 32),
           OTLicenseBody(
             registerCallback: () {
-              executeRegister(context).catchError((e) {
-                state.jumpTo(this);
+              executeRegister(context).catchError((e, st) {
+                state.jumpBackFromLoadingPage();
                 Noticing.showNotice(state.context, "当前无法连接到服务器，请重试。");
               });
             },
@@ -493,6 +505,7 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
   Widget buildContent(BuildContext context) {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
           "注册成功",
@@ -517,6 +530,43 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
         ),
         Text(model.password!),
         SizedBox(height: 16),
+        PlatformElevatedButton(
+          material: (_, __) =>
+              MaterialElevatedButtonData(icon: Icon(Icons.done)),
+          child: Text("完成"),
+          onPressed: () {
+            Navigator.pop(state.context);
+          },
+        )
+      ],
+    );
+  }
+}
+
+class OTLoginSuccessWidget extends SubStatelessWidget {
+  @override
+  final bool backable = false;
+
+  OTLoginSuccessWidget({Key? key, required _HoleLoginPageState state})
+      : super(key: key, state: state);
+
+  @override
+  Widget buildContent(BuildContext context) {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          "欢迎回来",
+          style: Theme.of(context).textTheme.headline6,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          "账户已设置完成",
+          style: Theme.of(context).textTheme.caption,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 32),
         PlatformElevatedButton(
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.done)),

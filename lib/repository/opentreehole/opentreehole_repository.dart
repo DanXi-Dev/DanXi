@@ -84,7 +84,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<String?> getVerifyCode(String email) async {
-    final Response response = await dio!.get(_BASE_URL + "/verify/apikey",
+    Response response = await dio!.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.FDUHOLE_API_KEY,
           "email": email,
@@ -94,7 +94,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     if (response.statusCode == 409) {
       return null;
     }
-
+    response = await dio!.get(_BASE_URL + "/verify/apikey",
+        queryParameters: {
+          "apikey": Secret.FDUHOLE_API_KEY,
+          "email": email,
+        },
+        options: Options(validateStatus: (code) => code! <= 409));
     var json = response.data is Map ? response.data : jsonDecode(response.data);
     return json["code"].toString();
   }
@@ -104,7 +109,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response response = await dio!.post(_BASE_URL + "/register", data: {
       "password": password,
       "email": email,
-      "verification": verifyCode,
+      "verification": int.parse(verifyCode),
     });
     return SettingsProvider.getInstance().fduholeToken = response.data["token"];
   }
@@ -169,7 +174,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Map<String, String> get _tokenHeader {
     if (_token == null) throw NotLoginError("Null Token");
     return {"Authorization": "Token " + _token!};
-    // return {"Authorization": "Token 97bcf61a86f94696b712e4cd189f24de9552e852"};
   }
 
   bool get isUserInitialized => _token != null;
