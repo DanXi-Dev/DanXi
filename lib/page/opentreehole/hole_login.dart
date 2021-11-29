@@ -104,25 +104,28 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
             iosContentPadding: false,
             body: SafeArea(
               bottom: false,
-              child: AnimatedSwitcher(
-                switchInCurve: Curves.ease,
-                switchOutCurve: Curves.ease,
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  var tween =
-                      Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
-                  // reverse the animation if invoked jumpBack().
-                  if (_backwardRun > 0) {
-                    tween =
-                        Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0));
-                    _backwardRun--;
-                  }
-                  return MySlideTransition(
-                    position: tween.animate(animation),
-                    child: child,
-                  );
-                },
-                duration: Duration(milliseconds: 250),
-                child: _currentWidget,
+              child: Material(
+                child: AnimatedSwitcher(
+                  switchInCurve: Curves.ease,
+                  switchOutCurve: Curves.ease,
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    var tween =
+                        Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+                    // reverse the animation if invoked jumpBack().
+                    if (_backwardRun > 0) {
+                      tween = Tween<Offset>(
+                          begin: Offset(-1, 0), end: Offset(0, 0));
+                      _backwardRun--;
+                    }
+                    return MySlideTransition(
+                      position: tween.animate(animation),
+                      child: child,
+                    );
+                  },
+                  duration: Duration(milliseconds: 250),
+                  child: _currentWidget,
+                ),
               ),
             )),
       ),
@@ -142,7 +145,6 @@ abstract class SubStatelessWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = ViewportUtils.getMainNavigatorSize(context);
     return Container(
-      color: Colors.white,
       child: Align(
         alignment: Alignment.topCenter,
         child: Padding(
@@ -178,7 +180,7 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            "选择您的登录/注册方式",
+            S.of(context).select_login_method,
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
@@ -186,14 +188,14 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
             height: 32,
           ),
           ListTile(
-            title: Text("UIS 快捷注册/登录"),
+            title: Text(S.of(context).fudan_uis_quick_login),
             onTap: () => state.jumpTo(OTEmailSelectionWidget(
               state: state,
             )),
           ),
           Divider(),
           ListTile(
-            title: Text("邮箱密码登录"),
+            title: Text(S.of(context).login_by_email_password),
             onTap: () => state.jumpTo(OTEmailPasswordLoginWidget(
               state: state,
             )),
@@ -234,7 +236,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
     List<String> suggestEmail = [
       "${state.info.id}@fudan.edu.cn",
       "${state.info.id}@m.fudan.edu.cn",
-      "我的邮箱不在列表中"
+      S.of(context).my_email_not_in_list
     ];
 
     return Column(
@@ -242,12 +244,12 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
-          "UIS 快捷注册/登录",
+          S.of(context).fudan_uis_quick_login,
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
         Text(
-          "从下面的选项中选择您的邮箱",
+          S.of(context).choose_your_email_below,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
@@ -259,20 +261,20 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                   title: Text(e),
                   onTap: () async {
                     String? email = e;
-                    if (e == "我的邮箱不在列表中") {
+                    if (e == S.of(context).my_email_not_in_list) {
                       email = await showPlatformDialog<String?>(
                           context: context,
                           builder: (cxt) {
                             TextEditingController controller =
                                 new TextEditingController();
                             return PlatformAlertDialog(
-                              title: Text("输入您的邮箱"),
+                              title: Text(S.of(context).input_your_email),
                               content: TextField(
                                 controller: controller,
                               ),
                               actions: [
                                 PlatformDialogAction(
-                                  child: Text("确认"),
+                                  child: Text(S.of(context).i_see),
                                   onPressed: () {
                                     if (controller.text.trim().isNotEmpty) {
                                       Navigator.pop(
@@ -293,7 +295,8 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                     if (email != null) {
                       checkEmailInfo(context, email).catchError((e) {
                         state.jumpBackFromLoadingPage();
-                        Noticing.showNotice(state.context, "当前无法连接到服务器，请重试。");
+                        Noticing.showNotice(state.context,
+                            S.of(context).unable_to_connect_to_server);
                       });
                     }
                   },
@@ -327,12 +330,12 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     return Column(
       children: <Widget>[
         Text(
-          "使用邮箱密码登录",
+          S.of(context).login_by_email_password,
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
         Text(
-          "输入您的 FDUHole 账号/密码",
+          S.of(context).input_your_email_password,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
@@ -372,7 +375,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                 _usernameController.text.length > 0) {
               executeLogin(context).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showNotice(state.context, "登录时发生了一些问题，请重试。");
+                Noticing.showNotice(
+                    state.context, S.of(context).login_problem_occurred);
               });
             }
           },
@@ -394,7 +398,7 @@ class OTLoadingWidget extends SubStatelessWidget {
     return Column(
       children: <Widget>[
         Text(
-          "正在获取信息……",
+          S.of(context).obtaining_information,
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
@@ -431,12 +435,12 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            "欢迎注册 FDUHole",
+            S.of(context).welcome_to_fduhole,
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
           Text(
-            "您需要阅读并同意以下协议",
+            S.of(context).agree_license_tip,
             style: Theme.of(context).textTheme.caption,
             textAlign: TextAlign.center,
           ),
@@ -445,7 +449,8 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             registerCallback: () {
               executeRegister(context).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showNotice(state.context, "当前无法连接到服务器，请重试。");
+                Noticing.showNotice(
+                    state.context, S.of(context).unable_to_connect_to_server);
               });
             },
           )
@@ -475,7 +480,7 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
       children: [
         CheckboxListTile(
             title: Text(
-              "我已阅读并同意《FDUHole 社区公约》",
+              S.of(context).i_have_read_and_agreed("《社区公约》"),
               style: Theme.of(context).textTheme.subtitle2,
             ),
             controlAffinity: ListTileControlAffinity.leading,
@@ -486,7 +491,7 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
         PlatformElevatedButton(
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.app_registration)),
-          child: Text("下一步"),
+          child: Text(S.of(context).next),
           onPressed: _agreed ? widget.registerCallback : null,
         )
       ],
@@ -508,24 +513,24 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
-          "注册成功",
+          S.of(context).registration_succeed,
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
         Text(
-          "请妥善保存以下信息",
+          S.of(context).save_your_information,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 32),
         Text(
-          "邮箱",
+          S.of(context).email,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(model.selectedEmail!),
         SizedBox(height: 8),
         Text(
-          "密码",
+          S.of(context).password,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(model.password!),
@@ -533,7 +538,7 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
         PlatformElevatedButton(
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.done)),
-          child: Text("完成"),
+          child: Text(S.of(context).i_see),
           onPressed: () {
             Navigator.pop(state.context);
           },
@@ -557,12 +562,12 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
-          "欢迎回来",
+          S.of(context).welcome_back,
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
         Text(
-          "账户已设置完成",
+          S.of(context).account_is_set,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
@@ -570,7 +575,7 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
         PlatformElevatedButton(
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.done)),
-          child: Text("完成"),
+          child: Text(S.of(context).i_see),
           onPressed: () {
             Navigator.pop(state.context);
           },
