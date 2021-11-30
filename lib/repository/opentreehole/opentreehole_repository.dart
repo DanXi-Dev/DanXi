@@ -83,7 +83,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  Future<String?> getVerifyCode(String email) async {
+  Future<bool> checkRegisterStatus(String email) async {
     Response response = await dio!.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.FDUHOLE_API_KEY,
@@ -91,10 +91,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "check_register": 1,
         },
         options: Options(validateStatus: (code) => code! <= 409));
-    if (response.statusCode == 409) {
-      return null;
-    }
-    response = await dio!.get(_BASE_URL + "/verify/apikey",
+    return response.statusCode == 409;
+  }
+
+  Future<String?> getVerifyCode(String email) async {
+    Response response = await dio!.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.FDUHOLE_API_KEY,
           "email": email,
@@ -102,6 +103,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(validateStatus: (code) => code! <= 409));
     var json = response.data is Map ? response.data : jsonDecode(response.data);
     return json["code"].toString();
+  }
+
+  Future<void> requestEmailVerifyCode(String email) async {
+    await dio!
+        .get(_BASE_URL + "/verify/email", queryParameters: {"email": email});
   }
 
   Future<String?> register(

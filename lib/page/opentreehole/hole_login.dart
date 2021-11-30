@@ -210,35 +210,48 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
   const OTEmailSelectionWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
 
-  Future<void> checkEmailInfo(BuildContext context, String email) async {
+  /// Check [email] usability.
+  ///
+  /// if [isRecommendedEmail], get the verify code straightly.
+  /// Otherwise request an email OTP code.
+  Future<void> checkEmailInfo(
+      BuildContext context, String email, bool isRecommendedEmail) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(
         OTLoadingWidget(
           state: state,
         ),
         putInStack: false);
-    String? result =
-        await OpenTreeHoleRepository.getInstance().getVerifyCode(email);
-    if (result == null) {
-      // Registered
+    bool registered =
+        await OpenTreeHoleRepository.getInstance().checkRegisterStatus(email);
+    if (registered) {
       state.jumpTo(OTEmailPasswordLoginWidget(
         state: state,
       ));
     } else {
-      model.verifyCode = result;
-      // Not registered
-      state.jumpTo(OTRegisterLicenseWidget(state: state));
+      if (isRecommendedEmail) {
+        model.verifyCode =
+            await OpenTreeHoleRepository.getInstance().getVerifyCode(email);
+        state.jumpTo(OTRegisterLicenseWidget(state: state));
+      } else {
+        model.verifyCode = null;
+        state.jumpTo(OTRegisterLicenseWidget(state: state));
+      }
     }
   }
 
   @override
   Widget buildContent(BuildContext context) {
+    final EmailProvider provider = EmailProviderImpl();
+    final String? recommendedEmail =
+        provider.getRecommendedEmailList(state.info);
+    final List<String> optionalEmail =
+        provider.getOptionalEmailList(state.info);
     List<String> suggestEmail = [
-      "${state.info.id}@fudan.edu.cn",
-      "${state.info.id}@m.fudan.edu.cn",
+      ...optionalEmail,
       S.of(context).my_email_not_in_list
     ];
-
+    if (recommendedEmail != null) suggestEmail.insert(0, recommendedEmail);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -258,49 +271,50 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
         ),
         ...suggestEmail
             .map<Widget>((e) => ListTile(
-                  title: Text(e),
-                  onTap: () async {
-                    String? email = e;
-                    if (e == S.of(context).my_email_not_in_list) {
-                      email = await showPlatformDialog<String?>(
-                          context: context,
-                          builder: (cxt) {
-                            TextEditingController controller =
-                                new TextEditingController();
-                            return PlatformAlertDialog(
-                              title: Text(S.of(context).input_your_email),
-                              content: TextField(
-                                controller: controller,
-                              ),
-                              actions: [
-                                PlatformDialogAction(
-                                  child: Text(S.of(context).i_see),
-                                  onPressed: () {
-                                    if (controller.text.trim().isNotEmpty) {
-                                      Navigator.pop(
-                                          cxt, controller.text.trim());
-                                    }
-                                  },
-                                ),
-                                PlatformDialogAction(
-                                  child: Text(S.of(context).cancel),
-                                  onPressed: () => Navigator.pop(cxt, null),
-                                )
-                              ],
-                            );
-                          });
-                    }
-                    Provider.of<LoginInfoModel>(context, listen: false)
-                        .selectedEmail = email;
-                    if (email != null) {
-                      checkEmailInfo(context, email).catchError((e) {
+          title: Text(e),
+          onTap: () async {
+            String? email = e;
+            if (e == S.of(context).my_email_not_in_list) {
+              email = await showPlatformDialog<String?>(
+                  context: context,
+                  builder: (cxt) {
+                    TextEditingController controller =
+                    new TextEditingController();
+                    return PlatformAlertDialog(
+                      title: Text(S.of(context).input_your_email),
+                      content: TextField(
+                        controller: controller,
+                      ),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text(S.of(context).i_see),
+                          onPressed: () {
+                            if (controller.text.trim().isNotEmpty) {
+                              Navigator.pop(
+                                  cxt, controller.text.trim());
+                            }
+                          },
+                        ),
+                        PlatformDialogAction(
+                          child: Text(S.of(context).cancel),
+                          onPressed: () => Navigator.pop(cxt, null),
+                        )
+                      ],
+                    );
+                  });
+            }
+            Provider.of<LoginInfoModel>(context, listen: false)
+                .selectedEmail = email;
+            if (email != null) {
+                      checkEmailInfo(context, email, email == recommendedEmail)
+                          .catchError((e) {
                         state.jumpBackFromLoadingPage();
                         Noticing.showNotice(state.context,
                             S.of(context).unable_to_connect_to_server);
                       });
                     }
                   },
-                ))
+        ))
             .toList()
             .joinElement(() => Divider())!
       ],
@@ -417,9 +431,16 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
   const OTRegisterLicenseWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
 
-  Future<void> executeRegister(BuildContext context) async {
+  static Future<void> executeRegister(
+      BuildContext context, _HoleLoginPageState state) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
+    if (model.verifyCode == null) {
+      await OpenTreeHoleRepository.getInstance()
+          .requestEmailVerifyCode(model.selectedEmail!);
+      state.jumpTo(OTEmailVerifyCodeWidget(state: state));
+      return;
+    }
     String generatedPassword = PasswordUtil.generateNormalPassword(8);
     model.password = generatedPassword;
     await OpenTreeHoleRepository.getInstance()
@@ -447,7 +468,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
           SizedBox(height: 32),
           OTLicenseBody(
             registerCallback: () {
-              executeRegister(context).catchError((e, st) {
+              executeRegister(context, state).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
                 Noticing.showNotice(
                     state.context, S.of(context).unable_to_connect_to_server);
@@ -493,6 +514,69 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
               MaterialElevatedButtonData(icon: Icon(Icons.app_registration)),
           child: Text(S.of(context).next),
           onPressed: _agreed ? widget.registerCallback : null,
+        )
+      ],
+    );
+  }
+}
+
+class OTEmailVerifyCodeWidget extends SubStatelessWidget {
+  final TextEditingController _verifyCodeController = TextEditingController();
+
+  OTEmailVerifyCodeWidget({Key? key, required _HoleLoginPageState state})
+      : super(key: key, state: state);
+
+  @override
+  Widget buildContent(BuildContext context) {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    return Column(
+      children: <Widget>[
+        Text(
+          "安全验证",
+          style: Theme.of(context).textTheme.headline6,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          "请输入您的邮箱验证码",
+          style: Theme.of(context).textTheme.caption,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          height: 32,
+        ),
+        Text(
+          "我们刚刚向您发送了一封含有一次性验证码的邮件，请输入您得到的验证码。",
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        TextField(
+          controller: _verifyCodeController,
+          decoration: InputDecoration(
+              labelText: "验证码",
+              icon: PlatformX.isAndroid
+                  ? Icon(Icons.perm_identity)
+                  : Icon(CupertinoIcons.person_crop_circle)),
+        ),
+        SizedBox(
+          height: 16,
+        ),
+        PlatformElevatedButton(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(S.of(context).next),
+          ),
+          onPressed: () {
+            model.verifyCode = _verifyCodeController.text;
+            if (_verifyCodeController.text.length > 0) {
+              OTRegisterLicenseWidget.executeRegister(context, state)
+                  .catchError((e, st) {
+                state.jumpBackFromLoadingPage();
+                Noticing.showNotice(
+                    state.context, S.of(context).login_problem_occurred);
+              });
+            }
+          },
         )
       ],
     );
@@ -582,6 +666,62 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
         )
       ],
     );
+  }
+}
+
+/// EmailProvider is to provide an email list for user in [OTEmailSelectionWidget].
+///
+/// If return null, the corresponding [ListView] will be hidden.
+abstract class EmailProvider {
+  String? getRecommendedEmailList(PersonInfo info);
+
+  List<String> getOptionalEmailList(PersonInfo info);
+}
+
+class EmailProviderImpl extends EmailProvider {
+  @override
+  List<String> getOptionalEmailList(PersonInfo info) {
+    List<String> emailList = [];
+    switch (info.group) {
+      case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
+      case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
+        if (info.id!.length >= 2) {
+          int year = int.tryParse(info.id!.substring(0, 2)) ?? 0;
+          if (year >= 21) {
+            emailList.add(info.id! + "@fudan.edu.cn");
+          } else {
+            emailList.add(info.id! + "@m.fudan.edu.cn");
+          }
+        }
+        break;
+      case UserGroup.VISITOR:
+      case UserGroup.FUDAN_STAFF:
+      case UserGroup.SJTU_STUDENT:
+        break;
+    }
+    return emailList;
+  }
+
+  @override
+  String? getRecommendedEmailList(PersonInfo info) {
+    switch (info.group) {
+      case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
+      case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
+        if (info.id!.length >= 2) {
+          int year = int.tryParse(info.id!.substring(0, 2)) ?? 0;
+          if (year >= 21) {
+            return info.id! + "@m.fudan.edu.cn";
+          } else {
+            return info.id! + "@fudan.edu.cn";
+          }
+        }
+        break;
+      case UserGroup.VISITOR:
+      case UserGroup.FUDAN_STAFF:
+      case UserGroup.SJTU_STUDENT:
+        break;
+    }
+    return null;
   }
 }
 
