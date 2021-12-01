@@ -83,7 +83,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     } else {
       throw NotLoginError("No token");
       // _token = await requestToken(info!);
-      // updatePushNotificationToken();
     }
     _divisionCache = await loadDivisions();
   }
@@ -504,6 +503,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       [String? token, String? id, PushNotificationServiceType? service]) async {
+    print("pushing token $token and id $id");
     if (isUserInitialized) {
       await dio!.post(_BASE_URL + "/users",
           data: {

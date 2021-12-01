@@ -92,15 +92,14 @@ import WatchConnectivity
                     UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
                     application.registerUserNotificationSettings(settings)
                 }
+                // This gets called regardless of whether user grants permission or not.
+                application.registerForRemoteNotifications()
             case "send_token":
                 self.sendString(text: call.arguments as! String)
             default:
                 break
             }
         })
-        
-        /* APNS support */
-        application.registerForRemoteNotifications()
         
         /* watchOS Support */
         if(WCSession.isSupported()){

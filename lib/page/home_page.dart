@@ -31,6 +31,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
@@ -354,18 +355,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    // Init watchOS support
     const channel_a = const MethodChannel('fduhole');
     channel_a.setMethodCallHandler((MethodCall call) async {
-      if (call.method == 'get_token') {
-        // If we haven't loaded [StateProvider.personInfo]
-        if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-          sendFduholeTokenToWatch(
-              _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
-        } else {
-          // Notify that we should send the token to watch later
-          _needSendToWatch = true;
-        }
+      switch (call.method) {
+        case "upload_apns_token":
+          OpenTreeHoleRepository.getInstance().updatePushNotificationToken(
+              call.arguments["token"],
+              call.arguments["id"],
+              PushNotificationServiceType.APNS);
+          break;
+        case 'getToken':
+          // If we haven't loaded [StateProvider.personInfo]
+          if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+            sendFduholeTokenToWatch(
+                _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          } else {
+            // Notify that we should send the token to watch later
+            _needSendToWatch = true;
+          }
+          break;
       }
     });
   }
