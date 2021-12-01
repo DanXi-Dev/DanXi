@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:asn1lib/asn1lib.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
@@ -51,6 +52,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Cached floors, used by [mentions]
   List<OTFloor> _floorCache = [];
 
+  /// Cached divisions
+  List<OTDivision> _divisionCache = [];
+
   /// Push Notification Registration Cache
   String? _deviceId, _pushNotificationToken;
   PushNotificationServiceType? _pushNotificationService;
@@ -68,7 +72,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     dio!.options = BaseOptions(receiveDataWhenStatusError: true);
   }
 
-  Future<void> initializeUser() async {
+  Future<void> initializeRepo() async {
     print(
         "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
     try {
@@ -81,6 +85,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       // _token = await requestToken(info!);
       // updatePushNotificationToken();
     }
+    _divisionCache = await loadDivisions();
   }
 
   Future<bool> checkRegisterStatus(String email) async {
@@ -100,8 +105,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "apikey": Secret.FDUHOLE_API_KEY,
           "email": email,
         },
-        options: Options(validateStatus: (code) => code! <= 409));
-    var json = response.data is Map ? response.data : jsonDecode(response.data);
+        options: Options(validateStatus: (code) => code! < 300));
+    final json =
+        response.data is Map ? response.data : jsonDecode(response.data);
     return json["code"].toString();
   }
 
@@ -184,12 +190,47 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null;
 
+  Future<List<OTDivision>> loadDivisions({bool useCache = true}) async {
+    if (_divisionCache.isNotEmpty && useCache) {
+      return _divisionCache;
+    }
+    final Response response = await dio!
+        .get(_BASE_URL + "/divisions", options: Options(headers: _tokenHeader));
+    final List result = response.data;
+    _divisionCache = result.map((e) => OTDivision.fromJson(e)).toList();
+    return _divisionCache;
+  }
+
+  List<OTDivision> getDivisions() {
+    return _divisionCache;
+  }
+
+  Future<OTDivision> loadSpecificDivision(int divisionId,
+      {bool useCache = true}) async {
+    if (useCache) {
+      try {
+        final OTDivision cached =
+            _divisionCache.firstWhere((e) => e.division_id == divisionId);
+        return cached;
+      } catch (ignored) {}
+    }
+    final Response response = await dio!.get(
+        _BASE_URL + "/divisions/$divisionId",
+        options: Options(headers: _tokenHeader));
+    final result = response.data;
+    final newDivision = OTDivision.fromJson(result);
+    _divisionCache.removeWhere((element) => element.division_id == divisionId);
+    _divisionCache.add(newDivision);
+    return newDivision;
+  }
+
   Future<List<OTHole>> loadHoles(
     DateTime startTime,
     int divisionId, {
     int length = 10,
     int prefetchLength = 10,
   }) async {
+    print(divisionId);
     final Response response = await dio!.get(_BASE_URL + "/holes",
         queryParameters: {
           "start_time": startTime.toIso8601String(),

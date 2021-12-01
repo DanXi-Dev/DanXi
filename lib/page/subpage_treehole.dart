@@ -22,6 +22,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
@@ -99,20 +100,20 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   String get debugTag => "BBSPage";
 
   /// Build a list of options controlling how to sort posts.
-  List<Widget> _buildSortOptionsList(BuildContext cxt) {
+  List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
     List<Widget> list = [];
-    Function onTapListener = (SortOrder newOrder) {
+    Function onTapListener = (OTDivision newDivision) {
       Navigator.of(cxt).pop();
-      SortOrderChangedEvent(newOrder).fire();
+      DivisionChangedEvent(newDivision).fire();
     };
-    SortOrder.values.forEach((value) {
+    OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(cxt)!),
+          child: Text(value.name ?? "null"),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(cxt)!),
+          title: Text(value.name ?? "null"),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -130,7 +131,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
             builder: (BuildContext context) => PlatformWidget(
               cupertino: (_, __) => CupertinoActionSheet(
                 title: Text(S.of(cxt).sort_order),
-                actions: _buildSortOptionsList(context),
+                actions: _buildDivisionOptionsList(context),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () {
@@ -140,7 +141,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
               ),
               material: (_, __) => Column(
                 mainAxisSize: MainAxisSize.min,
-                children: _buildSortOptionsList(context),
+                children: _buildDivisionOptionsList(context),
               ),
             ),
           ),
@@ -175,10 +176,10 @@ class RefreshBBSEvent {
   RefreshBBSEvent({this.refreshAll = false});
 }
 
-class SortOrderChangedEvent {
-  SortOrder newOrder;
+class DivisionChangedEvent {
+  final OTDivision newDivision;
 
-  SortOrderChangedEvent(this.newOrder);
+  DivisionChangedEvent(this.newDivision);
 }
 
 enum PostsType { FAVORED_DISCUSSION, FILTER_BY_TAG, NORMAL_POSTS }
@@ -198,7 +199,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   final StateStreamListener _postSubscription = StateStreamListener();
   final StateStreamListener _refreshSubscription = StateStreamListener();
   final StateStreamListener _searchSubscription = StateStreamListener();
-  final StateStreamListener _sortOrderChangedSubscription =
+  final StateStreamListener _divisionChangedSubscription =
       StateStreamListener();
   String? _tagFilter;
   FocusNode _searchFocus = FocusNode();
@@ -237,7 +238,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           // Initialize the user token from shared preferences.
           // If no token, NotLoginError will be thrown.
           if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
-            await OpenTreeHoleRepository.getInstance().initializeUser();
+            await OpenTreeHoleRepository.getInstance().initializeRepo();
 
           List<OTHole>? loadedPost = await adaptLayer
               .generateReceiver(_listViewController, (lastElement) {
@@ -368,11 +369,13 @@ class _BBSSubpageState extends State<BBSSubpage>
             refreshSelf();
         }),
         hashCode);
-    _sortOrderChangedSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<SortOrderChangedEvent>().listen((event) {
-          SettingsProvider.getInstance().fduholeSortOrder =
-              _sortOrder = event.newOrder;
-          refreshSelf();
+    _divisionChangedSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
+          if (event.newDivision.division_id != _divisionId) {
+            _divisionId = event.newDivision.division_id!;
+            _refreshAll();
+          }
+          //SettingsProvider.getInstance().fduholeSortOrder = _sortOrder = event.newDivision;
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
@@ -404,7 +407,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _postSubscription.cancel();
     _refreshSubscription.cancel();
     _searchSubscription.cancel();
-    _sortOrderChangedSubscription.cancel();
+    _divisionChangedSubscription.cancel();
   }
 
   @override
