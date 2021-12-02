@@ -20,6 +20,8 @@ import 'dart:ui';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
@@ -40,6 +42,7 @@ import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -248,8 +251,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   List<Widget> _buildFoldBehaviorList(BuildContext context) {
     List<Widget> list = [];
     Function onTapListener = (FoldBehavior value) {
-      SettingsProvider.getInstance().fduholeFoldBehavior = value;
-      RefreshBBSEvent().fire();
+      // TODO: handle null userInfo
+      OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
+          value.internalString();
+      RefreshBBSEvent(refreshAll: true).fire();
       Navigator.of(context).pop();
       refreshSelf();
     };
@@ -425,43 +430,141 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     refreshSelf();
                                   },
                                 ),
-                              ListTile(
-                                title:
-                                    Text(S.of(context).fduhole_nsfw_behavior),
-                                leading: PlatformX.isMaterial(context)
-                                    ? const Icon(Icons.hide_image)
-                                    : const Icon(CupertinoIcons.eye_slash),
-                                subtitle: Text(SettingsProvider.getInstance()
-                                    .fduholeFoldBehavior
-                                    .displayTitle(context)!),
-                                onTap: () {
-                                  showPlatformModalSheet(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          PlatformWidget(
-                                            cupertino: (_, __) =>
-                                                CupertinoActionSheet(
-                                              title: Text(S
-                                                  .of(context)
-                                                  .fduhole_nsfw_behavior),
-                                              actions: _buildFoldBehaviorList(
-                                                  context),
-                                              cancelButton:
-                                                  CupertinoActionSheetAction(
-                                                child:
-                                                    Text(S.of(context).cancel),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
+                              FutureWidget<OTUser?>(
+                                future: OpenTreeHoleRepository.getInstance()
+                                    .getUserProfile(),
+                                successBuilder: (BuildContext context,
+                                        AsyncSnapshot<OTUser?> snapshot) =>
+                                    ListTile(
+                                  title:
+                                      Text(S.of(context).fduhole_nsfw_behavior),
+                                  leading: PlatformX.isMaterial(context)
+                                      ? const Icon(Icons.hide_image)
+                                      : const Icon(CupertinoIcons.eye_slash),
+                                  subtitle: Text(foldBehaviorFromInternalString(
+                                          snapshot.data!.config!.show_folded!)
+                                      .displayTitle(context)!),
+                                  onTap: () {
+                                    showPlatformModalSheet(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            PlatformWidget(
+                                              cupertino: (_, __) =>
+                                                  CupertinoActionSheet(
+                                                title: Text(S
+                                                    .of(context)
+                                                    .fduhole_nsfw_behavior),
+                                                actions: _buildFoldBehaviorList(
+                                                    context),
+                                                cancelButton:
+                                                    CupertinoActionSheetAction(
+                                                  child: Text(
+                                                      S.of(context).cancel),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                            material: (_, __) => Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: _buildFoldBehaviorList(
-                                                  context),
-                                            ),
-                                          ));
-                                },
+                                              material: (_, __) => Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children:
+                                                    _buildFoldBehaviorList(
+                                                        context),
+                                              ),
+                                            ));
+                                  },
+                                ),
+                                errorBuilder: ListTile(
+                                  title:
+                                      Text(S.of(context).fduhole_nsfw_behavior),
+                                  leading: PlatformX.isMaterial(context)
+                                      ? const Icon(Icons.hide_image)
+                                      : const Icon(CupertinoIcons.eye_slash),
+                                  subtitle: Text(S.of(context).fatal_error),
+                                  onTap: () {
+                                    refreshSelf();
+                                  },
+                                ),
+                                loadingBuilder: ListTile(
+                                  title:
+                                      Text(S.of(context).fduhole_nsfw_behavior),
+                                  leading: PlatformX.isMaterial(context)
+                                      ? const Icon(Icons.hide_image)
+                                      : const Icon(CupertinoIcons.eye_slash),
+                                  subtitle: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: PlatformCircularProgressIndicator(),
+                                  ),
+                                  onTap: () {
+                                    refreshSelf();
+                                  },
+                                ),
+                              ),
+                              FutureWidget<OTUser?>(
+                                future: OpenTreeHoleRepository.getInstance()
+                                    .getUserProfile(),
+                                successBuilder: (BuildContext context,
+                                        AsyncSnapshot<OTUser?> snapshot) =>
+                                    ListTile(
+                                  title: Text("notification"),
+                                  leading: PlatformX.isMaterial(context)
+                                      ? const Icon(Icons.notifications)
+                                      : const Icon(CupertinoIcons.bell),
+                                  subtitle: Text(snapshot.data!.config!.notify!
+                                      .toString()),
+                                  onTap: () {
+                                    showPlatformModalSheet(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            PlatformWidget(
+                                              cupertino: (_, __) =>
+                                                  CupertinoActionSheet(
+                                                title: Text(S
+                                                    .of(context)
+                                                    .fduhole_nsfw_behavior),
+                                                actions: _buildFoldBehaviorList(
+                                                    context),
+                                                cancelButton:
+                                                    CupertinoActionSheetAction(
+                                                  child: Text(
+                                                      S.of(context).cancel),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ),
+                                              material: (_, __) => Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children:
+                                                    _buildFoldBehaviorList(
+                                                        context),
+                                              ),
+                                            ));
+                                  },
+                                ),
+                                errorBuilder: ListTile(
+                                  title: Text("notification"),
+                                  leading: PlatformX.isMaterial(context)
+                                      ? const Icon(Icons.notifications)
+                                      : const Icon(CupertinoIcons.bell),
+                                  subtitle: Text(S.of(context).fatal_error),
+                                  onTap: () {
+                                    refreshSelf();
+                                  },
+                                ),
+                                loadingBuilder: ListTile(
+                                  title: Text("notification"),
+                                  leading: PlatformX.isMaterial(context)
+                                      ? const Icon(Icons.notifications)
+                                      : const Icon(CupertinoIcons.bell),
+                                  subtitle: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: PlatformCircularProgressIndicator(),
+                                  ),
+                                  onTap: () {
+                                    refreshSelf();
+                                  },
+                                ),
                               ),
                               SwitchListTile(
                                 title: Text(S.of(context).fduhole_clean_mode),

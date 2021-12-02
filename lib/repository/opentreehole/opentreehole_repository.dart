@@ -259,12 +259,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Do we have such an API?
-  Future<List<OTHole>> loadTagFilteredDiscussions(
-      String tag, SortOrder sortBy, int page) async {
+  Future<List<OTHole>> loadTagFilteredDiscussions(String tag, int page) async {
     try {
       final response = await dio!.get(_BASE_URL + "/discussions/",
           queryParameters: {
-            "order": sortBy.getInternalString(),
             "tag_name": tag,
             "page": page,
           },
@@ -375,6 +373,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
+  OTUser? get userInfo => _userInfo;
+  set userInfo(OTUser? value) {
+    _userInfo = value;
+    updateUserProfile();
+  }
+
   // Migrated
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (_userInfo == null || forceUpdate) {
@@ -382,6 +386,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           .get(_BASE_URL + "/users", options: Options(headers: _tokenHeader));
       _userInfo = OTUser.fromJson(response.data);
     }
+    return _userInfo;
+  }
+
+  Future<OTUser?> updateUserProfile() async {
+    final Response response = await dio!.put(_BASE_URL + "/users",
+        data: _userInfo!.toJson(), options: Options(headers: _tokenHeader));
+    _userInfo = OTUser.fromJson(response.data);
     return _userInfo;
   }
 

@@ -308,4 +308,28 @@ extension FoldBehaviorEx on FoldBehavior {
         return S.of(context).show;
     }
   }
+
+  String? internalString() {
+    switch (this) {
+      case FoldBehavior.FOLD:
+        return 'fold';
+      case FoldBehavior.HIDE:
+        return 'hide';
+      case FoldBehavior.SHOW:
+        return 'show';
+    }
+  }
+}
+
+FoldBehavior foldBehaviorFromInternalString(String str) {
+  switch (str) {
+    case 'fold':
+      return FoldBehavior.FOLD;
+    case 'hide':
+      return FoldBehavior.HIDE;
+    case 'show':
+      return FoldBehavior.SHOW;
+    default:
+      return FoldBehavior.FOLD;
+  }
 }

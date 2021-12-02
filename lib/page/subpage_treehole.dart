@@ -213,8 +213,8 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   /// Fields related to the display states.
   int _divisionId = 1;
-  SortOrder? _sortOrder;
-  FoldBehavior? _foldBehavior;
+  FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
+      OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded!);
 
   BannerAd? bannerAd;
 
@@ -224,16 +224,13 @@ class _BBSSubpageState extends State<BBSSubpage>
   ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
   Future<List<OTHole>?> _loadContent(int page) async {
     if (checkGroup(kCompatibleUserGroup)) {
-      _sortOrder = SettingsProvider.getInstance().fduholeSortOrder ??
-          SortOrder.LAST_REPLIED;
-      _foldBehavior = SettingsProvider.getInstance().fduholeFoldBehavior;
       switch (_postsType) {
         case PostsType.FAVORED_DISCUSSION:
           if (page > 1) return Future.value([]);
           return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
         case PostsType.FILTER_BY_TAG:
           return await OpenTreeHoleRepository.getInstance()
-              .loadTagFilteredDiscussions(_tagFilter!, _sortOrder!, page);
+              .loadTagFilteredDiscussions(_tagFilter!, page);
         case PostsType.NORMAL_POSTS:
           // Initialize the user token from shared preferences.
           // If no token, NotLoginError will be thrown.
@@ -522,7 +519,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       OTHole postElement) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
-        (_foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
+        (foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
       return Container();
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
@@ -550,7 +547,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 const SizedBox(
                   height: 10,
                 ),
-                (postElement.is_folded && _foldBehavior == FoldBehavior.FOLD)
+                (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
                     ? Theme(
                         data: Theme.of(context)
                             .copyWith(dividerColor: Colors.transparent),
@@ -610,13 +607,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                 "post": postElement,
               });
             }),
-        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
+        if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           Divider(
             height: 4,
           ),
-        if (!(postElement.is_folded && _foldBehavior == FoldBehavior.FOLD) &&
+        if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
             postElement.floors?.last_floor!.hole_id !=
                 postElement.floors?.first_floor!.hole_id)
           _buildCommentView(postElement),
