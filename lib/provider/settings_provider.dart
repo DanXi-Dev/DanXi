@@ -26,7 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// A class to manage [SharedPreferences] Settings
 ///
-/// Code Integrity Notice:
+/// Code Integrity Note:
 /// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
 /// Only return [null] when there is no default value.
 class SettingsProvider {

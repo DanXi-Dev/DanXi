@@ -30,7 +30,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-/// OpenTreeHole Login Wizard UI
+/// OpenTreeHole login wizard page.
 ///
 class HoleLoginPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;

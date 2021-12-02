@@ -20,16 +20,17 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
+/// A list page allowing user to configure his/her blocking list of tags.
 class BBSHiddenTagsPreferencePage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

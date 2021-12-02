@@ -18,12 +18,12 @@
 import 'dart:io';
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -40,6 +40,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
+/// A list page showing user's GPA scores and exam information.
 class ExamList extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

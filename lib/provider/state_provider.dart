@@ -15,16 +15,17 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/util/editor_object.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/util/editor_object.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Manage global states of the app.
 ///
-/// Code structural warning: You should ONLY directly refer to this class in the codes of
-/// Application layer, rather than in Util, Model or Repository. Do NOT touch the decoupling
-/// of this project!
+/// Code Structural Warning:
+/// You should ONLY directly refer to this class in the codes of
+/// Application layer, rather than in any classes of Util, Model or Repository.
+/// Do NOT break the decoupling of the project!
 class StateProvider {
   StateProvider() {
     throw UnimplementedError();

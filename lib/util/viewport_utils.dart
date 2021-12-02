@@ -17,6 +17,7 @@
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:flutter/cupertino.dart';
 
+/// Some useful methods to help get an accurate size whether in mobile or tablet mode.
 class ViewportUtils {
   static double getViewportWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;

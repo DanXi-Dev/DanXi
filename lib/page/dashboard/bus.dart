@@ -33,6 +33,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
+/// A list page showing campus bus schedule.
 class BusPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

@@ -26,6 +26,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+/// Store some important constants, like app id, default color styles, etc.
 class Constant {
   static const POST_COUNT_PER_PAGE = 10;
   static const bool IS_PRODUCTION_ENVIRONMENT =

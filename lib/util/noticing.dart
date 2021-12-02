@@ -23,7 +23,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-/// Simple helper class to show a [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
+/// Simple helper class to show a notice,
+/// like [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
 class Noticing {
   static showNotice(BuildContext context, String message,
       {String? confirmText,

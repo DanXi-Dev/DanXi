@@ -21,16 +21,16 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/fdu/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +38,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
+/// A list page showing usages of classrooms.
 class EmptyClassroomDetailPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

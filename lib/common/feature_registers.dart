@@ -19,7 +19,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 
-/// A static register table of [Feature], declaring its compatibility of user group.
+/// A global register table of [Feature], which declares its compatibility of user group here.
 Map<String, List<UserGroup>> _kRegister = {};
 
 void registerFeature(Feature feature,

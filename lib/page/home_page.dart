@@ -25,28 +25,28 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -68,6 +68,8 @@ void sendFduholeTokenToWatch(String? token) {
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 final QuickActions quickActions = QuickActions();
 
+/// The main page of DanXi.
+/// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 

@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+/// A list page showing user's GPA scores and his/her ranking.
 class GpaTablePage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

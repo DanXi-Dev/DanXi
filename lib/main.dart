@@ -54,7 +54,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'generated/l10n.dart';
 
 /// The main entry of the whole app.
-/// Do some initiative work here.
+/// Do some initial work here.
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
   CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
@@ -89,6 +89,8 @@ void main() {
         debugConfig: debugOptions,
         releaseConfig: releaseOptions);
   });
+
+  // Init DesktopWindow on desktop environment.
   if (PlatformX.isDesktop)
     doWhenWindowReady(() {
       final win = appWindow;
@@ -143,7 +145,6 @@ class DanxiApp extends StatelessWidget {
     '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
   };
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Phoenix(

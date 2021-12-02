@@ -18,21 +18,20 @@
 import 'dart:async';
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
-import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/model/report.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -92,14 +91,7 @@ String preprocessContentForDisplay(String content,
   return result;
 }
 
-/// A list page showing the content of a bbs post.
-///
-/// Arguments:
-/// [BBSPost] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
-/// Otherwise as a list of search result.
-/// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
-/// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
-///
+/// A list page showing the reports for administrators.
 class BBSReportDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

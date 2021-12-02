@@ -23,10 +23,10 @@ import 'package:dan_xi/repository/fdu/card_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +34,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
+/// A list page showing user's campus card spending history.
+///
+/// Arguments:
+/// [CardInfo] cardInfo: user's card info.
 class CardDetailPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
