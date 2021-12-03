@@ -229,7 +229,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     int length = 10,
     int prefetchLength = 10,
   }) async {
-    print(divisionId);
     final Response response = await dio!.get(_BASE_URL + "/holes",
         queryParameters: {
           "start_time": startTime.toIso8601String(),
@@ -514,7 +513,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       [String? token, String? id, PushNotificationServiceType? service]) async {
-    print("pushing token $token and id $id");
     if (isUserInitialized) {
       await dio!.post(_BASE_URL + "/users",
           data: {

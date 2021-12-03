@@ -158,6 +158,10 @@
     "modify": "Modify",
     "like": "Like ({likes})",
     "liked": "Liked ({likes})",
+    "notification_settings": "FDUHole: Notifications",
+    "notification_mention": "When your post was quoted",
+    "notification_favorite": "When favorited post was updated",
+    "notification_reply": "When your hole was replied to",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",

@@ -44,7 +44,7 @@ class OTLeadingTag extends StatelessWidget {
   final String colorString;
   final String text;
 
-  const OTLeadingTag({Key? key, required this.colorString, this.text = "OP"})
+  const OTLeadingTag({Key? key, required this.colorString, this.text = "DZ"})
       : super(key: key);
 
   @override

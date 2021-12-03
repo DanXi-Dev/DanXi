@@ -37,7 +37,7 @@ class SettingsProvider {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
+  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v2";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
       "ec_last_choice";
@@ -331,5 +331,44 @@ FoldBehavior foldBehaviorFromInternalString(String str) {
       return FoldBehavior.SHOW;
     default:
       return FoldBehavior.FOLD;
+  }
+}
+
+enum OTNotificationTypes { MENTION, FAVORITE }
+
+extension OTNotificationTypesEx on OTNotificationTypes {
+  String? displayTitle(BuildContext context) {
+    switch (this) {
+      case OTNotificationTypes.MENTION:
+        return S.of(context).notification_mention;
+      case OTNotificationTypes.FAVORITE:
+        return S.of(context).notification_favorite;
+      //case OTNotificationTypes.REPLY:
+      //  return S.of(context).notification_reply;
+    }
+  }
+
+  String? internalString() {
+    switch (this) {
+      case OTNotificationTypes.MENTION:
+        return 'mention';
+      case OTNotificationTypes.FAVORITE:
+        return 'favorite';
+      //case OTNotificationTypes.REPLY:
+      //  return 'reply';
+    }
+  }
+}
+
+OTNotificationTypes? notificationTypeFromInternalString(String str) {
+  switch (str) {
+    case 'mention':
+      return OTNotificationTypes.MENTION;
+    case 'favorite':
+      return OTNotificationTypes.FAVORITE;
+    //case 'reply':
+    //  return OTNotificationTypes.REPLY;
+    default:
+      return null;
   }
 }

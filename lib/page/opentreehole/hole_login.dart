@@ -271,41 +271,41 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
         ),
         ...suggestEmail
             .map<Widget>((e) => ListTile(
-          title: Text(e),
-          onTap: () async {
-            String? email = e;
-            if (e == S.of(context).my_email_not_in_list) {
-              email = await showPlatformDialog<String?>(
-                  context: context,
-                  builder: (cxt) {
-                    TextEditingController controller =
-                    new TextEditingController();
-                    return PlatformAlertDialog(
-                      title: Text(S.of(context).input_your_email),
-                      content: TextField(
-                        controller: controller,
-                      ),
-                      actions: [
-                        PlatformDialogAction(
-                          child: Text(S.of(context).i_see),
-                          onPressed: () {
-                            if (controller.text.trim().isNotEmpty) {
-                              Navigator.pop(
-                                  cxt, controller.text.trim());
-                            }
-                          },
-                        ),
-                        PlatformDialogAction(
-                          child: Text(S.of(context).cancel),
-                          onPressed: () => Navigator.pop(cxt, null),
-                        )
-                      ],
-                    );
-                  });
-            }
-            Provider.of<LoginInfoModel>(context, listen: false)
-                .selectedEmail = email;
-            if (email != null) {
+                  title: Text(e),
+                  onTap: () async {
+                    String? email = e;
+                    if (e == S.of(context).my_email_not_in_list) {
+                      email = await showPlatformDialog<String?>(
+                          context: context,
+                          builder: (cxt) {
+                            TextEditingController controller =
+                                new TextEditingController();
+                            return PlatformAlertDialog(
+                              title: Text(S.of(context).input_your_email),
+                              content: TextField(
+                                controller: controller,
+                              ),
+                              actions: [
+                                PlatformDialogAction(
+                                  child: Text(S.of(context).i_see),
+                                  onPressed: () {
+                                    if (controller.text.trim().isNotEmpty) {
+                                      Navigator.pop(
+                                          cxt, controller.text.trim());
+                                    }
+                                  },
+                                ),
+                                PlatformDialogAction(
+                                  child: Text(S.of(context).cancel),
+                                  onPressed: () => Navigator.pop(cxt, null),
+                                )
+                              ],
+                            );
+                          });
+                    }
+                    Provider.of<LoginInfoModel>(context, listen: false)
+                        .selectedEmail = email;
+                    if (email != null) {
                       checkEmailInfo(context, email, email == recommendedEmail)
                           .catchError((e) {
                         state.jumpBackFromLoadingPage();
@@ -314,7 +314,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                       });
                     }
                   },
-        ))
+                ))
             .toList()
             .joinElement(() => Divider())!
       ],
@@ -327,7 +327,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
 
   OTEmailPasswordLoginWidget({Key? key, required _HoleLoginPageState state})
-      : super(key: key, state: state) {}
+      : super(key: key, state: state);
 
   Future<void> executeLogin(BuildContext context) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
@@ -339,8 +339,10 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
 
   @override
   Widget buildContent(BuildContext context) {
-    var model = Provider.of<LoginInfoModel>(context, listen: false);
-    _usernameController.text = model.selectedEmail ?? "";
+    final model = Provider.of<LoginInfoModel>(context, listen: false);
+    if (_usernameController.text.isEmpty) {
+      _usernameController.text = model.selectedEmail ?? "";
+    }
     return Column(
       children: <Widget>[
         Text(

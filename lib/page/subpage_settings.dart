@@ -273,6 +273,18 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     return list;
   }
 
+  String _generateNotificationSettingsSummary(
+      BuildContext context, List<String>? data) {
+    List<String> summary = [];
+    data?.forEach((element) {
+      final text =
+          notificationTypeFromInternalString(element)?.displayTitle(context);
+      if (text == null) return;
+      summary.add(text);
+    });
+    return summary.join(', ');
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -491,10 +503,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   leading: PlatformX.isMaterial(context)
                                       ? const Icon(Icons.hide_image)
                                       : const Icon(CupertinoIcons.eye_slash),
-                                  subtitle: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: PlatformCircularProgressIndicator(),
-                                  ),
+                                  subtitle: Text(S.of(context).loading),
                                   onTap: () {
                                     refreshSelf();
                                   },
@@ -506,44 +515,34 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 successBuilder: (BuildContext context,
                                         AsyncSnapshot<OTUser?> snapshot) =>
                                     ListTile(
-                                  title: Text("notification"),
+                                  title:
+                                      Text(S.of(context).notification_settings),
                                   leading: PlatformX.isMaterial(context)
                                       ? const Icon(Icons.notifications)
                                       : const Icon(CupertinoIcons.bell),
-                                  subtitle: Text(snapshot.data!.config!.notify!
-                                      .toString()),
+                                  subtitle: Text(
+                                      _generateNotificationSettingsSummary(
+                                          context,
+                                          snapshot.data?.config?.notify)),
                                   onTap: () {
                                     showPlatformModalSheet(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            PlatformWidget(
-                                              cupertino: (_, __) =>
-                                                  CupertinoActionSheet(
-                                                title: Text(S
-                                                    .of(context)
-                                                    .fduhole_nsfw_behavior),
-                                                actions: _buildFoldBehaviorList(
-                                                    context),
-                                                cancelButton:
-                                                    CupertinoActionSheetAction(
-                                                  child: Text(
-                                                      S.of(context).cancel),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ),
-                                              material: (_, __) => Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children:
-                                                    _buildFoldBehaviorList(
-                                                        context),
-                                              ),
-                                            ));
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          SafeArea(
+                                        child: Card(
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child:
+                                                  OTNotificationSettingsWidget()),
+                                        ),
+                                      ),
+                                    ).then((value) => refreshSelf());
                                   },
                                 ),
                                 errorBuilder: ListTile(
-                                  title: Text("notification"),
+                                  title:
+                                      Text(S.of(context).notification_settings),
                                   leading: PlatformX.isMaterial(context)
                                       ? const Icon(Icons.notifications)
                                       : const Icon(CupertinoIcons.bell),
@@ -553,14 +552,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   },
                                 ),
                                 loadingBuilder: ListTile(
-                                  title: Text("notification"),
+                                  title:
+                                      Text(S.of(context).notification_settings),
                                   leading: PlatformX.isMaterial(context)
                                       ? const Icon(Icons.notifications)
                                       : const Icon(CupertinoIcons.bell),
-                                  subtitle: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: PlatformCircularProgressIndicator(),
-                                  ),
+                                  subtitle: Text(S.of(context).loading),
                                   onTap: () {
                                     refreshSelf();
                                   },
@@ -1001,4 +998,68 @@ class Developer {
   final String url;
 
   const Developer(this.name, this.imageUrl, this.url, this.description);
+}
+
+class OTNotificationSettingsWidget extends StatefulWidget {
+  const OTNotificationSettingsWidget({Key? key}) : super(key: key);
+
+  @override
+  State<OTNotificationSettingsWidget> createState() =>
+      _OTNotificationSettingsWidgetState();
+}
+
+class _OTNotificationSettingsWidgetState
+    extends State<OTNotificationSettingsWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: _buildNotificationSettingsList(context),
+    );
+  }
+
+  List<Widget> _buildNotificationSettingsList(BuildContext context) {
+    List<Widget> list = [];
+    if (OpenTreeHoleRepository.getInstance().userInfo?.config?.notify == null) {
+      return [Text(S.of(context).fatal_error)];
+    }
+    OTNotificationTypes.values.forEach((value) {
+      list.add(
+        CheckboxListTile(
+            title: Text(value.displayTitle(context) ?? "null"),
+            value: OpenTreeHoleRepository.getInstance()
+                .userInfo!
+                .config!
+                .notify!
+                .contains(value.internalString()),
+            onChanged: (newValue) {
+              if (newValue == true &&
+                  !OpenTreeHoleRepository.getInstance()
+                      .userInfo!
+                      .config!
+                      .notify!
+                      .contains(value.internalString())) {
+                OpenTreeHoleRepository.getInstance()
+                    .userInfo!
+                    .config!
+                    .notify!
+                    .add(value.internalString()!);
+              } else if (newValue == false &&
+                  OpenTreeHoleRepository.getInstance()
+                      .userInfo!
+                      .config!
+                      .notify!
+                      .contains(value.internalString())) {
+                OpenTreeHoleRepository.getInstance()
+                    .userInfo!
+                    .config!
+                    .notify!
+                    .remove(value.internalString()!);
+              }
+              setState(() {});
+            }),
+      );
+    });
+    return list;
+  }
 }
