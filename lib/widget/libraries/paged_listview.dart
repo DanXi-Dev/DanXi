@@ -48,7 +48,7 @@ class PagedListView<T> extends StatefulWidget {
   final PagedListViewController? pagedController;
 
   /// The data that will be used as preloaded data before loading.
-  final List<T>? initialData;
+  final Future<List<T>>? initialData;
 
   /// The builder to build every list item.
   final IndexedDataWidgetBuilder<T> builder;
@@ -96,7 +96,7 @@ class PagedListView<T> extends StatefulWidget {
   const PagedListView(
       {Key? key,
       this.pagedController,
-      this.initialData = const [],
+      this.initialData,
       required this.builder,
       required this.loadingBuilder,
       this.headBuilder,
@@ -347,11 +347,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
-      if (widget.initialData != null &&
-          widget.initialData!.isNotEmpty &&
-          useInitialData) {
+      if (widget.initialData != null && useInitialData) {
         _isRefreshing = true;
-        return Future.value(widget.initialData);
+        return widget.initialData!;
       } else {
         _isRefreshing = true;
         return LazyFuture.pack(widget.dataReceiver(pageIndex));

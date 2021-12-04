@@ -65,7 +65,7 @@
     "notification_settings": "FDUHole: 推送通知",
     "notification_mention": "当您的帖子被引用时",
     "notification_favorite": "当您收藏的树洞更新时",
-    "notification_reply": "当您的树洞被回复时",
+    "notification_reported": "当您的树洞因举报被处理时",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

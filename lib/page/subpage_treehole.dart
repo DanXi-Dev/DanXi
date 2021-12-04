@@ -455,6 +455,8 @@ class _BBSSubpageState extends State<BBSSubpage>
               await refreshSelf();
             },
             child: PagedListView<OTHole>(
+                initialData: Future.value(OpenTreeHoleRepository.getInstance()
+                    .loadPinned(_divisionId)),
                 noneItem: OTHole.DUMMY_POST,
                 pagedController: _listViewController,
                 withScrollbar: true,

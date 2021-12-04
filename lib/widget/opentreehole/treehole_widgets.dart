@@ -153,7 +153,9 @@ class OTFloorWidget extends StatelessWidget {
                     if (floor.anonyname ==
                         parentHole?.floors?.first_floor?.anonyname) ...[
                       OTLeadingTag(
-                          colorString: parentHole?.tags?.first.color ?? 'blue'),
+                          colorString: isNested
+                              ? 'grey'
+                              : parentHole?.tags?.first.color ?? 'blue'),
                       const SizedBox(width: 2),
                     ],
                     Text(

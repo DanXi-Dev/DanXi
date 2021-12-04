@@ -56,20 +56,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   List<OTDivision> _divisionCache = [];
 
   /// Push Notification Registration Cache
-  String? _deviceId, _pushNotificationToken;
-  PushNotificationServiceType? _pushNotificationService;
+  PushNotificationRegData? _pushNotificationRegData;
 
   void clearCache() {
     _token = null;
     _userInfo = null;
-    _deviceId = null;
-    _pushNotificationService = null;
-    _pushNotificationToken = null;
+    _pushNotificationRegData = null;
   }
 
   OpenTreeHoleRepository._() {
     // Override the options set in parent class.
     dio!.options = BaseOptions(receiveDataWhenStatusError: true);
+    initializeRepo();
   }
 
   Future<void> initializeRepo() async {
@@ -82,9 +80,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
       throw NotLoginError("No token");
-      // _token = await requestToken(info!);
     }
-    _divisionCache = await loadDivisions();
+    if (_pushNotificationRegData != null) {
+      await updatePushNotificationToken(_pushNotificationRegData!.token,
+          _pushNotificationRegData!.deviceId, _pushNotificationRegData!.type);
+    }
   }
 
   Future<bool> checkRegisterStatus(String email) async {
@@ -189,7 +189,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<OTDivision>> loadDivisions({bool useCache = true}) async {
+  Future<List<OTDivision>> loadDivisions(
+      {bool useCache = true, int? divisionId}) async {
     if (_divisionCache.isNotEmpty && useCache) {
       return _divisionCache;
     }
@@ -198,6 +199,24 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final List result = response.data;
     _divisionCache = result.map((e) => OTDivision.fromJson(e)).toList();
     return _divisionCache;
+  }
+
+  Future<List<OTHole>> loadPinned(int? divisionId,
+      {bool useCache = true}) async {
+    if (_divisionCache.isNotEmpty && useCache) {
+      return _divisionCache
+              .firstWhere((element) => element.division_id == divisionId)
+              .pinned ??
+          List<OTHole>.empty();
+    }
+    final Response response = await dio!
+        .get(_BASE_URL + "/divisions", options: Options(headers: _tokenHeader));
+    final List result = response.data;
+    _divisionCache = result.map((e) => OTDivision.fromJson(e)).toList();
+    return _divisionCache
+            .firstWhere((element) => element.division_id == divisionId)
+            .pinned ??
+        List<OTHole>.empty();
   }
 
   List<OTDivision> getDivisions() {
@@ -512,20 +531,17 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   // Migrated
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
-      [String? token, String? id, PushNotificationServiceType? service]) async {
+      String token, String id, PushNotificationServiceType service) async {
     if (isUserInitialized) {
       await dio!.post(_BASE_URL + "/users",
           data: {
-            "service":
-                (service ?? _pushNotificationService).toStringRepresentation(),
-            "device_id": id ?? _deviceId,
-            "token": token ?? _pushNotificationToken,
+            "service": service.toStringRepresentation(),
+            "device_id": id,
+            "token": token,
           },
           options: Options(headers: _tokenHeader));
     } else {
-      _deviceId = id;
-      _pushNotificationToken = token;
-      _pushNotificationService = service;
+      _pushNotificationRegData = PushNotificationRegData(id, token, service);
     }
   }
 
@@ -552,10 +568,15 @@ enum SetFavoriteMode { ADD, DELETE }
 
 class NotLoginError implements FatalException {
   final String errorMessage;
-
   NotLoginError(this.errorMessage);
 }
 
 class LoginExpiredError implements Exception {}
 
 class ImageUploadError implements Exception {}
+
+class PushNotificationRegData {
+  final String deviceId, token;
+  final PushNotificationServiceType type;
+  PushNotificationRegData(this.deviceId, this.token, this.type);
+}

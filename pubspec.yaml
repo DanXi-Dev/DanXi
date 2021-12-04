@@ -72,8 +72,6 @@ dependencies:
   flutter_layout_grid: ^1.0.3
   flutter_js: ^0.5.0+3
 
-  flutter_svg: 0.22.0 # transitive dependency, but higher versions doesn't work with 2.2.3 (require 2.5.0)
-
 dependency_overrides:
   fluttertoast:
     git:

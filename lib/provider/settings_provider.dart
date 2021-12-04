@@ -334,7 +334,7 @@ FoldBehavior foldBehaviorFromInternalString(String str) {
   }
 }
 
-enum OTNotificationTypes { MENTION, FAVORITE }
+enum OTNotificationTypes { MENTION, FAVORITE, REPORT }
 
 extension OTNotificationTypesEx on OTNotificationTypes {
   String? displayTitle(BuildContext context) {
@@ -343,8 +343,8 @@ extension OTNotificationTypesEx on OTNotificationTypes {
         return S.of(context).notification_mention;
       case OTNotificationTypes.FAVORITE:
         return S.of(context).notification_favorite;
-      //case OTNotificationTypes.REPLY:
-      //  return S.of(context).notification_reply;
+      case OTNotificationTypes.REPORT:
+        return S.of(context).notification_reported;
     }
   }
 
@@ -354,8 +354,8 @@ extension OTNotificationTypesEx on OTNotificationTypes {
         return 'mention';
       case OTNotificationTypes.FAVORITE:
         return 'favorite';
-      //case OTNotificationTypes.REPLY:
-      //  return 'reply';
+      case OTNotificationTypes.REPORT:
+        return 'report';
     }
   }
 }
@@ -366,8 +366,8 @@ OTNotificationTypes? notificationTypeFromInternalString(String str) {
       return OTNotificationTypes.MENTION;
     case 'favorite':
       return OTNotificationTypes.FAVORITE;
-    //case 'reply':
-    //  return OTNotificationTypes.REPLY;
+    case 'report':
+      return OTNotificationTypes.REPORT;
     default:
       return null;
   }

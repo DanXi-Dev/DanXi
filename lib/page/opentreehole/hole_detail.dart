@@ -216,7 +216,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 await refreshSelf();
               },
               child: PagedListView<OTFloor>(
-                initialData: _post.floors?.prefetch ?? [],
+                initialData: Future.value(_post.floors?.prefetch ?? []),
                 pagedController: _listViewController,
                 withScrollbar: true,
                 scrollController: PrimaryScrollController.of(context),
