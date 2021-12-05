@@ -66,6 +66,9 @@
     "notification_mention": "当您的帖子被引用时",
     "notification_favorite": "当您收藏的树洞更新时",
     "notification_reported": "当您的树洞因举报被处理时",
+    "unsupported": "此设备暂不支持",
+    "unauthorized": "未授权",
+    "not_logged_in": "未登录",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

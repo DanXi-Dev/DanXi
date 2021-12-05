@@ -162,6 +162,9 @@
     "notification_mention": "When your post was quoted",
     "notification_favorite": "When favorited post was updated",
     "notification_reported": "When your post has been flagged as inapporpriate",
+    "unsupported": "Unsupported on this device",
+    "unauthorized": "Unauthorized",
+    "not_logged_in": "Not logged in",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",

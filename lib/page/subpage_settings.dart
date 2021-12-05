@@ -56,6 +56,7 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -271,18 +272,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       ));
     });
     return list;
-  }
-
-  String _generateNotificationSettingsSummary(
-      BuildContext context, List<String>? data) {
-    List<String> summary = [];
-    data?.forEach((element) {
-      final text =
-          notificationTypeFromInternalString(element)?.displayTitle(context);
-      if (text == null) return;
-      summary.add(text);
-    });
-    return summary.join(', ');
   }
 
   @override
@@ -509,59 +498,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   },
                                 ),
                               ),
-                              FutureWidget<OTUser?>(
-                                future: OpenTreeHoleRepository.getInstance()
-                                    .getUserProfile(),
-                                successBuilder: (BuildContext context,
-                                        AsyncSnapshot<OTUser?> snapshot) =>
-                                    ListTile(
-                                  title:
-                                      Text(S.of(context).notification_settings),
-                                  leading: PlatformX.isMaterial(context)
-                                      ? const Icon(Icons.notifications)
-                                      : const Icon(CupertinoIcons.bell),
-                                  subtitle: Text(
-                                      _generateNotificationSettingsSummary(
-                                          context,
-                                          snapshot.data?.config?.notify)),
-                                  onTap: () {
-                                    showPlatformModalSheet(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          SafeArea(
-                                        child: Card(
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(16.0),
-                                              child:
-                                                  OTNotificationSettingsWidget()),
-                                        ),
-                                      ),
-                                    ).then((value) => refreshSelf());
-                                  },
-                                ),
-                                errorBuilder: ListTile(
-                                  title:
-                                      Text(S.of(context).notification_settings),
-                                  leading: PlatformX.isMaterial(context)
-                                      ? const Icon(Icons.notifications)
-                                      : const Icon(CupertinoIcons.bell),
-                                  subtitle: Text(S.of(context).fatal_error),
-                                  onTap: () {
-                                    refreshSelf();
-                                  },
-                                ),
-                                loadingBuilder: ListTile(
-                                  title:
-                                      Text(S.of(context).notification_settings),
-                                  leading: PlatformX.isMaterial(context)
-                                      ? const Icon(Icons.notifications)
-                                      : const Icon(CupertinoIcons.bell),
-                                  subtitle: Text(S.of(context).loading),
-                                  onTap: () {
-                                    refreshSelf();
-                                  },
-                                ),
+                              OTNotificationSettingsTile(
+                                parentSetStateFunction: refreshSelf,
                               ),
                               SwitchListTile(
                                 title: Text(S.of(context).fduhole_clean_mode),
@@ -1061,5 +999,118 @@ class _OTNotificationSettingsWidgetState
       );
     });
     return list;
+  }
+}
+
+class OTNotificationSettingsTile extends StatelessWidget {
+  final Function parentSetStateFunction;
+
+  const OTNotificationSettingsTile(
+      {Key? key, required this.parentSetStateFunction})
+      : super(key: key);
+
+  String _generateNotificationSettingsSummary(
+      BuildContext context, List<String>? data) {
+    List<String> summary = [];
+    data?.forEach((element) {
+      final text =
+          notificationTypeFromInternalString(element)?.displayTitle(context);
+      if (text == null) return;
+      summary.add(text);
+    });
+    return summary.join(', ');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!PlatformX.isApplePlatform)
+      return ListTile(
+        title: Text(S.of(context).notification_settings),
+        leading: PlatformX.isMaterial(context)
+            ? const Icon(Icons.notifications)
+            : const Icon(CupertinoIcons.bell),
+        subtitle: Text(S.of(context).unsupported),
+        enabled: false,
+      );
+    else {
+      final loadingBuilder = ListTile(
+        title: Text(S.of(context).notification_settings),
+        leading: PlatformX.isMaterial(context)
+            ? const Icon(Icons.notifications)
+            : const Icon(CupertinoIcons.bell),
+        subtitle: Text(S.of(context).loading),
+        onTap: () {
+          parentSetStateFunction();
+        },
+      );
+      final errorBuilder = ListTile(
+        title: Text(S.of(context).notification_settings),
+        leading: PlatformX.isMaterial(context)
+            ? const Icon(Icons.notifications)
+            : const Icon(CupertinoIcons.bell),
+        subtitle: Text(S.of(context).fatal_error),
+        onTap: () {
+          parentSetStateFunction();
+        },
+      );
+      return FutureWidget<bool>(
+          future: Permission.notification.isGranted,
+          successBuilder:
+              (BuildContext context, AsyncSnapshot<bool> permissionSnapshot) {
+            if (permissionSnapshot.data == true) {
+              if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
+                return ListTile(
+                  title: Text(S.of(context).notification_settings),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.notifications)
+                      : const Icon(CupertinoIcons.bell),
+                  subtitle: Text(S.of(context).not_logged_in),
+                  onTap: () {
+                    parentSetStateFunction();
+                  },
+                );
+
+              return FutureWidget<OTUser?>(
+                future: OpenTreeHoleRepository.getInstance().getUserProfile(),
+                successBuilder:
+                    (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
+                        ListTile(
+                  title: Text(S.of(context).notification_settings),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.notifications)
+                      : const Icon(CupertinoIcons.bell),
+                  subtitle: Text(_generateNotificationSettingsSummary(
+                      context, snapshot.data?.config?.notify)),
+                  onTap: () {
+                    showPlatformModalSheet(
+                      context: context,
+                      builder: (BuildContext context) => SafeArea(
+                        child: Card(
+                          child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: OTNotificationSettingsWidget()),
+                        ),
+                      ),
+                    ).then((value) => parentSetStateFunction());
+                  },
+                ),
+                errorBuilder: errorBuilder,
+                loadingBuilder: loadingBuilder,
+              );
+            } else
+              return ListTile(
+                title: Text(S.of(context).notification_settings),
+                leading: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.notifications)
+                    : const Icon(CupertinoIcons.bell),
+                subtitle: Text(S.of(context).unauthorized),
+                onTap: () {
+                  parentSetStateFunction();
+                },
+              );
+          },
+          errorBuilder: errorBuilder,
+          loadingBuilder: loadingBuilder);
+    }
   }
 }
