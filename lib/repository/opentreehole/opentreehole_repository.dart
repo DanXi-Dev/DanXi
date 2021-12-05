@@ -35,6 +35,7 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final _instance = OpenTreeHoleRepository._();
@@ -264,16 +265,29 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<OTHole> loadSpecificHole(int discussionId) async {
     final Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
         options: Options(headers: _tokenHeader));
-    return OTHole.fromJson(response.data);
+    final hole = OTHole.fromJson(response.data);
+    hole.floors!.prefetch!.forEach((floor) {
+      floor.mention?.forEach((mention) {
+        _floorCache
+            .removeWhere((element) => element.floor_id == mention.floor_id);
+        _floorCache.add(mention);
+      });
+    });
+    return hole;
   }
 
   // Migrated
   Future<OTFloor> loadSpecificFloor(int floorId) async {
-    // TODO: This API should first check if the requested floor is already cached.
-    // Inside [Mention]
-    final Response response = await dio!.get(_BASE_URL + "/floors/$floorId",
-        options: Options(headers: _tokenHeader));
-    return OTFloor.fromJson(response.data);
+    try {
+      return _floorCache.lastWhere((element) => element.floor_id == floorId);
+    } catch (ignored) {
+      final Response response = await dio!.get(_BASE_URL + "/floors/$floorId",
+          options: Options(headers: _tokenHeader));
+      final floor = OTFloor.fromJson(response.data);
+      _floorCache.removeWhere((element) => element.floor_id == floor.floor_id);
+      _floorCache.add(floor);
+      return floor;
+    }
   }
 
   // Do we have such an API?
