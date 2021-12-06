@@ -70,6 +70,7 @@
     "unauthorized": "未授权",
     "not_logged_in": "未登录",
     "messages": "消息",
+    "deleted": "已删除",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

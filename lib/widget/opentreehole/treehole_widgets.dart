@@ -150,19 +150,29 @@ class OTFloorWidget extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (floor.anonyname ==
-                        parentHole?.floors?.first_floor?.anonyname) ...[
-                      OTLeadingTag(
-                          colorString: isNested
-                              ? 'grey'
-                              : parentHole?.tags?.first.color ?? 'blue'),
-                      const SizedBox(width: 2),
-                    ],
-                    Text(
-                      "${floor.anonyname}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        if (floor.anonyname ==
+                            parentHole?.floors?.first_floor?.anonyname) ...[
+                          OTLeadingTag(
+                              colorString: isNested
+                                  ? 'grey'
+                                  : parentHole?.tags?.first.color ?? 'blue'),
+                          const SizedBox(width: 4),
+                        ],
+                        Text(
+                          "${floor.anonyname}",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
+                    if (floor.deleted == true) ...[
+                      const SizedBox(width: 4),
+                      OTLeadingTag(
+                          colorString: 'red', text: S.of(context).deleted),
+                    ]
                   ],
                 ),
               ),
