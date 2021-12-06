@@ -165,6 +165,7 @@
     "unsupported": "Unsupported on this device",
     "unauthorized": "Unauthorized",
     "not_logged_in": "Not logged in",
+    "messages": "Messages",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
@@ -254,7 +255,7 @@
     "unable_to_access_url": "Test connection failed\nCan't to connect to this website, please check your URL.",
     "cannot_launch_url": "Unable to open this URL",
     "error_adding_exam": "There was an error adding exam \"{name}\".",
-    "no_data": "Empty Data",
+    "no_data": "No Data",
     "post_does_not_exist": "The requested post does not exist.",
     "add_image": "Add Image",
     "markdown_enabled": "Markdown enabled",

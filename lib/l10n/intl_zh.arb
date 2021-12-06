@@ -69,6 +69,7 @@
     "unsupported": "此设备暂不支持",
     "unauthorized": "未授权",
     "not_logged_in": "未登录",
+    "messages": "消息",
 
     "empty_classrooms": "空教室",
     "settings": "设置",

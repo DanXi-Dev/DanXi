@@ -33,6 +33,7 @@ import 'package:dan_xi/page/dashboard/gpa_table.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_login.dart';
+import 'package:dan_xi/page/opentreehole/hole_messages.dart';
 import 'package:dan_xi/page/opentreehole/hole_reports.dart';
 import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
@@ -155,6 +156,8 @@ class DanxiApp extends StatelessWidget {
     '/bbs/tags/blocklist': (context, {arguments}) =>
         BBSHiddenTagsPreferencePage(arguments: arguments),
     '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
+    '/bbs/messages': (context, {arguments}) =>
+        OTMessagesPage(arguments: arguments),
   };
 
   @override
@@ -166,7 +169,6 @@ class DanxiApp extends StatelessWidget {
           data: PlatformX.getTheme(context),
           child: PlatformApp(
             scrollBehavior: MyCustomScrollBehavior(),
-            title: '旦夕',
             debugShowCheckedModeBanner: false,
             // Fix cupertino UI text color issues
             cupertino: (_, __) => CupertinoAppData(
@@ -191,7 +193,7 @@ class DanxiApp extends StatelessWidget {
             // Configure the page route behaviour of the whole app
             onGenerateRoute: (settings) {
               final Function? pageContentBuilder =
-              DanxiApp.routes[settings.name!];
+                  DanxiApp.routes[settings.name!];
               if (pageContentBuilder != null) {
                 return platformPageRoute(
                     context: context,

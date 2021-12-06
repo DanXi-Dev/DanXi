@@ -20,6 +20,7 @@ import 'dart:async';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/report.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -29,67 +30,14 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:linkify/linkify.dart';
-
-/// This function preprocesses content downloaded from FDUHOLE so that
-/// (1) HTML href is added to raw links
-/// (2) Markdown Images are converted to HTML images.
-String preprocessContentForDisplay(String content,
-    {bool forceMarkdown = false}) {
-  String result = "";
-  int hrefCount = 0;
-
-  /* Workaround Markdown images
-  content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
-      (match) => "<img src=\"${match.group(1)}\"></img>");*/
-  if (isHtml(content) && !forceMarkdown) {
-    linkify(content, options: LinkifyOptions(humanize: false))
-        .forEach((element) {
-      if (element is UrlElement) {
-        // Only add tag if tag has not yet been added.
-        if (hrefCount == 0) {
-          result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
-        } else {
-          result += element.text;
-          hrefCount--;
-        }
-      } else {
-        if (element.text.contains('<a href='))
-          hrefCount++;
-        else if (element.text.contains('<img src="')) hrefCount++;
-        result += element.text;
-      }
-    });
-  } else {
-    linkify(content, options: LinkifyOptions(humanize: false))
-        .forEach((element) {
-      if (element is UrlElement) {
-        // Only add tag if tag has not yet been added.
-        if (RegExp("\\[.*?\\]\\(${RegExp.escape(element.url)}\\)")
-                .hasMatch(content) ||
-            RegExp("\\[.*?${RegExp.escape(element.url)}.*?\\]\\(http.*?\\)")
-                .hasMatch(content)) {
-          result += element.url;
-        } else {
-          result += "[${element.text}](${element.url})";
-        }
-      } else
-        result += element.text;
-    });
-  }
-  return result;
-}
 
 /// A list page showing the reports for administrators.
 class BBSReportDetail extends StatefulWidget {
@@ -246,7 +194,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 Text(
-                  HumanDuration.format(
+                  HumanDuration.tryFormat(
                       context, DateTime.parse(e.date_created!)),
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
@@ -282,19 +230,3 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     );
   }
 }
-
-PostRenderWidget smartRender(String content, LinkTapCallback onTapLink,
-        ImageTapCallback onTapImage) =>
-    isHtml(content)
-        ? PostRenderWidget(
-            render: kHtmlRender,
-            content: preprocessContentForDisplay(content),
-            onTapImage: onTapImage,
-            onTapLink: onTapLink,
-          )
-        : PostRenderWidget(
-            render: kMarkdownRender,
-            content: preprocessContentForDisplay(content),
-            onTapImage: onTapImage,
-            onTapLink: onTapLink,
-          );

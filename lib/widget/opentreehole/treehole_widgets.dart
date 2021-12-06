@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -224,7 +225,7 @@ class OTFloorWidget extends StatelessWidget {
                     ],
                   ),
                 Text(
-                  HumanDuration.format(
+                  HumanDuration.tryFormat(
                       context, DateTime.tryParse(floor.time_created!)),
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
@@ -460,6 +461,28 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class OTMessageItem extends StatelessWidget {
+  final OTMessage message;
+
+  const OTMessageItem({Key? key, required this.message}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: PlatformX.isMaterial(context)
+            ? Icon(Icons.developer_board)
+            : Icon(CupertinoIcons.info_circle),
+        title: Text(message.message ?? "null"),
+        subtitle: Text(HumanDuration.tryFormat(
+            context, DateTime.tryParse(message.time_created ?? ""))),
+        onTap: () => Noticing.showNotice(
+            context, message.data ?? "null"), // TODO: How to process this data?
+      ),
     );
   }
 }

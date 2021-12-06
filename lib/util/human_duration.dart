@@ -20,7 +20,7 @@ import 'package:flutter/cupertino.dart';
 
 /// Create human-readable duration, e.g.: 1 hour ago, 2 days ago
 class HumanDuration {
-  static String format(BuildContext context, DateTime? dateTime) {
+  static String tryFormat(BuildContext context, DateTime? dateTime) {
     try {
       final Duration duration = DateTime.now().difference(dateTime!);
       if (duration.inSeconds < 1) {

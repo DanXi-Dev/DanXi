@@ -123,7 +123,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text(HumanDuration.format(
+        subtitle: Text(HumanDuration.tryFormat(
             context, DateTime.tryParse(value.updatedAt!)!)),
         onTap: () => showPlatformDialog(
             context: context,

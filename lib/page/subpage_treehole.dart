@@ -125,6 +125,15 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
+          S.of(cxt).messages,
+          Icon(CupertinoIcons.bell),
+          () => smartNavigatorPush(cxt, '/bbs/messages'),
+        )
+      ];
+
+/*  @override
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+        AppBarButtonItem(
           S.of(cxt).sort_order,
           Icon(CupertinoIcons.sort_down_circle),
           () => showPlatformModalSheet(
@@ -147,7 +156,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
             ),
           ),
         )
-      ];
+      ]; */
 
   @override
   Create<String> get title => (cxt) => S.of(cxt).forum;
@@ -241,10 +250,11 @@ class _BBSSubpageState extends State<BBSSubpage>
 
           List<OTHole>? loadedPost = await adaptLayer
               .generateReceiver(_listViewController, (lastElement) {
-            DateTime time = DateTime.now();
+            DateTime time;
             if (lastElement != null) {
               time = DateTime.parse(lastElement.time_updated!);
-            }
+            } else
+              time = DateTime.now();
             return OpenTreeHoleRepository.getInstance()
                 .loadHoles(time, _divisionId);
           }).call(page);
@@ -585,7 +595,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text("#${postElement.hole_id}", style: infoStyle),
                 Text(
-                    HumanDuration.format(
+                    HumanDuration.tryFormat(
                         context, DateTime.parse(postElement.time_created!)),
                     style: infoStyle),
                 Row(children: [
@@ -637,7 +647,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     Text(
                       S.of(context).latest_reply(
                           postElement.floors!.last_floor!.anonyname ?? "?",
-                          HumanDuration.format(
+                          HumanDuration.tryFormat(
                               context,
                               DateTime.parse(postElement
                                   .floors!.last_floor!.time_created!))),
