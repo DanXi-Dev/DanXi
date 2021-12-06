@@ -470,19 +470,27 @@ class OTMessageItem extends StatelessWidget {
 
   const OTMessageItem({Key? key, required this.message}) : super(key: key);
 
+  void guessDataType(BuildContext context, Map<String, dynamic>? data) {
+    try {
+      final floor = OTFloor.fromJson(data!);
+      OTFloorMentionWidget.showFloorDetail(context, floor);
+    } catch (e) {
+      // TODO: Support Other Types
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: PlatformX.isMaterial(context)
-            ? Icon(Icons.developer_board)
-            : Icon(CupertinoIcons.info_circle),
-        title: Text(message.message ?? "null"),
-        subtitle: Text(HumanDuration.tryFormat(
-            context, DateTime.tryParse(message.time_created ?? ""))),
-        onTap: () => Noticing.showNotice(
-            context, message.data ?? "null"), // TODO: How to process this data?
-      ),
+          leading: PlatformX.isMaterial(context)
+              ? Icon(Icons.developer_board)
+              : Icon(CupertinoIcons.info_circle),
+          title: Text(message.message ?? "null"),
+          subtitle: Text(HumanDuration.tryFormat(
+              context, DateTime.tryParse(message.time_created ?? ""))),
+          onTap: () => guessDataType(context, message.data)),
     );
   }
 }

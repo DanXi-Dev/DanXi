@@ -28,7 +28,7 @@ class OTMessage {
   bool? has_read;
 
   /// This can be anything, in json format
-  String? data;
+  Map<String, dynamic>? data;
 
   factory OTMessage.fromJson(Map<String, dynamic> json) =>
       _$OTMessageFromJson(json);

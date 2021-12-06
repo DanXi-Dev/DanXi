@@ -51,7 +51,8 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTMessage>?> _loadContent(int page) async {
-    return await adaptLayer.generateReceiver(_listViewController,
+    return OpenTreeHoleRepository.getInstance().loadMessages(unreadOnly: false);
+    /*return await adaptLayer.generateReceiver(_listViewController,
         (lastElement) {
       DateTime time;
       if (lastElement != null) {
@@ -60,7 +61,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
         time = DateTime.now();
       return OpenTreeHoleRepository.getInstance()
           .loadMessages(startTime: time, unreadOnly: false);
-    }).call(page);
+    }).call(page);*/
   }
 
   @override

@@ -13,7 +13,7 @@ OTMessage _$OTMessageFromJson(Map<String, dynamic> json) {
     json['code'] as String?,
     json['time_created'] as String?,
     json['has_read'] as bool?,
-    json['data'] as String?,
+    json['data'] as Map<String, dynamic>?,
   );
 }
 

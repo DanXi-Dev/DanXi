@@ -429,11 +429,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTMessage>> loadMessages(
-      {bool unreadOnly = true, required DateTime startTime}) async {
+      {bool unreadOnly = true, DateTime? startTime}) async {
     final Response response = await dio!.get(_BASE_URL + "/messages",
         queryParameters: {
           "not_read": unreadOnly,
-          "start_time": startTime.toIso8601String(),
+          "start_time": startTime?.toIso8601String(),
         },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
