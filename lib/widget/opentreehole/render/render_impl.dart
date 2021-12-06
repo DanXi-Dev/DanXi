@@ -88,9 +88,10 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    inlineSyntaxes: [LatexSyntax(), MentionSyntax()],
+    inlineSyntaxes: [LatexSyntax(), LatexMultiLineSyntax(), MentionSyntax()],
     builders: {
       'tex': MarkdownLatexSupport(),
+      'texLine': MarkdownLatexMultiLineSupport(),
       'mention': MarkdownMentionSupport(),
     },
     imageBuilder: (Uri uri, String? title, String? alt) {
@@ -106,6 +107,18 @@ class MarkdownLatexSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return Math.tex(element.textContent);
+  }
+}
+
+class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [Math.tex(element.textContent)],
+    );
   }
 }
 
@@ -133,12 +146,26 @@ BaseRender kMarkdownSelectorRender = (BuildContext context, String? content,
 };
 
 class LatexSyntax extends md.InlineSyntax {
-  LatexSyntax() : super(r'\$(.*?)\$');
+  LatexSyntax() : super(r'(?<!\$)\$([^\$]+?)\$(?!\$)');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
     parser.addNode(md.Element.text("tex", tex));
+    return true;
+  }
+}
+
+class LatexMultiLineSyntax extends md.InlineSyntax {
+  LatexMultiLineSyntax() : super(r'\$\$([\s\S^\$]*?)\$\$');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    var tex = match[1]!;
+    print(tex);
+    parser.addNode(md.Element.empty("br"));
+    parser.addNode(md.Element.text("texLine", tex));
+    parser.addNode(md.Element.empty("br"));
     return true;
   }
 }
