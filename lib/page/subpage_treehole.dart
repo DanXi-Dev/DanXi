@@ -505,7 +505,15 @@ class _BBSSubpageState extends State<BBSSubpage>
                         child: Text(S.of(context).end_reached),
                       ),
                     ),
-                emptyBuilder: (_) => _buildEmptyFavoritesPage(),
+                emptyBuilder: (_) {
+                  if (_postsType == PostsType.FAVORED_DISCUSSION)
+                    return _buildEmptyFavoritesPage();
+                  else
+                    return Container(
+                      padding: EdgeInsets.all(8),
+                      child: Center(child: Text(S.of(context).no_data)),
+                    );
+                },
                 fatalErrorBuilder: (_, e) {
                   if (e is NotLoginError) {
                     return ErrorPageWidget(
