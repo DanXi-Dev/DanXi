@@ -609,6 +609,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                         context, DateTime.parse(postElement.time_created!)),
                     style: infoStyle),
                 Row(children: [
+                  Text("${postElement.view} ", style: infoStyle),
+                  Icon(CupertinoIcons.eye,
+                      size: infoStyle.fontSize, color: infoStyle.color),
+                  const SizedBox(width: 4),
                   Text("${postElement.reply} ", style: infoStyle),
                   Icon(CupertinoIcons.ellipses_bubble,
                       size: infoStyle.fontSize, color: infoStyle.color),
