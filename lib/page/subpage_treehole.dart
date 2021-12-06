@@ -128,7 +128,10 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
         AppBarButtonItem(
           S.of(cxt).messages,
           Icon(CupertinoIcons.bell),
-          () => smartNavigatorPush(cxt, '/bbs/messages'),
+          () {
+            if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+              smartNavigatorPush(cxt, '/bbs/messages');
+          },
         )
       ];
 
@@ -164,18 +167,21 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-        AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag),
-            () => smartNavigatorPush(cxt, '/bbs/tags')),
+        AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+            smartNavigatorPush(cxt, '/bbs/tags');
+        }),
+        AppBarButtonItem(S.of(cxt).favorites, Icon(CupertinoIcons.star), () {
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+            smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
+              'showFavoredDiscussion': true,
+            });
+        }),
         AppBarButtonItem(
-            S.of(cxt).favorites,
-            Icon(CupertinoIcons.star),
-            () => smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
-                  'showFavoredDiscussion': true,
-                })),
-        AppBarButtonItem(
-            S.of(cxt).new_post,
-            Icon(PlatformIcons(cxt).addCircled),
-            () => AddNewPostEvent().fire()),
+            S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+            AddNewPostEvent().fire();
+        }),
       ];
 }
 
