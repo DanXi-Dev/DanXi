@@ -44,6 +44,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -515,16 +516,11 @@ class _BBSSubpageState extends State<BBSSubpage>
                 },
                 fatalErrorBuilder: (_, e) {
                   if (e is NotLoginError) {
-                    return ErrorPageWidget(
-                        buttonText: S.of(context).login,
-                        errorMessage: S.of(context).you_need_login,
-                        onTap: () async {
-                          await smartNavigatorPush(context, "/bbs/login",
-                              arguments: {
-                                "info": StateProvider.personInfo.value!
-                              });
-                          refreshSelf();
-                        });
+                    return OTWelcomeWidget(loginCallback: () async {
+                      await smartNavigatorPush(context, "/bbs/login",
+                          arguments: {"info": StateProvider.personInfo.value!});
+                      refreshSelf();
+                    });
                   }
                   return Container();
                 },

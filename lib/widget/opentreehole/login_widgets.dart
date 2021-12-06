@@ -16,145 +16,58 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class OTLoginHelper {
-  static final _instance = OTLoginHelper._();
+class OTWelcomeWidget extends StatelessWidget {
+  final void Function() loginCallback;
 
-  factory OTLoginHelper.getInstance() => _instance;
-
-  OTLoginHelper._();
-
-  // This lock is to prevent repeated login dialog popping up.
-  bool _loginLock = false;
-
-  Future<void> loginWithPwd(BuildContext context) async {
-    if (_loginLock) {
-      return;
-    }
-    _loginLock = true;
-    try {
-      await _loginWithUsernamePassword(context);
-      _loginLock = false;
-    } catch (e) {
-      _loginLock = false;
-      rethrow;
-    }
-  }
-
-  static Future<String?> _loginWithUsernamePassword(
-      BuildContext context) async {
-    final Credentials? credentials = await showPlatformModalSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Card(
-          child: OTUsernamePasswordLoginWidget(),
-        );
-      },
-    );
-    if (credentials == null) {
-      return null;
-    }
-    return OpenTreeHoleRepository.getInstance()
-        .loginWithUsernamePassword(credentials.username, credentials.password);
-  }
-}
-
-class OTUsernamePasswordLoginWidget extends StatelessWidget {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  const OTWelcomeWidget({Key? key, required this.loginCallback})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        TextField(
-          controller: _usernameController,
-          decoration: InputDecoration(
-              labelText: S.of(context).login_uis_uid,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.perm_identity)
-                  : Icon(CupertinoIcons.person_crop_circle)),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text(
+              "FDUHole 2.0",
+              style: TextStyle(fontSize: 32.0),
+            ),
+            Column(
+              children: [
+                ListTile(
+                  leading: Icon(CupertinoIcons.bell),
+                  title: Text("Notifications"),
+                  subtitle:
+                      Text("Receive notifications when new data is available"),
+                ),
+                ListTile(
+                  leading: Icon(CupertinoIcons.textformat_superscript),
+                  title: Text("LaTeX Support"),
+                  subtitle: Text("Use LaTeX in your notes"),
+                ),
+                ListTile(
+                  leading: Icon(CupertinoIcons.hand_thumbsup),
+                  title: Text("Like and Division"),
+                  subtitle: Text("Like floors and different divisions"),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: PlatformElevatedButton(
+                child: Text(S.of(context).login),
+                onPressed: loginCallback,
+              ),
+            ),
+          ],
         ),
-        TextField(
-          controller: _passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: S.of(context).login_uis_pwd,
-            icon: PlatformX.isAndroid
-                ? Icon(Icons.lock_outline)
-                : Icon(CupertinoIcons.lock_circle),
-          ),
-        ),
-        ElevatedButton(
-          child: Text(S.of(context).login),
-          onPressed: () {
-            Navigator.of(context).pop(Credentials(
-                _usernameController.text, _passwordController.text));
-          },
-        ),
-        ElevatedButton(
-          child: Text(S.of(context).cancel),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
+      ),
     );
   }
-}
-
-class OTEmailSelectionWidget extends StatelessWidget {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        TextField(
-          controller: _usernameController,
-          decoration: InputDecoration(
-              labelText: S.of(context).login_uis_uid,
-              icon: PlatformX.isAndroid
-                  ? Icon(Icons.perm_identity)
-                  : Icon(CupertinoIcons.person_crop_circle)),
-        ),
-        TextField(
-          controller: _passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: S.of(context).login_uis_pwd,
-            icon: PlatformX.isAndroid
-                ? Icon(Icons.lock_outline)
-                : Icon(CupertinoIcons.lock_circle),
-          ),
-        ),
-        ElevatedButton(
-          child: Text(S.of(context).login),
-          onPressed: () {
-            Navigator.of(context).pop(Credentials(
-                _usernameController.text, _passwordController.text));
-          },
-        ),
-        ElevatedButton(
-          child: Text(S.of(context).cancel),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class Credentials {
-  final String username;
-  final String password;
-
-  Credentials(this.username, this.password);
 }

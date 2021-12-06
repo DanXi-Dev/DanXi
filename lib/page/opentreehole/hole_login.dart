@@ -199,7 +199,7 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
             onTap: () => state.jumpTo(OTEmailPasswordLoginWidget(
               state: state,
             )),
-          )
+          ),
         ],
       ),
     );
