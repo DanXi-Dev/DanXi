@@ -475,17 +475,34 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                             ));
                                   },
                                 ),
-                                errorBuilder: ListTile(
-                                  title:
-                                      Text(S.of(context).fduhole_nsfw_behavior),
-                                  leading: PlatformX.isMaterial(context)
-                                      ? const Icon(Icons.hide_image)
-                                      : const Icon(CupertinoIcons.eye_slash),
-                                  subtitle: Text(S.of(context).fatal_error),
-                                  onTap: () {
-                                    refreshSelf();
-                                  },
-                                ),
+                                errorBuilder: () {
+                                  if (!OpenTreeHoleRepository.getInstance()
+                                      .isUserInitialized)
+                                    return ListTile(
+                                        title: Text(S
+                                            .of(context)
+                                            .fduhole_nsfw_behavior),
+                                        leading: PlatformX.isMaterial(context)
+                                            ? const Icon(Icons.hide_image)
+                                            : const Icon(
+                                                CupertinoIcons.eye_slash),
+                                        subtitle:
+                                            Text(S.of(context).not_logged_in),
+                                        onTap: () {
+                                          refreshSelf();
+                                        });
+                                  return ListTile(
+                                    title: Text(
+                                        S.of(context).fduhole_nsfw_behavior),
+                                    leading: PlatformX.isMaterial(context)
+                                        ? const Icon(Icons.hide_image)
+                                        : const Icon(CupertinoIcons.eye_slash),
+                                    subtitle: Text(S.of(context).fatal_error),
+                                    onTap: () {
+                                      refreshSelf();
+                                    },
+                                  );
+                                },
                                 loadingBuilder: ListTile(
                                   title:
                                       Text(S.of(context).fduhole_nsfw_behavior),
