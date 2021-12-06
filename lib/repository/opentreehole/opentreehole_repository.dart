@@ -302,13 +302,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Migrated
-  Future<List<OTFloor>> loadSearchResults(
-      String? searchString, int page) async {
-    // Search results only have a single page.
-    // Return nothing if [page] > 1.
-    if (page > 1) return Future.value([]);
+  Future<List<OTFloor>> loadSearchResults(String? searchString,
+      {int? start_floor, int length = 10}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
-        queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
+        //queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
+        queryParameters: {
+          "start_floor": start_floor,
+          "s": searchString,
+          "length": length,
+        },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
     return result.map((e) => OTFloor.fromJson(e)).toList();

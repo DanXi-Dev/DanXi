@@ -125,14 +125,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   bool shouldScrollToEnd = false;
 
-  final PagedListViewController _listViewController = PagedListViewController();
+  final TimeBasedLoadAdaptLayer<OTFloor> adaptLayer =
+      new TimeBasedLoadAdaptLayer(10, 1);
+
+  final PagedListViewController<OTFloor> _listViewController =
+      PagedListViewController<OTFloor>();
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
-    if (_searchKeyword != null)
-      return await OpenTreeHoleRepository.getInstance()
-          .loadSearchResults(_searchKeyword, page);
-    else
+    if (_searchKeyword != null) {
+      return OpenTreeHoleRepository.getInstance().loadSearchResults(
+          _searchKeyword,
+          start_floor: _listViewController.length());
+    } else
       return await OpenTreeHoleRepository.getInstance()
           .loadFloors(_post, page * 10, 10);
   }
@@ -216,7 +221,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 await refreshSelf();
               },
               child: PagedListView<OTFloor>(
-                initialData: Future.value(_post.floors?.prefetch ?? []),
+                initialData: _post.floors?.prefetch,
                 pagedController: _listViewController,
                 withScrollbar: true,
                 scrollController: PrimaryScrollController.of(context),

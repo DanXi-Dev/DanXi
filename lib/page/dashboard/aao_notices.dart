@@ -101,7 +101,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
                 )
               ],
             ),
-            initialData: Future.value(_data),
+            initialData: _data,
             dataReceiver: (index) => FudanAAORepository.getInstance()
                 .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
                     index + 1, _info),

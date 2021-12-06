@@ -162,7 +162,6 @@ class LatexMultiLineSyntax extends md.InlineSyntax {
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
-    print(tex);
     parser.addNode(md.Element.empty("br"));
     parser.addNode(md.Element.text("texLine", tex));
     parser.addNode(md.Element.empty("br"));
