@@ -128,6 +128,9 @@ class OTFloorWidget extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: Card(
+        color: isNested && PlatformX.isCupertino(context)
+            ? Theme.of(context).dividerColor.withOpacity(0.05)
+            : null,
         child: ListTile(
           dense: true,
           title: Column(

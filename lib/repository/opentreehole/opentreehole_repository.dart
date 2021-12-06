@@ -243,18 +243,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>> loadHoles(
-    DateTime startTime,
-    int divisionId, {
-    int length = 10,
-    int prefetchLength = 10,
-  }) async {
+  Future<List<OTHole>> loadHoles(DateTime startTime, int divisionId,
+      {int length = 10, int prefetchLength = 10, String? tag}) async {
     final Response response = await dio!.get(_BASE_URL + "/holes",
         queryParameters: {
           "start_time": startTime.toIso8601String(),
           "division_id": divisionId,
           "length": length,
-          "prefetch_length": prefetchLength
+          "prefetch_length": prefetchLength,
+          "tag": tag,
         },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
@@ -287,26 +284,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       _floorCache.removeWhere((element) => element.floor_id == floor.floor_id);
       _floorCache.add(floor);
       return floor;
-    }
-  }
-
-  // Do we have such an API?
-  Future<List<OTHole>> loadTagFilteredDiscussions(String tag, int page) async {
-    try {
-      final response = await dio!.get(_BASE_URL + "/discussions/",
-          queryParameters: {
-            "tag_name": tag,
-            "page": page,
-          },
-          options: Options(headers: _tokenHeader));
-      final List result = response.data;
-      return result.map((e) => OTHole.fromJson(e)).toList();
-    } catch (error) {
-      if (error is DioError && error.response?.statusCode == 401) {
-        _token = null;
-        throw LoginExpiredError;
-      }
-      rethrow;
     }
   }
 

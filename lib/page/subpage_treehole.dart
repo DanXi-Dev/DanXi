@@ -240,8 +240,6 @@ class _BBSSubpageState extends State<BBSSubpage>
           if (page > 1) return Future.value([]);
           return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
         case PostsType.FILTER_BY_TAG:
-          return await OpenTreeHoleRepository.getInstance()
-              .loadTagFilteredDiscussions(_tagFilter!, page);
         case PostsType.NORMAL_POSTS:
           // Initialize the user token from shared preferences.
           // If no token, NotLoginError will be thrown.
@@ -256,7 +254,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             } else
               time = DateTime.now();
             return OpenTreeHoleRepository.getInstance()
-                .loadHoles(time, _divisionId);
+                .loadHoles(time, _divisionId, tag: _tagFilter);
           }).call(page);
           // Filter blocked posts
           List<OTTag> hiddenTags =
