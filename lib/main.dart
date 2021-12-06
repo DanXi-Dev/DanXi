@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
@@ -98,6 +100,16 @@ void main() {
     });
 }
 
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        // etc.
+      };
+}
+
 /// ## Note: A Checklist After Creating a New Page
 ///
 /// [TextSelectorPage] is a simple example of what a typical page in DanXi looks like.
@@ -153,6 +165,7 @@ class DanxiApp extends StatelessWidget {
         builder: (BuildContext context) => Theme(
           data: PlatformX.getTheme(context),
           child: PlatformApp(
+            scrollBehavior: MyCustomScrollBehavior(),
             title: '旦夕',
             debugShowCheckedModeBanner: false,
             // Fix cupertino UI text color issues
@@ -178,7 +191,7 @@ class DanxiApp extends StatelessWidget {
             // Configure the page route behaviour of the whole app
             onGenerateRoute: (settings) {
               final Function? pageContentBuilder =
-                  DanxiApp.routes[settings.name!];
+              DanxiApp.routes[settings.name!];
               if (pageContentBuilder != null) {
                 return platformPageRoute(
                     context: context,
