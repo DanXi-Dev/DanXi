@@ -339,6 +339,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _autoPinnedPosts() {
+    if (_postsType != PostsType.NORMAL_POSTS) return Container();
     return FutureWidget<List<OTHole>?>(
       future: LazyFuture<List<OTHole>?>.pack(
           OpenTreeHoleRepository.getInstance().loadPinned(_divisionId)),
@@ -508,16 +509,15 @@ class _BBSSubpageState extends State<BBSSubpage>
                 fatalErrorBuilder: (_, e) {
                   if (e is NotLoginError) {
                     return ErrorPageWidget(
-                      buttonText: S.of(context).login,
-                      errorMessage: "You need log in now.",
-                      onTap: () async {
-                        await smartNavigatorPush(context, "/bbs/login",
-                            arguments: {
-                              "info": StateProvider.personInfo.value!
-                            });
-                        refreshSelf();
-                      },
-                    );
+                        buttonText: S.of(context).login,
+                        errorMessage: "You need log in now.",
+                        onTap: () async {
+                          await smartNavigatorPush(context, "/bbs/login",
+                              arguments: {
+                                "info": StateProvider.personInfo.value!
+                              });
+                          refreshSelf();
+                        });
                   }
                   return Container();
                 },
@@ -569,9 +569,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                 smartNavigatorPush(context, '/bbs/discussions',
                     arguments: {"tagFilter": tagname});
               }, SettingsProvider.getInstance().useAccessibilityColoring),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
                   ? Theme(
                       data: Theme.of(context)
@@ -670,10 +668,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                     onOpen: _launchUrlWithNotice)),
           ],
         ),
-        onTap: () => smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": postElement,
-              "scroll_to_end": true,
-            }));
+        onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
+            arguments: {"post": postElement, "scroll_to_end": true}));
   }
 
   @override
