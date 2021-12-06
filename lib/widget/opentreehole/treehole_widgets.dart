@@ -196,7 +196,9 @@ class OTFloorWidget extends StatelessWidget {
                             }
                           })
                       : smartRender(
-                          floor.filteredContent!, onLinkTap, onImageTap)),
+                          floor.filteredContent ?? S.of(context).fatal_error,
+                          onLinkTap,
+                          onImageTap)),
             ],
           ),
           subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -236,7 +238,7 @@ class OTFloorWidget extends StatelessWidget {
                   ),
                 Text(
                   HumanDuration.tryFormat(
-                      context, DateTime.tryParse(floor.time_created!)),
+                      context, DateTime.tryParse(floor.time_created ?? "")),
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
@@ -498,12 +500,23 @@ class OTMessageItem extends StatelessWidget {
 
   const OTMessageItem({Key? key, required this.message}) : super(key: key);
 
-  void guessDataType(BuildContext context, Map<String, dynamic>? data) {
+  static void dispMessageDetailBasedOnGuessedDataType(
+      BuildContext context, String? code, Map<String, dynamic>? data) {
     try {
-      final floor = OTFloor.fromJson(data!);
-      if (floor.floor_id == null) return;
-      OTFloorMentionWidget.showFloorDetail(context, floor);
-    } catch (e) {
+      switch (code) {
+        case 'mention':
+        case 'favorite':
+        case 'modify':
+          // data should be [OTFloor]
+          final floor = OTFloor.fromJson(data!);
+          if (floor.floor_id == null) return;
+          OTFloorMentionWidget.showFloorDetail(context, floor);
+          break;
+        case 'report':
+          //TODO: Unimplemented
+          break;
+      }
+    } catch (ignored) {
       // TODO: Support Other Types
       return;
     }
@@ -519,7 +532,8 @@ class OTMessageItem extends StatelessWidget {
           title: Text(message.message ?? "null"),
           subtitle: Text(HumanDuration.tryFormat(
               context, DateTime.tryParse(message.time_created ?? ""))),
-          onTap: () => guessDataType(context, message.data)),
+          onTap: () => dispMessageDetailBasedOnGuessedDataType(
+              context, message.code, message.data)),
     );
   }
 }

@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -22,6 +23,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
+import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -38,6 +40,7 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -47,6 +50,7 @@ import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
+import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -357,9 +361,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    const channel_a = const MethodChannel('fduhole');
-    channel_a.setMethodCallHandler((MethodCall call) async {
+    const fduhole_channel = const MethodChannel('fduhole');
+    fduhole_channel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
+        case "launch_from_notification":
+          Map<String, dynamic> map =
+              Map<String, dynamic>.from(call.arguments['data']);
+          // Reconstruct data to restore proper type
+          map.updateAll((key, value) {
+            try {
+              return int.parse(value);
+            } catch (ignored) {}
+            return value;
+          });
+          OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
+              context, call.arguments['code'], map);
+          break;
         case "upload_apns_token":
           OpenTreeHoleRepository.getInstance().updatePushNotificationToken(
               call.arguments["token"],

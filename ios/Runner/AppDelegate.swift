@@ -74,6 +74,10 @@ import WatchConnectivity
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.current().delegate = self
+        }
+        
         /* Flutter */
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
@@ -86,7 +90,6 @@ import WatchConnectivity
                     UNUserNotificationCenter.current().requestAuthorization(
                         options: authOptions,
                         completionHandler: {_, _ in })
-                    UNUserNotificationCenter.current().delegate = self
                 } else {
                     let settings: UIUserNotificationSettings =
                     UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
@@ -118,5 +121,31 @@ import WatchConnectivity
         
         let channel = FlutterMethodChannel(name: "plugins.flutter.io/quick_actions", binaryMessenger: controller! as! FlutterBinaryMessenger)
         channel.invokeMethod("launch", arguments: shortcutItem.type)
+    }
+}
+
+@available(iOS 10.0, *)
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    
+    // This function will be called when the app receive notification
+    // This override is necessary to display notification while app is in foreground
+    override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // show the notification alert (banner), and with sound
+        completionHandler([.alert, .sound, .badge])
+    }
+    
+    // This function will be called right after user tap on the notification
+    override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let controller = window.rootViewController as? FlutterViewController
+        let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller! as! FlutterBinaryMessenger)
+        /*let application = UIApplication.shared
+        if (application.applicationState == .active) {
+            print("user tapped the notification bar when the app is in foreground")
+        }
+        else if (application.applicationState == .inactive) {
+            print("user tapped the notification bar when the app is in background")
+        }*/
+        channel.invokeMethod("launch_from_notification", arguments: response.notification.request.content.userInfo)
+        completionHandler()
     }
 }

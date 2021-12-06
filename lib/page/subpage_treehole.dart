@@ -225,7 +225,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   int _divisionId = 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
-      OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded!);
+      OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
 
   BannerAd? bannerAd;
 

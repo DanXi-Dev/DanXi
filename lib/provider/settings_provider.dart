@@ -321,7 +321,7 @@ extension FoldBehaviorEx on FoldBehavior {
   }
 }
 
-FoldBehavior foldBehaviorFromInternalString(String str) {
+FoldBehavior foldBehaviorFromInternalString(String? str) {
   switch (str) {
     case 'fold':
       return FoldBehavior.FOLD;
