@@ -24,6 +24,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/model/person.dart';
@@ -426,6 +427,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         data: _userInfo!.toJson(), options: Options(headers: _tokenHeader));
     _userInfo = OTUser.fromJson(response.data);
     return _userInfo;
+  }
+
+  Future<List<OTMessage>> loadMessages(
+      {bool unreadOnly = true, required DateTime startTime}) async {
+    final Response response = await dio!.get(_BASE_URL + "/messages",
+        queryParameters: {
+          "not_read": unreadOnly,
+          "start_time": startTime.toIso8601String(),
+        },
+        options: Options(headers: _tokenHeader));
+    final List result = response.data;
+    return result.map((e) => OTMessage.fromJson(e)).toList();
   }
 
   // Migrated
