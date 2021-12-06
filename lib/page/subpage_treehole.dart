@@ -241,7 +241,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               .generateReceiver(_listViewController, (lastElement) {
             DateTime time = DateTime.now();
             if (lastElement != null) {
-              time = DateTime.parse(lastElement.time_created!);
+              time = DateTime.parse(lastElement.time_updated!);
             }
             return OpenTreeHoleRepository.getInstance()
                 .loadHoles(time, _divisionId);
@@ -370,7 +370,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           if (event.newDivision.division_id != _divisionId) {
             _divisionId = event.newDivision.division_id!;
-            _refreshAll();
+            refreshSelf();
           }
           //SettingsProvider.getInstance().fduholeSortOrder = _sortOrder = event.newDivision;
         }),
@@ -439,12 +439,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildPageBody() {
     return Material(
       child: Container(
-        // decoration: BoxDecoration(
-        //   image: DecorationImage(
-        //     image: AssetImage("assets/graphics/kavinzhao.jpeg"),
-        //     fit: BoxFit.cover,
-        //   ),
-        // ),
         child: SafeArea(
           bottom: false,
           child: RefreshIndicator(
@@ -683,7 +677,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   bool get wantKeepAlive => true;
 }
 
-/// This class is a workaround between Open Tree Hole's time-based content retrieval
+/// This class is a workaround between Open Tree Hole's time-based content retrieval style
 /// and [PagedListView]'s page-based loading style.
 class TimeBasedLoadAdaptLayer<T> {
   final int pageSize;
