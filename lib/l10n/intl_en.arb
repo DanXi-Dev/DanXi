@@ -167,6 +167,7 @@
     "not_logged_in": "Not logged in",
     "messages": "Messages",
     "deleted": "Deleted",
+    "pinned": "Pinned",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",

@@ -345,7 +345,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         if (snapshot.data != null) {
           return Column(
             children: snapshot.data!
-                .map((e) => _buildListItem(context, null, null, e))
+                .map((e) =>
+                    _buildListItem(context, null, null, e, isPinned: true))
                 .toList(),
           );
         }
@@ -490,7 +491,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                         AutoBannerAdWidget(bannerAd: bannerAd),
                         _autoSearchTextField(),
                         _autoAdminNotice(),
-                        _autoPinnedPosts()
+                        _autoPinnedPosts(),
                       ],
                     ),
                 loadingBuilder: (BuildContext context) => Container(
@@ -548,7 +549,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
-      OTHole postElement) {
+      OTHole postElement,
+      {bool isPinned = false}) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
@@ -597,6 +599,8 @@ class _BBSSubpageState extends State<BBSSubpage>
             subtitle: Column(children: [
               const SizedBox(height: 12),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                if (isPinned)
+                  OTLeadingTag(colorString: 'blue', text: S.of(context).pinned),
                 Text("#${postElement.hole_id}", style: infoStyle),
                 Text(
                     HumanDuration.tryFormat(
@@ -606,8 +610,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                   Text("${postElement.reply} ", style: infoStyle),
                   Icon(CupertinoIcons.ellipses_bubble,
                       size: infoStyle.fontSize, color: infoStyle.color),
-                ])
-              ])
+                ]),
+              ]),
             ]),
             onTap: () {
               smartNavigatorPush(context, "/bbs/postDetail", arguments: {
