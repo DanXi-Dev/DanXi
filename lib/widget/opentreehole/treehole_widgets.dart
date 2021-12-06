@@ -434,7 +434,6 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                 },
               ),
             ),
-            VerticalDivider(width: 0),
             if (floor.is_me != true)
               Expanded(
                 child: InkWell(
@@ -461,7 +460,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   },
                 ),
               ),
-            if (floor.is_me == true)
+            if (floor.is_me == true) ...[
               Expanded(
                 child: InkWell(
                   child: Padding(
@@ -470,7 +469,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          CupertinoIcons.pencil_circle,
+                          CupertinoIcons.pencil,
                           color: Theme.of(context).hintColor,
                           size: 12,
                         ),
@@ -488,6 +487,46 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   },
                 ),
               ),
+              Expanded(
+                child: InkWell(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CupertinoIcons.trash,
+                          color: Theme.of(context).hintColor,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(S.of(context).delete,
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+                    if (await Noticing.askForConfirmation(
+                            context,
+                            S.of(context).about_to_delete_floor(
+                                floor.floor_id ?? "null"),
+                            title: S.of(context).are_you_sure,
+                            isConfirmDestructive: true) ==
+                        true) {
+                      try {
+                        await OpenTreeHoleRepository.getInstance()
+                            .deleteFloor(floor.floor_id!);
+                      } catch (e) {
+                        Noticing.showNotice(context, e.toString(),
+                            title: S.of(context).fatal_error);
+                      }
+                    }
+                  },
+                ),
+              ),
+            ]
           ],
         ),
       ],

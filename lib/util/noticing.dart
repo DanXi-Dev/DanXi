@@ -55,11 +55,15 @@ class Noticing {
                 content: centerContent!
                     ? Center(
                         child: Linkify(
+                        textAlign:
+                            centerContent ? TextAlign.center : TextAlign.start,
                         text: message,
                         onOpen: (element) =>
                             BrowserUtil.openUrl(element.url, context),
                       ))
                     : Linkify(
+                        textAlign:
+                            centerContent ? TextAlign.center : TextAlign.start,
                         text: message,
                         onOpen: (element) =>
                             BrowserUtil.openUrl(element.url, context),
@@ -71,6 +75,47 @@ class Noticing {
                 ],
               ));
     }
+  }
+
+  static Future<bool?> askForConfirmation(BuildContext context, String message,
+      {String? confirmText,
+      String? title,
+      bool isConfirmDestructive = false,
+      bool? centerContent}) async {
+    centerContent ??= !PlatformX.isMaterial(context);
+    return await showPlatformDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: title == null ? null : Text(title),
+              content: centerContent!
+                  ? Center(
+                      child: Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ))
+                  : Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    cupertino: (context, platform) =>
+                        CupertinoDialogActionData(isDefaultAction: true),
+                    child: PlatformText(confirmText ?? S.of(context).cancel),
+                    onPressed: () => Navigator.pop(context, false)),
+                PlatformDialogAction(
+                    cupertino: (context, platform) => CupertinoDialogActionData(
+                        isDestructiveAction: isConfirmDestructive),
+                    child: PlatformText(confirmText ?? S.of(context).i_see),
+                    onPressed: () => Navigator.pop(context, true)),
+              ],
+            ));
   }
 
   static showModalNotice(BuildContext context,

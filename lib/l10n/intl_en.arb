@@ -245,6 +245,9 @@
     "clear_cache_description": "Images will reload next time you view them",
     "cache_cleared": "Cached cleared",
     "exam_unavailable": "Exam Data Unavailable",
+    "delete": "Delete",
+    "are_you_sure": "Are you sure?",
+    "about_to_delete_floor": "You are about to delete floor #{floor}",
 
     "fold": "Fold",
     "hide": "Hide",

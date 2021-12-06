@@ -128,7 +128,7 @@ class BBSEditor {
         ?.text;
     if (content == null || content.trim() == "") return;
     await OpenTreeHoleRepository.getInstance()
-        .adminModifyPost(content, discussionId, postId)
+        .modifyFloor(content, postId)
         .onError((dynamic error, stackTrace) {
       if (error is DioError) {
         Noticing.showNotice(context,

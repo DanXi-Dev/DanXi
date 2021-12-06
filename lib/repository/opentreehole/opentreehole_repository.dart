@@ -464,18 +464,23 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  // NOT YET MIGRATED: missing API doc
-  /// Modify a post
-  Future<void> adminModifyPost(
-      String content, int? discussionId, int? postId) async {
-    await dio!.post(_BASE_URL + "/admin/",
-        data: {
-          "content": content,
-          "operation": "modify",
-          "discussion_id": discussionId,
-          "post_id": postId,
-        },
-        options: Options(headers: _tokenHeader));
+  // Migrated, TODO: Mention
+  /// Modify a floor
+  Future<int?> modifyFloor(String content, int? floorId) async {
+    return (await dio!.put(_BASE_URL + "/floors/$floorId",
+            data: {
+              "content": content,
+            },
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
+  // Migrated
+  /// Delete a floor
+  Future<int?> deleteFloor(int? floorId) async {
+    return (await dio!.delete(_BASE_URL + "/floors/$floorId",
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
   }
 
   /// Disable a post, requires Admin privilege
