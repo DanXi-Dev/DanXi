@@ -192,6 +192,7 @@
     "timetable":"日程",
     "week":"第 {week} 周",
 
+    "you_need_login":"点击[登录]以登录到 FDUHole。",
     "select_login_method":"选择您的登录/注册方式",
     "fudan_uis_quick_login":"UIS 快捷注册/登录",
     "login_by_email_password":"使用邮箱密码登录",

@@ -178,6 +178,7 @@
     "timetable":"Agenda",
     "week":"Week {week}",
 
+    "you_need_login":"You need log in now.",
     "select_login_method":"Select authentication method",
     "fudan_uis_quick_login":"Fudan UIS Quick Login",
     "login_by_email_password":"Log in by email and password",

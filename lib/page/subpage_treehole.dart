@@ -518,7 +518,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                   if (e is NotLoginError) {
                     return ErrorPageWidget(
                         buttonText: S.of(context).login,
-                        errorMessage: "You need log in now.",
+                        errorMessage: S.of(context).you_need_login,
                         onTap: () async {
                           await smartNavigatorPush(context, "/bbs/login",
                               arguments: {
