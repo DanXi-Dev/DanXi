@@ -280,27 +280,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) => [
-        // Admin Operations
-        if (OpenTreeHoleRepository.getInstance().isUserAdminNonAsync())
-          PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.of(menuContext).pop();
-                BBSEditor.adminModifyReply(
-                    menuContext, e.hole_id, e.floor_id, e.content);
-              },
-              child: Text("Modify Post"),
-            ),
-            material: (_, __) => ListTile(
-              title: Text("Modify Post"),
-              onTap: () {
-                Navigator.of(menuContext).pop();
-                BBSEditor.adminModifyReply(
-                    menuContext, e.hole_id, e.floor_id, e.content);
-              },
-            ),
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(menuContext).pop();
+              BBSEditor.modifyReply(
+                  menuContext, e.hole_id, e.floor_id, e.content);
+            },
+            child: Text(S.of(context).modify),
           ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(context).modify),
+            onTap: () {
+              Navigator.of(menuContext).pop();
+              BBSEditor.modifyReply(
+                  menuContext, e.hole_id, e.floor_id, e.content);
+            },
+          ),
+        ),
         if (OpenTreeHoleRepository.getInstance().isUserAdminNonAsync())
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(

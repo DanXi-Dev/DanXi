@@ -128,9 +128,6 @@ class OTFloorWidget extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: Card(
-        color: isNested && PlatformX.isCupertino(context)
-            ? Theme.of(context).dividerColor.withOpacity(0.05)
-            : null,
         child: ListTile(
           dense: true,
           title: Column(
@@ -240,16 +237,6 @@ class OTFloorWidget extends StatelessWidget {
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
-                if (!isNested)
-                  GestureDetector(
-                    child: Text(S.of(context).modify,
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12)),
-                    onTap: () {
-                      // TODO: Modify post
-                      throw UnimplementedError();
-                    },
-                  ),
               ],
             ),
             if (!isNested) OTFloorWidgetBottomBar(floor: floor),
@@ -443,31 +430,59 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
               ),
             ),
             VerticalDivider(width: 0),
-            Expanded(
-              child: InkWell(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.exclamationmark_octagon,
-                        color: Theme.of(context).hintColor,
-                        size: 12,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(S.of(context).report,
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor,
-                              fontSize: 12)),
-                    ],
+            if (floor.is_me != true)
+              Expanded(
+                child: InkWell(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CupertinoIcons.exclamationmark_octagon,
+                          color: Theme.of(context).hintColor,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(S.of(context).report,
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12)),
+                      ],
+                    ),
                   ),
+                  onTap: () {
+                    BBSEditor.reportPost(context, floor.floor_id);
+                  },
                 ),
-                onTap: () {
-                  BBSEditor.reportPost(context, floor.floor_id);
-                },
               ),
-            ),
+            if (floor.is_me == true)
+              Expanded(
+                child: InkWell(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CupertinoIcons.pencil_circle,
+                          color: Theme.of(context).hintColor,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(S.of(context).modify,
+                            style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    BBSEditor.modifyReply(
+                        context, floor.hole_id, floor.floor_id, floor.content);
+                  },
+                ),
+              ),
           ],
         ),
       ],

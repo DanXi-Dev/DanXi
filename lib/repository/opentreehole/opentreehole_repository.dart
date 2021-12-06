@@ -487,8 +487,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  /// Modify a post, requires Admin privilege
-  /// Throws on failure.
+  // NOT YET MIGRATED: missing API doc
+  /// Modify a post
   Future<void> adminModifyPost(
       String content, int? discussionId, int? postId) async {
     await dio!.post(_BASE_URL + "/admin/",
