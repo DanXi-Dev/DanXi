@@ -236,7 +236,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         });
   }
 
-  Widget _errorBuilder(AsyncSnapshot<List<T>?>? snapshot) {
+  Widget _defaultErrorBuilder(AsyncSnapshot<List<T>?>? snapshot) {
     String error;
     if (snapshot == null)
       error = "Unknown Error";
@@ -244,46 +244,35 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       if (snapshot.error is LoginExpiredError) {
         SettingsProvider.getInstance().deleteSavedFduholeToken();
       }
-
       if (snapshot.error is NotLoginError)
-        error = (snapshot.error as NotLoginError).errorMessage.trim();
+        error = (snapshot.error as NotLoginError).errorMessage;
       else if (snapshot.error is DioError)
-        error = (snapshot.error as DioError).message.trim() +
+        error = (snapshot.error as DioError).message +
             '\n' +
-            ((snapshot.error as DioError).response?.data?.toString().trim() ??
-                "");
+            ((snapshot.error as DioError).response?.data?.toString() ?? "");
       else
-        error = snapshot.error.toString().trim();
+        error = snapshot.error.toString();
     }
 
     return Card(
       child: GestureDetector(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                S.of(context).failed,
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-              Text(
-                error,
-                style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                    color: Theme.of(context).textTheme.caption!.color),
-              ),
-            ],
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(S.of(context).failed,
+                  style: Theme.of(context).textTheme.subtitle1),
+              const SizedBox(height: 4),
+              Text(error,
+                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                      color: Theme.of(context).textTheme.caption!.color))
+            ]),
           ),
-        ),
-        onTap: () {
-          setState(() {
-            _futureData = _setFuture();
-          });
-        },
-      ),
+          onTap: () {
+            setState(() {
+              _futureData = _setFuture();
+            });
+          }),
     );
   }
 
@@ -332,7 +321,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       );
     } else if (index == _data.length) {
       if (_hasError) {
-        return _errorBuilder(snapshot);
+        return _defaultErrorBuilder(snapshot);
       } else if (_isRefreshing) {
         return widget.loadingBuilder(context);
       } else if (_isEnded) {
@@ -430,8 +419,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   @override
   void initState() {
     super.initState();
-    initialize();
     widget.pagedController?.setListener(this);
+    initialize();
 
     // This ensures that scroll to end is not called upon rebuild.
     if (widget.shouldScrollToEnd == true) {

@@ -70,5 +70,10 @@ class OTFloor {
       : content;
 
   @override
+  String toString() {
+    return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, like: $like, mention: $mention}';
+  }
+
+  @override
   int get hashCode => floor_id!;
 }

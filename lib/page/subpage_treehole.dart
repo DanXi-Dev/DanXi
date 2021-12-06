@@ -33,6 +33,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -213,6 +214,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   /// Fields related to the display states.
   int _divisionId = 1;
+
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded!);
 
@@ -270,7 +272,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     await _listViewController.notifyUpdate();
   }
 
-  Widget _buildSearchTextField() {
+  Widget _autoSearchTextField() {
     // If user is filtering by tag, do not build search text field.
     if (_postsType != PostsType.NORMAL_POSTS) return Container();
     final RegExp pidPattern = new RegExp(r'#[0-9]+');
@@ -317,6 +319,25 @@ class _BBSSubpageState extends State<BBSSubpage>
                 smartNavigatorPush(context, "/bbs/reports");
               },
             ),
+          );
+        }
+        return Container();
+      },
+      errorBuilder: Container(),
+      loadingBuilder: Container(),
+    );
+  }
+
+  Widget _autoPinnedPosts() {
+    return FutureWidget<List<OTHole>?>(
+      future: LazyFuture<List<OTHole>?>.pack(
+          OpenTreeHoleRepository.getInstance().loadPinned(_divisionId)),
+      successBuilder: (context, snapshot) {
+        if (snapshot.data != null) {
+          return Column(
+            children: snapshot.data!
+                .map((e) => _buildListItem(context, null, null, e))
+                .toList(),
           );
         }
         return Container();
@@ -449,8 +470,6 @@ class _BBSSubpageState extends State<BBSSubpage>
               await refreshSelf();
             },
             child: PagedListView<OTHole>(
-                initialData: Future.value(OpenTreeHoleRepository.getInstance()
-                    .loadPinned(_divisionId)),
                 noneItem: OTHole.DUMMY_POST,
                 pagedController: _listViewController,
                 withScrollbar: true,
@@ -460,8 +479,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                 headBuilder: (_) => Column(
                       children: [
                         AutoBannerAdWidget(bannerAd: bannerAd),
-                        _buildSearchTextField(),
-                        _autoAdminNotice()
+                        _autoSearchTextField(),
+                        _autoAdminNotice(),
+                        _autoPinnedPosts()
                       ],
                     ),
                 loadingBuilder: (BuildContext context) => Container(
@@ -511,7 +531,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
-  Widget _buildListItem(BuildContext context, ListProvider<OTHole> _, int index,
+  Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
@@ -527,27 +547,26 @@ class _BBSSubpageState extends State<BBSSubpage>
     );
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
+
     return Card(
       child: Column(children: [
         ListTile(
             contentPadding: EdgeInsets.fromLTRB(16, 4, 10, 0),
             dense: false,
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                generateTagWidgets(context, postElement, (String? tagname) {
-                  smartNavigatorPush(context, '/bbs/discussions', arguments: {
-                    "tagFilter": tagname,
-                  });
-                }, SettingsProvider.getInstance().useAccessibilityColoring),
-                const SizedBox(
-                  height: 10,
-                ),
-                (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
-                    ? Theme(
-                        data: Theme.of(context)
-                            .copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
+            title:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              generateTagWidgets(context, postElement, (String? tagname) {
+                smartNavigatorPush(context, '/bbs/discussions',
+                    arguments: {"tagFilter": tagname});
+              }, SettingsProvider.getInstance().useAccessibilityColoring),
+              const SizedBox(
+                height: 10,
+              ),
+              (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
+                  ? Theme(
+                      data: Theme.of(context)
+                          .copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
                           expandedCrossAxisAlignment: CrossAxisAlignment.start,
                           expandedAlignment: Alignment.topLeft,
                           childrenPadding: EdgeInsets.symmetric(vertical: 4),
@@ -558,61 +577,35 @@ class _BBSSubpageState extends State<BBSSubpage>
                           ),
                           children: [
                             postContentWidget,
-                          ],
-                        ),
-                      )
-                    : postContentWidget,
-              ],
-            ),
-            subtitle: Column(
-              children: [
-                const SizedBox(
-                  height: 12,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "#${postElement.hole_id}",
-                      style: infoStyle,
-                    ),
-                    Text(
-                      HumanDuration.format(
-                          context, DateTime.parse(postElement.time_created!)),
-                      style: infoStyle,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          "${postElement.reply} ",
-                          style: infoStyle,
-                        ),
-                        Icon(
-                          CupertinoIcons.ellipses_bubble,
-                          size: infoStyle.fontSize,
-                          color: infoStyle.color,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                          ]))
+                  : postContentWidget,
+            ]),
+            subtitle: Column(children: [
+              const SizedBox(height: 12),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text("#${postElement.hole_id}", style: infoStyle),
+                Text(
+                    HumanDuration.format(
+                        context, DateTime.parse(postElement.time_created!)),
+                    style: infoStyle),
+                Row(children: [
+                  Text("${postElement.reply} ", style: infoStyle),
+                  Icon(CupertinoIcons.ellipses_bubble,
+                      size: infoStyle.fontSize, color: infoStyle.color),
+                ])
+              ])
+            ]),
             onTap: () {
               smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                 "post": postElement,
               });
             }),
         if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
-            postElement.floors?.last_floor!.hole_id !=
-                postElement.floors?.first_floor!.hole_id)
-          Divider(
-            height: 4,
-          ),
-        if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
-            postElement.floors?.last_floor!.hole_id !=
-                postElement.floors?.first_floor!.hole_id)
-          _buildCommentView(postElement),
+            postElement.floors?.last_floor !=
+                postElement.floors?.first_floor) ...[
+          Divider(height: 4),
+          _buildCommentView(postElement)
+        ]
       ]),
     );
   }

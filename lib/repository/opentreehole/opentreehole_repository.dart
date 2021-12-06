@@ -35,7 +35,6 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final _instance = OpenTreeHoleRepository._();
@@ -202,7 +201,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _divisionCache;
   }
 
-  Future<List<OTHole>> loadPinned(int? divisionId,
+  Future<List<OTHole>?> loadPinned(int? divisionId,
       {bool useCache = true}) async {
     if (_divisionCache.isNotEmpty && useCache) {
       return _divisionCache
