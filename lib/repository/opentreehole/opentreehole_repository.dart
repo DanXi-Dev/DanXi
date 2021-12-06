@@ -108,7 +108,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(validateStatus: (code) => code! < 300));
     final json =
         response.data is Map ? response.data : jsonDecode(response.data);
-    return json["code"].toString();
+    return json["code"]?.toString();
   }
 
   Future<void> requestEmailVerifyCode(String email) async {
