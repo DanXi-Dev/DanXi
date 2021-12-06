@@ -121,7 +121,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               context: context,
               builder: (cxt) {
                 return PlatformAlertDialog(
-                  title: Text("请输入课程表系统验证码"), //TODO: Localize
+                  title: Text(S.of(context).enter_captcha),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -131,7 +131,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                   ),
                   actions: [
                     PlatformDialogAction(
-                      child: Text("确认"), //TODO: Localize
+                      child: Text(S.of(context).ok),
                       onPressed: () {
                         Navigator.of(cxt).pop();
                       },

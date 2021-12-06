@@ -501,6 +501,7 @@ class OTMessageItem extends StatelessWidget {
   void guessDataType(BuildContext context, Map<String, dynamic>? data) {
     try {
       final floor = OTFloor.fromJson(data!);
+      if (floor.floor_id == null) return;
       OTFloorMentionWidget.showFloorDetail(context, floor);
     } catch (e) {
       // TODO: Support Other Types

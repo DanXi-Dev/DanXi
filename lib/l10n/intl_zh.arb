@@ -140,6 +140,7 @@
     "holiday": "休息日",
     "weekday": "工作日",
     "no_matching_bus": "您所在的校区没有可乘坐的校车",
+    "enter_captcha": "请输入验证码",
 
     "sponsor_us": "支持我们 🍀",
     "sponsor_us_detail": "非常感谢你愿意启用它！旦夕和 FDUHole 作为独立项目，已经运营了很长一段时间。然而，从长期来看，我们对于高额的服务器和运营费用有些力不从心。\n\n相比于直接的资金支持，我们选择了更温和的方式——在旦夕中显示一些由 Google 提供的广告。这些广告不会干扰你的浏览，但能够给我们带来少许实际的收入，让我们更好地、更有干劲地将项目坚持下去。",
@@ -234,7 +235,7 @@
     "reason_report_post": "请填写举报理由(#{id})",
     "editor_hint": "提示：向右滑动工具栏以查看更多字体风格选项",
     "end_reached": "已经到底了",
-    "latest_reply": "[{username}] 于{date}回复：",
+    "latest_reply": "{username} 于{date}回复：",
     "no_summary": "[无法显示此类型的消息]",
     "image_tag": "[图片]",
     "last_replied": "最近回复",

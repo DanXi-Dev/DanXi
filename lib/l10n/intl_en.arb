@@ -220,7 +220,7 @@
     "reason_report_post": "Reason for reporting #{id}",
     "editor_hint": "Hint: Swipe the toolbar to the right to see more styling options.",
     "end_reached": "You have reached the end.",
-    "latest_reply": "[{username}] replied {date}:",
+    "latest_reply": "{username} replied {date}:",
     "no_summary": "[Unable to display content of this type.]",
     "image_tag": "[Image]",
     "last_replied": "Last replied",
@@ -268,6 +268,7 @@
     "major": "Major",
     "holiday": "Holiday",
     "weekday": "Weekday",
+    "enter_captcha": "Enter Captcha",
 
     "sponsor_us": "Support Us 🍀",
     "sponsor_us_detail": "Thank you so much for your kindness to enable it! Danxi and FDUHole have been operating as independent projects for a long time. However, in the long run, we are a bit overwhelmed by the high server costs.\n\nRather than direct donations, we chose a more modest way - to display some ads provided by Google in Danxi. These ads won't interfere with your browsing, but they will bring us real income and motivate us to keep going.",
