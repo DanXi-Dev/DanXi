@@ -523,6 +523,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           // Set the replyId to null when tapping on the first reply.
           if (_post.floors!.first_floor!.floor_id != floor.floor_id) {
             replyId = floor.floor_id;
+            OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
           BBSEditor.createNewReply(context, _post.hole_id, replyId)
               .then((value) => refreshSelf(scrollToEnd: true));

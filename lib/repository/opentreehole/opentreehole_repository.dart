@@ -52,6 +52,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   /// Cached floors, used by [mentions]
   List<OTFloor> _floorCache = [];
+  void cacheFloor(OTFloor floor) {
+    _floorCache.remove(floor);
+    _floorCache.add(floor);
+  }
 
   /// Cached divisions
   List<OTDivision> _divisionCache = [];
@@ -63,6 +67,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _token = null;
     _userInfo = null;
     _pushNotificationRegData = null;
+    _floorCache = [];
+    _divisionCache = [];
   }
 
   OpenTreeHoleRepository._() {
@@ -292,7 +298,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
-    return result.map((e) => OTFloor.fromJson(e)).toList();
+    final floors = result.map((e) => OTFloor.fromJson(e)).toList();
+    floors.forEach((element) {
+      element.mention?.forEach((mention) {
+        cacheFloor(mention);
+      });
+    });
+    return floors;
   }
 
   // Migrated
