@@ -174,7 +174,9 @@ class OTFloorWidget extends StatelessWidget {
                     if (floor.deleted == true) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
-                          colorString: 'red', text: S.of(context).deleted),
+                        colorString: 'red',
+                        text: S.of(context).deleted,
+                      ),
                     ]
                   ],
                 ),
