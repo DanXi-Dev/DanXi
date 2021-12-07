@@ -30,28 +30,40 @@ class OTWelcomeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Text(
-              S.of(context).welcome_title,
-              style: TextStyle(fontSize: 32.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48.0),
+              child: Text(
+                S.of(context).welcome_title,
+                style: TextStyle(fontSize: 28.0),
+              ),
             ),
             Column(
               children: [
                 ListTile(
-                  leading: Icon(CupertinoIcons.bell),
+                  leading: Icon(
+                    CupertinoIcons.bell,
+                    color: Theme.of(context).accentColor,
+                  ),
                   title: Text(S.of(context).welcome_1),
                   subtitle: Text(S.of(context).welcome_1s),
                 ),
                 ListTile(
-                  leading: Icon(CupertinoIcons.bubble_right),
+                  leading: Icon(
+                    CupertinoIcons.bubble_right,
+                    color: Theme.of(context).accentColor,
+                  ),
                   title: Text(S.of(context).welcome_2),
                   subtitle: Text(S.of(context).welcome_2s),
                 ),
                 ListTile(
-                  leading: Icon(CupertinoIcons.textformat_superscript),
+                  leading: Icon(
+                    CupertinoIcons.textformat_superscript,
+                    color: Theme.of(context).accentColor,
+                  ),
                   title: Text(S.of(context).welcome_3),
                   subtitle: Text(S.of(context).welcome_3s),
                 ),

@@ -37,7 +37,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT,
-  UserGroup.VISITOR
+  //UserGroup.VISITOR
 ];
 
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
@@ -80,7 +80,8 @@ class _LoginDialogState extends State<LoginDialog> {
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _pwdController = new TextEditingController();
   String _errorText = "";
-  UserGroup _group = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
+  static const DEFAULT_USERGROUP = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
+  UserGroup _group = DEFAULT_USERGROUP;
 
   Future<bool> _deleteAllData() async =>
       await widget.sharedPreferences!.clear();
@@ -192,8 +193,20 @@ class _LoginDialogState extends State<LoginDialog> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(S.of(context).login_uis_description),
+              Text(
+                S.of(context).login_uis_description,
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              if (_group == DEFAULT_USERGROUP)
+                GestureDetector(
+                  child: Text(
+                    S.of(context).not_undergraduate,
+                    style: linkText,
+                  ),
+                  onTap: () => _showSwitchGroupModal(),
+                ),
               Text(
                 _errorText,
                 textAlign: TextAlign.start,
@@ -302,28 +315,32 @@ class _LoginDialogState extends State<LoginDialog> {
         ),
         TextButton(
             onPressed: () {
-              showPlatformModalSheet(
-                  context: context,
-                  builder: (_) => PlatformWidget(
-                        cupertino: (_, __) => CupertinoActionSheet(
-                          actions: _buildLoginAsList(),
-                          cancelButton: CupertinoActionSheetAction(
-                            child: Text(S.of(context).cancel),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                        material: (_, __) => Container(
-                          child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: _buildLoginAsList()),
-                        ),
-                      ));
+              _showSwitchGroupModal();
             },
             child: Text(S.of(context).login_as_others))
       ],
     );
+  }
+
+  _showSwitchGroupModal() {
+    return showPlatformModalSheet(
+        context: context,
+        builder: (_) => PlatformWidget(
+              cupertino: (_, __) => CupertinoActionSheet(
+                actions: _buildLoginAsList(),
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              material: (_, __) => Container(
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _buildLoginAsList()),
+              ),
+            ));
   }
 
   /// Change the login group and rebuild the dialog.
