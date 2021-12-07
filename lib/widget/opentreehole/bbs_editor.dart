@@ -437,13 +437,12 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
 
 class PostEditorText {
   String? text;
-  List<OTTag> tags = [];
+  List<OTTag> tags = List<OTTag>.empty(growable: true);
 
   PostEditorText(this.text, this.tags);
 
-  PostEditorText.newInstance({withText = '', withTags = const <OTTag>[]}) {
+  PostEditorText.newInstance({withText = ''}) {
     text = withText;
-    tags = withTags;
   }
 }
 

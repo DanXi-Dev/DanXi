@@ -321,14 +321,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   // Migrated
   Future<int?> newHole(int divisionId, String? content,
       {List<OTTag>? tags}) async {
-    if (content == null) return 0;
-    if (tags == null) tags = [];
+    if (content == null) return -1;
+    if (tags == null || tags.isEmpty) tags = [OTTag(0, 0, "默认")];
     // Suppose user is logged in. He should be.
     final Response response = await dio!.post(_BASE_URL + "/holes",
         data: {
           "division_id": divisionId,
           "content": content,
-          "tag_names": tags.map((e) => e.name).toList()
+          "tags": tags,
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;
