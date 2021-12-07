@@ -1030,8 +1030,8 @@ class OTNotificationSettingsTile extends StatelessWidget {
       BuildContext context, List<String>? data) {
     List<String> summary = [];
     data?.forEach((element) {
-      final text =
-          notificationTypeFromInternalString(element)?.displayTitle(context);
+      final text = notificationTypeFromInternalString(element)
+          ?.displayShortTitle(context);
       if (text == null) return;
       summary.add(text);
     });

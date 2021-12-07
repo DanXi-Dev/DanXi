@@ -348,6 +348,17 @@ extension OTNotificationTypesEx on OTNotificationTypes {
     }
   }
 
+  String? displayShortTitle(BuildContext context) {
+    switch (this) {
+      case OTNotificationTypes.MENTION:
+        return S.of(context).notification_mention_s;
+      case OTNotificationTypes.FAVORITE:
+        return S.of(context).notification_favorite_s;
+      case OTNotificationTypes.REPORT:
+        return S.of(context).notification_reported_s;
+    }
+  }
+
   String? internalString() {
     switch (this) {
       case OTNotificationTypes.MENTION:

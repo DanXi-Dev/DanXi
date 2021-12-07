@@ -35,26 +35,25 @@ class OTWelcomeWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Text(
-              "FDUHole 2.0",
+              S.of(context).welcome_title,
               style: TextStyle(fontSize: 32.0),
             ),
             Column(
               children: [
                 ListTile(
                   leading: Icon(CupertinoIcons.bell),
-                  title: Text("Notifications"),
-                  subtitle:
-                      Text("Receive notifications when new data is available"),
+                  title: Text(S.of(context).welcome_1),
+                  subtitle: Text(S.of(context).welcome_1s),
+                ),
+                ListTile(
+                  leading: Icon(CupertinoIcons.bubble_right),
+                  title: Text(S.of(context).welcome_2),
+                  subtitle: Text(S.of(context).welcome_2s),
                 ),
                 ListTile(
                   leading: Icon(CupertinoIcons.textformat_superscript),
-                  title: Text("LaTeX Support"),
-                  subtitle: Text("Use LaTeX in your notes"),
-                ),
-                ListTile(
-                  leading: Icon(CupertinoIcons.hand_thumbsup),
-                  title: Text("Like and Division"),
-                  subtitle: Text("Like floors and different divisions"),
+                  title: Text(S.of(context).welcome_3),
+                  subtitle: Text(S.of(context).welcome_3s),
                 ),
               ],
             ),
