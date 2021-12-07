@@ -68,7 +68,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   OpenTreeHoleRepository._() {
     // Override the options set in parent class.
     dio!.options = BaseOptions(receiveDataWhenStatusError: true);
-    initializeRepo();
   }
 
   Future<void> initializeRepo() async {
@@ -82,8 +81,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     } else {
       throw NotLoginError("No token");
     }
+    if (_divisionCache.isEmpty) await loadDivisions();
     if (_pushNotificationRegData != null) {
-      await updatePushNotificationToken(_pushNotificationRegData!.token,
+      // No need for [await] here, we can do this in the background
+      updatePushNotificationToken(_pushNotificationRegData!.token,
           _pushNotificationRegData!.deviceId, _pushNotificationRegData!.type);
     }
   }
@@ -202,22 +203,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _divisionCache;
   }
 
-  Future<List<OTHole>?> loadPinned(int? divisionId,
-      {bool useCache = true}) async {
-    if (_divisionCache.isNotEmpty && useCache) {
+  List<OTHole> getPinned(int divisionId) {
+    try {
       return _divisionCache
               .firstWhere((element) => element.division_id == divisionId)
               .pinned ??
           List<OTHole>.empty();
+    } catch (ignored) {
+      return List<OTHole>.empty();
     }
-    final Response response = await dio!
-        .get(_BASE_URL + "/divisions", options: Options(headers: _tokenHeader));
-    final List result = response.data;
-    _divisionCache = result.map((e) => OTDivision.fromJson(e)).toList();
-    return _divisionCache
-            .firstWhere((element) => element.division_id == divisionId)
-            .pinned ??
-        List<OTHole>.empty();
   }
 
   List<OTDivision> getDivisions() {

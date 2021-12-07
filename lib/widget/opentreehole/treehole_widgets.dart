@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
@@ -34,6 +36,7 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -573,6 +576,63 @@ class OTMessageItem extends StatelessWidget {
               context, DateTime.tryParse(message.time_created ?? ""))),
           onTap: () => dispMessageDetailBasedOnGuessedDataType(
               context, message.code, message.data)),
+    );
+  }
+}
+
+class OTSearchWidget extends StatelessWidget {
+  final FocusNode focusNode;
+
+  const OTSearchWidget({Key? key, required this.focusNode}) : super(key: key);
+
+  _goToPIDResultPage(BuildContext context, int pid) async {
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    try {
+      final OTHole post =
+          await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
+      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+        "post": post,
+      });
+    } catch (error) {
+      if (error is DioError &&
+          error.response?.statusCode == HttpStatus.notFound)
+        Noticing.showNotice(context, S.of(context).post_does_not_exist,
+            title: S.of(context).fatal_error);
+      else
+        Noticing.showNotice(context, error.toString(),
+            title: S.of(context).fatal_error);
+    }
+    progressDialog.dismiss();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final RegExp pidPattern = new RegExp(r'#[0-9]+');
+    return Container(
+      padding: Theme.of(context)
+          .cardTheme
+          .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      child: CupertinoSearchTextField(
+        focusNode: focusNode,
+        placeholder: S.of(context).search_hint,
+        onSubmitted: (value) {
+          value = value.trim();
+          if (value.isEmpty) return;
+          // Determine if user is using #PID pattern to reach a specific post
+          if (value.startsWith(pidPattern)) {
+            // We needn't deal with the situation that "id = null" here.
+            // If so, it will turn into a 404 http error.
+            try {
+              _goToPIDResultPage(context,
+                  int.parse(pidPattern.firstMatch(value)![0]!.substring(1)));
+              return;
+            } catch (ignored) {}
+          }
+          smartNavigatorPush(context, "/bbs/postDetail",
+              arguments: {"searchKeyword": value});
+        },
+      ),
     );
   }
 }

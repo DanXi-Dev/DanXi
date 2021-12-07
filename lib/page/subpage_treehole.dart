@@ -241,41 +241,40 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
   Future<List<OTHole>?> _loadContent(int page) async {
-    if (checkGroup(kCompatibleUserGroup)) {
-      switch (_postsType) {
-        case PostsType.FAVORED_DISCUSSION:
-          if (page > 1) return Future.value([]);
-          return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
-        case PostsType.FILTER_BY_TAG:
-        case PostsType.NORMAL_POSTS:
-          // Initialize the user token from shared preferences.
-          // If no token, NotLoginError will be thrown.
-          if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
-            await OpenTreeHoleRepository.getInstance().initializeRepo();
-
-          List<OTHole>? loadedPost = await adaptLayer
-              .generateReceiver(_listViewController, (lastElement) {
-            DateTime time;
-            if (lastElement != null) {
-              time = DateTime.parse(lastElement.time_updated!);
-            } else
-              time = DateTime.now();
-            return OpenTreeHoleRepository.getInstance()
-                .loadHoles(time, _divisionId, tag: _tagFilter);
-          }).call(page);
-          // Filter blocked posts
-          List<OTTag> hiddenTags =
-              SettingsProvider.getInstance().hiddenTags ?? [];
-          loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
-              hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
-
-          // About this line, see [PagedListView].
-          return loadedPost == null || loadedPost.isEmpty
-              ? [OTHole.DUMMY_POST]
-              : loadedPost;
-      }
-    } else {
+    if (!checkGroup(kCompatibleUserGroup))
       throw NotLoginError("Logged in as a visitor.");
+
+    // Initialize the user token from shared preferences.
+    // If no token, NotLoginError will be thrown.
+    if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
+      await OpenTreeHoleRepository.getInstance().initializeRepo();
+
+    switch (_postsType) {
+      case PostsType.FAVORED_DISCUSSION:
+        if (page > 1) return Future.value([]);
+        return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
+      case PostsType.FILTER_BY_TAG:
+      case PostsType.NORMAL_POSTS:
+        List<OTHole>? loadedPost = await adaptLayer
+            .generateReceiver(_listViewController, (lastElement) {
+          DateTime time;
+          if (lastElement != null) {
+            time = DateTime.parse(lastElement.time_updated!);
+          } else
+            time = DateTime.now();
+          return OpenTreeHoleRepository.getInstance()
+              .loadHoles(time, _divisionId, tag: _tagFilter);
+        }).call(page);
+        // Filter blocked posts
+        List<OTTag> hiddenTags =
+            SettingsProvider.getInstance().hiddenTags ?? [];
+        loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
+            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+
+        // About this line, see [PagedListView].
+        return loadedPost == null || loadedPost.isEmpty
+            ? [OTHole.DUMMY_POST]
+            : loadedPost;
     }
   }
 
@@ -285,37 +284,6 @@ class _BBSSubpageState extends State<BBSSubpage>
           .getFavoriteHoleId(forceUpdate: true);
     }
     await _listViewController.notifyUpdate();
-  }
-
-  Widget _autoSearchTextField() {
-    // If user is filtering by tag, do not build search text field.
-    if (_postsType != PostsType.NORMAL_POSTS) return Container();
-    final RegExp pidPattern = new RegExp(r'#[0-9]+');
-    return Container(
-      padding: Theme.of(context)
-          .cardTheme
-          .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: CupertinoSearchTextField(
-        focusNode: _searchFocus,
-        placeholder: S.of(context).search_hint,
-        onSubmitted: (value) {
-          value = value.trim();
-          if (value.isEmpty) return;
-          // Determine if user is using #PID pattern to reach a specific post
-          if (value.startsWith(pidPattern)) {
-            // We needn't deal with the situation that "id = null" here.
-            // If so, it will turn into a 404 http error.
-            try {
-              _goToPIDResultPage(
-                  int.parse(pidPattern.firstMatch(value)![0]!.substring(1)));
-              return;
-            } catch (ignored) {}
-          }
-          smartNavigatorPush(context, "/bbs/postDetail",
-              arguments: {"searchKeyword": value});
-        },
-      ),
-    );
   }
 
   Widget _autoAdminNotice() {
@@ -344,45 +312,12 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _autoPinnedPosts() {
-    if (_postsType != PostsType.NORMAL_POSTS) return Container();
-    return FutureWidget<List<OTHole>?>(
-      future: LazyFuture<List<OTHole>?>.pack(
-          OpenTreeHoleRepository.getInstance().loadPinned(_divisionId)),
-      successBuilder: (context, snapshot) {
-        if (snapshot.data != null) {
-          return Column(
-            children: snapshot.data!
-                .map((e) =>
-                    _buildListItem(context, null, null, e, isPinned: true))
-                .toList(),
-          );
-        }
-        return Container();
-      },
-      errorBuilder: Container(),
-      loadingBuilder: Container(),
+    return Column(
+      children: OpenTreeHoleRepository.getInstance()
+          .getPinned(_divisionId)
+          .map((e) => _buildListItem(context, null, null, e, isPinned: true))
+          .toList(),
     );
-  }
-
-  _goToPIDResultPage(int pid) async {
-    ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S.of(context).loading, context: context);
-    try {
-      final OTHole post =
-          await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
-      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-        "post": post,
-      });
-    } catch (error) {
-      if (error is DioError &&
-          error.response?.statusCode == HttpStatus.notFound)
-        Noticing.showNotice(context, S.of(context).post_does_not_exist,
-            title: S.of(context).fatal_error);
-      else
-        Noticing.showNotice(context, error.toString(),
-            title: S.of(context).fatal_error);
-    }
-    progressDialog.dismiss();
   }
 
   @override
@@ -496,9 +431,13 @@ class _BBSSubpageState extends State<BBSSubpage>
                 headBuilder: (_) => Column(
                       children: [
                         AutoBannerAdWidget(bannerAd: bannerAd),
-                        _autoSearchTextField(),
                         _autoAdminNotice(),
-                        _autoPinnedPosts(),
+                        if (_postsType == PostsType.NORMAL_POSTS) ...[
+                          OTSearchWidget(
+                            focusNode: _searchFocus,
+                          ),
+                          _autoPinnedPosts(),
+                        ],
                       ],
                     ),
                 loadingBuilder: (BuildContext context) => Container(
