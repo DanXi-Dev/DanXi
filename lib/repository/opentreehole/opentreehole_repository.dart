@@ -197,8 +197,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null;
 
-  Future<List<OTDivision>> loadDivisions(
-      {bool useCache = true, int? divisionId}) async {
+  Future<List<OTDivision>> loadDivisions({bool useCache = true}) async {
     if (_divisionCache.isNotEmpty && useCache) {
       return _divisionCache;
     }
