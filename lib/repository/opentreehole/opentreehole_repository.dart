@@ -33,6 +33,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -358,16 +359,23 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data['url'];
   }
 
-  // Partly migrated. What does [mention] means?
-  Future<int?> newFloor(int? discussionId, int? replyTo, String content) async {
+  // Migrated
+  Future<int?> newFloor(int? discussionId, String content) async {
     final Response response = await dio!.post(_BASE_URL + "/floors",
         data: {
           "content": content,
           "hole_id": discussionId,
-          "reply_to": replyTo
+          "mention": findMention(content)
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;
+  }
+
+  List<int?> findMention(String content) {
+    final matches =
+        RegExp(MENTION_REGEX_STRING, multiLine: true).allMatches(content);
+    final result = matches.map((e) => int.tryParse(e.group(1) ?? ""));
+    return result.where((element) => element != null).toList();
   }
 
   // Migrated
@@ -477,6 +485,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return (await dio!.put(_BASE_URL + "/floors/$floorId",
             data: {
               "content": content,
+              "mention": findMention(content),
             },
             options: Options(headers: _tokenHeader)))
         .statusCode;

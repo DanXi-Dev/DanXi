@@ -169,8 +169,10 @@ class LatexMultiLineSyntax extends md.InlineSyntax {
   }
 }
 
+const MENTION_REGEX_STRING = r'#([0-9]+)';
+
 class MentionSyntax extends md.InlineSyntax {
-  MentionSyntax() : super(r'#([0-9]+)');
+  MentionSyntax() : super(MENTION_REGEX_STRING);
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {

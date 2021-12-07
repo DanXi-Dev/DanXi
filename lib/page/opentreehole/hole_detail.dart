@@ -196,9 +196,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
-              onPressed: () {
-                BBSEditor.createNewReply(context, _post.hole_id, null)
-                    .then((_) => refreshSelf(scrollToEnd: true));
+              onPressed: () async {
+                await BBSEditor.createNewReply(context, _post.hole_id, null);
+                await refreshSelf();
               },
             ),
         ],
@@ -525,8 +525,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             replyId = floor.floor_id;
             OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
-          BBSEditor.createNewReply(context, _post.hole_id, replyId)
-              .then((value) => refreshSelf(scrollToEnd: true));
+          await BBSEditor.createNewReply(context, _post.hole_id, replyId);
+          await refreshSelf();
         } else {
           ProgressFuture progressDialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
