@@ -80,19 +80,24 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<void> initializeRepo() async {
     print(
         "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
-    try {
-      PlatformBridge.requestNotificationPermission();
-    } catch (ignored) {}
-    if (SettingsProvider.getInstance().fduholeToken != null) {
+    if (SettingsProvider.getInstance().fduholeToken != null)
       _token = SettingsProvider.getInstance().fduholeToken;
-    } else {
+    else
       throw NotLoginError("No token");
-    }
-    if (_divisionCache.isEmpty) await loadDivisions();
+
+    try {
+      PlatformBridge.registerRemoteNotification();
+    } catch (ignored) {}
+
+    if (_userInfo == null) await getUserProfile(forceUpdate: true);
+    if (_divisionCache.isEmpty) await loadDivisions(useCache: false);
     if (_pushNotificationRegData != null) {
       // No need for [await] here, we can do this in the background
-      updatePushNotificationToken(_pushNotificationRegData!.token,
-          _pushNotificationRegData!.deviceId, _pushNotificationRegData!.type);
+      updatePushNotificationToken(
+              _pushNotificationRegData!.token,
+              _pushNotificationRegData!.deviceId,
+              _pushNotificationRegData!.type)
+          .catchError((ignored) {});
     }
   }
 

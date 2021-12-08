@@ -284,28 +284,23 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _autoAdminNotice() {
-    return FutureWidget<bool?>(
-      future: OpenTreeHoleRepository.getInstance().isUserAdmin(),
-      successBuilder: (context, snapshot) {
-        if (snapshot.data as bool) {
-          return Card(
-            child: ListTile(
-              title: Text("FDUHole Administrative Interface"),
-              subtitle: Text(
-                "Status: Authorized",
-                style: TextStyle(color: Colors.green),
-              ),
-              onTap: () {
-                smartNavigatorPush(context, "/bbs/reports");
-              },
+    {
+      if (OpenTreeHoleRepository.getInstance().isAdmin) {
+        return Card(
+          child: ListTile(
+            title: Text("FDUHole Administrative Interface"),
+            subtitle: Text(
+              "Status: Authorized",
+              style: TextStyle(color: Colors.green),
             ),
-          );
-        }
-        return const SizedBox();
-      },
-      errorBuilder: const SizedBox(),
-      loadingBuilder: const SizedBox(),
-    );
+            onTap: () {
+              smartNavigatorPush(context, "/bbs/reports");
+            },
+          ),
+        );
+      }
+    }
+    return const SizedBox();
   }
 
   Widget _autoSilenceNotice() {
