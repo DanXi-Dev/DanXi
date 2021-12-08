@@ -89,7 +89,7 @@ class _AutoBBSImageState extends State<AutoBBSImage> {
                 return BBSImagePlaceholder(
                   size: widget.maxWidth,
                   child: progress.progress == null
-                      ? Container()
+                      ? const SizedBox()
                       : LinearProgressIndicator(
                           value: progress.progress,
                         ),

@@ -901,7 +901,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             builder: (BuildContext context,
                                 AsyncSnapshot<bool> snapshot) {
                               if (snapshot.hasError || snapshot.data == false)
-                                return Container();
+                                return const SizedBox();
                               return TextButton(
                                 child: Text(S.of(context).rate),
                                 onPressed: () {

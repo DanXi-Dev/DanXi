@@ -301,10 +301,36 @@ class _BBSSubpageState extends State<BBSSubpage>
             ),
           );
         }
-        return Container();
+        return const SizedBox();
       },
-      errorBuilder: Container(),
-      loadingBuilder: Container(),
+      errorBuilder: const SizedBox(),
+      loadingBuilder: const SizedBox(),
+    );
+  }
+
+  Widget _autoSilenceNotice() {
+    final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
+        .getSilenceDateForDivision(_divisionId);
+    if (silenceDate == null) return const SizedBox();
+    return Card(
+      child: ListTile(
+        leading: Icon(
+          CupertinoIcons.exclamationmark_triangle,
+          color: Theme.of(context).errorColor,
+        ),
+        title: Text(
+          S.of(context).silence_notice,
+          style: TextStyle(color: Theme.of(context).errorColor),
+        ),
+        subtitle: Text(
+          S.of(context).ban_post_until(
+              "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),
+        ),
+        onTap: () {
+          Noticing.showNotice(context, S.of(context).silence_detail,
+              title: S.of(context).silence_notice, useSnackBar: false);
+        },
+      ),
     );
   }
 
@@ -428,11 +454,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                 headBuilder: (_) => Column(
                       children: [
                         AutoBannerAdWidget(bannerAd: bannerAd),
-                        _autoAdminNotice(),
                         if (_postsType == PostsType.NORMAL_POSTS) ...[
                           OTSearchWidget(
                             focusNode: _searchFocus,
                           ),
+                          _autoSilenceNotice(),
+                          _autoAdminNotice(),
                           _autoPinnedPosts(),
                         ],
                       ],
@@ -464,7 +491,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                       refreshSelf();
                     });
                   }
-                  return Container();
+                  return const SizedBox();
                 },
                 dataReceiver: _loadContent),
           ),
@@ -492,7 +519,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
-      return Container();
+      return const SizedBox();
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag),

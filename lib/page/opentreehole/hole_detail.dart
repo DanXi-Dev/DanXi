@@ -303,7 +303,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             },
           ),
         ),
-        if (OpenTreeHoleRepository.getInstance().isUserAdminNonAsync())
+        if (OpenTreeHoleRepository.getInstance().isAdmin)
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,
@@ -353,7 +353,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               },
             ),
           ),
-        if (OpenTreeHoleRepository.getInstance().isUserAdminNonAsync())
+        if (OpenTreeHoleRepository.getInstance().isAdmin)
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,
@@ -403,7 +403,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               },
             ),
           ),
-        if (OpenTreeHoleRepository.getInstance().isUserAdminNonAsync())
+        if (OpenTreeHoleRepository.getInstance().isAdmin)
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               isDestructiveAction: true,

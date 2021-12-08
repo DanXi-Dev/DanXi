@@ -437,9 +437,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return (await getUserProfile())!.is_admin;
   }
 
-  // Migrated
+  /// Get silence date for division, return [null] if not silenced or not initialized
+  DateTime? getSilenceDateForDivision(int divisionId) {
+    return DateTime.tryParse(_userInfo?.permission?.silent?[divisionId] ?? "");
+  }
+
   /// Non-async version of [isUserAdmin], will return false if data is not yet ready
-  bool isUserAdminNonAsync() {
+  bool get isAdmin {
     return _userInfo?.is_admin ?? false;
   }
 

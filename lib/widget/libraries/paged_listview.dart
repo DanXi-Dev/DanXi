@@ -328,7 +328,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         return widget.endBuilder(context);
       }
     }
-    return Container();
+    return const SizedBox();
   }
 
   // Move things into a separate function to control reload more easily

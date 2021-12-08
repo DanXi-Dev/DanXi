@@ -40,7 +40,7 @@ class BusPage extends StatefulWidget {
   @override
   _BusPageState createState() => _BusPageState();
 
-  BusPage({Key? key, this.arguments});
+  BusPage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _BusPageState extends State<BusPage> {
@@ -308,7 +308,7 @@ class _BusPageState extends State<BusPage> {
         ),
       )
     ];
-    if (_filteredBusList == null) return [Container()];
+    if (_filteredBusList == null) return [const SizedBox()];
     _filteredBusList.forEach((value) {
       if (_showAll ||
           value.realStartTime == null ||

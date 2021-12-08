@@ -167,8 +167,7 @@ class BBSEditor {
       required BBSEditorType? editorType,
       required EditorObject object,
       String placeholder = ""}) async {
-    final BBSEditorType defaultType =
-        isTablet(context) ? BBSEditorType.DIALOG : BBSEditorType.PAGE;
+    final BBSEditorType defaultType = BBSEditorType.PAGE;
     switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
         if (!StateProvider.editorCache.containsKey(object))

@@ -170,7 +170,7 @@ class _HomeSubpageState extends State<HomeSubpage>
       'fudan_daily_feature': FeatureListItem(
         feature: FudanDailyFeature(),
       ),
-      'new_card': Container(),
+      'new_card': const SizedBox(),
       'qr_feature': FeatureListItem(
         feature: QRFeature(),
       ),

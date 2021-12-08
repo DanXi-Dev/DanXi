@@ -141,7 +141,7 @@ BaseRender kMarkdownSelectorRender = (BuildContext context, String? content,
         _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    imageBuilder: (Uri uri, String? title, String? alt) => Container(),
+    imageBuilder: (Uri uri, String? title, String? alt) => const SizedBox(),
   );
 };
 

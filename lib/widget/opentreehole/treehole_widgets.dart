@@ -77,7 +77,7 @@ class OTLeadingTag extends StatelessWidget {
 /// Turn tags into Widgets
 Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
-  if (e == null || e.tags == null) return Container();
+  if (e == null || e.tags == null) return const SizedBox();
   List<Widget> _tags = [];
   e.tags!.forEach((element) {
     if (element.name == KEY_NO_TAG) return;

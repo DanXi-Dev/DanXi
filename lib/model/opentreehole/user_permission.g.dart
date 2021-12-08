@@ -8,16 +8,15 @@ part of 'user_permission.dart';
 
 OTUserPermission _$OTUserPermissionFromJson(Map<String, dynamic> json) {
   return OTUserPermission(
-    json['silent'] == null
-        ? null
-        : OTUserPermissionSilentConfig.fromJson(
-            json['silent'] as Map<String, dynamic>),
+    (json['silent'] as Map<String, dynamic>?)?.map(
+      (k, e) => MapEntry(int.parse(k), e as String),
+    ),
     json['admin'] as String?,
   );
 }
 
 Map<String, dynamic> _$OTUserPermissionToJson(OTUserPermission instance) =>
     <String, dynamic>{
-      'silent': instance.silent,
+      'silent': instance.silent?.map((k, e) => MapEntry(k.toString(), e)),
       'admin': instance.admin,
     };

@@ -122,7 +122,7 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) => Container(),
+    '/placeholder': (context, {arguments}) => const SizedBox(),
     '/bbs/reports': (context, {arguments}) =>
         BBSReportDetail(arguments: arguments),
     '/card/detail': (context, {arguments}) =>

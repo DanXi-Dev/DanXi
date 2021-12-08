@@ -431,7 +431,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         appBar: PlatformAppBar(
           title: Text(title),
         ),
-        body: Container(),
+        body: const SizedBox(),
       );
 
   Widget _buildBody(String title) {

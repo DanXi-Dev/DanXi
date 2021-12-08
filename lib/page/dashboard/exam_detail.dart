@@ -329,7 +329,7 @@ class _ExamListState extends State<ExamList> {
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              return Container();
+              return const SizedBox();
             },
             loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
           ),
@@ -436,7 +436,7 @@ class _ExamListState extends State<ExamList> {
                             semesterId: _unpackedSemester![_showingSemester!]
                                 .semesterId),
                     loadingBuilder: PlatformCircularProgressIndicator(),
-                    errorBuilder: Container(),
+                    errorBuilder: const SizedBox(),
                     successBuilder: (context, snapshot) {
                       if (snapshot.hasData) {
                         try {
@@ -462,7 +462,7 @@ class _ExamListState extends State<ExamList> {
                               ));
                         } catch (ignored) {}
                       }
-                      return Container();
+                      return const SizedBox();
                     },
                   ),
                 )
