@@ -21,6 +21,7 @@ import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_tags_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,36 +51,37 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: false,
-      iosContentPadding: true,
+      iosContentPadding: false,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).all_tags),
       ),
-      body: MediaQuery.removePadding(
-        removeTop: true,
-        context: context,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-          primary: true,
-          child: FutureWidget<List<OTTag>?>(
-            future: _content,
-            successBuilder: (context, snapshot) => BBSTagsContainer(
-              tags: snapshot.data,
-              onTap: (e) =>
-                  smartNavigatorPush(context, '/bbs/discussions', arguments: {
-                "tagFilter": e.name,
-              }),
-            ),
-            errorBuilder: GestureDetector(
-              child: Center(
-                child: Text(S.of(context).failed),
+      body: SafeArea(
+        child: WithScrollbar(
+          controller: PrimaryScrollController.of(context),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+            primary: true,
+            child: FutureWidget<List<OTTag>?>(
+              future: _content,
+              successBuilder: (context, snapshot) => BBSTagsContainer(
+                tags: snapshot.data,
+                onTap: (e) =>
+                    smartNavigatorPush(context, '/bbs/discussions', arguments: {
+                  "tagFilter": e.name,
+                }),
               ),
-              onTap: () {
-                setState(() => _content = LazyFuture.pack(
-                    OpenTreeHoleRepository.getInstance().loadTags()));
-              },
-            ),
-            loadingBuilder: Center(
-              child: PlatformCircularProgressIndicator(),
+              errorBuilder: GestureDetector(
+                child: Center(
+                  child: Text(S.of(context).failed),
+                ),
+                onTap: () {
+                  setState(() => _content = LazyFuture.pack(
+                      OpenTreeHoleRepository.getInstance().loadTags()));
+                },
+              ),
+              loadingBuilder: Center(
+                child: PlatformCircularProgressIndicator(),
+              ),
             ),
           ),
         ),
