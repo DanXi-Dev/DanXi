@@ -87,7 +87,7 @@ class BBSEditor {
                 : S.of(context).reply_to(postId),
             editorType: editorType,
             object: object,
-            placeholder: postId == null ? "" : "#$postId\n"))
+            placeholder: postId == null ? "" : "##$postId\n"))
         ?.text;
     if (content == null || content.trim() == "") return;
     ProgressFuture progressDialog = showProgressDialog(

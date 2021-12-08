@@ -264,8 +264,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Migrated
-  Future<OTHole> loadSpecificHole(int discussionId) async {
-    final Response response = await dio!.get(_BASE_URL + "/holes/$discussionId",
+  Future<OTHole> loadSpecificHole(int holeId) async {
+    final Response response = await dio!.get(_BASE_URL + "/holes/$holeId",
         options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data);
     hole.floors!.prefetch!.forEach((floor) {
@@ -370,18 +370,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         data: {
           "content": content,
           "hole_id": discussionId,
-          "mention": findMention(content)
+          //"mention": findMention(content)
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
-  List<int?> findMention(String content) {
+  /*List<int?> findMention(String content) {
     final matches =
         RegExp(MENTION_REGEX_STRING, multiLine: true).allMatches(content);
     final result = matches.map((e) => int.tryParse(e.group(1) ?? ""));
     return result.where((element) => element != null).toList();
-  }
+  }*/
 
   // Migrated
   Future<OTFloor> likeFloor(int floorId, bool like) async {
@@ -488,13 +488,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  // Migrated, TODO: Mention
+  // Migrated
   /// Modify a floor
   Future<int?> modifyFloor(String content, int? floorId) async {
     return (await dio!.put(_BASE_URL + "/floors/$floorId",
             data: {
               "content": content,
-              "mention": findMention(content),
+              //"mention": findMention(content),
             },
             options: Options(headers: _tokenHeader)))
         .statusCode;

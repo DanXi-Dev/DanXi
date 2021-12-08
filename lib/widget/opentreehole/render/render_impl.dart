@@ -92,7 +92,8 @@ BaseRender kMarkdownRender = (BuildContext context, String? content,
     builders: {
       'tex': MarkdownLatexSupport(),
       'texLine': MarkdownLatexMultiLineSupport(),
-      'mention': MarkdownMentionSupport(),
+      'floor_mention': MarkdownFloorMentionSupport(),
+      'hole_mention': MarkdownHoleMentionSupport(),
     },
     imageBuilder: (Uri uri, String? title, String? alt) {
       return Center(
@@ -122,12 +123,22 @@ class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
   }
 }
 
-class MarkdownMentionSupport extends MarkdownElementBuilder {
+class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return OTFloorMentionWidget(
         future: OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(int.parse(element.textContent)));
+  }
+}
+
+class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    return OTFloorMentionWidget(
+        future: OpenTreeHoleRepository.getInstance()
+            .loadSpecificHole(int.parse(element.textContent))
+            .then((value) => value.floors!.first_floor!));
   }
 }
 
@@ -169,15 +180,22 @@ class LatexMultiLineSyntax extends md.InlineSyntax {
   }
 }
 
-const MENTION_REGEX_STRING = r'#([0-9]+)';
+const MENTION_REGEX_STRING = r'(#{1,2})([0-9]+)';
 
 class MentionSyntax extends md.InlineSyntax {
   MentionSyntax() : super(MENTION_REGEX_STRING);
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
-    var mention = match[1]!;
-    parser.addNode(md.Element.text("mention", mention));
-    return true;
+    final type = match[1]!;
+    final mention = match[2]!;
+    if (type == "#") {
+      parser.addNode(md.Element.text("hole_mention", mention));
+      return true;
+    } else if (type == "##") {
+      parser.addNode(md.Element.text("floor_mention", mention));
+      return true;
+    }
+    return false;
   }
 }

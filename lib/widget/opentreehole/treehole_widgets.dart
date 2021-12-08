@@ -104,7 +104,11 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
 
 class OTFloorWidget extends StatelessWidget {
   final OTFloor floor;
-  final bool isNested;
+
+  /// Whether this widget is called as a result of [mention]
+  final bool isInMention;
+
+  final bool showBottomBar;
   final OTHole? parentHole;
   final int? index;
   final void Function()? onTap;
@@ -112,7 +116,8 @@ class OTFloorWidget extends StatelessWidget {
 
   const OTFloorWidget({
     required this.floor,
-    this.isNested = false,
+    this.isInMention = false,
+    this.showBottomBar = true,
     this.index,
     this.onTap,
     this.onLongPress,
@@ -131,7 +136,7 @@ class OTFloorWidget extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: Card(
-        color: isNested && PlatformX.isCupertino(context)
+        color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : null,
         child: ListTile(
@@ -160,7 +165,7 @@ class OTFloorWidget extends StatelessWidget {
                         if (floor.anonyname ==
                             parentHole?.floors?.first_floor?.anonyname) ...[
                           OTLeadingTag(
-                              colorString: isNested
+                              colorString: isInMention
                                   ? 'grey'
                                   : parentHole?.tags?.first.color ?? 'blue'),
                           const SizedBox(width: 4),
@@ -183,7 +188,7 @@ class OTFloorWidget extends StatelessWidget {
               ),
               Align(
                   alignment: Alignment.topLeft,
-                  child: isNested
+                  child: isInMention
                       // If content is being quoted, limit its height so that the view won't be too long.
                       ? Linkify(
                           text: renderText(floor.filteredContent!,
@@ -214,11 +219,23 @@ class OTFloorWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (index == null)
-                  Text(
-                    "#${floor.floor_id}",
-                    style: TextStyle(
-                      color: Theme.of(context).hintColor,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "#${floor.hole_id}",
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
+                      Text(
+                        "  (##${floor.floor_id})",
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
                 if (index != null)
                   Row(
@@ -233,7 +250,7 @@ class OTFloorWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "  (#${floor.floor_id})",
+                        "  (##${floor.floor_id})",
                         style: TextStyle(
                           color: Theme.of(context).hintColor,
                           fontSize: 10,
@@ -249,7 +266,7 @@ class OTFloorWidget extends StatelessWidget {
                 ),
               ],
             ),
-            if (!isNested) OTFloorWidgetBottomBar(floor: floor),
+            if (showBottomBar) OTFloorWidgetBottomBar(floor: floor),
           ]),
           onTap: onTap,
         ),
@@ -260,9 +277,11 @@ class OTFloorWidget extends StatelessWidget {
 
 class OTFloorMentionWidget extends StatelessWidget {
   final Future<OTFloor> future;
+  final showBottomBar;
 
   OTFloorMentionWidget({
     required this.future,
+    this.showBottomBar = false,
   });
 
   static void showFloorDetail(BuildContext context, OTFloor floor) {
@@ -275,6 +294,7 @@ class OTFloorMentionWidget extends StatelessWidget {
             children: [
               OTFloorWidget(
                 floor: floor,
+                showBottomBar: false,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
@@ -354,18 +374,21 @@ class OTFloorMentionWidget extends StatelessWidget {
             (BuildContext context, AsyncSnapshot<OTFloor> snapshot) {
           return OTFloorWidget(
             floor: snapshot.data!,
-            isNested: true,
+            isInMention: true,
+            showBottomBar: showBottomBar,
             onTap: () => showFloorDetail(context, snapshot.data!),
           );
         },
         errorBuilder: OTFloorWidget(
           floor: OTFloor.special(
               S.of(context).fatal_error, S.of(context).unable_to_find_quote),
-          isNested: true,
+          isInMention: true,
+          showBottomBar: showBottomBar,
         ),
         loadingBuilder: OTFloorWidget(
           floor: OTFloor.special(S.of(context).loading, S.of(context).loading),
-          isNested: true,
+          isInMention: true,
+          showBottomBar: showBottomBar,
         ));
   }
 }

@@ -492,7 +492,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     return OTFloorWidget(
       floor: floor,
       index: index,
-      isNested: isNested,
+      isInMention: isNested,
       parentHole: _post,
       onLongPress: () {
         showPlatformModalSheet(
