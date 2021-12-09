@@ -28,7 +28,7 @@ import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/report.dart';
+import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
@@ -508,31 +508,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
-  /// Disable a post, requires Admin privilege
-  /// Throws on failure.
-  Future<void> adminDisablePost(int? discussionId, int? postId) async {
-    await dio!.post(_BASE_URL + "/admin/",
-        data: {
-          "operation": "disable",
-          "discussion_id": discussionId,
-          "post_id": postId,
-        },
-        options: Options(headers: _tokenHeader));
-  }
-
-  /// Disable a discussion, requires Admin privilege
-  /// Throws on failure.
-  Future<void> adminDisableDiscussion(int? discussionId) async {
-    await dio!.post(_BASE_URL + "/admin/",
-        data: {
-          "operation": "disable_discussion",
-          "discussion_id": discussionId,
-        },
-        options: Options(headers: _tokenHeader));
-  }
-
   /// Get sender username of a post, requires Admin privilege
-  Future<String> adminGetUser(int? discussionId, int? postId) async {
+  /*Future<String> adminGetUser(int? discussionId, int? postId) async {
+    throw UnimplementedError();
     final response = await dio!.post(_BASE_URL + "/admin/",
         data: {
           "operation": "get_user",
@@ -541,17 +519,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         },
         options: Options(headers: _tokenHeader));
     return response.data.toString();
-  }
+  }*/
 
-  Future<List<Report>> adminGetReports(int page) async {
-    final response = await dio!.get(_BASE_URL + "/admin/",
-        queryParameters: {"page": page, "show_only_undealt": true},
+  Future<List<OTReport>> adminGetReports() async {
+    final response = await dio!.get(_BASE_URL + "/reports",
+        //queryParameters: {"category": page, "show_only_undealt": true},
         options: Options(headers: _tokenHeader));
     final result = response.data;
-    return result.map<Report>((e) => Report.fromJson(e)).toList();
+    return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
   }
 
-  Future<String> adminSetReportDealt(int? reportId) async {
+  /*Future<String> adminSetReportDealt(int? reportId) async {
+    throw UnimplementedError();
     final response = await dio!.post(_BASE_URL + "/admin/",
         data: {
           "operation": "set_report_dealed",
@@ -559,7 +538,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         },
         options: Options(headers: _tokenHeader));
     return response.data.toString();
-  }
+  }*/
 
   // Migrated
   /// Upload or update Push Notification token to server
