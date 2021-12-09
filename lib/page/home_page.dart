@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -23,7 +22,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -40,7 +38,6 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';

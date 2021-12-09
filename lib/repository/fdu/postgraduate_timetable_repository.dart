@@ -25,7 +25,6 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_js/flutter_js.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
