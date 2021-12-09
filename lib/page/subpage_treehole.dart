@@ -74,8 +74,8 @@ String renderText(String content, String imagePlaceholder) {
     content = md.markdownToHtml(content);
   }
   // Deal with Markdown
-  content =
-      content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
+  //content =
+  //    content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
 
   var soup = BeautifulSoup(content);
   var images = soup.findAll("img");
