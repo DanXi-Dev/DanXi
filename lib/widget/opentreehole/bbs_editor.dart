@@ -83,7 +83,7 @@ class BBSEditor {
             context,
             postId == null
                 ? S.of(context).reply_to(discussionId ?? "?")
-                : S.of(context).reply_to(postId),
+                : S.of(context).reply_to_floor(postId),
             editorType: editorType,
             object: object,
             placeholder: postId == null ? "" : "##$postId\n"))
@@ -120,7 +120,7 @@ class BBSEditor {
             context,
             postId == null
                 ? S.of(context).reply_to(discussionId ?? "?")
-                : S.of(context).reply_to(postId),
+                : S.of(context).reply_to_floor(postId),
             editorType: editorType,
             object: object,
             placeholder: originalContent ?? ""))
