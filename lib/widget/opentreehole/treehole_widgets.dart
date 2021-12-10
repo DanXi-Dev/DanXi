@@ -191,8 +191,10 @@ class OTFloorWidget extends StatelessWidget {
                   child: isInMention
                       // If content is being quoted, limit its height so that the view won't be too long.
                       ? Linkify(
-                          text: renderText(floor.filteredContent!,
-                                  S.of(context).image_tag)
+                          text: renderText(
+                                  floor.filteredContent!,
+                                  S.of(context).image_tag,
+                                  S.of(context).formula)
                               .trim(),
                           textScaleFactor: 0.8,
                           maxLines: 2,

@@ -42,6 +42,7 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -67,15 +68,23 @@ bool isHtml(String content) {
   return htmlMatcher.hasMatch(content);
 }
 
+final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
+    multiLine: true, dotAll: true);
+//final RegExp mentionRegExp = RegExp(r"<(floor|hole)_mention>.*?</(floor|hole)_mention>");
+
 /// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
-String renderText(String content, String imagePlaceholder) {
+String renderText(
+    String content, String imagePlaceholder, String formulaPlaceholder) {
   if (!isHtml(content)) {
-    content = md.markdownToHtml(content);
+    content = md.markdownToHtml(content, inlineSyntaxes: [
+      LatexSyntax(),
+      LatexMultiLineSyntax(),
+      MentionSyntax()
+    ]);
   }
-  // Deal with Markdown
-  //content =
-  //    content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
+  // Deal with LaTex
+  content = content.replaceAll(latexRegExp, formulaPlaceholder);
 
   var soup = BeautifulSoup(content);
   var images = soup.findAll("img");
@@ -520,7 +529,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       return const SizedBox();
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
-          S.of(context).image_tag),
+          S.of(context).image_tag, S.of(context).formula),
       style: TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -616,7 +625,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _buildCommentView(OTHole postElement, {bool useLeading = true}) {
     final String lastReplyContent = renderText(
         postElement.floors!.last_floor!.filteredContent!,
-        S.of(context).image_tag);
+        S.of(context).image_tag,
+        S.of(context).formula);
     return ListTile(
         dense: true,
         minLeadingWidth: 16,
