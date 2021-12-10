@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -45,7 +46,9 @@ class OTWelcomeWidget extends StatelessWidget {
               children: [
                 ListTile(
                   leading: Icon(
-                    CupertinoIcons.bell,
+                    PlatformX.isMaterial(context)
+                        ? Icons.notifications
+                        : CupertinoIcons.bell,
                     color: Theme.of(context).accentColor,
                   ),
                   title: Text(S.of(context).welcome_1),
@@ -53,7 +56,9 @@ class OTWelcomeWidget extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(
-                    CupertinoIcons.bubble_right,
+                    PlatformX.isMaterial(context)
+                        ? Icons.forum
+                        : CupertinoIcons.bubble_right,
                     color: Theme.of(context).accentColor,
                   ),
                   title: Text(S.of(context).welcome_2),
@@ -61,7 +66,9 @@ class OTWelcomeWidget extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(
-                    CupertinoIcons.textformat_superscript,
+                    PlatformX.isMaterial(context)
+                        ? Icons.superscript
+                        : CupertinoIcons.textformat_superscript,
                     color: Theme.of(context).accentColor,
                   ),
                   title: Text(S.of(context).welcome_3),

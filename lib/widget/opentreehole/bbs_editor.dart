@@ -273,6 +273,36 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
     widget.controller!.addListener(() => refreshSelf());
   }
 
+  Widget _buildIntroButton(BuildContext context, IconData iconData,
+      String title, String description) {
+    return PlatformIconButton(
+        icon: Icon(iconData, color: Theme.of(context).accentColor),
+        onPressed: () {
+          showPlatformModalSheet(
+              context: context,
+              builder: (BuildContext context) => Material(
+                    color: PlatformX.backgroundColor(context),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: Icon(iconData),
+                            title: Text(title),
+                          ),
+                          Divider(),
+                          Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Linkify(
+                                text: description,
+                                onOpen: (element) =>
+                                    BrowserUtil.openUrl(element.url, context),
+                              )),
+                        ]),
+                  ));
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Widget textField = PlatformTextField(
@@ -301,19 +331,19 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 child: ThemedMaterial(
                   child: FlutterTagging<OTTag>(
                       initialItems:
-                      StateProvider.editorCache[widget.editorObject]!.tags,
+                          StateProvider.editorCache[widget.editorObject]!.tags,
                       emptyBuilder: (context) => Wrap(
-                        alignment: WrapAlignment.spaceAround,
-                        children: [
-                          Text(S.of(context).failed),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {});
-                            },
-                            child: Text(S.of(context).retry),
+                            alignment: WrapAlignment.spaceAround,
+                            children: [
+                              Text(S.of(context).failed),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {});
+                                },
+                                child: Text(S.of(context).retry),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: InputDecoration(
                           labelStyle: TextStyle(fontSize: 12),
@@ -326,63 +356,63 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                               .loadTags();
                         return _allTags!
                             .where((value) => value.name!
-                            .toLowerCase()
-                            .contains(filter.toLowerCase()))
+                                .toLowerCase()
+                                .contains(filter.toLowerCase()))
                             .toList();
                       },
                       additionCallback: (value) => OTTag(0, 0, value),
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
-                        title: Text(
-                          tag.name!,
-                          style: TextStyle(
-                              color:
-                              Constant.getColorFromString(tag.color)),
-                        ),
-                        subtitle: Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.flame,
-                              color: Constant.getColorFromString(tag.color),
-                              size: 12,
-                            ),
-                            const SizedBox(
-                              width: 2,
-                            ),
-                            Text(
-                              tag.temperature.toString(),
+                            title: Text(
+                              tag.name!,
                               style: TextStyle(
-                                  fontSize: 13,
-                                  color: Constant.getColorFromString(
-                                      tag.color)),
+                                  color:
+                                      Constant.getColorFromString(tag.color)),
                             ),
-                          ],
-                        ),
-                        additionWidget: Chip(
-                          avatar: Icon(
-                            Icons.add_circle,
-                            color: Colors.white,
+                            subtitle: Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.flame,
+                                  color: Constant.getColorFromString(tag.color),
+                                  size: 12,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  tag.temperature.toString(),
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Constant.getColorFromString(
+                                          tag.color)),
+                                ),
+                              ],
+                            ),
+                            additionWidget: Chip(
+                              avatar: Icon(
+                                Icons.add_circle,
+                                color: Colors.white,
+                              ),
+                              label: Text(S.of(context).add_new_tag),
+                              labelStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w300,
+                              ),
+                              backgroundColor: Theme.of(context).accentColor,
+                            ),
                           ),
-                          label: Text(S.of(context).add_new_tag),
-                          labelStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w300,
-                          ),
-                          backgroundColor: Theme.of(context).accentColor,
-                        ),
-                      ),
                       configureChip: (tag) => ChipConfiguration(
-                        label: Text(tag.name!),
-                        backgroundColor:
-                        Constant.getColorFromString(tag.color),
-                        labelStyle: TextStyle(
-                            color: Constant.getColorFromString(tag.color)
-                                .computeLuminance() >=
-                                0.5
-                                ? Colors.black
-                                : Colors.white),
-                        deleteIconColor:
+                            label: Text(tag.name!),
+                            backgroundColor:
+                                Constant.getColorFromString(tag.color),
+                            labelStyle: TextStyle(
+                                color: Constant.getColorFromString(tag.color)
+                                            .computeLuminance() >=
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white),
+                            deleteIconColor:
                                 Constant.getColorFromString(tag.color)
                                             .computeLuminance() >=
                                         0.5
@@ -392,39 +422,23 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       onChanged: () {}),
                 ),
               ),
-            PlatformIconButton(
-                icon: Icon(
-                  IconFont.markdown,
-                  color: Theme.of(context).accentColor,
-                ),
-                onPressed: () {
-                  showPlatformModalSheet(
-                      context: context,
-                      builder: (BuildContext context) => Material(
-                            color: PlatformX.backgroundColor(context),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ListTile(
-                                    leading: Icon(
-                                      IconFont.markdown,
-                                    ),
-                                    title: Text(S.of(context).markdown_enabled),
-                                  ),
-                                  Divider(),
-                                  Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Linkify(
-                                        text:
-                                            S.of(context).markdown_description,
-                                        onOpen: (element) =>
-                                            BrowserUtil.openUrl(
-                                                element.url, context),
-                                      )),
-                                ]),
-                          ));
-                }),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildIntroButton(
+                    context,
+                    IconFont.markdown,
+                    S.of(context).markdown_enabled,
+                    S.of(context).markdown_description),
+                _buildIntroButton(
+                    context,
+                    PlatformX.isMaterial(context)
+                        ? Icons.superscript
+                        : CupertinoIcons.textformat_superscript,
+                    S.of(context).latex_enabled,
+                    S.of(context).latex_description),
+              ],
+            ),
             textField,
             Divider(),
             Text(S.of(context).preview,

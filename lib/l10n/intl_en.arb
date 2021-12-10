@@ -281,6 +281,8 @@
     "add_image": "Add Image",
     "markdown_enabled": "Markdown enabled",
     "markdown_description": "Markdown parser is on. You can write with Markdown syntax. If you don't know what Markdown is, check out https://www.runoob.com/markdown/md-tutorial.html .",
+    "latex_enabled": "LaTex enabled",
+    "latex_description": "LaTex parser is on. You can write with LaTex syntax. If you don't know what LaTex is, check out https://liam.page/2014/09/08/latex-introduction/ .",
     "all_tags": "All Tags",
     "preview": "Preview",
     "seats": "{seats} seats",
