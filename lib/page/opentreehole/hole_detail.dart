@@ -327,7 +327,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(menuContext).pop();
-              FlutterClipboard.copy(renderText(e.filteredContent!, ''));
+              FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
             },
             child: Text(S.of(menuContext).copy),
           ),
@@ -335,8 +335,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             title: Text(S.of(menuContext).copy),
             onTap: () {
               Navigator.of(menuContext).pop();
-              FlutterClipboard.copy(renderText(e.filteredContent!, '')).then(
-                  (value) => Noticing.showNotice(
+              FlutterClipboard.copy(renderText(e.filteredContent!, '', ''))
+                  .then((value) => Noticing.showNotice(
                       menuContext, S.of(menuContext).copy_success));
             },
           ),
