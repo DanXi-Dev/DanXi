@@ -364,6 +364,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     _futureData = _setFuture(useInitialData: useInitialData);
   }
 
+  /// Clear all the data saved.
   void _clearData() {
     _data.clear();
     valueKeys.clear();
@@ -439,7 +440,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       _data.firstWhere(test, orElse: orElse as T Function()?);
 
   @override
-  int getIndexOf(T element, [int start = 0]) => _data.indexOf(element, start);
+  int indexOf(T element, [int start = 0]) => _data.indexOf(element, start);
 
   @override
   int length() {
@@ -510,8 +511,8 @@ class PagedListViewController<T> implements ListProvider<T> {
   }
 
   @override
-  int getIndexOf(T element, [int start = 0]) {
-    return _state.getIndexOf(element, start);
+  int indexOf(T element, [int start = 0]) {
+    return _state.indexOf(element, start);
   }
 
   @override
@@ -528,7 +529,7 @@ mixin ListProvider<T> {
   T getElementFirstWhere(bool Function(dynamic) test,
       {dynamic Function()? orElse});
 
-  int getIndexOf(T element, [int start = 0]);
+  int indexOf(T element, [int start = 0]);
 
   int length();
 }

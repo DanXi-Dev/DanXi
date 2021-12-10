@@ -99,7 +99,7 @@ String preprocessContentForDisplay(String content,
 /// A list page showing the content of a bbs post.
 ///
 /// Arguments:
-/// [BBSPost] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
+/// [OTHole] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
 /// Otherwise as a list of search result.
 /// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
 /// the post as soon as the page shows. This implies that [post] should be a [BBSPost].

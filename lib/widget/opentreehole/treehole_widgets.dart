@@ -313,8 +313,8 @@ class OTFloorMentionWidget extends StatelessWidget {
                                   PagedListView<OTFloor>>()!
                               .pagedController!;
                           // If this floor is directly in the hole
-                          if (pagedListViewController.getIndexOf(floor) != -1) {
-                            // Scroll to the corrosponding post
+                          if (pagedListViewController.indexOf(floor) != -1) {
+                            // Scroll to the corresponding post
                             while (!(await pagedListViewController
                                 .scrollToItem(floor))) {
                               if (pagedListViewController

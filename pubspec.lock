@@ -509,7 +509,7 @@ packages:
     source: hosted
     version: "0.6.8"
   flutter_math_fork:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_math_fork
       url: "https://pub.flutter-io.cn"
