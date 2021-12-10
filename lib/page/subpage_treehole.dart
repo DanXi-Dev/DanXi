@@ -74,8 +74,8 @@ String renderText(String content, String imagePlaceholder) {
     content = md.markdownToHtml(content);
   }
   // Deal with Markdown
-  content =
-      content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
+  //content =
+  //    content.replaceAll(RegExp(r"!\[.*\]\(http(s)?://.+\)"), imagePlaceholder);
 
   var soup = BeautifulSoup(content);
   var images = soup.findAll("img");
@@ -306,7 +306,8 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _autoSilenceNotice() {
     final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
         .getSilenceDateForDivision(_divisionId);
-    if (silenceDate == null) return const SizedBox();
+    if (silenceDate == null || silenceDate.isBefore(DateTime.now()))
+      return const SizedBox();
     return Card(
       child: ListTile(
         leading: Icon(
@@ -586,8 +587,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                       Row(children: [
                         /*Text("${postElement.view} ", style: infoStyle),
                         Icon(CupertinoIcons.eye,
-                            size: infoStyle.fontSize, color: infoStyle.color),*/
-                        const SizedBox(width: 4),
+                            size: infoStyle.fontSize, color: infoStyle.color),
+                        const SizedBox(width: 4),*/
                         Text("${postElement.reply} ", style: infoStyle),
                         Icon(CupertinoIcons.ellipses_bubble,
                             size: infoStyle.fontSize, color: infoStyle.color),

@@ -21,7 +21,6 @@ import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
-import 'package:dan_xi/model/post.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -303,131 +302,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             },
           ),
         ),
-        if (OpenTreeHoleRepository.getInstance().isAdmin)
-          PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.of(menuContext).pop();
-                OpenTreeHoleRepository.getInstance()
-                    .adminDisablePost(e.hole_id, e.floor_id)
-                    .onError((dynamic error, stackTrace) {
-                  if (error is DioError) {
-                    Noticing.showNotice(
-                        context,
-                        error.message +
-                            '\n' +
-                            (error.response?.data?.toString() ?? ""),
-                        title: error.type.toString(),
-                        useSnackBar: false);
-                  } else
-                    Noticing.showNotice(context, error.toString(),
-                        title: S.of(menuContext).fatal_error,
-                        useSnackBar: false);
-                  return -1;
-                });
-              },
-              child: Text("Disable Post"),
-            ),
-            material: (_, __) => ListTile(
-              title: Text("Disable Post"),
-              onTap: () {
-                Navigator.of(menuContext).pop();
-                OpenTreeHoleRepository.getInstance()
-                    .adminDisablePost(e.hole_id, e.floor_id)
-                    .onError((dynamic error, stackTrace) {
-                  if (error is DioError) {
-                    Noticing.showNotice(
-                        context,
-                        error.message +
-                            '\n' +
-                            (error.response?.data?.toString() ?? ""),
-                        title: error.type.toString(),
-                        useSnackBar: false);
-                  } else
-                    Noticing.showNotice(context, error.toString(),
-                        title: S.of(menuContext).fatal_error,
-                        useSnackBar: false);
-                  return -1;
-                });
-              },
-            ),
-          ),
-        if (OpenTreeHoleRepository.getInstance().isAdmin)
-          PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.of(menuContext).pop();
-                OpenTreeHoleRepository.getInstance()
-                    .adminDisableDiscussion(e.hole_id)
-                    .onError((dynamic error, stackTrace) {
-                  if (error is DioError) {
-                    Noticing.showNotice(
-                        context,
-                        error.message +
-                            '\n' +
-                            (error.response?.data?.toString() ?? ""),
-                        title: error.type.toString(),
-                        useSnackBar: false);
-                  } else
-                    Noticing.showNotice(context, error.toString(),
-                        title: S.of(menuContext).fatal_error,
-                        useSnackBar: false);
-                  return -1;
-                });
-              },
-              child: Text("Disable Discussion"),
-            ),
-            material: (_, __) => ListTile(
-              title: Text("Disable Discussion"),
-              onTap: () {
-                Navigator.of(menuContext).pop();
-                OpenTreeHoleRepository.getInstance()
-                    .adminDisableDiscussion(e.hole_id)
-                    .onError((dynamic error, stackTrace) {
-                  if (error is DioError) {
-                    Noticing.showNotice(
-                        context,
-                        error.message +
-                            '\n' +
-                            (error.response?.data?.toString() ?? ""),
-                        title: error.type.toString(),
-                        useSnackBar: false);
-                  } else
-                    Noticing.showNotice(context, error.toString(),
-                        title: S.of(menuContext).fatal_error,
-                        useSnackBar: false);
-                  return -1;
-                });
-              },
-            ),
-          ),
-        if (OpenTreeHoleRepository.getInstance().isAdmin)
-          PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.of(menuContext).pop();
-                OpenTreeHoleRepository.getInstance()
-                    .adminGetUser(e.hole_id, e.floor_id)
-                    .then((value) => Noticing.showNotice(context, value,
-                        useSnackBar: false));
-              },
-              child: Text("Get Username"),
-            ),
-            material: (_, __) => ListTile(
-              title: Text("Get Username"),
-              onTap: () {
-                Navigator.of(menuContext).pop();
-                OpenTreeHoleRepository.getInstance()
-                    .adminGetUser(e.hole_id, e.floor_id)
-                    .then((value) {
-                  Noticing.showNotice(context, value, useSnackBar: false);
-                });
-              },
-            ),
-          ),
 
         // Standard Operations
         if (!isHtml(e.filteredContent!))

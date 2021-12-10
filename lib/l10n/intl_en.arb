@@ -232,6 +232,7 @@
     "share":"Share",
     "login_with_uis":"Sign in anonymously as:",
     "reply_to":"Reply #{name}",
+    "reply_to_floor":"Reply ##{name}",
     "reason_report_post": "Reason for reporting #{id}",
     "editor_hint": "Hint: Swipe the toolbar to the right to see more styling options.",
     "end_reached": "You have reached the end.",

@@ -15,10 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
 import 'package:flutter/widgets.dart';
 
 const kTabletMasterContainerWidth = 370.0;
 
-bool isTablet(BuildContext context) {
-  return MediaQuery.of(context).size.width >= 768.0;
+bool isTablet() {
+  return MediaQueryData.fromWindow(window).size.width >= 768.0;
 }

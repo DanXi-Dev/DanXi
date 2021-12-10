@@ -1,5 +1,3 @@
-
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -16,30 +14,35 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'report.g.dart';
 
 @JsonSerializable()
-class Report {
-  final int? id;
+class OTReport {
+  final int? report_id;
   final String? reason;
   final String? content;
-  final int? discussion;
-  final int? post;
-  final String? date_created;
+  final OTFloor? floor;
+  final int? hole_id;
+  final String? time_created;
+  final String? time_updated;
   final bool? dealed;
+  final String? dealed_by;
 
-  Report(this.id, this.reason, this.post, this.date_created, this.dealed,
-      this.content, this.discussion);
-
-  @override
-  int get hashCode => id!;
+  OTReport(this.report_id, this.reason, this.content, this.floor, this.hole_id,
+      this.time_created, this.time_updated, this.dealed, this.dealed_by);
 
   @override
-  bool operator ==(Object other) => (other is Report) && id == other.id;
+  int get hashCode => report_id!;
 
-  factory Report.fromJson(Map<String, dynamic> json) => _$ReportFromJson(json);
+  @override
+  bool operator ==(Object other) =>
+      (other is OTReport) && report_id == other.report_id;
 
-  Map<String, dynamic> toJson() => _$ReportToJson(this);
+  factory OTReport.fromJson(Map<String, dynamic> json) =>
+      _$OTReportFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OTReportToJson(this);
 }

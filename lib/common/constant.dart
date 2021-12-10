@@ -113,12 +113,11 @@ class Constant {
   }
 
   static String updateUrl() {
-    if (PlatformX.isDesktop) {
-      return "https://github.com/DanXi-Dev/DanXi/releases";
-    } else if (PlatformX.isIOS) {
+    // Don't use GitHub URL, since access is not guaranteed
+    if (PlatformX.isIOS) {
       return "https://apps.apple.com/app/id$APPSTORE_APPID";
     }
-    return "https://danxi-dev.github.io/";
+    return "https://danxi.fduhole.com";
   }
 
   static ThemeData lightTheme(bool isCupertino) {

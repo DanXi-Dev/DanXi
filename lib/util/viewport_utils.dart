@@ -28,9 +28,8 @@ class ViewportUtils {
   static Size getMainNavigatorSize(BuildContext context) =>
       Size(getMainNavigatorWidth(context), getMainNavigatorHeight(context));
 
-  static double getMainNavigatorWidth(BuildContext context) => isTablet(context)
-      ? kTabletMasterContainerWidth
-      : getViewportWidth(context);
+  static double getMainNavigatorWidth(BuildContext context) =>
+      isTablet() ? kTabletMasterContainerWidth : getViewportWidth(context);
 
   static double getMainNavigatorHeight(BuildContext context) =>
       getViewportHeight(context);

@@ -19,7 +19,7 @@ import 'dart:async';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
-import 'package:dan_xi/model/report.dart';
+import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -53,8 +53,8 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController _listViewController = PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<Report>?> _loadContent(int page) async {
-    return await OpenTreeHoleRepository.getInstance().adminGetReports(page);
+  Future<List<OTReport>?> _loadContent(int page) async {
+    return await OpenTreeHoleRepository.getInstance().adminGetReports();
   }
 
   @override
@@ -95,7 +95,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             refreshSelf();
           },
           child: Material(
-              child: PagedListView<Report>(
+              child: PagedListView<OTReport>(
             startPage: 1,
             pagedController: _listViewController,
             withScrollbar: true,
@@ -118,12 +118,13 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     );
   }
 
-  _buildContextMenu(BuildContext context, Report e) => [
-        PlatformWidget(
+  _buildContextMenu(BuildContext context, OTReport e) => [
+        /*PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
-              OpenTreeHoleRepository.getInstance().adminSetReportDealt(e.id);
+              OpenTreeHoleRepository.getInstance()
+                  .adminSetReportDealt(e.report_id);
             },
             child: Text("Mark as dealt"),
           ),
@@ -131,14 +132,15 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             title: Text("Mark as dealt"),
             onTap: () {
               Navigator.of(context).pop();
-              OpenTreeHoleRepository.getInstance().adminSetReportDealt(e.id);
+              OpenTreeHoleRepository.getInstance()
+                  .adminSetReportDealt(e.report_id);
             },
           ),
-        ),
+        ),*/
       ];
 
-  Widget _getListItems(BuildContext context, ListProvider<Report> dataProvider,
-      int index, Report e) {
+  Widget _getListItems(BuildContext context,
+      ListProvider<OTReport> dataProvider, int index, OTReport e) {
     LinkTapCallback onLinkTap = (url) {
       BrowserUtil.openUrl(url!, context);
     };
@@ -189,25 +191,25 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               ),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
-                  "#${e.post}",
+                  "#${e.hole_id} (##${e.floor?.floor_id})",
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 Text(
                   HumanDuration.tryFormat(
-                      context, DateTime.parse(e.date_created!)),
+                      context, DateTime.parse(e.time_created!)),
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
-                GestureDetector(
+                /*GestureDetector(
                   child: Text("Mark as dealt",
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12)),
                   onTap: () {
                     OpenTreeHoleRepository.getInstance()
-                        .adminSetReportDealt(e.id);
+                        .adminSetReportDealt(e.report_id);
                   },
-                ),
+                ),*/
               ]),
             ]),
             onTap: () async {
@@ -215,7 +217,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   loadingText: S.of(context).loading, context: context);
               try {
                 final OTHole post = await OpenTreeHoleRepository.getInstance()
-                    .loadSpecificHole(e.discussion!);
+                    .loadSpecificHole(e.hole_id!);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
                   "post": post,
                 });

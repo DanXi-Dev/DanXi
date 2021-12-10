@@ -49,7 +49,6 @@ import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -167,42 +166,8 @@ class DanxiApp extends StatelessWidget {
         // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => Theme(
           data: PlatformX.getTheme(context),
-          child: PlatformApp(
-            scrollBehavior: MyCustomScrollBehavior(),
-            debugShowCheckedModeBanner: false,
-            // Fix cupertino UI text color issues
-            cupertino: (_, __) => CupertinoAppData(
-                theme: CupertinoThemeData(
-                    textTheme: CupertinoTextThemeData(
-                        textStyle: TextStyle(
-                            color: PlatformX.getTheme(context)
-                                .textTheme
-                                .bodyText1!
-                                .color)))),
-            // Configure i18n delegates
-            localizationsDelegates: [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: MasterDetailController(
-              masterPage: HomePage(),
-            ),
-            // Configure the page route behaviour of the whole app
-            onGenerateRoute: (settings) {
-              final Function? pageContentBuilder =
-                  DanxiApp.routes[settings.name!];
-              if (pageContentBuilder != null) {
-                return platformPageRoute(
-                    context: context,
-                    builder: (context) => pageContentBuilder(context,
-                        arguments: settings.arguments));
-              }
-              return null;
-            },
-            navigatorKey: Catcher.navigatorKey,
+          child: PlatformMasterDetailApp(
+            masterPage: HomePage(),
           ),
         ),
       ),
