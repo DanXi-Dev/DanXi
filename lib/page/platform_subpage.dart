@@ -29,7 +29,7 @@ abstract class PlatformSubpage extends StatefulWidget {
   @deprecated
   final bool needBottomPadding = false;
 
-  Create<String> get title;
+  Create<Widget> get title;
 
   Create<List<AppBarButtonItem>> get leading => (_) => [];
 

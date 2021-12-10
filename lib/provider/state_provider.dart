@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/util/editor_object.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
@@ -36,6 +37,9 @@ class StateProvider {
 
   /// Caches of [BBSEditor].
   static final Map<EditorObject?, PostEditorText> editorCache = {};
+
+  /// The current division.
+  static OTDivision? divisionId;
 
   static void initialize() {
     personInfo.value = null;

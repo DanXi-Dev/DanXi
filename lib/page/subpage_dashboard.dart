@@ -32,15 +32,15 @@ import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
@@ -51,7 +51,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 import 'package:provider/provider.dart';
 
 class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
@@ -64,7 +63,7 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   String get debugTag => "HomePage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).app_name;
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).app_name);
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [

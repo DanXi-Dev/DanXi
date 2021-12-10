@@ -71,7 +71,7 @@ class SettingsSubpage extends PlatformSubpage
   String get debugTag => "SettingsPage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).settings;
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
 }
 
 class _SettingsSubpageState extends State<SettingsSubpage>

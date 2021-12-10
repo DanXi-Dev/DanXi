@@ -25,13 +25,13 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
@@ -64,7 +64,7 @@ class TimetableSubPage extends PlatformSubpage
   String get debugTag => "TimetablePage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).timetable;
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).timetable);
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [

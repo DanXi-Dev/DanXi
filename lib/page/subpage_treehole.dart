@@ -49,6 +49,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -94,22 +95,37 @@ String renderText(
 
 const String KEY_NO_TAG = "默认";
 
-class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
-  final Map<String, dynamic>? arguments;
+class OTTitle extends StatefulWidget {
+  const OTTitle({Key? key}) : super(key: key);
 
   @override
-  _BBSSubpageState createState() => _BBSSubpageState();
+  _OTTitleState createState() => _OTTitleState();
+}
 
-  BBSSubpage({Key? key, this.arguments});
+class _OTTitleState extends State<OTTitle> {
+  final StateStreamListener _divisionChangedSubscription =
+      StateStreamListener();
 
   @override
-  String get debugTag => "BBSPage";
+  void initState() {
+    super.initState();
+    _divisionChangedSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
+          if (event.newDivision.division_id !=
+              StateProvider.divisionId?.division_id) {
+            StateProvider.divisionId = event.newDivision;
+            refreshSelf();
+          }
+        }),
+        hashCode);
+  }
 
   /// Build a list of options controlling how to sort posts.
   List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
     List<Widget> list = [];
     Function onTapListener = (OTDivision newDivision) {
       Navigator.of(cxt).pop();
+
       DivisionChangedEvent(newDivision).fire();
     };
     OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
@@ -128,6 +144,44 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   }
 
   @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Text(StateProvider.divisionId?.name ?? S.of(context).forum),
+      onTap: () => showPlatformModalSheet(
+        context: context,
+        builder: (BuildContext context) => PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheet(
+            title: Text(S.of(context).sort_order),
+            actions: _buildDivisionOptionsList(context),
+            cancelButton: CupertinoActionSheetAction(
+              child: Text(S.of(context).cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+          material: (_, __) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: _buildDivisionOptionsList(context),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
+  final Map<String, dynamic>? arguments;
+
+  @override
+  _BBSSubpageState createState() => _BBSSubpageState();
+
+  BBSSubpage({Key? key, this.arguments});
+
+  @override
+  String get debugTag => "BBSPage";
+
+  @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(
           S.of(cxt).messages,
@@ -141,35 +195,8 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
         )
       ];
 
-/*  @override
-  Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(
-          S.of(cxt).sort_order,
-          Icon(CupertinoIcons.sort_down_circle),
-          () => showPlatformModalSheet(
-            context: cxt,
-            builder: (BuildContext context) => PlatformWidget(
-              cupertino: (_, __) => CupertinoActionSheet(
-                title: Text(S.of(cxt).sort_order),
-                actions: _buildDivisionOptionsList(context),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              material: (_, __) => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: _buildDivisionOptionsList(context),
-              ),
-            ),
-          ),
-        )
-      ]; */
-
   @override
-  Create<String> get title => (cxt) => S.of(cxt).forum;
+  Create<Widget> get title => (cxt) => OTTitle();
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
@@ -235,7 +262,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       new TimeBasedLoadAdaptLayer(10, 1);
 
   /// Fields related to the display states.
-  int _divisionId = 1;
+  int get _divisionId => StateProvider.divisionId?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
@@ -372,7 +399,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           if (event.newDivision.division_id != _divisionId) {
-            _divisionId = event.newDivision.division_id!;
+            StateProvider.divisionId = event.newDivision;
             refreshSelf();
           }
           //SettingsProvider.getInstance().fduholeSortOrder = _sortOrder = event.newDivision;
@@ -440,6 +467,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildPageBody() {
+    print("division id:${_divisionId}");
     return Material(
       child: Container(
         child: SafeArea(
@@ -459,12 +487,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                 startPage: 1,
                 builder: _buildListItem,
                 headBuilder: (_) => Column(
-                      children: [
-                        AutoBannerAdWidget(bannerAd: bannerAd),
-                        if (_postsType == PostsType.NORMAL_POSTS) ...[
-                          OTSearchWidget(
-                            focusNode: _searchFocus,
-                          ),
+                  children: [
+                    AutoBannerAdWidget(bannerAd: bannerAd),
+                    if (_postsType == PostsType.NORMAL_POSTS) ...[
+                          OTSearchWidget(focusNode: _searchFocus),
                           _autoSilenceNotice(),
                           _autoAdminNotice(),
                           _autoPinnedPosts(),
@@ -476,11 +502,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                       child: Center(child: PlatformCircularProgressIndicator()),
                     ),
                 endBuilder: (context) => Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(S.of(context).end_reached),
-                      ),
-                    ),
+                        child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(S.of(context).end_reached),
+                    )),
                 emptyBuilder: (_) {
                   if (_postsType == PostsType.FAVORED_DISCUSSION)
                     return _buildEmptyFavoritesPage();

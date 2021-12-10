@@ -421,17 +421,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Show an empty container, if no person info is set.
-  Widget _buildDummyBody(String title) => PlatformScaffold(
+  Widget _buildDummyBody(Widget title) => PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: true,
         // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBar(
-          title: Text(title),
+          title: title,
         ),
         body: const SizedBox(),
       );
 
-  Widget _buildBody(String title) {
+  Widget _buildBody(Widget title) {
     // Build action buttons.
     PlatformIconButton? leadingButton;
     List<PlatformIconButton> trailingButtons = [];
@@ -476,17 +476,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               data: MediaQueryData(
                   textScaleFactor: MediaQuery.textScaleFactorOf(context)),
               child: TopController(
-                child: Text(title),
+                child: title,
                 controller: PrimaryScrollController.of(context),
               ),
             ),
           ),
           material: (_, __) => MaterialAppBarData(
             title: TopController(
-              child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              child: DefaultTextStyle(
+                  style: Theme.of(context)
+                          .textTheme
+                          .headline6
+                          ?.copyWith(fontWeight: FontWeight.bold) ??
+                      TextStyle(),
+                  child: title),
               controller: PrimaryScrollController.of(context),
             ),
           ),
@@ -558,8 +561,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     _lastRefreshTime = DateTime.now();
-    String title = _subpage.isEmpty
-        ? S.of(context).app_name
+    Widget title = _subpage.isEmpty
+        ? Text(S.of(context).app_name)
         : _subpage[_pageIndex.value].title.call(context);
     return StateProvider.personInfo.value == null || _subpage.isEmpty
         ? _buildDummyBody(title)
