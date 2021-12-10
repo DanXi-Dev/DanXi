@@ -250,9 +250,14 @@ class BBSEditorWidget extends StatefulWidget {
   final TextEditingController? controller;
   final EditorObject? editorObject;
   final bool? allowTags;
+  final bool fullscreen;
 
   const BBSEditorWidget(
-      {Key? key, this.controller, this.allowTags, this.editorObject})
+      {Key? key,
+      this.controller,
+      this.allowTags,
+      this.editorObject,
+      this.fullscreen = false})
       : super(key: key);
 
   @override
@@ -265,13 +270,26 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   @override
   void initState() {
     super.initState();
-    widget.controller!.addListener(() {
-      refreshSelf();
-    });
+    widget.controller!.addListener(() => refreshSelf());
   }
 
   @override
   Widget build(BuildContext context) {
+    final Widget textField = PlatformTextField(
+      material: (_, __) => MaterialTextFieldData(
+          decoration: widget.fullscreen
+              ? InputDecoration(border: InputBorder.none)
+              : InputDecoration(border: OutlineInputBorder(gapPadding: 2.0))),
+      controller: widget.controller,
+      keyboardType: TextInputType.multiline,
+      maxLines: widget.fullscreen ? null : 5,
+      expands: widget.fullscreen,
+      autofocus: true,
+      textAlignVertical: TextAlignVertical.top,
+    );
+    if (widget.fullscreen) {
+      return textField;
+    }
     return SingleChildScrollView(
       child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -283,19 +301,19 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 child: ThemedMaterial(
                   child: FlutterTagging<OTTag>(
                       initialItems:
-                          StateProvider.editorCache[widget.editorObject]!.tags,
+                      StateProvider.editorCache[widget.editorObject]!.tags,
                       emptyBuilder: (context) => Wrap(
-                            alignment: WrapAlignment.spaceAround,
-                            children: [
-                              Text(S.of(context).failed),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {});
-                                },
-                                child: Text(S.of(context).retry),
-                              ),
-                            ],
+                        alignment: WrapAlignment.spaceAround,
+                        children: [
+                          Text(S.of(context).failed),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {});
+                            },
+                            child: Text(S.of(context).retry),
                           ),
+                        ],
+                      ),
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: InputDecoration(
                           labelStyle: TextStyle(fontSize: 12),
@@ -308,63 +326,63 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                               .loadTags();
                         return _allTags!
                             .where((value) => value.name!
-                                .toLowerCase()
-                                .contains(filter.toLowerCase()))
+                            .toLowerCase()
+                            .contains(filter.toLowerCase()))
                             .toList();
                       },
                       additionCallback: (value) => OTTag(0, 0, value),
                       onAdded: (tag) => tag,
                       configureSuggestion: (tag) => SuggestionConfiguration(
-                            title: Text(
-                              tag.name!,
+                        title: Text(
+                          tag.name!,
+                          style: TextStyle(
+                              color:
+                              Constant.getColorFromString(tag.color)),
+                        ),
+                        subtitle: Row(
+                          children: [
+                            Icon(
+                              CupertinoIcons.flame,
+                              color: Constant.getColorFromString(tag.color),
+                              size: 12,
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Text(
+                              tag.temperature.toString(),
                               style: TextStyle(
-                                  color:
-                                      Constant.getColorFromString(tag.color)),
+                                  fontSize: 13,
+                                  color: Constant.getColorFromString(
+                                      tag.color)),
                             ),
-                            subtitle: Row(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.flame,
-                                  color: Constant.getColorFromString(tag.color),
-                                  size: 12,
-                                ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
-                                Text(
-                                  tag.temperature.toString(),
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Constant.getColorFromString(
-                                          tag.color)),
-                                ),
-                              ],
-                            ),
-                            additionWidget: Chip(
-                              avatar: Icon(
-                                Icons.add_circle,
-                                color: Colors.white,
-                              ),
-                              label: Text(S.of(context).add_new_tag),
-                              labelStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w300,
-                              ),
-                              backgroundColor: Theme.of(context).accentColor,
-                            ),
+                          ],
+                        ),
+                        additionWidget: Chip(
+                          avatar: Icon(
+                            Icons.add_circle,
+                            color: Colors.white,
                           ),
+                          label: Text(S.of(context).add_new_tag),
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          backgroundColor: Theme.of(context).accentColor,
+                        ),
+                      ),
                       configureChip: (tag) => ChipConfiguration(
-                            label: Text(tag.name!),
-                            backgroundColor:
-                                Constant.getColorFromString(tag.color),
-                            labelStyle: TextStyle(
-                                color: Constant.getColorFromString(tag.color)
-                                            .computeLuminance() >=
-                                        0.5
-                                    ? Colors.black
-                                    : Colors.white),
-                            deleteIconColor:
+                        label: Text(tag.name!),
+                        backgroundColor:
+                        Constant.getColorFromString(tag.color),
+                        labelStyle: TextStyle(
+                            color: Constant.getColorFromString(tag.color)
+                                .computeLuminance() >=
+                                0.5
+                                ? Colors.black
+                                : Colors.white),
+                        deleteIconColor:
                                 Constant.getColorFromString(tag.color)
                                             .computeLuminance() >=
                                         0.5
@@ -375,52 +393,39 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 ),
               ),
             PlatformIconButton(
-              icon: Icon(
-                IconFont.markdown,
-                color: Theme.of(context).accentColor,
-              ),
-              onPressed: () {
-                showPlatformModalSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Material(
-                      color: PlatformX.backgroundColor(context),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: Icon(
-                              IconFont.markdown,
-                            ),
-                            title: Text(S.of(context).markdown_enabled),
-                          ),
-                          Divider(),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Linkify(
-                              text: S.of(context).markdown_description,
-                              onOpen: (element) =>
-                                  BrowserUtil.openUrl(element.url, context),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-            PlatformTextField(
-              material: (_, __) => MaterialTextFieldData(
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(gapPadding: 2.0))),
-              controller: widget.controller,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              minLines: 5,
-              autofocus: true,
-            ),
+                icon: Icon(
+                  IconFont.markdown,
+                  color: Theme.of(context).accentColor,
+                ),
+                onPressed: () {
+                  showPlatformModalSheet(
+                      context: context,
+                      builder: (BuildContext context) => Material(
+                            color: PlatformX.backgroundColor(context),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: Icon(
+                                      IconFont.markdown,
+                                    ),
+                                    title: Text(S.of(context).markdown_enabled),
+                                  ),
+                                  Divider(),
+                                  Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Linkify(
+                                        text:
+                                            S.of(context).markdown_description,
+                                        onOpen: (element) =>
+                                            BrowserUtil.openUrl(
+                                                element.url, context),
+                                      )),
+                                ]),
+                          ));
+                }),
+            textField,
             Divider(),
             Text(S.of(context).preview,
                 style: TextStyle(color: Theme.of(context).hintColor)),
@@ -466,7 +471,10 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   /// Whether the send button is enabled
   bool _canSend = true;
+
+  bool _isFullscreen = false;
   bool? _supportTags;
+
   late EditorObject _object;
   late String _title;
   late String _placeholder;
@@ -504,6 +512,13 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    Icon fullScreenIcon = _isFullscreen
+        ? (PlatformX.isAndroid
+            ? const Icon(Icons.close_fullscreen)
+            : const Icon(CupertinoIcons.fullscreen_exit))
+        : (PlatformX.isAndroid
+            ? const Icon(Icons.fullscreen)
+            : const Icon(CupertinoIcons.fullscreen));
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: false,
@@ -511,6 +526,10 @@ class BBSEditorPageState extends State<BBSEditorPage> {
       appBar: PlatformAppBarX(
         title: Text(_title),
         trailingActions: [
+          PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: fullScreenIcon,
+              onPressed: () => setState(() => _isFullscreen = !_isFullscreen)),
           PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isAndroid
@@ -534,6 +553,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                     controller: _controller,
                     allowTags: _supportTags,
                     editorObject: _object,
+                    fullscreen: _isFullscreen,
                   )))),
     );
   }
