@@ -110,11 +110,9 @@ class _OTTitleState extends State<OTTitle> {
     super.initState();
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          if (event.newDivision.division_id !=
-              StateProvider.divisionId?.division_id) {
-            StateProvider.divisionId = event.newDivision;
-            refreshSelf();
-          }
+          StateProvider.divisionId = event.newDivision;
+          Future.delayed(Duration(milliseconds: 200))
+              .then((value) => refreshSelf());
         }),
         hashCode);
   }
@@ -124,7 +122,6 @@ class _OTTitleState extends State<OTTitle> {
     List<Widget> list = [];
     Function onTapListener = (OTDivision newDivision) {
       Navigator.of(cxt).pop();
-
       DivisionChangedEvent(newDivision).fire();
     };
     OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
@@ -140,6 +137,13 @@ class _OTTitleState extends State<OTTitle> {
       ));
     });
     return list;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print("disposed!");
+    _divisionChangedSubscription.cancel();
   }
 
   @override
@@ -351,10 +355,8 @@ class _BBSSubpageState extends State<BBSSubpage>
           CupertinoIcons.exclamationmark_triangle,
           color: Theme.of(context).errorColor,
         ),
-        title: Text(
-          S.of(context).silence_notice,
-          style: TextStyle(color: Theme.of(context).errorColor),
-        ),
+        title: Text(S.of(context).silence_notice,
+            style: TextStyle(color: Theme.of(context).errorColor)),
         subtitle: Text(
           S.of(context).ban_post_until(
               "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),
@@ -397,10 +399,10 @@ class _BBSSubpageState extends State<BBSSubpage>
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          if (event.newDivision.division_id != _divisionId) {
-            StateProvider.divisionId = event.newDivision;
+          // if (event.newDivision.division_id != _divisionId) {
+          StateProvider.divisionId = event.newDivision;
             _refreshList();
-          }
+          // }
           //SettingsProvider.getInstance().fduholeSortOrder = _sortOrder = event.newDivision;
         }),
         hashCode);
@@ -487,9 +489,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                 startPage: 1,
                 builder: _buildListItem,
                 headBuilder: (_) => Column(
-                  children: [
-                    AutoBannerAdWidget(bannerAd: bannerAd),
-                    if (_postsType == PostsType.NORMAL_POSTS) ...[
+                      children: [
+                        AutoBannerAdWidget(bannerAd: bannerAd),
+                        if (_postsType == PostsType.NORMAL_POSTS) ...[
                           OTSearchWidget(focusNode: _searchFocus),
                           _autoSilenceNotice(),
                           _autoAdminNotice(),
