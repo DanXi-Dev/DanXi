@@ -15,12 +15,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
+import 'package:catcher/core/catcher.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/main.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/page/home_page.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class MasterDetailController extends StatelessWidget {
@@ -33,42 +39,117 @@ class MasterDetailController extends StatelessWidget {
     if (!isTablet(context)) {
       return masterPage!;
     }
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-              width: kTabletMasterContainerWidth,
-              height: MediaQuery.of(context).size.height,
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                  border: Border(
-                      right: BorderSide(
-                          width: 1, color: Theme.of(context).dividerColor))),
-              child: masterPage),
-          Container(
-              width: MediaQuery.of(context).size.width -
+    return Directionality(
+      textDirection: TextDirection.ltr, //TODO: Hardcoded TextDirection
+      child: Container(
+        color: Theme.of(context).backgroundColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            MediaQuery(
+              data: MediaQueryData.fromWindow(window).copyWith(
+                size: Size(
                   kTabletMasterContainerWidth,
-              height: MediaQuery.of(context).size.height,
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(),
-              child: Navigator(
-                key: detailNavigatorKey,
-                onGenerateRoute: (settings) {
-                  final Function? pageContentBuilder =
-                      DanxiApp.routes[settings.name!];
-                  if (pageContentBuilder != null) {
-                    return platformPageRoute(
-                        context: context,
-                        builder: (context) => pageContentBuilder(context,
-                            arguments: settings.arguments));
-                  }
-                  return null;
-                },
-                initialRoute: '/placeholder',
-              ))
-        ],
+                  window.physicalSize.height,
+                ),
+              ),
+              child: Container(
+                width: kTabletMasterContainerWidth,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                    border: Border(
+                        right: BorderSide(
+                            width: 1, color: Theme.of(context).dividerColor))),
+                child: PlatformApp(
+                  useInheritedMediaQuery: true,
+                  scrollBehavior: MyCustomScrollBehavior(),
+                  debugShowCheckedModeBanner: false,
+                  // Fix cupertino UI text color issues
+                  cupertino: (context, __) => CupertinoAppData(
+                      theme: CupertinoThemeData(
+                          textTheme: CupertinoTextThemeData(
+                              textStyle: TextStyle(
+                                  color: PlatformX.getTheme(context)
+                                      .textTheme
+                                      .bodyText1!
+                                      .color)))),
+                  // Configure i18n delegates
+                  localizationsDelegates: [
+                    S.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate
+                  ],
+                  supportedLocales: S.delegate.supportedLocales,
+                  home: masterPage,
+                  // Configure the page route behaviour of the whole app
+                  onGenerateRoute: (settings) {
+                    final Function? pageContentBuilder =
+                        DanxiApp.routes[settings.name!];
+                    if (pageContentBuilder != null) {
+                      return platformPageRoute(
+                          context: context,
+                          builder: (context) => pageContentBuilder(context,
+                              arguments: settings.arguments));
+                    }
+                    return null;
+                  },
+                  navigatorKey: Catcher.navigatorKey,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(),
+                child: MediaQuery(
+                  data: MediaQueryData.fromWindow(window).copyWith(
+                    size: Size(
+                      window.physicalSize.width - kTabletMasterContainerWidth,
+                      window.physicalSize.height,
+                    ),
+                  ),
+                  child: PlatformApp(
+                    useInheritedMediaQuery: true,
+                    scrollBehavior: MyCustomScrollBehavior(),
+                    debugShowCheckedModeBanner: false,
+                    // Fix cupertino UI text color issues
+                    cupertino: (context, __) => CupertinoAppData(
+                        theme: CupertinoThemeData(
+                            textTheme: CupertinoTextThemeData(
+                                textStyle: TextStyle(
+                                    color: PlatformX.getTheme(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .color)))),
+                    // Configure i18n delegates
+                    localizationsDelegates: [
+                      S.delegate,
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate
+                    ],
+                    supportedLocales: S.delegate.supportedLocales,
+                    home: const SizedBox(),
+                    // Configure the page route behaviour of the whole app
+                    onGenerateRoute: (settings) {
+                      final Function? pageContentBuilder =
+                          DanxiApp.routes[settings.name!];
+                      if (pageContentBuilder != null) {
+                        return platformPageRoute(
+                            context: context,
+                            builder: (context) => pageContentBuilder(context,
+                                arguments: settings.arguments));
+                      }
+                      return null;
+                    },
+                    navigatorKey: detailNavigatorKey,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
