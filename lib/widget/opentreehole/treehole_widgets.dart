@@ -141,16 +141,6 @@ class OTFloorWidget extends StatelessWidget {
             : null,
         child: ListTile(
           dense: true,
-          leading: isInMention
-              ? null
-              : Container(
-                  width: 4,
-                  color: Colors
-                      .accents[floor.anonyname.hashCode % Colors.accents.length]
-                      .shade700
-                  //.withOpacity(0.5),
-                  ),
-          minLeadingWidth: 0,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
