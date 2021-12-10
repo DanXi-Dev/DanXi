@@ -49,7 +49,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -311,7 +310,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
-  Future<void> refreshSelf() async {
+  Future<void> _refreshList() async {
     if (_postsType == PostsType.FAVORED_DISCUSSION) {
       await OpenTreeHoleRepository.getInstance()
           .getFavoriteHoleId(forceUpdate: true);
@@ -385,7 +384,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
               await BBSEditor.createNewPost(context, _divisionId);
-          if (success) refreshSelf();
+          if (success) _refreshList();
         }),
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
@@ -393,14 +392,14 @@ class _BBSSubpageState extends State<BBSSubpage>
           if (event.refreshAll == true) {
             _refreshAll();
           } else
-            refreshSelf();
+            _refreshList();
         }),
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           if (event.newDivision.division_id != _divisionId) {
             StateProvider.divisionId = event.newDivision;
-            refreshSelf();
+            _refreshList();
           }
           //SettingsProvider.getInstance().fduholeSortOrder = _sortOrder = event.newDivision;
         }),
@@ -408,6 +407,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
   }
 
+  /// Reload the whole page.
   void _refreshAll() {
     setState(() {});
   }
@@ -477,7 +477,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
-              await refreshSelf();
+              await _refreshList();
             },
             child: PagedListView<OTHole>(
                 noneItem: OTHole.DUMMY_POST,
@@ -520,7 +520,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     return OTWelcomeWidget(loginCallback: () async {
                       await smartNavigatorPush(context, "/bbs/login",
                           arguments: {"info": StateProvider.personInfo.value!});
-                      refreshSelf();
+                      _refreshList();
                     });
                   }
                   return const SizedBox();

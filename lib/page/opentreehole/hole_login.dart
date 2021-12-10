@@ -24,6 +24,7 @@ import 'package:dan_xi/util/password_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -55,9 +56,7 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
   void initState() {
     super.initState();
     info = widget.arguments!["info"];
-    _currentWidget = OTLoginMethodSelectionWidget(
-      state: this,
-    );
+    _currentWidget = OTLoginMethodSelectionWidget(state: this);
     _widgetStack.add(_currentWidget);
   }
 
@@ -158,7 +157,13 @@ abstract class SubStatelessWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4))),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-              child: buildContent(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (backable) ThemedMaterial(child: BackButton()),
+                  buildContent(context),
+                ],
+              ),
             ),
           ),
         ),
