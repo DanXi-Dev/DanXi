@@ -207,6 +207,8 @@
     "forum":"树洞",
     "timetable":"日程",
     "week":"第 {week} 周",
+    "postgraduates_need_login":"点击此处以登录课表系统。",
+    "not_fudan_student":"非复旦学生暂不支持课表功能。",
 
     "you_need_login":"点击[登录]以登录到 FDUHole。",
     "select_login_method":"选择您的登录/注册方式",

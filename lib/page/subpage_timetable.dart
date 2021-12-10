@@ -142,13 +142,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           return controller.text;
         });
       } else {
-        _content = LazyFuture.pack(Future<TimeTable>.error(
-            NotLoginError("Pull down to load timetable.")));
+        _content = LazyFuture.pack(Future<TimeTable?>.error(
+            NotLoginError(S.of(context).postgraduates_need_login)));
       }
       _manualLoad = false;
     } else {
-      _content = LazyFuture.pack(Future<TimeTable>.error(
-          NotLoginError("Haven't logged in as FDU student.")));
+      _content = LazyFuture.pack(Future<TimeTable?>.error(
+          NotLoginError(S.of(context).not_fudan_student)));
     }
   }
 
@@ -259,17 +259,31 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         return _buildPage(snapshot.data);
       },
       future: _content,
-      errorBuilder:
-          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
-              GestureDetector(
-        onTap: () {
-          _manualLoad = true;
-          refreshSelf();
-        },
-        child: Center(
-          child: Text(S.of(context).failed + "\n" + snapshot.error.toString()),
-        ),
-      ),
+      errorBuilder: (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
+        if (snapshot.error != null && snapshot.error is NotLoginError) {
+          return GestureDetector(
+            onTap: () {
+              _manualLoad = true;
+              refreshSelf();
+            },
+            child: Center(
+              child: Text(S.of(context).failed +
+                  "\n" +
+                  (snapshot.error! as NotLoginError).errorMessage),
+            ),
+          );
+        }
+        return GestureDetector(
+          onTap: () {
+            _manualLoad = true;
+            refreshSelf();
+          },
+          child: Center(
+            child:
+                Text(S.of(context).failed + "\n" + snapshot.error.toString()),
+          ),
+        );
+      },
       loadingBuilder: Center(
         child: PlatformCircularProgressIndicator(),
       ),

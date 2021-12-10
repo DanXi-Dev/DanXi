@@ -483,13 +483,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           material: (_, __) => MaterialAppBarData(
             title: TopController(
-              child: DefaultTextStyle(
-                  style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          ?.copyWith(fontWeight: FontWeight.bold) ??
-                      TextStyle(),
-                  child: title),
+              child: title,
               controller: PrimaryScrollController.of(context),
             ),
           ),

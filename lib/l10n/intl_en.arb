@@ -192,6 +192,8 @@
     "forum":"FDUHole",
     "timetable":"Agenda",
     "week":"Week {week}",
+    "postgraduates_need_login":"Click here to log in Campus Schedule System",
+    "not_fudan_student":"Agenda is unavailable for students not in Fudan.",
 
     "you_need_login":"You need log in now.",
     "select_login_method":"Select authentication method",
