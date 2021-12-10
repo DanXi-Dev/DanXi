@@ -168,7 +168,7 @@ class LatexSyntax extends md.InlineSyntax {
 }
 
 class LatexMultiLineSyntax extends md.InlineSyntax {
-  LatexMultiLineSyntax() : super(r'\$\$([\s\S^\$]*?)\$\$');
+  LatexMultiLineSyntax() : super(r'\$\$([^\$]*?)\$\$');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
