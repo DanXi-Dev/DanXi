@@ -29,16 +29,50 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class MasterDetailController extends StatelessWidget {
+class PlatformMasterDetailApp extends StatelessWidget {
   final Widget? masterPage;
 
-  MasterDetailController({Key? key, this.masterPage}) : super(key: key);
+  PlatformMasterDetailApp({Key? key, this.masterPage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (!isTablet(context)) {
-      return masterPage!;
+    if (!isTablet()) {
+      return PlatformApp(
+        scrollBehavior: MyCustomScrollBehavior(),
+        debugShowCheckedModeBanner: false,
+        // Fix cupertino UI text color issues
+        cupertino: (context, __) => CupertinoAppData(
+            theme: CupertinoThemeData(
+                textTheme: CupertinoTextThemeData(
+                    textStyle: TextStyle(
+                        color: PlatformX.getTheme(context)
+                            .textTheme
+                            .bodyText1!
+                            .color)))),
+        // Configure i18n delegates
+        localizationsDelegates: [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+        home: masterPage,
+        // Configure the page route behaviour of the whole app
+        onGenerateRoute: (settings) {
+          final Function? pageContentBuilder = DanxiApp.routes[settings.name!];
+          if (pageContentBuilder != null) {
+            return platformPageRoute(
+                context: context,
+                builder: (context) =>
+                    pageContentBuilder(context, arguments: settings.arguments));
+          }
+          return null;
+        },
+        navigatorKey: Catcher.navigatorKey,
+      );
     }
+    final mqData = MediaQueryData.fromWindow(window);
     return Directionality(
       textDirection: TextDirection.ltr, //TODO: Hardcoded TextDirection
       child: Container(
@@ -47,10 +81,10 @@ class MasterDetailController extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             MediaQuery(
-              data: MediaQueryData.fromWindow(window).copyWith(
+              data: mqData.copyWith(
                 size: Size(
                   kTabletMasterContainerWidth,
-                  window.physicalSize.height,
+                  mqData.size.height,
                 ),
               ),
               child: Container(
@@ -105,8 +139,8 @@ class MasterDetailController extends StatelessWidget {
                 child: MediaQuery(
                   data: MediaQueryData.fromWindow(window).copyWith(
                     size: Size(
-                      window.physicalSize.width - kTabletMasterContainerWidth,
-                      window.physicalSize.height,
+                      mqData.size.width - kTabletMasterContainerWidth,
+                      mqData.size.height,
                     ),
                   ),
                   child: PlatformApp(
@@ -158,9 +192,11 @@ class MasterDetailController extends StatelessWidget {
 Future<T?> smartNavigatorPush<T extends Object>(
     BuildContext context, String routeName,
     {Object? arguments, bool forcePushOnMainNavigator = false}) {
-  if (isTablet(context) && !forcePushOnMainNavigator) {
+  if (isTablet() && !forcePushOnMainNavigator) {
     return detailNavigatorKey.currentState!
         .pushNamed<T?>(routeName, arguments: arguments);
   }
   return Navigator.of(context).pushNamed<T?>(routeName, arguments: arguments);
 }
+
+NavigatorState? get auxiliaryNavigatorState => detailNavigatorKey.currentState;

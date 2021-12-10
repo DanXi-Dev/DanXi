@@ -49,7 +49,6 @@ import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -167,7 +166,7 @@ class DanxiApp extends StatelessWidget {
         // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => Theme(
           data: PlatformX.getTheme(context),
-          child: MasterDetailController(
+          child: PlatformMasterDetailApp(
             masterPage: HomePage(),
           ),
         ),
