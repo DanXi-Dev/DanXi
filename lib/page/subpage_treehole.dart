@@ -124,16 +124,13 @@ class _OTTitleState extends State<OTTitle> {
       DivisionChangedEvent(newDivision).fire();
     };
     OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
-      list.add(PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () => onTapListener(value),
-          child: Text(value.name ?? "null"),
-        ),
-        material: (_, __) => ListTile(
+      list.add(
+        ListTile(
           title: Text(value.name ?? "null"),
+          subtitle: Text(value.description ?? "null"),
           onTap: () => onTapListener(value),
         ),
-      ));
+      );
     });
     return list;
   }
@@ -148,29 +145,22 @@ class _OTTitleState extends State<OTTitle> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(StateProvider.divisionId?.name ?? S.of(context).forum),
-          Icon(PlatformX.isMaterial(context)
-              ? Icons.arrow_drop_down
-              : CupertinoIcons.chevron_compact_down)
+          Icon(Icons.arrow_drop_down)
         ],
       ),
       onTap: () => showPlatformModalSheet(
         context: context,
-        builder: (BuildContext context) => PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheet(
-            title: Text(S.of(context).sort_order),
-            actions: _buildDivisionOptionsList(context),
-            cancelButton: CupertinoActionSheetAction(
-              child: Text(S.of(context).cancel),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+        builder: (BuildContext context) => Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
+              shrinkWrap: true,
+              primary: false,
+              children: _buildDivisionOptionsList(context),
             ),
-          ),
-          material: (_, __) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _buildDivisionOptionsList(context),
           ),
         ),
       ),
