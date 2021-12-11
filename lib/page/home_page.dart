@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -60,6 +61,10 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart';
+import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
+import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
 void sendFduholeTokenToWatch(String? token) {
   const channel = const MethodChannel('fduhole');
@@ -392,6 +397,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           break;
       }
     });
+    if (PlatformX.isAndroid) {
+      XiaoMiPushPlugin.addListener((type, params) {
+        switch (type) {
+          case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
+            if (params is MiPushMessageEntity && params.content != null) {
+              Map obj = jsonDecode(params.content!);
+              OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
+                  context, obj['code'], obj['data']);
+            }
+            break;
+          case XiaoMiPushListenerTypeEnum.RequirePermissions:
+            break;
+          case XiaoMiPushListenerTypeEnum.ReceivePassThroughMessage:
+            break;
+          case XiaoMiPushListenerTypeEnum.CommandResult:
+            break;
+          case XiaoMiPushListenerTypeEnum.ReceiveRegisterResult:
+            if (params is MiPushCommandMessageEntity &&
+                (params.commandArguments?.isNotEmpty ?? false)) {
+              String regId = params.commandArguments![0];
+              if (regId != SettingsProvider.getInstance().miPushRegId) {
+                SettingsProvider.getInstance().miPushRegId = regId;
+                OpenTreeHoleRepository.getInstance()
+                    .updatePushNotificationToken(
+                        regId, "", PushNotificationServiceType.MIPUSH);
+              }
+            }
+            break;
+          case XiaoMiPushListenerTypeEnum.NotificationMessageArrived:
+            break;
+        }
+      });
+    }
   }
 
   @override

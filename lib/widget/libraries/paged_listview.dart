@@ -373,7 +373,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   Future<void> notifyUpdate({useInitialData = true}) async {
-    initialize(useInitialData: useInitialData, queueDataClear: true);
+    initialize(useInitialData: useInitialData, queueDataClear: false);
     refreshSelf();
     await _futureData;
   }
@@ -410,14 +410,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   Future<void> scrollDelta(double pixels,
-      [Duration duration = kDuration, Curve curve = kCurve]) async {
-    await currentController!.animateTo(currentController!.offset + pixels,
-        duration: duration, curve: curve);
-  }
+          [Duration duration = kDuration, Curve curve = kCurve]) =>
+      currentController!.animateTo(currentController!.offset + pixels,
+          duration: duration, curve: curve);
 
-  ScrollController? getScrollController() {
-    return currentController;
-  }
+  ScrollController? getScrollController() => currentController;
 
   @override
   void initState() {
@@ -458,9 +455,8 @@ class PagedListViewController<T> implements ListProvider<T> {
     this._state = state;
   }
 
-  Future<void> notifyUpdate({useInitialData = true}) {
-    return _state.notifyUpdate(useInitialData: useInitialData);
-  }
+  Future<void> notifyUpdate({useInitialData = true}) =>
+      _state.notifyUpdate(useInitialData: useInitialData);
 
   /// Returns whether the scroll was successful or not
   /// May fail due to RenderObject not cached
@@ -485,9 +481,7 @@ class PagedListViewController<T> implements ListProvider<T> {
     await _state.scrollDelta(pixels, duration, curve);
   }
 
-  ScrollController? getScrollController() {
-    return _state.getScrollController();
-  }
+  ScrollController? getScrollController() => _state.getScrollController();
 
   queueScrollToEnd() {
     _state.queueScrollToEnd();
@@ -500,25 +494,18 @@ class PagedListViewController<T> implements ListProvider<T> {
   }
 
   @override
-  T getElementAt(int index) {
-    return _state.getElementAt(index);
-  }
+  T getElementAt(int index) => _state.getElementAt(index);
 
   @override
   T getElementFirstWhere(bool Function(dynamic) test,
-      {dynamic Function()? orElse}) {
-    return _state.getElementFirstWhere(test, orElse: orElse);
-  }
+          {dynamic Function()? orElse}) =>
+      _state.getElementFirstWhere(test, orElse: orElse);
 
   @override
-  int indexOf(T element, [int start = 0]) {
-    return _state.indexOf(element, start);
-  }
+  int indexOf(T element, [int start = 0]) => _state.indexOf(element, start);
 
   @override
-  int length() {
-    return _state.length();
-  }
+  int length() => _state.length();
 }
 
 class FatalException implements Exception {}

@@ -52,8 +52,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-import 'generated/l10n.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 
 /// The main entry of the whole app.
 /// Do some initial work here.
@@ -76,6 +75,11 @@ void main() {
 
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+
+  // Init Mi push Service.
+  if (PlatformX.isAndroid)
+    XiaoMiPushPlugin.init(
+        appId: "2882303761519940685", appKey: "5821994071685");
 
   // Init Feature registration.
   FeatureMap.registerAllFeatures();

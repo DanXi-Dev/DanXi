@@ -111,8 +111,7 @@ class _OTTitleState extends State<OTTitle> {
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           StateProvider.divisionId = event.newDivision;
-          Future.delayed(Duration(milliseconds: 200))
-              .then((value) => refreshSelf());
+          refreshSelf();
         }),
         hashCode);
   }
@@ -142,14 +141,20 @@ class _OTTitleState extends State<OTTitle> {
   @override
   void dispose() {
     super.dispose();
-    print("disposed!");
     _divisionChangedSubscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: Text(StateProvider.divisionId?.name ?? S.of(context).forum),
+      child: Row(
+        children: [
+          Text(StateProvider.divisionId?.name ?? S.of(context).forum),
+          Icon(PlatformX.isMaterial(context)
+              ? Icons.arrow_drop_down
+              : CupertinoIcons.chevron_compact_down)
+        ],
+      ),
       onTap: () => showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) => PlatformWidget(
@@ -392,26 +397,18 @@ class _BBSSubpageState extends State<BBSSubpage>
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshBBSEvent>().listen((event) {
           if (event.refreshAll == true) {
-            _refreshAll();
+            refreshSelf();
           } else
             _refreshList();
         }),
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          // if (event.newDivision.division_id != _divisionId) {
           StateProvider.divisionId = event.newDivision;
-            _refreshList();
-          // }
-          //SettingsProvider.getInstance().fduholeSortOrder = _sortOrder = event.newDivision;
+          _refreshList();
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
-  }
-
-  /// Reload the whole page.
-  void _refreshAll() {
-    setState(() {});
   }
 
   @override
