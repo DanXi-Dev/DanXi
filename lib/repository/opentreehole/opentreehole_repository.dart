@@ -551,7 +551,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             "device_id": id,
             "token": token,
           },
-          options: Options(headers: _tokenHeader));
+          options: Options(
+            headers: _tokenHeader,
+            validateStatus: (status) => status == 200,
+          ));
     } else {
       _pushNotificationRegData = PushNotificationRegData(id, token, service);
     }

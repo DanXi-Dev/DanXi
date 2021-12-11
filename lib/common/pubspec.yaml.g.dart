@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1638868170;
+const int timestamp = 1639197658;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -102,6 +102,12 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'master',
     },
   },
+  'xiao_mi_push_plugin': <String, Object>{
+    'git': <String, Object>{
+      'url': r'git://github.com/w568w/FlutterXiaoMiPushPlugin.git',
+      'ref': r'master',
+    },
+  },
   'beautiful_soup_dart': r'^0.2.0',
   'quick_actions': r'^0.6.0+1',
   'qr_flutter': r'^4.0.0',
@@ -110,11 +116,11 @@ const Map<String, Object> dependencies = <String, Object>{
   'event_bus': r'^2.0.0',
   'flutter_platform_widgets': r'^1.1.0',
   'share': r'^2.0.1',
-  'path_provider': r'^2.0.1',
+  'path_provider': r'^2.0.8',
   'screen_brightness': r'^0.1.1',
   'flutter_email_sender': r'^5.0.0',
   'auto_size_text': r'^3.0.0-nullsafety.0',
-  'ical': r'^0.2.0',
+  'ical': r'^0.2.2',
   'url_launcher': r'^6.0.3',
   'desktop_window': r'^0.4.0',
   'flutter_html': r'^2.0.0',
@@ -127,7 +133,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'image_picker': r'^0.8.1',
   'clipboard': r'^0.1.3',
   'flutter_inappwebview': r'^5.3.2',
-  'permission_handler': r'^8.1.4+2',
+  'permission_handler': r'^8.3.0',
   'in_app_review': r'^2.0.2',
   'flutter_linkify': r'^5.0.2',
   'linkify': r'^4.0.0',
@@ -149,6 +155,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
   'flutter_js': r'^0.5.0+3',
+  'flutter_math_fork': r'^0.5.0',
 };
 
 /// Developer dependencies
