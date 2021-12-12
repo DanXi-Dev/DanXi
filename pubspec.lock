@@ -1140,6 +1140,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.2"
+  screen_capture_event:
+    dependency: "direct main"
+    description:
+      name: screen_capture_event
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.0+1"
   sentry:
     dependency: transitive
     description:

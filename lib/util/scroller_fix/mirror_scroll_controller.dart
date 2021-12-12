@@ -32,10 +32,15 @@ import 'package:flutter/widgets.dart';
 /// the same [PrimaryScrollController], which is not permitted. (See [ScrollController.position])
 /// And this class is to solve such a problem, working as a decoration of [PrimaryScrollController].
 ///
-/// Further more:
+/// Furthermore:
 /// It is useless in most cases. If you find yourself in a situation that this class is necessary,
 /// you should consider wrapping the layout of subpages with [Scaffold] or its subclasses, so every subpage has
 /// its own [PrimaryScrollController] and conflict above is easily prevented.
+///
+/// See also:
+///   * [PrimaryScrollController]
+///   * [PlatformSubpage]
+///   * [PageWithPrimaryScrollController]
 class MirrorScrollController extends ScrollController {
   final ScrollController? originController;
   ScrollPosition? _oldPosition;

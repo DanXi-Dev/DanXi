@@ -204,7 +204,7 @@ class Course {
 
   static _trimCourseName(String name) {
     name = name.trim();
-    int idPos = name.lastIndexOf(RegExp(r'\(\w{4}\d{6}.?\.\d{2}\)'));
+    int idPos = name.lastIndexOf(RegExp(r'\(\w{3,4}\d{6}.?\.\d{2}h?\)'));
     return idPos >= 0 ? name.replaceRange(idPos, name.length, "") : name;
   }
 
