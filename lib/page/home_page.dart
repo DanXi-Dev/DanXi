@@ -413,10 +413,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         switch (type) {
           case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
             if (params is MiPushMessageEntity && params.content != null) {
-              print("Receive content: ${params.content}");
-              Map obj = jsonDecode(Uri.decodeComponent(params.content!));
+              Map<String, String> obj = Uri.splitQueryString(params.content!);
               OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
-                  context, obj['code'], obj['data']);
+                  context, obj['code'], jsonDecode(obj['data'] ?? ""));
             }
             break;
           case XiaoMiPushListenerTypeEnum.RequirePermissions:
