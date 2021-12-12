@@ -314,8 +314,6 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                     checkEmailInfo(context, email, email == recommendedEmail)
                         .catchError((e, st) {
                       state.jumpBackFromLoadingPage();
-                      debugPrint(e);
-                      debugPrintStack(stackTrace: st);
                       Noticing.showNotice(state.context,
                           S.of(state.context).unable_to_connect_to_server);
                     });
@@ -670,9 +668,7 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.done)),
           child: Text(S.of(context).i_see),
-          onPressed: () {
-            Navigator.pop(state.context);
-          },
+          onPressed: () => Navigator.pop(state.context),
         )
       ],
     );

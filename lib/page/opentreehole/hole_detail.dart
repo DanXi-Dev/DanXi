@@ -35,7 +35,6 @@ import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -144,7 +143,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           .loadFloors(_post, page * 10, 10);
   }
 
-  Future<bool?> _isHoleFavorited() async {
+  Future<bool?> _isHoleFavorite() async {
     if (_isFavored != null) return _isFavored;
     final List<int>? favorites =
         await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
@@ -270,7 +269,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _buildFavoredActionButton() => PlatformIconButton(
         padding: EdgeInsets.zero,
         icon: FutureWidget<bool?>(
-          future: _isHoleFavorited(),
+          future: _isHoleFavorite(),
           loadingBuilder: PlatformCircularProgressIndicator(),
           successBuilder:
               (BuildContext context, AsyncSnapshot<bool?> snapshot) {
@@ -393,20 +392,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             // to its children. Otherwise, context of bbs_post will be used, which
             // will result in incorrect Navigator.pop() behavior.
             builder: (BuildContext context) => PlatformWidget(
-                  cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(context, floor),
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                cupertino: (_, __) => CupertinoActionSheet(
+                      actions: _buildContextMenu(context, floor),
+                      cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
                     ),
-                  ),
-                  material: (_, __) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _buildContextMenu(context, floor),
-                  ),
-                ));
+                material: (_, __) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _buildContextMenu(context, floor),
+                    )));
       },
       onTap: () async {
         if (_searchKeyword == null) {

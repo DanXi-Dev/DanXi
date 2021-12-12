@@ -71,7 +71,8 @@ bool isHtml(String content) {
 
 final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
     multiLine: true, dotAll: true);
-//final RegExp mentionRegExp = RegExp(r"<(floor|hole)_mention>.*?</(floor|hole)_mention>");
+final RegExp mentionRegExp =
+    RegExp(r"<(floor|hole)_mention>.*?</(floor|hole)_mention>");
 
 /// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
@@ -81,11 +82,13 @@ String renderText(
     content = md.markdownToHtml(content, inlineSyntaxes: [
       LatexSyntax(),
       LatexMultiLineSyntax(),
+      MentionSyntax()
     ]);
   }
   // Deal with LaTex
   content = content.replaceAll(latexRegExp, formulaPlaceholder);
-
+  // Deal with Mention
+  content = content.replaceAll(mentionRegExp, "");
   var soup = BeautifulSoup(content);
   var images = soup.findAll("img");
   if (images.length > 0) return soup.getText().trim() + imagePlaceholder;
