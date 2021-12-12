@@ -18,6 +18,7 @@
 import 'dart:convert';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
@@ -170,7 +171,14 @@ class SettingsProvider {
   set fduholeToken(String? value) =>
       preferences!.setString(KEY_FDUHOLE_TOKEN, value!);
 
-  void deleteSavedFduholeToken() => preferences!.remove(KEY_FDUHOLE_TOKEN);
+  void deleteAllFduholeData() {
+    preferences!.remove(KEY_FDUHOLE_TOKEN);
+    preferences!.remove(KEY_LAST_PUSH_TOKEN);
+    preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
+    preferences!.remove(KEY_FDUHOLE_SORTORDER);
+    preferences!.remove(KEY_HIDDEN_HOLE);
+    preferences!.remove(KEY_HIDDEN_TAGS);
+  }
 
   //Debug Mode
   bool get debugMode {

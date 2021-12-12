@@ -60,6 +60,8 @@ class TimetableSubPage extends PlatformSubpage
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 
+  TimetableSubPage({Key? key}) : super(key: key);
+
   @override
   String get debugTag => "TimetablePage";
 

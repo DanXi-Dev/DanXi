@@ -181,7 +181,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   _BBSSubpageState createState() => _BBSSubpageState();
 
-  BBSSubpage({Key? key, this.arguments});
+  BBSSubpage({Key? key, this.arguments}) : super(key: key);
 
   @override
   String get debugTag => "BBSPage";

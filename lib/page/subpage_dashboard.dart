@@ -57,7 +57,7 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
   _HomeSubpageState createState() => _HomeSubpageState();
 
-  HomeSubpage({Key? key});
+  HomeSubpage({Key? key}) : super(key: key);
 
   @override
   String get debugTag => "HomePage";

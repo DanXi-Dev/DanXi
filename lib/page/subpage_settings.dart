@@ -63,7 +63,7 @@ class SettingsSubpage extends PlatformSubpage
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 
-  SettingsSubpage({Key? key});
+  SettingsSubpage({Key? key}) : super(key: key);
 
   @override
   String get debugTag => "SettingsPage";
@@ -241,7 +241,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   List<Widget> _buildFoldBehaviorList(BuildContext context) {
     List<Widget> list = [];
     Function onTapListener = (FoldBehavior value) {
-      // TODO: handle null userInfo
       OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
           value.internalString();
       RefreshBBSEvent(refreshAll: true).fire();
@@ -392,162 +391,189 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             },
                           ),
                         ),
+                        if (PlatformX.isWindows)
+                          Card(
+                            child: SwitchListTile(
+                                title: Text(
+                                    S.of(context).windows_auto_start_title),
+                                secondary: const Icon(Icons.settings_power),
+                                subtitle: Text(S
+                                    .of(context)
+                                    .windows_auto_start_description),
+                                value: WindowsAutoStart.autoStart,
+                                onChanged: (bool value) async {
+                                  WindowsAutoStart.autoStart = value;
+                                  await Noticing.showNotice(
+                                      context,
+                                      S
+                                          .of(context)
+                                          .windows_auto_start_wait_dialog_message,
+                                      title: S
+                                          .of(context)
+                                          .windows_auto_start_wait_dialog_title,
+                                      useSnackBar: false);
+                                  refreshSelf();
+                                }),
+                          ),
 
                         // FDUHOLE
                         Card(
                           child: Column(
                             children: [
-                              if (PlatformX.isWindows)
-                                SwitchListTile(
-                                    title: Text(
-                                        S.of(context).windows_auto_start_title),
-                                    secondary: const Icon(Icons.settings_power),
-                                    subtitle: Text(S
-                                        .of(context)
-                                        .windows_auto_start_description),
-                                    value: WindowsAutoStart.autoStart,
-                                    onChanged: (bool value) async {
-                                      WindowsAutoStart.autoStart = value;
-                                      await Noticing.showNotice(
-                                          context,
-                                          S
-                                              .of(context)
-                                              .windows_auto_start_wait_dialog_message,
-                                          title: S
-                                              .of(context)
-                                              .windows_auto_start_wait_dialog_title,
-                                          useSnackBar: false);
-                                      refreshSelf();
-                                    }),
-                              FutureWidget<OTUser?>(
-                                future: OpenTreeHoleRepository.getInstance()
-                                    .getUserProfile(),
-                                successBuilder: (BuildContext context,
-                                        AsyncSnapshot<OTUser?> snapshot) =>
-                                    ListTile(
-                                  title:
-                                      Text(S.of(context).fduhole_nsfw_behavior),
-                                  leading: PlatformX.isMaterial(context)
-                                      ? const Icon(Icons.hide_image)
-                                      : const Icon(CupertinoIcons.eye_slash),
-                                  subtitle: Text(foldBehaviorFromInternalString(
-                                          snapshot.data!.config!.show_folded!)
-                                      .displayTitle(context)!),
-                                  onTap: () {
-                                    showPlatformModalSheet(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            PlatformWidget(
-                                              cupertino: (_, __) =>
-                                                  CupertinoActionSheet(
-                                                title: Text(S
-                                                    .of(context)
-                                                    .fduhole_nsfw_behavior),
-                                                actions: _buildFoldBehaviorList(
-                                                    context),
-                                                cancelButton:
-                                                    CupertinoActionSheetAction(
-                                                  child: Text(
-                                                      S.of(context).cancel),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ),
-                                              material: (_, __) => Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children:
-                                                    _buildFoldBehaviorList(
-                                                        context),
-                                              ),
-                                            ));
-                                  },
-                                ),
-                                errorBuilder: () {
-                                  if (!OpenTreeHoleRepository.getInstance()
-                                      .isUserInitialized)
-                                    return ListTile(
-                                        title: Text(S
-                                            .of(context)
-                                            .fduhole_nsfw_behavior),
-                                        leading: PlatformX.isMaterial(context)
-                                            ? const Icon(Icons.hide_image)
-                                            : const Icon(
-                                                CupertinoIcons.eye_slash),
-                                        subtitle:
-                                            Text(S.of(context).not_logged_in),
-                                        onTap: () {
-                                          refreshSelf();
-                                        });
-                                  return ListTile(
+                              ListTile(
+                                leading:
+                                    Icon(PlatformIcons(context).accountCircle),
+                                title: Text(
+                                    "${S.of(context).forum} ${S.of(context).account}"),
+                                subtitle: Text(OpenTreeHoleRepository
+                                            .getInstance()
+                                        .isUserInitialized
+                                    ? S.of(context).fduhole_user_id(
+                                        (OpenTreeHoleRepository.getInstance()
+                                                .userInfo
+                                                ?.user_id)
+                                            .toString())
+                                    : S.of(context).not_logged_in),
+                                onTap: () async {
+                                  if (OpenTreeHoleRepository.getInstance()
+                                          .isUserInitialized &&
+                                      await Noticing.askForConfirmation(context,
+                                              S.of(context).logout_fduhole,
+                                              title: S.of(context).logout) ==
+                                          true) {
+                                    OpenTreeHoleRepository.getInstance()
+                                        .clearCache();
+                                    SettingsProvider.getInstance()
+                                        .deleteAllFduholeData();
+                                  }
+                                },
+                              ),
+                              if (OpenTreeHoleRepository.getInstance()
+                                  .isUserInitialized) ...[
+                                Divider(height: 0),
+                                FutureWidget<OTUser?>(
+                                  future: OpenTreeHoleRepository.getInstance()
+                                      .getUserProfile(),
+                                  successBuilder: (BuildContext context,
+                                          AsyncSnapshot<OTUser?> snapshot) =>
+                                      ListTile(
                                     title: Text(
                                         S.of(context).fduhole_nsfw_behavior),
                                     leading: PlatformX.isMaterial(context)
                                         ? const Icon(Icons.hide_image)
                                         : const Icon(CupertinoIcons.eye_slash),
-                                    subtitle: Text(S.of(context).fatal_error),
+                                    subtitle: Text(
+                                        foldBehaviorFromInternalString(snapshot
+                                                .data!.config!.show_folded!)
+                                            .displayTitle(context)!),
+                                    onTap: () {
+                                      showPlatformModalSheet(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              PlatformWidget(
+                                                cupertino: (_, __) =>
+                                                    CupertinoActionSheet(
+                                                  title: Text(S
+                                                      .of(context)
+                                                      .fduhole_nsfw_behavior),
+                                                  actions:
+                                                      _buildFoldBehaviorList(
+                                                          context),
+                                                  cancelButton:
+                                                      CupertinoActionSheetAction(
+                                                    child: Text(
+                                                        S.of(context).cancel),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                ),
+                                                material: (_, __) => Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children:
+                                                      _buildFoldBehaviorList(
+                                                          context),
+                                                ),
+                                              ));
+                                    },
+                                  ),
+                                  errorBuilder: () {
+                                    return ListTile(
+                                      title: Text(
+                                          S.of(context).fduhole_nsfw_behavior),
+                                      leading: PlatformX.isMaterial(context)
+                                          ? const Icon(Icons.hide_image)
+                                          : const Icon(
+                                              CupertinoIcons.eye_slash),
+                                      subtitle: Text(S.of(context).fatal_error),
+                                      onTap: () {
+                                        refreshSelf();
+                                      },
+                                    );
+                                  },
+                                  loadingBuilder: ListTile(
+                                    title: Text(
+                                        S.of(context).fduhole_nsfw_behavior),
+                                    leading: PlatformX.isMaterial(context)
+                                        ? const Icon(Icons.hide_image)
+                                        : const Icon(CupertinoIcons.eye_slash),
+                                    subtitle: Text(S.of(context).loading),
                                     onTap: () {
                                       refreshSelf();
                                     },
-                                  );
-                                },
-                                loadingBuilder: ListTile(
-                                  title:
-                                      Text(S.of(context).fduhole_nsfw_behavior),
-                                  leading: PlatformX.isMaterial(context)
-                                      ? const Icon(Icons.hide_image)
-                                      : const Icon(CupertinoIcons.eye_slash),
-                                  subtitle: Text(S.of(context).loading),
-                                  onTap: () {
-                                    refreshSelf();
+                                  ),
+                                ),
+                                OTNotificationSettingsTile(
+                                  parentSetStateFunction: refreshSelf,
+                                ),
+                                SwitchListTile(
+                                  title: Text(S.of(context).fduhole_clean_mode),
+                                  secondary: const Icon(Icons.ac_unit),
+                                  subtitle: Text(S
+                                      .of(context)
+                                      .fduhole_clean_mode_description),
+                                  value:
+                                      SettingsProvider.getInstance().cleanMode,
+                                  onChanged: (bool value) {
+                                    if (value) {
+                                      _showCleanModeGuideDialog();
+                                    }
+                                    setState(() =>
+                                        SettingsProvider.getInstance()
+                                            .cleanMode = value);
                                   },
                                 ),
-                              ),
-                              OTNotificationSettingsTile(
-                                parentSetStateFunction: refreshSelf,
-                              ),
-                              SwitchListTile(
-                                title: Text(S.of(context).fduhole_clean_mode),
-                                secondary: const Icon(Icons.ac_unit),
-                                subtitle: Text(S
-                                    .of(context)
-                                    .fduhole_clean_mode_description),
-                                value: SettingsProvider.getInstance().cleanMode,
-                                onChanged: (bool value) {
-                                  if (value) {
-                                    _showCleanModeGuideDialog();
-                                  }
-                                  setState(() => SettingsProvider.getInstance()
-                                      .cleanMode = value);
-                                },
-                              ),
-                              ListTile(
-                                leading: Icon(PlatformIcons(context).tag),
-                                title: Text(S.of(context).fduhole_hidden_tags),
-                                subtitle: Text(S
-                                    .of(context)
-                                    .fduhole_hidden_tags_description),
-                                onTap: () async {
-                                  await smartNavigatorPush(
-                                      context, '/bbs/tags/blocklist');
-                                  RefreshBBSEvent().fire();
-                                },
-                              ),
-                              // Clear Cache
-                              ListTile(
-                                leading:
-                                    Icon(PlatformIcons(context).photoLibrary),
-                                title: Text(S.of(context).clear_cache),
-                                subtitle: Text(_clearCacheSubtitle ??
-                                    S.of(context).clear_cache_description),
-                                onTap: () async {
-                                  await DefaultCacheManager().emptyCache();
-                                  setState(() {
-                                    _clearCacheSubtitle =
-                                        S.of(context).cache_cleared;
-                                  });
-                                },
-                              ),
+                                ListTile(
+                                  leading: Icon(PlatformIcons(context).tag),
+                                  title:
+                                      Text(S.of(context).fduhole_hidden_tags),
+                                  subtitle: Text(S
+                                      .of(context)
+                                      .fduhole_hidden_tags_description),
+                                  onTap: () async {
+                                    await smartNavigatorPush(
+                                        context, '/bbs/tags/blocklist');
+                                    RefreshBBSEvent().fire();
+                                  },
+                                ),
+                                // Clear Cache
+                                ListTile(
+                                  leading:
+                                      Icon(PlatformIcons(context).photoLibrary),
+                                  title: Text(S.of(context).clear_cache),
+                                  subtitle: Text(_clearCacheSubtitle ??
+                                      S.of(context).clear_cache_description),
+                                  onTap: () async {
+                                    await DefaultCacheManager().emptyCache();
+                                    setState(() {
+                                      _clearCacheSubtitle =
+                                          S.of(context).cache_cleared;
+                                    });
+                                  },
+                                ),
+                              ],
                             ],
                           ),
                         ),
