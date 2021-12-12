@@ -155,25 +155,28 @@ class _OTTitleState extends State<OTTitle> {
               : CupertinoIcons.chevron_compact_down)
         ],
       ),
-      onTap: () => showPlatformModalSheet(
-        context: context,
-        builder: (BuildContext context) => PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheet(
-            title: Text(S.of(context).sort_order),
-            actions: _buildDivisionOptionsList(context),
-            cancelButton: CupertinoActionSheetAction(
-              child: Text(S.of(context).cancel),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+      onTap: () {
+        if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+          showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext context) => PlatformWidget(
+              cupertino: (_, __) => CupertinoActionSheet(
+                title: Text(S.of(context).sort_order),
+                actions: _buildDivisionOptionsList(context),
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              material: (_, __) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildDivisionOptionsList(context),
+              ),
             ),
-          ),
-          material: (_, __) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _buildDivisionOptionsList(context),
-          ),
-        ),
-      ),
+          );
+      },
     );
   }
 }
