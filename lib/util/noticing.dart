@@ -23,7 +23,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-/// Simple helper class to show a [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
+/// Simple helper class to show a notice,
+/// like [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
 class Noticing {
   static showNotice(BuildContext context, String message,
       {String? confirmText,
@@ -54,11 +55,15 @@ class Noticing {
                 content: centerContent!
                     ? Center(
                         child: Linkify(
+                        textAlign:
+                            centerContent ? TextAlign.center : TextAlign.start,
                         text: message,
                         onOpen: (element) =>
                             BrowserUtil.openUrl(element.url, context),
                       ))
                     : Linkify(
+                        textAlign:
+                            centerContent ? TextAlign.center : TextAlign.start,
                         text: message,
                         onOpen: (element) =>
                             BrowserUtil.openUrl(element.url, context),
@@ -70,6 +75,48 @@ class Noticing {
                 ],
               ));
     }
+  }
+
+  static Future<bool?> showConfirmationDialog(
+      BuildContext context, String message,
+      {String? confirmText,
+      String? title,
+      bool isConfirmDestructive = false,
+      bool? centerContent}) async {
+    centerContent ??= !PlatformX.isMaterial(context);
+    return await showPlatformDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: title == null ? null : Text(title),
+              content: centerContent!
+                  ? Center(
+                      child: Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ))
+                  : Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    cupertino: (context, platform) =>
+                        CupertinoDialogActionData(isDefaultAction: true),
+                    child: PlatformText(confirmText ?? S.of(context).cancel),
+                    onPressed: () => Navigator.pop(context, false)),
+                PlatformDialogAction(
+                    cupertino: (context, platform) => CupertinoDialogActionData(
+                        isDestructiveAction: isConfirmDestructive),
+                    child: PlatformText(confirmText ?? S.of(context).i_see),
+                    onPressed: () => Navigator.pop(context, true)),
+              ],
+            ));
   }
 
   static showModalNotice(BuildContext context,
@@ -91,4 +138,8 @@ class Noticing {
       ),
     );
   }
+
+  static showScreenshotWarning(BuildContext context) =>
+      Noticing.showNotice(context, S.of(context).screenshot_warning,
+          title: S.of(context).screenshot_warning_title, useSnackBar: false);
 }

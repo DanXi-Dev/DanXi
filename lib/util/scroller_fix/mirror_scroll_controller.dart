@@ -15,9 +15,27 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+/// A scroll controller to imitate the scroll state of [originController],
+/// but it allows multiple [attach] and [detach].
+///
+/// Why:
+/// It is used in the situation that there are more than one [ListView]s on a
+/// page which shows one of them at one time (i.e. a page with tab pages, like [HomePage]),
+/// and in different subpage you hope only the exact [ListView] on that subpage responds to
+/// primary scroll control actions (e.g. double tap on the title bar on iOS).
+/// When the tab pages initialize, all of its [ListView] will try to attach themselves to
+/// the same [PrimaryScrollController], which is not permitted. (See [ScrollController.position])
+/// And this class is to solve such a problem, working as a decoration of [PrimaryScrollController].
+///
+/// Further more:
+/// It is useless in most cases. If you find yourself in a situation that this class is necessary,
+/// you should consider wrapping the layout of subpages with [Scaffold] or its subclasses, so every subpage has
+/// its own [PrimaryScrollController] and conflict above is easily prevented.
 class MirrorScrollController extends ScrollController {
   final ScrollController? originController;
   ScrollPosition? _oldPosition;

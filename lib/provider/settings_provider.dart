@@ -18,15 +18,16 @@
 import 'dart:convert';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
-import 'package:dan_xi/model/post_tag.dart';
+import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A class to manage [SharedPreferences] Settings
 ///
-/// Code Integrity Notice:
+/// Code Integrity Note:
 /// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
 /// Only return [null] when there is no default value.
 class SettingsProvider {
@@ -37,7 +38,8 @@ class SettingsProvider {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
+  static const String KEY_LAST_PUSH_TOKEN = "push_token";
+  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v2";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
       "ec_last_choice";
@@ -147,31 +149,16 @@ class SettingsProvider {
     preferences!.setString(KEY_PREFERRED_CAMPUS, campus.toString());
   }
 
-  //FudanDaily AutoTick
-  /*
-  String get autoTickCancelDate {
-    if (_preferences.containsKey(KEY_AUTOTICK_LAST_CANCEL_DATE)) {
-      return _preferences.getString(KEY_AUTOTICK_LAST_CANCEL_DATE);
+  //Push Token
+  String? get lastPushToken {
+    if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {
+      return preferences!.getString(KEY_LAST_PUSH_TOKEN)!;
     }
     return null;
   }
 
-  set autoTickCancelDate(String datetime) {
-    _preferences.setString(KEY_AUTOTICK_LAST_CANCEL_DATE, datetime.toString());
-  }
-
-  //Theme
-  //int: 0 for Material, 1 for Cupertino
-  int get theme {
-    if (_preferences.containsKey(KEY_PREFERRED_THEME)) {
-      return _preferences.getInt(KEY_PREFERRED_THEME);
-    }
-    return null;
-  }
-
-  set theme(int theme) {
-    _preferences.setInt(KEY_PREFERRED_THEME, theme);
-  }*/
+  set lastPushToken(String? value) =>
+      preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);
 
   //Token
   String? get fduholeToken {
@@ -184,7 +171,14 @@ class SettingsProvider {
   set fduholeToken(String? value) =>
       preferences!.setString(KEY_FDUHOLE_TOKEN, value!);
 
-  void deleteSavedFduholeToken() => preferences!.remove(KEY_FDUHOLE_TOKEN);
+  void deleteAllFduholeData() {
+    preferences!.remove(KEY_FDUHOLE_TOKEN);
+    preferences!.remove(KEY_LAST_PUSH_TOKEN);
+    preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
+    preferences!.remove(KEY_FDUHOLE_SORTORDER);
+    preferences!.remove(KEY_HIDDEN_HOLE);
+    preferences!.remove(KEY_HIDDEN_TAGS);
+  }
 
   //Debug Mode
   bool get debugMode {
@@ -241,17 +235,17 @@ class SettingsProvider {
   set cleanMode(bool mode) => preferences!.setBool(KEY_CLEAN_MODE, mode);
 
   /// Hidden tags
-  List<PostTag>? get hiddenTags {
+  List<OTTag>? get hiddenTags {
     try {
       var json = jsonDecode(preferences!.getString(KEY_HIDDEN_TAGS)!);
       if (json is Iterable) {
-        return json.map((e) => PostTag.fromJson(e)).toList();
+        return json.map((e) => OTTag.fromJson(e)).toList();
       }
     } catch (ignored) {}
     return null;
   }
 
-  set hiddenTags(List<PostTag>? tags) {
+  set hiddenTags(List<OTTag>? tags) {
     if (tags == null) return;
     preferences!.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
   }
@@ -307,5 +301,79 @@ extension FoldBehaviorEx on FoldBehavior {
       case FoldBehavior.SHOW:
         return S.of(context).show;
     }
+  }
+
+  String? internalString() {
+    switch (this) {
+      case FoldBehavior.FOLD:
+        return 'fold';
+      case FoldBehavior.HIDE:
+        return 'hide';
+      case FoldBehavior.SHOW:
+        return 'show';
+    }
+  }
+}
+
+FoldBehavior foldBehaviorFromInternalString(String? str) {
+  switch (str) {
+    case 'fold':
+      return FoldBehavior.FOLD;
+    case 'hide':
+      return FoldBehavior.HIDE;
+    case 'show':
+      return FoldBehavior.SHOW;
+    default:
+      return FoldBehavior.FOLD;
+  }
+}
+
+enum OTNotificationTypes { MENTION, FAVORITE, REPORT }
+
+extension OTNotificationTypesEx on OTNotificationTypes {
+  String? displayTitle(BuildContext context) {
+    switch (this) {
+      case OTNotificationTypes.MENTION:
+        return S.of(context).notification_mention;
+      case OTNotificationTypes.FAVORITE:
+        return S.of(context).notification_favorite;
+      case OTNotificationTypes.REPORT:
+        return S.of(context).notification_reported;
+    }
+  }
+
+  String? displayShortTitle(BuildContext context) {
+    switch (this) {
+      case OTNotificationTypes.MENTION:
+        return S.of(context).notification_mention_s;
+      case OTNotificationTypes.FAVORITE:
+        return S.of(context).notification_favorite_s;
+      case OTNotificationTypes.REPORT:
+        return S.of(context).notification_reported_s;
+    }
+  }
+
+  String internalString() {
+    switch (this) {
+      case OTNotificationTypes.MENTION:
+        return 'mention';
+      case OTNotificationTypes.FAVORITE:
+        return 'favorite';
+      case OTNotificationTypes.REPORT:
+        return 'report';
+    }
+  }
+}
+
+OTNotificationTypes? notificationTypeFromInternalString(String str) {
+  switch (str) {
+    case 'mention':
+      return OTNotificationTypes.MENTION;
+    case 'favorite':
+      return OTNotificationTypes.FAVORITE;
+    case 'report':
+      return OTNotificationTypes.REPORT;
+    default:
+      return null;
   }
 }

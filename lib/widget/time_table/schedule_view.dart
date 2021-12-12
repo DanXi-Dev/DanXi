@@ -85,7 +85,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                 rowStart: index ~/ cols, columnStart: index % cols));
 
     // Build corner
-    result[0] = Container()
+    result[0] = const SizedBox()
         .withRatio(kRatio)
         .withGridPlacement(columnStart: 0, rowStart: 0);
 

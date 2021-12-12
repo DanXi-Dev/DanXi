@@ -21,7 +21,7 @@ import 'package:flutter/services.dart';
 class PlatformBridge {
   static const FDUHOLE_CHANNEL = const MethodChannel('fduhole');
 
-  static void requestNotificationPermission() {
+  static void registerRemoteNotification() {
     if (PlatformX.isIOS)
       FDUHOLE_CHANNEL.invokeMethod("request_notification_permission");
   }

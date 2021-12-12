@@ -15,14 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/opentreehole/user_permission_silent_config.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_permission.g.dart';
 
 @JsonSerializable()
 class OTUserPermission {
-  OTUserPermissionSilentConfig? silent;
+  Map<int, String>? silent;
   String? admin;
 
   factory OTUserPermission.fromJson(Map<String, dynamic> json) =>

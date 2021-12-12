@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/clean_mode_filter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'floor.g.dart';
@@ -39,6 +41,12 @@ class OTFloor {
 
   Map<String, dynamic> toJson() => _$OTFloorToJson(this);
 
+  /// Generate an empty BBSPost for special sakes.
+  factory OTFloor.dummy() =>
+      OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, []);
+  factory OTFloor.special(String title, String content) =>
+      OTFloor(0, 0, content, title, '', '', false, [], 0, false, false, []);
+
   @override
   bool operator ==(Object other) =>
       (other is OTFloor) && floor_id == other.floor_id;
@@ -56,6 +64,15 @@ class OTFloor {
       this.is_me,
       this.liked,
       this.mention);
+
+  String? get filteredContent => SettingsProvider.getInstance().cleanMode
+      ? CleanModeFilter.cleanText(content)
+      : content;
+
+  @override
+  String toString() {
+    return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, like: $like, mention: $mention}';
+  }
 
   @override
   int get hashCode => floor_id!;

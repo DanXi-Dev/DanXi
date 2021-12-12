@@ -17,6 +17,7 @@
 
 import 'package:flutter/widgets.dart';
 
+/// Some icons from third-part.
 class IconFont {
   static const IconData markdown =
       const IconData(0xe673, fontFamily: "iconfont", matchTextDirection: true);

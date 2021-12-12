@@ -15,45 +15,47 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/feature/feature_map.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
-import 'package:dan_xi/page/aao_notices.dart';
-import 'package:dan_xi/page/announcement_notices.dart';
-import 'package:dan_xi/page/bbs_hidden_tags_preference.dart';
-import 'package:dan_xi/page/bbs_post.dart';
-import 'package:dan_xi/page/bbs_reports.dart';
-import 'package:dan_xi/page/bbs_tags.dart';
-import 'package:dan_xi/page/bus.dart';
-import 'package:dan_xi/page/card_detail.dart';
-import 'package:dan_xi/page/card_traffic.dart';
-import 'package:dan_xi/page/dashboard_reorder.dart';
-import 'package:dan_xi/page/empty_classroom_detail.dart';
-import 'package:dan_xi/page/exam_detail.dart';
-import 'package:dan_xi/page/gpa_table.dart';
+import 'package:dan_xi/page/dashboard/aao_notices.dart';
+import 'package:dan_xi/page/dashboard/announcement_notices.dart';
+import 'package:dan_xi/page/dashboard/bus.dart';
+import 'package:dan_xi/page/dashboard/card_detail.dart';
+import 'package:dan_xi/page/dashboard/card_traffic.dart';
+import 'package:dan_xi/page/dashboard/dashboard_reorder.dart';
+import 'package:dan_xi/page/dashboard/empty_classroom_detail.dart';
+import 'package:dan_xi/page/dashboard/exam_detail.dart';
+import 'package:dan_xi/page/dashboard/gpa_table.dart';
 import 'package:dan_xi/page/home_page.dart';
-import 'package:dan_xi/page/image_viewer.dart';
-import 'package:dan_xi/page/open_source_license.dart';
-import 'package:dan_xi/page/subpage_bbs.dart';
-import 'package:dan_xi/page/text_selector.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/opentreehole/hole_login.dart';
+import 'package:dan_xi/page/opentreehole/hole_messages.dart';
+import 'package:dan_xi/page/opentreehole/hole_reports.dart';
+import 'package:dan_xi/page/opentreehole/hole_tags.dart';
+import 'package:dan_xi/page/opentreehole/image_viewer.dart';
+import 'package:dan_xi/page/opentreehole/text_selector.dart';
+import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
+import 'package:dan_xi/page/settings/open_source_license.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/bbs_editor.dart';
+import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-import 'generated/l10n.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 
 /// The main entry of the whole app.
-/// Do some initiative work here.
+/// Do some initial work here.
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
   CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
@@ -74,6 +76,11 @@ void main() {
   // Init Bmob database.
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
 
+  // Init Mi push Service.
+  if (PlatformX.isAndroid)
+    XiaoMiPushPlugin.init(
+        appId: "2882303761519940685", appKey: "5821994071685");
+
   // Init Feature registration.
   FeatureMap.registerAllFeatures();
   SettingsProvider.getInstance().init().then((_) {
@@ -88,11 +95,23 @@ void main() {
         debugConfig: debugOptions,
         releaseConfig: releaseOptions);
   });
+
+  // Init DesktopWindow on desktop environment.
   if (PlatformX.isDesktop)
     doWhenWindowReady(() {
       final win = appWindow;
       win.show();
     });
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        // etc.
+      };
 }
 
 /// ## Note: A Checklist After Creating a New Page
@@ -106,7 +125,7 @@ void main() {
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) => Container(),
+    '/placeholder': (context, {arguments}) => const SizedBox(),
     '/bbs/reports': (context, {arguments}) =>
         BBSReportDetail(arguments: arguments),
     '/card/detail': (context, {arguments}) =>
@@ -139,9 +158,11 @@ class DanxiApp extends StatelessWidget {
     '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
     '/bbs/tags/blocklist': (context, {arguments}) =>
         BBSHiddenTagsPreferencePage(arguments: arguments),
+    '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
+    '/bbs/messages': (context, {arguments}) =>
+        OTMessagesPage(arguments: arguments),
   };
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Phoenix(
@@ -149,42 +170,8 @@ class DanxiApp extends StatelessWidget {
         // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => Theme(
           data: PlatformX.getTheme(context),
-          child: PlatformApp(
-            title: '旦夕',
-            debugShowCheckedModeBanner: false,
-            // Fix cupertino UI text color issues
-            cupertino: (_, __) => CupertinoAppData(
-                theme: CupertinoThemeData(
-                    textTheme: CupertinoTextThemeData(
-                        textStyle: TextStyle(
-                            color: PlatformX.getTheme(context)
-                                .textTheme
-                                .bodyText1!
-                                .color)))),
-            // Configure i18n delegates
-            localizationsDelegates: [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: MasterDetailController(
-              masterPage: HomePage(),
-            ),
-            // Configure the page route behaviour of the whole app
-            onGenerateRoute: (settings) {
-              final Function? pageContentBuilder =
-                  DanxiApp.routes[settings.name!];
-              if (pageContentBuilder != null) {
-                return platformPageRoute(
-                    context: context,
-                    builder: (context) => pageContentBuilder(context,
-                        arguments: settings.arguments));
-              }
-              return null;
-            },
-            navigatorKey: Catcher.navigatorKey,
+          child: PlatformMasterDetailApp(
+            masterPage: HomePage(),
           ),
         ),
       ),

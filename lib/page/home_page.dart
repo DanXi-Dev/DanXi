@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -25,27 +26,29 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/page/subpage_bbs.dart';
-import 'package:dan_xi/page/subpage_main.dart';
+import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/repository/time_table_repository.dart';
-import 'package:dan_xi/repository/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/widget/login_dialog/login_dialog.dart';
-import 'package:dan_xi/widget/post_render.dart';
-import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
-import 'package:dan_xi/widget/render/render_impl.dart';
-import 'package:dan_xi/widget/top_controller.dart';
+import 'package:dan_xi/widget/dialogs/login_dialog.dart';
+import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
+import 'package:dan_xi/widget/libraries/top_controller.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
+import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -58,6 +61,10 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart';
+import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
+import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
 void sendFduholeTokenToWatch(String? token) {
   const channel = const MethodChannel('fduhole');
@@ -65,8 +72,14 @@ void sendFduholeTokenToWatch(String? token) {
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
+GlobalKey<State> settingsPageKey = GlobalKey();
+GlobalKey<State> treeholePageKey = GlobalKey();
+GlobalKey<State> dashboardPageKey = GlobalKey();
+GlobalKey<State> timetablePageKey = GlobalKey();
 final QuickActions quickActions = QuickActions();
 
+/// The main page of DanXi.
+/// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
@@ -106,10 +119,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// It's usually called when user changes his account.
   void _rebuildPage() {
     _subpage = [
-      HomeSubpage(),
-      if (!SettingsProvider.getInstance().hideHole) BBSSubpage(),
-      TimetableSubPage(),
-      SettingsSubpage(),
+      HomeSubpage(key: dashboardPageKey),
+      if (!SettingsProvider.getInstance().hideHole)
+        BBSSubpage(key: treeholePageKey),
+      TimetableSubPage(key: timetablePageKey),
+      SettingsSubpage(key: settingsPageKey),
     ];
   }
 
@@ -228,7 +242,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     .compareTo(Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
-          RefreshHomepageEvent().fire();
+          dashboardPageKey.currentState?.setState(() {});
         }
         break;
       case AppLifecycleState.inactive:
@@ -354,20 +368,83 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    // Init watchOS support
-    const channel_a = const MethodChannel('fduhole');
-    channel_a.setMethodCallHandler((MethodCall call) async {
-      if (call.method == 'get_token') {
-        // If we haven't loaded [StateProvider.personInfo]
-        if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
-          sendFduholeTokenToWatch(
-              _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
-        } else {
-          // Notify that we should send the token to watch later
-          _needSendToWatch = true;
-        }
+    const fduhole_channel = const MethodChannel('fduhole');
+    fduhole_channel.setMethodCallHandler((MethodCall call) async {
+      switch (call.method) {
+        case "launch_from_notification":
+          Map<String, dynamic> map =
+              Map<String, dynamic>.from(call.arguments['data']);
+          // Reconstruct data to restore proper type
+          map.updateAll((key, value) {
+            try {
+              return int.parse(value);
+            } catch (ignored) {}
+            return value;
+          });
+          OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
+              context, call.arguments['code'], map);
+          break;
+        case "upload_apns_token":
+          if (call.arguments["token"] !=
+              SettingsProvider.getInstance().lastPushToken) {
+            OpenTreeHoleRepository.getInstance()
+                .updatePushNotificationToken(call.arguments["token"],
+                    call.arguments["id"], PushNotificationServiceType.APNS)
+                .then((value) {
+              SettingsProvider.getInstance().lastPushToken =
+                  call.arguments["token"];
+            }, onError: (value) => null);
+          }
+          break;
+        case 'getToken':
+          // If we haven't loaded [StateProvider.personInfo]
+          if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+            sendFduholeTokenToWatch(
+                _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          } else {
+            // Notify that we should send the token to watch later
+            _needSendToWatch = true;
+          }
+          break;
       }
     });
+    if (PlatformX.isAndroid) {
+      XiaoMiPushPlugin.addListener((type, params) async {
+        switch (type) {
+          case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
+            if (params is MiPushMessageEntity && params.content != null) {
+              Map obj = jsonDecode(params.content!);
+              OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
+                  context, obj['code'], obj['data']);
+            }
+            break;
+          case XiaoMiPushListenerTypeEnum.RequirePermissions:
+            break;
+          case XiaoMiPushListenerTypeEnum.ReceivePassThroughMessage:
+            break;
+          case XiaoMiPushListenerTypeEnum.CommandResult:
+            break;
+          case XiaoMiPushListenerTypeEnum.ReceiveRegisterResult:
+            if (params is MiPushCommandMessageEntity &&
+                (params.commandArguments?.isNotEmpty ?? false)) {
+              String regId = params.commandArguments![0];
+              if (regId != SettingsProvider.getInstance().lastPushToken) {
+                OpenTreeHoleRepository.getInstance()
+                    .updatePushNotificationToken(
+                        regId,
+                        await PlatformX.getUniqueDeviceId(),
+                        PushNotificationServiceType.MIPUSH)
+                    .then((value) {
+                  SettingsProvider.getInstance().lastPushToken = regId;
+                }, onError: (value) => null);
+              }
+            }
+            break;
+          case XiaoMiPushListenerTypeEnum.NotificationMessageArrived:
+            break;
+        }
+      });
+    }
   }
 
   @override
@@ -397,17 +474,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Show an empty container, if no person info is set.
-  Widget _buildDummyBody(String title) => PlatformScaffold(
+  Widget _buildDummyBody(Widget title) => PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: true,
         // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBar(
-          title: Text(title),
+          title: title,
         ),
-        body: Container(),
+        body: const SizedBox(),
       );
 
-  Widget _buildBody(String title) {
+  Widget _buildBody(Widget title) {
     // Build action buttons.
     PlatformIconButton? leadingButton;
     List<PlatformIconButton> trailingButtons = [];
@@ -452,17 +529,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               data: MediaQueryData(
                   textScaleFactor: MediaQuery.textScaleFactorOf(context)),
               child: TopController(
-                child: Text(title),
+                child: title,
                 controller: PrimaryScrollController.of(context),
               ),
             ),
           ),
           material: (_, __) => MaterialAppBarData(
             title: TopController(
-              child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              child: title,
               controller: PrimaryScrollController.of(context),
             ),
           ),
@@ -534,8 +608,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     _lastRefreshTime = DateTime.now();
-    String title = _subpage.isEmpty
-        ? S.of(context).app_name
+    Widget title = _subpage.isEmpty
+        ? Text(S.of(context).app_name)
         : _subpage[_pageIndex.value].title.call(context);
     return StateProvider.personInfo.value == null || _subpage.isEmpty
         ? _buildDummyBody(title)

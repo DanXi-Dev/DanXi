@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

@@ -43,6 +43,15 @@ class OTHole {
   OTHole(this.hole_id, this.division_id, this.time_created, this.time_updated,
       this.tags, this.view, this.reply, this.floors);
 
+  /// Generate an empty BBSPost for special sakes.
+  factory OTHole.dummy() => OTHole(-1, -1, "", "", [], -1, -1, null);
+
+  bool get is_folded =>
+      tags?.any((element) => element.name?.startsWith("*") ?? false) ?? false;
+
+  // ignore: non_constant_identifier_names
+  static final DUMMY_POST = OTHole.dummy();
+
   @override
   int get hashCode => hole_id!;
 }

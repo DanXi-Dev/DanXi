@@ -19,12 +19,10 @@ import 'dart:io';
 
 // ignore: implementation_imports
 import 'package:cookie_jar/src/cookie_jar.dart';
-
 // ignore: implementation_imports
 import 'package:cookie_jar/src/serializable_cookie.dart';
 
-//A copy of [DefaultCookieJar], but with an independent cookie storage.
-
+/// A copy of [DefaultCookieJar], but with an independent cookie storage.
 class NonpersistentCookieJar implements CookieJar {
   /// A array to save cookies.
   ///

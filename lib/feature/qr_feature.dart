@@ -19,7 +19,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/qr_code_dialog/qr_code_dialog.dart';
+import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

@@ -25,18 +25,18 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/public_extension_methods.dart';
-import 'package:dan_xi/repository/bbs/post_repository.dart';
-import 'package:dan_xi/repository/time_table_repository.dart';
-import 'package:dan_xi/repository/undergraduate_timetable_repository.dart';
+import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
-import 'package:dan_xi/widget/future_widget.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -60,11 +60,13 @@ class TimetableSubPage extends PlatformSubpage
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 
+  TimetableSubPage({Key? key}) : super(key: key);
+
   @override
   String get debugTag => "TimetablePage";
 
   @override
-  Create<String> get title => (cxt) => S.of(cxt).timetable;
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).timetable);
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
@@ -121,7 +123,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               context: context,
               builder: (cxt) {
                 return PlatformAlertDialog(
-                  title: Text("请输入课程表系统验证码"), //TODO: Localize
+                  title: Text(S.of(context).enter_captcha),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -131,7 +133,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                   ),
                   actions: [
                     PlatformDialogAction(
-                      child: Text("确认"), //TODO: Localize
+                      child: Text(S.of(context).ok),
                       onPressed: () {
                         Navigator.of(cxt).pop();
                       },
@@ -142,13 +144,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           return controller.text;
         });
       } else {
-        _content = LazyFuture.pack(Future<TimeTable>.error(
-            NotLoginError("Pull down to load timetable.")));
+        _content = LazyFuture.pack(Future<TimeTable?>.error(
+            NotLoginError(S.of(context).postgraduates_need_login)));
       }
       _manualLoad = false;
     } else {
-      _content = LazyFuture.pack(Future<TimeTable>.error(
-          NotLoginError("Haven't logged in as FDU student.")));
+      _content = LazyFuture.pack(Future<TimeTable?>.error(
+          NotLoginError(S.of(context).not_fudan_student)));
     }
   }
 
@@ -259,17 +261,31 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         return _buildPage(snapshot.data);
       },
       future: _content,
-      errorBuilder:
-          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
-              GestureDetector(
-        onTap: () {
-          _manualLoad = true;
-          refreshSelf();
-        },
-        child: Center(
-          child: Text(S.of(context).failed + "\n" + snapshot.error.toString()),
-        ),
-      ),
+      errorBuilder: (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
+        if (snapshot.error != null && snapshot.error is NotLoginError) {
+          return GestureDetector(
+            onTap: () {
+              _manualLoad = true;
+              refreshSelf();
+            },
+            child: Center(
+              child: Text(S.of(context).failed +
+                  "\n" +
+                  (snapshot.error! as NotLoginError).errorMessage),
+            ),
+          );
+        }
+        return GestureDetector(
+          onTap: () {
+            _manualLoad = true;
+            refreshSelf();
+          },
+          child: Center(
+            child:
+                Text(S.of(context).failed + "\n" + snapshot.error.toString()),
+          ),
+        );
+      },
       loadingBuilder: Center(
         child: PlatformCircularProgressIndicator(),
       ),

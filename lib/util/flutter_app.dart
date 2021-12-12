@@ -20,7 +20,8 @@ import 'dart:io';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/bbs/post_repository.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -40,8 +41,11 @@ class FlutterApp {
 
   static Future<void> restartApp(BuildContext context) async {
     await BaseRepositoryWithDio.clearAllCookies();
-    await PostRepository.getInstance().clearCache();
+    OpenTreeHoleRepository.getInstance().clearCache();
     StateProvider.initialize();
+    while (auxiliaryNavigatorState?.canPop() == true) {
+      auxiliaryNavigatorState?.pop();
+    }
     Phoenix.rebirth(context);
   }
 

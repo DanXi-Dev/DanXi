@@ -18,7 +18,7 @@
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -30,22 +30,21 @@ import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
   // Popover crashes on iPad
-  static InAppBrowserClassOptions getOptions(BuildContext context) =>
-      isTablet(context)
-          ? InAppBrowserClassOptions(
-              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                  javaScriptEnabled: true, useOnDownloadStart: true),
-            ))
-          : InAppBrowserClassOptions(
-              android: AndroidInAppBrowserOptions(hideTitleBar: true),
-              ios: IOSInAppBrowserOptions(
-                presentationStyle: IOSUIModalPresentationStyle.POPOVER,
-              ),
-              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(
-                    javaScriptEnabled: true, useOnDownloadStart: true),
-              ));
+  static InAppBrowserClassOptions getOptions(BuildContext context) => isTablet()
+      ? InAppBrowserClassOptions(
+          inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+          crossPlatform: InAppWebViewOptions(
+              javaScriptEnabled: true, useOnDownloadStart: true),
+        ))
+      : InAppBrowserClassOptions(
+          android: AndroidInAppBrowserOptions(hideTitleBar: true),
+          ios: IOSInAppBrowserOptions(
+            presentationStyle: IOSUIModalPresentationStyle.POPOVER,
+          ),
+          inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+            crossPlatform: InAppWebViewOptions(
+                javaScriptEnabled: true, useOnDownloadStart: true),
+          ));
 
   static openUrl(String url, BuildContext? context,
       [NonpersistentCookieJar? cookieJar]) async {
