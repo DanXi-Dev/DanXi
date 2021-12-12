@@ -48,10 +48,10 @@
 
 ```shell script
 $ flutter --version
-Flutter 2.2.3 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision f4abaa0735 (5 weeks ago) • 2021-07-01 12:46:11 -0700
-Engine • revision 241c87ad80
-Tools • Dart 2.13.4
+Flutter 2.5.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 18116933e7 (8 weeks ago) • 2021-10-15 10:46:35 -0700
+Engine • revision d3ea636dc5
+Tools • Dart 2.14.4
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
