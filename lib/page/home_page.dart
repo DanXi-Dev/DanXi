@@ -404,7 +404,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
     if (PlatformX.isAndroid) {
-      XiaoMiPushPlugin.addListener((type, params) {
+      XiaoMiPushPlugin.addListener((type, params) async {
         switch (type) {
           case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
             if (params is MiPushMessageEntity && params.content != null) {
@@ -427,9 +427,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 OpenTreeHoleRepository.getInstance()
                     .updatePushNotificationToken(
                         regId,
-                        "",
-                        PushNotificationServiceType
-                            .MIPUSH) // TODO: must include device id here
+                        await PlatformX.getUniqueDeviceId(),
+                        PushNotificationServiceType.MIPUSH)
                     .then((value) {
                   SettingsProvider.getInstance().lastPushToken = regId;
                 }, onError: (value) => null);

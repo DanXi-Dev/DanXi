@@ -21,31 +21,31 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/clean_mode_filter.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -140,6 +140,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         "https://github.com/Sub6Resources/flutter_html"),
     LicenseItem("flutter_inappwebview", LICENSE_APACHE_2_0,
         "https://github.com/pichillilorenzo/flutter_inappwebview"),
+    LicenseItem("flutter_math_fork", LICENSE_APACHE_2_0,
+        "https://github.com/simpleclub-extended/flutter_math_fork"),
     LicenseItem("flutter_linkify", LICENSE_MIT,
         "https://github.com/Cretezy/flutter_linkify"),
     LicenseItem("flutter_localizations", LICENSE_BSD_3_0_CLAUSE,
@@ -158,9 +160,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html"),
     LicenseItem("gallery_saver", LICENSE_APACHE_2_0,
         "https://github.com/CarnegieTechnologies/gallery_saver"),
+    LicenseItem("xiao_mi_push_plugin", LICENSE_APACHE_2_0,
+        "https://github.com/w568w/FlutterXiaoMiPushPlugin"),
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
     LicenseItem(
         "ical", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dartclub/ical"),
+    LicenseItem("platform_device_id", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/BestBurning/platform_device_id"),
     LicenseItem("in_app_review", LICENSE_MIT,
         "https://github.com/britannio/in_app_review"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
@@ -194,6 +200,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         "url_launcher", LICENSE_BSD, "https://github.com/flutter/plugins"),
     LicenseItem("screen_brightness", LICENSE_MIT,
         "https://github.com/aaassseee/screen_brightness"),
+    LicenseItem("uuid", LICENSE_MIT, "https://github.com/Daegalus/dart-uuid"),
   ];
   BannerAd? myBanner;
 

@@ -23,6 +23,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid_util.dart';
+import 'package:win32/win32.dart';
 
 /// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
 class PlatformX {
@@ -45,6 +49,18 @@ class PlatformX {
   static bool get isDesktop => !isMobile;
 
   static bool get isApplePlatform => isIOS || isMacOS;
+
+  static Future<String> getUniqueDeviceId() async {
+    String? deviceId;
+    try {
+      deviceId = await PlatformDeviceId.getDeviceId;
+    } catch (ignored) {}
+    if (deviceId == null) {
+      return Uuid().v4();
+    } else {
+      return deviceId;
+    }
+  }
 
   static ThemeData getTheme(BuildContext context) {
     return PlatformX.isDarkMode
