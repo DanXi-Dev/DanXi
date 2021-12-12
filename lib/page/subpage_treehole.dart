@@ -117,7 +117,6 @@ class _OTTitleState extends State<OTTitle> {
         hashCode);
   }
 
-  /// Build a list of options controlling how to sort posts.
   List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
     List<Widget> list = [];
     Function onTapListener = (OTDivision newDivision) {
@@ -125,15 +124,10 @@ class _OTTitleState extends State<OTTitle> {
       DivisionChangedEvent(newDivision).fire();
     };
     OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
-      list.add(PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () => onTapListener(value),
-          child: Text(value.name ?? "null"),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(value.name ?? "null"),
-          onTap: () => onTapListener(value),
-        ),
+      list.add(ListTile(
+        title: Text(value.name ?? "null"),
+        subtitle: Text(value.description ?? ""),
+        onTap: () => onTapListener(value),
       ));
     });
     return list;
