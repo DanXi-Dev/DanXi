@@ -143,11 +143,10 @@ class _OTTitleState extends State<OTTitle> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(StateProvider.divisionId?.name ?? S.of(context).forum),
-          Icon(PlatformX.isMaterial(context)
-              ? Icons.arrow_drop_down
-              : CupertinoIcons.chevron_compact_down)
+          Icon(Icons.arrow_drop_down)
         ],
       ),
       onTap: () {
