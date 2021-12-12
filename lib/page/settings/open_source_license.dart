@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -60,7 +61,7 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
               // Enable debug mode
               Noticing.showNotice(context,
                   "Debug mode enabled. Welcome, developer.\nRefresh for changes to take effect.");
-              RefreshHomepageEvent().fire();
+              dashboardPageKey.currentState?.setState(() {});
             } else {
               Noticing.showNotice(context, "Debug mode disabled");
             }

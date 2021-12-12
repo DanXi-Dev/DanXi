@@ -21,6 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -220,7 +221,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     Function onTapListener = (Campus campus) {
       SettingsProvider.getInstance().campus = campus;
       Navigator.of(context).pop();
-      RefreshHomepageEvent().fire();
+      dashboardPageKey.currentState?.setState(() {});
       refreshSelf();
     };
     Constant.CAMPUS_VALUES.forEach((value) {
@@ -243,7 +244,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     Function onTapListener = (FoldBehavior value) {
       OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
           value.internalString();
-      RefreshBBSEvent(refreshAll: true).fire();
+      treeholePageKey.currentState?.setState(() {});
       Navigator.of(context).pop();
       refreshSelf();
     };
@@ -386,7 +387,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       .useAccessibilityColoring =
                                   !SettingsProvider.getInstance()
                                       .useAccessibilityColoring;
-                              RefreshBBSEvent(refreshAll: true).fire();
+                              treeholePageKey.currentState?.setState(() {});
                               setState(() {});
                             },
                           ),
@@ -555,7 +556,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                   onTap: () async {
                                     await smartNavigatorPush(
                                         context, '/bbs/tags/blocklist');
-                                    RefreshBBSEvent().fire();
+                                    treeholePageKey.currentState
+                                        ?.setState(() {});
                                   },
                                 ),
                                 // Clear Cache
@@ -634,9 +636,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   void _toggleAdDisplay() {
     SettingsProvider.getInstance().isAdEnabled =
         !SettingsProvider.getInstance().isAdEnabled;
-    RefreshHomepageEvent().fire();
-    RefreshBBSEvent().fire();
-    RefreshTimetableEvent().fire();
+    dashboardPageKey.currentState?.setState(() {});
+    treeholePageKey.currentState?.setState(() {});
+    timetablePageKey.currentState?.setState(() {});
     setState(() {});
   }
 

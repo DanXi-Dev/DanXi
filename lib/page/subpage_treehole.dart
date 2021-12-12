@@ -25,6 +25,7 @@ import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -284,8 +285,10 @@ class _BBSSubpageState extends State<BBSSubpage>
 
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
-    if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
+    if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().initializeRepo();
+      settingsPageKey.currentState?.setState(() {});
+    }
 
     switch (_postsType) {
       case PostsType.FAVORED_DISCUSSION:

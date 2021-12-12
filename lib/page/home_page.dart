@@ -72,6 +72,10 @@ void sendFduholeTokenToWatch(String? token) {
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
+GlobalKey<State> settingsPageKey = GlobalKey();
+GlobalKey<State> treeholePageKey = GlobalKey();
+GlobalKey<State> dashboardPageKey = GlobalKey();
+GlobalKey<State> timetablePageKey = GlobalKey();
 final QuickActions quickActions = QuickActions();
 
 /// The main page of DanXi.
@@ -115,10 +119,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// It's usually called when user changes his account.
   void _rebuildPage() {
     _subpage = [
-      HomeSubpage(),
-      if (!SettingsProvider.getInstance().hideHole) BBSSubpage(),
-      TimetableSubPage(),
-      SettingsSubpage(),
+      HomeSubpage(key: dashboardPageKey),
+      if (!SettingsProvider.getInstance().hideHole)
+        BBSSubpage(key: treeholePageKey),
+      TimetableSubPage(key: timetablePageKey),
+      SettingsSubpage(key: settingsPageKey),
     ];
   }
 
@@ -237,7 +242,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     .compareTo(Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
-          RefreshHomepageEvent().fire();
+          dashboardPageKey.currentState?.setState(() {});
         }
         break;
       case AppLifecycleState.inactive:
