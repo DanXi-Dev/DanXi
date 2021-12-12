@@ -21,7 +21,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -41,7 +40,6 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
-import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
@@ -215,22 +213,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   Future<void> _deleteAllDataAndExit() async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     _preferences.clear().then((value) => FlutterApp.restartApp(context));
-  }
-
-  void initLogin({bool forceLogin = false}) {
-    _showLoginDialog(forceLogin: forceLogin);
-  }
-
-  /// Pop up a dialog where user can give his name & password.
-  void _showLoginDialog({bool forceLogin = false}) {
-    ValueNotifier<PersonInfo?> _infoNotifier = StateProvider.personInfo;
-    showPlatformDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => LoginDialog(
-            sharedPreferences: SettingsProvider.getInstance().preferences,
-            personInfo: _infoNotifier,
-            dismissible: forceLogin));
   }
 
   List<Widget> _buildCampusAreaList(BuildContext context) {
@@ -417,27 +399,26 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                             children: [
                               if (PlatformX.isWindows)
                                 SwitchListTile(
-                                  title: Text(
-                                      S.of(context).windows_auto_start_title),
-                                  secondary: const Icon(Icons.settings_power),
-                                  subtitle: Text(S
-                                      .of(context)
-                                      .windows_auto_start_description),
-                                  value: WindowsAutoStart.autoStart,
-                                  onChanged: (bool value) async {
-                                    WindowsAutoStart.autoStart = value;
-                                    await Noticing.showNotice(
-                                        context,
-                                        S
-                                            .of(context)
-                                            .windows_auto_start_wait_dialog_message,
-                                        title: S
-                                            .of(context)
-                                            .windows_auto_start_wait_dialog_title,
-                                        useSnackBar: false);
-                                    refreshSelf();
-                                  },
-                                ),
+                                    title: Text(
+                                        S.of(context).windows_auto_start_title),
+                                    secondary: const Icon(Icons.settings_power),
+                                    subtitle: Text(S
+                                        .of(context)
+                                        .windows_auto_start_description),
+                                    value: WindowsAutoStart.autoStart,
+                                    onChanged: (bool value) async {
+                                      WindowsAutoStart.autoStart = value;
+                                      await Noticing.showNotice(
+                                          context,
+                                          S
+                                              .of(context)
+                                              .windows_auto_start_wait_dialog_message,
+                                          title: S
+                                              .of(context)
+                                              .windows_auto_start_wait_dialog_title,
+                                          useSnackBar: false);
+                                      refreshSelf();
+                                    }),
                               FutureWidget<OTUser?>(
                                 future: OpenTreeHoleRepository.getInstance()
                                     .getUserProfile(),
@@ -985,42 +966,22 @@ class _OTNotificationSettingsWidgetState
     if (OpenTreeHoleRepository.getInstance().userInfo?.config?.notify == null) {
       return [Text(S.of(context).fatal_error)];
     }
+    Function getNotifyListNonNull =
+        () => OpenTreeHoleRepository.getInstance().userInfo!.config!.notify!;
     OTNotificationTypes.values.forEach((value) {
-      list.add(
-        CheckboxListTile(
-            title: Text(value.displayTitle(context) ?? "null"),
-            value: OpenTreeHoleRepository.getInstance()
-                .userInfo!
-                .config!
-                .notify!
-                .contains(value.internalString()),
-            onChanged: (newValue) {
-              if (newValue == true &&
-                  !OpenTreeHoleRepository.getInstance()
-                      .userInfo!
-                      .config!
-                      .notify!
-                      .contains(value.internalString())) {
-                OpenTreeHoleRepository.getInstance()
-                    .userInfo!
-                    .config!
-                    .notify!
-                    .add(value.internalString()!);
-              } else if (newValue == false &&
-                  OpenTreeHoleRepository.getInstance()
-                      .userInfo!
-                      .config!
-                      .notify!
-                      .contains(value.internalString())) {
-                OpenTreeHoleRepository.getInstance()
-                    .userInfo!
-                    .config!
-                    .notify!
-                    .remove(value.internalString()!);
-              }
-              setState(() {});
-            }),
-      );
+      list.add(CheckboxListTile(
+          title: Text(value.displayTitle(context) ?? "null"),
+          value: getNotifyListNonNull().contains(value.internalString()),
+          onChanged: (newValue) {
+            if (newValue == true &&
+                !getNotifyListNonNull().contains(value.internalString())) {
+              getNotifyListNonNull().add(value.internalString());
+            } else if (newValue == false &&
+                getNotifyListNonNull().contains(value.internalString())) {
+              getNotifyListNonNull().remove(value.internalString());
+            }
+            refreshSelf();
+          }));
     });
     return list;
   }
@@ -1047,36 +1008,21 @@ class OTNotificationSettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!PlatformX.isApplePlatform)
-      return ListTile(
-        title: Text(S.of(context).notification_settings),
-        leading: PlatformX.isMaterial(context)
-            ? const Icon(Icons.notifications)
-            : const Icon(CupertinoIcons.bell),
-        subtitle: Text(S.of(context).unsupported),
-        enabled: false,
-      );
-    else {
+    if (PlatformX.isApplePlatform || PlatformX.isAndroid) {
       final loadingBuilder = ListTile(
-        title: Text(S.of(context).notification_settings),
-        leading: PlatformX.isMaterial(context)
-            ? const Icon(Icons.notifications)
-            : const Icon(CupertinoIcons.bell),
-        subtitle: Text(S.of(context).loading),
-        onTap: () {
-          parentSetStateFunction();
-        },
-      );
+          title: Text(S.of(context).notification_settings),
+          leading: PlatformX.isMaterial(context)
+              ? const Icon(Icons.notifications)
+              : const Icon(CupertinoIcons.bell),
+          subtitle: Text(S.of(context).loading),
+          onTap: () => parentSetStateFunction());
       final errorBuilder = ListTile(
-        title: Text(S.of(context).notification_settings),
-        leading: PlatformX.isMaterial(context)
-            ? const Icon(Icons.notifications)
-            : const Icon(CupertinoIcons.bell),
-        subtitle: Text(S.of(context).fatal_error),
-        onTap: () {
-          parentSetStateFunction();
-        },
-      );
+          title: Text(S.of(context).notification_settings),
+          leading: PlatformX.isMaterial(context)
+              ? const Icon(Icons.notifications)
+              : const Icon(CupertinoIcons.bell),
+          subtitle: Text(S.of(context).fatal_error),
+          onTap: () => parentSetStateFunction());
       return FutureWidget<bool>(
           future: Permission.notification.isGranted,
           successBuilder:
@@ -1089,9 +1035,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
                       ? const Icon(Icons.notifications)
                       : const Icon(CupertinoIcons.bell),
                   subtitle: Text(S.of(context).not_logged_in),
-                  onTap: () {
-                    parentSetStateFunction();
-                  },
+                  onTap: () => parentSetStateFunction(),
                 );
 
               return FutureWidget<OTUser?>(
@@ -1121,20 +1065,27 @@ class OTNotificationSettingsTile extends StatelessWidget {
                 errorBuilder: errorBuilder,
                 loadingBuilder: loadingBuilder,
               );
-            } else
+            } else {
               return ListTile(
-                title: Text(S.of(context).notification_settings),
-                leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.notifications)
-                    : const Icon(CupertinoIcons.bell),
-                subtitle: Text(S.of(context).unauthorized),
-                onTap: () {
-                  parentSetStateFunction();
-                },
-              );
+                  title: Text(S.of(context).notification_settings),
+                  leading: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.notifications)
+                      : const Icon(CupertinoIcons.bell),
+                  subtitle: Text(S.of(context).unauthorized),
+                  onTap: () {
+                    parentSetStateFunction();
+                  });
+            }
           },
           errorBuilder: errorBuilder,
           loadingBuilder: loadingBuilder);
-    }
+    } else
+      return ListTile(
+          title: Text(S.of(context).notification_settings),
+          leading: PlatformX.isMaterial(context)
+              ? const Icon(Icons.notifications)
+              : const Icon(CupertinoIcons.bell),
+          subtitle: Text(S.of(context).unsupported),
+          enabled: false);
   }
 }

@@ -345,7 +345,7 @@ extension OTNotificationTypesEx on OTNotificationTypes {
     }
   }
 
-  String? internalString() {
+  String internalString() {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return 'mention';
