@@ -55,7 +55,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
-import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const kCompatibleUserGroup = [
@@ -561,8 +560,11 @@ class _BBSSubpageState extends State<BBSSubpage>
       {bool isPinned = false}) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
-        (foldBehavior == FoldBehavior.HIDE && postElement.is_folded))
-      return const SizedBox();
+        (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
+        (!isPinned &&
+            OpenTreeHoleRepository.getInstance()
+                .getPinned(_divisionId)
+                .contains(postElement))) return const SizedBox();
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag, S.of(context).formula),
@@ -584,22 +586,21 @@ class _BBSSubpageState extends State<BBSSubpage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        generateTagWidgets(context, postElement,
-                            (String? tagname) {
-                          smartNavigatorPush(context, '/bbs/discussions',
-                              arguments: {"tagFilter": tagname});
-                        },
-                            SettingsProvider.getInstance()
-                                .useAccessibilityColoring),
-                        if (isPinned)
-                          OTLeadingTag(
-                            colorString: 'blue',
-                            text: S.of(context).pinned,
-                          ),
-                      ],
-                    ),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          generateTagWidgets(context, postElement,
+                              (String? tagname) {
+                            smartNavigatorPush(context, '/bbs/discussions',
+                                arguments: {"tagFilter": tagname});
+                          },
+                              SettingsProvider.getInstance()
+                                  .useAccessibilityColoring),
+                          if (isPinned)
+                            OTLeadingTag(
+                              colorString: 'blue',
+                              text: S.of(context).pinned,
+                            )
+                        ]),
                     const SizedBox(height: 10),
                     (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
                         ? Theme(

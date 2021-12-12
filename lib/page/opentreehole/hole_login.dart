@@ -99,6 +99,8 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
       child: Provider<LoginInfoModel>(
         create: (BuildContext context) => model,
         child: PlatformScaffold(
+            material: (_, __) =>
+                MaterialScaffoldData(resizeToAvoidBottomInset: false),
             iosContentBottomPadding: false,
             iosContentPadding: false,
             body: SafeArea(
@@ -110,7 +112,7 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
                     var tween =
-                        Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+                    Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
                     // reverse the animation if invoked jumpBack().
                     if (_backwardRun > 0) {
                       tween = Tween<Offset>(
@@ -158,6 +160,7 @@ abstract class SubStatelessWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (backable) ThemedMaterial(child: BackButton()),
@@ -349,6 +352,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
       _usernameController.text = model.selectedEmail ?? "";
     }
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
           S.of(context).login_by_email_password,
