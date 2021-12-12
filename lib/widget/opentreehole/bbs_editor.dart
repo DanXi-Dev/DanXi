@@ -151,7 +151,7 @@ class BBSEditor {
 
     int? responseCode =
         await OpenTreeHoleRepository.getInstance().reportPost(postId, content);
-    if (responseCode != 200) {
+    if (responseCode == null || responseCode >= 400) {
       Noticing.showNotice(
           context, S.of(context).report_failed(responseCode ?? "?"),
           title: S.of(context).fatal_error, useSnackBar: false);
@@ -280,25 +280,27 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
         onPressed: () {
           showPlatformModalSheet(
               context: context,
-              builder: (BuildContext context) => Material(
-                    color: PlatformX.backgroundColor(context),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: Icon(iconData),
-                            title: Text(title),
-                          ),
-                          Divider(),
-                          Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Linkify(
-                                text: description,
-                                onOpen: (element) =>
-                                    BrowserUtil.openUrl(element.url, context),
-                              )),
-                        ]),
+              builder: (BuildContext context) => Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              leading: Icon(iconData),
+                              title: Text(title),
+                            ),
+                            Divider(),
+                            Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Linkify(
+                                  text: description,
+                                  onOpen: (element) =>
+                                      BrowserUtil.openUrl(element.url, context),
+                                )),
+                          ]),
+                    ),
                   ));
         });
   }
@@ -432,9 +434,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                     S.of(context).markdown_description),
                 _buildIntroButton(
                     context,
-                    PlatformX.isMaterial(context)
-                        ? Icons.superscript
-                        : CupertinoIcons.textformat_superscript,
+                    Icons.superscript,
                     S.of(context).latex_enabled,
                     S.of(context).latex_description),
               ],

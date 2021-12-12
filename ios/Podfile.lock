@@ -280,7 +280,7 @@ SPEC CHECKSUMS:
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   quick_actions: cd83314083fa994182e6cd9e7516167a215a4f83
-  screen_brightness_ios: 2090900979d89f34e772bc832aa19fe707988188
+  screen_brightness_ios: e2f4c3492ec238bb8ea1f5558f67ea22557cf997
   SDWebImage: 4dc3e42d9ec0c1028b960a33ac6b637bb432207b
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   shared_preferences_ios: aef470a42dc4675a1cdd50e3158b42e3d1232b32

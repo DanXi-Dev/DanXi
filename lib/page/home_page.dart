@@ -380,10 +380,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               context, call.arguments['code'], map);
           break;
         case "upload_apns_token":
-          OpenTreeHoleRepository.getInstance().updatePushNotificationToken(
-              call.arguments["token"],
-              call.arguments["id"],
-              PushNotificationServiceType.APNS);
+          if (call.arguments["token"] !=
+              SettingsProvider.getInstance().lastPushToken) {
+            OpenTreeHoleRepository.getInstance()
+                .updatePushNotificationToken(call.arguments["token"],
+                    call.arguments["id"], PushNotificationServiceType.APNS)
+                .then((value) {
+              SettingsProvider.getInstance().lastPushToken =
+                  call.arguments["token"];
+            }, onError: (value) => null);
+          }
           break;
         case 'getToken':
           // If we haven't loaded [StateProvider.personInfo]
@@ -417,11 +423,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             if (params is MiPushCommandMessageEntity &&
                 (params.commandArguments?.isNotEmpty ?? false)) {
               String regId = params.commandArguments![0];
-              if (regId != SettingsProvider.getInstance().miPushRegId) {
-                SettingsProvider.getInstance().miPushRegId = regId;
+              if (regId != SettingsProvider.getInstance().lastPushToken) {
                 OpenTreeHoleRepository.getInstance()
                     .updatePushNotificationToken(
-                        regId, "", PushNotificationServiceType.MIPUSH);
+                        regId,
+                        "",
+                        PushNotificationServiceType
+                            .MIPUSH) // TODO: must include device id here
+                    .then((value) {
+                  SettingsProvider.getInstance().lastPushToken = regId;
+                }, onError: (value) => null);
               }
             }
             break;

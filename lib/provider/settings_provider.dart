@@ -37,7 +37,7 @@ class SettingsProvider {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_MI_PUSH_TOKEN = "mipush_token";
+  static const String KEY_LAST_PUSH_TOKEN = "push_token";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v2";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
@@ -148,41 +148,16 @@ class SettingsProvider {
     preferences!.setString(KEY_PREFERRED_CAMPUS, campus.toString());
   }
 
-  //FudanDaily AutoTick
-  /*
-  String get autoTickCancelDate {
-    if (_preferences.containsKey(KEY_AUTOTICK_LAST_CANCEL_DATE)) {
-      return _preferences.getString(KEY_AUTOTICK_LAST_CANCEL_DATE);
+  //Push Token
+  String? get lastPushToken {
+    if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {
+      return preferences!.getString(KEY_LAST_PUSH_TOKEN)!;
     }
     return null;
   }
 
-  set autoTickCancelDate(String datetime) {
-    _preferences.setString(KEY_AUTOTICK_LAST_CANCEL_DATE, datetime.toString());
-  }
-
-  //Theme
-  //int: 0 for Material, 1 for Cupertino
-  int get theme {
-    if (_preferences.containsKey(KEY_PREFERRED_THEME)) {
-      return _preferences.getInt(KEY_PREFERRED_THEME);
-    }
-    return null;
-  }
-
-  set theme(int theme) {
-    _preferences.setInt(KEY_PREFERRED_THEME, theme);
-  }*/
-  //MiPushToken
-  String? get miPushRegId {
-    if (preferences!.containsKey(KEY_MI_PUSH_TOKEN)) {
-      return preferences!.getString(KEY_MI_PUSH_TOKEN)!;
-    }
-    return null;
-  }
-
-  set miPushRegId(String? value) =>
-      preferences!.setString(KEY_MI_PUSH_TOKEN, value!);
+  set lastPushToken(String? value) =>
+      preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);
 
   //Token
   String? get fduholeToken {

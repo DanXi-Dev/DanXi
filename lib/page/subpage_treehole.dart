@@ -159,20 +159,14 @@ class _OTTitleState extends State<OTTitle> {
         if (OpenTreeHoleRepository.getInstance().isUserInitialized)
           showPlatformModalSheet(
             context: context,
-            builder: (BuildContext context) => PlatformWidget(
-              cupertino: (_, __) => CupertinoActionSheet(
-                title: Text(S.of(context).sort_order),
-                actions: _buildDivisionOptionsList(context),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+            builder: (BuildContext context) => Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView(
+                  shrinkWrap: true,
+                  primary: false,
+                  children: _buildDivisionOptionsList(context),
                 ),
-              ),
-              material: (_, __) => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: _buildDivisionOptionsList(context),
               ),
             ),
           );
