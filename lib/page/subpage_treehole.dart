@@ -55,6 +55,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
+import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const kCompatibleUserGroup = [
@@ -257,6 +258,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   final StateStreamListener _searchSubscription = StateStreamListener();
   final StateStreamListener _divisionChangedSubscription =
       StateStreamListener();
+
+  //final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
+
   String? _tagFilter;
   FocusNode _searchFocus = FocusNode();
   PostsType _postsType = PostsType.NORMAL_POSTS;
@@ -408,6 +412,15 @@ class _BBSSubpageState extends State<BBSSubpage>
           _refreshList();
         }),
         hashCode);
+
+    /*screenListener.addScreenRecordListener((recorded) {
+      Noticing.showScreenshotWarning(context);
+    });
+    screenListener.addScreenShotListener((filePath) {
+      Noticing.showScreenshotWarning(context);
+    });
+    screenListener.watch();*/
+
     bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
   }
 
@@ -429,6 +442,7 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   @override
   void dispose() {
+    //screenListener.dispose();
     super.dispose();
     _postSubscription.cancel();
     _refreshSubscription.cancel();
@@ -466,7 +480,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildPageBody() {
-    print("division id:${_divisionId}");
     return Material(
       child: Container(
         child: SafeArea(

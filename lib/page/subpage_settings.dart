@@ -438,7 +438,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                 onTap: () async {
                                   if (OpenTreeHoleRepository.getInstance()
                                           .isUserInitialized &&
-                                      await Noticing.askForConfirmation(context,
+                                      await Noticing.showConfirmationDialog(
+                                              context,
                                               S.of(context).logout_fduhole,
                                               title: S.of(context).logout) ==
                                           true) {

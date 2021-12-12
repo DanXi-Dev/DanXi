@@ -45,6 +45,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
+import 'package:screen_capture_event/screen_capture_event.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -118,6 +119,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   late OTHole _post;
   String? _searchKeyword;
 
+  final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
+
   /// Fields related to the display states.
   bool? _isFavored;
   bool shouldUsePreloadedContent = true;
@@ -162,6 +165,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
+
+    screenListener.addScreenRecordListener((recorded) {
+      Noticing.showScreenshotWarning(context);
+    });
+    screenListener.addScreenShotListener((filePath) {
+      Noticing.showScreenshotWarning(context);
+    });
+    screenListener.watch();
+  }
+
+  @override
+  void dispose() {
+    screenListener.dispose();
+    super.dispose();
   }
 
   /// Rebuild everything and refresh itself.

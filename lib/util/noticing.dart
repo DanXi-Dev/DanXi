@@ -77,7 +77,8 @@ class Noticing {
     }
   }
 
-  static Future<bool?> askForConfirmation(BuildContext context, String message,
+  static Future<bool?> showConfirmationDialog(
+      BuildContext context, String message,
       {String? confirmText,
       String? title,
       bool isConfirmDestructive = false,
@@ -137,4 +138,8 @@ class Noticing {
       ),
     );
   }
+
+  static showScreenshotWarning(BuildContext context) =>
+      Noticing.showNotice(context, S.of(context).screenshot_warning,
+          title: S.of(context).screenshot_warning_title, useSnackBar: false);
 }

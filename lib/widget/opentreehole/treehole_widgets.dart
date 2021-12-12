@@ -538,7 +538,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     ),
                   ),
                   onTap: () async {
-                    if (await Noticing.askForConfirmation(
+                    if (await Noticing.showConfirmationDialog(
                             context,
                             S.of(context).about_to_delete_floor(
                                 floor.floor_id ?? "null"),

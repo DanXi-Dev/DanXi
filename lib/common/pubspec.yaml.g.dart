@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1639197658;
+const int timestamp = 1639281585;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -156,6 +156,9 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_layout_grid': r'^1.0.3',
   'flutter_js': r'^0.5.0+3',
   'flutter_math_fork': r'^0.5.0',
+  'platform_device_id': r'^1.0.1',
+  'uuid': r'^3.0.5',
+  'screen_capture_event': r'^1.0.0+1',
 };
 
 /// Developer dependencies
