@@ -112,7 +112,7 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
                     var tween =
-                    Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+                        Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
                     // reverse the animation if invoked jumpBack().
                     if (_backwardRun > 0) {
                       tween = Tween<Offset>(
@@ -279,50 +279,48 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
         ),
         ...suggestEmail
             .map<Widget>((e) => ListTile(
-                  title: Text(e),
-                  onTap: () async {
-                    String? email = e;
-                    if (e == S.of(context).my_email_not_in_list) {
-                      email = await showPlatformDialog<String?>(
-                          context: context,
-                          builder: (cxt) {
-                            TextEditingController controller =
-                                new TextEditingController();
-                            return PlatformAlertDialog(
-                              title: Text(S.of(context).input_your_email),
-                              content: TextField(
-                                controller: controller,
-                              ),
-                              actions: [
-                                PlatformDialogAction(
+                title: Text(e),
+                onTap: () async {
+                  String? email = e;
+                  if (e == S.of(context).my_email_not_in_list) {
+                    email = await showPlatformDialog<String?>(
+                        context: context,
+                        builder: (cxt) {
+                          TextEditingController controller =
+                              new TextEditingController();
+                          return PlatformAlertDialog(
+                            title: Text(S.of(context).input_your_email),
+                            content: TextField(controller: controller),
+                            actions: [
+                              PlatformDialogAction(
                                   child: Text(S.of(context).i_see),
                                   onPressed: () {
                                     if (controller.text.trim().isNotEmpty) {
                                       Navigator.pop(
                                           cxt, controller.text.trim());
                                     }
-                                  },
-                                ),
-                                PlatformDialogAction(
-                                  child: Text(S.of(context).cancel),
-                                  onPressed: () => Navigator.pop(cxt, null),
-                                )
-                              ],
-                            );
-                          });
-                    }
-                    Provider.of<LoginInfoModel>(context, listen: false)
-                        .selectedEmail = email;
-                    if (email != null) {
-                      checkEmailInfo(context, email, email == recommendedEmail)
-                          .catchError((e) {
-                        state.jumpBackFromLoadingPage();
-                        Noticing.showNotice(state.context,
-                            S.of(context).unable_to_connect_to_server);
-                      });
-                    }
-                  },
-                ))
+                                  }),
+                              PlatformDialogAction(
+                                child: Text(S.of(context).cancel),
+                                onPressed: () => Navigator.pop(cxt, null),
+                              )
+                            ],
+                          );
+                        });
+                  }
+                  Provider.of<LoginInfoModel>(context, listen: false)
+                      .selectedEmail = email;
+                  if (email != null) {
+                    checkEmailInfo(context, email, email == recommendedEmail)
+                        .catchError((e, st) {
+                      state.jumpBackFromLoadingPage();
+                      debugPrint(e);
+                      debugPrintStack(stackTrace: st);
+                      Noticing.showNotice(state.context,
+                          S.of(state.context).unable_to_connect_to_server);
+                    });
+                  }
+                }))
             .toList()
             .joinElement(() => Divider())!
       ],
@@ -400,8 +398,9 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                 _usernameController.text.length > 0) {
               executeLogin(context).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
+                debugPrintStack(stackTrace: st);
                 Noticing.showNotice(
-                    state.context, S.of(context).login_problem_occurred);
+                    state.context, S.of(state.context).login_problem_occurred);
               });
             }
           },
@@ -481,8 +480,8 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             registerCallback: () {
               executeRegister(context, state).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showNotice(
-                    state.context, S.of(context).unable_to_connect_to_server);
+                Noticing.showNotice(state.context,
+                    S.of(state.context).unable_to_connect_to_server);
               });
             },
           )
@@ -584,7 +583,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
                   .catchError((e, st) {
                 state.jumpBackFromLoadingPage();
                 Noticing.showNotice(
-                    state.context, S.of(context).login_problem_occurred);
+                    state.context, S.of(state.context).login_problem_occurred);
               });
             }
           },
