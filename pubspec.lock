@@ -43,6 +43,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.0"
+  base32:
+    dependency: transitive
+    description:
+      name: base32
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.1"
   beautiful_soup_dart:
     dependency: "direct main"
     description:
@@ -818,6 +825,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.2.1"
+  otp:
+    dependency: "direct main"
+    description:
+      name: otp
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.1"
   package_config:
     dependency: transitive
     description:

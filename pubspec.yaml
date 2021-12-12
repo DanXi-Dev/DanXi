@@ -79,6 +79,7 @@ dependencies:
   platform_device_id: ^1.0.1
   uuid: ^3.0.5
   screen_capture_event: ^1.0.0+1
+  otp: ^3.0.1
 
 dependency_overrides:
   fluttertoast:

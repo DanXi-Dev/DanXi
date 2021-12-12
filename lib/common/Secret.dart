@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021  w568w
+ *     Copyright (C) 2021  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,21 +15,33 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class Secret {
-  static const APP_ID = "YOUR-APP-ID";
-  static const API_KEY = "YOUR-API-KEY";
+import 'package:otp/otp.dart';
+import 'package:base32/base32.dart';
 
-  static const FDUHOLE_API_KEY = "YOUR-API-KEY";
+class Secret {
+  static const APP_ID = "";
+  static const API_KEY = "";
+
+  /// The api key to register/login FDUHole.
+  static const String FDUHOLE_API_KEY = "";
+  static generateOneTimeAPIKey() {
+    return OTP.generateTOTPCodeString(base32.encodeString(FDUHOLE_API_KEY),
+        DateTime.now().millisecondsSinceEpoch,
+        length: 16, interval: 5, isGoogle: true);
+  }
+
+  /// One unit id for each Ad placement.
+  /// Respectively, Dashboard, TreeHole, Agenda, Settings.
   static const List<String> ADMOB_UNIT_ID_LIST_ANDROID = [
-    "ca-app-pub-",
-    "ca-app-pub-",
-    "ca-app-pub-",
-    "ca-app-pub-",
+    "",
+    "",
+    "",
+    "",
   ];
   static const List<String> ADMOB_UNIT_ID_LIST_IOS = [
-    "ca-app-pub-",
-    "ca-app-pub-",
-    "ca-app-pub-",
-    "ca-app-pub-",
+    "",
+    "",
+    "",
+    "",
   ];
 }

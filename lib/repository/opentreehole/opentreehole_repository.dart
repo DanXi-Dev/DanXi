@@ -104,7 +104,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<bool> checkRegisterStatus(String email) async {
     Response response = await dio!.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
-          "apikey": Secret.FDUHOLE_API_KEY,
+          "apikey": Secret.generateOneTimeAPIKey(),
           "email": email,
           "check_register": 1,
         },
@@ -115,7 +115,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<String?> getVerifyCode(String email) async {
     Response response = await dio!.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
-          "apikey": Secret.FDUHOLE_API_KEY,
+          "apikey": Secret.generateOneTimeAPIKey(),
           "email": email,
         },
         options: Options(validateStatus: (code) => code! < 300));
@@ -181,7 +181,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
     final Response response =
         await secureDio.post(_BASE_URL + "/register/", data: {
-      'api-key': Secret.FDUHOLE_API_KEY,
+      'api-key': Secret.generateOneTimeAPIKey(),
       'email': "${info.id}@fudan.edu.cn",
       // Temporarily disable v2 API until the protocol is ready.
       //'ID': base64.encode(utf8.encode(encrypt(info.id, publicKey)))
