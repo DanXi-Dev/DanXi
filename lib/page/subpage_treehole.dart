@@ -82,7 +82,6 @@ String renderText(
     content = md.markdownToHtml(content, inlineSyntaxes: [
       LatexSyntax(),
       LatexMultiLineSyntax(),
-      MentionSyntax()
     ]);
   }
   // Deal with LaTex
