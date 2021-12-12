@@ -7,10 +7,10 @@
 
 import Foundation
 
-let BASE_URL = "https://www.fduhole.tk/v1"
+let BASE_URL = "https://hole.hath.top"
 
 func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrder, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
-    var components = URLComponents(string: BASE_URL + "/discussions/")!
+    var components = URLComponents(string: BASE_URL + "/holes")!
     components.queryItems = [
         URLQueryItem(name: "page", value: String(page)),
         URLQueryItem(name: "order", value: sortOrder.getString())

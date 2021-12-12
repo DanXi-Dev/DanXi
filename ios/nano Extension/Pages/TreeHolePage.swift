@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TreeHolePage: View {
     @EnvironmentObject var fduholeLoginInfo: WatchSessionDelegate
-    @State private var discussions = [THDiscussion]()
+    @State private var discussions = [OTHole]()
     @State private var currentPage = 1
     @State private var endReached = false
     @State private var error: String? = nil
@@ -20,7 +20,7 @@ struct TreeHolePage: View {
     func refreshDiscussions() {
         currentPage = 1
         isLoading = true
-        loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
+        loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [OTHole]?, errorString: String?) -> Void in
             error = errorString
             if (errorString == nil) {
                 discussions = T!
@@ -33,7 +33,7 @@ struct TreeHolePage: View {
         currentPage += 1
         if (!isLoading) {
             isLoading = true
-            loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
+            loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [OTHole]?, errorString: String?) -> Void in
                 error = errorString
                 if (errorString == nil) {
                     if (T!.isEmpty) {
@@ -67,7 +67,7 @@ struct TreeHolePage: View {
                     }
                     ForEach(discussions) { discussion in
                         ZStack(alignment: .leading) {
-                            THPostView(discussion: discussion)
+                            THPostView(hole: discussion)
                             NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.posts)) {
                                 EmptyView()
                             }
