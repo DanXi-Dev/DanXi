@@ -166,6 +166,7 @@ class BBSEditor {
       required BBSEditorType? editorType,
       required EditorObject object,
       String placeholder = ""}) async {
+    final String randomTip = await Constant.randomFduholeTip;
     final BBSEditorType defaultType = BBSEditorType.PAGE;
     switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
@@ -180,44 +181,47 @@ class BBSEditor {
             barrierDismissible: false,
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
-                  title: Text(title),
-                  content: BBSEditorWidget(
-                    controller: textController,
+              title: Text(title),
+              content: BBSEditorWidget(
+                controller: textController,
                     allowTags: allowTags,
                     editorObject: object,
+                    tip: randomTip,
                   ),
-                  actions: [
-                    PlatformDialogAction(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () {
-                          StateProvider.editorCache[object]!.text =
-                              textController.text;
-                          Navigator.of(context).pop<PostEditorText>(null);
-                        }),
-                    PlatformDialogAction(
-                        child: Text(S.of(context).add_image),
-                        onPressed: () => uploadImage(context, textController)),
-                    PlatformDialogAction(
-                        child: Text(S.of(context).submit),
-                        onPressed: () async {
-                          Navigator.of(context).pop<PostEditorText>(
-                              PostEditorText(textController.text,
-                                  StateProvider.editorCache[object]!.tags));
-                        }),
-                  ],
-                ));
+              actions: [
+                PlatformDialogAction(
+                    child: Text(S.of(context).cancel),
+                    onPressed: () {
+                      StateProvider.editorCache[object]!.text =
+                          textController.text;
+                      Navigator.of(context).pop<PostEditorText>(null);
+                    }),
+                PlatformDialogAction(
+                    child: Text(S.of(context).add_image),
+                    onPressed: () => uploadImage(context, textController)),
+                PlatformDialogAction(
+                    child: Text(S.of(context).submit),
+                    onPressed: () async {
+                      Navigator.of(context).pop<PostEditorText>(
+                          PostEditorText(textController.text,
+                              StateProvider.editorCache[object]!.tags));
+                    }),
+              ],
+            ));
         // TODO: This dispose is causing more trouble than it's worth.
         //textController.dispose();
         return value;
       case BBSEditorType.PAGE:
-        // Receive the value with **dynamic** variable to prevent automatic type inference
+      // Receive the value with **dynamic** variable to prevent automatic type inference
         final dynamic result = await smartNavigatorPush(
-            context, '/bbs/fullScreenEditor', arguments: {
-          "title": title,
-          "tags": allowTags,
-          'object': object,
-          'placeholder': placeholder
-        });
+            context, '/bbs/fullScreenEditor',
+            arguments: {
+              "title": title,
+              "tags": allowTags,
+              'object': object,
+              'placeholder': placeholder,
+              'tip': randomTip
+            });
         return result;
     }
   }
@@ -251,13 +255,15 @@ class BBSEditorWidget extends StatefulWidget {
   final EditorObject? editorObject;
   final bool? allowTags;
   final bool fullscreen;
+  final String? tip;
 
   const BBSEditorWidget(
       {Key? key,
       this.controller,
       this.allowTags,
       this.editorObject,
-      this.fullscreen = false})
+      this.fullscreen = false,
+      this.tip})
       : super(key: key);
 
   @override
@@ -308,6 +314,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   @override
   Widget build(BuildContext context) {
     final Widget textField = PlatformTextField(
+      hintText: widget.tip,
       material: (_, __) => MaterialTextFieldData(
           decoration: widget.fullscreen
               ? InputDecoration(border: InputBorder.none)
@@ -489,6 +496,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   bool _isFullscreen = false;
   bool? _supportTags;
 
+  String? _tip;
   late EditorObject _object;
   late String _title;
   late String _placeholder;
@@ -509,6 +517,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   void didChangeDependencies() {
+    _tip = widget.arguments!['tip'];
     _supportTags = widget.arguments!['tags'] ?? false;
     _title =
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
@@ -568,6 +577,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                     allowTags: _supportTags,
                     editorObject: _object,
                     fullscreen: _isFullscreen,
+                    tip: _tip,
                   )))),
     );
   }

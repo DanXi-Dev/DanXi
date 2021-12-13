@@ -24,6 +24,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// Store some important constants, like app id, default color styles, etc.
@@ -45,6 +46,22 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
   static const FUDAN_DAILY_COUNTDOWN_SECONDS = 5;
+
+  static List<String> fduHoleTips = [];
+
+  static Future<List<String>> _loadTips() async {
+    String tipsJson = await rootBundle.loadString("assets/texts/tips.dat");
+    return tipsJson.split("\n");
+  }
+
+  static Future<String> get randomFduholeTip async {
+    if (fduHoleTips.isEmpty) fduHoleTips = await _loadTips();
+
+    if (fduHoleTips.isEmpty)
+      return '';
+    else
+      return fduHoleTips[Random().nextInt(fduHoleTips.length)];
+  }
 
   static Map<String, String> getFeatureName(BuildContext context) {
     return {

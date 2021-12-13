@@ -104,6 +104,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/graphics/
+    - assets/texts/
   fonts:
     - family: iconfont
       fonts:
