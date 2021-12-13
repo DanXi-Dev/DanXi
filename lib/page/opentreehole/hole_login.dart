@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/animation.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/password_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -514,9 +515,15 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
             ),
             controlAffinity: ListTileControlAffinity.leading,
             value: _agreed,
-            onChanged: (newValue) => setState(() {
-                  _agreed = newValue!;
-                })),
+            onChanged: (newValue) {
+              setState(() {
+                _agreed = newValue!;
+                if (_agreed) {
+                  BrowserUtil.openUrl(
+                      "https://www.fduhole.com/#/licence", context);
+                }
+              });
+            }),
         PlatformElevatedButton(
           material: (_, __) =>
               MaterialElevatedButtonData(icon: Icon(Icons.app_registration)),

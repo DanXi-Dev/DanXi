@@ -58,13 +58,14 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1639281585;
+const int timestamp = 1639374225;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description = r'Maybe the best all-rounded service app for Fudan University students.';
+const String description =
+    r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -159,6 +160,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.5',
   'screen_capture_event': r'^1.0.0+1',
+  'otp': r'^3.0.1',
 };
 
 /// Developer dependencies
