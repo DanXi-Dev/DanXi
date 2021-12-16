@@ -441,12 +441,17 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       await Noticing.showConfirmationDialog(
                                               context,
                                               S.of(context).logout_fduhole,
-                                              title: S.of(context).logout) ==
+                                              title: S.of(context).logout,
+                                              isConfirmDestructive: true) ==
                                           true) {
                                     OpenTreeHoleRepository.getInstance()
                                         .clearCache();
                                     SettingsProvider.getInstance()
                                         .deleteAllFduholeData();
+                                    settingsPageKey.currentState
+                                        ?.setState(() {});
+                                    treeholePageKey.currentState
+                                        ?.setState(() {});
                                   }
                                 },
                               ),
