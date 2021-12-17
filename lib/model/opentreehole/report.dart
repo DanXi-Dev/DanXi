@@ -14,6 +14,9 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -31,8 +34,16 @@ class OTReport {
   final bool? dealed;
   final String? dealed_by;
 
-  OTReport(this.report_id, this.reason, this.content, this.floor, this.hole_id,
-      this.time_created, this.time_updated, this.dealed, this.dealed_by);
+  const OTReport(
+      this.report_id,
+      this.reason,
+      this.content,
+      this.floor,
+      this.hole_id,
+      this.time_created,
+      this.time_updated,
+      this.dealed,
+      this.dealed_by);
 
   @override
   int get hashCode => report_id!;

@@ -283,7 +283,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   Widget _buildIntroButton(BuildContext context, IconData iconData,
       String title, String description) {
     return PlatformIconButton(
-        icon: Icon(iconData, color: Theme.of(context).accentColor),
+        icon: Icon(iconData, color: Theme.of(context).colorScheme.secondary),
         onPressed: () {
           showPlatformModalSheet(
               context: context,
@@ -409,7 +409,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w300,
                               ),
-                              backgroundColor: Theme.of(context).accentColor,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                       configureChip: (tag) => ChipConfiguration(

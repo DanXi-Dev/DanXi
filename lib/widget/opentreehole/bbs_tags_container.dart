@@ -19,7 +19,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 /// A wrapped container for [OTTag].
 class BBSTagsContainer extends StatefulWidget {

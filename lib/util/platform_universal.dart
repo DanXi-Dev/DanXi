@@ -19,14 +19,11 @@ import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:uuid/uuid.dart';
-import 'package:uuid/uuid_util.dart';
-import 'package:win32/win32.dart';
 
 /// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
 class PlatformX {
@@ -75,7 +72,7 @@ class PlatformX {
   static Color backgroundAccentColor(BuildContext context) {
     return isMaterial(context)
         ? Theme.of(context).primaryColor
-        : Theme.of(context).accentColor;
+        : Theme.of(context).colorScheme.secondary;
   }
 
   static const illegalCharWindows = [r'\/', r':', r'@'];

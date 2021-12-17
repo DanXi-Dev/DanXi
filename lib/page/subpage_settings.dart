@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
 import 'package:dan_xi/generated/l10n.dart';
@@ -46,7 +44,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -270,7 +267,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         child: WithScrollbar(
             controller: widget.primaryScrollController(context),
             child: RefreshIndicator(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
                 backgroundColor: Theme.of(context).dialogBackgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
@@ -647,7 +644,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
-  Future<bool?> _showAdsDialog() => showPlatformDialog<bool>(
+  /*Future<bool?> _showAdsDialog() => showPlatformDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
             title: Text(S.of(context).sponsor_us),
@@ -667,7 +664,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 onPressed: () => Navigator.of(context).pop(true),
               ),
             ],
-          ));
+          ));*/
 
   _showAdsThankDialog() => showPlatformDialog(
       context: context,
@@ -730,7 +727,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     final TextStyle linkText = Theme.of(context)
         .textTheme
         .bodyText2!
-        .copyWith(color: Theme.of(context).accentColor);
+        .copyWith(color: Theme.of(context).colorScheme.secondary);
 
     final developersIcons = Constant.getDevelopers(context)
         .map((e) => ListTile(

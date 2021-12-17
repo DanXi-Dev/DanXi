@@ -28,9 +28,7 @@ import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
@@ -84,7 +82,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       body: Column(children: [
         TagContainer(
             fillRandomColor: false,
-            fixedColor: Theme.of(context).accentColor,
+            fixedColor: Theme.of(context).colorScheme.secondary,
             fontSize: 16,
             enabled: _selectable,
             singleChoice: true,

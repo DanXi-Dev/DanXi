@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -79,7 +81,6 @@ class TimeTable {
     }
     return newTable;
   }
-
 
   factory TimeTable.fromUGjson(DateTime startTime, dynamic Coursejson) {
     TimeTable newTable = new TimeTable()..startTime = startTime;
@@ -232,10 +233,9 @@ class Course {
       ..courseName = UGPart["KCMC"]
       ..roomName = UGPart["JASMC"]
       ..availableWeeks = _parseWeeksFromString(UGPart["ZCBH"])
-      ..times = [CourseTime(UGPart["XQ"]-1, UGPart["KSJCDM"]-1)]
+      ..times = [CourseTime(UGPart["XQ"] - 1, UGPart["KSJCDM"] - 1)]
       ..teacherNames = [UGPart["JSXM"]];
   }
-
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 

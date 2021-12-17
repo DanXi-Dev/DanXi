@@ -16,7 +16,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// A container of [Material] that applies the app's theme settings on it.
 ///

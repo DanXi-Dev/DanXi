@@ -29,7 +29,6 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A list page showing how crowded each of the campus dining halls is.
@@ -179,16 +178,16 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                 PlatformX.isMaterial(context)
                     ? Icon(
                         Icons.location_on_outlined,
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.secondary,
                       )
                     : Icon(
                         CupertinoIcons.location_circle,
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.secondary,
                       ),
                 Text(zoneName,
                     style: TextStyle(
                       fontSize: 18,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.secondary,
                     )),
               ],
             ),

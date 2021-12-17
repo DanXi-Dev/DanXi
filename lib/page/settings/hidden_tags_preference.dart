@@ -26,7 +26,6 @@ import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configur
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -129,7 +128,8 @@ class _BBSHiddenTagsPreferencePageState
                           fontSize: 14.0,
                           fontWeight: FontWeight.w300,
                         ),
-                        backgroundColor: Theme.of(context).accentColor,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
                       ),
                     ),
                 configureChip: (tag) => ChipConfiguration(

@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// SmallTag is a small tag, usually showing on the home page to visualize different data items.
 /// Such as "Next course", "Last transaction", etc.

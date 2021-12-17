@@ -31,7 +31,7 @@ class Cache {
       {bool validate(String cachedValue)?}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     if (validate == null) {
-      validate = (v) => v != null;
+      validate = (v) => true;
     }
     if (!preferences.containsKey(key)) {
       // Reload the cache
@@ -67,7 +67,7 @@ class Cache {
     } else {
       // Fall back to local cache.
       return get(key, fetch, decode, encode,
-          validate: (v) => v != null && validate!(decode(v)));
+          validate: (v) => validate!(decode(v)));
     }
   }
 }

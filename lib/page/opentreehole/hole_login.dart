@@ -28,7 +28,6 @@ import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -656,7 +655,7 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
 
   @override
   Widget buildContent(BuildContext context) {
-    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    //var model = Provider.of<LoginInfoModel>(context, listen: false);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[

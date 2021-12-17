@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:dan_xi/model/opentreehole/floors.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -49,7 +51,6 @@ class OTHole {
   bool get is_folded =>
       tags?.any((element) => element.name?.startsWith("*") ?? false) ?? false;
 
-  // ignore: non_constant_identifier_names
   static final DUMMY_POST = OTHole.dummy();
 
   @override

@@ -19,7 +19,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class BBSImagePlaceholder extends StatelessWidget {
