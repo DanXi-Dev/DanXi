@@ -389,6 +389,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     });
   }
 
+  replaceDataInRangeWith(Iterable<T> data, int start) {
+    setState(() {
+      _data.setAll(start, data);
+    });
+  }
+
   queueScrollToEnd() {
     _scrollToEndQueued = true;
   }
@@ -491,6 +497,10 @@ class PagedListViewController<T> implements ListProvider<T> {
   /// Will no longer load content on scroll after this is called.
   replaceDataWith(List<T> data) {
     _state.replaceDataWith(data);
+  }
+
+  replaceDataInRangeWith(Iterable<T> data, int start) {
+    _state.replaceDataInRangeWith(data, start);
   }
 
   @override

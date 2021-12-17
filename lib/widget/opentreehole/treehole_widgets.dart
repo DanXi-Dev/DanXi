@@ -415,6 +415,12 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   }
 
   @override
+  void didUpdateWidget(OTFloorWidgetBottomBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    floor = widget.floor;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,

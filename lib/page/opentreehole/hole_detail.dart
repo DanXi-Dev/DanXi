@@ -140,7 +140,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           start_floor: _listViewController.length());
     } else
       return await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_post, page * 10, 10);
+          .loadFloors(_post, startFloor: page * 10);
   }
 
   Future<bool?> _isHoleFavorite() async {
@@ -188,6 +188,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      // Replaced precached data with updated ones
+      OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
+        _listViewController.replaceDataInRangeWith(value, 0);
+      }, onError: (error, st) {});
+    });
     return PlatformScaffold(
       material: (_, __) =>
           MaterialScaffoldData(resizeToAvoidBottomInset: false),
@@ -204,8 +210,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               : S.of(context).search_result),
         ),
         trailingActions: [
-          if (_searchKeyword == null) _buildFavoredActionButton(),
-          if (_searchKeyword == null)
+          if (_searchKeyword == null) ...[
+            _buildFavoredActionButton(),
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
@@ -218,6 +224,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 }
               },
             ),
+          ]
         ],
       ),
       body: Material(
@@ -243,11 +250,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 withScrollbar: true,
                 scrollController: PrimaryScrollController.of(context),
                 dataReceiver: _loadContent,
-                // Load all data if user instructed us to scroll to end
-                allDataReceiver: (shouldScrollToEnd && _post.reply! > 10)
-                    ? OpenTreeHoleRepository.getInstance()
-                        .loadFloors(_post, 0, 0)
-                    : null,
                 shouldScrollToEnd: shouldScrollToEnd,
                 builder: _getListItems,
                 loadingBuilder: (BuildContext context) => Container(
