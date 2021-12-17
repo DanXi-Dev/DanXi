@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// A helper class to convert [String],[WidgetBuilder],[List<Widget>] or something similar into [Widget].
@@ -41,10 +42,13 @@ class SmartWidget {
     } else if (object is AsyncWidgetBuilder<T> ||
         object is AsyncWidgetBuilder<T?>) {
       return object(context, snapshot!);
-    } else if (object is ControlsWidgetBuilder) {
+    }
+    // TODO: Due to framework change, this has been temporarily disabled
+    /* else if (object is ControlsWidgetBuilder) {
       return object(context,
           onStepContinue: onStepContinue, onStepCancel: onStepCancel);
-    } else if (object is Function) {
+    } */
+    else if (object is Function) {
       return object();
     } else if (object is Widget) {
       return object;

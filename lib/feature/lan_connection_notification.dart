@@ -17,9 +17,10 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -52,22 +53,11 @@ class LanConnectionNotification extends Feature {
               builder: (_) => PlatformAlertDialog(
                     title:
                         Text(S.of(context!).lan_connection_issue_1_guide_title),
-                    content: Html(
-                        data:
+                    content: PostRenderWidget(
+                        content:
                             S.of(context!).lan_connection_issue_1_guide_content,
-                        style: {
-                          "body": Style(
-                            margin: EdgeInsets.zero,
-                            padding: EdgeInsets.zero,
-                            fontSize: FontSize(16),
-                          ),
-                          "p": Style(
-                            margin: EdgeInsets.zero,
-                            padding: EdgeInsets.zero,
-                            fontSize: FontSize(16),
-                          ),
-                        },
-                        onLinkTap: (url, _, __, ___) => launch(url!)),
+                        render: kMarkdownRender,
+                        onTapLink: (url) => launch(url!)),
                     actions: [
                       PlatformDialogAction(
                         child: Text(S.of(context!).i_see),

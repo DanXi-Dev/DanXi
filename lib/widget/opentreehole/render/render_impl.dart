@@ -23,14 +23,13 @@ import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
-BaseRender kHtmlRender = (BuildContext context, String? content,
+/*BaseRender kHtmlRender = (BuildContext context, String? content,
     ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
   Style noPaddingStyle = Style(
@@ -57,7 +56,7 @@ BaseRender kHtmlRender = (BuildContext context, String? content,
       },
     },
   );
-};
+};*/
 
 MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) =>
     MarkdownStyleSheet.fromTheme(Theme.of(context));

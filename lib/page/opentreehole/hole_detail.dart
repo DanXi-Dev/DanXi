@@ -437,16 +437,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
 PostRenderWidget smartRender(String content, LinkTapCallback? onTapLink,
         ImageTapCallback? onTapImage) =>
-    isHtml(content)
-        ? PostRenderWidget(
-            render: kHtmlRender,
-            content: preprocessContentForDisplay(content),
-            onTapImage: onTapImage,
-            onTapLink: onTapLink,
-          )
-        : PostRenderWidget(
-            render: kMarkdownRender,
-            content: preprocessContentForDisplay(content),
-            onTapImage: onTapImage,
-            onTapLink: onTapLink,
-          );
+    PostRenderWidget(
+      render: kMarkdownRender,
+      content: preprocessContentForDisplay(content),
+      onTapImage: onTapImage,
+      onTapLink: onTapLink,
+    );
