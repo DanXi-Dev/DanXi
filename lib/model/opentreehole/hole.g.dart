@@ -6,22 +6,20 @@ part of 'hole.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-OTHole _$OTHoleFromJson(Map<String, dynamic> json) {
-  return OTHole(
-    json['hole_id'] as int?,
-    json['division_id'] as int?,
-    json['time_created'] as String?,
-    json['time_updated'] as String?,
-    (json['tags'] as List<dynamic>?)
-        ?.map((e) => OTTag.fromJson(e as Map<String, dynamic>))
-        .toList(),
-    json['view'] as int?,
-    json['reply'] as int?,
-    json['floors'] == null
-        ? null
-        : OTFloors.fromJson(json['floors'] as Map<String, dynamic>),
-  );
-}
+OTHole _$OTHoleFromJson(Map<String, dynamic> json) => OTHole(
+      json['hole_id'] as int?,
+      json['division_id'] as int?,
+      json['time_created'] as String?,
+      json['time_updated'] as String?,
+      (json['tags'] as List<dynamic>?)
+          ?.map((e) => OTTag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['view'] as int?,
+      json['reply'] as int?,
+      json['floors'] == null
+          ? null
+          : OTFloors.fromJson(json['floors'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$OTHoleToJson(OTHole instance) => <String, dynamic>{
       'hole_id': instance.hole_id,

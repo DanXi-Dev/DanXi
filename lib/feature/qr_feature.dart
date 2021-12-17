@@ -22,7 +22,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class QRFeature extends Feature {
   @override

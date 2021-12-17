@@ -47,10 +47,10 @@ Distributions for macOS are uncontinued now because of very few users. If necess
 
 ```shell script
 $ flutter --version
-Flutter 2.2.3 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision f4abaa0735 (5 weeks ago) • 2021-07-01 12:46:11 -0700
-Engine • revision 241c87ad80
-Tools • Dart 2.13.4
+Flutter 2.8.1 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 77d935af4d (16 hours ago) • 2021-12-16 08:37:33 -0800
+Engine • revision 890a5fca2e
+Tools • Dart 2.15.1
 ```
 ## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  

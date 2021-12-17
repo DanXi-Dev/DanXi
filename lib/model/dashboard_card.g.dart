@@ -6,14 +6,13 @@ part of 'dashboard_card.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-DashboardCard _$DashboardCardFromJson(Map<String, dynamic> json) {
-  return DashboardCard(
-    json['internalString'] as String?,
-    json['title'] as String?,
-    json['link'] as String?,
-    json['enabled'] as bool?,
-  );
-}
+DashboardCard _$DashboardCardFromJson(Map<String, dynamic> json) =>
+    DashboardCard(
+      json['internalString'] as String?,
+      json['title'] as String?,
+      json['link'] as String?,
+      json['enabled'] as bool?,
+    );
 
 Map<String, dynamic> _$DashboardCardToJson(DashboardCard instance) =>
     <String, dynamic>{

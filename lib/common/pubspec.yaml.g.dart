@@ -58,14 +58,13 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1639374225;
+const int timestamp = 1639732094;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -124,7 +123,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'ical': r'^0.2.2',
   'url_launcher': r'^6.0.3',
   'desktop_window': r'^0.4.0',
-  'flutter_html': r'^2.0.0',
   'intl': r'^0.17.0-nullsafety.2',
   'http': r'^0.13.1',
   'dio': r'^4.0.0',
@@ -140,8 +138,8 @@ const Map<String, Object> dependencies = <String, Object>{
   'linkify': r'^4.0.0',
   'open_file': r'^3.2.1',
   'dio_log': r'^2.0.0',
-  'json_serializable': r'^4.0.0',
-  'photo_view': r'^0.12.0',
+  'json_serializable': r'^6.1.3',
+  'photo_view': r'^0.13.0',
   'gallery_saver': r'^2.1.2',
   'flutter_markdown': r'^0.6.2',
   'markdown': r'^4.0.0',
@@ -150,13 +148,13 @@ const Map<String, Object> dependencies = <String, Object>{
   'win32': r'^2.2.5',
   'file_picker': r'^4.0.0',
   'cached_network_image': r'^3.1.0',
-  'google_mobile_ads': r'^0.13.4',
+  'google_mobile_ads': r'^1.0.1',
   'flutter_typeahead': r'>=3.1.0 <4.0.0',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
   'flutter_js': r'^0.5.0+3',
-  'flutter_math_fork': r'^0.5.0',
+  'flutter_math_fork': r'^0.6.0',
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.5',
   'screen_capture_event': r'^1.0.0+1',
@@ -212,6 +210,7 @@ const Map<String, Object> source = <String, Object>{
     'uses-material-design': true,
     'assets': <Object>[
       r'assets/graphics/',
+      r'assets/texts/',
     ],
     'fonts': <Object>[
       <String, Object>{

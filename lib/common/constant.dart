@@ -22,10 +22,8 @@ import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:event_bus/event_bus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 /// Store some important constants, like app id, default color styles, etc.
 class Constant {

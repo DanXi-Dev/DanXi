@@ -6,16 +6,14 @@ part of 'message.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-OTMessage _$OTMessageFromJson(Map<String, dynamic> json) {
-  return OTMessage(
-    json['message_id'] as int?,
-    json['message'] as String?,
-    json['code'] as String?,
-    json['time_created'] as String?,
-    json['has_read'] as bool?,
-    json['data'] as Map<String, dynamic>?,
-  );
-}
+OTMessage _$OTMessageFromJson(Map<String, dynamic> json) => OTMessage(
+      json['message_id'] as int?,
+      json['message'] as String?,
+      json['code'] as String?,
+      json['time_created'] as String?,
+      json['has_read'] as bool?,
+      json['data'] as Map<String, dynamic>?,
+    );
 
 Map<String, dynamic> _$OTMessageToJson(OTMessage instance) => <String, dynamic>{
       'message_id': instance.message_id,
