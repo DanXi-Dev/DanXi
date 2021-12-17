@@ -152,13 +152,15 @@ class _OTTitleState extends State<OTTitle> {
         if (OpenTreeHoleRepository.getInstance().isUserInitialized)
           showPlatformModalSheet(
             context: context,
-            builder: (BuildContext context) => Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                  shrinkWrap: true,
-                  primary: false,
-                  children: _buildDivisionOptionsList(context),
+            builder: (BuildContext context) => SafeArea(
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(
+                    shrinkWrap: true,
+                    primary: false,
+                    children: _buildDivisionOptionsList(context),
+                  ),
                 ),
               ),
             ),
