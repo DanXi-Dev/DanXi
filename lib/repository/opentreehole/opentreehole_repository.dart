@@ -355,12 +355,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
     Response response = await dio!
-        .post(_BASE_URL + "/images/",
+        .post(_BASE_URL + "/images",
             data: FormData.fromMap({
-              "img": await MultipartFile.fromFile(path, filename: fileName)
+              "image": await MultipartFile.fromFile(path, filename: fileName)
             }),
             options: Options(headers: _tokenHeader))
-        .onError(((dynamic error, stackTrace) => throw ImageUploadError()));
+        .onError(((error, stackTrace) {
+      throw ImageUploadError();
+    }));
     return response.data['url'];
   }
 
