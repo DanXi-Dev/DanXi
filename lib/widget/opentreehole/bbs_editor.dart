@@ -73,7 +73,7 @@ class BBSEditor {
     return true;
   }
 
-  static Future<void> createNewReply(
+  static Future<bool> createNewReply(
       BuildContext context, int? discussionId, int? postId,
       {BBSEditorType? editorType}) async {
     final object = (postId == null
@@ -88,7 +88,7 @@ class BBSEditor {
             object: object,
             placeholder: postId == null ? "" : "##$postId\n"))
         ?.text;
-    if (content == null || content.trim() == "") return;
+    if (content == null || content.trim() == "") return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     final int? success = await OpenTreeHoleRepository.getInstance()
@@ -106,8 +106,9 @@ class BBSEditor {
       return -1;
     });
     progressDialog.dismiss(showAnim: false);
-    if (success == -1) return;
+    if (success == -1) return false;
     StateProvider.editorCache.remove(object);
+    return true;
   }
 
   static Future<void> modifyReply(BuildContext context, int? discussionId,
@@ -181,38 +182,38 @@ class BBSEditor {
             barrierDismissible: false,
             context: context,
             builder: (BuildContext context) => PlatformAlertDialog(
-              title: Text(title),
-              content: BBSEditorWidget(
-                controller: textController,
+                  title: Text(title),
+                  content: BBSEditorWidget(
+                    controller: textController,
                     allowTags: allowTags,
                     editorObject: object,
                     tip: randomTip,
                   ),
-              actions: [
-                PlatformDialogAction(
-                    child: Text(S.of(context).cancel),
-                    onPressed: () {
-                      StateProvider.editorCache[object]!.text =
-                          textController.text;
-                      Navigator.of(context).pop<PostEditorText>(null);
-                    }),
-                PlatformDialogAction(
-                    child: Text(S.of(context).add_image),
-                    onPressed: () => uploadImage(context, textController)),
-                PlatformDialogAction(
-                    child: Text(S.of(context).submit),
-                    onPressed: () async {
-                      Navigator.of(context).pop<PostEditorText>(
-                          PostEditorText(textController.text,
-                              StateProvider.editorCache[object]!.tags));
-                    }),
-              ],
-            ));
+                  actions: [
+                    PlatformDialogAction(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () {
+                          StateProvider.editorCache[object]!.text =
+                              textController.text;
+                          Navigator.of(context).pop<PostEditorText>(null);
+                        }),
+                    PlatformDialogAction(
+                        child: Text(S.of(context).add_image),
+                        onPressed: () => uploadImage(context, textController)),
+                    PlatformDialogAction(
+                        child: Text(S.of(context).submit),
+                        onPressed: () async {
+                          Navigator.of(context).pop<PostEditorText>(
+                              PostEditorText(textController.text,
+                                  StateProvider.editorCache[object]!.tags));
+                        }),
+                  ],
+                ));
         // TODO: This dispose is causing more trouble than it's worth.
         //textController.dispose();
         return value;
       case BBSEditorType.PAGE:
-      // Receive the value with **dynamic** variable to prevent automatic type inference
+        // Receive the value with **dynamic** variable to prevent automatic type inference
         final dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
             arguments: {
