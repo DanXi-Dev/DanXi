@@ -73,11 +73,6 @@ import WatchConnectivity
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self
-        }
-        
         /* Flutter */
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
@@ -103,6 +98,12 @@ import WatchConnectivity
                 break
             }
         })
+        
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.current().delegate = self
+        }
+        // Clear badge on launch
+        UIApplication.shared.applicationIconBadgeNumber = 0
         
         /* watchOS Support */
         if(WCSession.isSupported()){
