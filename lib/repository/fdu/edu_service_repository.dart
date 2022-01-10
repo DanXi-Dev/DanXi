@@ -16,12 +16,13 @@
  */
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
@@ -43,7 +44,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
-
+  static const String ID_URL =
+      'https://jwfw.fudan.edu.cn/eams/courseTableForStd.action';
   static const Map<String, String> _JWFW_HEADER = {
     "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
@@ -63,15 +65,32 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>> loadExamListRemotely(PersonInfo? info) =>
+  Future<List<Exam>> loadExamListRemotely(PersonInfo? info,
+          {String? semesterId}) =>
       Retrier.tryAsyncWithFix(
-          () => _loadExamList(),
+          () => _loadExamList(semesterId: semesterId),
           (exception) => UISLoginTool.loginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
-  Future<List<Exam>> _loadExamList() async {
+  Future<String?> get semesterIdFromCookie async =>
+      (await cookieJar!.loadForRequest(Uri.parse(HOST)))
+          .firstWhere((element) => element.name == "semester.id",
+              orElse: () => Cookie("semester.id", ""))
+          .value;
+
+  Future<List<Exam>> _loadExamList({String? semesterId}) async {
+    String? oldSemesterId = await semesterIdFromCookie;
+    // Set the semester id
+    if (semesterId != null)
+      cookieJar?.saveFromResponse(
+          Uri.parse(HOST), [Cookie("semester.id", semesterId)]);
     final Response r = await dio!
         .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
+
+    // Restore old semester id
+    if (oldSemesterId != null)
+      cookieJar?.saveFromResponse(
+          Uri.parse(HOST), [Cookie("semester.id", oldSemesterId)]);
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
     final DOM.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
@@ -89,10 +108,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<ExamScore>?> _loadExamScore([String? semesterId]) async {
     final Response r = await dio!.get(
-        kExamScoreUrl(semesterId ??
-            (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-                .firstWhere((element) => element.name == "semester.id")
-                .value),
+        kExamScoreUrl(semesterId ?? await semesterIdFromCookie),
         options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
     final DOM.Element tableBody = soup.find("tbody")!.element!;

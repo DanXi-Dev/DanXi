@@ -40,6 +40,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
 /// A list page showing user's GPA scores and exam information.
+/// It will try to fetch [SemesterInfo] first.
+/// If successful, it will fetch exams in this term. In case that there is no exam, it shows the score of this term.
+/// If failed, it will try to fetch the list of score in all terms from DataCenter.
 class ExamList extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
@@ -50,13 +53,12 @@ class ExamList extends StatefulWidget {
 }
 
 class _ExamListState extends State<ExamList> {
-  List<Exam> _data = [];
+  List<Exam> _examData = [];
   PersonInfo? _info;
-  Future<List<Exam>>? _examList;
-  Future<List<GPAListItem>?>? _gpaList;
+  Future<List<GPAListItem>?>? _gpaListFuture;
   List<GPAListItem>? _gpa;
 
-  Future<List<SemesterInfo>?>? _semester;
+  Future<List<SemesterInfo>?>? _semesterFuture;
   List<SemesterInfo>? _unpackedSemester;
   int? _showingSemester;
 
@@ -64,22 +66,20 @@ class _ExamListState extends State<ExamList> {
   void initState() {
     super.initState();
     _info = StateProvider.personInfo.value;
-    _examList = LazyFuture<List<Exam>>.pack(
-        EduServiceRepository.getInstance().loadExamListRemotely(_info));
-    _gpaList = LazyFuture.pack(
+    _gpaListFuture = LazyFuture.pack(
         EduServiceRepository.getInstance().loadGPARemotely(_info));
-    _semester = LazyFuture.pack(
+    _semesterFuture = LazyFuture.pack(
         EduServiceRepository.getInstance().loadSemesters(_info));
   }
 
   void _exportICal() async {
-    if (_data.isEmpty) {
+    if (_examData.isEmpty) {
       Noticing.showNotice(context, S.of(context).exam_unavailable,
           title: S.of(context).fatal_error);
       return;
     }
     ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
-    _data.forEach((element) {
+    _examData.forEach((element) {
       if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty)
         try {
           cal.addElement(IEvent(
@@ -120,9 +120,7 @@ class _ExamListState extends State<ExamList> {
         iosContentBottomPadding: false,
         iosContentPadding: false,
         appBar: PlatformAppBarX(
-          title: Text(
-            S.of(context).exam_schedule,
-          ),
+          title: Text(S.of(context).exam_schedule),
           trailingActions: [
             PlatformIconButton(
               padding: EdgeInsets.zero,
@@ -136,12 +134,11 @@ class _ExamListState extends State<ExamList> {
         body: Material(
             child: SafeArea(
                 child: FutureWidget<List<SemesterInfo>?>(
-                    future: _semester,
+                    future: _semesterFuture,
                     successBuilder: (BuildContext context,
                         AsyncSnapshot<List<SemesterInfo>?> snapshot) {
                       _unpackedSemester = snapshot.data;
-                      if (_showingSemester == null)
-                        _showingSemester = _unpackedSemester!.length - 5;
+                      _showingSemester ??= _unpackedSemester!.length - 5;
                       return _loadExamGradeHybridView();
                     },
                     loadingBuilder:
@@ -149,80 +146,73 @@ class _ExamListState extends State<ExamList> {
                     errorBuilder: _loadGradeViewFromDataCenter))));
   }
 
-  Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>?>(
-      future: _examList,
-      successBuilder: (_, snapShot) {
-        _data = snapShot.data!;
-        return Column(
+  Widget _loadExamGradeHybridView() {
+    Widget body = FutureWidget<List<Exam>?>(
+        future: LazyFuture.pack(EduServiceRepository.getInstance()
+            .loadExamListRemotely(_info,
+                semesterId: _unpackedSemester![_showingSemester!].semesterId)),
+        successBuilder: (_, snapShot) {
+          _examData = snapShot.data!;
+          Widget? body;
+          if (_examData.isEmpty) {
+            return _loadGradeView();
+          } else {
+            return ListView(children: _getListWidgetsHybrid());
+          }
+        },
+        loadingBuilder: Center(
+          child: PlatformCircularProgressIndicator(),
+        ),
+        errorBuilder: _loadGradeView);
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: WithScrollbar(
-                controller: PrimaryScrollController.of(context),
-                child: ListView(
-                  primary: true,
-                  children: _getListWidgetsHybrid(),
-                ),
-              ),
+            PlatformIconButton(
+              icon: Icon(Icons.chevron_left),
+              onPressed: _showingSemester! > 0
+                  ? () =>
+                      setState(() => _showingSemester = _showingSemester! - 1)
+                  : null,
+            ),
+            Text(S.of(context).semester(
+                _unpackedSemester![_showingSemester!].schoolYear ?? "?",
+                _unpackedSemester![_showingSemester!].name ?? "?")),
+            PlatformIconButton(
+              icon: Icon(Icons.chevron_right),
+              onPressed: _showingSemester! < _unpackedSemester!.length - 1
+                  ? () =>
+                      setState(() => _showingSemester = _showingSemester! + 1)
+                  : null,
             )
           ],
-        );
-      },
+        ),
+        Expanded(child: body)
+      ],
+    );
+  }
+
+  Widget _loadGradeView() => FutureWidget<List<ExamScore>?>(
+      future: EduServiceRepository.getInstance().loadExamScoreRemotely(_info,
+          semesterId: _unpackedSemester![_showingSemester!].semesterId),
+      successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
       loadingBuilder: Center(
         child: PlatformCircularProgressIndicator(),
       ),
-      errorBuilder: _loadGradeView //Center(child: Text(S.of(context).no_data)),
-      );
-
-  Widget _loadGradeView() => Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              PlatformIconButton(
-                icon: Icon(Icons.chevron_left),
-                onPressed: _showingSemester! > 0
-                    ? () =>
-                        setState(() => _showingSemester = _showingSemester! - 1)
-                    : null,
+      errorBuilder:
+          (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
+        if (snapshot.error is RangeError)
+          return Padding(
+            child: Center(
+              child: Text(
+                S.of(context).no_data,
               ),
-              Text(S.of(context).semester(
-                  _unpackedSemester![_showingSemester!].schoolYear ?? "?",
-                  _unpackedSemester![_showingSemester!].name ?? "?")),
-              PlatformIconButton(
-                icon: Icon(Icons.chevron_right),
-                onPressed: _showingSemester! < _unpackedSemester!.length - 1
-                    ? () =>
-                        setState(() => _showingSemester = _showingSemester! + 1)
-                    : null,
-              )
-            ],
-          ),
-          Expanded(
-            child: FutureWidget<List<ExamScore>?>(
-                future: EduServiceRepository.getInstance()
-                    .loadExamScoreRemotely(_info,
-                        semesterId:
-                            _unpackedSemester![_showingSemester!].semesterId),
-                successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
-                loadingBuilder: Center(
-                  child: PlatformCircularProgressIndicator(),
-                ),
-                errorBuilder: (BuildContext context,
-                    AsyncSnapshot<List<ExamScore>?> snapshot) {
-                  if (snapshot.error is RangeError)
-                    return Padding(
-                      child: Center(
-                        child: Text(
-                          S.of(context).no_data,
-                        ),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 32),
-                    );
-                  return _loadGradeViewFromDataCenter();
-                }),
-          ),
-        ],
-      );
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 32),
+          );
+        return _loadGradeViewFromDataCenter();
+      });
 
   Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
           {bool isFallback = false}) =>
@@ -259,10 +249,8 @@ class _ExamListState extends State<ExamList> {
     return GestureDetector(
         onTap: () {
           setState(() {
-            _semester = LazyFuture.pack(
+            _semesterFuture = LazyFuture.pack(
                 EduServiceRepository.getInstance().loadSemesters(_info));
-            _examList = LazyFuture.pack(
-                EduServiceRepository.getInstance().loadExamListRemotely(_info));
           });
         },
         child: Padding(
@@ -310,7 +298,7 @@ class _ExamListState extends State<ExamList> {
             style: TextStyle(color: Colors.white),
           ),
           trailing: FutureWidget<List<GPAListItem>?>(
-            future: _gpaList,
+            future: _gpaListFuture,
             successBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>?> snapShot) {
               _gpa = snapShot.data;
@@ -329,7 +317,7 @@ class _ExamListState extends State<ExamList> {
             loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
           ),
           subtitle: FutureWidget<List<GPAListItem>?>(
-            future: _gpaList,
+            future: _gpaListFuture,
             successBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>?> snapShot) {
               GPAListItem myGPA = snapShot.data!
@@ -356,8 +344,8 @@ class _ExamListState extends State<ExamList> {
       _buildDividerWithText(S.of(context).other_types_exam,
           Theme.of(context).textTheme.bodyText1!.color)
     ]; //These widgets are displayed after the ones above
-    if (_data.isEmpty) return widgets;
-    _data.forEach((Exam value) {
+    if (_examData.isEmpty) return widgets;
+    _examData.forEach((Exam value) {
       if (value.testCategory.trim() == "论文" ||
           value.testCategory.trim() == "其他")
         secondaryWidgets.add(_buildCardHybrid(value, context));
