@@ -60,7 +60,15 @@ class _ExamListState extends State<ExamList> {
 
   Future<List<SemesterInfo>?>? _semesterFuture;
   List<SemesterInfo>? _unpackedSemester;
+  List<ExamScore>? _cachedScoreData;
   int? _showingSemester;
+
+  set semester(int? newSemester) {
+    _cachedScoreData = null;
+    _showingSemester = newSemester;
+  }
+
+  int? get semester => _showingSemester;
 
   @override
   void initState() {
@@ -138,7 +146,7 @@ class _ExamListState extends State<ExamList> {
                     successBuilder: (BuildContext context,
                         AsyncSnapshot<List<SemesterInfo>?> snapshot) {
                       _unpackedSemester = snapshot.data;
-                      _showingSemester ??= _unpackedSemester!.length - 5;
+                      semester ??= _unpackedSemester!.length - 5;
                       return _loadExamGradeHybridView();
                     },
                     loadingBuilder:
@@ -150,7 +158,7 @@ class _ExamListState extends State<ExamList> {
     Widget body = FutureWidget<List<Exam>?>(
         future: LazyFuture.pack(EduServiceRepository.getInstance()
             .loadExamListRemotely(_info,
-                semesterId: _unpackedSemester![_showingSemester!].semesterId)),
+                semesterId: _unpackedSemester![semester!].semesterId)),
         successBuilder: (_, snapShot) {
           _examData = snapShot.data!;
           Widget? body;
@@ -171,19 +179,17 @@ class _ExamListState extends State<ExamList> {
           children: [
             PlatformIconButton(
               icon: Icon(Icons.chevron_left),
-              onPressed: _showingSemester! > 0
-                  ? () =>
-                      setState(() => _showingSemester = _showingSemester! - 1)
+              onPressed: semester! > 0
+                  ? () => setState(() => semester = semester! - 1)
                   : null,
             ),
             Text(S.of(context).semester(
-                _unpackedSemester![_showingSemester!].schoolYear ?? "?",
-                _unpackedSemester![_showingSemester!].name ?? "?")),
+                _unpackedSemester![semester!].schoolYear ?? "?",
+                _unpackedSemester![semester!].name ?? "?")),
             PlatformIconButton(
               icon: Icon(Icons.chevron_right),
-              onPressed: _showingSemester! < _unpackedSemester!.length - 1
-                  ? () =>
-                      setState(() => _showingSemester = _showingSemester! + 1)
+              onPressed: semester! < _unpackedSemester!.length - 1
+                  ? () => setState(() => semester = semester! + 1)
                   : null,
             )
           ],
@@ -195,11 +201,9 @@ class _ExamListState extends State<ExamList> {
 
   Widget _loadGradeView() => FutureWidget<List<ExamScore>?>(
       future: EduServiceRepository.getInstance().loadExamScoreRemotely(_info,
-          semesterId: _unpackedSemester![_showingSemester!].semesterId),
+          semesterId: _unpackedSemester![semester!].semesterId),
       successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
-      loadingBuilder: Center(
-        child: PlatformCircularProgressIndicator(),
-      ),
+      loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
       errorBuilder:
           (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
         if (snapshot.error is RangeError)
@@ -414,14 +418,18 @@ class _ExamListState extends State<ExamList> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: FutureWidget<List<ExamScore>?>(
-                    future: EduServiceRepository.getInstance()
-                        .loadExamScoreRemotely(_info,
-                            semesterId: _unpackedSemester![_showingSemester!]
-                                .semesterId),
+                    // Using our cached data here
+                    future: _cachedScoreData == null
+                        ? EduServiceRepository.getInstance()
+                            .loadExamScoreRemotely(_info,
+                                semesterId:
+                                    _unpackedSemester![semester!].semesterId)
+                        : Future.value(_cachedScoreData),
                     loadingBuilder: PlatformCircularProgressIndicator(),
                     errorBuilder: const SizedBox(),
                     successBuilder: (context, snapshot) {
                       if (snapshot.hasData) {
+                        _cachedScoreData = snapshot.data;
                         try {
                           return Container(
                               height: 28,
@@ -435,13 +443,11 @@ class _ExamListState extends State<ExamList> {
                               ),
                               child: Center(
                                 child: Text(
-                                  snapshot.data!
-                                      .firstWhere((element) =>
-                                          element.name == value.name)
-                                      .level,
-                                  textScaleFactor: 1.2,
-                                  //style: TextStyle(color: Colors.red),
-                                ),
+                                    _cachedScoreData!
+                                        .firstWhere((element) =>
+                                            element.name == value.name)
+                                        .level,
+                                    textScaleFactor: 1.2),
                               ));
                         } catch (ignored) {}
                       }
