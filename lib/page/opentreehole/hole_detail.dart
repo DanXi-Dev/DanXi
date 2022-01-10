@@ -36,11 +36,8 @@ import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
@@ -140,7 +137,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           start_floor: _listViewController.length());
     } else
       return await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_post, page * 10, 10);
+          .loadFloors(_post, startFloor: page * 10);
   }
 
   Future<bool?> _isHoleFavorite() async {
@@ -188,6 +185,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      // Replaced precached data with updated ones
+      OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
+        _listViewController.replaceDataInRangeWith(value, 0);
+      }, onError: (error, st) {});
+    });
     return PlatformScaffold(
       material: (_, __) =>
           MaterialScaffoldData(resizeToAvoidBottomInset: false),
@@ -204,18 +207,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               : S.of(context).search_result),
         ),
         trailingActions: [
-          if (_searchKeyword == null) _buildFavoredActionButton(),
-          if (_searchKeyword == null)
+          if (_searchKeyword == null) ...[
+            _buildFavoredActionButton(),
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
-                await BBSEditor.createNewReply(context, _post.hole_id, null);
-                await refreshSelf();
+                if (await BBSEditor.createNewReply(
+                    context, _post.hole_id, null)) {
+                  await refreshSelf();
+                }
               },
             ),
+          ]
         ],
       ),
       body: Material(
@@ -229,7 +235,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: SafeArea(
             bottom: false,
             child: RefreshIndicator(
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
               backgroundColor: Theme.of(context).dialogBackgroundColor,
               onRefresh: () async {
                 HapticFeedback.mediumImpact();
@@ -241,11 +247,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 withScrollbar: true,
                 scrollController: PrimaryScrollController.of(context),
                 dataReceiver: _loadContent,
-                // Load all data if user instructed us to scroll to end
-                allDataReceiver: (shouldScrollToEnd && _post.reply! > 10)
-                    ? OpenTreeHoleRepository.getInstance()
-                        .loadFloors(_post, 0, 0)
-                    : null,
                 shouldScrollToEnd: shouldScrollToEnd,
                 builder: _getListItems,
                 loadingBuilder: (BuildContext context) => Container(
@@ -414,8 +415,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             replyId = floor.floor_id;
             OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
-          await BBSEditor.createNewReply(context, _post.hole_id, replyId);
-          await refreshSelf();
+          if (await BBSEditor.createNewReply(context, _post.hole_id, replyId)) {
+            await refreshSelf();
+          }
         } else {
           ProgressFuture progressDialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
@@ -432,16 +434,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
 PostRenderWidget smartRender(String content, LinkTapCallback? onTapLink,
         ImageTapCallback? onTapImage) =>
-    isHtml(content)
-        ? PostRenderWidget(
-            render: kHtmlRender,
-            content: preprocessContentForDisplay(content),
-            onTapImage: onTapImage,
-            onTapLink: onTapLink,
-          )
-        : PostRenderWidget(
-            render: kMarkdownRender,
-            content: preprocessContentForDisplay(content),
-            onTapImage: onTapImage,
-            onTapLink: onTapLink,
-          );
+    PostRenderWidget(
+      render: kMarkdownRender,
+      content: preprocessContentForDisplay(content),
+      onTapImage: onTapImage,
+      onTapLink: onTapLink,
+    );

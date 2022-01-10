@@ -38,7 +38,7 @@
     "lan_connection_issue_1_description":"无法连接到复旦内部网络，部分功能不可用。您是否在校外或使用了移动数据链接？\n\n您可以使用校园 VPN(Easy Connect) 或链接 Eduroam 热点以访问内网资源。",
     "lan_connection_issue_1_action":"校园 VPN",
     "lan_connection_issue_1_guide_title":"如何使用校园 VPN？",
-    "lan_connection_issue_1_guide_content":"三步走即可:<br /><br />1. <a href=\"https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common\">点击这里</a>去VPN下载界面，选择对应平台安装。<br />2. 打开安装的软件，在地址栏输入 stuvpn.fudan.edu.cn ，点击确定。<br />3. 弹出登录界面，输入自己的UIS账号，点击连接。<br /><br />然后就可以正常使用旦夕各项功能了！",
+    "lan_connection_issue_1_guide_content":"三步走即可:\n\n1. [点击这里](https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common)去VPN下载界面，选择对应平台安装。\n2. 打开安装的软件，在地址栏输入 stuvpn.fudan.edu.cn ，点击确定。\n3. 弹出登录界面，输入自己的UIS账号，点击连接。\n\n然后就可以正常使用旦夕各项功能了！",
     "re_login":"重新登录",
     "retry":"重试",
     "skip":"跳过",

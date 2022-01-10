@@ -16,9 +16,9 @@
  */
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/shims/dart_ui_real.dart';
 
 class ImageUtils {
   /// Load image byte array from [provider].

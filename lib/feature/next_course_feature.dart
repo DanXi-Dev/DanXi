@@ -28,7 +28,6 @@ import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class NextCourseFeature extends Feature {
   LiveCourseModel? _data;

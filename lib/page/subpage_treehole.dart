@@ -46,10 +46,8 @@ import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -154,13 +152,15 @@ class _OTTitleState extends State<OTTitle> {
         if (OpenTreeHoleRepository.getInstance().isUserInitialized)
           showPlatformModalSheet(
             context: context,
-            builder: (BuildContext context) => Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                  shrinkWrap: true,
-                  primary: false,
-                  children: _buildDivisionOptionsList(context),
+            builder: (BuildContext context) => SafeArea(
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(
+                    shrinkWrap: true,
+                    primary: false,
+                    children: _buildDivisionOptionsList(context),
+                  ),
                 ),
               ),
             ),
@@ -478,7 +478,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         child: SafeArea(
           bottom: false,
           child: RefreshIndicator(
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).colorScheme.secondary,
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();

@@ -33,7 +33,6 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -293,8 +292,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   // Migrated
-  Future<List<OTFloor>> loadFloors(
-      OTHole post, int startFloor, int length) async {
+  Future<List<OTFloor>> loadFloors(OTHole post,
+      {int? startFloor, int length = 10}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         queryParameters: {
           "start_floor": startFloor,
@@ -355,12 +354,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
     Response response = await dio!
-        .post(_BASE_URL + "/images/",
+        .post(_BASE_URL + "/images",
             data: FormData.fromMap({
-              "img": await MultipartFile.fromFile(path, filename: fileName)
+              "image": await MultipartFile.fromFile(path, filename: fileName)
             }),
             options: Options(headers: _tokenHeader))
-        .onError(((dynamic error, stackTrace) => throw ImageUploadError()));
+        .onError(((error, stackTrace) {
+      throw ImageUploadError();
+    }));
     return response.data['url'];
   }
 

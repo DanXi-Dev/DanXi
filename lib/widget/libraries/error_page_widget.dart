@@ -17,7 +17,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/shims/dart_ui.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A simple error page, usually shown as full-screen.

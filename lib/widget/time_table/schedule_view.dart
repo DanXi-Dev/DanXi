@@ -21,9 +21,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:intl/intl.dart';
 
@@ -126,7 +124,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
       TextStyle highlightStyle =
-          TextStyle(color: Theme.of(context).accentColor);
+          TextStyle(color: Theme.of(context).colorScheme.secondary);
       // Build weekday indicators
       result[1 + day] = Center(
         child: Column(
@@ -231,14 +229,14 @@ class _ScheduleViewState extends State<ScheduleView> {
 
   Widget _buildCourseBody(Course course) {
     final TextStyle? textStyle = Theme.of(context).textTheme.overline?.copyWith(
-        color: Theme.of(context).accentColorBrightness == Brightness.light
+        color: Theme.of(context).colorScheme.secondary.computeLuminance() >= 0.5
             ? Colors.black
             : Colors.white);
     return Container(
       margin: EdgeInsets.all(2),
       padding: EdgeInsets.all(2),
       decoration: BoxDecoration(
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(2)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

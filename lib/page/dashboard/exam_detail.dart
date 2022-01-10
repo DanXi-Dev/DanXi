@@ -33,7 +33,6 @@ import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:ical/serializer.dart';
 import 'package:open_file/open_file.dart';
@@ -118,8 +117,8 @@ class _ExamListState extends State<ExamList> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-        iosContentBottomPadding: true,
-        iosContentPadding: true,
+        iosContentBottomPadding: false,
+        iosContentPadding: false,
         appBar: PlatformAppBarX(
           title: Text(
             S.of(context).exam_schedule,
@@ -135,99 +134,95 @@ class _ExamListState extends State<ExamList> {
           ],
         ),
         body: Material(
-            child: FutureWidget<List<SemesterInfo>?>(
-                future: _semester,
-                successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                  _unpackedSemester = snapshot.data;
-                  if (_showingSemester == null)
-                    _showingSemester = _unpackedSemester!.length - 5;
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          PlatformIconButton(
-                            icon: Icon(Icons.chevron_left),
-                            onPressed: _showingSemester! > 0
-                                ? () => setState(() =>
-                                    _showingSemester = _showingSemester! - 1)
-                                : null,
-                          ),
-                          Text(S.of(context).semester(
-                              _unpackedSemester![_showingSemester!]
-                                      .schoolYear ??
-                                  "?",
-                              _unpackedSemester![_showingSemester!].name ??
-                                  "?")),
-                          PlatformIconButton(
-                            icon: Icon(Icons.chevron_right),
-                            onPressed: _showingSemester! <
-                                    _unpackedSemester!.length - 1
-                                ? () => setState(() =>
-                                    _showingSemester = _showingSemester! + 1)
-                                : null,
-                          )
-                        ],
-                      ),
-                      Expanded(
-                        child: _loadExamGradeHybridView(),
-                      )
-                    ],
-                  );
-                },
-                loadingBuilder:
-                    Center(child: PlatformCircularProgressIndicator()),
-                errorBuilder: _loadGradeViewFromDataCenter)));
+            child: SafeArea(
+                child: FutureWidget<List<SemesterInfo>?>(
+                    future: _semester,
+                    successBuilder: (BuildContext context,
+                        AsyncSnapshot<List<SemesterInfo>?> snapshot) {
+                      _unpackedSemester = snapshot.data;
+                      if (_showingSemester == null)
+                        _showingSemester = _unpackedSemester!.length - 5;
+                      return _loadExamGradeHybridView();
+                    },
+                    loadingBuilder:
+                        Center(child: PlatformCircularProgressIndicator()),
+                    errorBuilder: _loadGradeViewFromDataCenter))));
   }
 
   Widget _loadExamGradeHybridView() => FutureWidget<List<Exam>?>(
-        future: _examList,
-        successBuilder: (_, snapShot) {
-          _data = snapShot.data!;
-          return Column(
-            children: [
-              Expanded(
-                  child: MediaQuery.removePadding(
-                      context: context,
-                      removeTop: true,
-                      child: WithScrollbar(
-                          controller: PrimaryScrollController.of(context),
-                          child: ListView(
-                            primary: true,
-                            children: _getListWidgetsHybrid(),
-                          ))))
-            ],
-          );
-        },
-        loadingBuilder: Center(
-          child: PlatformCircularProgressIndicator(),
-        ),
-        errorBuilder: _loadGradeView,
+      future: _examList,
+      successBuilder: (_, snapShot) {
+        _data = snapShot.data!;
+        return Column(
+          children: [
+            Expanded(
+              child: WithScrollbar(
+                controller: PrimaryScrollController.of(context),
+                child: ListView(
+                  primary: true,
+                  children: _getListWidgetsHybrid(),
+                ),
+              ),
+            )
+          ],
+        );
+      },
+      loadingBuilder: Center(
+        child: PlatformCircularProgressIndicator(),
+      ),
+      errorBuilder: _loadGradeView //Center(child: Text(S.of(context).no_data)),
       );
 
-  Widget _loadGradeView() => GestureDetector(
-      child: FutureWidget<List<ExamScore>?>(
-          future: EduServiceRepository.getInstance().loadExamScoreRemotely(
-              _info,
-              semesterId: _unpackedSemester![_showingSemester!].semesterId),
-          successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
-          loadingBuilder: Center(
-            child: PlatformCircularProgressIndicator(),
+  Widget _loadGradeView() => Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PlatformIconButton(
+                icon: Icon(Icons.chevron_left),
+                onPressed: _showingSemester! > 0
+                    ? () =>
+                        setState(() => _showingSemester = _showingSemester! - 1)
+                    : null,
+              ),
+              Text(S.of(context).semester(
+                  _unpackedSemester![_showingSemester!].schoolYear ?? "?",
+                  _unpackedSemester![_showingSemester!].name ?? "?")),
+              PlatformIconButton(
+                icon: Icon(Icons.chevron_right),
+                onPressed: _showingSemester! < _unpackedSemester!.length - 1
+                    ? () =>
+                        setState(() => _showingSemester = _showingSemester! + 1)
+                    : null,
+              )
+            ],
           ),
-          errorBuilder:
-              (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
-            if (snapshot.error is RangeError)
-              return Padding(
-                child: Center(
-                  child: Text(
-                    S.of(context).no_data,
-                  ),
+          Expanded(
+            child: FutureWidget<List<ExamScore>?>(
+                future: EduServiceRepository.getInstance()
+                    .loadExamScoreRemotely(_info,
+                        semesterId:
+                            _unpackedSemester![_showingSemester!].semesterId),
+                successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
+                loadingBuilder: Center(
+                  child: PlatformCircularProgressIndicator(),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 32),
-              );
-            return _loadGradeViewFromDataCenter();
-          }));
+                errorBuilder: (BuildContext context,
+                    AsyncSnapshot<List<ExamScore>?> snapshot) {
+                  if (snapshot.error is RangeError)
+                    return Padding(
+                      child: Center(
+                        child: Text(
+                          S.of(context).no_data,
+                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 32),
+                    );
+                  return _loadGradeViewFromDataCenter();
+                }),
+          ),
+        ],
+      );
 
   Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
           {bool isFallback = false}) =>

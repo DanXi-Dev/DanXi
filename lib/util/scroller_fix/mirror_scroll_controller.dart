@@ -18,7 +18,6 @@
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// A scroll controller to imitate the scroll state of [originController],
 /// but it allows multiple [attach] and [detach].

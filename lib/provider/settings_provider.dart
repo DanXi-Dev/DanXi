@@ -18,7 +18,6 @@
 import 'dart:convert';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';

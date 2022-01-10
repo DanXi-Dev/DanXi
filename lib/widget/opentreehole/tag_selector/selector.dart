@@ -20,7 +20,6 @@ import 'dart:math';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /*
 Originally by @hemantkhorwal on Github.

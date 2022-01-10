@@ -20,9 +20,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomShortcutFeature extends Feature {

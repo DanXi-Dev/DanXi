@@ -67,14 +67,14 @@ class PlatformAppBarX extends PlatformAppBar {
       automaticallyImplyLeading:
           data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
       bottomOpacity: data?.bottomOpacity ?? 1.0,
-      brightness: data?.brightness,
+      toolbarTextStyle: data?.toolbarTextStyle,
       centerTitle: data?.centerTitle,
       elevation: data?.elevation ?? 4.0,
       flexibleSpace: data?.flexibleSpace,
       iconTheme: data?.iconTheme,
       leading: data?.leading ?? leading,
       primary: data?.primary ?? true,
-      textTheme: data?.textTheme,
+      titleTextStyle: data?.titleTextStyle,
       titleSpacing: data?.titleSpacing ?? NavigationToolbar.kMiddleSpacing,
       toolbarOpacity: data?.toolbarOpacity ?? 1.0,
       actionsIconTheme: data?.actionsIconTheme,
@@ -83,11 +83,8 @@ class PlatformAppBarX extends PlatformAppBar {
       shadowColor: data?.shadowColor,
       toolbarHeight: data?.toolbarHeight,
       leadingWidth: data?.leadingWidth,
-      backwardsCompatibility: data?.backwardsCompatibility,
       foregroundColor: data?.foregroundColor,
       systemOverlayStyle: data?.systemOverlayStyle,
-      titleTextStyle: data?.titleTextStyle,
-      toolbarTextStyle: data?.toolbarTextStyle,
     );
   }
 

@@ -49,7 +49,7 @@ class OTWelcomeWidget extends StatelessWidget {
                     PlatformX.isMaterial(context)
                         ? Icons.notifications
                         : CupertinoIcons.bell,
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   title: Text(S.of(context).welcome_1),
                   subtitle: Text(S.of(context).welcome_1s),
@@ -59,7 +59,7 @@ class OTWelcomeWidget extends StatelessWidget {
                     PlatformX.isMaterial(context)
                         ? Icons.forum
                         : CupertinoIcons.bubble_right,
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   title: Text(S.of(context).welcome_2),
                   subtitle: Text(S.of(context).welcome_2s),
@@ -69,7 +69,7 @@ class OTWelcomeWidget extends StatelessWidget {
                     PlatformX.isMaterial(context)
                         ? Icons.superscript
                         : CupertinoIcons.textformat_superscript,
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   title: Text(S.of(context).welcome_3),
                   subtitle: Text(S.of(context).welcome_3s),

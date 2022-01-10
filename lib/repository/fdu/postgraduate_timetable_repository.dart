@@ -62,7 +62,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
 
   Future<void> _requestLogin(
       String id, String pwd, String yzm, String token) async {
-    var result = await dio!.post(LOGIN_URL,
+    await dio!.post(LOGIN_URL,
         data: {
           "loginName": id,
           "loginPwd": pwd,

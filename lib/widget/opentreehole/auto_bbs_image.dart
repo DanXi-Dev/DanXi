@@ -19,7 +19,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class BBSImagePlaceholder extends StatelessWidget {
@@ -47,47 +46,39 @@ class BBSImagePlaceholder extends StatelessWidget {
 
 /// A network image loader that will show the image from network, and
 /// fit the image's size to at most [maxWidth].
-class AutoBBSImage extends StatefulWidget {
+class AutoBBSImage extends StatelessWidget {
   @protected
   final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
-  final String? src;
+  final String src;
   final double? maxWidth;
   final ImageTapCallback? onTapImage;
 
-  AutoBBSImage({Key? key, this.src, this.maxWidth, this.onTapImage})
+  AutoBBSImage({Key? key, required this.src, this.maxWidth, this.onTapImage})
       : super(key: key);
-
-  @override
-  _AutoBBSImageState createState() => _AutoBBSImageState();
-}
-
-class _AutoBBSImageState extends State<AutoBBSImage> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 8),
-        constraints: BoxConstraints(maxHeight: widget.maxWidth!),
+        constraints: BoxConstraints(maxHeight: maxWidth!),
         child: GestureDetector(
           child: CachedNetworkImage(
-              imageUrl: widget.src!,
-              width: widget.maxWidth,
-              height: widget
-                  .maxWidth, // Ensure shape is the same as the loading indicator
+              imageUrl: src,
+              width: maxWidth,
+              height:
+                  maxWidth, // Ensure shape is the same as the loading indicator
               fit: BoxFit.contain,
-              errorWidget: (context, url, error) => BBSImagePlaceholder(
-                    size: widget.maxWidth,
-                    child: Icon(PlatformIcons(context).error,
-                        color: Theme.of(context).errorColor),
-                  ),
+              errorWidget: (context, url, error) {
+                return BBSImagePlaceholder(
+                  size: maxWidth,
+                  child: Icon(PlatformIcons(context).error,
+                      color: Theme.of(context).errorColor),
+                );
+              },
               progressIndicatorBuilder: (context, url, progress) {
                 return BBSImagePlaceholder(
-                  size: widget.maxWidth,
+                  size: maxWidth,
                   child: progress.progress == null
                       ? const SizedBox()
                       : LinearProgressIndicator(
@@ -95,7 +86,9 @@ class _AutoBBSImageState extends State<AutoBBSImage> {
                         ),
                 );
               }),
-          onTap: () => widget.onTapImage!(widget.src),
+          onTap: () {
+            if (onTapImage != null) onTapImage!(src);
+          },
         ),
       ),
     );

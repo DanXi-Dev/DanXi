@@ -6,21 +6,19 @@ part of 'report.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-OTReport _$OTReportFromJson(Map<String, dynamic> json) {
-  return OTReport(
-    json['report_id'] as int?,
-    json['reason'] as String?,
-    json['content'] as String?,
-    json['floor'] == null
-        ? null
-        : OTFloor.fromJson(json['floor'] as Map<String, dynamic>),
-    json['hole_id'] as int?,
-    json['time_created'] as String?,
-    json['time_updated'] as String?,
-    json['dealed'] as bool?,
-    json['dealed_by'] as String?,
-  );
-}
+OTReport _$OTReportFromJson(Map<String, dynamic> json) => OTReport(
+      json['report_id'] as int?,
+      json['reason'] as String?,
+      json['content'] as String?,
+      json['floor'] == null
+          ? null
+          : OTFloor.fromJson(json['floor'] as Map<String, dynamic>),
+      json['hole_id'] as int?,
+      json['time_created'] as String?,
+      json['time_updated'] as String?,
+      json['dealed'] as bool?,
+      json['dealed_by'] as String?,
+    );
 
 Map<String, dynamic> _$OTReportToJson(OTReport instance) => <String, dynamic>{
       'report_id': instance.report_id,

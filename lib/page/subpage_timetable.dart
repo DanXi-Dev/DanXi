@@ -42,7 +42,6 @@ import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:open_file/open_file.dart';
@@ -344,7 +343,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     return SafeArea(
       child: Material(
         child: RefreshIndicator(
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             _manualLoad = true;

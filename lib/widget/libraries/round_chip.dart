@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// A round chip, usually used as a tag, to match the tag widget of fduhole's web style.
 class RoundChip extends StatefulWidget {

@@ -49,7 +49,6 @@ import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
@@ -263,7 +262,7 @@ class _HomeSubpageState extends State<HomeSubpage>
         child: WithScrollbar(
             controller: widget.primaryScrollController(context),
             child: RefreshIndicator(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
                 backgroundColor: Theme.of(context).dialogBackgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();

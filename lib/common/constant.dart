@@ -22,10 +22,8 @@ import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:event_bus/event_bus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 /// Store some important constants, like app id, default color styles, etc.
 class Constant {
@@ -141,7 +139,8 @@ class Constant {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.light,
-        accentColor: Color(0xFF007AFF),
+        colorScheme: ColorScheme.light()
+            .copyWith(secondary: Color(0xFF007AFF), primary: Color(0xFF007AFF)),
         toggleableActiveColor: Color(0xFF007AFF),
         canvasColor: Color.fromRGBO(242, 242, 247, 1),
         backgroundColor: Color.fromRGBO(242, 242, 247, 1),
@@ -172,7 +171,8 @@ class Constant {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.dark,
-        accentColor: Color(0xFF007AFF),
+        colorScheme: ColorScheme.dark()
+            .copyWith(secondary: Color(0xFF007AFF), primary: Color(0xFF007AFF)),
         toggleableActiveColor: Color(0xFF007AFF),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,

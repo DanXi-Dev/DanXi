@@ -28,8 +28,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -177,7 +175,7 @@ class _LoginDialogState extends State<LoginDialog> {
     var linkText = Theme.of(context)
         .textTheme
         .bodyText2!
-        .copyWith(color: Theme.of(context).accentColor, fontSize: 12);
+        .copyWith(color: Theme.of(context).colorScheme.secondary, fontSize: 12);
 
     //Tackle #25
     if (!widget.dismissible) {

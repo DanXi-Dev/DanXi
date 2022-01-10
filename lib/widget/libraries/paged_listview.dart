@@ -24,9 +24,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 const kDuration = Duration(milliseconds: 500);
 const kCurve = Curves.easeInOut;
@@ -389,6 +387,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     });
   }
 
+  replaceDataInRangeWith(Iterable<T> data, int start) {
+    setState(() {
+      _data.setAll(start, data);
+    });
+  }
+
   queueScrollToEnd() {
     _scrollToEndQueued = true;
   }
@@ -491,6 +495,10 @@ class PagedListViewController<T> implements ListProvider<T> {
   /// Will no longer load content on scroll after this is called.
   replaceDataWith(List<T> data) {
     _state.replaceDataWith(data);
+  }
+
+  replaceDataInRangeWith(Iterable<T> data, int start) {
+    _state.replaceDataInRangeWith(data, start);
   }
 
   @override

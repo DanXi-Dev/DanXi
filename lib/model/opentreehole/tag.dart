@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/taggable.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -23,9 +25,9 @@ part 'tag.g.dart';
 
 @JsonSerializable()
 class OTTag extends Taggable {
-  int? tag_id;
-  int? temperature;
-  String? name;
+  final int? tag_id;
+  final int? temperature;
+  final String? name;
 
   factory OTTag.fromJson(Map<String, dynamic> json) => _$OTTagFromJson(json);
 
@@ -34,7 +36,7 @@ class OTTag extends Taggable {
   @override
   bool operator ==(Object other) => (other is OTTag) && tag_id == other.tag_id;
 
-  OTTag(this.tag_id, this.temperature, this.name);
+  const OTTag(this.tag_id, this.temperature, this.name);
 
   @override
   int get hashCode => tag_id!;

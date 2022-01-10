@@ -16,7 +16,6 @@
  */
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 /// Useful utils when processing network requests by dio.
 class DioUtils {
