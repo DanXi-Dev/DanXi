@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
+import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -28,6 +29,7 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 
 /// A list page showing AAO notices.
 ///
@@ -79,13 +81,16 @@ class _AAONoticesListState extends State<AAONoticesList> {
                     : Icon(CupertinoIcons.info_circle_fill),
                 title: Text(value.title),
                 subtitle: Text(value.time),
-                onTap: () async => BrowserUtil.openUrl(
-                    value.url,
-                    context,
-                    PlatformX.isIOS
-                        ? null
-                        : await FudanAAORepository.getInstance()
-                            .thisCookies), // TODO: fix this for iOS
+                onTap: () async {
+                  NonpersistentCookieJar? cookie;
+                  if (PlatformX.isMobile && !PlatformX.isIOS) {
+                    ProgressFuture progressDialog = showProgressDialog(
+                        loadingText: S.of(context).loading, context: context);
+                    cookie = await FudanAAORepository.getInstance().thisCookies;
+                    progressDialog.dismiss(showAnim: false);
+                  }
+                  BrowserUtil.openUrl(value.url, context, cookie);
+                }, // TODO: fix this for iOS
               ));
             },
             loadingBuilder: (_) => Center(
