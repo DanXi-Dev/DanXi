@@ -140,7 +140,7 @@ class _OTTitleState extends State<OTTitle> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Listener(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -148,8 +148,9 @@ class _OTTitleState extends State<OTTitle> {
           Icon(Icons.arrow_drop_down)
         ],
       ),
-      onTap: () {
-        if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+      onPointerUp: (PointerUpEvent details) {
+        if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
+            OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty)
           showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => SafeArea(
