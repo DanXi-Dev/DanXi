@@ -37,6 +37,9 @@ class Constant {
   static const String ADMOB_APP_ID_IOS =
       "ca-app-pub-4420475240805528~1122982272";
 
+  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
+      "https://opentreehole.github.io/#/forgetpassword";
+
   // ignore: non_constant_identifier_names
   static get DEFAULT_SEMESTER_START_TIME => DateTime(2021, 9, 13);
 

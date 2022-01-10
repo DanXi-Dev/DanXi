@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -384,24 +385,39 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
         SizedBox(
           height: 16,
         ),
-        PlatformElevatedButton(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(S.of(context).login),
-          ),
-          onPressed: () {
-            model.selectedEmail = _usernameController.text;
-            model.password = _passwordController.text;
-            if (_passwordController.text.length > 0 &&
-                _usernameController.text.length > 0) {
-              executeLogin(context).catchError((e, st) {
-                state.jumpBackFromLoadingPage();
-                debugPrintStack(stackTrace: st);
-                Noticing.showNotice(
-                    state.context, S.of(state.context).login_problem_occurred);
-              });
-            }
-          },
+        Stack(
+          children: [
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: PlatformTextButton(
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0), child: Text("忘记密码")),
+                onPressed: () => BrowserUtil.openUrl(
+                    Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: PlatformElevatedButton(
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(S.of(context).login)),
+                onPressed: () {
+                  model.selectedEmail = _usernameController.text;
+                  model.password = _passwordController.text;
+                  if (_passwordController.text.length > 0 &&
+                      _usernameController.text.length > 0) {
+                    executeLogin(context).catchError((e, st) {
+                      state.jumpBackFromLoadingPage();
+                      debugPrintStack(stackTrace: st);
+                      Noticing.showNotice(state.context,
+                          S.of(state.context).login_problem_occurred);
+                    });
+                  }
+                },
+              ),
+            )
+          ],
         )
       ],
     );
