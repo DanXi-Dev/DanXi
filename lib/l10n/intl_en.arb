@@ -12,6 +12,7 @@
     "current_connection":"Current Connection",
     "ecard_balance":"Card Balance",
     "ecard_balance_log":"Transactions",
+    "fudan_library_crowdedness":"Library Popularity",
     "dining_hall_crowdedness":"Canteen Popularity",
     "choose_area":"Select Campus",
     "out_of_dining_time":"It's not dining time right now.",

@@ -24,6 +24,7 @@ import 'package:dan_xi/feature/dorm_electricity_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_feature.dart';
+import 'package:dan_xi/feature/fudan_library_crowdedness_feature.dart';
 import 'package:dan_xi/feature/lan_connection_notification.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/pe_feature.dart';
@@ -41,16 +42,17 @@ class FeatureMap {
   ///
   /// Should be invoked only once at startup.
   static registerAllFeatures() {
-    registerFeature(FudanAAONoticesFeature());
     registerFeature(BusFeature());
     registerFeature(DiningHallCrowdednessFeature());
+    registerFeature(DormElectricityFeature());
     registerFeature(EcardBalanceFeature());
     registerFeature(EmptyClassroomFeature());
+    registerFeature(FudanAAONoticesFeature());
     registerFeature(FudanDailyFeature());
+    registerFeature(FudanLibraryCrowdednessFeature());
     registerFeature(NextCourseFeature());
     registerFeature(PEFeature());
     registerFeature(QRFeature());
-    registerFeature(DormElectricityFeature());
     registerFeature(WelcomeFeature(), groups: UserGroup.values);
   }
 }

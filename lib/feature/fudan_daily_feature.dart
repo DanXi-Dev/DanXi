@@ -31,7 +31,6 @@ import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 
 class FudanDailyFeature extends Feature {
@@ -131,7 +130,7 @@ class FudanDailyFeature extends Feature {
   //String get tertiaryTitle => S.of(context).fudan_daily_disabled_notice;
 
   @override
-  Widget get icon => PlatformX.isAndroid
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.cloud_upload)
       : const Icon(CupertinoIcons.arrow_up_doc);
 

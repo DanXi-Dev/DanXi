@@ -18,10 +18,10 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/card_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
@@ -116,7 +116,7 @@ class EcardBalanceFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isAndroid
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.account_balance_wallet)
       : const Icon(CupertinoIcons.creditcard);
 

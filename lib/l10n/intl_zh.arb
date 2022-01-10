@@ -12,6 +12,7 @@
     "current_connection":"当前连接",
     "ecard_balance":"校园卡余额",
     "ecard_balance_log":"消费记录",
+    "fudan_library_crowdedness":"图书馆人数",
     "dining_hall_crowdedness":"食堂排队消费状况",
     "choose_area":"选择校区",
     "out_of_dining_time":"现在不是用餐时间",

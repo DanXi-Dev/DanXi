@@ -20,11 +20,11 @@ import 'dart:math';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:dan_xi/widget/libraries/small_tag.dart';
@@ -233,7 +233,7 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isAndroid
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.stacked_line_chart)
       : const Icon(CupertinoIcons.person_3_fill);
 

@@ -442,10 +442,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                         .clearCache();
                                     SettingsProvider.getInstance()
                                         .deleteAllFduholeData();
-                                    settingsPageKey.currentState
-                                        ?.setState(() {});
-                                    treeholePageKey.currentState
-                                        ?.setState(() {});
+                                    settingsPageKey.currentState?.refreshSelf();
+                                    treeholePageKey.currentState?.refreshSelf();
                                   }
                                 },
                               ),

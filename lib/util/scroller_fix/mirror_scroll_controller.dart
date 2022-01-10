@@ -24,17 +24,18 @@ import 'package:flutter/material.dart';
 ///
 /// Why:
 /// It is used in the situation that there are more than one [ListView]s on a
-/// page which shows one of them at one time (i.e. a page with tab pages, like [HomePage]),
-/// and in different subpage you hope only the exact [ListView] on that subpage responds to
+/// page which shows one of these [ListView]s at one time (i.e. a page with tab pages, like [HomePage]),
+/// and in the different subpage you hope only the exact [ListView] on that subpage responds to
 /// primary scroll control actions (e.g. double tap on the title bar on iOS).
-/// When the tab pages initialize, all of its [ListView] will try to attach themselves to
+/// When tab pages get initialized, all of its [ListView]s will try to attach themselves to
 /// the same [PrimaryScrollController], which is not permitted. (See [ScrollController.position])
 /// And this class is to solve such a problem, working as a decoration of [PrimaryScrollController].
 ///
 /// Furthermore:
 /// It is useless in most cases. If you find yourself in a situation that this class is necessary,
 /// you should consider wrapping the layout of subpages with [Scaffold] or its subclasses, so every subpage has
-/// its own [PrimaryScrollController] and conflict above is easily prevented.
+/// its own [PrimaryScrollController] and conflict described above is easily prevented. It is my bad design that makes the
+/// project fall into such a situation.
 ///
 /// See also:
 ///   * [PrimaryScrollController]

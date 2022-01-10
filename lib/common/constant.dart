@@ -71,6 +71,8 @@ class Constant {
       'divider': S.of(context).divider,
       'ecard_balance_feature': S.of(context).ecard_balance,
       'dining_hall_crowdedness_feature': S.of(context).dining_hall_crowdedness,
+      'fudan_library_crowdedness_feature':
+          S.of(context).fudan_library_crowdedness,
       'aao_notice_feature': S.of(context).fudan_aao_notices,
       'empty_classroom_feature': S.of(context).empty_classrooms,
       'fudan_daily_feature': S.of(context).fudan_daily,
@@ -89,6 +91,7 @@ class Constant {
     DashboardCard("divider", null, null, true),
     DashboardCard("ecard_balance_feature", null, null, true),
     DashboardCard("dining_hall_crowdedness_feature", null, null, true),
+    DashboardCard("fudan_library_crowdedness_feature", null, null, true),
     DashboardCard("aao_notice_feature", null, null, true),
     DashboardCard("empty_classroom_feature", null, null, true),
     DashboardCard("dorm_electricity_feature", null, null, true),

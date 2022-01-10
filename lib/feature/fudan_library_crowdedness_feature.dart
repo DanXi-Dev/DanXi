@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021  DanXi-Dev
+ *     Copyright (C) 2022  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,26 +18,31 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/repository/fdu/fudan_library_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class FudanAAONoticesFeature extends Feature {
-  List<Notice>? _initialData;
+class FudanLibraryCrowdednessFeature extends Feature {
+  List<int?>? _libraryCrowdedness;
+
+  static const List<String> _LIBRARY_NAME = ["理图", "文图", "张江", "枫林", "江湾"];
+
+  /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
 
-  Future<void> _loadNotices() async {
+  void _loadLibraryCrowdedness() async {
     _status = ConnectionStatus.CONNECTING;
-    _initialData = await FudanAAORepository.getInstance().getNotices(
-        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
-        1,
-        StateProvider.personInfo.value);
-    _status = ConnectionStatus.DONE;
+    try {
+      _libraryCrowdedness =
+          await FudanLibraryRepository.getInstance().getLibraryRawData();
+      _status = ConnectionStatus.DONE;
+    } catch (error) {
+      _status = ConnectionStatus.FAILED;
+    }
     notifyUpdate();
   }
 
@@ -47,51 +52,32 @@ class FudanAAONoticesFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _loadNotices().catchError((e) {
-        _status = ConnectionStatus.FAILED;
-        notifyUpdate();
-      });
+      _libraryCrowdedness = null;
+      _loadLibraryCrowdedness();
     }
   }
 
   @override
-  String get mainTitle => S.of(context!).fudan_aao_notices;
+  String get mainTitle => S.of(context!).fudan_library_crowdedness;
 
   @override
-  String? get subTitle {
+  String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
         return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        if (_initialData != null) {
-          return _initialData!.length > 0 ? _initialData!.first.title : null;
-        } else {
-          return null;
+        if (_libraryCrowdedness!.isEmpty)
+          return S.of(context!).no_data;
+        else {
+          List<String> result = [];
+          for (int i = 0; i < _libraryCrowdedness!.length; i++)
+            result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
+          return result.join(" ");
         }
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context!).failed;
-    }
-  }
-
-  void refreshData() {
-    _status = ConnectionStatus.NONE;
-    notifyUpdate();
-  }
-
-  @override
-  Widget get icon => PlatformX.isMaterial(context!)
-      ? Icon(Icons.developer_board)
-      : Icon(CupertinoIcons.info_circle);
-
-  @override
-  void onTap() {
-    if (_initialData != null) {
-      smartNavigatorPush(context!, "/notice/aao/list",
-          arguments: {"initialData": _initialData});
-    } else {
-      refreshData();
     }
   }
 
@@ -104,6 +90,30 @@ class FudanAAONoticesFeature extends Feature {
       );
     }
     return null;
+  }
+
+  @override
+  Widget get icon => PlatformX.isMaterial(context!)
+      ? const Icon(Icons.local_library)
+      : const Icon(CupertinoIcons.book);
+
+  void refreshData() {
+    _status = ConnectionStatus.NONE;
+    notifyUpdate();
+  }
+
+  @override
+  void onTap() {
+    if (_libraryCrowdedness != null && _libraryCrowdedness!.isNotEmpty) {
+      List<String> result = [];
+      for (int i = 0; i < _libraryCrowdedness!.length; i++)
+        result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
+      Noticing.showModalNotice(context!,
+          message: result.join("\n"),
+          title: S.of(context!).fudan_library_crowdedness);
+    } else {
+      refreshData();
+    }
   }
 
   @override
