@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1639374225;
+const int timestamp = 1640258200;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -212,6 +212,7 @@ const Map<String, Object> source = <String, Object>{
     'uses-material-design': true,
     'assets': <Object>[
       r'assets/graphics/',
+      r'assets/texts/',
     ],
     'fonts': <Object>[
       <String, Object>{
