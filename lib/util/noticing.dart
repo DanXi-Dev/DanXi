@@ -122,20 +122,29 @@ class Noticing {
   static showModalNotice(BuildContext context,
       {String? confirmText, String title = "", String message = ""}) async {
     if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
+    Widget content = Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListTile(
+          title: Text(title),
+          subtitle: Linkify(
+            text: message,
+          )),
+    );
+    Widget body;
+    if (PlatformX.isCupertino(context)) {
+      body = SafeArea(
+        child: Card(
+          child: content,
+        ),
+      );
+    } else {
+      body = SafeArea(
+        child: content,
+      );
+    }
     showPlatformModalSheet(
       context: context,
-      builder: (BuildContext context) => SafeArea(
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListTile(
-                title: Text(title),
-                subtitle: Linkify(
-                  text: message,
-                )),
-          ),
-        ),
-      ),
+      builder: (BuildContext context) => body,
     );
   }
 

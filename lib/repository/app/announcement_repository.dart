@@ -52,7 +52,7 @@ class AnnouncementRepository {
         return null;
       } else {
         list.add(announcement.objectId!);
-        pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list as List<String>);
+        pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list);
         return announcement;
       }
     } else {

@@ -141,33 +141,34 @@ class _OTTitleState extends State<OTTitle> {
   @override
   Widget build(BuildContext context) {
     return Listener(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(StateProvider.divisionId?.name ?? S.of(context).forum),
-          Icon(Icons.arrow_drop_down)
-        ],
-      ),
-      onPointerUp: (PointerUpEvent details) {
-        if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
-            OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty)
-          showPlatformModalSheet(
-            context: context,
-            builder: (BuildContext context) => SafeArea(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListView(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(StateProvider.divisionId?.name ?? S.of(context).forum),
+            Icon(Icons.arrow_drop_down)
+          ],
+        ),
+        onPointerUp: (PointerUpEvent details) {
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
+              OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty) {
+            Widget content = Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView(
                     shrinkWrap: true,
                     primary: false,
-                    children: _buildDivisionOptionsList(context),
-                  ),
-                ),
-              ),
-            ),
-          );
-      },
-    );
+                    children: _buildDivisionOptionsList(context)));
+
+            showPlatformModalSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  if (PlatformX.isCupertino(context)) {
+                    return SafeArea(child: Card(child: content));
+                  } else {
+                    return SafeArea(child: content);
+                  }
+                });
+          }
+        });
   }
 }
 
