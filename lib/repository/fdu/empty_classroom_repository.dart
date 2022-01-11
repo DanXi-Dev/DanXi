@@ -51,7 +51,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
             dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
-  Future<List<RoomInfo>> _getBuildingRoomInfo(
+  Future<List<RoomInfo>?> _getBuildingRoomInfo(
       String areaName, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final response = await dio!.get(detailUrl(areaName, buildingName, date));

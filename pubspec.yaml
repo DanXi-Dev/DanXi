@@ -24,23 +24,23 @@ dependencies:
       url: git://github.com/w568w/FlutterXiaoMiPushPlugin.git
       ref: master
   beautiful_soup_dart: ^0.2.0
-  quick_actions: ^0.6.0+1
+  quick_actions: ^0.6.0+9
   qr_flutter: ^4.0.0
-  provider: ^6.0.0
-  catcher: ^0.6.5
+  provider: ^6.0.2
+  catcher: ^0.6.9
   event_bus: ^2.0.0
-  flutter_platform_widgets: ^1.1.0
-  share: ^2.0.1
+  flutter_platform_widgets: ^1.12.1
+  share: ^2.0.4
   path_provider: ^2.0.8
-  screen_brightness: ^0.1.1
-  flutter_email_sender: ^5.0.0
+  screen_brightness: ^0.1.3
+  flutter_email_sender: ^5.0.2
   auto_size_text: ^3.0.0-nullsafety.0
   ical: ^0.2.2
-  url_launcher: ^6.0.3
+  url_launcher: ^6.0.18
   desktop_window: ^0.4.0
   intl: ^0.17.0-nullsafety.2
   http: ^0.13.1
-  dio: ^4.0.0
+  dio: ^4.0.4
   # crypto: ^3.0.1
   shared_preferences: ^2.0.5
   flutter_phoenix: ^1.0.0
@@ -79,6 +79,7 @@ dependencies:
   uuid: ^3.0.5
   screen_capture_event: ^1.0.0+1
   otp: ^3.0.1
+  lunar: ^1.2.15
 
 dependency_overrides:
   fluttertoast:

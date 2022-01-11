@@ -639,11 +639,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                       ]),
                     ]),
               ]),
-              onTap: () {
-                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                  "post": postElement,
-                });
-              }),
+              onTap: () =>
+                  smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                    "post": postElement,
+                  })),
           if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
               postElement.floors?.last_floor !=
                   postElement.floors?.first_floor) ...[
