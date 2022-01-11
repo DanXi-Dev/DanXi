@@ -33,12 +33,12 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost] = Dio();
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
-          connectTimeout: 5000,
-          receiveTimeout: 5000,
-          sendTimeout: 5000);
+          connectTimeout: 10000,
+          receiveTimeout: 10000,
+          sendTimeout: 10000);
       _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
-  }
+    }
     return _dios[linkHost];
   }
 

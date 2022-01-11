@@ -74,26 +74,18 @@ class _BusPageState extends State<BusPage> {
 
   Widget _buildFutureWidget() => FutureWidget<List<BusScheduleItem>?>(
       future: _setContent(),
-      successBuilder: (context, snapshot) {
-        return ListView(
-          physics: AlwaysScrollableScrollPhysics(),
-          primary: true,
-          children: _getListWidgets(snapshot.data as List<BusScheduleItem>),
-        );
-      },
-      errorBuilder: (context, snapshot) {
-        return Center(
-          child: GestureDetector(
-            child: Text(S.of(context).failed),
-            onTap: () => setState(() {}),
+      successBuilder: (context, snapshot) => ListView(
+            physics: AlwaysScrollableScrollPhysics(),
+            children: _getListWidgets(snapshot.data as List<BusScheduleItem>),
           ),
-        );
-      },
-      loadingBuilder: (context) {
-        return Center(
-          child: PlatformCircularProgressIndicator(),
-        );
-      });
+      errorBuilder: (context, snapshot) => Center(
+            child: GestureDetector(
+              child: Text(S.of(context).failed),
+              onTap: () => setState(() {}),
+            ),
+          ),
+      loadingBuilder: (_) =>
+          Center(child: PlatformCircularProgressIndicator()));
 
   Widget _autoSelectWidget() {
     if (_holidaySliding == 1) {

@@ -18,9 +18,9 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
@@ -37,7 +37,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
 
   static sStadiumDetailUrl(String? contentId, DateTime queryDate) =>
       "https://elife.fudan.edu.cn/public/front/getResource2.htm?contentId=$contentId&ordersId=&"
-      "currentDate=${queryDate == null ? '' : DateFormat('yyyy-MM-dd').format(queryDate)}";
+      "currentDate=${DateFormat('yyyy-MM-dd').format(queryDate)}";
 
   SportsReserveRepository._();
 
@@ -45,7 +45,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
 
   factory SportsReserveRepository.getInstance() => _instance;
 
-  Future<List<StadiumData>> getStadiumFullList(PersonInfo info,
+  Future<List<StadiumData>?> getStadiumFullList(PersonInfo info,
           {DateTime? queryDate, SportsType? type, Campus? campus}) async =>
       Retrier.tryAsyncWithFix(
           () => _getStadiumFullList(
@@ -59,18 +59,18 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
     return int.parse(pageNumber);
   }
 
-  Future<List<StadiumData>> _getStadiumFullList(
+  Future<List<StadiumData>?> _getStadiumFullList(
       {DateTime? queryDate, SportsType? type, Campus? campus}) async {
     var result = <StadiumData>[];
     int pages = await _getStadiumPageNumber();
     for (int i = 1; i <= pages; i++) {
-      result.addAll(await _getStadiumList(
-          queryDate: queryDate, type: type, campus: campus, page: i));
+      result.addAll((await _getStadiumList(
+          queryDate: queryDate, type: type, campus: campus, page: i))!);
     }
     return result;
   }
 
-  Future<List<StadiumData>> _getStadiumList(
+  Future<List<StadiumData>?> _getStadiumList(
       {DateTime? queryDate,
       SportsType? type,
       Campus? campus,
@@ -94,11 +94,23 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
     return elements.map((e) => StadiumData.fromHtml(e)).toList();
   }
 
-  Future<StadiumScheduleData> _getScheduleData(
+  Future<StadiumScheduleData?> getScheduleData(
+          PersonInfo info, StadiumData stadium, DateTime date) async =>
+      Retrier.tryAsyncWithFix(
+          () => _getScheduleData(stadium, date),
+          (exception) async => await UISLoginTool.loginUIS(
+              dio!, LOGIN_URL, cookieJar!, info, true));
+
+  Future<StadiumScheduleData?> _getScheduleData(
       StadiumData stadium, DateTime date) async {
     Response res = await dio!.get(sStadiumDetailUrl(stadium.contentId, date));
     BeautifulSoup soup = BeautifulSoup(res.data.toString());
-    throw UnimplementedError();
+    List<Bs4Element> listOfSchedule = soup
+        .findAll("table", class_: "site_table")
+        .first
+        .findAll("", selector: "tbody>tr");
+    return StadiumScheduleData.fromHtmlPart(
+        stadium, date, listOfSchedule.map((e) => e.element!).toList());
   }
 
   @override
@@ -160,18 +172,38 @@ class StadiumScheduleData {
 
   StadiumScheduleData(this.stadium, this.schedule, this.date);
 
-// factory StadiumScheduleData.fromHtmlPart(List<DOM.Element> elements) {
-//   var items=[];
-//   elements.map((e) {
-//     e.getElementsByClassName('site_td1').first;
-//
-//   });
-// }
+  @override
+  String toString() {
+    return 'StadiumScheduleData{stadium: $stadium, date: $date, schedule: $schedule}';
+  }
+
+  factory StadiumScheduleData.fromHtmlPart(
+          StadiumData stadium, DateTime date, List<DOM.Element> elements) =>
+      StadiumScheduleData(
+          stadium,
+          elements.map((e) {
+            var timeElement = e.getElementsByClassName('site_td1').first;
+            var timeMatches =
+                RegExp(r'\d{2}:\d{2}').allMatches(timeElement.text);
+            var reverseElement = e.getElementsByClassName('site_td4').first;
+            var reverseNums = reverseElement.text.trim().split("/");
+            return StadiumScheduleItem(
+                timeMatches.first.group(0)!,
+                timeMatches.last.group(0)!,
+                int.parse(reverseNums[0]),
+                int.parse(reverseNums[1]));
+          }).toList(),
+          date);
 }
 
 class StadiumScheduleItem {
   final String startTime, endTime;
   final int reserved, total;
+
+  @override
+  String toString() {
+    return 'StadiumScheduleItem{startTime: $startTime, endTime: $endTime, reserved: $reserved, total: $total}';
+  }
 
   StadiumScheduleItem(this.startTime, this.endTime, this.reserved, this.total);
 }
