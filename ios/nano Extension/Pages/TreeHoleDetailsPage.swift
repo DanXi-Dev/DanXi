@@ -23,7 +23,7 @@ struct TreeHoleDetailsPage: View {
         currentPage += 1
         if (!isLoading) {
             isLoading = true
-            loadReplies(token: fduholeLoginInfo.token, page: currentPage, discussionId: replyList.first!.discussion) { (T: [OTFloor]?, errorString: String?) -> Void in
+            loadFloors(token: fduholeLoginInfo.token, page: currentPage, discussionId: replyList.first!.hole_id) { (T: [OTFloor]?, errorString: String?) -> Void in
                 error = errorString
                 if (errorString == nil) {
                     if (T!.isEmpty) {
@@ -56,12 +56,12 @@ struct TreeHoleDetailsPage: View {
                 Text("end_reached")
             }
         }
-        .navigationTitle("#\(replyList.first!.discussion)")
+        .navigationTitle("#\(replyList.first!.hole_id)")
     }
 }
 
 struct TreeHoleDetailsPage_Previews: PreviewProvider {
     static var previews: some View {
-        TreeHoleDetailsPage(replies: [OTFloor(id: 456, discussion: 123, content: "HelloWorld", username: "Demo", date_created: "xxx", reply_to: nil, is_me: false), OTFloor(id: 456, discussion: 123, content: "HelloWorld", username: "Demo", date_created: "xxx", reply_to: nil, is_me: false)])
+        Text("too lazy to write preview")
     }
 }

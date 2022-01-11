@@ -8,7 +8,7 @@
   
   MIT License
   
-  Copyright (c) 2021 Plague Fox
+  Copyright (c) 2022 Plague Fox
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -58,14 +58,13 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1639732094;
+const int timestamp = 1641889020;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -110,24 +109,23 @@ const Map<String, Object> dependencies = <String, Object>{
     },
   },
   'beautiful_soup_dart': r'^0.2.0',
-  'quick_actions': r'^0.6.0+1',
+  'quick_actions': r'^0.6.0+9',
   'qr_flutter': r'^4.0.0',
-  'provider': r'^6.0.0',
-  'catcher': r'^0.6.5',
+  'provider': r'^6.0.2',
+  'catcher': r'^0.6.9',
   'event_bus': r'^2.0.0',
-  'flutter_platform_widgets': r'^1.1.0',
-  'share': r'^2.0.1',
+  'flutter_platform_widgets': r'^1.12.1',
+  'share': r'^2.0.4',
   'path_provider': r'^2.0.8',
-  'screen_brightness': r'^0.1.1',
-  'flutter_email_sender': r'^5.0.0',
+  'screen_brightness': r'^0.1.3',
+  'flutter_email_sender': r'^5.0.2',
   'auto_size_text': r'^3.0.0-nullsafety.0',
   'ical': r'^0.2.2',
-  'url_launcher': r'^6.0.3',
+  'url_launcher': r'^6.0.18',
   'desktop_window': r'^0.4.0',
-  'flutter_html': r'^2.0.0',
   'intl': r'^0.17.0-nullsafety.2',
   'http': r'^0.13.1',
-  'dio': r'^4.0.0',
+  'dio': r'^4.0.4',
   'shared_preferences': r'^2.0.5',
   'flutter_phoenix': r'^1.0.0',
   'asn1lib': r'^1.0.0',
@@ -140,8 +138,8 @@ const Map<String, Object> dependencies = <String, Object>{
   'linkify': r'^4.0.0',
   'open_file': r'^3.2.1',
   'dio_log': r'^2.0.0',
-  'json_serializable': r'^4.0.0',
-  'photo_view': r'^0.12.0',
+  'json_serializable': r'^6.1.3',
+  'photo_view': r'^0.13.0',
   'gallery_saver': r'^2.1.2',
   'flutter_markdown': r'^0.6.2',
   'markdown': r'^4.0.0',
@@ -150,17 +148,19 @@ const Map<String, Object> dependencies = <String, Object>{
   'win32': r'^2.2.5',
   'file_picker': r'^4.0.0',
   'cached_network_image': r'^3.1.0',
-  'google_mobile_ads': r'^0.13.4',
+  'google_mobile_ads': r'^1.0.1',
   'flutter_typeahead': r'>=3.1.0 <4.0.0',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
   'flutter_js': r'^0.5.0+3',
-  'flutter_math_fork': r'^0.5.0',
+  'flutter_math_fork': r'^0.6.0',
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.5',
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.1',
+  'lunar': r'^1.2.15',
+  'animated_text_kit': r'^4.2.1',
 };
 
 /// Developer dependencies
@@ -212,6 +212,7 @@ const Map<String, Object> source = <String, Object>{
     'uses-material-design': true,
     'assets': <Object>[
       r'assets/graphics/',
+      r'assets/texts/',
     ],
     'fonts': <Object>[
       <String, Object>{

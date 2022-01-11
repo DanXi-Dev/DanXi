@@ -17,6 +17,7 @@ struct OTHole: Hashable, Codable, Identifiable {
             return self.hole_id
         }
     }
+    
     let hole_id, division_id: Int
     let view, reply: Int?
     let floors: _OTFloors
@@ -35,6 +36,7 @@ struct OTFloor: Hashable, Codable, Identifiable {
             return self.floor_id
         }
     }
+    
     let floor_id, hole_id, like: Int
     let content, anonyname, time_updated, time_created: String
     let deleted, is_me, liked: Bool?
