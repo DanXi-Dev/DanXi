@@ -261,7 +261,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 endBuilder: (context) => Center(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(S.of(context).end_reached),
+                    child: Text((_post.view ?? -1) >= 0
+                        ? S.of(context).view_count(_post.view.toString())
+                        : S.of(context).end_reached),
                   ),
                 ),
               ),

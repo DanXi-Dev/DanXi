@@ -55,6 +55,7 @@
     "rank": "Rank",
     "semester": "{schoolYear}学年 {semName}学期",
     "all": "All",
+    "view_count": "Views: {view}",
 
     "screenshot_warning_title": "Screenshot Detected",
     "screenshot_warning": "To ensure data security and to protect the privacy of other users, please do not send screenshots to non-FDUHole users. Thank you for your cooperation.",
