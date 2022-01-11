@@ -22,6 +22,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -161,6 +162,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
+
+    // Prevents repeated listener registeration
+    // TODO: this is not ideal, should we really need multiple listeners, this will cause unexpected disposal.
+    screenListener.dispose();
 
     screenListener.addScreenRecordListener((recorded) {
       Noticing.showScreenshotWarning(context);
