@@ -15,10 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementRepository {
@@ -46,18 +45,18 @@ class AnnouncementRepository {
     Announcement? announcement = getLastAnnouncement();
     if (announcement == null) return null;
     SharedPreferences pre = await SharedPreferences.getInstance();
-    List<String?> list = [];
+    List<String>? list = [];
     if (pre.containsKey(KEY_SEEN_ANNOUNCEMENT)) {
       list = pre.getStringList(KEY_SEEN_ANNOUNCEMENT)!;
       if (list.any(((element) => element == announcement.objectId))) {
         return null;
       } else {
-        list.add(announcement.objectId);
+        list.add(announcement.objectId!);
         pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list as List<String>);
         return announcement;
       }
     } else {
-      list.add(announcement.objectId);
+      list.add(announcement.objectId!);
       pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list as List<String>);
       return announcement;
     }
@@ -69,7 +68,7 @@ class AnnouncementRepository {
   }
 
   List<Announcement> getAnnouncements() {
-    final version = int.tryParse(build.first) ?? 0;
+    final version = int.tryParse("1") ?? 0;
     return _announcementCache
         .filter((element) => element.maxVersion! >= version);
   }

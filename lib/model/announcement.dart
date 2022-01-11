@@ -33,6 +33,11 @@ class Announcement extends BmobObject {
   factory Announcement.fromJson(Map<String, dynamic> json) =>
       _$AnnouncementFromJson(json);
 
+  @override
+  String toString() {
+    return 'Announcement{content: $content, maxVersion: $maxVersion}';
+  }
+
   Map<String, dynamic> toJson() => _$AnnouncementToJson(this);
 
   Announcement(this.content);
