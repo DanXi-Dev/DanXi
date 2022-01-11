@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -68,7 +69,7 @@ class AnnouncementRepository {
   }
 
   List<Announcement> getAnnouncements() {
-    final version = int.tryParse("1") ?? 0;
+    final version = int.tryParse(build.first) ?? 0;
     return _announcementCache
         .filter((element) => element.maxVersion! >= version);
   }
