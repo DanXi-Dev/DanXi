@@ -133,145 +133,151 @@ class OTFloorWidget extends StatelessWidget {
     final ImageTapCallback onImageTap = (url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     };
+    final cardChild = ListTile(
+      dense: true,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (generateTags)
+            Padding(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child:
+                    generateTagWidgets(context, parentHole, (String? tagName) {
+                  smartNavigatorPush(context, '/bbs/discussions',
+                      arguments: {"tagFilter": tagName});
+                }, SettingsProvider.getInstance().useAccessibilityColoring)),
+          Padding(
+            padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    if (floor.anonyname ==
+                        parentHole?.floors?.first_floor?.anonyname) ...[
+                      OTLeadingTag(
+                          colorString: isInMention
+                              ? 'grey'
+                              : parentHole?.tags?.first.color ?? 'blue'),
+                      const SizedBox(width: 4),
+                    ],
+                    Text(
+                      "${floor.anonyname}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                if (floor.deleted == true) ...[
+                  const SizedBox(width: 4),
+                  OTLeadingTag(
+                    colorString: 'red',
+                    text: S.of(context).deleted,
+                  ),
+                ]
+              ],
+            ),
+          ),
+          Align(
+              alignment: Alignment.topLeft,
+              child: isInMention
+                  // If content is being quoted, limit its height so that the view won't be too long.
+                  ? Linkify(
+                      text: renderText(floor.filteredContent!,
+                              S.of(context).image_tag, S.of(context).formula)
+                          .trim(),
+                      textScaleFactor: 0.8,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      onOpen: (link) async {
+                        if (await canLaunch(link.url)) {
+                          BrowserUtil.openUrl(link.url, context);
+                        } else {
+                          Noticing.showNotice(
+                              context, S.of(context).cannot_launch_url);
+                        }
+                      })
+                  : smartRender(
+                      floor.filteredContent ?? S.of(context).fatal_error,
+                      onLinkTap,
+                      onImageTap)),
+        ],
+      ),
+      subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
+        const SizedBox(
+          height: 8,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (index == null)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "#${floor.hole_id}",
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                    ),
+                  ),
+                  Text(
+                    "  (##${floor.floor_id})",
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            if (index != null)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "${index! + 1}F",
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "  (##${floor.floor_id})",
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            Text(
+              HumanDuration.tryFormat(
+                  context, DateTime.tryParse(floor.time_created ?? "")),
+              style:
+                  TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+            ),
+          ],
+        ),
+        if (showBottomBar) OTFloorWidgetBottomBar(floor: floor),
+      ]),
+      onTap: onTap,
+    );
+
     return GestureDetector(
       onLongPress: onLongPress,
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : null,
-        child: ListTile(
-          dense: true,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (generateTags)
-                Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: generateTagWidgets(context, parentHole,
-                        (String? tagName) {
-                      smartNavigatorPush(context, '/bbs/discussions',
-                          arguments: {"tagFilter": tagName});
-                    },
-                        SettingsProvider.getInstance()
-                            .useAccessibilityColoring)),
-              Padding(
-                padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        if (floor.anonyname ==
-                            parentHole?.floors?.first_floor?.anonyname) ...[
-                          OTLeadingTag(
-                              colorString: isInMention
-                                  ? 'grey'
-                                  : parentHole?.tags?.first.color ?? 'blue'),
-                          const SizedBox(width: 4),
-                        ],
-                        Text(
-                          "${floor.anonyname}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    if (floor.deleted == true) ...[
-                      const SizedBox(width: 4),
-                      OTLeadingTag(
-                        colorString: 'red',
-                        text: S.of(context).deleted,
-                      ),
-                    ]
-                  ],
+        child: floor.deleted == true
+            ? ExpansionTile(
+                title: Text(
+                  floor.content ?? "?",
+                  style: TextStyle(color: Theme.of(context).hintColor),
                 ),
-              ),
-              Align(
-                  alignment: Alignment.topLeft,
-                  child: isInMention
-                      // If content is being quoted, limit its height so that the view won't be too long.
-                      ? Linkify(
-                          text: renderText(
-                                  floor.filteredContent!,
-                                  S.of(context).image_tag,
-                                  S.of(context).formula)
-                              .trim(),
-                          textScaleFactor: 0.8,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          onOpen: (link) async {
-                            if (await canLaunch(link.url)) {
-                              BrowserUtil.openUrl(link.url, context);
-                            } else {
-                              Noticing.showNotice(
-                                  context, S.of(context).cannot_launch_url);
-                            }
-                          })
-                      : smartRender(
-                          floor.filteredContent ?? S.of(context).fatal_error,
-                          onLinkTap,
-                          onImageTap)),
-            ],
-          ),
-          subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
-            const SizedBox(
-              height: 8,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (index == null)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "#${floor.hole_id}",
-                        style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                      Text(
-                        "  (##${floor.floor_id})",
-                        style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                if (index != null)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "${index! + 1}F",
-                        style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "  (##${floor.floor_id})",
-                        style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                Text(
-                  HumanDuration.tryFormat(
-                      context, DateTime.tryParse(floor.time_created ?? "")),
-                  style: TextStyle(
-                      color: Theme.of(context).hintColor, fontSize: 12),
-                ),
-              ],
-            ),
-            if (showBottomBar) OTFloorWidgetBottomBar(floor: floor),
-          ]),
-          onTap: onTap,
-        ),
+                children: [cardChild],
+              )
+            : cardChild,
       ),
     );
   }
