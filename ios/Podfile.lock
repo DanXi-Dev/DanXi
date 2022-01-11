@@ -130,7 +130,7 @@ PODS:
   - PromisesObjC (2.0.0)
   - quick_actions (0.0.1):
     - Flutter
-  - screen_brightness_ios (0.0.1):
+  - screen_brightness_ios (0.0.4):
     - Flutter
   - screen_capture_event (0.0.1):
     - Flutter
@@ -282,7 +282,7 @@ SPEC CHECKSUMS:
   platform_device_id: 81b3e2993881f87d0c82ef151dc274df4869aef5
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   quick_actions: cd83314083fa994182e6cd9e7516167a215a4f83
-  screen_brightness_ios: e2f4c3492ec238bb8ea1f5558f67ea22557cf997
+  screen_brightness_ios: e5f17b7c7a48abc4350c0143c6d9b1420fe064b9
   screen_capture_event: bcf965bb31968a51c08ad3698725c5ad8c597124
   SDWebImage: 4dc3e42d9ec0c1028b960a33ac6b637bb432207b
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410

@@ -91,7 +91,7 @@ struct THPostView: View {
             
             // Comment Count
             HStack(alignment: .bottom) {
-                Label("\(discussion.count)", systemImage: "ellipsis.bubble")
+                Label(String(discussion.reply!), systemImage: "ellipsis.bubble")
                     .font(.footnote)
                     .imageScale(.small)
                 /*Label(humanReadableDateString(dateString: discussion.date_created) , systemImage: "clock")

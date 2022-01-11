@@ -9,11 +9,11 @@ import Foundation
 
 let BASE_URL = "https://hole.hath.top"
 
-func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrder, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
+func loadHoles<T: Decodable>(token: String, startTime: String, divisionId: Int?, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
     var components = URLComponents(string: BASE_URL + "/holes")!
     components.queryItems = [
-        URLQueryItem(name: "page", value: String(page)),
-        URLQueryItem(name: "order", value: sortOrder.getString())
+        URLQueryItem(name: "start_time", value: startTime),
+        URLQueryItem(name: "division_id", value: String(divisionId ?? 1))
     ]
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
@@ -24,7 +24,6 @@ func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrde
         if (error == nil) {
             if let data = data {
                 if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
-                    // we have good data – go back to the main thread
                     completion(decodedResponse, nil)
                     return
                 }
@@ -36,11 +35,11 @@ func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrde
     }.resume()
 }
 
-func loadReplies<T: Decodable>(token: String, page: Int, discussionId: Int, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
-    var components = URLComponents(string: BASE_URL + "/posts/")!
+func loadFloors<T: Decodable>(token: String, page: Int, discussionId: Int, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
+    var components = URLComponents(string: BASE_URL + "/floors")!
     components.queryItems = [
-        URLQueryItem(name: "page", value: String(page)),
-        URLQueryItem(name: "id", value: String(discussionId))
+        URLQueryItem(name: "start_floor", value: String((page-1)*10)),
+        URLQueryItem(name: "hole_id", value: String(discussionId))
     ]
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
@@ -52,7 +51,6 @@ func loadReplies<T: Decodable>(token: String, page: Int, discussionId: Int, comp
         if (error == nil) {
             if let data = data {
                 if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
-                    // we have good data – go back to the main thread
                     completion(decodedResponse, nil)
                     return
                 }
