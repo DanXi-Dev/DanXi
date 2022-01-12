@@ -154,24 +154,30 @@ class _ExamListState extends State<ExamList> {
                     errorBuilder: _loadGradeViewFromDataCenter))));
   }
 
+  Future<void> loadExamAndScore() async {
+    _examData.clear();
+    _cachedScoreData = null;
+    _examData = await EduServiceRepository.getInstance().loadExamListRemotely(
+        _info,
+        semesterId: _unpackedSemester![semester!].semesterId);
+    print("Exam data loaded");
+    print(_examData);
+    _cachedScoreData = await EduServiceRepository.getInstance()
+        .loadExamScoreRemotely(_info,
+            semesterId: _unpackedSemester![semester!].semesterId);
+  }
+
   Widget _loadExamGradeHybridView() {
-    Widget body = FutureWidget<List<Exam>?>(
-        future: LazyFuture.pack(EduServiceRepository.getInstance()
-            .loadExamListRemotely(_info,
-                semesterId: _unpackedSemester![semester!].semesterId)),
-        successBuilder: (_, snapShot) {
-          _examData = snapShot.data!;
-          Widget? body;
-          if (_examData.isEmpty) {
-            return _loadGradeView();
-          } else {
-            return ListView(children: _getListWidgetsHybrid());
-          }
-        },
+    Widget body = FutureWidget<void>(
+        nullable: true,
+        future: LazyFuture.pack(loadExamAndScore()),
+        successBuilder: (_, snapShot) => _examData.isEmpty
+            ? _loadGradeView(needReloadScoreData: false)
+            : ListView(children: _getListWidgetsHybrid()),
         loadingBuilder: Center(
           child: PlatformCircularProgressIndicator(),
         ),
-        errorBuilder: _loadGradeView);
+        errorBuilder: () => _loadGradeView());
     return Column(
       children: [
         Row(
@@ -199,42 +205,39 @@ class _ExamListState extends State<ExamList> {
     );
   }
 
-  Widget _loadGradeView() => FutureWidget<List<ExamScore>?>(
-      future: EduServiceRepository.getInstance().loadExamScoreRemotely(_info,
-          semesterId: _unpackedSemester![semester!].semesterId),
-      successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
-      loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
-      errorBuilder:
-          (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
-        if (snapshot.error is RangeError)
-          return Padding(
-            child: Center(
-              child: Text(
-                S.of(context).no_data,
-              ),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 32),
-          );
-        return _loadGradeViewFromDataCenter();
-      });
+  Widget _loadGradeView({bool needReloadScoreData = true}) =>
+      FutureWidget<List<ExamScore>?>(
+          future: needReloadScoreData
+              ? EduServiceRepository.getInstance().loadExamScoreRemotely(_info,
+                  semesterId: _unpackedSemester![semester!].semesterId)
+              : Future.value(_cachedScoreData),
+          successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
+          loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
+          errorBuilder:
+              (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
+            if (snapshot.error is RangeError)
+              return Padding(
+                  child: Center(
+                    child: Text(S.of(context).no_data),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 32));
+            return _loadGradeViewFromDataCenter();
+          });
 
   Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
           {bool isFallback = false}) =>
-      Column(
-        children: [
-          Expanded(
-              child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: WithScrollbar(
-                      controller: PrimaryScrollController.of(context),
-                      child: ListView(
+      Column(children: [
+        Expanded(
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: WithScrollbar(
+                    controller: PrimaryScrollController.of(context),
+                    child: ListView(
                         primary: true,
                         children: _getListWidgetsGrade(snapshot.data!,
-                            isFallback: isFallback),
-                      ))))
-        ],
-      );
+                            isFallback: isFallback)))))
+      ]);
 
   Widget _loadGradeViewFromDataCenter() {
     return GestureDetector(
@@ -357,6 +360,13 @@ class _ExamListState extends State<ExamList> {
         widgets.add(_buildCardHybrid(value, context));
     });
 
+    // Some courses do not require an exam but also have given their scores.
+    // Append these courses to the bottom of the list.
+    _cachedScoreData?.forEach((element) {
+      if (_examData.every((exam) => exam.id != element.id)) {
+        secondaryWidgets.add(_buildCardGrade(element, context));
+      }
+    });
     return widgets + secondaryWidgets;
   }
 
