@@ -291,7 +291,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                               new TextEditingController();
                           return PlatformAlertDialog(
                             title: Text(S.of(context).input_your_email),
-                            content: TextField(controller: controller),
+                            content: PlatformTextField(controller: controller),
                             actions: [
                               PlatformDialogAction(
                                   child: Text(S.of(context).i_see),
