@@ -322,8 +322,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_postsType == PostsType.FAVORED_DISCUSSION) {
       await OpenTreeHoleRepository.getInstance()
           .getFavoriteHoleId(forceUpdate: true);
-    }
-    if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+    } else if (OpenTreeHoleRepository.getInstance().isUserInitialized)
       await OpenTreeHoleRepository.getInstance().loadDivisions(useCache: false);
     await _listViewController.notifyUpdate();
   }
@@ -334,10 +333,6 @@ class _BBSSubpageState extends State<BBSSubpage>
         return Card(
           child: ListTile(
             title: Text("FDUHole Administrative Interface"),
-            subtitle: Text(
-              "Status: Authorized",
-              style: TextStyle(color: Colors.green),
-            ),
             onTap: () {
               smartNavigatorPush(context, "/bbs/reports");
             },

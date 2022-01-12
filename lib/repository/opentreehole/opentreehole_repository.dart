@@ -63,6 +63,21 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Push Notification Registration Cache
   PushNotificationRegData? _pushNotificationRegData;
 
+  Future<void> logout() async {
+    if (SettingsProvider.getInstance().lastPushToken != null) {
+      if (!isUserInitialized) {
+        if (SettingsProvider.getInstance().fduholeToken == null)
+          return;
+        else
+          _token = SettingsProvider.getInstance().fduholeToken;
+      }
+      await deletePushNotificationToken(
+          SettingsProvider.getInstance().lastPushToken!);
+    }
+    clearCache();
+    SettingsProvider.getInstance().deleteAllFduholeData();
+  }
+
   void clearCache() {
     _token = null;
     _userInfo = null;
@@ -559,6 +574,21 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     } else {
       _pushNotificationRegData = PushNotificationRegData(id, token, service);
     }
+  }
+
+  Future<void> deletePushNotificationToken(String token) async {
+    throw UnimplementedError(
+        "delete push notification token function has not yet been implemented, awaiting API negotiation.");
+    /*await dio!.delete(_BASE_URL + "/users",
+        data: {
+          "service": service.toStringRepresentation(),
+          "device_id": id,
+          "token": token,
+        },
+        options: Options(
+          headers: _tokenHeader,
+          validateStatus: (status) => status == 200,
+        ));*/
   }
 
   @override

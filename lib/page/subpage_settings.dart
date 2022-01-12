@@ -207,6 +207,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   String? _clearCacheSubtitle;
 
   Future<void> _deleteAllDataAndExit() async {
+    OpenTreeHoleRepository.getInstance().logout();
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
@@ -443,9 +444,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               isConfirmDestructive: true) ==
                                       true) {
                                     OpenTreeHoleRepository.getInstance()
-                                        .clearCache();
-                                    SettingsProvider.getInstance()
-                                        .deleteAllFduholeData();
+                                        .logout();
                                     settingsPageKey.currentState?.refreshSelf();
                                     treeholePageKey.currentState?.refreshSelf();
                                   }
