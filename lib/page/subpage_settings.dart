@@ -194,6 +194,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     LicenseItem("screen_brightness", LICENSE_MIT,
         "https://github.com/aaassseee/screen_brightness"),
     LicenseItem("uuid", LICENSE_MIT, "https://github.com/Daegalus/dart-uuid"),
+    LicenseItem("lunar", LICENSE_MIT, "https://github.com/6tail/lunar-flutter")
   ];
   BannerAd? myBanner;
 

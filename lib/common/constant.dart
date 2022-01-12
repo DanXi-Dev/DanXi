@@ -284,6 +284,17 @@ class Constant {
     Campus.JIANGWAN_CAMPUS,
     Campus.ZHANGJIANG_CAMPUS
   ];
+
+  /// Special days to celebrate in lunar calendar.
+  static const Map<String, List<String>> SPECIAL_DAYS = {
+    "除夕": [
+      "万物迎春送残腊，一年结局在今宵。🎇",
+      "鼓角梅花添一部，五更欢笑拜新年。🎇",
+      "冬尽今宵促，年开明日长。🎇",
+      "春风来不远，只在屋东头。"
+    ],
+    "春节": ["爆竹声中一岁除，春风送暖入屠苏。🎆", "不须迎向东郊去，春在千门万户中。🎆", "松竹含新秋，轩窗有余清。"]
+  };
 }
 
 enum Campus {
