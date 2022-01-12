@@ -287,28 +287,32 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
         onPressed: () {
           showPlatformModalSheet(
               context: context,
-              builder: (BuildContext context) => Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(iconData),
-                              title: Text(title),
-                            ),
-                            Divider(),
-                            Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Linkify(
-                                  text: description,
-                                  onOpen: (element) =>
-                                      BrowserUtil.openUrl(element.url, context),
-                                )),
-                          ]),
-                    ),
-                  ));
+              builder: (BuildContext context) {
+                Widget body = Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(iconData),
+                          title: Text(title),
+                        ),
+                        Divider(),
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Linkify(
+                              text: description,
+                              onOpen: (element) =>
+                                  BrowserUtil.openUrl(element.url, context),
+                            )),
+                      ]),
+                );
+                if (PlatformX.isMaterial(context))
+                  return body;
+                else
+                  return Card(child: body);
+              });
         });
   }
 
