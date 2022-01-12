@@ -431,14 +431,17 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                             .toString())
                                     : S.of(context).not_logged_in),
                                 onTap: () async {
-                                  if (OpenTreeHoleRepository.getInstance()
-                                          .isUserInitialized &&
-                                      await Noticing.showConfirmationDialog(
-                                              context,
+                                  if (!OpenTreeHoleRepository.getInstance()
+                                      .isUserInitialized) {
+                                    await OpenTreeHoleRepository.getInstance()
+                                        .initializeRepo();
+                                    refreshSelf();
+                                  } else if (await Noticing
+                                          .showConfirmationDialog(context,
                                               S.of(context).logout_fduhole,
                                               title: S.of(context).logout,
                                               isConfirmDestructive: true) ==
-                                          true) {
+                                      true) {
                                     OpenTreeHoleRepository.getInstance()
                                         .clearCache();
                                     SettingsProvider.getInstance()

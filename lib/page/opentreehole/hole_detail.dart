@@ -308,24 +308,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) => [
-        PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(menuContext).pop();
-              BBSEditor.modifyReply(
-                  menuContext, e.hole_id, e.floor_id, e.content);
-            },
-            child: Text(S.of(context).modify),
+        if (e.is_me == true)
+          PlatformWidget(
+            cupertino: (_, __) => CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(menuContext).pop();
+                BBSEditor.modifyReply(
+                    menuContext, e.hole_id, e.floor_id, e.content);
+              },
+              child: Text(S.of(context).modify),
+            ),
+            material: (_, __) => ListTile(
+              title: Text(S.of(context).modify),
+              onTap: () {
+                Navigator.of(menuContext).pop();
+                BBSEditor.modifyReply(
+                    menuContext, e.hole_id, e.floor_id, e.content);
+              },
+            ),
           ),
-          material: (_, __) => ListTile(
-            title: Text(S.of(context).modify),
-            onTap: () {
-              Navigator.of(menuContext).pop();
-              BBSEditor.modifyReply(
-                  menuContext, e.hole_id, e.floor_id, e.content);
-            },
-          ),
-        ),
 
         // Standard Operations
         if (!isHtml(e.filteredContent!))
