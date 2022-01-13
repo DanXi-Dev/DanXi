@@ -40,8 +40,9 @@
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。  
 
 ## macOS
-使用 Apple Silicon 的用户可以直接从 [App Store](https://apps.apple.com/app/id1568629997) 下载 iPadOS 版本使用
-其他用户：我们将等待 Flutter 框架对 macOS 的支持稳定后考虑发行专属的 macOS 版本
+使用 Apple Silicon 的用户可以直接从 [App Store](https://apps.apple.com/app/id1568629997) 下载。
+
+其他用户：我们将等待 Flutter 框架对 macOS 的支持稳定后考虑发行专属的 macOS 版本。
 
 # 构建
 ## 我们当前使用的 Flutter 编译版本
@@ -68,4 +69,5 @@ Tools • Dart 2.15.1
 
 ## 赞助
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
+
 我们的邮箱：[danxi_dev@protonmail.com](mailto:danxi_dev@protonmail.com)
