@@ -22,7 +22,7 @@ import 'package:flutter/widgets.dart';
 /// controlling a [ScrollController] or calling [onDoubleTap] method to scroll to the top.
 ///
 /// Usually wrap a [Text] widget in [PlatformAppBarX].
-class TopController extends StatefulWidget {
+class TopController extends StatelessWidget {
   final Widget? child;
   final ScrollController? controller;
   final Function? onDoubleTap;
@@ -34,20 +34,15 @@ class TopController extends StatefulWidget {
       duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
 
   @override
-  _TopControllerState createState() => _TopControllerState();
-}
-
-class _TopControllerState extends State<TopController> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onDoubleTap: () {
-        TopController.scrollToTop(widget.controller);
-        if (widget.onDoubleTap != null) {
-          widget.onDoubleTap!();
+        TopController.scrollToTop(controller);
+        if (onDoubleTap != null) {
+          onDoubleTap!();
         }
       },
-      child: widget.child,
+      child: child,
     );
   }
 }

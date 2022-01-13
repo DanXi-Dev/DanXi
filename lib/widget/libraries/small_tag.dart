@@ -21,16 +21,11 @@ import 'package:flutter/material.dart';
 ///
 /// It defaultly uses [Theme.of(context).hintColor] as its background color, and
 /// self-adaptive text color.
-class SmallTag extends StatefulWidget {
+class SmallTag extends StatelessWidget {
   final String? label;
 
   const SmallTag({Key? key, this.label}) : super(key: key);
 
-  @override
-  _SmallTagState createState() => _SmallTagState();
-}
-
-class _SmallTagState extends State<SmallTag> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -39,7 +34,7 @@ class _SmallTagState extends State<SmallTag> {
           color: Theme.of(context).hintColor.withOpacity(0.25),
           borderRadius: const BorderRadius.all(Radius.circular(4.0))),
       child: Text(
-        widget.label!,
+        label!,
         style: TextStyle(
             color: Theme.of(context).hintColor.computeLuminance() >= 0.5
                 ? Colors.black

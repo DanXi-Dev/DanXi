@@ -19,7 +19,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 
 /// A round chip, usually used as a tag, to match the tag widget of fduhole's web style.
-class RoundChip extends StatefulWidget {
+class RoundChip extends StatelessWidget {
   final String? label;
   final VoidCallback? onTap;
   final Color? color;
@@ -28,35 +28,29 @@ class RoundChip extends StatefulWidget {
       : super(key: key);
 
   @override
-  _RoundChipState createState() => _RoundChipState();
-}
-
-class _RoundChipState extends State<RoundChip> {
-  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
-          onTap: widget.onTap,
+          onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
             height: 24,
             decoration: BoxDecoration(
               border: Border.all(
-                color: widget.color!,
+                color: color!,
                 width: 1,
               ),
-              color:
-                  PlatformX.isDarkMode ? widget.color!.withOpacity(0.3) : null,
+              color: PlatformX.isDarkMode ? color!.withOpacity(0.3) : null,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
-                widget.label!,
+                label!,
                 style: TextStyle(
                     fontSize: 14,
-                    color: PlatformX.isDarkMode ? Colors.white : widget.color),
+                    color: PlatformX.isDarkMode ? Colors.white : color),
               ),
             ),
           ),

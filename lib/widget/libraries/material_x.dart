@@ -20,21 +20,16 @@ import 'package:flutter/material.dart';
 /// A container of [Material] that applies the app's theme settings on it.
 ///
 /// Use it anywhere you need a [Material].
-class ThemedMaterial extends StatefulWidget {
+class ThemedMaterial extends StatelessWidget {
   final Widget? child;
 
   const ThemedMaterial({Key? key, this.child}) : super(key: key);
 
   @override
-  _ThemedMaterialState createState() => _ThemedMaterialState();
-}
-
-class _ThemedMaterialState extends State<ThemedMaterial> {
-  @override
   Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
-      child: widget.child,
+      child: child,
     );
   }
 }

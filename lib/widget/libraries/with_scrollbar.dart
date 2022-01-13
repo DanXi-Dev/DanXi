@@ -23,29 +23,25 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 //import 'custom_cupertino_scrollbar.dart';
 
 /// A widget that will add a scroll bar for its child.
-class WithScrollbar extends StatefulWidget {
+class WithScrollbar extends StatelessWidget {
   final ScrollController? controller;
   final Widget? child;
 
-  const WithScrollbar({Key? key, this.controller, this.child}) : super(key: key);
+  const WithScrollbar({Key? key, this.controller, this.child})
+      : super(key: key);
 
-  @override
-  _WithScrollbarState createState() => _WithScrollbarState();
-}
-
-class _WithScrollbarState extends State<WithScrollbar> {
   @override
   Widget build(BuildContext context) {
     return PlatformWidget(
         // Add a scrollbar on desktop platform
         material: (_, __) => Scrollbar(
-          controller: widget.controller,
+              controller: controller,
               interactive: PlatformX.isDesktop,
-              child: widget.child!,
+              child: child!,
             ),
         cupertino: (_, __) => CupertinoScrollbar(
-              controller: widget.controller,
-              child: widget.child!,
+              controller: controller,
+              child: child!,
             ));
   }
 }

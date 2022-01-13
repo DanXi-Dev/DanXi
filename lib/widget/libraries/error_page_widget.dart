@@ -20,7 +20,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A simple error page, usually shown as full-screen.
-class ErrorPageWidget extends StatefulWidget {
+class ErrorPageWidget extends StatelessWidget {
   final Widget? icon;
   final String buttonText;
   final String errorMessage;
@@ -35,28 +35,23 @@ class ErrorPageWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ErrorPageWidgetState createState() => _ErrorPageWidgetState();
-}
-
-class _ErrorPageWidgetState extends State<ErrorPageWidget> {
-  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.icon != null) widget.icon!,
-          if (widget.icon != null)
+          if (icon != null) icon!,
+          if (icon != null)
             const SizedBox(
               height: 8,
             ),
-          Text(widget.errorMessage),
+          Text(errorMessage),
           const SizedBox(
             height: 8,
           ),
           PlatformElevatedButton(
-            child: Text(widget.buttonText),
-            onPressed: widget.onTap,
+            child: Text(buttonText),
+            onPressed: onTap,
           )
         ],
       ),
