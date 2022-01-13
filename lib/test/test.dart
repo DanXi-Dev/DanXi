@@ -15,11 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/sports_reserve_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -42,14 +40,14 @@ class _TestLifeCycle {
   }
 
   static void onStartAsync(BuildContext context) async {
-    List<StadiumData> list = (await SportsReserveRepository.getInstance()
-        .getStadiumFullList(StateProvider.personInfo.value!,
-            queryDate: DateTime.now(),
-            type: SportsType.BADMINTON,
-            campus: Campus.HANDAN_CAMPUS))!;
-    var data = await SportsReserveRepository.getInstance().getScheduleData(
-        StateProvider.personInfo.value!, list.first, DateTime.now());
-    debugPrint(data.toString());
+    // List<StadiumData> list = (await SportsReserveRepository.getInstance()
+    //     .getStadiumFullList(StateProvider.personInfo.value!,
+    //         queryDate: DateTime.now(),
+    //         type: SportsType.BADMINTON,
+    //         campus: Campus.HANDAN_CAMPUS))!;
+    // var data = await SportsReserveRepository.getInstance().getScheduleData(
+    //     StateProvider.personInfo.value!, list.first, DateTime.now());
+    // debugPrint(data.toString());
   }
 }
 

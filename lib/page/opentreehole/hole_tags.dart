@@ -19,6 +19,7 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -70,15 +71,12 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
                   "tagFilter": e.name,
                 }),
               ),
-              errorBuilder: GestureDetector(
-                child: Center(
-                  child: Text(S.of(context).failed),
-                ),
-                onTap: () {
-                  setState(() => _content = LazyFuture.pack(
-                      OpenTreeHoleRepository.getInstance().loadTags()));
-                },
-              ),
+              errorBuilder: (BuildContext context,
+                      AsyncSnapshot<List<OTTag>?> snapShot) =>
+                  ErrorPageWidget.buildWidget(context, snapShot.error,
+                      stackTrace: snapShot.stackTrace,
+                      onTap: () => setState(() => _content = LazyFuture.pack(
+                          OpenTreeHoleRepository.getInstance().loadTags()))),
               loadingBuilder: Center(
                 child: PlatformCircularProgressIndicator(),
               ),

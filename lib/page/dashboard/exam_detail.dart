@@ -27,6 +27,7 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -252,23 +253,19 @@ class _ExamListState extends State<ExamList> {
   }
 
   Widget _buildErrorPage(
-      BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
-    return GestureDetector(
-        onTap: () {
-          setState(() {
-            _semesterFuture = LazyFuture.pack(
-                EduServiceRepository.getInstance().loadSemesters(_info));
-          });
-        },
-        child: Padding(
-          child: Center(
-            child: Text(S.of(context).failed +
-                '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
-                snapshot.error.toString()),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-        ));
-  }
+          BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
+      ErrorPageWidget(
+        errorMessage: S.of(context).failed +
+            '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
+            snapshot.error.toString(),
+        error: snapshot.error,
+        trace: snapshot.stackTrace,
+        onTap: () => setState(() {
+          _semesterFuture = LazyFuture.pack(
+              EduServiceRepository.getInstance().loadSemesters(_info));
+        }),
+        buttonText: S.of(context).retry,
+      );
 
   List<Widget> _getListWidgetsGrade(List<ExamScore> scores,
       {bool isFallback = false}) {

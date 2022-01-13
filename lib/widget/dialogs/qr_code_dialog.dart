@@ -15,12 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/fdu/qr_code_repository.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -64,55 +66,42 @@ class QRDialog extends StatefulWidget {
 }
 
 class _QRDialogState extends State<QRDialog> {
-  ConnectionStatus _status = ConnectionStatus.NONE;
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-        title: Text(S.of(context).fudan_qr_code),
-        content: GestureDetector(
-            onTap: () {
-              if (_status == ConnectionStatus.FAILED) {
-                _status = ConnectionStatus.NONE;
-                refreshSelf();
-              }
-            },
-            child: SizedBox(
-                width: double.maxFinite,
-                height: 200.0,
-                child: Center(
-                    child: FutureBuilder<String?>(
-                        future: QRCodeRepository.getInstance()
-                            .getQRCode(widget.personInfo),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<String?> snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.none:
-                            case ConnectionState.waiting:
-                            case ConnectionState.active:
-                              return Text(S.of(context).loading_qr_code);
-                            case ConnectionState.done:
-                              if (snapshot.hasError) {
-                                _status = ConnectionStatus.FAILED;
-                                return Text(S.of(context).fail_to_acquire_qr);
-                              } else {
-                                _status = ConnectionStatus.DONE;
-                                return QrImage(
-                                  data: snapshot.data!,
-                                  size: 200.0,
-                                  foregroundColor: Colors.black,
-                                  backgroundColor: Colors.white,
-                                );
-                              }
-                          }
-                        })))),
-        actions: <Widget>[
-          TextButton(
-              child: PlatformText(S.of(context).i_see),
-              onPressed: () async {
-                ScreenProxy.resetBrightness();
-                //ScreenProxy.keepOn(false);
-                Navigator.pop(context);
-              }),
-        ],
-      );
+  Widget build(BuildContext context) {
+    return PlatformAlertDialog(
+      title: Text(S.of(context).fudan_qr_code),
+      content: SizedBox(
+          width: double.maxFinite,
+          height: 200.0,
+          child: Center(
+            child: FutureWidget<String?>(
+              future: LazyFuture.pack(
+                  QRCodeRepository.getInstance().getQRCode(widget.personInfo)),
+              successBuilder: (_, snapshot) {
+                return QrImage(
+                    data: snapshot.data!,
+                    size: 200.0,
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.white);
+              },
+              loadingBuilder: Text(S.of(context).loading_qr_code),
+              errorBuilder:
+                  (BuildContext context, AsyncSnapshot<String?> snapShot) =>
+                      ErrorPageWidget.buildWidget(context, snapShot.error,
+                          stackTrace: snapShot.stackTrace,
+                          onTap: () => refreshSelf()),
+            ),
+          )),
+      actions: <Widget>[
+        TextButton(
+            child: PlatformText(S.of(context).i_see),
+            onPressed: () async {
+              ScreenProxy.resetBrightness();
+              //ScreenProxy.keepOn(false);
+              Navigator.pop(context);
+            }),
+      ],
+    );
+  }
 }

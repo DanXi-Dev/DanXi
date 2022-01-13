@@ -22,6 +22,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -95,14 +96,9 @@ class _AnnouncementListState extends State<AnnouncementList> {
           );
         },
         loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
-        errorBuilder: (_, snapShot) => GestureDetector(
-          onTap: () {
-            refreshSelf();
-          },
-          child: Center(
-            child: Text(S.of(context).failed),
-          ),
-        ),
+        errorBuilder: (BuildContext context, AsyncSnapshot<bool?> snapShot) =>
+            ErrorPageWidget.buildWidget(context, snapShot.error,
+                stackTrace: snapShot.stackTrace, onTap: () => refreshSelf()),
       ),
     );
   }

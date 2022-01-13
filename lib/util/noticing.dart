@@ -120,7 +120,7 @@ class Noticing {
   }
 
   static showModalNotice(BuildContext context,
-      {String? confirmText, String title = "", String message = ""}) async {
+      {String title = "", String message = ""}) async {
     if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
     Widget content = Padding(
       padding: const EdgeInsets.all(16.0),
