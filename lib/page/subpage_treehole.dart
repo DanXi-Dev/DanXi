@@ -40,6 +40,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
@@ -609,23 +610,20 @@ class _BBSSubpageState extends State<BBSSubpage>
                         ]),
                     const SizedBox(height: 10),
                     (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
-                        ? Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.transparent),
-                            child: ExpansionTile(
-                                expandedCrossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                expandedAlignment: Alignment.topLeft,
-                                childrenPadding:
-                                    const EdgeInsets.symmetric(vertical: 4),
-                                tilePadding: EdgeInsets.zero,
-                                title: Text(
-                                  S.of(context).folded,
-                                  style: infoStyle,
-                                ),
-                                children: [
-                                  postContentWidget,
-                                ]))
+                        ? ExpansionTileX(
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            expandedAlignment: Alignment.topLeft,
+                            childrenPadding:
+                                const EdgeInsets.symmetric(vertical: 4),
+                            tilePadding: EdgeInsets.zero,
+                            title: Text(
+                              S.of(context).folded,
+                              style: infoStyle,
+                            ),
+                            children: [
+                                postContentWidget,
+                              ])
                         : postContentWidget,
                   ]),
               subtitle: Column(children: [

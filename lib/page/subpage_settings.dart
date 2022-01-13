@@ -37,6 +37,7 @@ import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -750,218 +751,202 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             ))
         .toList();
     return Card(
-        child: Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-                maintainState: true,
-                leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.info)
-                    : const Icon(CupertinoIcons.info_circle),
-                title: Text(S.of(context).about),
-                children: <Widget>[
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
+        child: ExpansionTileX(
+            maintainState: true,
+            leading: PlatformX.isMaterial(context)
+                ? const Icon(Icons.info)
+                : const Icon(CupertinoIcons.info_circle),
+            title: Text(S.of(context).about),
+            children: <Widget>[
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.fromLTRB(25, 5, 25, 0),
+                child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(25, 5, 25, 0),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              //Description
-                              Text(
-                                S.of(context).app_description_title,
-                                textScaleFactor: 1.1,
-                              ),
-                              Divider(
-                                color: _originalDividerColor,
-                              ),
-                              Text(S.of(context).app_description),
-                              const SizedBox(
-                                height: 16,
-                              ),
-                              //Terms and Conditions
-                              Text(
-                                S.of(context).terms_and_conditions_title,
-                                textScaleFactor: 1.1,
-                              ),
-                              Divider(
-                                color: _originalDividerColor,
-                              ),
-                              RichText(
-                                  text: TextSpan(children: [
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S
-                                      .of(context)
-                                      .terms_and_conditions_content,
-                                ),
-                                TextSpan(
-                                    style: linkText,
-                                    text: S.of(context).privacy_policy,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () => BrowserUtil.openUrl(
-                                          S.of(context).privacy_policy_url,
-                                          context)),
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S
-                                      .of(context)
-                                      .terms_and_conditions_content_end,
-                                ),
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S.of(context).view_ossl,
-                                ),
-                                TextSpan(
-                                    style: linkText,
-                                    text: S
-                                        .of(context)
-                                        .open_source_software_licenses,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () => smartNavigatorPush(
-                                              context, "/about/openLicense",
-                                              arguments: {
-                                                "items": _LICENSE_ITEMS
-                                              })),
-                              ])),
-                              const SizedBox(
-                                height: 16,
-                              ),
-                              //Acknowledgement
-                              Text(
-                                S.of(context).acknowledgements,
-                                textScaleFactor: 1.1,
-                              ),
-                              Divider(
-                                color: _originalDividerColor,
-                              ),
-                              RichText(
-                                  text: TextSpan(children: [
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S.of(context).acknowledgements_1,
-                                ),
-                                TextSpan(
-                                    style: linkText,
-                                    text: S.of(context).acknowledgement_name_1,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () => BrowserUtil.openUrl(
-                                          S.of(context).acknowledgement_link_1,
-                                          context)),
-                                TextSpan(
-                                  style: defaultText,
-                                  text: S.of(context).acknowledgements_2,
-                                ),
-                              ])),
-
-                              const SizedBox(
-                                height: 16,
-                              ),
-
-                              // Authors
-                              Text(
-                                S.of(context).authors,
-                                textScaleFactor: 1.1,
-                              ),
-                              Divider(
-                                color: _originalDividerColor,
-                              ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: developersIcons.sublist(
-                                              0,
-                                              (developersIcons.length + 1) ~/
-                                                  2)),
-                                    ),
-                                    Expanded(
-                                        child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: developersIcons.sublist(
-                                          (developersIcons.length + 1) ~/ 2),
-                                    )),
-                                  ]),
-                              const SizedBox(height: 16),
-                              //Version
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  '${S.of(context).version} ${pubspec.major}.${pubspec.minor}.${pubspec.patch} build ${pubspec.build.first}',
-                                  textScaleFactor: 0.7,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Text(
-                                    S.of(context).author_descriptor,
-                                    textScaleFactor: 0.7,
-                                    textAlign: TextAlign.right,
-                                  )
-                                ],
-                              ),
-                            ]),
+                      //Description
+                      Text(
+                        S.of(context).app_description_title,
+                        textScaleFactor: 1.1,
                       ),
-                      const SizedBox(height: 8),
+                      Divider(
+                        color: _originalDividerColor,
+                      ),
+                      Text(S.of(context).app_description),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      //Terms and Conditions
+                      Text(
+                        S.of(context).terms_and_conditions_title,
+                        textScaleFactor: 1.1,
+                      ),
+                      Divider(
+                        color: _originalDividerColor,
+                      ),
+                      RichText(
+                          text: TextSpan(children: [
+                        TextSpan(
+                          style: defaultText,
+                          text: S.of(context).terms_and_conditions_content,
+                        ),
+                        TextSpan(
+                            style: linkText,
+                            text: S.of(context).privacy_policy,
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => BrowserUtil.openUrl(
+                                  S.of(context).privacy_policy_url, context)),
+                        TextSpan(
+                          style: defaultText,
+                          text: S.of(context).terms_and_conditions_content_end,
+                        ),
+                        TextSpan(
+                          style: defaultText,
+                          text: S.of(context).view_ossl,
+                        ),
+                        TextSpan(
+                            style: linkText,
+                            text: S.of(context).open_source_software_licenses,
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => smartNavigatorPush(
+                                  context, "/about/openLicense",
+                                  arguments: {"items": _LICENSE_ITEMS})),
+                      ])),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      //Acknowledgement
+                      Text(
+                        S.of(context).acknowledgements,
+                        textScaleFactor: 1.1,
+                      ),
+                      Divider(
+                        color: _originalDividerColor,
+                      ),
+                      RichText(
+                          text: TextSpan(children: [
+                        TextSpan(
+                          style: defaultText,
+                          text: S.of(context).acknowledgements_1,
+                        ),
+                        TextSpan(
+                            style: linkText,
+                            text: S.of(context).acknowledgement_name_1,
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => BrowserUtil.openUrl(
+                                  S.of(context).acknowledgement_link_1,
+                                  context)),
+                        TextSpan(
+                          style: defaultText,
+                          text: S.of(context).acknowledgements_2,
+                        ),
+                      ])),
+
+                      const SizedBox(
+                        height: 16,
+                      ),
+
+                      // Authors
+                      Text(
+                        S.of(context).authors,
+                        textScaleFactor: 1.1,
+                      ),
+                      Divider(
+                        color: _originalDividerColor,
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: developersIcons.sublist(
+                                      0, (developersIcons.length + 1) ~/ 2)),
+                            ),
+                            Expanded(
+                                child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: developersIcons
+                                  .sublist((developersIcons.length + 1) ~/ 2),
+                            )),
+                          ]),
+                      const SizedBox(height: 16),
+                      //Version
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          '${S.of(context).version} ${pubspec.major}.${pubspec.minor}.${pubspec.patch} build ${pubspec.build.first}',
+                          textScaleFactor: 0.7,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          FutureBuilder<bool>(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<bool> snapshot) {
-                              if (snapshot.hasError || snapshot.data == false) {
-                                return const SizedBox();
-                              }
-                              return TextButton(
-                                child: Text(S.of(context).rate),
-                                onPressed: () {
-                                  inAppReview.openStoreListing(
-                                    appStoreId: Constant.APPSTORE_APPID,
-                                  );
-                                },
-                              );
-                            },
-                            future: inAppReview.isAvailable(),
-                          ),
-                          const SizedBox(width: 8),
-                          TextButton(
-                            child: Text(S.of(context).contact_us),
-                            onPressed: () async {
-                              final Email email = Email(
-                                body: '',
-                                subject: S.of(context).app_feedback,
-                                recipients: [S.of(context).feedback_email],
-                                isHTML: false,
-                              );
-                              await FlutterEmailSender.send(email);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          TextButton(
-                            child: Text(S.of(context).project_page),
-                            onPressed: () {
-                              BrowserUtil.openUrl(
-                                  S.of(context).project_url, context);
-                            },
-                          ),
-                          const SizedBox(width: 8),
+                          Text(
+                            S.of(context).author_descriptor,
+                            textScaleFactor: 0.7,
+                            textAlign: TextAlign.right,
+                          )
                         ],
                       ),
-                    ],
+                    ]),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FutureBuilder<bool>(
+                    builder:
+                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                      if (snapshot.hasError || snapshot.data == false) {
+                        return const SizedBox();
+                      }
+                      return TextButton(
+                        child: Text(S.of(context).rate),
+                        onPressed: () {
+                          inAppReview.openStoreListing(
+                            appStoreId: Constant.APPSTORE_APPID,
+                          );
+                        },
+                      );
+                    },
+                    future: inAppReview.isAvailable(),
                   ),
-                ])));
+                  const SizedBox(width: 8),
+                  TextButton(
+                    child: Text(S.of(context).contact_us),
+                    onPressed: () async {
+                      final Email email = Email(
+                        body: '',
+                        subject: S.of(context).app_feedback,
+                        recipients: [S.of(context).feedback_email],
+                        isHTML: false,
+                      );
+                      await FlutterEmailSender.send(email);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    child: Text(S.of(context).project_page),
+                    onPressed: () {
+                      BrowserUtil.openUrl(S.of(context).project_url, context);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              ),
+            ],
+          ),
+        ]));
   }
 
   @override

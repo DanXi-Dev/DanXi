@@ -32,6 +32,7 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
@@ -272,7 +273,7 @@ class OTFloorWidget extends StatelessWidget {
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : null,
         child: floor.deleted == true
-            ? ExpansionTile(
+            ? ExpansionTileX(
                 title: Text(
                   floor.content ?? "?",
                   style: TextStyle(color: Theme.of(context).hintColor),
