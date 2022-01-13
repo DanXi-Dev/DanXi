@@ -54,7 +54,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     return idMatcher.firstMatch(html)!.group(0);
   }
 
-  Future<TimeTable> loadTimeTableRemotely(PersonInfo? info,
+  Future<TimeTable?> loadTimeTableRemotely(PersonInfo? info,
       {DateTime? startTime}) {
     return Retrier.tryAsyncWithFix(
         () => _loadTimeTableRemotely(startTime: startTime),
@@ -62,7 +62,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
             dio!, LOGIN_URL, cookieJar!, info, true));
   }
 
-  Future<TimeTable> _loadTimeTableRemotely({DateTime? startTime}) async {
+  Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
     Response idPage = await dio!.get(ID_URL);
     String? termId = _getIds(idPage.data.toString());
     Response tablePage = await dio!.post(TIME_TABLE_URL,
@@ -84,12 +84,12 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         tablePage.data.toString());
   }
 
-  Future<TimeTable> loadTimeTableLocally(PersonInfo? info,
-      {DateTime? startTime, bool forceLoadFromRemote = false}) async {
+  Future<TimeTable?> loadTimeTableLocally(PersonInfo? info,
+      {DateTime? startTime, bool forceLoadFromRemote = false}) {
     startTime ??= TimeTable.defaultStartTime;
-    return await Cache.get(
+    return Cache.get<TimeTable>(
         KEY_TIMETABLE_CACHE,
-        () => loadTimeTableRemotely(info, startTime: startTime),
+        () async => (await loadTimeTableRemotely(info, startTime: startTime))!,
         (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
         (object) => jsonEncode(object.toJson()),
         validate: (value) => !forceLoadFromRemote);

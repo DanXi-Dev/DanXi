@@ -36,6 +36,7 @@ import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -260,31 +261,15 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         return _buildPage(snapshot.data);
       },
       future: _content,
-      errorBuilder: (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
-        if (snapshot.error != null && snapshot.error is NotLoginError) {
-          return GestureDetector(
-            onTap: () {
-              _manualLoad = true;
-              refreshSelf();
-            },
-            child: Center(
-              child: Text(S.of(context).failed +
-                  "\n" +
-                  (snapshot.error! as NotLoginError).errorMessage),
-            ),
-          );
-        }
-        return GestureDetector(
-          onTap: () {
-            _manualLoad = true;
-            refreshSelf();
-          },
-          child: Center(
-            child:
-                Text(S.of(context).failed + "\n" + snapshot.error.toString()),
-          ),
-        );
+      errorBuilder: (BuildContext context,
+              AsyncSnapshot<TimeTable?> snapshot) =>
+          ErrorPageWidget.buildWidget(context, snapshot.error,
+              stackTrace: snapshot.stackTrace, onTap: () {
+        _manualLoad = true;
+        refreshSelf();
       },
+              buttonText:
+                  snapshot.error is NotLoginError ? S.of(context).login : null),
       loadingBuilder: Center(
         child: PlatformCircularProgressIndicator(),
       ),

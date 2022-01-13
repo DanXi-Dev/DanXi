@@ -23,6 +23,8 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/fudan_bus_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -75,15 +77,13 @@ class _BusPageState extends State<BusPage> {
   Widget _buildFutureWidget() => FutureWidget<List<BusScheduleItem>?>(
       future: _setContent(),
       successBuilder: (context, snapshot) => ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             children: _getListWidgets(snapshot.data as List<BusScheduleItem>),
           ),
-      errorBuilder: (context, snapshot) => Center(
-            child: GestureDetector(
-              child: Text(S.of(context).failed),
-              onTap: () => setState(() {}),
-            ),
-          ),
+      errorBuilder: (BuildContext context,
+              AsyncSnapshot<List<BusScheduleItem>?> snapShot) =>
+          ErrorPageWidget.buildWidget(context, snapShot.error,
+              stackTrace: snapShot.stackTrace, onTap: () => refreshSelf()),
       loadingBuilder: (_) =>
           Center(child: PlatformCircularProgressIndicator()));
 

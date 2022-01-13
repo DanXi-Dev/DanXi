@@ -39,6 +39,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
@@ -203,8 +204,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   Create<Widget> get title => (cxt) => const OTTitle();
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) =>
-  [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/tags');
@@ -538,7 +538,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                     _refreshList();
                   });
                 }
-                return const SizedBox();
+                return ErrorPageWidget.buildWidget(context, e,
+                    onTap: () => refreshSelf());
               },
               dataReceiver: _loadContent),
         ),

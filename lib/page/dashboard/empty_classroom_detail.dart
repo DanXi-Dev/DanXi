@@ -25,6 +25,7 @@ import 'package:dan_xi/repository/fdu/empty_classroom_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -302,7 +303,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                 primary: true,
                                 children: _getListWidgets(snapshot.data),
                               )),
-                      errorBuilder: (_, snapShot) => _buildErrorWidget(),
+                      errorBuilder: (BuildContext context,
+                              AsyncSnapshot<List<RoomInfo>?> snapShot) =>
+                          ErrorPageWidget.buildWidget(context, snapShot.error,
+                              stackTrace: snapShot.stackTrace,
+                              onTap: () => refreshSelf()),
                       loadingBuilder: _buildLoadingWidget()),
                 )
               ]),
@@ -440,14 +445,4 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         child: PlatformCircularProgressIndicator(),
       );
 
-  Widget _buildErrorWidget() {
-    return GestureDetector(
-      child: Center(
-        child: Text(S.of(context).failed),
-      ),
-      onTap: () {
-        refreshSelf();
-      },
-    );
-  }
 }
