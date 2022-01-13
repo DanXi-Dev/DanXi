@@ -234,6 +234,11 @@
     "password":"密码",
     "welcome_back":"欢迎回来",
     "account_is_set":"账户已设置完成",
+    "secure_verification":"安全验证",
+    "input_your_email_secure_code":"请输入您的邮箱验证码",
+    "secure_verification_description":"我们刚刚向您发送了一封含有一次性验证码的邮件，请输入您得到的验证码。",
+    "secure_code":"验证码",
+    "forgot_password":"忘记密码",
 
     "new_post":"发布新帖子",
     "posting":"正在发布内容...",

@@ -391,7 +391,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
               alignment: Alignment.bottomLeft,
               child: PlatformTextButton(
                 child: Padding(
-                    padding: const EdgeInsets.all(8.0), child: Text("忘记密码")),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(S.of(context).forgot_password)),
                 onPressed: () => BrowserUtil.openUrl(
                     Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
               ),
@@ -562,35 +563,27 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
     return Column(
       children: <Widget>[
         Text(
-          "安全验证",
+          S.of(context).secure_verification,
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
         Text(
-          "请输入您的邮箱验证码",
+          S.of(context).input_your_email_secure_code,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        SizedBox(
-          height: 32,
-        ),
-        Text(
-          "我们刚刚向您发送了一封含有一次性验证码的邮件，请输入您得到的验证码。",
-        ),
-        SizedBox(
-          height: 8,
-        ),
+        SizedBox(height: 32),
+        Text(S.of(context).secure_verification_description),
+        SizedBox(height: 8),
         TextField(
           controller: _verifyCodeController,
           decoration: InputDecoration(
-              labelText: "验证码",
+              labelText: S.of(context).secure_code,
               icon: PlatformX.isAndroid
                   ? Icon(Icons.perm_identity)
                   : Icon(CupertinoIcons.person_crop_circle)),
         ),
-        SizedBox(
-          height: 16,
-        ),
+        SizedBox(height: 16),
         PlatformElevatedButton(
           child: Padding(
             padding: const EdgeInsets.all(8.0),

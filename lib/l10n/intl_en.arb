@@ -223,6 +223,11 @@
     "password":"Password",
     "welcome_back":"Welcome back",
     "account_is_set":"Your account is all set",
+    "secure_verification":"Secure Verification",
+    "input_your_email_secure_code":"Input your OTP code",
+    "secure_verification_description":"We have just sent you an email with an OTP code, input it below.",
+    "secure_code":"OTP code",
+    "forgot_password":"Password forgot",
 
     "new_post":"New Post",
     "posting":"Posting...",
