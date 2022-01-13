@@ -203,8 +203,7 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   Create<Widget> get title => (cxt) => const OTTitle();
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) =>
-  [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/tags');
@@ -356,7 +355,8 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _autoSilenceNotice() {
     final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
-        .getSilenceDateForDivision(_divisionId);
+        .getSilenceDateForDivision(_divisionId)
+        ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
     }
@@ -547,7 +547,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildEmptyFavoritesPage() => Container(
-    padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Center(child: Text(S.of(context).no_favorites)),
       );
 
@@ -633,8 +633,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                     children: [
                       Text("#${postElement.hole_id}", style: infoStyle),
                       Text(
-                          HumanDuration.tryFormat(context,
-                              DateTime.parse(postElement.time_created!)),
+                          HumanDuration.tryFormat(
+                              context,
+                              DateTime.parse(postElement.time_created!)
+                                  .toLocal()),
                           style: infoStyle),
                       Row(children: [
                         /*Text("${postElement.view} ", style: infoStyle),
@@ -672,7 +674,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         minLeadingWidth: 16,
         leading: useLeading
             ? Padding(
-          padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 4),
                 child: Icon(
                   CupertinoIcons.quote_bubble,
                   color: Theme.of(context).hintColor,
@@ -693,7 +695,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                           HumanDuration.tryFormat(
                               context,
                               DateTime.parse(postElement
-                                  .floors!.last_floor!.time_created!))),
+                                      .floors!.last_floor!.time_created!)
+                                  .toLocal())),
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Icon(CupertinoIcons.search,
