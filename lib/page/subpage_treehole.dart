@@ -40,6 +40,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
@@ -356,7 +357,8 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _autoSilenceNotice() {
     final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
-        .getSilenceDateForDivision(_divisionId);
+        .getSilenceDateForDivision(_divisionId)
+        ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
     }
@@ -548,7 +550,7 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildEmptyFavoritesPage() => Container(
-    padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Center(child: Text(S.of(context).no_favorites)),
       );
 
@@ -608,23 +610,20 @@ class _BBSSubpageState extends State<BBSSubpage>
                         ]),
                     const SizedBox(height: 10),
                     (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
-                        ? Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.transparent),
-                            child: ExpansionTile(
-                                expandedCrossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                expandedAlignment: Alignment.topLeft,
-                                childrenPadding:
-                                    const EdgeInsets.symmetric(vertical: 4),
-                                tilePadding: EdgeInsets.zero,
-                                title: Text(
-                                  S.of(context).folded,
-                                  style: infoStyle,
-                                ),
-                                children: [
-                                  postContentWidget,
-                                ]))
+                        ? ExpansionTileX(
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            expandedAlignment: Alignment.topLeft,
+                            childrenPadding:
+                                const EdgeInsets.symmetric(vertical: 4),
+                            tilePadding: EdgeInsets.zero,
+                            title: Text(
+                              S.of(context).folded,
+                              style: infoStyle,
+                            ),
+                            children: [
+                                postContentWidget,
+                              ])
                         : postContentWidget,
                   ]),
               subtitle: Column(children: [
@@ -634,8 +633,10 @@ class _BBSSubpageState extends State<BBSSubpage>
                     children: [
                       Text("#${postElement.hole_id}", style: infoStyle),
                       Text(
-                          HumanDuration.tryFormat(context,
-                              DateTime.parse(postElement.time_created!)),
+                          HumanDuration.tryFormat(
+                              context,
+                              DateTime.parse(postElement.time_created!)
+                                  .toLocal()),
                           style: infoStyle),
                       Row(children: [
                         /*Text("${postElement.view} ", style: infoStyle),
@@ -673,7 +674,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         minLeadingWidth: 16,
         leading: useLeading
             ? Padding(
-          padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 4),
                 child: Icon(
                   CupertinoIcons.quote_bubble,
                   color: Theme.of(context).hintColor,
@@ -694,7 +695,8 @@ class _BBSSubpageState extends State<BBSSubpage>
                           HumanDuration.tryFormat(
                               context,
                               DateTime.parse(postElement
-                                  .floors!.last_floor!.time_created!))),
+                                      .floors!.last_floor!.time_created!)
+                                  .toLocal())),
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Icon(CupertinoIcons.search,

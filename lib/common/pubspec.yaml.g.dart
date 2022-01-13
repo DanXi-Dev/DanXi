@@ -64,8 +64,7 @@ const int timestamp = 1642076746;
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -144,7 +143,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'gallery_saver': r'^2.1.2',
   'flutter_markdown': r'^0.6.2',
   'markdown': r'^4.0.0',
-  'system_tray': r'^0.0.7',
+  'system_tray': r'^0.0.6',
   'bitsdojo_window': r'^0.1.1+1',
   'win32': r'^2.2.5',
   'file_picker': r'^4.0.0',
@@ -161,6 +160,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.1',
   'lunar': r'^1.2.15',
+  'animated_text_kit': r'^4.2.1',
 };
 
 /// Developer dependencies
@@ -170,12 +170,10 @@ const Map<String, Object> devDependencies = <String, Object>{
   'flutter_test': <String, Object>{
     'sdk': r'flutter',
   },
-  'flutter_lints': r'^1.0.4',
 };
 
 /// Dependency overrides
 const Map<String, Object> dependencyOverrides = <String, Object>{
-  'device_info_plus': r'^3.2.1',
   'fluttertoast': <String, Object>{
     'git': <String, Object>{
       'url': r'git://github.com/ponnamkarthik/FlutterToast.git',
