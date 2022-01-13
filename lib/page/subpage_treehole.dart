@@ -593,9 +593,9 @@ class _BBSSubpageState extends State<BBSSubpage>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           generateTagWidgets(context, postElement,
-                              (String? tagname) {
+                              (String? tagName) {
                             smartNavigatorPush(context, '/bbs/discussions',
-                                arguments: {"tagFilter": tagname});
+                                arguments: {"tagFilter": tagName});
                           },
                               SettingsProvider.getInstance()
                                   .useAccessibilityColoring),

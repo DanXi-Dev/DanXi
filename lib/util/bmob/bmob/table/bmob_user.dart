@@ -1,14 +1,14 @@
 import 'dart:async';
-
-import '../response/bmob_handled.dart';
-
-import 'bmob_object.dart';
-import '../bmob_dio.dart';
 import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
-import '../response/bmob_registered.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../bmob.dart';
+import '../bmob_dio.dart';
+import '../response/bmob_handled.dart';
+import '../response/bmob_registered.dart';
+import 'bmob_object.dart';
 
 //此处与类名一致，由指令自动生成代码
 part 'bmob_user.g.dart';
@@ -35,7 +35,7 @@ class BmobUser extends BmobObject {
   ///用户账号密码注册
   Future<BmobRegistered> register() async {
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     //去除由服务器生成的字段值
     map.remove("objectId");
     map.remove("createdAt");
@@ -60,7 +60,7 @@ class BmobUser extends BmobObject {
   ///账号密码登录
   Future<BmobUser> login() async {
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     //去除由服务器生成的字段值
     map.remove("objectId");
     map.remove("createdAt");
@@ -89,7 +89,7 @@ class BmobUser extends BmobObject {
   ///手机短信验证码登录
   Future<BmobUser> loginBySms(String smsCode) async {
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     data["smsCode"] = smsCode;
     //去除由服务器生成的字段值
     map.remove("objectId");
@@ -114,7 +114,7 @@ class BmobUser extends BmobObject {
   ///发送邮箱重置密码的请求
   Future<BmobHandled> requestPasswordResetByEmail() async {
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     //去除由服务器生成的字段值
     map.remove("objectId");
     map.remove("createdAt");
@@ -138,7 +138,7 @@ class BmobUser extends BmobObject {
   ///短信重置密码
   Future<BmobHandled> requestPasswordResetBySmsCode(String smsCode) async {
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     //去除由服务器生成的字段值
     map.remove("objectId");
     map.remove("createdAt");
@@ -163,15 +163,17 @@ class BmobUser extends BmobObject {
 
   ///发送验证邮箱
   static Future<BmobHandled> requestEmailVerify(String email) async {
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
 
     data["email"] = email;
 
     //Map转String
     //发送请求
     Map result = await (BmobDio.getInstance()!
-        .post(Bmob.BMOB_API_REQUEST_REQUEST_EMAIL_VERIFY, data: data) as FutureOr<Map<dynamic, dynamic>>);
-    BmobHandled bmobHandled = BmobHandled.fromJson(result as Map<String, dynamic>);
+            .post(Bmob.BMOB_API_REQUEST_REQUEST_EMAIL_VERIFY, data: data)
+        as FutureOr<Map<dynamic, dynamic>>);
+    BmobHandled bmobHandled =
+        BmobHandled.fromJson(result as Map<String, dynamic>);
     return bmobHandled;
   }
 
@@ -179,7 +181,7 @@ class BmobUser extends BmobObject {
   Future<BmobHandled> updateUserPassword(
       String oldPassword, String newPassword) async {
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
 
     data["oldPassword"] = oldPassword;
     data["newPassword"] = newPassword;
@@ -222,7 +224,7 @@ class BmobUser extends BmobObject {
   Map getParams() {
     // TODO: implement getJson
     Map<String, dynamic> map = toJson();
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     //去除空值
     map.forEach((key, value) {
       if (value != null) {

@@ -18,6 +18,7 @@ class BmobError extends Error {
   //此处与类名一致，由指令自动生成代码
   Map<String, dynamic> toJson() => _$BmobErrorToJson(this);
 
+  @override
   String toString() => "BmobError [$code]:" + error!;
 
   //转化DioError错误为BmobError类型
