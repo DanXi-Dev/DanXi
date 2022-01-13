@@ -15,9 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+
 import 'package:beautiful_soup_dart/src/extensions.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
+import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +30,7 @@ class AnnouncementRepository {
   static const _ID_START_DATE = -1;
   static const _ID_LATEST_VERSION = -2;
   static const _ID_CHANGE_LOG = -3;
+  static const _ID_CELEBRATION = -4;
 
   AnnouncementRepository._();
 
@@ -89,6 +93,13 @@ class AnnouncementRepository {
       _announcementCache!
           .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
           .content);
+
+  List<Celebration> getCelebrations() {
+    List celebrationJson = jsonDecode(_announcementCache!
+        .firstWhere((element) => element.maxVersion == _ID_CELEBRATION)
+        .content!);
+    return celebrationJson.map((e) => Celebration.fromJson(e)).toList();
+  }
 }
 
 class UpdateInfo {

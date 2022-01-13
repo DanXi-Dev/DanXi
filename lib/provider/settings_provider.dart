@@ -19,6 +19,7 @@ import 'dart:convert';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
@@ -52,6 +53,7 @@ class SettingsProvider {
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
   static const String KEY_HIDDEN_HOLE = "hidden_hole";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
+  static const String KEY_CELEBRATION = "celebration";
 
   SettingsProvider._();
 
@@ -260,6 +262,18 @@ class SettingsProvider {
   }
 
   set hideHole(bool mode) => preferences!.setBool(KEY_HIDDEN_HOLE, mode);
+
+  /// Celebration words
+  List<Celebration> get celebrationWords =>
+      jsonDecode(preferences!.containsKey(KEY_CELEBRATION)
+              ? preferences!.getString(KEY_CELEBRATION)!
+              : Constant.SPECIAL_DAYS)
+          .map<Celebration>((e) => Celebration.fromJson(e))
+          .toList();
+
+  set celebrationWords(List<Celebration> lists) {
+    preferences!.setString(KEY_CELEBRATION, jsonEncode(lists));
+  }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

@@ -17,14 +17,12 @@
 
 import 'dart:math';
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:lunar/calendar/Lunar.dart';
 
 class WelcomeFeature extends Feature {
   PersonInfo? _info;
@@ -37,13 +35,18 @@ class WelcomeFeature extends Feature {
     _info = StateProvider.personInfo.value;
 
     try {
-      var lunarFestivals = Lunar.fromDate(DateTime.now()).getFestivals();
-      String days = Constant.SPECIAL_DAYS.keys
-          .firstWhere((key) => lunarFestivals.contains(key));
-      _helloQuote = Constant.SPECIAL_DAYS[days]![
-          Random().nextInt(Constant.SPECIAL_DAYS[days]!.length)];
-      return;
-    } catch (ignored) {}
+      List<String> celebrationWords = [];
+      for (var celebration in SettingsProvider.getInstance().celebrationWords) {
+        if (celebration.match(DateTime.now())) {
+          celebrationWords.addAll(celebration.celebrationWords);
+        }
+      }
+      if (celebrationWords.isNotEmpty) {
+        _helloQuote =
+            celebrationWords[Random().nextInt(celebrationWords.length)];
+        return;
+      }
+    } catch (_) {}
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
       _helloQuote = S.of(context!).late_night;

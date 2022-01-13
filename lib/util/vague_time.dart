@@ -36,6 +36,12 @@ class VagueTime implements Comparable<VagueTime> {
         hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
   }
 
+  factory VagueTime.onlymmdd(String mmdd) {
+    var splitTime = mmdd.split("-");
+    return VagueTime(
+        month: int.parse(splitTime[0]), day: int.parse(splitTime[1]));
+  }
+
   /// Merge the unfilled field with [exactDate], and return the filled time.
   DateTime toExactTime([DateTime? exactDate]) {
     exactDate ??= DateTime.now();
@@ -49,6 +55,17 @@ class VagueTime implements Comparable<VagueTime> {
         millisecond ?? exactDate.millisecond,
         microsecond ?? exactDate.microsecond);
   }
+
+  /// Compare to decide if it is matched with given [time].
+  /// If matched, return true.
+  bool match(DateTime time) => !((year != null && year != time.year) ||
+      (month != null && month != time.month) ||
+      (day != null && day != time.day) ||
+      (hour != null && hour != time.hour) ||
+      (minute != null && minute != time.minute) ||
+      (second != null && second != time.second) ||
+      (millisecond != null && millisecond != time.millisecond) ||
+      (microsecond != null && microsecond != time.microsecond));
 
   @override
   int compareTo(VagueTime other) =>

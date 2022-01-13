@@ -220,6 +220,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
       _loadStartDate().catchError((ignored) {});
+      _loadCelebration().catchError((ignored, st) {
+        print(ignored);
+        print(st);
+      });
     }, onError: (e) {
       _dealWithBmobError();
     });
@@ -698,5 +702,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       SettingsProvider.getInstance().lastSemesterStartTime =
           TimeTable.defaultStartTime.toIso8601String();
     }
+  }
+
+  Future<void> _loadCelebration() async {
+    SettingsProvider.getInstance().celebrationWords =
+        AnnouncementRepository.getInstance().getCelebrations();
   }
 }

@@ -58,10 +58,11 @@ class Constant {
   static Future<String> get randomFduholeTip async {
     if (fduHoleTips.isEmpty) fduHoleTips = await _loadTips();
 
-    if (fduHoleTips.isEmpty)
+    if (fduHoleTips.isEmpty) {
       return '';
-    else
+    } else {
       return fduHoleTips[Random().nextInt(fduHoleTips.length)];
+    }
   }
 
   static Map<String, String> getFeatureName(BuildContext context) {
@@ -145,14 +146,15 @@ class Constant {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.light,
-        colorScheme: ColorScheme.light()
-            .copyWith(secondary: Color(0xFF007AFF), primary: Color(0xFF007AFF)),
-        toggleableActiveColor: Color(0xFF007AFF),
-        canvasColor: Color.fromRGBO(242, 242, 247, 1),
-        backgroundColor: Color.fromRGBO(242, 242, 247, 1),
-        scaffoldBackgroundColor: Color.fromRGBO(242, 242, 247, 1),
+        colorScheme: const ColorScheme.light().copyWith(
+            secondary: const Color(0xFF007AFF),
+            primary: const Color(0xFF007AFF)),
+        toggleableActiveColor: const Color(0xFF007AFF),
+        canvasColor: const Color.fromRGBO(242, 242, 247, 1),
+        backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+        scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
+          margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -160,14 +162,14 @@ class Constant {
           //color: ThemeData.light().cardColor.withOpacity(0.8),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
+          style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
         ),
       );
     }
     return ThemeData(
       brightness: Brightness.light,
       primarySwatch: Colors.blue,
-      cardTheme: CardTheme(
+      cardTheme: const CardTheme(
         margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
       ),
     );
@@ -177,15 +179,16 @@ class Constant {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.dark()
-            .copyWith(secondary: Color(0xFF007AFF), primary: Color(0xFF007AFF)),
-        toggleableActiveColor: Color(0xFF007AFF),
+        colorScheme: const ColorScheme.dark().copyWith(
+            secondary: const Color(0xFF007AFF),
+            primary: const Color(0xFF007AFF)),
+        toggleableActiveColor: const Color(0xFF007AFF),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,
         backgroundColor: Colors.black,
         cardTheme: CardTheme(
-          margin: EdgeInsets.fromLTRB(7, 8, 7, 8),
-          color: Color.fromRGBO(28, 28, 30, 1),
+          margin: const EdgeInsets.fromLTRB(7, 8, 7, 8),
+          color: const Color.fromRGBO(28, 28, 30, 1),
           //color: Color.fromRGBO(30, 30, 33, 0.8),
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -193,15 +196,15 @@ class Constant {
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: Color(0xFF007AFF)),
+          style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
         ),
-        dialogBackgroundColor: Color.fromRGBO(28, 28, 30, 1.0),
+        dialogBackgroundColor: const Color.fromRGBO(28, 28, 30, 1.0),
         textTheme: Typography.whiteCupertino,
       );
     }
     return ThemeData(
       brightness: Brightness.dark,
-      cardTheme: CardTheme(
+      cardTheme: const CardTheme(
         margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
       ),
     );
@@ -286,15 +289,29 @@ class Constant {
   ];
 
   /// Special days to celebrate in lunar calendar.
-  static const Map<String, List<String>> SPECIAL_DAYS = {
-    "除夕": [
-      "万物迎春送残腊，一年结局在今宵。🎇",
-      "鼓角梅花添一部，五更欢笑拜新年。🎇",
-      "冬尽今宵促，年开明日长。🎇",
-      "春风来不远，只在屋东头。"
-    ],
-    "春节": ["爆竹声中一岁除，春风送暖入屠苏。🎆", "不须迎向东郊去，春在千门万户中。🎆", "松竹含新秋，轩窗有余清。"]
-  };
+  static const String SPECIAL_DAYS = '''
+  [
+    {
+        "type": 1,
+        "date": "除夕",
+        "celebrationWords": [
+            "万物迎春送残腊，一年结局在今宵。🎇",
+            "鼓角梅花添一部，五更欢笑拜新年。🎇",
+            "冬尽今宵促，年开明日长。🎇",
+            "春风来不远，只在屋东头。"
+        ]
+    },
+    {
+        "type": 1,
+        "date": "春节",
+        "celebrationWords": [
+            "爆竹声中一岁除，春风送暖入屠苏。🎆",
+            "不须迎向东郊去，春在千门万户中。🎆",
+            "松竹含新秋，轩窗有余清。"
+        ]
+    }
+  ]
+  ''';
 }
 
 enum Campus {
