@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'68'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1641889020;
+const int timestamp = 1642070007;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -143,7 +143,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'gallery_saver': r'^2.1.2',
   'flutter_markdown': r'^0.6.2',
   'markdown': r'^4.0.0',
-  'system_tray': r'^0.0.6',
+  'system_tray': r'^0.0.7',
   'bitsdojo_window': r'^0.1.1+1',
   'win32': r'^2.2.5',
   'file_picker': r'^4.0.0',
@@ -170,10 +170,12 @@ const Map<String, Object> devDependencies = <String, Object>{
   'flutter_test': <String, Object>{
     'sdk': r'flutter',
   },
+  'flutter_lints': r'^1.0.4',
 };
 
 /// Dependency overrides
 const Map<String, Object> dependencyOverrides = <String, Object>{
+  'device_info_plus': r'^3.2.1',
   'fluttertoast': <String, Object>{
     'git': <String, Object>{
       'url': r'git://github.com/ponnamkarthik/FlutterToast.git',
