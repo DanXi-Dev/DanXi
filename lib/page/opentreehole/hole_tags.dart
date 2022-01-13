@@ -35,7 +35,7 @@ class BBSTagsPage extends StatefulWidget {
   @override
   _BBSTagsPageState createState() => _BBSTagsPageState();
 
-  BBSTagsPage({Key? key, this.arguments});
+  const BBSTagsPage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _BBSTagsPageState extends State<BBSTagsPage> {
@@ -59,7 +59,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
         child: WithScrollbar(
           controller: PrimaryScrollController.of(context),
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
             primary: true,
             child: FutureWidget<List<OTTag>?>(
               future: _content,

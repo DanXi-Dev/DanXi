@@ -93,8 +93,8 @@ class PersonInfo {
   static Future<void> removeFromSharedPreferences(
       SharedPreferences preferences) async {
     const fieldString = ["id", "password", "name", "user_group"];
-    fieldString.forEach((element) async {
+    for (var element in fieldString) {
       if (preferences.containsKey(element)) await preferences.remove(element);
-    });
+    }
   }
 }

@@ -40,7 +40,7 @@ class _RoundChipState extends State<RoundChip> {
         GestureDetector(
           onTap: widget.onTap,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
             height: 24,
             decoration: BoxDecoration(
               border: Border.all(

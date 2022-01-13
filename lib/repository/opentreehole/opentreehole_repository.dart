@@ -25,10 +25,10 @@ import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
+import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
@@ -66,10 +66,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<void> logout() async {
     if (SettingsProvider.getInstance().lastPushToken != null) {
       if (!isUserInitialized) {
-        if (SettingsProvider.getInstance().fduholeToken == null)
+        if (SettingsProvider.getInstance().fduholeToken == null) {
           return;
-        else
+        } else {
           _token = SettingsProvider.getInstance().fduholeToken;
+        }
       }
       await deletePushNotificationToken(
           SettingsProvider.getInstance().lastPushToken!);
@@ -92,12 +93,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> initializeRepo() async {
-    print(
+    debugPrint(
         "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
-    if (SettingsProvider.getInstance().fduholeToken != null)
+    if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
-    else
+    } else {
       throw NotLoginError("No token");
+    }
 
     try {
       PlatformBridge.registerRemoteNotification();
@@ -282,13 +284,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response response = await dio!.get(_BASE_URL + "/holes/$holeId",
         options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data);
-    hole.floors!.prefetch!.forEach((floor) {
+    for (var floor in hole.floors!.prefetch!) {
       floor.mention?.forEach((mention) {
         _floorCache
             .removeWhere((element) => element.floor_id == mention.floor_id);
         _floorCache.add(mention);
       });
-    });
+    }
     return hole;
   }
 
@@ -318,21 +320,21 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     final List result = response.data;
     final floors = result.map((e) => OTFloor.fromJson(e)).toList();
-    floors.forEach((element) {
+    for (var element in floors) {
       element.mention?.forEach((mention) {
         cacheFloor(mention);
       });
-    });
+    }
     return floors;
   }
 
   // Migrated
   Future<List<OTFloor>> loadSearchResults(String? searchString,
-      {int? start_floor, int length = 10}) async {
+      {int? startFloor, int length = 10}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         //queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
         queryParameters: {
-          "start_floor": start_floor,
+          "start_floor": startFloor,
           "s": searchString,
           "length": length,
         },
@@ -353,7 +355,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<int?> newHole(int divisionId, String? content,
       {List<OTTag>? tags}) async {
     if (content == null) return -1;
-    if (tags == null || tags.isEmpty) tags = [OTTag(0, 0, "默认")];
+    if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, "默认")];
     // Suppose user is logged in. He should be.
     final Response response = await dio!.post(_BASE_URL + "/holes",
         data: {

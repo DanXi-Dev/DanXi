@@ -46,8 +46,9 @@ class EcardBalanceFeature extends Feature {
     _balance = _cardInfo!.cash;
 
     // If there's any transaction, we'll show it in the subtitle
-    if (_cardInfo!.records!.isNotEmpty)
+    if (_cardInfo!.records!.isNotEmpty) {
       _lastTransaction = _cardInfo!.records!.first;
+    }
     if (_balance == null) {
       _status = ConnectionStatus.FAILED;
     } else {
@@ -101,7 +102,7 @@ class EcardBalanceFeature extends Feature {
         scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
-    } else if (_status == ConnectionStatus.DONE)
+    } else if (_status == ConnectionStatus.DONE) {
       return Text(
         Constant.yuanSymbol(_balance),
         textScaleFactor: 1.2,
@@ -112,6 +113,7 @@ class EcardBalanceFeature extends Feature {
                     ? Theme.of(context!).errorColor
                     : null),
       );
+    }
     return null;
   }
 

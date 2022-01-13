@@ -70,12 +70,12 @@ class PEFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        if (_exercises!.isEmpty)
+        if (_exercises!.isEmpty) {
           return S.of(context!).no_data;
-        else {
+        } else {
           // 1 Morning, 2 Must-do, 3 Select-do
           List<int> exerciseCategory = [0, 0, 0];
-          _exercises!.forEach((element) {
+          for (var element in _exercises!) {
             switch (element.title) {
               case '早操':
                 exerciseCategory[0] += element.times!;
@@ -111,7 +111,7 @@ class PEFeature extends Feature {
                 exerciseCategory[2] += element.times!;
                 break;
             }
-          });
+          }
           return "早锻: ${exerciseCategory[0]} 必锻: ${exerciseCategory[1]} 选锻: ${exerciseCategory[2]}";
         }
       case ConnectionStatus.FAILED:
@@ -145,9 +145,9 @@ class PEFeature extends Feature {
   void onTap() {
     if (_exercises != null && _exercises!.isNotEmpty) {
       String body = "";
-      _exercises!.forEach((element) {
+      for (var element in _exercises!) {
         body += "\n${element.title}: ${element.times}";
-      });
+      }
       Noticing.showModalNotice(context!,
           message: body, title: S.of(context!).pe_exercises);
     } else {

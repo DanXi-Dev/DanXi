@@ -88,7 +88,7 @@ String renderText(
   //content = content.replaceAll(mentionRegExp, "");
   var soup = BeautifulSoup(content);
   var images = soup.findAll("img");
-  if (images.length > 0) return soup.getText().trim() + imagePlaceholder;
+  if (images.isNotEmpty) return soup.getText().trim() + imagePlaceholder;
   return soup.getText().trim();
 }
 
@@ -102,7 +102,7 @@ class OTTitle extends StatefulWidget {
 }
 
 class _OTTitleState extends State<OTTitle> {
-  final StateStreamListener _divisionChangedSubscription =
+  final StateStreamListener<DivisionChangedEvent> _divisionChangedSubscription =
       StateStreamListener();
 
   @override
@@ -118,10 +118,11 @@ class _OTTitleState extends State<OTTitle> {
 
   List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
     List<Widget> list = [];
-    Function onTapListener = (OTDivision newDivision) {
+    onTapListener(OTDivision newDivision) {
       Navigator.of(cxt).pop();
       DivisionChangedEvent(newDivision).fire();
-    };
+    }
+
     OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
       list.add(ListTile(
         title: Text(value.name ?? "null"),
@@ -145,7 +146,7 @@ class _OTTitleState extends State<OTTitle> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(StateProvider.divisionId?.name ?? S.of(context).forum),
-            Icon(Icons.arrow_drop_down)
+            const Icon(Icons.arrow_drop_down)
           ],
         ),
         onPointerUp: (PointerUpEvent details) {
@@ -191,31 +192,37 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
               ? Icons.notifications
               : CupertinoIcons.bell),
           () {
-            if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+            if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
               smartNavigatorPush(cxt, '/bbs/messages');
+            }
           },
         )
       ];
 
   @override
-  Create<Widget> get title => (cxt) => OTTitle();
+  Create<Widget> get title => (cxt) => const OTTitle();
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) =>
+  [
         AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/tags');
+          }
         }),
-        AppBarButtonItem(S.of(cxt).favorites, Icon(CupertinoIcons.star), () {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+        AppBarButtonItem(S.of(cxt).favorites, const Icon(CupertinoIcons.star),
+            () {
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
               'showFavoredDiscussion': true,
             });
+          }
         }),
         AppBarButtonItem(
             S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+          if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             AddNewPostEvent().fire();
+          }
         }),
       ];
 }
@@ -248,23 +255,24 @@ class _BBSSubpageState extends State<BBSSubpage>
     with AutomaticKeepAliveClientMixin {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
-  final StateStreamListener _postSubscription = StateStreamListener();
-  final StateStreamListener _refreshSubscription = StateStreamListener();
-  final StateStreamListener _searchSubscription = StateStreamListener();
-  final StateStreamListener _divisionChangedSubscription =
+  final StateStreamListener<AddNewPostEvent> _postSubscription =
+      StateStreamListener();
+  final StateStreamListener<RefreshBBSEvent> _refreshSubscription =
+      StateStreamListener();
+  final StateStreamListener<DivisionChangedEvent> _divisionChangedSubscription =
       StateStreamListener();
 
   //final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
 
   String? _tagFilter;
-  FocusNode _searchFocus = FocusNode();
+  final FocusNode _searchFocus = FocusNode();
   PostsType _postsType = PostsType.NORMAL_POSTS;
 
   final PagedListViewController<OTHole> _listViewController =
       PagedListViewController();
 
   final TimeBasedLoadAdaptLayer<OTHole> adaptLayer =
-      new TimeBasedLoadAdaptLayer(10, 1);
+      TimeBasedLoadAdaptLayer(10, 1);
 
   /// Fields related to the display states.
   int get _divisionId => StateProvider.divisionId?.division_id ?? 1;
@@ -279,8 +287,9 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
   Future<List<OTHole>?> _loadContent(int page) async {
-    if (!checkGroup(kCompatibleUserGroup))
+    if (!checkGroup(kCompatibleUserGroup)) {
       throw NotLoginError("Logged in as a visitor.");
+    }
 
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
@@ -300,8 +309,9 @@ class _BBSSubpageState extends State<BBSSubpage>
           DateTime time;
           if (lastElement != null) {
             time = DateTime.parse(lastElement.time_updated!);
-          } else
+          } else {
             time = DateTime.now();
+          }
           return OpenTreeHoleRepository.getInstance()
               .loadHoles(time, _divisionId, tag: _tagFilter);
         }).call(page);
@@ -322,8 +332,9 @@ class _BBSSubpageState extends State<BBSSubpage>
     if (_postsType == PostsType.FAVORED_DISCUSSION) {
       await OpenTreeHoleRepository.getInstance()
           .getFavoriteHoleId(forceUpdate: true);
-    } else if (OpenTreeHoleRepository.getInstance().isUserInitialized)
+    } else if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().loadDivisions(useCache: false);
+    }
     await _listViewController.notifyUpdate();
   }
 
@@ -332,7 +343,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       if (OpenTreeHoleRepository.getInstance().isAdmin) {
         return Card(
           child: ListTile(
-            title: Text("FDUHole Administrative Interface"),
+            title: const Text("FDUHole Administrative Interface"),
             onTap: () {
               smartNavigatorPush(context, "/bbs/reports");
             },
@@ -346,8 +357,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   Widget _autoSilenceNotice() {
     final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
         .getSilenceDateForDivision(_divisionId);
-    if (silenceDate == null || silenceDate.isBefore(DateTime.now()))
+    if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
+    }
     return Card(
       child: ListTile(
         leading: Icon(
@@ -392,8 +404,9 @@ class _BBSSubpageState extends State<BBSSubpage>
         Constant.eventBus.on<RefreshBBSEvent>().listen((event) {
           if (event.refreshAll == true) {
             refreshSelf();
-          } else
+          } else {
             _refreshList();
+          }
         }),
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
@@ -417,8 +430,9 @@ class _BBSSubpageState extends State<BBSSubpage>
   @override
   void didChangeDependencies() {
     if (!_fieldInitComplete) {
-      if (widget.arguments?.containsKey('tagFilter') ?? false)
+      if (widget.arguments?.containsKey('tagFilter') ?? false) {
         _tagFilter = widget.arguments!['tagFilter'];
+      }
       if (_tagFilter != null) {
         _postsType = PostsType.FILTER_BY_TAG;
       } else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
@@ -436,7 +450,6 @@ class _BBSSubpageState extends State<BBSSubpage>
     super.dispose();
     _postSubscription.cancel();
     _refreshSubscription.cancel();
-    _searchSubscription.cancel();
     _divisionChangedSubscription.cancel();
   }
 
@@ -471,71 +484,70 @@ class _BBSSubpageState extends State<BBSSubpage>
 
   Widget _buildPageBody() {
     return Material(
-      child: Container(
-        child: SafeArea(
-          bottom: false,
-          child: RefreshIndicator(
-            color: Theme.of(context).colorScheme.secondary,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              await _refreshList();
-            },
-            child: PagedListView<OTHole>(
-                noneItem: OTHole.DUMMY_POST,
-                pagedController: _listViewController,
-                withScrollbar: true,
-                scrollController: widget.primaryScrollController(context),
-                startPage: 1,
-                builder: _buildListItem,
-                headBuilder: (_) => Column(
-                      children: [
-                        AutoBannerAdWidget(bannerAd: bannerAd),
-                        if (_postsType == PostsType.NORMAL_POSTS) ...[
-                          OTSearchWidget(focusNode: _searchFocus),
-                          _autoSilenceNotice(),
-                          _autoAdminNotice(),
-                          _autoPinnedPosts(),
-                        ],
+      child: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          color: Theme.of(context).colorScheme.secondary,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            await _refreshList();
+          },
+          child: PagedListView<OTHole>(
+              noneItem: OTHole.DUMMY_POST,
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: widget.primaryScrollController(context),
+              startPage: 1,
+              builder: _buildListItem,
+              headBuilder: (_) => Column(
+                    children: [
+                      AutoBannerAdWidget(bannerAd: bannerAd),
+                      if (_postsType == PostsType.NORMAL_POSTS) ...[
+                        OTSearchWidget(focusNode: _searchFocus),
+                        _autoSilenceNotice(),
+                        _autoAdminNotice(),
+                        _autoPinnedPosts(),
                       ],
-                    ),
-                loadingBuilder: (BuildContext context) => Container(
-                      padding: EdgeInsets.all(8),
-                      child: Center(child: PlatformCircularProgressIndicator()),
-                    ),
-                endBuilder: (context) => Center(
-                        child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(S.of(context).end_reached),
-                    )),
-                emptyBuilder: (_) {
-                  if (_postsType == PostsType.FAVORED_DISCUSSION)
-                    return _buildEmptyFavoritesPage();
-                  else
-                    return Container(
-                      padding: EdgeInsets.all(8),
-                      child: Center(child: Text(S.of(context).no_data)),
-                    );
-                },
-                fatalErrorBuilder: (_, e) {
-                  if (e is NotLoginError) {
-                    return OTWelcomeWidget(loginCallback: () async {
-                      await smartNavigatorPush(context, "/bbs/login",
-                          arguments: {"info": StateProvider.personInfo.value!});
-                      _refreshList();
-                    });
-                  }
-                  return const SizedBox();
-                },
-                dataReceiver: _loadContent),
-          ),
+                    ],
+                  ),
+              loadingBuilder: (BuildContext context) => Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Center(child: PlatformCircularProgressIndicator()),
+                  ),
+              endBuilder: (context) => Center(
+                      child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(S.of(context).end_reached),
+                  )),
+              emptyBuilder: (_) {
+                if (_postsType == PostsType.FAVORED_DISCUSSION) {
+                  return _buildEmptyFavoritesPage();
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Center(child: Text(S.of(context).no_data)),
+                  );
+                }
+              },
+              fatalErrorBuilder: (_, e) {
+                if (e is NotLoginError) {
+                  return OTWelcomeWidget(loginCallback: () async {
+                    await smartNavigatorPush(context, "/bbs/login",
+                        arguments: {"info": StateProvider.personInfo.value!});
+                    _refreshList();
+                  });
+                }
+                return const SizedBox();
+              },
+              dataReceiver: _loadContent),
         ),
       ),
     );
   }
 
   Widget _buildEmptyFavoritesPage() => Container(
-        padding: EdgeInsets.all(8),
+    padding: const EdgeInsets.all(8),
         child: Center(child: Text(S.of(context).no_favorites)),
       );
 
@@ -560,7 +572,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag, S.of(context).formula),
-      style: TextStyle(fontSize: 16),
+      style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
       onOpen: _launchUrlWithNotice,
@@ -572,7 +584,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       child: Column(
         children: [
           ListTile(
-              contentPadding: EdgeInsets.fromLTRB(16, 4, 10, 0),
+              contentPadding: const EdgeInsets.fromLTRB(16, 4, 10, 0),
               dense: false,
               title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,7 +615,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                                     CrossAxisAlignment.start,
                                 expandedAlignment: Alignment.topLeft,
                                 childrenPadding:
-                                    EdgeInsets.symmetric(vertical: 4),
+                                    const EdgeInsets.symmetric(vertical: 4),
                                 tilePadding: EdgeInsets.zero,
                                 title: Text(
                                   S.of(context).folded,
@@ -642,7 +654,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
               postElement.floors?.last_floor !=
                   postElement.floors?.first_floor) ...[
-            Divider(height: 4),
+            const Divider(height: 4),
             _buildCommentView(postElement)
           ]
         ],
@@ -660,7 +672,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         minLeadingWidth: 16,
         leading: useLeading
             ? Padding(
-                padding: EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.only(bottom: 4),
                 child: Icon(
                   CupertinoIcons.quote_bubble,
                   color: Theme.of(context).hintColor,
@@ -671,7 +683,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -690,12 +702,12 @@ class _BBSSubpageState extends State<BBSSubpage>
                   ]),
             ),
             Padding(
-                padding: EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Linkify(
                     text: lastReplyContent.trim().isEmpty
                         ? S.of(context).no_summary
                         : lastReplyContent,
-                    style: TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 14),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     onOpen: _launchUrlWithNotice)),

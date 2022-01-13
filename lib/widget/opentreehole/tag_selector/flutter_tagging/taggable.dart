@@ -20,7 +20,7 @@ import 'package:meta/meta.dart';
 @immutable
 abstract class Taggable {
   /// The [List] of `props` (properties) which will be used to determine whether
-  /// two [Taggables] are equal.
+  /// two [Taggable]s are equal.
   List<Object> get props;
 
   /// If true, string comparison will be case sensitive.
@@ -52,9 +52,11 @@ abstract class Taggable {
 mixin TaggableMixin implements Taggable {
   /// The [List] of `props` (properties) which will be used to determine whether
   /// two [Taggables] are equal.
+  @override
   List<Object> get props;
 
   /// If true, string comparison will be case sensitive.
+  @override
   bool get caseSensitive => false;
 
   @override
@@ -98,7 +100,7 @@ int _mapPropsToHashCode(dynamic props) {
 
 const DeepCollectionEquality _equality = DeepCollectionEquality();
 
-bool _equals(List list1, List list2, bool caseSensitive) {
+bool _equals<T>(List<T> list1, List<T> list2, bool caseSensitive) {
   if (identical(list1, list2)) return true;
   var length = list1.length;
   if (length != list2.length) return false;
@@ -111,7 +113,7 @@ bool _equals(List list1, List list2, bool caseSensitive) {
       if (!_equality.equals(unit1, unit2)) return false;
     } else if (unit1?.runtimeType != unit2?.runtimeType) {
       return false;
-    } else if (unit1 is String) {
+    } else if (unit1 is String && unit2 is String) {
       if (caseSensitive && unit1.compareTo(unit2) != 0) {
         return false;
       }

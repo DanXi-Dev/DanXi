@@ -18,9 +18,9 @@
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -89,14 +89,14 @@ class BrowserUtil {
       });
     } else {
       var cookies = await cookieJar.loadForRequest(uri);
-      cookies.forEach((cookie) {
+      for (var cookie in cookies) {
         CookieManager.instance().setCookie(
             url: uri,
             name: cookie.name,
             path: cookie.path!,
             value: cookie.value,
             domain: cookie.domain);
-      });
+      }
     }
     CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)),
@@ -108,9 +108,10 @@ class CustomInAppBrowser extends InAppBrowser {
   @override
   Future<GeolocationPermissionShowPromptResponse>
       androidOnGeolocationPermissionsShowPrompt(String origin) {
-    if (origin == '''https://zlapp.fudan.edu.cn/''')
+    if (origin == '''https://zlapp.fudan.edu.cn/''') {
       return Future.value(GeolocationPermissionShowPromptResponse(
           origin: origin, allow: true, retain: true));
+    }
     // Only give geolocation permission on PAFD site
     return Future.value(GeolocationPermissionShowPromptResponse(
         origin: origin, allow: false, retain: false));
@@ -133,8 +134,8 @@ class CustomInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onDownloadStart(Uri uri) {
-    launch(uri.toString());
+  void onDownloadStart(Uri url) {
+    launch(url.toString());
   }
 
   @override

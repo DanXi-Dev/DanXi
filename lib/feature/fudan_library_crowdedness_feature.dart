@@ -67,12 +67,13 @@ class FudanLibraryCrowdednessFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        if (_libraryCrowdedness!.isEmpty)
+        if (_libraryCrowdedness!.isEmpty) {
           return S.of(context!).no_data;
-        else {
+        } else {
           List<String> result = [];
-          for (int i = 0; i < _libraryCrowdedness!.length; i++)
+          for (int i = 0; i < _libraryCrowdedness!.length; i++) {
             result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
+          }
           return result.join(" ");
         }
       case ConnectionStatus.FAILED:
@@ -106,8 +107,9 @@ class FudanLibraryCrowdednessFeature extends Feature {
   void onTap() {
     if (_libraryCrowdedness != null && _libraryCrowdedness!.isNotEmpty) {
       List<String> result = [];
-      for (int i = 0; i < _libraryCrowdedness!.length; i++)
+      for (int i = 0; i < _libraryCrowdedness!.length; i++) {
         result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
+      }
       Noticing.showModalNotice(context!,
           message: result.join("\n"),
           title: S.of(context!).fudan_library_crowdedness);

@@ -38,12 +38,12 @@ class CardCrowdData extends StatefulWidget {
   @override
   _CardCrowdDataState createState() => _CardCrowdDataState();
 
-  CardCrowdData({Key? key, this.arguments});
+  const CardCrowdData({Key? key, this.arguments}) : super(key: key);
 }
 
 class _CardCrowdDataState extends State<CardCrowdData> {
   PersonInfo? _personInfo;
-  Map<String, TrafficInfo>? _trafficInfos;
+  Map<String, TrafficInfo>? _trafficInfo;
   Campus? _selectItem = Campus.NONE;
   int? _sliding;
 
@@ -58,8 +58,8 @@ class _CardCrowdDataState extends State<CardCrowdData> {
 
   /// Load dining hall data
   Future<void> _onSelectedItemChanged(Campus? e) async {
-    setState(() => {_selectItem = e, _trafficInfos = null});
-    _trafficInfos = await DataCenterRepository.getInstance()
+    setState(() => {_selectItem = e, _trafficInfo = null});
+    _trafficInfo = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(_personInfo, _selectItem!.index)
         .catchError((e) {
       // If it's not time for a meal
@@ -117,7 +117,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     );
   }
 
-  List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
+  List<DropdownMenuItem<Campus>> _getItems() => Constant.CAMPUS_VALUES.map((e) {
         return DropdownMenuItem(
             value: e, child: Text(e.displayTitle(context)!));
       }).toList(growable: false);
@@ -129,10 +129,10 @@ class _CardCrowdDataState extends State<CardCrowdData> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    if (_trafficInfos == null) return widgets;
+    if (_trafficInfo == null) return widgets;
 
     DataCenterRepository.getInstance()
-        .toZoneList(_selectItem.displayTitle(context), _trafficInfos)
+        .toZoneList(_selectItem.displayTitle(context), _trafficInfo)
         .forEach((key, value) {
       widgets.add(_buildZoneCard(key!, value));
     });
@@ -143,7 +143,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     List<Widget> infoIndicators = [];
     infoList.forEach((key, value) {
       infoIndicators.add(Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
             Stack(
@@ -166,9 +166,9 @@ class _CardCrowdDataState extends State<CardCrowdData> {
       ));
     });
     return Card(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Column(
           // Make the title align to left
           crossAxisAlignment: CrossAxisAlignment.start,

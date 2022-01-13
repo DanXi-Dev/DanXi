@@ -133,29 +133,30 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
   final List<T> initialItems;
 
   /// Creates a [FlutterTagging] widget.
-  FlutterTagging({
-    required this.initialItems,
-    required this.findSuggestions,
-    required this.configureChip,
-    required this.configureSuggestion,
-    this.onChanged,
-    this.additionCallback,
-    this.enableImmediateSuggestion = false,
-    this.errorBuilder,
-    this.loadingBuilder,
-    this.emptyBuilder,
-    this.wrapConfiguration = const WrapConfiguration(),
-    this.textFieldConfiguration = const TextFieldConfiguration(),
-    this.suggestionsBoxConfiguration = const SuggestionsBoxConfiguration(),
-    this.transitionBuilder,
-    this.debounceDuration = const Duration(milliseconds: 300),
-    this.hideOnEmpty = false,
-    this.hideOnError = false,
-    this.hideOnLoading = false,
-    this.animationDuration = const Duration(milliseconds: 500),
-    this.animationStart = 0.25,
-    this.onAdded,
-  });
+  const FlutterTagging(
+      {required this.initialItems,
+      required this.findSuggestions,
+      required this.configureChip,
+      required this.configureSuggestion,
+      this.onChanged,
+      this.additionCallback,
+      this.enableImmediateSuggestion = false,
+      this.errorBuilder,
+      this.loadingBuilder,
+      this.emptyBuilder,
+      this.wrapConfiguration = const WrapConfiguration(),
+      this.textFieldConfiguration = const TextFieldConfiguration(),
+      this.suggestionsBoxConfiguration = const SuggestionsBoxConfiguration(),
+      this.transitionBuilder,
+      this.debounceDuration = const Duration(milliseconds: 300),
+      this.hideOnEmpty = false,
+      this.hideOnError = false,
+      this.hideOnLoading = false,
+      this.animationDuration = const Duration(milliseconds: 500),
+      this.animationStart = 0.25,
+      this.onAdded,
+      Key? key})
+      : super(key: key);
 
   @override
   _FlutterTaggingState<T> createState() => _FlutterTaggingState<T>();
@@ -215,7 +216,7 @@ class _FlutterTaggingState<T extends Taggable>
           transitionBuilder: widget.transitionBuilder,
           loadingBuilder: (context) =>
               widget.loadingBuilder?.call(context) ??
-              SizedBox(
+                  const SizedBox(
                 height: 3.0,
                 child: LinearProgressIndicator(),
               ),
@@ -267,7 +268,7 @@ class _FlutterTaggingState<T extends Taggable>
                     if (conf.additionWidget != null && _additionItem == item) {
                       return conf.additionWidget!;
                     } else {
-                      return SizedBox(width: 0);
+                      return const SizedBox(width: 0);
                     }
                   },
                 ),

@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 
 class MySlideTransition extends AnimatedWidget {
-  MySlideTransition({
+  const MySlideTransition({
     Key? key,
     required Animation<Offset> position,
     this.transformHitTests = true,

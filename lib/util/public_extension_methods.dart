@@ -106,7 +106,7 @@ extension ListEx<T> on List<T>? {
   }
 
   /// Join [generator] between every element of this list.
-  List<T>? joinElement(T generator()) {
+  List<T>? joinElement(T Function() generator) {
     if (this == null) return null;
     List<T> newList = [];
     for (int i = 0; i < this!.length; i++) {

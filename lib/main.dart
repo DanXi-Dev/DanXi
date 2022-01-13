@@ -75,9 +75,10 @@ void main() {
   Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
 
   // Init Mi push Service.
-  if (PlatformX.isAndroid)
+  if (PlatformX.isAndroid) {
     XiaoMiPushPlugin.init(
         appId: "2882303761519940685", appKey: "5821994071685");
+  }
 
   // Init Feature registration.
   FeatureMap.registerAllFeatures();
@@ -85,21 +86,23 @@ void main() {
     // Initialize Ad only if user has opted-in to save resources
     // If user decides to opt-in after the app has started,
     // Admob SDK will automatically initialize on first request.
-    if (SettingsProvider.getInstance().isAdEnabled)
+    if (SettingsProvider.getInstance().isAdEnabled) {
       MobileAds.instance.initialize();
+    }
 
     Catcher(
-        rootWidget: DanxiApp(),
+        rootWidget: const DanxiApp(),
         debugConfig: debugOptions,
         releaseConfig: releaseOptions);
   });
 
   // Init DesktopWindow on desktop environment.
-  if (PlatformX.isDesktop)
+  if (PlatformX.isDesktop) {
     doWhenWindowReady(() {
       final win = appWindow;
       win.show();
     });
+  }
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
@@ -161,6 +164,8 @@ class DanxiApp extends StatelessWidget {
         OTMessagesPage(arguments: arguments),
   };
 
+  const DanxiApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Phoenix(
@@ -168,7 +173,7 @@ class DanxiApp extends StatelessWidget {
         // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => Theme(
           data: PlatformX.getTheme(context),
-          child: PlatformMasterDetailApp(
+          child: const PlatformMasterDetailApp(
             masterPage: HomePage(),
           ),
         ),

@@ -18,9 +18,9 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -106,10 +106,10 @@ class CardRepository extends BaseRepositoryWithDio {
         .firstWhereOrNull((element) => element.attributes["name"] == "_csrf")!;
     String? csrfId = element.attributes["content"];
     // Build the request body.
-    DateTime end = new DateTime.now();
+    DateTime end = DateTime.now();
     int backDays = logDays == 0 ? 30 : logDays;
     DateTime start = end.add(Duration(days: -backDays));
-    DateFormat formatter = new DateFormat('yyyy-MM-dd');
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
     Map<String, String?> data = {
       "aaxmlrequest": "true",
       "pageNo": "1",
@@ -172,5 +172,5 @@ class CardRecord {
   final String location;
   final String payment;
 
-  CardRecord(this.time, this.type, this.location, this.payment);
+  const CardRecord(this.time, this.type, this.location, this.payment);
 }

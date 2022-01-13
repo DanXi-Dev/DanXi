@@ -34,7 +34,7 @@ class LanConnectionNotification extends Feature {
   String get subTitle => S.of(context!).lan_connection_issue_1_description;
 
   @override
-  Widget get icon => Icon(Icons.signal_wifi_connected_no_internet_4);
+  Widget get icon => const Icon(Icons.signal_wifi_connected_no_internet_4);
 
   @override
   Widget get trailing {

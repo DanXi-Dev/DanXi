@@ -27,7 +27,8 @@ class FeatureListItem extends StatefulWidget implements FeatureContainer {
   @override
   _FeatureListItemState createState() => _FeatureListItemState();
 
-  FeatureListItem({required this.feature, this.arguments});
+  const FeatureListItem({required this.feature, this.arguments, Key? key})
+      : super(key: key);
 
   @override
   Feature get childFeature => feature;
@@ -44,8 +45,9 @@ class _FeatureListItemState extends State<FeatureListItem>
 
     List<String?> summary = [];
     summary.add(widget.feature.subTitle ?? "");
-    if (widget.feature.tertiaryTitle != null)
+    if (widget.feature.tertiaryTitle != null) {
       summary.add(widget.feature.tertiaryTitle);
+    }
 
     var tile = ListTile(
       trailing: widget.feature.trailing,
@@ -56,9 +58,7 @@ class _FeatureListItemState extends State<FeatureListItem>
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: widget.feature.customSubtitle == null
-          ? Text(summary.join("\n"))
-          : widget.feature.customSubtitle,
+      subtitle: widget.feature.customSubtitle ?? Text(summary.join("\n")),
       onTap: widget.feature.clickable ? widget.feature.onTap : null,
     );
     widget.feature.onEvent(FeatureEvent.CREATE);

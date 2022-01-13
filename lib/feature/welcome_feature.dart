@@ -43,7 +43,7 @@ class WelcomeFeature extends Feature {
       _helloQuote = Constant.SPECIAL_DAYS[days]![
           Random().nextInt(Constant.SPECIAL_DAYS[days]!.length)];
       return;
-    } catch (noElement) {}
+    } catch (ignored) {}
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {
       _helloQuote = S.of(context!).late_night;
@@ -66,11 +66,12 @@ class WelcomeFeature extends Feature {
 
   @override
   Widget? get customSubtitle {
-    if (SettingsProvider.getInstance().debugMode)
-      return Text(
+    if (SettingsProvider.getInstance().debugMode) {
+      return const Text(
         "Welcome, developer. [Debug Mode Enabled]",
         style: TextStyle(color: Colors.red),
       );
+    }
     return null;
   }
 }

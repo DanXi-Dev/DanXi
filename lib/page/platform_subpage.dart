@@ -24,7 +24,7 @@ import 'package:provider/provider.dart';
 ///
 /// It is equipped with a callback to help the implementation know when its state changes.
 abstract class PlatformSubpage extends StatefulWidget {
-  PlatformSubpage({Key? key}) : super(key: key);
+  const PlatformSubpage({Key? key}) : super(key: key);
 
   @deprecated
   final bool needPadding = false;

@@ -27,7 +27,7 @@ class SmartWidget {
       Widget? child,
       VoidCallback? onStepContinue,
       VoidCallback? onStepCancel}) {
-    if (fallback == null) fallback = const SizedBox();
+    fallback ??= const SizedBox();
     if (object == null) return fallback;
 
     if (object is String) {

@@ -47,11 +47,11 @@ class _ErrorPageWidgetState extends State<ErrorPageWidget> {
         children: [
           if (widget.icon != null) widget.icon!,
           if (widget.icon != null)
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
           Text(widget.errorMessage),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           PlatformElevatedButton(

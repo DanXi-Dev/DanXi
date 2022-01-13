@@ -31,7 +31,7 @@ class TopController extends StatefulWidget {
       : super(key: key);
 
   static scrollToTop(ScrollController? controller) => controller?.animateTo(0,
-      duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+      duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
 
   @override
   _TopControllerState createState() => _TopControllerState();

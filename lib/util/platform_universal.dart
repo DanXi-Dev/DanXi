@@ -87,8 +87,9 @@ class PlatformX {
     // Skip the disk letter(like "C:")
     for (int i = 1; i < pathSegment.length; i++) {
       if (isWindows) {
-        illegalCharWindows.forEach((element) =>
-            pathSegment[i] = pathSegment[i].replaceAll(RegExp(element), ""));
+        for (var char in illegalCharWindows) {
+          pathSegment[i] = pathSegment[i].replaceAll(RegExp(char), "");
+        }
       }
     }
     return File(pathSegment.join(fileSystemSlash));

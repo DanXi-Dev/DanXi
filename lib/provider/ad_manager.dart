@@ -57,7 +57,7 @@ class AdManager {
       onAdFailedToLoad: (Ad ad, LoadAdError error) {
         // Dispose the ad here to free resources.
         ad.dispose();
-        print('Ad failed to load: $error');
+        debugPrint('Ad failed to load: $error');
       },
       // Called when an ad opens an overlay that covers the screen.
       onAdOpened: (Ad ad) {},
@@ -69,7 +69,7 @@ class AdManager {
     bannerAd = BannerAd(
       adUnitId: unitIdList[index],
       size: AdSize.banner,
-      request: AdRequest(),
+      request: const AdRequest(),
       listener: listener,
     );
     bannerAd.load();
@@ -93,7 +93,7 @@ class AutoBannerAdWidget extends StatelessWidget {
       const double padding = 8.0;
       return Center(
         child: Container(
-          padding: EdgeInsets.only(bottom: padding),
+          padding: const EdgeInsets.only(bottom: padding),
           alignment: Alignment.center,
           child: AdWidget(ad: bannerAd!),
           width: bannerAd!.size.width.toDouble(),

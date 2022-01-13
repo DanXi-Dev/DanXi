@@ -49,7 +49,7 @@ class _TestLifeCycle {
             campus: Campus.HANDAN_CAMPUS))!;
     var data = await SportsReserveRepository.getInstance().getScheduleData(
         StateProvider.personInfo.value!, list.first, DateTime.now());
-    print(data);
+    debugPrint(data.toString());
   }
 }
 

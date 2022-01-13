@@ -39,7 +39,7 @@ class OTWelcomeWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
               child: Text(
                 S.of(context).welcome_title,
-                style: TextStyle(fontSize: 28.0),
+                style: const TextStyle(fontSize: 28.0),
               ),
             ),
             Column(

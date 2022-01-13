@@ -33,7 +33,7 @@ class BBSTagsContainer extends StatefulWidget {
 }
 
 class _BBSTagsContainerState extends State<BBSTagsContainer> {
-  FocusNode _searchFocus = FocusNode();
+  final FocusNode _searchFocus = FocusNode();
   List<OTTag>? filteredTags;
 
   @override
@@ -61,7 +61,7 @@ class _BBSTagsContainerState extends State<BBSTagsContainer> {
               children: (filteredTags ?? widget.tags)!
                   .map(
                     (e) => Padding(
-                        padding: EdgeInsets.only(top: 16, right: 12),
+                        padding: const EdgeInsets.only(top: 16, right: 12),
                         child: RoundChip(
                             label: e.name,
                             color: Constant.getColorFromString(e.color),

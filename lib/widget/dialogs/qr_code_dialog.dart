@@ -18,8 +18,8 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/fdu/qr_code_repository.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -45,7 +45,7 @@ class QRHelper {
   }
 
   //watchOS Support
-  static const channel = const MethodChannel('watchQRValue');
+  static const channel = MethodChannel('watchQRValue');
 
   static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
     String? qr = await QRCodeRepository.getInstance().getQRCode(personInfo);
@@ -76,7 +76,7 @@ class _QRDialogState extends State<QRDialog> {
                 refreshSelf();
               }
             },
-            child: Container(
+            child: SizedBox(
                 width: double.maxFinite,
                 height: 200.0,
                 child: Center(

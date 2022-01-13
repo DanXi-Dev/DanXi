@@ -32,7 +32,7 @@ class FlutterApp {
     if (PlatformX.isAndroid) {
       SystemNavigator.pop(animated: true);
     } else if (PlatformX.isIOS) {
-      const channel = const MethodChannel('appControl');
+      const channel = MethodChannel('appControl');
       channel.invokeMethod('exit');
     } else {
       exit(0);

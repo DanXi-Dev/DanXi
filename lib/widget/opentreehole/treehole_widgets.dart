@@ -35,7 +35,6 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
-import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -54,10 +53,10 @@ class OTLeadingTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
       decoration: BoxDecoration(
           color: Constant.getColorFromString(colorString).withOpacity(0.8),
-          borderRadius: BorderRadius.all(Radius.circular(4.0))),
+          borderRadius: const BorderRadius.all(Radius.circular(4.0))),
       child: Text(
         text,
         style: TextStyle(
@@ -115,6 +114,7 @@ class OTFloorWidget extends StatelessWidget {
   final void Function()? onLongPress;
 
   const OTFloorWidget({
+    Key? key,
     required this.floor,
     this.isInMention = false,
     this.showBottomBar = true,
@@ -122,17 +122,19 @@ class OTFloorWidget extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.parentHole,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final bool generateTags = (index == 0);
-    final LinkTapCallback onLinkTap = (url) {
+    onLinkTap(url) {
       BrowserUtil.openUrl(url!, context);
-    };
-    final ImageTapCallback onImageTap = (url) {
+    }
+
+    onImageTap(url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
-    };
+    }
+
     final cardChild = ListTile(
       dense: true,
       title: Column(
@@ -141,14 +143,14 @@ class OTFloorWidget extends StatelessWidget {
         children: [
           if (generateTags)
             Padding(
-                padding: EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child:
                     generateTagWidgets(context, parentHole, (String? tagName) {
                   smartNavigatorPush(context, '/bbs/discussions',
                       arguments: {"tagFilter": tagName});
                 }, SettingsProvider.getInstance().useAccessibilityColoring)),
           Padding(
-            padding: EdgeInsets.fromLTRB(2, 4, 2, 4),
+            padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -164,7 +166,7 @@ class OTFloorWidget extends StatelessWidget {
                     ],
                     Text(
                       "${floor.anonyname}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -285,12 +287,13 @@ class OTFloorWidget extends StatelessWidget {
 
 class OTFloorMentionWidget extends StatelessWidget {
   final Future<OTFloor> future;
-  final showBottomBar;
+  final bool showBottomBar;
 
-  OTFloorMentionWidget({
+  const OTFloorMentionWidget({
+    Key? key,
     required this.future,
     this.showBottomBar = false,
-  });
+  }) : super(key: key);
 
   static void showFloorDetail(BuildContext context, OTFloor floor) {
     showPlatformModalSheet(
@@ -305,7 +308,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                 showBottomBar: false,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -329,8 +332,10 @@ class OTFloorMentionWidget extends StatelessWidget {
                                       .getScrollController()!
                                       .offset <
                                   10) break; // Prevent deadlock
-                              await pagedListViewController.scrollDelta(-100,
-                                  Duration(milliseconds: 1), Curves.linear);
+                              await pagedListViewController.scrollDelta(
+                                  -100,
+                                  const Duration(milliseconds: 1),
+                                  Curves.linear);
                             }
                             return;
                           }
@@ -431,14 +436,14 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Divider(),
+        const Divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
               child: InkWell(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -480,7 +485,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
               Expanded(
                 child: InkWell(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -506,7 +511,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
               Expanded(
                 child: InkWell(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -532,7 +537,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
               Expanded(
                 child: InkWell(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -608,8 +613,8 @@ class OTMessageItem extends StatelessWidget {
     return Card(
       child: ListTile(
           leading: PlatformX.isMaterial(context)
-              ? Icon(Icons.developer_board)
-              : Icon(CupertinoIcons.info_circle),
+              ? const Icon(Icons.developer_board)
+              : const Icon(CupertinoIcons.info_circle),
           title: Text(message.message ?? "null"),
           subtitle: Text(HumanDuration.tryFormat(
               context, DateTime.tryParse(message.time_created ?? ""))),
@@ -635,19 +640,20 @@ class OTSearchWidget extends StatelessWidget {
       });
     } catch (error) {
       if (error is DioError &&
-          error.response?.statusCode == HttpStatus.notFound)
+          error.response?.statusCode == HttpStatus.notFound) {
         Noticing.showNotice(context, S.of(context).post_does_not_exist,
             title: S.of(context).fatal_error);
-      else
+      } else {
         Noticing.showNotice(context, error.toString(),
             title: S.of(context).fatal_error);
+      }
     }
     progressDialog.dismiss();
   }
 
   @override
   Widget build(BuildContext context) {
-    final RegExp pidPattern = new RegExp(r'#[0-9]+');
+    final RegExp pidPattern = RegExp(r'#[0-9]+');
     return Container(
       padding: Theme.of(context)
           .cardTheme

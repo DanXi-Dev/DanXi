@@ -17,12 +17,12 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/fdu/card_repository.dart';
 import 'package:dan_xi/repository/fdu/fudan_ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -75,8 +75,8 @@ class LoginDialog extends StatefulWidget {
 }
 
 class _LoginDialogState extends State<LoginDialog> {
-  TextEditingController _nameController = new TextEditingController();
-  TextEditingController _pwdController = new TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _pwdController = TextEditingController();
   String _errorText = "";
   static const DEFAULT_USERGROUP = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
   UserGroup _group = DEFAULT_USERGROUP;
@@ -122,8 +122,9 @@ class _LoginDialogState extends State<LoginDialog> {
           try {
             await CardRepository.getInstance().init(newInfo);
             newInfo.name = await CardRepository.getInstance().getName();
-            if (newInfo.name?.isNotEmpty == true)
+            if (newInfo.name?.isNotEmpty == true) {
               throw GeneralLoginFailedException();
+            }
             await _deleteAllData();
             await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
             widget.personInfo.value = newInfo;
@@ -151,7 +152,7 @@ class _LoginDialogState extends State<LoginDialog> {
 
   List<Widget> _buildLoginAsList() {
     List<Widget> widgets = [];
-    kCompatibleUserGroup.forEach((e) {
+    for (var e in kCompatibleUserGroup) {
       if (e != _group) {
         widgets.add(PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
@@ -164,7 +165,7 @@ class _LoginDialogState extends State<LoginDialog> {
           ),
         ));
       }
-    });
+    }
     return widgets;
   }
 
@@ -208,7 +209,7 @@ class _LoginDialogState extends State<LoginDialog> {
               Text(
                 _errorText,
                 textAlign: TextAlign.start,
-                style: TextStyle(fontSize: 12, color: Colors.red),
+                style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
               TextField(
                 controller: _nameController,
@@ -218,8 +219,8 @@ class _LoginDialogState extends State<LoginDialog> {
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
                     icon: PlatformX.isAndroid
-                        ? Icon(Icons.perm_identity)
-                        : Icon(CupertinoIcons.person_crop_circle)),
+                        ? const Icon(Icons.perm_identity)
+                        : const Icon(CupertinoIcons.person_crop_circle)),
                 //),
                 /*cupertino: (_, __) => CupertinoTextFieldData(
                 placeholder: S.of(context).login_uis_uid),*/
@@ -233,8 +234,8 @@ class _LoginDialogState extends State<LoginDialog> {
                 decoration: InputDecoration(
                   labelText: S.of(context).login_uis_pwd,
                   icon: PlatformX.isAndroid
-                      ? Icon(Icons.lock_outline)
-                      : Icon(CupertinoIcons.lock_circle),
+                      ? const Icon(Icons.lock_outline)
+                      : const Icon(CupertinoIcons.lock_circle),
                 ),
                 //)),
                 /*cupertino: (_, __) => CupertinoTextFieldData(
@@ -324,7 +325,7 @@ class _LoginDialogState extends State<LoginDialog> {
     return showPlatformModalSheet(
         context: context,
         builder: (_) => PlatformWidget(
-              cupertino: (_, __) => CupertinoActionSheet(
+          cupertino: (_, __) => CupertinoActionSheet(
                 actions: _buildLoginAsList(),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
@@ -333,11 +334,9 @@ class _LoginDialogState extends State<LoginDialog> {
                   },
                 ),
               ),
-              material: (_, __) => Container(
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _buildLoginAsList()),
-              ),
+              material: (_, __) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _buildLoginAsList()),
             ));
   }
 

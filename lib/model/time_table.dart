@@ -49,21 +49,21 @@ class TimeTable {
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
   static final List<VagueTime> kCourseSlotStartTime = [
-    VagueTime(hour: 8, minute: 0),
-    VagueTime(hour: 8, minute: 55),
-    VagueTime(hour: 9, minute: 55),
-    VagueTime(hour: 10, minute: 50),
-    VagueTime(hour: 11, minute: 45),
-    VagueTime(hour: 13, minute: 30),
-    VagueTime(hour: 14, minute: 25),
-    VagueTime(hour: 15, minute: 25),
-    VagueTime(hour: 16, minute: 20),
-    VagueTime(hour: 17, minute: 15),
-    VagueTime(hour: 18, minute: 30),
-    VagueTime(hour: 19, minute: 25),
-    VagueTime(hour: 20, minute: 20),
-    VagueTime(hour: 21, minute: 15),
-    VagueTime(hour: 22, minute: 10),
+    const VagueTime(hour: 8, minute: 0),
+    const VagueTime(hour: 8, minute: 55),
+    const VagueTime(hour: 9, minute: 55),
+    const VagueTime(hour: 10, minute: 50),
+    const VagueTime(hour: 11, minute: 45),
+    const VagueTime(hour: 13, minute: 30),
+    const VagueTime(hour: 14, minute: 25),
+    const VagueTime(hour: 15, minute: 25),
+    const VagueTime(hour: 16, minute: 20),
+    const VagueTime(hour: 17, minute: 15),
+    const VagueTime(hour: 18, minute: 30),
+    const VagueTime(hour: 19, minute: 25),
+    const VagueTime(hour: 20, minute: 20),
+    const VagueTime(hour: 21, minute: 15),
+    const VagueTime(hour: 22, minute: 10),
   ];
   List<Course>? courses = [];
 
@@ -73,7 +73,7 @@ class TimeTable {
   TimeTable();
 
   factory TimeTable.fromHtml(DateTime startTime, String tablePageSource) {
-    TimeTable newTable = new TimeTable()..startTime = startTime;
+    TimeTable newTable = TimeTable()..startTime = startTime;
     RegExp courseMatcher =
         RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
     for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
@@ -83,7 +83,7 @@ class TimeTable {
   }
 
   factory TimeTable.fromUGjson(DateTime startTime, dynamic Coursejson) {
-    TimeTable newTable = new TimeTable()..startTime = startTime;
+    TimeTable newTable = TimeTable()..startTime = startTime;
     for (dynamic course in Coursejson["results"]) {
       newTable.courses!.add(Course.fromUGPart(course));
     }
@@ -120,40 +120,45 @@ class TimeTable {
   }
 
   Map<int, List<Event>> toWeekCourses(int week) {
-    Map<int, List<Event>> table = Map();
-    for (int i = 0; i < 7; i++) table[i] = [];
+    Map<int, List<Event>> table = {};
+    for (int i = 0; i < 7; i++) {
+      table[i] = [];
+    }
 
-    courses!.forEach((course) {
+    for (var course in courses!) {
       if (course.availableWeeks!.contains(week)) {
-        course.times!.forEach((courseTime) =>
-            table[courseTime.weekDay]!.add(Event(course, courseTime)));
+        for (var courseTime in course.times!) {
+          table[courseTime.weekDay]!.add(Event(course, courseTime));
+        }
       }
-    });
+    }
     return table;
   }
 
   /// Convert the specific [week]'s timetable to [DayEvents], usually for a [ScheduleView].
   List<DayEvents> toDayEvents(int week,
       {TableDisplayType compact = TableDisplayType.COMPAT}) {
-    Map<int, List<Event>> table = Map();
+    Map<int, List<Event>> table = {};
     List<DayEvents> result = [];
     for (int i = 0; i < DateTime.daysPerWeek; i++) {
       table[i] = [];
     }
-    courses!.forEach((course) {
+    for (var course in courses!) {
       if (course.availableWeeks!.contains(week)) {
-        course.times!.forEach((courseTime) =>
-            table[courseTime.weekDay]!.add(Event(course, courseTime)));
+        for (var courseTime in course.times!) {
+          table[courseTime.weekDay]!.add(Event(course, courseTime));
+        }
       }
-    });
+    }
     for (int i = 0; i < DateTime.daysPerWeek; i++) {
       if ((compact == TableDisplayType.FULL) ||
           (compact == TableDisplayType.STANDARD && i <= DateTime.friday - 1) ||
-          table[i]!.isNotEmpty)
+          table[i]!.isNotEmpty) {
         result.add(DayEvents(
             day: DateFormat.E().format(kMonday.add(Duration(days: i))),
             events: table[i]!,
             weekday: i));
+      }
     }
     return result;
   }
@@ -210,7 +215,7 @@ class Course {
   }
 
   factory Course.fromHtmlPart(String htmlPart) {
-    Course newCourse = new Course();
+    Course newCourse = Course();
     RegExp infoMatcher = RegExp(r'(?<=TaskActivity\(").*(?="\))');
     RegExp timeMatcher = RegExp(r'[0-9]+\*unitCount\+[0-9]+');
     String info = infoMatcher.firstMatch(htmlPart)!.group(0)!;
@@ -228,7 +233,7 @@ class Course {
   }
 
   factory Course.fromUGPart(dynamic UGPart) {
-    Course newCourse = new Course();
+    Course newCourse = Course();
     return newCourse
       ..courseName = UGPart["KCMC"]
       ..roomName = UGPart["JASMC"]

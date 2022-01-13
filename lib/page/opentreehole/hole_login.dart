@@ -40,14 +40,14 @@ class HoleLoginPage extends StatefulWidget {
   @override
   _HoleLoginPageState createState() => _HoleLoginPageState();
 
-  HoleLoginPage({Key? key, this.arguments}) : super(key: key);
+  const HoleLoginPage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _HoleLoginPageState extends State<HoleLoginPage> {
   late SubStatelessWidget _currentWidget;
   late PersonInfo info;
-  LoginInfoModel model = new LoginInfoModel();
-  List<SubStatelessWidget> _widgetStack = [];
+  LoginInfoModel model = LoginInfoModel();
+  final List<SubStatelessWidget> _widgetStack = [];
 
   /// Indicate the next [_backwardRun] animation should run in the reverse direction,
   /// since we are going back to the previous page.
@@ -93,8 +93,9 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_widgetStack.isNotEmpty && !_widgetStack.last.backable)
+        if (_widgetStack.isNotEmpty && !_widgetStack.last.backable) {
           return false;
+        }
         return !jumpBackIgnoringBackable();
       },
       child: Provider<LoginInfoModel>(
@@ -112,12 +113,12 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
                   switchOutCurve: Curves.ease,
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
-                    var tween =
-                        Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+                    var tween = Tween<Offset>(
+                        begin: const Offset(1, 0), end: const Offset(0, 0));
                     // reverse the animation if invoked jumpBack().
                     if (_backwardRun > 0) {
                       tween = Tween<Offset>(
-                          begin: Offset(-1, 0), end: Offset(0, 0));
+                          begin: const Offset(-1, 0), end: const Offset(0, 0));
                       _backwardRun--;
                     }
                     return MySlideTransition(
@@ -125,7 +126,7 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
                       child: child,
                     );
                   },
-                  duration: Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 250),
                   child: _currentWidget,
                 ),
               ),
@@ -146,28 +147,26 @@ abstract class SubStatelessWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = ViewportUtils.getMainNavigatorSize(context);
-    return Container(
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: size.width * 0.1, vertical: size.height * 0.1),
-          child: Container(
-            decoration: ShapeDecoration(
-                color: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.grey, width: 0.5),
-                    borderRadius: BorderRadius.circular(4))),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (backable) ThemedMaterial(child: BackButton()),
-                  buildContent(context),
-                ],
-              ),
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: size.width * 0.1, vertical: size.height * 0.1),
+        child: Container(
+          decoration: ShapeDecoration(
+              color: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: Colors.grey, width: 0.5),
+                  borderRadius: BorderRadius.circular(4))),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (backable) const ThemedMaterial(child: BackButton()),
+                buildContent(context),
+              ],
             ),
           ),
         ),
@@ -193,7 +192,7 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
-          SizedBox(
+          const SizedBox(
             height: 32,
           ),
           ListTile(
@@ -202,7 +201,7 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
               state: state,
             )),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             title: Text(S.of(context).login_by_email_password),
             onTap: () => state.jumpTo(OTEmailPasswordLoginWidget(
@@ -275,7 +274,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        SizedBox(
+        const SizedBox(
           height: 32,
         ),
         ...suggestEmail
@@ -288,7 +287,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                         context: context,
                         builder: (cxt) {
                           TextEditingController controller =
-                              new TextEditingController();
+                              TextEditingController();
                           return PlatformAlertDialog(
                             title: Text(S.of(context).input_your_email),
                             content: PlatformTextField(controller: controller),
@@ -321,7 +320,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                   }
                 }))
             .toList()
-            .joinElement(() => Divider())!
+            .joinElement(() => const Divider())!
       ],
     );
   }
@@ -361,7 +360,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        SizedBox(
+        const SizedBox(
           height: 32,
         ),
         TextField(
@@ -369,8 +368,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           decoration: InputDecoration(
               labelText: S.of(context).login_uis_uid,
               icon: PlatformX.isAndroid
-                  ? Icon(Icons.perm_identity)
-                  : Icon(CupertinoIcons.person_crop_circle)),
+                  ? const Icon(Icons.perm_identity)
+                  : const Icon(CupertinoIcons.person_crop_circle)),
         ),
         TextField(
           controller: _passwordController,
@@ -378,11 +377,11 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           decoration: InputDecoration(
             labelText: S.of(context).login_uis_pwd,
             icon: PlatformX.isAndroid
-                ? Icon(Icons.lock_outline)
-                : Icon(CupertinoIcons.lock_circle),
+                ? const Icon(Icons.lock_outline)
+                : const Icon(CupertinoIcons.lock_circle),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         Stack(
@@ -406,8 +405,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                 onPressed: () {
                   model.selectedEmail = _usernameController.text;
                   model.password = _passwordController.text;
-                  if (_passwordController.text.length > 0 &&
-                      _usernameController.text.length > 0) {
+                  if (_passwordController.text.isNotEmpty &&
+                      _usernameController.text.isNotEmpty) {
                     executeLogin(context).catchError((e, st) {
                       state.jumpBackFromLoadingPage();
                       debugPrintStack(stackTrace: st);
@@ -441,7 +440,7 @@ class OTLoadingWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.headline6,
           textAlign: TextAlign.center,
         ),
-        SizedBox(
+        const SizedBox(
           height: 32,
         ),
         Center(
@@ -490,7 +489,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             style: Theme.of(context).textTheme.caption,
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 32),
+          const SizedBox(height: 32),
           OTLicenseBody(
             registerCallback: () {
               executeRegister(context, state).catchError((e, st) {
@@ -541,8 +540,8 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
               });
             }),
         PlatformElevatedButton(
-          material: (_, __) =>
-              MaterialElevatedButtonData(icon: Icon(Icons.app_registration)),
+          material: (_, __) => MaterialElevatedButtonData(
+              icon: const Icon(Icons.app_registration)),
           child: Text(S.of(context).next),
           onPressed: _agreed ? widget.registerCallback : null,
         )
@@ -572,18 +571,18 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 32),
+        const SizedBox(height: 32),
         Text(S.of(context).secure_verification_description),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         TextField(
           controller: _verifyCodeController,
           decoration: InputDecoration(
               labelText: S.of(context).secure_code,
               icon: PlatformX.isAndroid
-                  ? Icon(Icons.perm_identity)
-                  : Icon(CupertinoIcons.person_crop_circle)),
+                  ? const Icon(Icons.perm_identity)
+                  : const Icon(CupertinoIcons.person_crop_circle)),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         PlatformElevatedButton(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -591,7 +590,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
           ),
           onPressed: () {
             model.verifyCode = _verifyCodeController.text;
-            if (_verifyCodeController.text.length > 0) {
+            if (_verifyCodeController.text.isNotEmpty) {
               OTRegisterLicenseWidget.executeRegister(context, state)
                   .catchError((e, st) {
                 state.jumpBackFromLoadingPage();
@@ -610,7 +609,7 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
   @override
   final bool backable = false;
 
-  OTRegisterSuccessWidget({Key? key, required _HoleLoginPageState state})
+  const OTRegisterSuccessWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -629,22 +628,22 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 32),
+        const SizedBox(height: 32),
         Text(
           S.of(context).email,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(model.selectedEmail!),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           S.of(context).password,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(model.password!),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         PlatformElevatedButton(
           material: (_, __) =>
-              MaterialElevatedButtonData(icon: Icon(Icons.done)),
+              MaterialElevatedButtonData(icon: const Icon(Icons.done)),
           child: Text(S.of(context).i_see),
           onPressed: () {
             Navigator.pop(state.context);
@@ -659,7 +658,7 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
   @override
   final bool backable = false;
 
-  OTLoginSuccessWidget({Key? key, required _HoleLoginPageState state})
+  const OTLoginSuccessWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -678,10 +677,10 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 32),
+        const SizedBox(height: 32),
         PlatformElevatedButton(
           material: (_, __) =>
-              MaterialElevatedButtonData(icon: Icon(Icons.done)),
+              MaterialElevatedButtonData(icon: const Icon(Icons.done)),
           child: Text(S.of(context).i_see),
           onPressed: () => Navigator.pop(state.context),
         )

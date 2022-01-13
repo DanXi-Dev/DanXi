@@ -44,7 +44,7 @@ class EmptyClassroomDetailPage extends StatefulWidget {
   _EmptyClassroomDetailPageState createState() =>
       _EmptyClassroomDetailPageState();
 
-  EmptyClassroomDetailPage({Key? key, this.arguments});
+  const EmptyClassroomDetailPage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
@@ -82,14 +82,14 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   DateTime? selectDate;
 
-  Widget _buildCupertinoDatePicker() => Container(
+  Widget _buildCupertinoDatePicker() => SizedBox(
       height: ViewportUtils.getMainNavigatorHeight(context) / 3,
       child: CupertinoDatePicker(
         backgroundColor: Theme.of(context).bottomAppBarColor,
         mode: CupertinoDatePickerMode.date,
         initialDateTime: DateTime.now(),
-        minimumDate: DateTime.now().add(Duration(days: -1)),
-        maximumDate: DateTime.now().add(Duration(days: 14)),
+        minimumDate: DateTime.now().add(const Duration(days: -1)),
+        maximumDate: DateTime.now().add(const Duration(days: 14)),
         onDateTimeChanged: (DateTime value) {
           setState(() {
             selectDate = value;
@@ -114,12 +114,15 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         .map((e) => Text(e))
         .toList()
         .asMap();
-    if (_selectBuildingIndex >= _buildingList.keys.length)
+    if (_selectBuildingIndex >= _buildingList.keys.length) {
       _selectBuildingIndex = 0;
+    }
 
-    if (PlatformX.isMaterial(context))
+    if (PlatformX.isMaterial(context)) {
       selectDate = DateTime.now().add(Duration(days: _selectDate.round()));
-    else if (selectDate == null) selectDate = DateTime.now();
+    } else {
+      selectDate ??= DateTime.now();
+    }
 
     return PlatformScaffold(
         iosContentBottomPadding: false,
@@ -224,14 +227,14 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 ),
 
                 Container(
-                  padding: EdgeInsets.fromLTRB(25, 10, 25, 0),
+                  padding: const EdgeInsets.fromLTRB(25, 10, 25, 0),
                   child: Column(children: [
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
                             S.of(context).classroom,
-                            style: TextStyle(fontSize: 18),
+                            style: const TextStyle(fontSize: 18),
                           ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -280,7 +283,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                             ],
                           ),
                         ]),
-                    Divider(),
+                    const Divider(),
                   ]),
                 ),
                 Expanded(
@@ -308,11 +311,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   List<Widget> _getListWidgets(List<RoomInfo>? data) {
     List<Widget> widgets = [];
-    if (data != null)
-      data.forEach((element) {
+    if (data != null) {
+      for (var element in data) {
         widgets.add(Material(
             child: Container(
-          padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+          padding: const EdgeInsets.fromLTRB(25, 5, 25, 0),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -336,12 +339,13 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                     children: _buildBusinessViewForRoom(element),
                   ),
                 ]),
-            Divider(),
+            const Divider(),
           ]
               //subtitle: Divider(height: 5,),
               ),
         )));
-      });
+      }
+    }
     return widgets;
   }
 
@@ -383,11 +387,11 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     var _slot = TimeTable.defaultNow().slot + 1;
 
     // Prevent repeated read from disk
-    final accessiblityColoring =
+    final accessibilityColoring =
         SettingsProvider.getInstance().useAccessibilityColoring;
 
-    roomInfo.busy!.forEach((element) {
-      if (accessiblityColoring) {
+    for (var element in roomInfo.busy!) {
+      if (accessibilityColoring) {
         _list.add(Container(
           decoration: BoxDecoration(
               border: _slot == _time
@@ -401,9 +405,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                     ),
               color:
                   element ? Theme.of(context).textTheme.bodyText1!.color : null,
-              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              borderRadius: const BorderRadius.all(Radius.circular(5.0))),
           width: ViewportUtils.getMainNavigatorWidth(context) / 32,
-          margin: EdgeInsets.symmetric(horizontal: 2),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           height: 22,
         ));
       } else {
@@ -416,18 +420,19 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                     )
                   : null,
               color: element ? Colors.red : Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              borderRadius: const BorderRadius.all(Radius.circular(5.0))),
           width: ViewportUtils.getMainNavigatorWidth(context) / 32,
-          margin: EdgeInsets.symmetric(horizontal: 2),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           height: 22,
         ));
       }
 
-      if (_time++ % 5 == 0)
-        _list.add(SizedBox(
+      if (_time++ % 5 == 0) {
+        _list.add(const SizedBox(
           width: 7,
         ));
-    });
+      }
+    }
     return _list;
   }
 

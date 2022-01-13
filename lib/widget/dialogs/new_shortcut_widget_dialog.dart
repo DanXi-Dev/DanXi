@@ -19,13 +19,12 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Allows user to create custom dashboard widgets that link to certain websites.
@@ -42,13 +41,16 @@ class NewShortcutDialog extends StatefulWidget {
 }
 
 class _NewShortcutDialogState extends State<NewShortcutDialog> {
-  TextEditingController _nameTextFieldController = new TextEditingController();
-  TextEditingController _linkTextFieldController = new TextEditingController();
+  final TextEditingController _nameTextFieldController =
+      TextEditingController();
+  final TextEditingController _linkTextFieldController =
+      TextEditingController();
   String _errorText = "";
 
   void _save() async {
-    if (!_linkTextFieldController.text.startsWith('http'))
+    if (!_linkTextFieldController.text.startsWith('http')) {
       _linkTextFieldController.text = 'http://' + _linkTextFieldController.text;
+    }
     // Validate URL
     try {
       await Dio().head(_linkTextFieldController.text);
@@ -76,13 +78,13 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
           Text(
             _errorText,
             textAlign: TextAlign.start,
-            style: TextStyle(fontSize: 12, color: Colors.red),
+            style: const TextStyle(fontSize: 12, color: Colors.red),
           ),
           if (PlatformX.isCupertino(context))
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(4, 8, 0, 4),
+                padding: const EdgeInsets.fromLTRB(4, 8, 0, 4),
                 child: Text(S.of(context).name),
               ),
             ),
@@ -92,8 +94,8 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
               decoration: InputDecoration(
                 labelText: S.of(context).name,
                 icon: PlatformX.isAndroid
-                    ? Icon(Icons.lock_outline)
-                    : Icon(CupertinoIcons.lock_circle),
+                    ? const Icon(Icons.lock_outline)
+                    : const Icon(CupertinoIcons.lock_circle),
               ),
             ),
             cupertino: (_, __) =>
@@ -103,7 +105,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(4, 8, 0, 4),
+                padding: const EdgeInsets.fromLTRB(4, 8, 0, 4),
                 child: Text(S.of(context).link),
               ),
             ),
@@ -115,8 +117,8 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
                     decoration: InputDecoration(
                       labelText: S.of(context).link,
                       icon: PlatformX.isAndroid
-                          ? Icon(Icons.lock_outline)
-                          : Icon(CupertinoIcons.lock_circle),
+                          ? const Icon(Icons.lock_outline)
+                          : const Icon(CupertinoIcons.lock_circle),
                     ),
                   ),
               cupertino: (_, __) => CupertinoTextFieldData(

@@ -43,7 +43,7 @@ class PagedListView<T> extends StatefulWidget {
   final T? noneItem;
 
   /// Use the PagedListViewController to control its behaviour, e.g. refreshing
-  final PagedListViewController? pagedController;
+  final PagedListViewController<T>? pagedController;
 
   /// The data that will be used as preloaded data before loading.
   final List<T>? initialData;
@@ -141,8 +141,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   @override
   Widget build(BuildContext context) {
-    NotificationListenerCallback<ScrollNotification> scrollToEnd =
-        (ScrollNotification scrollInfo) {
+    bool scrollToEnd(ScrollNotification scrollInfo) {
       if (scrollInfo.metrics.extentAfter < 500 &&
           !_isRefreshing &&
           !_isEnded &&
@@ -155,7 +154,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         });
       }
       return false;
-    };
+    }
 
     if (widget.withScrollbar) {
       return NotificationListener<ScrollNotification>(
@@ -187,7 +186,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
                     .jumpTo(currentController!.position.maxScrollExtent);
 
                 // TODO: Evil hack to wait for new contents to load
-                await Future.delayed(Duration(milliseconds: 100));
+                await Future.delayed(const Duration(milliseconds: 100));
               }
               if (_isEnded) _scrollToEndQueued = false;
             }
@@ -236,26 +235,27 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   Widget _defaultErrorBuilder(AsyncSnapshot<List<T>?>? snapshot) {
     String error;
-    if (snapshot == null)
+    if (snapshot == null) {
       error = "Unknown Error";
-    else {
+    } else {
       if (snapshot.error is LoginExpiredError) {
         SettingsProvider.getInstance().deleteAllFduholeData();
       }
-      if (snapshot.error is NotLoginError)
+      if (snapshot.error is NotLoginError) {
         error = (snapshot.error as NotLoginError).errorMessage;
-      else if (snapshot.error is DioError)
+      } else if (snapshot.error is DioError) {
         error = (snapshot.error as DioError).message +
             '\n' +
             ((snapshot.error as DioError).response?.data?.toString() ?? "");
-      else
+      } else {
         error = snapshot.error.toString();
+      }
     }
 
     return Card(
       child: GestureDetector(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(S.of(context).failed,
@@ -456,7 +456,7 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   @protected
   setListener(_PagedListViewState<T> state) {
-    this._state = state;
+    _state = state;
   }
 
   Future<void> notifyUpdate({useInitialData = true}) =>

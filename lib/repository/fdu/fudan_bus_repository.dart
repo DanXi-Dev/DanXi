@@ -21,9 +21,9 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/vague_time.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
@@ -109,7 +109,7 @@ enum BusDirection {
   FORWARD
 }
 
-extension busDirectionExtension on BusDirection {
+extension BusDirectionExtension on BusDirection {
   static const FORWARD_ARROW = " → ";
   static const BACKWARD_ARROW = " ← ";
   static const DUAL_ARROW = " ↔ ";
@@ -128,10 +128,10 @@ extension busDirectionExtension on BusDirection {
   }
 }
 
-extension vagueTimeExtension on VagueTime {
+extension VagueTimeExtension on VagueTime {
   String toDisplayFormat() {
     final format = NumberFormat("00");
     //if (this == null) return ""; Can't be null
-    return "${format.format(this.hour)}:${format.format(this.minute)}";
+    return "${format.format(hour)}:${format.format(minute)}";
   }
 }

@@ -34,7 +34,7 @@ class CustomShortcutFeature extends Feature {
   String? get subTitle => link;
 
   @override
-  Widget get icon => Icon(CupertinoIcons.bookmark);
+  Widget get icon => const Icon(CupertinoIcons.bookmark);
 
   @override
   void onTap() async {

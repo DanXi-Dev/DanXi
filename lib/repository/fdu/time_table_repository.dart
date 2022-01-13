@@ -27,7 +27,7 @@ import 'package:dan_xi/util/cache.dart';
 import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as DOM;
+import 'package:html/dom.dart' as dom;
 
 class TimeTableRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
@@ -86,7 +86,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   Future<TimeTable> loadTimeTableLocally(PersonInfo? info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
-    if (startTime == null) startTime = TimeTable.defaultStartTime;
+    startTime ??= TimeTable.defaultStartTime;
     return await Cache.get(
         KEY_TIMETABLE_CACHE,
         () => loadTimeTableRemotely(info, startTime: startTime),
@@ -112,8 +112,8 @@ class Test {
   Test(this.id, this.name, this.type, this.date, this.time, this.location,
       this.testCategory, this.note);
 
-  factory Test.fromHtml(DOM.Element html) {
-    List<DOM.Element> elements = html.getElementsByTagName("td");
+  factory Test.fromHtml(dom.Element html) {
+    List<dom.Element> elements = html.getElementsByTagName("td");
     return Test(
         elements[0].text.trim(),
         elements[2].text.trim(),

@@ -33,7 +33,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class OTMessagesPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const OTMessagesPage({Key? key, this.arguments});
+  const OTMessagesPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   _OTMessagesPageState createState() => _OTMessagesPageState();
@@ -44,7 +44,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
       PagedListViewController();
 
   final TimeBasedLoadAdaptLayer<OTMessage> adaptLayer =
-      new TimeBasedLoadAdaptLayer(10, 1);
+      TimeBasedLoadAdaptLayer(10, 1);
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTMessage>?> _loadContent(int page) async {
@@ -54,8 +54,9 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
       DateTime? time;
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_created!);
-      } else
+      } else {
         time = DateTime.now();
+      }
       return OpenTreeHoleRepository.getInstance()
           .loadMessages(startTime: time, unreadOnly: false);
     }).call(page);
@@ -87,7 +88,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
           controller: PrimaryScrollController.of(context),
           child: Text(S.of(context).messages),
         ),
-        trailingActions: [],
+        trailingActions: const [],
       ),
       body: SafeArea(
         bottom: false,
@@ -107,7 +108,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
             dataReceiver: _loadContent,
             builder: (_, __, ___, message) => OTMessageItem(message: message),
             loadingBuilder: (BuildContext context) => Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: Center(child: PlatformCircularProgressIndicator()),
             ),
             endBuilder: (context) => Center(

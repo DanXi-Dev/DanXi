@@ -19,10 +19,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-const Color _kDefaultNavBarBorderColor = const Color(0x4C000000);
+const Color _kDefaultNavBarBorderColor = Color(0x4C000000);
 
-const Border _kDefaultNavBarBorder = const Border(
-  bottom: const BorderSide(
+const Border _kDefaultNavBarBorder = Border(
+  bottom: BorderSide(
     color: _kDefaultNavBarBorderColor,
     width: 0.0, // One physical pixel.
     style: BorderStyle.solid,
@@ -31,15 +31,23 @@ const Border _kDefaultNavBarBorder = const Border(
 
 /// A copy of [PlatformAppBar], solving the issue "iOS navigationBar animation glitch" in commit a540b4f4.
 class PlatformAppBarX extends PlatformAppBar {
+  @override
   final Key? widgetKey;
 
+  @override
   final Widget? title;
+  @override
   final Color? backgroundColor;
+  @override
   final Widget? leading;
+  @override
   final List<Widget>? trailingActions;
+  @override
   final bool? automaticallyImplyLeading;
 
+  @override
   final PlatformBuilder<MaterialAppBarData>? material;
+  @override
   final PlatformBuilder<CupertinoNavigationBarData>? cupertino;
 
   PlatformAppBarX({
@@ -65,7 +73,7 @@ class PlatformAppBarX extends PlatformAppBar {
       bottom: data?.bottom,
       actions: data?.actions ?? trailingActions,
       automaticallyImplyLeading:
-          data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
+      data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
       bottomOpacity: data?.bottomOpacity ?? 1.0,
       toolbarTextStyle: data?.toolbarTextStyle,
       centerTitle: data?.centerTitle,
@@ -110,10 +118,10 @@ class PlatformAppBarX extends PlatformAppBar {
     var trailing = trailingActions?.isEmpty ?? true
         ? null
         : Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: trailingActions!,
-          );
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: trailingActions!,
+    );
 
     final heroTag = data?.heroTag;
     if (heroTag != null) {
@@ -141,7 +149,7 @@ class PlatformAppBarX extends PlatformAppBar {
       middle: defaultData.title ?? title,
       backgroundColor: defaultData.backgroundColor ?? backgroundColor,
       automaticallyImplyLeading:
-          data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
+      data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
       automaticallyImplyMiddle: data?.automaticallyImplyMiddle ?? true,
       previousPageTitle: data?.previousPageTitle,
       padding: data?.padding,

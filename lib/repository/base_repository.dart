@@ -56,6 +56,6 @@ abstract class BaseRepositoryWithDio {
     }
   }
 
-  static Map<String, NonpersistentCookieJar> _cookieJars = {};
-  static Map<String, Dio> _dios = {};
+  static final Map<String, NonpersistentCookieJar> _cookieJars = {};
+  static final Map<String, Dio> _dios = {};
 }

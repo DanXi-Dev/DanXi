@@ -25,7 +25,7 @@ part 'announcement.g.dart';
 @JsonSerializable()
 class Announcement extends BmobObject {
   // ignore: unused_field
-  String __type = "Announcement";
+  final String __type = "Announcement";
 
   String? content;
   int? maxVersion;
@@ -43,6 +43,6 @@ class Announcement extends BmobObject {
   Announcement(this.content);
 
   @override
-  Map getParams() => new Map<String, dynamic>.from(
-      {"content": content, "maxVersion": maxVersion});
+  Map getParams() =>
+      Map<String, dynamic>.from({"content": content, "maxVersion": maxVersion});
 }

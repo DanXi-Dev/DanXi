@@ -57,7 +57,7 @@ class ImageViewerPage extends StatefulWidget {
   @override
   _ImageViewerPageState createState() => _ImageViewerPageState();
 
-  ImageViewerPage({Key? key, this.arguments});
+  ImageViewerPage({Key? key, this.arguments}) : super(key: key);
 
   static bool isImage(String url) {
     if (url.isEmpty || Uri.tryParse(url) == null) return false;
@@ -93,9 +93,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> _prepareImageForSaving() async {
-    if (_rawImageToSave == null)
-      _rawImageToSave = await ImageUtils.providerToBytes(
-          context, CachedNetworkImageProvider(_url!));
+    _rawImageToSave ??= await ImageUtils.providerToBytes(
+        context, CachedNetworkImageProvider(_url!));
   }
 
   getFileName(String url) {
@@ -121,10 +120,10 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     // Save the image temporarily
     File outputFile =
         await saveToFile('temp_image', _fileName, _rawImageToSave!);
-    if (PlatformX.isMobile)
+    if (PlatformX.isMobile) {
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: [ImageViewerPage.getMineType(_url)]);
-    else {
+    } else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
@@ -172,7 +171,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
             if (!PlatformX.isIOS)
               PlatformIconButton(
                 padding: EdgeInsets.zero,
-                icon: Icon(Icons.save),
+                icon: const Icon(Icons.save),
                 onPressed: saveImage,
               )
           ],

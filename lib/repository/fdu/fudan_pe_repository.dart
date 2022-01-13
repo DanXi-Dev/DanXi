@@ -20,7 +20,7 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as DOM;
+import 'package:html/dom.dart' as dom;
 
 class FudanPERepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
@@ -52,16 +52,16 @@ class FudanPERepository extends BaseRepositoryWithDio {
     final List<ExerciseItem> items = [];
     final Response r = await dio!.get(_INFO_URL + "?token=" + token);
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    final Iterable<DOM.Element> tableLines = soup
+    final Iterable<dom.Element> tableLines = soup
         .findAll(
             "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
         .map((e) => e.element!);
 
     if (tableLines.isEmpty) throw "Unable to get the data";
 
-    tableLines.forEach((line) {
+    for (var line in tableLines) {
       items.addAll(ExerciseItem.fromHtml(line));
-    });
+    }
     return items;
   }
 
@@ -75,9 +75,9 @@ class ExerciseItem {
 
   ExerciseItem(this.title, this.times);
 
-  static List<ExerciseItem> fromHtml(DOM.Element html) {
+  static List<ExerciseItem> fromHtml(dom.Element html) {
     List<ExerciseItem> list = [];
-    List<DOM.Element> elements = html.getElementsByTagName("td");
+    List<dom.Element> elements = html.getElementsByTagName("td");
     for (int i = 0; i < elements.length; i += 2) {
       list.add(ExerciseItem(elements[i].text.trim().replaceFirst("：", ""),
           int.tryParse(elements[i + 1].text.trim())));

@@ -42,7 +42,7 @@ class CardDetailPage extends StatefulWidget {
   @override
   _CardDetailPageState createState() => _CardDetailPageState();
 
-  CardDetailPage({Key? key, this.arguments});
+  const CardDetailPage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _CardDetailPageState extends State<CardDetailPage> {
@@ -126,8 +126,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    if (_cardInfo!.records != null)
-      _cardInfo!.records!.forEach((element) {
+    if (_cardInfo!.records != null) {
+      for (var element in _cardInfo!.records!) {
         widgets.add(Material(
             child: ListTile(
           // leading: PlatformX.isAndroid
@@ -138,7 +138,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
           subtitle:
               Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
         )));
-      });
+      }
+    }
 
     return widgets;
   }

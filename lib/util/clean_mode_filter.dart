@@ -39,8 +39,9 @@ class CleanModeFilter {
 
   static String? cleanText(String? content) {
     String? newContent = content;
-    DELETE_EMOJI
-        .forEach((element) => newContent = newContent!.replaceAll(element, ' '));
+    for (var element in DELETE_EMOJI) {
+      newContent = newContent!.replaceAll(element, ' ');
+    }
 
     /* CN_FILTER_TEXT.forEach((element) {
       final filterRegex = RegExp(

@@ -22,7 +22,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -56,7 +55,7 @@ String preprocessContentForDisplay(String content,
   content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
       (match) => "<img src=\"${match.group(1)}\"></img>");*/
   if (isHtml(content) && !forceMarkdown) {
-    linkify(content, options: LinkifyOptions(humanize: false))
+    linkify(content, options: const LinkifyOptions(humanize: false))
         .forEach((element) {
       if (element is UrlElement) {
         // Only add tag if tag has not yet been added.
@@ -67,14 +66,16 @@ String preprocessContentForDisplay(String content,
           hrefCount--;
         }
       } else {
-        if (element.text.contains('<a href='))
+        if (element.text.contains('<a href=')) {
           hrefCount++;
-        else if (element.text.contains('<img src="')) hrefCount++;
+        } else if (element.text.contains('<img src="')) {
+          hrefCount++;
+        }
         result += element.text;
       }
     });
   } else {
-    linkify(content, options: LinkifyOptions(humanize: false))
+    linkify(content, options: const LinkifyOptions(humanize: false))
         .forEach((element) {
       if (element is UrlElement) {
         // Only add tag if tag has not yet been added.
@@ -86,8 +87,9 @@ String preprocessContentForDisplay(String content,
         } else {
           result += "[${element.text}](${element.url})";
         }
-      } else
+      } else {
         result += element.text;
+      }
     });
   }
   return result;
@@ -104,7 +106,7 @@ String preprocessContentForDisplay(String content,
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSPostDetail({Key? key, this.arguments});
+  const BBSPostDetail({Key? key, this.arguments}) : super(key: key);
 
   @override
   _BBSPostDetailState createState() => _BBSPostDetailState();
@@ -125,7 +127,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   bool shouldScrollToEnd = false;
 
   final TimeBasedLoadAdaptLayer<OTFloor> adaptLayer =
-      new TimeBasedLoadAdaptLayer(10, 1);
+      TimeBasedLoadAdaptLayer(10, 1);
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
@@ -135,10 +137,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_searchKeyword != null) {
       return OpenTreeHoleRepository.getInstance().loadSearchResults(
           _searchKeyword,
-          start_floor: _listViewController.length());
-    } else
+          startFloor: _listViewController.length());
+    } else {
       return await OpenTreeHoleRepository.getInstance()
           .loadFloors(_post, startFloor: page * 10);
+    }
   }
 
   Future<bool?> _isHoleFavorite() async {
@@ -230,41 +233,33 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       ),
       body: Material(
-        child: Container(
-          // decoration: BoxDecoration(
-          //   image: DecorationImage(
-          //     image: AssetImage("assets/graphics/kavinzhao.jpeg"),
-          //     fit: BoxFit.cover,
-          //   ),
-          // ),
-          child: SafeArea(
-            bottom: false,
-            child: RefreshIndicator(
-              color: Theme.of(context).colorScheme.secondary,
-              backgroundColor: Theme.of(context).dialogBackgroundColor,
-              onRefresh: () async {
-                HapticFeedback.mediumImpact();
-                await refreshSelf();
-              },
-              child: PagedListView<OTFloor>(
-                initialData: _post.floors?.prefetch,
-                pagedController: _listViewController,
-                withScrollbar: true,
-                scrollController: PrimaryScrollController.of(context),
-                dataReceiver: _loadContent,
-                shouldScrollToEnd: shouldScrollToEnd,
-                builder: _getListItems,
-                loadingBuilder: (BuildContext context) => Container(
-                  padding: EdgeInsets.all(8),
-                  child: Center(child: PlatformCircularProgressIndicator()),
-                ),
-                endBuilder: (context) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text((_post.view ?? -1) >= 0
-                        ? S.of(context).view_count(_post.view.toString())
-                        : S.of(context).end_reached),
-                  ),
+        child: SafeArea(
+          bottom: false,
+          child: RefreshIndicator(
+            color: Theme.of(context).colorScheme.secondary,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              await refreshSelf();
+            },
+            child: PagedListView<OTFloor>(
+              initialData: _post.floors?.prefetch,
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: PrimaryScrollController.of(context),
+              dataReceiver: _loadContent,
+              shouldScrollToEnd: shouldScrollToEnd,
+              builder: _getListItems,
+              loadingBuilder: (BuildContext context) => Container(
+                padding: const EdgeInsets.all(8),
+                child: Center(child: PlatformCircularProgressIndicator()),
+              ),
+              endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text((_post.view ?? -1) >= 0
+                      ? S.of(context).view_count(_post.view.toString())
+                      : S.of(context).end_reached),
                 ),
               ),
             ),
@@ -283,8 +278,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               (BuildContext context, AsyncSnapshot<bool?> snapshot) {
             _isFavored = snapshot.data;
             return _isFavored!
-                ? Icon(CupertinoIcons.star_fill)
-                : Icon(CupertinoIcons.star);
+                ? const Icon(CupertinoIcons.star_fill)
+                : const Icon(CupertinoIcons.star);
           },
           errorBuilder: () => Icon(
             PlatformIcons(context).error,

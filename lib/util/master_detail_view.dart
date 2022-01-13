@@ -20,8 +20,8 @@ import 'dart:ui';
 import 'package:catcher/core/catcher.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/main.dart';
-import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/page/home_page.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class PlatformMasterDetailApp extends StatelessWidget {
   final Widget? masterPage;
 
-  PlatformMasterDetailApp({Key? key, this.masterPage}) : super(key: key);
+  const PlatformMasterDetailApp({Key? key, this.masterPage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
                             .bodyText1!
                             .color)))),
         // Configure i18n delegates
-        localizationsDelegates: [
+        localizationsDelegates: const [
           S.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -107,7 +107,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
                                       .bodyText1!
                                       .color)))),
                   // Configure i18n delegates
-                  localizationsDelegates: [
+                  localizationsDelegates: const [
                     S.delegate,
                     GlobalMaterialLocalizations.delegate,
                     GlobalWidgetsLocalizations.delegate,
@@ -134,7 +134,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
             Expanded(
               child: Container(
                 clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(),
+                decoration: const BoxDecoration(),
                 child: MediaQuery(
                   data: MediaQueryData.fromWindow(window).copyWith(
                     size: Size(
@@ -156,7 +156,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
                                         .bodyText1!
                                         .color)))),
                     // Configure i18n delegates
-                    localizationsDelegates: [
+                    localizationsDelegates: const [
                       S.delegate,
                       GlobalMaterialLocalizations.delegate,
                       GlobalWidgetsLocalizations.delegate,

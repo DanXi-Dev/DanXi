@@ -38,7 +38,7 @@ class VagueTime implements Comparable<VagueTime> {
 
   /// Merge the unfilled field with [exactDate], and return the filled time.
   DateTime toExactTime([DateTime? exactDate]) {
-    if (exactDate == null) exactDate = DateTime.now();
+    exactDate ??= DateTime.now();
     return DateTime(
         year ?? exactDate.year,
         month ?? exactDate.month,

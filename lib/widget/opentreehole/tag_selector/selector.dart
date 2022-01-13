@@ -61,7 +61,7 @@ class TagContainer extends StatefulWidget {
   final bool enabled;
   final bool wrapped;
 
-  TagContainer(
+  const TagContainer(
       {Key? key,
       required this.tagList,
       required this.fillRandomColor,
@@ -76,7 +76,8 @@ class TagContainer extends StatefulWidget {
       this.wrapped = true})
       : assert(
             fillRandomColor || (fillRandomColor == false && fixedColor != null),
-            "fixedColor can't be empty.");
+            "fixedColor can't be empty."),
+        super(key: key);
 
   @override
   _TagContainerState createState() => _TagContainerState();
@@ -101,21 +102,16 @@ class _TagContainerState extends State<TagContainer> {
 
   @override
   Widget build(BuildContext context) {
-    this.tagList = widget.tagList;
+    tagList = widget.tagList;
     widget.iconColor == null
-        ? this.iconColor = Colors.white
-        : this.iconColor = widget.iconColor;
-    widget.fontSize == null
-        ? this.fontSize = 16
-        : this.fontSize = widget.fontSize;
-    widget.iconSize == null
-        ? this.iconSize = 22
-        : this.iconSize = widget.iconSize;
-    if (widget.defaultChoice! >= 0 &&
-        this.tagList!.length > widget.defaultChoice!) {
+        ? iconColor = Colors.white
+        : iconColor = widget.iconColor;
+    widget.fontSize == null ? fontSize = 16 : fontSize = widget.fontSize;
+    widget.iconSize == null ? iconSize = 22 : iconSize = widget.iconSize;
+    if (widget.defaultChoice! >= 0 && tagList!.length > widget.defaultChoice!) {
       tagList![widget.defaultChoice!].isSelected = true;
     }
-    this.fillRandomColor = widget.fillRandomColor;
+    fillRandomColor = widget.fillRandomColor;
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplier(widget.fixedColor);
@@ -123,22 +119,23 @@ class _TagContainerState extends State<TagContainer> {
       return ThemedMaterial(
           child: Container(
               margin: const EdgeInsets.only(top: 16),
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
               child: Wrap(
                 spacing: 8,
                 children: tagList!.map((e) => _buildTag(e)).toList(),
               )));
-    } else
+    } else {
       return ThemedMaterial(
           child: Container(
               margin: const EdgeInsets.only(top: 16),
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: tagList!.map((e) => _buildTag(e)).toList(),
                 ),
               )));
+    }
   }
 
   Widget _buildTag(Tag data) {
@@ -155,7 +152,9 @@ class _TagContainerState extends State<TagContainer> {
                   data.isSelected = !data.isSelected;
                   if (data.isSelected && widget.singleChoice) {
                     selectedCategories.clear();
-                    tagList!.forEach((element) => element.isSelected = false);
+                    for (var element in tagList!) {
+                      element.isSelected = false;
+                    }
                     data.isSelected = true;
                   }
                   data.isSelected
@@ -170,7 +169,7 @@ class _TagContainerState extends State<TagContainer> {
   }
 
   int generateRandom(int old) {
-    int newRandom = new Random().nextInt(_RANDOM_COLORS.length - 1);
+    int newRandom = Random().nextInt(_RANDOM_COLORS.length - 1);
     if (old == newRandom) {
       generateRandom(old);
     }
@@ -189,6 +188,8 @@ class _TagContainerState extends State<TagContainer> {
     // for (int i = 0; i <= tagList.length - 1; i++) {
     //   tagList[i].tagColor = fixedColor;
     // }
-    tagList!.forEach((element) => element.tagColor = fixedColor);
+    for (var element in tagList!) {
+      element.tagColor = fixedColor;
+    }
   }
 }

@@ -39,7 +39,7 @@ class BusPage extends StatefulWidget {
   @override
   _BusPageState createState() => _BusPageState();
 
-  BusPage({Key? key, this.arguments}) : super(key: key);
+  const BusPage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _BusPageState extends State<BusPage> {
@@ -75,7 +75,7 @@ class _BusPageState extends State<BusPage> {
   Widget _buildFutureWidget() => FutureWidget<List<BusScheduleItem>?>(
       future: _setContent(),
       successBuilder: (context, snapshot) => ListView(
-            physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
             children: _getListWidgets(snapshot.data as List<BusScheduleItem>),
           ),
       errorBuilder: (context, snapshot) => Center(
@@ -89,21 +89,21 @@ class _BusPageState extends State<BusPage> {
 
   Widget _autoSelectWidget() {
     if (_holidaySliding == 1) {
-      if (_busListHolidayLoaded == null)
+      if (_busListHolidayLoaded == null) {
         return _buildFutureWidget();
-      else {
+      } else {
         return ListView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           primary: true,
           children: _getListWidgets(_filterBus(_busListHolidayLoaded!)),
         );
       }
     } else {
-      if (_busListWeekdayLoaded == null)
+      if (_busListWeekdayLoaded == null) {
         return _buildFutureWidget();
-      else {
+      } else {
         return ListView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           primary: true,
           children: _getListWidgets(_filterBus(_busListWeekdayLoaded!)),
         );
@@ -150,7 +150,7 @@ class _BusPageState extends State<BusPage> {
 
   List<BusScheduleItem> _filterBus(List<BusScheduleItem> origBusList) {
     // Normalize all entries
-    origBusList.forEach((element) {
+    for (var element in origBusList) {
       if (element.direction == BusDirection.BACKWARD) {
         final start = element.start;
         element.start = element.end;
@@ -160,7 +160,7 @@ class _BusPageState extends State<BusPage> {
         element.endTime = startTime;
         element.direction = BusDirection.FORWARD;
       }
-    });
+    }
     return origBusList
         .where((element) =>
             (element.start == _startSelectItem &&
@@ -171,7 +171,7 @@ class _BusPageState extends State<BusPage> {
         .toList();
   }
 
-  List<DropdownMenuItem> _getItems() => Constant.CAMPUS_VALUES.map((e) {
+  List<DropdownMenuItem<Campus>> _getItems() => Constant.CAMPUS_VALUES.map((e) {
         return DropdownMenuItem(
             value: e, child: Text(e.displayTitle(context)!));
       }).toList(growable: false);
@@ -196,7 +196,7 @@ class _BusPageState extends State<BusPage> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 8, bottom: 4),
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
                 child: CupertinoSlidingSegmentedControl<int>(
                   onValueChanged: (int? value) {
                     setState(() {
@@ -216,7 +216,7 @@ class _BusPageState extends State<BusPage> {
                   Text(S.of(context).bus_start),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
-                      items: _getItems() as List<DropdownMenuItem<Campus>>?,
+                      items: _getItems(),
                       // Don't select anything if _selectItem == Campus.NONE
                       value: _startSelectItem == Campus.NONE
                           ? null
@@ -225,7 +225,7 @@ class _BusPageState extends State<BusPage> {
                       onChanged: (Campus? e) => _onStartLocationChanged(e),
                     ),
                     cupertino: (_, __) => Padding(
-                      padding: EdgeInsets.only(top: 8, bottom: 4),
+                      padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
                           _startSliding = value;
@@ -245,7 +245,7 @@ class _BusPageState extends State<BusPage> {
                   Text(S.of(context).bus_dest),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
-                      items: _getItems() as List<DropdownMenuItem<Campus>>?,
+                      items: _getItems(),
                       // Don't select anything if _selectItem == Campus.NONE
                       value:
                           _endSelectItem == Campus.NONE ? null : _endSelectItem,
@@ -253,7 +253,7 @@ class _BusPageState extends State<BusPage> {
                       onChanged: (Campus? e) => _onEndLocationChanged(e),
                     ),
                     cupertino: (_, __) => Padding(
-                      padding: EdgeInsets.only(top: 8, bottom: 4),
+                      padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
                           _endSliding = value;
@@ -300,19 +300,20 @@ class _BusPageState extends State<BusPage> {
       )
     ];
     if (_filteredBusList == null) return [const SizedBox()];
-    _filteredBusList.forEach((value) {
+    for (var value in _filteredBusList) {
       if (_showAll ||
           value.realStartTime == null ||
-          value.realStartTime!.toExactTime().isAfter(currentTime))
+          value.realStartTime!.toExactTime().isAfter(currentTime)) {
         widgets.add(_buildBusCard(value));
-    });
+      }
+    }
     return widgets;
   }
 
   Card _buildBusCard(BusScheduleItem item) {
     return Card(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12.0),
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -49,7 +49,7 @@ class ExamList extends StatefulWidget {
   @override
   _ExamListState createState() => _ExamListState();
 
-  ExamList({Key? key, this.arguments});
+  const ExamList({Key? key, this.arguments}) : super(key: key);
 }
 
 class _ExamListState extends State<ExamList> {
@@ -87,8 +87,8 @@ class _ExamListState extends State<ExamList> {
       return;
     }
     ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
-    _examData.forEach((element) {
-      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty)
+    for (var element in _examData) {
+      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty) {
         try {
           cal.addElement(IEvent(
             summary: element.name,
@@ -106,18 +106,19 @@ class _ExamListState extends State<ExamList> {
               context, S.of(context).error_adding_exam(element.name),
               title: S.of(context).fatal_error);
         }
-    });
+      }
+    }
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/exam.ics");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(cal.serialize(), flush: true);
-    if (PlatformX.isIOS)
+    if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: "text/calendar");
-    else if (PlatformX.isAndroid)
+    } else if (PlatformX.isAndroid) {
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: ["text/calendar"]);
-    else {
+    } else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
@@ -160,8 +161,6 @@ class _ExamListState extends State<ExamList> {
     _examData = await EduServiceRepository.getInstance().loadExamListRemotely(
         _info,
         semesterId: _unpackedSemester![semester!].semesterId);
-    print("Exam data loaded");
-    print(_examData);
     _cachedScoreData = await EduServiceRepository.getInstance()
         .loadExamScoreRemotely(_info,
             semesterId: _unpackedSemester![semester!].semesterId);
@@ -184,7 +183,7 @@ class _ExamListState extends State<ExamList> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             PlatformIconButton(
-              icon: Icon(Icons.chevron_left),
+              icon: const Icon(Icons.chevron_left),
               onPressed: semester! > 0
                   ? () => setState(() => semester = semester! - 1)
                   : null,
@@ -193,7 +192,7 @@ class _ExamListState extends State<ExamList> {
                 _unpackedSemester![semester!].schoolYear ?? "?",
                 _unpackedSemester![semester!].name ?? "?")),
             PlatformIconButton(
-              icon: Icon(Icons.chevron_right),
+              icon: const Icon(Icons.chevron_right),
               onPressed: semester! < _unpackedSemester!.length - 1
                   ? () => setState(() => semester = semester! + 1)
                   : null,
@@ -215,12 +214,13 @@ class _ExamListState extends State<ExamList> {
           loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
           errorBuilder:
               (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
-            if (snapshot.error is RangeError)
+                if (snapshot.error is RangeError) {
               return Padding(
                   child: Center(
                     child: Text(S.of(context).no_data),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 32));
+                  padding: const EdgeInsets.symmetric(horizontal: 32));
+            }
             return _loadGradeViewFromDataCenter();
           });
 
@@ -245,14 +245,14 @@ class _ExamListState extends State<ExamList> {
             future: DataCenterRepository.getInstance().loadAllExamScore(_info),
             successBuilder: (_, snapShot) =>
                 _buildGradeLayout(snapShot, isFallback: true),
-            loadingBuilder: Container(
-                child: Center(
+            loadingBuilder: Center(
               child: PlatformCircularProgressIndicator(),
-            )),
+            ),
             errorBuilder: _buildErrorPage));
   }
 
-  Widget _buildErrorPage(BuildContext context, AsyncSnapshot snapshot) {
+  Widget _buildErrorPage(
+      BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
     return GestureDetector(
         onTap: () {
           setState(() {
@@ -266,7 +266,7 @@ class _ExamListState extends State<ExamList> {
                 '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
                 snapshot.error.toString()),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
         ));
   }
 
@@ -278,9 +278,9 @@ class _ExamListState extends State<ExamList> {
     } else {
       widgets.add(_buildGPACard());
     }
-    scores.forEach((value) {
+    for (var value in scores) {
       widgets.add(_buildCardGrade(value, context));
-    });
+    }
     return widgets;
   }
 
@@ -290,10 +290,10 @@ class _ExamListState extends State<ExamList> {
         visualDensity: VisualDensity.comfortable,
         title: Text(
           S.of(context).limited_mode_title,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         subtitle: Text(S.of(context).limited_mode_description,
-            style: TextStyle(color: Colors.white)),
+            style: const TextStyle(color: Colors.white)),
       ));
 
   Widget _buildGPACard() => Card(
@@ -302,7 +302,7 @@ class _ExamListState extends State<ExamList> {
           visualDensity: VisualDensity.comfortable,
           title: Text(
             S.of(context).your_gpa,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           trailing: FutureWidget<List<GPAListItem>?>(
             future: _gpaListFuture,
@@ -314,7 +314,7 @@ class _ExamListState extends State<ExamList> {
                     .firstWhere((element) => element.id == _info!.id)
                     .gpa,
                 textScaleFactor: 1.25,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               );
             },
             errorBuilder: (BuildContext context,
@@ -352,13 +352,14 @@ class _ExamListState extends State<ExamList> {
           Theme.of(context).textTheme.bodyText1!.color)
     ]; //These widgets are displayed after the ones above
     if (_examData.isEmpty) return widgets;
-    _examData.forEach((Exam value) {
+    for (var value in _examData) {
       if (value.testCategory.trim() == "论文" ||
-          value.testCategory.trim() == "其他")
+          value.testCategory.trim() == "其他") {
         secondaryWidgets.add(_buildCardHybrid(value, context));
-      else
+      } else {
         widgets.add(_buildCardHybrid(value, context));
-    });
+      }
+    }
 
     // Some courses do not require an exam but also have given their scores.
     // Append these courses to the bottom of the list.
@@ -371,7 +372,7 @@ class _ExamListState extends State<ExamList> {
   }
 
   Widget _buildDividerWithText(String text, Color? color) => Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(children: <Widget>[
         Expanded(child: Divider(color: color)),
         Text(" $text ", style: TextStyle(color: color)),
@@ -381,7 +382,7 @@ class _ExamListState extends State<ExamList> {
   Widget _buildCardHybrid(Exam value, BuildContext context) => ThemedMaterial(
           child: Card(
         child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -395,8 +396,8 @@ class _ExamListState extends State<ExamList> {
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Text(
-                      "${value.name}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      value.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     if (value.date.trim() != "" ||
                         value.location.trim() != "" ||
@@ -419,7 +420,7 @@ class _ExamListState extends State<ExamList> {
                       ),
                     if (value.note.trim() != "")
                       Text(
-                        "${value.note}",
+                        value.note,
                         textScaleFactor: 0.8,
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
@@ -473,18 +474,18 @@ class _ExamListState extends State<ExamList> {
       ThemedMaterial(
           child: Card(
         child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                SizedBox(
                   width: ViewportUtils.getMainNavigatorWidth(context) - 80,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${value.type}",
+                        value.type,
                         textScaleFactor: 0.8,
                         style: TextStyle(color: Theme.of(context).hintColor),
                         maxLines: 1,
@@ -492,8 +493,8 @@ class _ExamListState extends State<ExamList> {
                         softWrap: true,
                       ),
                       Text(
-                        "${value.name}",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        value.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

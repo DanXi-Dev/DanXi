@@ -41,7 +41,7 @@ class AAONoticesList extends StatefulWidget {
   @override
   _AAONoticesListState createState() => _AAONoticesListState();
 
-  AAONoticesList({Key? key, this.arguments});
+  const AAONoticesList({Key? key, this.arguments}) : super(key: key);
 }
 
 class _AAONoticesListState extends State<AAONoticesList> {
@@ -76,9 +76,9 @@ class _AAONoticesListState extends State<AAONoticesList> {
             builder: (_, __, ___, Notice value) {
               return ThemedMaterial(
                   child: ListTile(
-                leading: PlatformX.isMaterial(context)
-                    ? Icon(Icons.info)
-                    : Icon(CupertinoIcons.info_circle_fill),
+                    leading: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.info)
+                    : const Icon(CupertinoIcons.info_circle_fill),
                 title: Text(value.title),
                 subtitle: Text(value.time),
                 onTap: () async {

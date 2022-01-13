@@ -36,9 +36,10 @@ class ScheduleView extends StatefulWidget {
   final ScrollController controller;
   final OnTapCourseCallback? tapCallback;
 
-  ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
+  const ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
       this.showingWeek, this.controller,
-      {this.tapCallback});
+      {Key? key, this.tapCallback})
+      : super(key: key);
 
   @override
   _ScheduleViewState createState() => _ScheduleViewState();
@@ -55,11 +56,11 @@ class _ScheduleViewState extends State<ScheduleView> {
   @override
   Widget build(BuildContext context) {
     Widget table;
-    widget.laneEventsList.forEach((element) {
-      element.events.forEach((element) {
-        _maxSlot = max(_maxSlot, element.time.slot);
-      });
-    });
+    for (var laneEvent in widget.laneEventsList) {
+      for (var event in laneEvent.events) {
+        _maxSlot = max(_maxSlot, event.time.slot);
+      }
+    }
     int cols = widget.laneEventsList.length + 1, rows = _maxSlot + 2;
     table = LayoutGrid(
       columnSizes: List.filled(cols, 1.fr),
@@ -74,8 +75,8 @@ class _ScheduleViewState extends State<ScheduleView> {
     List<Widget?> result = List.generate(
         cols * rows,
         (index) => Container(
-              margin: EdgeInsets.all(2),
-              padding: EdgeInsets.all(2),
+              margin: const EdgeInsets.all(2),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                   color: Theme.of(context).hintColor.withOpacity(0.14),
                   borderRadius: BorderRadius.circular(4)),
@@ -94,13 +95,13 @@ class _ScheduleViewState extends State<ScheduleView> {
       String endTime = DateFormat("HH:mm").format(TimeTable
           .kCourseSlotStartTime[slot]
           .toExactTime()
-          .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
+          .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
       result[cols * (slot + 1)] = Center(
               child: Column(
         children: [
           Text((slot + 1).toString()),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 2),
+            padding: const EdgeInsets.symmetric(vertical: 2),
             child: Text(
               startTime,
               style:
@@ -233,8 +234,8 @@ class _ScheduleViewState extends State<ScheduleView> {
             ? Colors.black
             : Colors.white);
     return Container(
-      margin: EdgeInsets.all(2),
-      padding: EdgeInsets.all(2),
+      margin: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(2)),
@@ -242,7 +243,7 @@ class _ScheduleViewState extends State<ScheduleView> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 2,
           ),
           AutoSizeText(course.courseName!,
@@ -250,7 +251,7 @@ class _ScheduleViewState extends State<ScheduleView> {
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
               style: textStyle?.copyWith(fontWeight: FontWeight.bold)),
-          SizedBox(
+          const SizedBox(
             height: 4,
           ),
           AutoSizeText(course.roomName!, minFontSize: 10, style: textStyle),
@@ -318,25 +319,25 @@ class TimetableStyle {
   final bool visibleDecorationBorder;
 
   const TimetableStyle({
-    this.startHour: 0,
-    this.endHour: 24,
-    this.laneColor: Colors.white,
-    this.cornerColor: Colors.white,
-    this.timelineColor: Colors.white,
-    this.timelineItemColor: Colors.white,
-    this.mainBackgroundColor: Colors.white,
-    this.decorationLineBorderColor: const Color(0x1A000000),
-    this.timelineBorderColor: const Color(0x1A000000),
-    this.timeItemTextColor: Colors.blue,
-    this.laneWidth: 300,
-    this.laneHeight: 70,
-    this.timeItemHeight: 60,
-    this.timeItemWidth: 70,
-    this.decorationLineHeight: 20,
-    this.decorationLineDashWidth: 9,
-    this.decorationLineDashSpaceWidth: 4,
-    this.visibleTimeBorder: true,
-    this.visibleDecorationBorder: false,
+    this.startHour = 0,
+    this.endHour = 24,
+    this.laneColor = Colors.white,
+    this.cornerColor = Colors.white,
+    this.timelineColor = Colors.white,
+    this.timelineItemColor = Colors.white,
+    this.mainBackgroundColor = Colors.white,
+    this.decorationLineBorderColor = const Color(0x1A000000),
+    this.timelineBorderColor = const Color(0x1A000000),
+    this.timeItemTextColor = Colors.blue,
+    this.laneWidth = 300,
+    this.laneHeight = 70,
+    this.timeItemHeight = 60,
+    this.timeItemWidth = 70,
+    this.decorationLineHeight = 20,
+    this.decorationLineDashWidth = 9,
+    this.decorationLineDashSpaceWidth = 4,
+    this.visibleTimeBorder = true,
+    this.visibleDecorationBorder = false,
   });
 }
 

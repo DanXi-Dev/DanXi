@@ -65,7 +65,7 @@ class FudanAAONoticesFeature extends Feature {
         return S.of(context!).loading;
       case ConnectionStatus.DONE:
         if (_initialData != null) {
-          return _initialData!.length > 0 ? _initialData!.first.title : null;
+          return _initialData!.isNotEmpty ? _initialData!.first.title : null;
         } else {
           return null;
         }
@@ -82,8 +82,8 @@ class FudanAAONoticesFeature extends Feature {
 
   @override
   Widget get icon => PlatformX.isMaterial(context!)
-      ? Icon(Icons.developer_board)
-      : Icon(CupertinoIcons.info_circle);
+      ? const Icon(Icons.developer_board)
+      : const Icon(CupertinoIcons.info_circle);
 
   @override
   void onTap() {

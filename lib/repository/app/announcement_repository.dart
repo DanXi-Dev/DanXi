@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:beautiful_soup_dart/src/extensions.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
@@ -58,14 +59,14 @@ class AnnouncementRepository {
       }
     } else {
       list.add(announcement.objectId!);
-      pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list as List<String>);
+      pre.setStringList(KEY_SEEN_ANNOUNCEMENT, list);
       return announcement;
     }
   }
 
   Announcement? getLastAnnouncement() {
     List<Announcement> list = getAnnouncements();
-    return list.length > 0 ? list[0] : null;
+    return list.firstOrNull;
   }
 
   List<Announcement> getAnnouncements() {
@@ -104,13 +105,17 @@ class UpdateInfo {
   bool isAfter(int major, int minor, int patch) {
     List<int?> versions =
         latestVersion!.split(".").map((e) => int.tryParse(e)).toList();
-    if (versions[0]! > major)
+    if (versions[0]! > major) {
       return true;
-    else if (versions[0]! < major) return false;
+    } else if (versions[0]! < major) {
+      return false;
+    }
 
-    if (versions[1]! > minor)
+    if (versions[1]! > minor) {
       return true;
-    else if (versions[1]! < minor) return false;
+    } else if (versions[1]! < minor) {
+      return false;
+    }
 
     if (versions[2]! > patch) return true;
 

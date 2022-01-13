@@ -19,10 +19,11 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/services.dart';
 
 class PlatformBridge {
-  static const FDUHOLE_CHANNEL = const MethodChannel('fduhole');
+  static const FDUHOLE_CHANNEL = MethodChannel('fduhole');
 
   static void registerRemoteNotification() {
-    if (PlatformX.isIOS)
+    if (PlatformX.isIOS) {
       FDUHOLE_CHANNEL.invokeMethod("request_notification_permission");
+    }
   }
 }

@@ -29,7 +29,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,14 +39,15 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 class BBSReportDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSReportDetail({Key? key, this.arguments});
+  const BBSReportDetail({Key? key, this.arguments}) : super(key: key);
 
   @override
   _BBSReportDetailState createState() => _BBSReportDetailState();
 }
 
 class _BBSReportDetailState extends State<BBSReportDetail> {
-  final PagedListViewController _listViewController = PagedListViewController();
+  final PagedListViewController<OTReport> _listViewController =
+      PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTReport>?> _loadContent(int page) async {
@@ -78,9 +78,9 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: Text("Reports"),
+          child: const Text("Reports"),
         ),
-        trailingActions: [],
+        trailingActions: const [],
       ),
       body: SafeArea(
         bottom: false,
@@ -100,7 +100,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
             dataReceiver: _loadContent,
             builder: _getListItems,
             loadingBuilder: (BuildContext context) => Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: Center(child: PlatformCircularProgressIndicator()),
             ),
             endBuilder: (context) => Center(
@@ -138,12 +138,14 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
 
   Widget _getListItems(BuildContext context,
       ListProvider<OTReport> dataProvider, int index, OTReport e) {
-    LinkTapCallback onLinkTap = (url) {
+    onLinkTap(url) {
       BrowserUtil.openUrl(url!, context);
-    };
-    ImageTapCallback onImageTap = (url) {
+    }
+
+    onImageTap(url) {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
-    };
+    }
+
     return GestureDetector(
       onLongPress: () {
         showPlatformModalSheet(
@@ -158,7 +160,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                       },
                     ),
                   ),
-                  material: (_, __) => Container(
+                  material: (_, __) => SizedBox(
                     height: 300,
                     child: Column(
                       children: _buildContextMenu(context, e),
@@ -175,11 +177,9 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                 Align(
                     alignment: Alignment.topLeft,
                     child: smartRender(e.reason!, onLinkTap, onImageTap)),
-                Divider(),
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(e
-                        .content!)), //smartRender(e.content, onLinkTap, onImageTap)),
+                const Divider(),
+                Align(alignment: Alignment.topLeft, child: Text(e.content!)),
+                //smartRender(e.content, onLinkTap, onImageTap)),
               ],
             ),
             subtitle: Column(children: [

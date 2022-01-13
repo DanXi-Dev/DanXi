@@ -46,7 +46,7 @@ class MirrorScrollController extends ScrollController {
   ScrollPosition? _oldPosition;
   String? debugTag;
   final BuildContext context;
-  List<AttachInterceptor> _interceptors = [];
+  final List<AttachInterceptor> _interceptors = [];
   late bool _isMaterial;
 
   MirrorScrollController(this.originController, this.context, {this.debugTag})
@@ -117,7 +117,7 @@ class MirrorScrollController extends ScrollController {
     // debugPrint("detachAll: $debugTag");
     if (!hasClients) return;
     var tempPos = positions.toList();
-    tempPos.forEach((element) {
+    for (var element in tempPos) {
       if (positions.contains(element)) {
         try {
           originController!.detach(element);
@@ -127,7 +127,7 @@ class MirrorScrollController extends ScrollController {
           // Here, we simply ignore everything thrown.
         } catch (ignored) {}
       }
-    });
+    }
   }
 
   void reattachPosition() {

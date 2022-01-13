@@ -60,7 +60,7 @@ class SettingsProvider {
   Future<void> init() async =>
       preferences = await SharedPreferences.getInstance();
 
-  @deprecated
+  @Deprecated("SettingsProvider do not need a BuildContext any more.")
   factory SettingsProvider.of(_) => SettingsProvider.getInstance();
 
   bool get useAccessibilityColoring {
@@ -116,13 +116,13 @@ class SettingsProvider {
               .map((i) => DashboardCard.fromJson(i))
               .toList();
       // Merge new features which are added in the new version.
-      Constant.defaultDashboardCardList.forEach((element) {
+      for (var element in Constant.defaultDashboardCardList) {
         if (!element.isSpecialCard &&
             !rawCardList
                 .any((card) => card.internalString == element.internalString)) {
           rawCardList.add(element);
         }
-      });
+      }
       return rawCardList;
     }
     return Constant.defaultDashboardCardList;
@@ -194,10 +194,11 @@ class SettingsProvider {
   SortOrder? get fduholeSortOrder {
     if (preferences!.containsKey(KEY_FDUHOLE_SORTORDER)) {
       String? str = preferences!.getString(KEY_FDUHOLE_SORTORDER);
-      if (str == SortOrder.LAST_CREATED.getInternalString())
+      if (str == SortOrder.LAST_CREATED.getInternalString()) {
         return SortOrder.LAST_CREATED;
-      else if (str == SortOrder.LAST_REPLIED.getInternalString())
+      } else if (str == SortOrder.LAST_REPLIED.getInternalString()) {
         return SortOrder.LAST_REPLIED;
+      }
     }
     return null;
   }

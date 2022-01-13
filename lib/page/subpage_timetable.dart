@@ -84,8 +84,10 @@ class RefreshTimetableEvent {}
 
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
-  final StateStreamListener _shareSubscription = StateStreamListener();
-  final StateStreamListener _refreshSubscription = StateStreamListener();
+  final StateStreamListener<ShareTimetableEvent> _shareSubscription =
+      StateStreamListener();
+  final StateStreamListener<RefreshTimetableEvent> _refreshSubscription =
+      StateStreamListener();
   final ScrollController _dummyScrollController = ScrollController();
 
   /// A map of all converters.
@@ -117,7 +119,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         _content = PostgraduateTimetableRepository.getInstance()
             .loadTimeTableRemotely(StateProvider.personInfo.value!,
                 (imageUrl) async {
-          TextEditingController controller = new TextEditingController();
+                  TextEditingController controller = TextEditingController();
           await showPlatformDialog(
               context: context,
               builder: (cxt) {
@@ -166,12 +168,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
     outputFile.createSync(recursive: true);
     await outputFile.writeAsString(converted, flush: true);
-    if (PlatformX.isIOS)
+    if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
-    else if (PlatformX.isAndroid)
+    } else if (PlatformX.isAndroid) {
       Share.shareFiles([outputFile.absolute.path],
           mimeTypes: [converter.mimeType]);
-    else {
+    } else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
@@ -203,7 +205,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           showPlatformModalSheet(
               context: context,
               builder: (BuildContext context) => PlatformWidget(
-                    cupertino: (_, __) => CupertinoActionSheet(
+                cupertino: (_, __) => CupertinoActionSheet(
                       actions: _buildShareList(context),
                       cancelButton: CupertinoActionSheetAction(
                         child: Text(S.of(context).cancel),
@@ -212,11 +214,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                         },
                       ),
                     ),
-                    material: (_, __) => Container(
-                      child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: _buildShareList(context)),
-                    ),
+                    material: (_, __) => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: _buildShareList(context)),
                   ));
         }),
         hashCode);
@@ -335,9 +335,9 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   }
 
   Widget _buildPage(TimeTable table) {
-    final TimetableStyle style = TimetableStyle();
+    const TimetableStyle style = TimetableStyle();
     _table = table;
-    if (_showingTime == null) _showingTime = _table!.now();
+    _showingTime ??= _table!.now();
     final List<DayEvents> scheduleData = _table!
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return SafeArea(
@@ -353,19 +353,19 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           child: ListView(
             // This ListView is a workaround, so that we can apply a custom scroll physics to it.
             controller: _dummyScrollController,
-            physics: AlwaysScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             children: [
               AutoBannerAdWidget(bannerAd: bannerAd),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   PlatformIconButton(
-                    icon: Icon(Icons.chevron_left),
+                    icon: const Icon(Icons.chevron_left),
                     onPressed: _showingTime!.week > 0 ? goToPrev : null,
                   ),
                   Text(S.of(context).week(_showingTime!.week)),
                   PlatformIconButton(
-                    icon: Icon(Icons.chevron_right),
+                    icon: const Icon(Icons.chevron_right),
                     onPressed: _showingTime!.week < TimeTable.MAX_WEEK
                         ? goToNext
                         : null,

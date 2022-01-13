@@ -37,7 +37,8 @@ class BBSHiddenTagsPreferencePage extends StatefulWidget {
   _BBSHiddenTagsPreferencePageState createState() =>
       _BBSHiddenTagsPreferencePageState();
 
-  BBSHiddenTagsPreferencePage({Key? key, this.arguments});
+  const BBSHiddenTagsPreferencePage({Key? key, this.arguments})
+      : super(key: key);
 }
 
 class _BBSHiddenTagsPreferencePageState
@@ -77,14 +78,13 @@ class _BBSHiddenTagsPreferencePageState
                     ),
                 textFieldConfiguration: TextFieldConfiguration(
                   decoration: InputDecoration(
-                    labelStyle: TextStyle(fontSize: 12),
+                    labelStyle: const TextStyle(fontSize: 12),
                     labelText: S.of(context).select_tags,
                   ),
                 ),
                 findSuggestions: (String filter) async {
-                  if (_allTags == null)
-                    _allTags =
-                        await OpenTreeHoleRepository.getInstance().loadTags();
+                  _allTags ??=
+                      await OpenTreeHoleRepository.getInstance().loadTags();
                   return _allTags!
                       .where((value) => value.name!
                           .toLowerCase()
@@ -118,12 +118,12 @@ class _BBSHiddenTagsPreferencePageState
                         ],
                       ),
                       additionWidget: Chip(
-                        avatar: Icon(
+                        avatar: const Icon(
                           Icons.add_circle,
                           color: Colors.white,
                         ),
                         label: Text(S.of(context).add_new_tag),
-                        labelStyle: TextStyle(
+                        labelStyle: const TextStyle(
                           color: Colors.white,
                           fontSize: 14.0,
                           fontWeight: FontWeight.w300,

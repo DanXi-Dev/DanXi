@@ -44,7 +44,7 @@ class DioUtils {
     //Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&
-        response.headers['location']!.length > 0) {
+        response.headers['location']!.isNotEmpty) {
       String location = response.headers['location']![0];
       if (location.isEmpty) return response;
       if (!Uri.parse(location).isAbsolute) {

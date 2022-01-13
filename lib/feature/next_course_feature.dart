@@ -36,7 +36,7 @@ class NextCourseFeature extends Feature {
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
     TimeTable timetable = await Retrier.runAsyncWithRetry(() async {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
       return await TimeTableRepository.getInstance()
           .loadTimeTableLocally(StateProvider.personInfo.value);
     });
@@ -58,13 +58,13 @@ class NextCourseFeature extends Feature {
       DateTime exactStartTime = startTime.toExactTime();
       if (exactStartTime.isBefore(DateTime.now()) &&
           exactStartTime
-              .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE))
+              .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE))
               .isAfter(DateTime.now())) {
         thisCourse = element;
       }
       if (exactStartTime.isAfter(DateTime.now())) {
         // Only get the next course once.
-        if (nextCourse == null) nextCourse = element;
+        nextCourse ??= element;
         courseLeft++;
       }
     }
@@ -117,8 +117,8 @@ class NextCourseFeature extends Feature {
 
   @override
   Widget get icon => PlatformX.isMaterial(context!)
-      ? Icon(Icons.today)
-      : Icon(CupertinoIcons.today);
+      ? const Icon(Icons.today)
+      : const Icon(CupertinoIcons.today);
 
   @override
   void onTap() {

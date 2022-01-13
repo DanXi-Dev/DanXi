@@ -34,7 +34,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
   PersonInfo? _info;
-  Map<String, TrafficInfo>? _trafficInfos;
+  Map<String, TrafficInfo>? _trafficInfo;
   String? _leastCrowdedCanteen;
   String? _mostCrowdedCanteen;
 
@@ -44,7 +44,7 @@ class DiningHallCrowdednessFeature extends Feature {
   Future<void> _loadCrowdednessSummary(PersonInfo? info) async {
     Campus preferredCampus = SettingsProvider.getInstance().campus;
     try {
-      _trafficInfos = await DataCenterRepository.getInstance()
+      _trafficInfo = await DataCenterRepository.getInstance()
           .getCrowdednessInfo(info, preferredCampus.index);
       generateSummary(preferredCampus);
     } on UnsuitableTimeException {
@@ -56,7 +56,7 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   void generateSummary(Campus preferredCampus) {
-    if (_trafficInfos != null) {
+    if (_trafficInfo != null) {
       if (preferredCampus == Campus.HANDAN_CAMPUS) {
         var crowdednessSum = List<num>.filled(5, 0);
         /* About crowdedness List
@@ -69,7 +69,7 @@ class DiningHallCrowdednessFeature extends Feature {
         // Map<String, Map<String, TrafficInfo>> zoneList =
         //     DiningHallCrowdednessRepository.getInstance()
         //         .toZoneList(preferredCampus.displayTitle(context), _trafficInfos);
-        _trafficInfos!.forEach((keyUnprocessed, value) {
+        _trafficInfo!.forEach((keyUnprocessed, value) {
           if (value.current != 0) {
             //Ignore zero entries
             var keyList = keyUnprocessed.split('\n');
@@ -142,7 +142,7 @@ class DiningHallCrowdednessFeature extends Feature {
         }
       } else {
         Map<String, double> crowdedness = {};
-        _trafficInfos!.forEach((key, value) {
+        _trafficInfo!.forEach((key, value) {
           if (value.current != 0) crowdedness[key] = value.current / value.max;
         });
         _mostCrowdedCanteen = crowdedness.keys.firstWhere(
@@ -166,7 +166,7 @@ class DiningHallCrowdednessFeature extends Feature {
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
       _status = ConnectionStatus.CONNECTING;
-      _trafficInfos = null;
+      _trafficInfo = null;
       _mostCrowdedCanteen = "";
       _leastCrowdedCanteen = "";
       _loadCrowdednessSummary(_info);
@@ -183,9 +183,10 @@ class DiningHallCrowdednessFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null)
+        if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null) {
           return S.of(context!).most_least_crowded_canteen(
               _mostCrowdedCanteen!, _leastCrowdedCanteen!);
+        }
         return '';
       case ConnectionStatus.FAILED:
         return S.of(context!).failed;
@@ -255,7 +256,7 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   void onTap() {
-    if (_trafficInfos != null) {
+    if (_trafficInfo != null) {
       smartNavigatorPush(context!, "/card/crowdData");
     } else {
       refreshData();

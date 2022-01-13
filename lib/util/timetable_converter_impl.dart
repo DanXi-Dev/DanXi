@@ -26,7 +26,7 @@ class ICSConverter extends TimetableConverter {
     for (int weekNum = 0; weekNum <= 24; weekNum++) {
       Map<int, List<Event>> weekTable = table!.toWeekCourses(weekNum);
       for (int day = 0; day < 7; day++) {
-        weekTable[day]!.forEach((event) {
+        for (var event in weekTable[day]!) {
           calendar.addElement(IEvent(
               status: IEventStatus.CONFIRMED,
               classification: IClass.PUBLIC,
@@ -46,7 +46,7 @@ class ICSConverter extends TimetableConverter {
                       minutes: TimeTable
                           .kCourseSlotStartTime[event.time.slot].minute!))
                   .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE))));
-        });
+        }
       }
     }
     return calendar.serialize();

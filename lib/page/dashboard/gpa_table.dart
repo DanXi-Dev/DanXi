@@ -27,7 +27,7 @@ class GpaTablePage extends StatefulWidget {
   @override
   _GpaTablePageState createState() => _GpaTablePageState();
 
-  GpaTablePage({Key? key, this.arguments});
+  const GpaTablePage({Key? key, this.arguments}) : super(key: key);
 }
 
 class _GpaTablePageState extends State<GpaTablePage> {
@@ -52,7 +52,8 @@ class _GpaTablePageState extends State<GpaTablePage> {
         body: SafeArea(
             bottom: false,
             child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                 controller: PrimaryScrollController.of(context),
                 child: Table(
                   children: _buildGpaRow(),
@@ -65,26 +66,26 @@ class _GpaTablePageState extends State<GpaTablePage> {
         Text(
           S.of(context).major,
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
           S.of(context).gpa,
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
           S.of(context).credits,
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
           S.of(context).rank,
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         )
       ])
     ];
-    gpaList!.forEach((element) {
+    for (var element in gpaList!) {
       TextStyle? textColorStyle = element.name == NAME_HIDDEN
           ? null
           : TextStyle(color: Theme.of(context).colorScheme.secondary);
@@ -110,7 +111,7 @@ class _GpaTablePageState extends State<GpaTablePage> {
           style: textColorStyle,
         )
       ]));
-    });
+    }
     return widgets;
   }
 }

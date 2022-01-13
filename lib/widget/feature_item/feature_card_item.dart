@@ -16,8 +16,8 @@
  */
 
 import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/material.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [Card].
@@ -29,7 +29,9 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   @override
   _FeatureCardItemState createState() => _FeatureCardItemState();
 
-  FeatureCardItem({required this.feature, this.arguments, this.onDismissed});
+  const FeatureCardItem(
+      {required this.feature, this.arguments, this.onDismissed, Key? key})
+      : super(key: key);
 
   @override
   Feature get childFeature => feature;
@@ -54,22 +56,23 @@ class _FeatureCardItemState extends State<FeatureCardItem>
 
     List<String?> summary = [];
     summary.add(widget.feature.subTitle ?? "");
-    if (widget.feature.tertiaryTitle != null)
+    if (widget.feature.tertiaryTitle != null) {
       summary.add(widget.feature.tertiaryTitle);
+    }
     Widget card = Card(
       child: Padding(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Row(
               children: [
                 widget.feature.icon,
-                SizedBox(
+                const SizedBox(
                   width: 8,
                 ),
                 Text(
                   widget.feature.mainTitle!,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 )
@@ -78,18 +81,17 @@ class _FeatureCardItemState extends State<FeatureCardItem>
                   .map((e) => e!)
                   .toList(growable: false),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
-            widget.feature.customSubtitle == null
-                ? Text(
-                    summary.join("\n"),
-                    style: PlatformX.getTheme(context)
-                        .textTheme
-                        .headline1!
-                        .copyWith(fontSize: 12),
-                  )
-                : widget.feature.customSubtitle,
+            widget.feature.customSubtitle ??
+                Text(
+                  summary.join("\n"),
+                  style: PlatformX.getTheme(context)
+                      .textTheme
+                      .headline1!
+                      .copyWith(fontSize: 12),
+                ),
             widget.feature.trailing
           ]
               .takeWhile((value) => value != null)

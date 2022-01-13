@@ -65,7 +65,7 @@ import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
 void sendFduholeTokenToWatch(String? token) {
-  const channel = const MethodChannel('fduhole');
+  const channel = MethodChannel('fduhole');
   channel.invokeMethod("send_token", token);
 }
 
@@ -74,12 +74,12 @@ GlobalKey<State> settingsPageKey = GlobalKey();
 GlobalKey<State> treeholePageKey = GlobalKey();
 GlobalKey<State> dashboardPageKey = GlobalKey();
 GlobalKey<State> timetablePageKey = GlobalKey();
-final QuickActions quickActions = QuickActions();
+const QuickActions quickActions = QuickActions();
 
 /// The main page of DanXi.
 /// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -91,9 +91,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Listener to the failure of logging in caused by different reasons.
   ///
   /// Open up a dialog to request user to log in manually in the browser.
-  static StateStreamListener<CaptchaNeededException> _captchaSubscription =
-      StateStreamListener();
-  static StateStreamListener<CredentialsInvalidException>
+  static final StateStreamListener<CaptchaNeededException>
+      _captchaSubscription = StateStreamListener();
+  static final StateStreamListener<CredentialsInvalidException>
       _credentialsInvalidSubscription = StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isErrorDialogShown = false;
 
   /// The tab page index.
-  ValueNotifier<int> _pageIndex = ValueNotifier(0);
+  final ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.
   List<PlatformSubpage> _subpage = [];
@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (_lastRefreshTime != null &&
             DateTime.now()
                     .difference(_lastRefreshTime!)
-                    .compareTo(Duration(minutes: 30)) >
+                    .compareTo(const Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
           dashboardPageKey.currentState?.setState(() {});
@@ -322,7 +322,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // This callback gets invoked every time brightness changes
       // What's wrong with this code? why does the app refresh on every launch?
       // The timer below is a workaround to the issue.
-      Timer(Duration(milliseconds: 500), () {
+          Timer(const Duration(milliseconds: 500), () {
         if (WidgetsBinding.instance!.platformDispatcher.platformBrightness !=
             Theme.of(context).brightness) FlutterApp.restartApp(context);
       });
@@ -342,13 +342,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // Load the latest version, announcement & the start date of the following term.
     _loadDataFromBmob();
     // Configure shortcut listeners on Android & iOS.
-    if (PlatformX.isMobile)
+    if (PlatformX.isMobile) {
       quickActions.initialize((shortcutType) {
         if (shortcutType == 'action_qr_code' &&
             StateProvider.personInfo.value != null) {
           QRHelper.showQRCode(context, StateProvider.personInfo.value);
         }
       });
+    }
     // Configure watch listeners on iOS.
     if (_needSendToWatch &&
         _preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
@@ -366,8 +367,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    const fduhole_channel = const MethodChannel('fduhole');
-    fduhole_channel.setMethodCallHandler((MethodCall call) async {
+    const fduholeChannel = MethodChannel('fduhole');
+    fduholeChannel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
         case "launch_from_notification":
           Map<String, dynamic> map =
@@ -555,30 +556,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             BottomNavigationBarItem(
               //backgroundColor: Colors.purple,
               icon: PlatformX.isAndroid
-                  ? Icon(Icons.dashboard)
-                  : Icon(CupertinoIcons.square_stack_3d_up_fill),
+                  ? const Icon(Icons.dashboard)
+                  : const Icon(CupertinoIcons.square_stack_3d_up_fill),
               label: S.of(context).dashboard,
             ),
             if (!SettingsProvider.getInstance().hideHole)
               BottomNavigationBarItem(
                 //backgroundColor: Colors.indigo,
                 icon: PlatformX.isAndroid
-                    ? Icon(Icons.forum)
-                    : Icon(CupertinoIcons.text_bubble),
+                    ? const Icon(Icons.forum)
+                    : const Icon(CupertinoIcons.text_bubble),
                 label: S.of(context).forum,
               ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.blue,
               icon: PlatformX.isAndroid
-                  ? Icon(Icons.calendar_today)
-                  : Icon(CupertinoIcons.calendar),
+                  ? const Icon(Icons.calendar_today)
+                  : const Icon(CupertinoIcons.calendar),
               label: S.of(context).timetable,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Theme.of(context).primaryColor,
               icon: PlatformX.isAndroid
-                  ? Icon(Icons.settings)
-                  : Icon(CupertinoIcons.gear_alt),
+                  ? const Icon(Icons.settings)
+                  : const Icon(CupertinoIcons.gear_alt),
               label: S.of(context).settings,
             ),
           ],

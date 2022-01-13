@@ -138,7 +138,7 @@ class StadiumData {
     String? name, info, contentId;
     Campus? campus;
     SportsType? type;
-    tableItems.forEach((element) {
+    for (var element in tableItems) {
       var key = element.querySelector('th')?.text.trim();
       var valueElement = element.querySelector('td');
       switch (key) {
@@ -158,7 +158,7 @@ class StadiumData {
         case '运动项目：':
           type = SportsType.fromLiterateName(valueElement!.text.trim());
       }
-    });
+    }
     return StadiumData(name, campus, type, info, contentId);
   }
 }

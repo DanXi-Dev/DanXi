@@ -64,8 +64,8 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                   [
                     Padding(
                       key: UniqueKey(),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).addCircled),
                         title: Text(S.of(context).add_new_card),
@@ -81,8 +81,8 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                     ),
                     Padding(
                       key: UniqueKey(),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).addCircled),
                         title: Text(S.of(context).add_new_divider),
@@ -99,8 +99,8 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                     ),
                     Padding(
                       key: UniqueKey(),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).addCircled),
                         title: Text(S.of(context).new_shortcut_card),
@@ -119,8 +119,8 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                     ),
                     Padding(
                       key: UniqueKey(),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 16),
                       child: ListTile(
                         leading: Icon(PlatformIcons(context).removeCircled),
                         title: Text(S.of(context).reset_layout),
@@ -168,10 +168,10 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
           // Show a red background as the item is swiped away.
           background: Container(color: Colors.red),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
             child: ListTile(
               title: Text(widgetName[sequence![index].internalString!]!),
-              trailing: Icon(Icons.drag_handle_rounded),
+              trailing: const Icon(Icons.drag_handle_rounded),
               //leading: Icon(CupertinoIcons.arrow_left_right_circle),
             ),
           ),
@@ -192,13 +192,13 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             // Show a red background as the item is swiped away.
             background: Container(color: Colors.red),
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(
                 title: Text(sequence![index].title!),
                 subtitle: Text(sequence![index].link!),
                 secondary: PlatformX.isDesktop
                     ? null
-                    : Icon(Icons.drag_handle_rounded),
+                    : const Icon(Icons.drag_handle_rounded),
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool? value) {
                   sequence![index].enabled = value;
@@ -229,11 +229,11 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
             confirmDismiss: (_) => Future.value(false),
             background: Center(child: Text(S.of(context).unmovable_widget)),
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               child: CheckboxListTile(
                 title: Text(widgetName[sequence![index].internalString!]!),
                 controlAffinity: ListTileControlAffinity.leading,
-                secondary: Icon(Icons.drag_handle_rounded),
+                secondary: const Icon(Icons.drag_handle_rounded),
                 onChanged: (bool? value) {
                   sequence![index].enabled = value;
                   SettingsProvider.getInstance().dashboardWidgetsSequence =

@@ -61,8 +61,9 @@ class BBSEditor {
         .newHole(divisionId, content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
-      if (error is DioError)
+      if (error is DioError) {
         error = error.message + '\n' + (error.response?.data?.toString() ?? "");
+      }
       Noticing.showNotice(context, error.toString(),
           title: S.of(context).post_failed, useSnackBar: false);
       return -1;
@@ -134,9 +135,10 @@ class BBSEditor {
         Noticing.showNotice(context,
             error.message + '\n' + (error.response?.data?.toString() ?? ""),
             title: S.of(context).reply_failed(error.type), useSnackBar: false);
-      } else
+      } else {
         Noticing.showNotice(context, S.of(context).reply_failed(error),
             title: S.of(context).fatal_error, useSnackBar: false);
+      }
       return -1;
     });
     StateProvider.editorCache.remove(object);
@@ -168,12 +170,13 @@ class BBSEditor {
       required EditorObject object,
       String placeholder = ""}) async {
     final String randomTip = await Constant.randomFduholeTip;
-    final BBSEditorType defaultType = BBSEditorType.PAGE;
+    const BBSEditorType defaultType = BBSEditorType.PAGE;
     switch (editorType ?? defaultType) {
       case BBSEditorType.DIALOG:
-        if (!StateProvider.editorCache.containsKey(object))
+        if (!StateProvider.editorCache.containsKey(object)) {
           StateProvider.editorCache[object] =
               PostEditorText.newInstance(withText: placeholder);
+        }
         final textController = TextEditingController(
             text: StateProvider.editorCache[object]!.text);
         textController.addListener(() =>
@@ -298,7 +301,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                           leading: Icon(iconData),
                           title: Text(title),
                         ),
-                        Divider(),
+                        const Divider(),
                         Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Linkify(
@@ -308,10 +311,11 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                             )),
                       ]),
                 );
-                if (PlatformX.isMaterial(context))
+                if (PlatformX.isMaterial(context)) {
                   return body;
-                else
+                } else {
                   return Card(child: body);
+                }
               });
         });
   }
@@ -322,8 +326,9 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
       hintText: widget.tip,
       material: (_, __) => MaterialTextFieldData(
           decoration: widget.fullscreen
-              ? InputDecoration(border: InputBorder.none)
-              : InputDecoration(border: OutlineInputBorder(gapPadding: 2.0))),
+              ? const InputDecoration(border: InputBorder.none)
+              : const InputDecoration(
+                  border: OutlineInputBorder(gapPadding: 2.0))),
       controller: widget.controller,
       keyboardType: TextInputType.multiline,
       maxLines: widget.fullscreen ? null : 5,
@@ -341,7 +346,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           children: [
             if (widget.allowTags!)
               Padding(
-                padding: EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: ThemedMaterial(
                   child: FlutterTagging<OTTag>(
                       initialItems:
@@ -360,14 +365,13 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                           ),
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: InputDecoration(
-                          labelStyle: TextStyle(fontSize: 12),
+                          labelStyle: const TextStyle(fontSize: 12),
                           labelText: S.of(context).select_tags,
                         ),
                       ),
                       findSuggestions: (String filter) async {
-                        if (_allTags == null)
-                          _allTags = await OpenTreeHoleRepository.getInstance()
-                              .loadTags();
+                        _allTags ??= await OpenTreeHoleRepository.getInstance()
+                            .loadTags();
                         return _allTags!
                             .where((value) => value.name!
                                 .toLowerCase()
@@ -403,12 +407,12 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                               ],
                             ),
                             additionWidget: Chip(
-                              avatar: Icon(
+                              avatar: const Icon(
                                 Icons.add_circle,
                                 color: Colors.white,
                               ),
                               label: Text(S.of(context).add_new_tag),
-                              labelStyle: TextStyle(
+                              labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w300,
@@ -453,7 +457,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
               ],
             ),
             textField,
-            Divider(),
+            const Divider(),
             Text(S.of(context).preview,
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
@@ -487,7 +491,7 @@ class PostEditorText {
 class BBSEditorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSEditorPage({Key? key, this.arguments});
+  const BBSEditorPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   BBSEditorPageState createState() => BBSEditorPageState();
@@ -529,9 +533,9 @@ class BBSEditorPageState extends State<BBSEditorPage> {
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments!['object'];
     _placeholder = widget.arguments!['placeholder'];
-    if (StateProvider.editorCache.containsKey(_object))
+    if (StateProvider.editorCache.containsKey(_object)) {
       _controller.text = StateProvider.editorCache[_object]!.text!;
-    else {
+    } else {
       StateProvider.editorCache[_object] =
           PostEditorText.newInstance(withText: _placeholder);
       _controller.text = _placeholder;
@@ -577,7 +581,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
           bottom: false,
           child: Material(
               child: Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: BBSEditorWidget(
                     controller: _controller,
                     allowTags: _supportTags,

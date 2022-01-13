@@ -18,11 +18,11 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/fudan_bus_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
@@ -110,8 +110,8 @@ class BusFeature extends Feature {
         break;
     }
     String connectChar = element.direction == BusDirection.DUAL
-        ? busDirectionExtension.DUAL_ARROW
-        : busDirectionExtension.FORWARD_ARROW;
+        ? BusDirectionExtension.DUAL_ARROW
+        : BusDirectionExtension.FORWARD_ARROW;
     return Wrap(
       children: [
         /*SmallTag(

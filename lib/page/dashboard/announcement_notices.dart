@@ -17,11 +17,11 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -38,7 +38,7 @@ class AnnouncementList extends StatefulWidget {
   @override
   _AnnouncementListState createState() => _AnnouncementListState();
 
-  AnnouncementList({Key? key, this.arguments});
+  const AnnouncementList({Key? key, this.arguments}) : super(key: key);
 }
 
 class _AnnouncementListState extends State<AnnouncementList> {
@@ -94,9 +94,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
             ],
           );
         },
-        loadingBuilder: Container(
-          child: Center(child: PlatformCircularProgressIndicator()),
-        ),
+        loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
         errorBuilder: (_, snapShot) => GestureDetector(
           onTap: () {
             refreshSelf();
@@ -111,12 +109,12 @@ class _AnnouncementListState extends State<AnnouncementList> {
 
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
-    _data.forEach((Announcement value) {
+    for (var value in _data) {
       widgets.add(ThemedMaterial(
           child: ListTile(
         leading: PlatformX.isAndroid
-            ? Icon(Icons.info)
-            : Icon(CupertinoIcons.info_circle_fill),
+            ? const Icon(Icons.info)
+            : const Icon(CupertinoIcons.info_circle_fill),
         title: Text(
           value.content!,
           maxLines: 1,
@@ -141,7 +139,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
                   ],
                 )),
       )));
-    });
+    }
 
     return widgets;
   }

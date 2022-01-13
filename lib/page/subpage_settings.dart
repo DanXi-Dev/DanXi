@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as Pubspec;
+import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/page/home_page.dart';
@@ -214,13 +214,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   List<Widget> _buildCampusAreaList(BuildContext context) {
     List<Widget> list = [];
-    Function onTapListener = (Campus campus) {
+    onTapListener(Campus campus) {
       SettingsProvider.getInstance().campus = campus;
       Navigator.of(context).pop();
       dashboardPageKey.currentState?.setState(() {});
       refreshSelf();
-    };
-    Constant.CAMPUS_VALUES.forEach((value) {
+    }
+
+    for (var value in Constant.CAMPUS_VALUES) {
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
@@ -231,20 +232,21 @@ class _SettingsSubpageState extends State<SettingsSubpage>
           onTap: () => onTapListener(value),
         ),
       ));
-    });
+    }
     return list;
   }
 
   List<Widget> _buildFoldBehaviorList(BuildContext context) {
     List<Widget> list = [];
-    Function onTapListener = (FoldBehavior value) {
+    onTapListener(FoldBehavior value) {
       OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
           value.internalString();
       treeholePageKey.currentState?.setState(() {});
       Navigator.of(context).pop();
       refreshSelf();
-    };
-    FoldBehavior.values.forEach((value) {
+    }
+
+    for (var value in FoldBehavior.values) {
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
@@ -255,7 +257,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
           onTap: () => onTapListener(value),
         ),
       ));
-    });
+    }
     return list;
   }
 
@@ -277,9 +279,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 },
                 child: Material(
                   child: ListView(
-                      padding: EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(4),
                       controller: widget.primaryScrollController(context),
-                      physics: AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       children: <Widget>[
                         AutoBannerAdWidget(
                           bannerAd: myBanner,
@@ -356,7 +358,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               },
                                             ),
                                           ),
-                                          material: (_, __) => Container(
+                                          material: (_, __) => SizedBox(
                                             height: 300,
                                             child: Column(
                                               children:
@@ -373,7 +375,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                         Card(
                           child: ListTile(
                             title: Text(S.of(context).accessibility_coloring),
-                            leading: Icon(Icons.accessibility_new_rounded),
+                            leading:
+                                const Icon(Icons.accessibility_new_rounded),
                             subtitle: Text(SettingsProvider.getInstance()
                                     .useAccessibilityColoring
                                 ? S.of(context).enabled
@@ -452,7 +455,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ),
                               if (OpenTreeHoleRepository.getInstance()
                                   .isUserInitialized) ...[
-                                Divider(height: 0),
+                                const Divider(height: 0),
                                 FutureWidget<OTUser?>(
                                   future: OpenTreeHoleRepository.getInstance()
                                       .getUserProfile(),
@@ -687,22 +690,22 @@ class _SettingsSubpageState extends State<SettingsSubpage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(S.of(context).fduhole_clean_mode_detail),
-                SizedBox(
+                const SizedBox(
                   height: 8,
                 ),
                 Text(S.of(context).before_enabled),
-                SizedBox(
+                const SizedBox(
                   height: 4,
                 ),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CLEAN_MODE_EXAMPLE,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 8,
                 ),
                 Text(S.of(context).after_enabled),
-                SizedBox(
+                const SizedBox(
                   height: 4,
                 ),
                 PostRenderWidget(
@@ -761,7 +764,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+                        padding: const EdgeInsets.fromLTRB(25, 5, 25, 0),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -892,9 +895,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  '${S.of(context).version} ${Pubspec.major}.${Pubspec.minor}.${Pubspec.patch} build ${Pubspec.build.first}',
+                                  '${S.of(context).version} ${pubspec.major}.${pubspec.minor}.${pubspec.patch} build ${pubspec.build.first}',
                                   textScaleFactor: 0.7,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -917,8 +921,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           FutureBuilder<bool>(
                             builder: (BuildContext context,
                                 AsyncSnapshot<bool> snapshot) {
-                              if (snapshot.hasError || snapshot.data == false)
+                              if (snapshot.hasError || snapshot.data == false) {
                                 return const SizedBox();
+                              }
                               return TextButton(
                                 child: Text(S.of(context).rate),
                                 onPressed: () {
@@ -995,9 +1000,9 @@ class _OTNotificationSettingsWidgetState
     if (OpenTreeHoleRepository.getInstance().userInfo?.config?.notify == null) {
       return [Text(S.of(context).fatal_error)];
     }
-    Function getNotifyListNonNull =
-        () => OpenTreeHoleRepository.getInstance().userInfo!.config!.notify!;
-    OTNotificationTypes.values.forEach((value) {
+    getNotifyListNonNull() =>
+        OpenTreeHoleRepository.getInstance().userInfo!.config!.notify!;
+    for (var value in OTNotificationTypes.values) {
       list.add(CheckboxListTile(
           title: Text(value.displayTitle(context) ?? "null"),
           value: getNotifyListNonNull().contains(value.internalString()),
@@ -1011,7 +1016,7 @@ class _OTNotificationSettingsWidgetState
             }
             refreshSelf();
           }));
-    });
+    }
     return list;
   }
 }
@@ -1057,7 +1062,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
           successBuilder:
               (BuildContext context, AsyncSnapshot<bool> permissionSnapshot) {
             if (permissionSnapshot.data == true) {
-              if (!OpenTreeHoleRepository.getInstance().isUserInitialized)
+              if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
                 return ListTile(
                   title: Text(S.of(context).notification_settings),
                   leading: PlatformX.isMaterial(context)
@@ -1066,6 +1071,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   subtitle: Text(S.of(context).not_logged_in),
                   onTap: () => parentSetStateFunction(),
                 );
+              }
 
               return FutureWidget<OTUser?>(
                 future: OpenTreeHoleRepository.getInstance().getUserProfile(),
@@ -1081,10 +1087,10 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   onTap: () {
                     showPlatformModalSheet(
                       context: context,
-                      builder: (BuildContext context) => SafeArea(
+                      builder: (BuildContext context) => const SafeArea(
                         child: Card(
                           child: Padding(
-                              padding: const EdgeInsets.all(16.0),
+                              padding: EdgeInsets.all(16.0),
                               child: OTNotificationSettingsWidget()),
                         ),
                       ),
@@ -1108,7 +1114,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
           },
           errorBuilder: errorBuilder,
           loadingBuilder: loadingBuilder);
-    } else
+    } else {
       return ListTile(
           title: Text(S.of(context).notification_settings),
           leading: PlatformX.isMaterial(context)
@@ -1116,5 +1122,6 @@ class OTNotificationSettingsTile extends StatelessWidget {
               : const Icon(CupertinoIcons.bell),
           subtitle: Text(S.of(context).unsupported),
           enabled: false);
+    }
   }
 }

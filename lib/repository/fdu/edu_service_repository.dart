@@ -25,7 +25,7 @@ import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as DOM;
+import 'package:html/dom.dart' as dom;
 
 class EduServiceRepository extends BaseRepositoryWithDio {
   static const String EXAM_TABLE_LOGIN_URL =
@@ -81,18 +81,20 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<Exam>> _loadExamList({String? semesterId}) async {
     String? oldSemesterId = await semesterIdFromCookie;
     // Set the semester id
-    if (semesterId != null)
+    if (semesterId != null) {
       cookieJar?.saveFromResponse(
           Uri.parse(HOST), [Cookie("semester.id", semesterId)]);
+    }
     final Response r = await dio!
         .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
 
     // Restore old semester id
-    if (oldSemesterId != null)
+    if (oldSemesterId != null) {
       cookieJar?.saveFromResponse(
           Uri.parse(HOST), [Cookie("semester.id", oldSemesterId)]);
+    }
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    final DOM.Element tableBody = soup.find("tbody")!.element!;
+    final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
@@ -111,7 +113,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         kExamScoreUrl(semesterId ?? await semesterIdFromCookie),
         options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    final DOM.Element tableBody = soup.find("tbody")!.element!;
+    final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromEduServiceHtml(e))
@@ -128,7 +130,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     final Response r = await dio!
         .get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    final DOM.Element tableBody = soup.find("tbody")!.element!;
+    final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => GPAListItem.fromHtml(e))
@@ -156,12 +158,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     final json = jsonDecode(jsonText);
     final Map semesters = json['semesters'];
     List<SemesterInfo> sems = [];
-    semesters.values.forEach((element) {
+    for (var element in semesters.values) {
       if (element is List && element.isNotEmpty) {
         var annualSemesters = element.map((e) => SemesterInfo.fromJson(e));
         sems.addAll(annualSemesters);
       }
-    });
+    }
     if (sems.isEmpty) throw "Retrieval failed";
     return sems;
   }
@@ -228,8 +230,8 @@ class Exam {
   Exam(this.id, this.name, this.type, this.date, this.time, this.location,
       this.testCategory, this.note);
 
-  factory Exam.fromHtml(DOM.Element html) {
-    List<DOM.Element> elements = html.getElementsByTagName("td");
+  factory Exam.fromHtml(dom.Element html) {
+    List<dom.Element> elements = html.getElementsByTagName("td");
     return Exam(
         elements[0].text.trim(),
         elements[2].text.trim(),
@@ -265,8 +267,8 @@ class ExamScore {
 
   ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
 
-  factory ExamScore.fromEduServiceHtml(DOM.Element html) {
-    List<DOM.Element> elements = html.getElementsByTagName("td");
+  factory ExamScore.fromEduServiceHtml(dom.Element html) {
+    List<dom.Element> elements = html.getElementsByTagName("td");
     return ExamScore(
         elements[2].text.trim(),
         elements[3].text.trim(),
@@ -278,8 +280,8 @@ class ExamScore {
 
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
-  factory ExamScore.fromDataCenterHtml(DOM.Element html) {
-    List<DOM.Element> elements = html.getElementsByTagName("td");
+  factory ExamScore.fromDataCenterHtml(dom.Element html) {
+    List<dom.Element> elements = html.getElementsByTagName("td");
     return ExamScore(
         elements[0].text.trim(),
         elements[3].text.trim(),
@@ -303,8 +305,8 @@ class GPAListItem {
   GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
       this.major, this.college);
 
-  factory GPAListItem.fromHtml(DOM.Element html) {
-    List<DOM.Element> elements = html.getElementsByTagName("td");
+  factory GPAListItem.fromHtml(dom.Element html) {
+    List<dom.Element> elements = html.getElementsByTagName("td");
     return GPAListItem(
         elements[1].text,
         elements[0].text,

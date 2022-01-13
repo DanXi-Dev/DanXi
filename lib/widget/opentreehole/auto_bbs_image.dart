@@ -32,8 +32,8 @@ class BBSImagePlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: EdgeInsets.all(64),
-        foregroundDecoration: BoxDecoration(color: Colors.black12),
+        padding: const EdgeInsets.all(64),
+        foregroundDecoration: const BoxDecoration(color: Colors.black12),
         width: size,
         height: size,
         child: Center(
@@ -60,14 +60,14 @@ class AutoBBSImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         constraints: BoxConstraints(maxHeight: maxWidth!),
         child: GestureDetector(
           child: CachedNetworkImage(
               imageUrl: src,
               width: maxWidth,
-              height:
-                  maxWidth, // Ensure shape is the same as the loading indicator
+              height: maxWidth,
+              // Ensure shape is the same as the loading indicator
               fit: BoxFit.contain,
               errorWidget: (context, url, error) {
                 return BBSImagePlaceholder(

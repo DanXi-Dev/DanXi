@@ -52,10 +52,11 @@ class FudanDailyFeature extends Feature {
       if (ticked) {
         _subTitle = S.of(context!).fudan_daily_ticked;
       } else {
-        if (SettingsProvider.getInstance().debugMode)
+        if (SettingsProvider.getInstance().debugMode) {
           _subTitle = S.of(context!).fudan_daily_tick;
-        else
+        } else {
           _subTitle = S.of(context!).fudan_daily_tick_link;
+        }
       }
       _hasTicked = ticked;
       notifyUpdate();
@@ -122,8 +123,8 @@ class FudanDailyFeature extends Feature {
   Widget? get customSubtitle => _hasTicked
       ? null
       : Text(
-          S.of(context!).fudan_daily_tick_link,
-          style: TextStyle(color: Colors.red),
+    S.of(context!).fudan_daily_tick_link,
+          style: const TextStyle(color: Colors.red),
         );
 
   //@override
@@ -187,9 +188,9 @@ class FudanDailyFeature extends Feature {
         } else {
           tickFudanDaily();
         }*/
-        if (SettingsProvider.getInstance().debugMode)
+        if (SettingsProvider.getInstance().debugMode) {
           tickFudanDaily();
-        else {
+        } else {
           if (PlatformX.isMobile) {
             // Request Location Permission
             if (await Permission.locationWhenInUse.request() !=

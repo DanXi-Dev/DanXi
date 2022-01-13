@@ -97,10 +97,11 @@ class RefreshHomepageEvent {
 
 class _HomeSubpageState extends State<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
-  static final StateStreamListener _refreshSubscription = StateStreamListener();
+  static final StateStreamListener<RefreshHomepageEvent> _refreshSubscription =
+      StateStreamListener();
   late Map<String, Widget> widgetMap;
   bool isRefreshQueued = false;
-  List<Feature> _notifications = [];
+  final List<Feature> _notifications = [];
 
   BannerAd? bannerAd;
 
@@ -110,9 +111,9 @@ class _HomeSubpageState extends State<HomeSubpage>
     // initPlatformState();
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshHomepageEvent>().listen((event) {
-          if (event.queueRefresh)
+          if (event.queueRefresh) {
             isRefreshQueued = true;
-          else if (event.onlyIfQueued) {
+          } else if (event.onlyIfQueued) {
             isRefreshQueued = false;
             refreshSelf();
           } else {
@@ -153,7 +154,7 @@ class _HomeSubpageState extends State<HomeSubpage>
       'next_course_feature': FeatureListItem(
         feature: NextCourseFeature(),
       ),
-      'divider': Divider(),
+      'divider': const Divider(),
       'ecard_balance_feature': FeatureListItem(
         feature: EcardBalanceFeature(),
       ),
@@ -196,8 +197,9 @@ class _HomeSubpageState extends State<HomeSubpage>
 
   void addNotification(Feature feature) {
     if (_notifications.any((element) =>
-        element.runtimeType.toString() == feature.runtimeType.toString()))
+        element.runtimeType.toString() == feature.runtimeType.toString())) {
       return;
+    }
     _notifications.add(feature);
     refreshSelf();
   }
@@ -275,9 +277,9 @@ class _HomeSubpageState extends State<HomeSubpage>
                 },
                 child: Material(
                     child: ListView(
-                  controller: widget.primaryScrollController(context),
-                  physics: AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.all(4),
+                      controller: widget.primaryScrollController(context),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(4),
                   children: _buildCards(widgetList),
                 )))));
   }
