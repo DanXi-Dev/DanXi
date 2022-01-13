@@ -1,9 +1,8 @@
-import '../response/bmob_error.dart';
+import 'dart:async';
 
+import '../response/bmob_error.dart';
 import 'change.dart';
 import 'client.dart';
-
-import 'dart:async';
 
 class RealTimeDataManager {
   static RealTimeDataManager? instance;
@@ -12,9 +11,7 @@ class RealTimeDataManager {
 
   ///单例
   static RealTimeDataManager? getInstance() {
-    if (instance == null) {
-      instance = new RealTimeDataManager();
-    }
+    instance ??= RealTimeDataManager();
     return instance;
   }
 

@@ -18,10 +18,10 @@ class Bmob {
   static String bmobApiSafe = "";
 
   //固定
-  static final String bmobSDKType = "Flutter";
+  static const String bmobSDKType = "Flutter";
 
   //固定
-  static final String bmobSDKVersion = "10";
+  static const String bmobSDKVersion = "10";
 
   static const String BMOB_PROPERTY_OBJECT_ID = "objectId";
   static const String BMOB_PROPERTY_CREATED_AT = "createdAt";

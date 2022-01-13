@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'bmob_dio.dart';
-import 'bmob.dart';
-import 'response/bmob_handled.dart';
 
-import 'type/bmob_file.dart';
+import 'bmob.dart';
+import 'bmob_dio.dart';
 import 'response/bmob_error.dart';
+import 'response/bmob_handled.dart';
+import 'type/bmob_file.dart';
 
 class BmobFileManager {
   ///文件上传
@@ -15,9 +15,6 @@ class BmobFileManager {
   static Future<BmobFile> upload(File file) async {
     String allPath = file.path;
     int indexSlash = allPath.lastIndexOf("/");
-    if (file == null) {
-      throw BmobError(9016, "The file is null.");
-    }
     if (indexSlash == -1) {
       throw BmobError(9016, "The file's path is available.");
     }
@@ -44,7 +41,7 @@ class BmobFileManager {
   ///method:delete
   ///http://bmob-cdn-18925.b0.upaiyun.com/2019/03/25/f425482f73e646a6a425d746764c3b6c.jpg
   static Future<BmobHandled> delete(String url) async {
-    if (url == null || url.isEmpty) {
+    if (url.isEmpty) {
       throw BmobError(9015, "The url is null or empty.");
     }
 

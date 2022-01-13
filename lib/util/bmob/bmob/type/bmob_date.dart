@@ -12,7 +12,7 @@ class BmobDate {
   BmobDate();
 
   void setDate(DateTime dateTime) {
-    this.iso = dateTime.toString();
+    iso = dateTime.toString();
   }
 
   //此处与类名一致，由指令自动生成代码

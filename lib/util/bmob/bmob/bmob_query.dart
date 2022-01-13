@@ -1,15 +1,14 @@
 import 'dart:async';
-
-import 'bmob_dio.dart';
-import 'response/bmob_results.dart';
-import 'table/bmob_installation.dart';
-
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
+
 import 'bmob.dart';
-import 'table/bmob_user.dart';
+import 'bmob_dio.dart';
+import 'response/bmob_results.dart';
+import 'table/bmob_installation.dart';
 import 'table/bmob_object.dart';
+import 'table/bmob_user.dart';
 import 'type/bmob_pointer.dart';
 
 //此处与类名一致，由指令自动生成代码
@@ -39,8 +38,8 @@ class BmobQuery<T> {
   bool? groupcount;
 
   BmobQuery() {
-    where = Map();
-    having = Map();
+    where = {};
+    having = {};
   }
 
   //添加等于条件查询
@@ -121,44 +120,44 @@ class BmobQuery<T> {
 
   ///是否返回统计的记录个数
   BmobQuery hasGroupCount(bool has) {
-    this.groupcount = has;
+    groupcount = has;
     return this;
   }
 
   ///分组 多个分组的列名
   BmobQuery groupByKeys(String keys) {
-    this.groupby = keys;
+    groupby = keys;
     return this;
   }
 
   ///求和  多个求和的列名
   BmobQuery sumKeys(String keys) {
-    this.sum = keys;
+    sum = keys;
     return this;
   }
 
   ///求均值 多个求平均值的列名
   BmobQuery averageKeys(String keys) {
-    this.average = keys;
+    average = keys;
     return this;
   }
 
   ///求最大值 多个求最大值的列名
   BmobQuery maxKeys(String keys) {
-    this.max = keys;
+    max = keys;
     return this;
   }
 
   ///求最小值 多个求最小值的列名
   BmobQuery minKeys(String keys) {
-    this.min = keys;
+    min = keys;
     return this;
   }
 
   ///获取数据个数
   Future<int?> queryCount() async {
-    this.count = 1;
-    this.limit = 0;
+    count = 1;
+    limit = 0;
 
     String tableName = T.toString();
     if (T.runtimeType is BmobUser) {
@@ -202,13 +201,13 @@ class BmobQuery<T> {
 
   String getStatistics() {
     String statistics = "";
-    statistics += addStatistics("sum", this.sum);
-    statistics += addStatistics("max", this.max);
-    statistics += addStatistics("min", this.min);
-    statistics += addStatistics("average", this.average);
-    statistics += addStatistics("groupby", this.groupby);
-    statistics += addStatistics("having", this.having);
-    statistics += addStatistics("groupcount", this.groupcount);
+    statistics += addStatistics("sum", sum);
+    statistics += addStatistics("max", max);
+    statistics += addStatistics("min", min);
+    statistics += addStatistics("average", average);
+    statistics += addStatistics("groupby", groupby);
+    statistics += addStatistics("having", having);
+    statistics += addStatistics("groupcount", groupcount);
     return statistics;
   }
 
@@ -216,20 +215,20 @@ class BmobQuery<T> {
     if (condition == null) {
       if (value is BmobUser) {
         BmobUser bmobUser = value;
-        Map<String, dynamic> map = new Map();
+        Map<String, dynamic> map = {};
         map["__type"] = "Pointer";
         map["objectId"] = bmobUser.objectId;
         map["className"] = "_User";
         where![key] = map;
       } else if (value is BmobObject) {
         BmobObject bmobObject = value;
-        Map<String, dynamic> map = new Map();
+        Map<String, dynamic> map = {};
         map["__type"] = "Pointer";
         map["objectId"] = bmobObject.objectId;
         map["className"] = value.runtimeType.toString();
         where![key] = map;
       } else if (value is BmobPointer) {
-        Map<String, dynamic> map = new Map();
+        Map<String, dynamic> map = {};
         map["object"] = value;
         where![key] = map;
       } else {
@@ -238,26 +237,26 @@ class BmobQuery<T> {
     } else {
       if (value is BmobUser) {
         BmobUser bmobUser = value;
-        Map<String, dynamic> map = new Map();
+        Map<String, dynamic> map = {};
         map["__type"] = "Pointer";
         map["objectId"] = bmobUser.objectId;
         map["className"] = "_User";
 
-        Map<String, dynamic> map1 = new Map();
+        Map<String, dynamic> map1 = {};
         map1[condition] = map;
         where![key] = map1;
       } else if (value is BmobObject) {
         BmobObject bmobObject = value;
-        Map<String, dynamic> map = new Map();
+        Map<String, dynamic> map = {};
         map["__type"] = "Pointer";
         map["objectId"] = bmobObject.objectId;
         map["className"] = value.runtimeType.toString();
 
-        Map<String, dynamic> map1 = new Map();
+        Map<String, dynamic> map1 = {};
         map1[condition] = map;
         where![key] = map1;
       } else {
-        Map<String, dynamic> map = new Map();
+        Map<String, dynamic> map = {};
         map[condition] = value;
         where![key] = map;
       }

@@ -1,17 +1,19 @@
 import 'dart:async';
-
-import '../bmob_dio.dart';
 import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
+
 import '../bmob.dart';
-import '../response/bmob_saved.dart';
+import '../bmob_dio.dart';
+import '../bmob_utils.dart';
 import '../response/bmob_error.dart';
 import '../response/bmob_handled.dart';
+import '../response/bmob_saved.dart';
 import '../response/bmob_updated.dart';
 import '../type/bmob_acl.dart';
-import '../bmob_utils.dart';
-import '../type/bmob_geo_point.dart';
 import '../type/bmob_date.dart';
 import '../type/bmob_file.dart';
+import '../type/bmob_geo_point.dart';
 import '../type/bmob_relation.dart';
 
 ///Bmob对象基本类型
@@ -24,7 +26,7 @@ abstract class BmobObject {
   }
 
   String? getCreatedAt() {
-    return this.createdAt;
+    return createdAt;
   }
 
   //更新时间
@@ -35,7 +37,7 @@ abstract class BmobObject {
   }
 
   String? getUpdatedAt() {
-    return this.updatedAt;
+    return updatedAt;
   }
 
   //唯一标志
@@ -46,7 +48,7 @@ abstract class BmobObject {
   }
 
   String? getObjectId() {
-    return this.objectId;
+    return objectId;
   }
 
   //访问控制权限
@@ -54,12 +56,12 @@ abstract class BmobObject {
   Map<String, Object>? ACL;
 
   void setAcl(BmobAcl bmobAcl) {
-    this.ACL = bmobAcl.acl as Map<String, Object>?;
+    ACL = bmobAcl.acl as Map<String, Object>?;
   }
 
   BmobAcl getAcl() {
     BmobAcl bmobAcl = BmobAcl();
-    bmobAcl.acl = this.ACL;
+    bmobAcl.acl = ACL;
     return bmobAcl;
   }
 
@@ -87,9 +89,9 @@ abstract class BmobObject {
   Future<BmobUpdated> update() async {
     Map<String, dynamic> map = getParams() as Map<String, dynamic>;
     String objectId = map[Bmob.BMOB_PROPERTY_OBJECT_ID];
-    if (objectId.isEmpty || objectId == null) {
+    if (objectId.isEmpty) {
       BmobError bmobError =
-          new BmobError(Bmob.BMOB_ERROR_CODE_LOCAL, Bmob.BMOB_ERROR_OBJECT_ID);
+          BmobError(Bmob.BMOB_ERROR_CODE_LOCAL, Bmob.BMOB_ERROR_OBJECT_ID);
       throw bmobError;
     } else {
       String params = getParamsJsonFromParamsMap(map);
@@ -97,7 +99,8 @@ abstract class BmobObject {
       Map responseData = await (BmobDio.getInstance()!.put(
           Bmob.BMOB_API_CLASSES + tableName + Bmob.BMOB_API_SLASH + objectId,
           data: params) as FutureOr<Map<dynamic, dynamic>>);
-      BmobUpdated bmobUpdated = BmobUpdated.fromJson(responseData as Map<String, dynamic>);
+      BmobUpdated bmobUpdated =
+          BmobUpdated.fromJson(responseData as Map<String, dynamic>);
       return bmobUpdated;
     }
   }
@@ -106,15 +109,19 @@ abstract class BmobObject {
   Future<BmobHandled> delete() async {
     Map<String, dynamic> map = getParams() as Map<String, dynamic>;
     String objectId = map[Bmob.BMOB_PROPERTY_OBJECT_ID];
-    if (objectId.isEmpty || objectId == null) {
+    if (objectId.isEmpty) {
       BmobError bmobError =
-          new BmobError(Bmob.BMOB_ERROR_CODE_LOCAL, Bmob.BMOB_ERROR_OBJECT_ID);
+          BmobError(Bmob.BMOB_ERROR_CODE_LOCAL, Bmob.BMOB_ERROR_OBJECT_ID);
       throw bmobError;
     } else {
       String tableName = BmobUtils.getTableName(this);
       Map responseData = await (BmobDio.getInstance()!.delete(
-          Bmob.BMOB_API_CLASSES + tableName + Bmob.BMOB_API_SLASH + objectId) as FutureOr<Map<dynamic, dynamic>>);
-      BmobHandled bmobHandled = BmobHandled.fromJson(responseData as Map<String, dynamic>);
+          Bmob.BMOB_API_CLASSES +
+              tableName +
+              Bmob.BMOB_API_SLASH +
+              objectId) as FutureOr<Map<dynamic, dynamic>>);
+      BmobHandled bmobHandled =
+          BmobHandled.fromJson(responseData as Map<String, dynamic>);
       return bmobHandled;
     }
   }
@@ -123,31 +130,32 @@ abstract class BmobObject {
   Future<BmobUpdated> deleteFieldValue(String fieldName) async {
     Map<String, dynamic> map = getParams() as Map<String, dynamic>;
     String objectId = map[Bmob.BMOB_PROPERTY_OBJECT_ID];
-    if (objectId.isEmpty || objectId == null) {
+    if (objectId.isEmpty) {
       BmobError bmobError =
-          new BmobError(Bmob.BMOB_ERROR_CODE_LOCAL, Bmob.BMOB_ERROR_OBJECT_ID);
+          BmobError(Bmob.BMOB_ERROR_CODE_LOCAL, Bmob.BMOB_ERROR_OBJECT_ID);
       throw bmobError;
     } else {
       String tableName = BmobUtils.getTableName(this);
-      Map<String, String> delete = Map();
+      Map<String, String> delete = {};
       delete['__op'] = 'Delete';
-      Map<String, dynamic> params = Map();
+      Map<String, dynamic> params = {};
       params[fieldName] = delete;
       String body = json.encode(params);
       Map responseData = await (BmobDio.getInstance()!.put(
           Bmob.BMOB_API_CLASSES + tableName + Bmob.BMOB_API_SLASH + objectId,
-          data: "$body") as FutureOr<Map<dynamic, dynamic>>);
-      BmobUpdated bmobUpdated = BmobUpdated.fromJson(responseData as Map<String, dynamic>);
+          data: body) as FutureOr<Map<dynamic, dynamic>>);
+      BmobUpdated bmobUpdated =
+          BmobUpdated.fromJson(responseData as Map<String, dynamic>);
       return bmobUpdated;
     }
   }
 
   ///获取请求参数，去掉服务器生成的字段值，将对象类型修改成pointer结构，去掉空值
   String getParamsJsonFromParamsMap(map) {
-    Map<String, dynamic> data = new Map();
+    Map<String, dynamic> data = {};
     //去除由服务器生成的字段值
     if (map == null) {
-      print("请先在继承类中实现BmobObject中的Map getParams()方法！");
+      debugPrint("请先在继承类中实现BmobObject中的Map getParams()方法！");
     }
     map.remove(Bmob.BMOB_PROPERTY_OBJECT_ID);
     map.remove(Bmob.BMOB_PROPERTY_CREATED_AT);
@@ -164,7 +172,7 @@ abstract class BmobObject {
           if (objectId == null) {
             data.remove(key);
           } else {
-            Map pointer = new Map();
+            Map pointer = {};
             pointer[Bmob.BMOB_PROPERTY_OBJECT_ID] = objectId;
             pointer[Bmob.BMOB_KEY_TYPE] = Bmob.BMOB_TYPE_POINTER;
             pointer[Bmob.BMOB_KEY_CLASS_NAME] = BmobUtils.getTableName(value);

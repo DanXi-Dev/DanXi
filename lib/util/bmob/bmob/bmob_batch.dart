@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'bmob.dart';
 import 'table/bmob_object.dart';
 import 'table/bmob_user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 class BmobBatch {
   Future<List> insertBatch(List<BmobObject> bmobObjects) async {
@@ -33,7 +34,7 @@ class BmobBatch {
     for (BmobObject bmobObject in bmobObjects) {
       if (bmobObject is BmobUser) {
         //过滤BmobUser类型的处理，因为批处理操作不支持对User表的操作
-        print("BmobUser does not support batch operations");
+        debugPrint("BmobUser does not support batch operations");
       } else {
         Map single = Map();
         single["method"] = method;

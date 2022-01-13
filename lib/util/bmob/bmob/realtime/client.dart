@@ -1,12 +1,12 @@
-import 'package:dan_xi/util/bmob/bmob/response/bmob_error.dart';
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:dan_xi/util/bmob/bmob/response/bmob_error.dart';
 
 import '../bmob.dart';
 import '../bmob_dio.dart';
 import 'change.dart';
 import 'message.dart';
-
-import 'dart:convert';
 
 class Client {
   ///更新表
@@ -84,7 +84,7 @@ class Client {
        */
       List<String> transports = transportsLine.split(",");
       if (!transports.contains(PROTOCOL_WEBSOCKET)) {
-        errorCallback(new BmobError(9015, "websocket not supported"));
+        errorCallback(BmobError(9015, "websocket not supported"));
       } else {
         ///获取配置信息成功后开始进行连接
         connect(session, heartbeatInt, onConnected: (Client client) {
@@ -107,7 +107,7 @@ class Client {
       {onConnected, onDisconnected, onDataChanged, onError}) async {
     String requestUrl =
         "$DEFAULT_REAL_TIME_DATA_HOST_WS$DEFAULT_REAL_TIME_DATA_PATH_WEBSOCKET$session";
-    Map<String, String> map = Map();
+    Map<String, String> map = {};
 
     map["GET"] = "HTTP/1.1";
     map["Upgrade"] = "websocket";
@@ -207,19 +207,19 @@ class Client {
           break;
         case 7:
           // error
-          onError(new BmobError(int.parse(parts[2]), parts[3]));
+          onError(BmobError(int.parse(parts[2]), parts[3]));
           break;
         case 8:
           // noop
           break;
         default:
-          throw new Exception("unknown code");
+          throw Exception("unknown code");
       }
     }, onDone: () {
       webSocket!.add("1::");
       webSocket!.add("2::");
     }, onError: (error) {
-      onError(new BmobError(9015, error.toString()));
+      onError(BmobError(9015, error.toString()));
     }, cancelOnError: true);
   }
 
@@ -307,7 +307,7 @@ class Client {
   }
 
   String getArgs(String tableName, String objectId, String action) {
-    Map<String, dynamic> map = Map();
+    Map<String, dynamic> map = {};
     map["appKey"] = Bmob.bmobAppId;
     map["tableName"] = tableName;
     map["objectId"] = objectId;
@@ -317,7 +317,7 @@ class Client {
   }
 
   Future emit(String name, List<String> args) async {
-    Map<String, dynamic> data = Map();
+    Map<String, dynamic> data = {};
 
     data["name"] = name;
     data["args"] = args;

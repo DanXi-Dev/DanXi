@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
 
-import 'package:dio/dio.dart';
-import 'bmob.dart';
-
-import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'bmob.dart';
 
 //    post or put:
 //		md5(url + timeStamp + safeToken + noncestr+ body + sdkVersion)
@@ -195,7 +196,7 @@ class BmobDio {
           getSafeSign(path, nonceStrKey, safeTimeStamp, data);
     } else {
       //没有初始化
-      print("请先进行SDK的初始化，再进行网络请求。");
+      debugPrint("请先进行SDK的初始化，再进行网络请求。");
     }
 
     map["Content-Type"] = "application/json";
