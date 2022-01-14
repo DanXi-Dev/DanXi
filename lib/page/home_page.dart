@@ -695,9 +695,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       TimeTableRepository.getInstance()
           .loadTimeTableLocally(StateProvider.personInfo.value,
               forceLoadFromRemote: true)
-          .onError((dynamic error, stackTrace) => Noticing.showNotice(
-              context, S.of(context).timetable_refresh_error,
-              title: S.of(context).fatal_error, useSnackBar: false));
+          .onError((dynamic error, stackTrace) {
+        Noticing.showNotice(context, S.of(context).timetable_refresh_error,
+            title: S.of(context).fatal_error, useSnackBar: false);
+      });
 
       SettingsProvider.getInstance().lastSemesterStartTime =
           TimeTable.defaultStartTime.toIso8601String();
