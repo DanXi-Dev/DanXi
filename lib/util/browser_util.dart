@@ -136,15 +136,24 @@ class CustomInAppBrowser extends InAppBrowser {
     launch(url.toString());
   }
 
-  String uisLoginJavaScript(PersonInfo info) => '''try{
-            document.getElementById('username').value = "${info.id}";
-            document.getElementById('password').value = "${info.password}";
+  String uisLoginJavaScript(PersonInfo info) =>
+      r'''try{
+            document.getElementById('username').value = String.raw`''' +
+      info.id! +
+      r'''`;
+            document.getElementById('password').value = String.raw`''' +
+      info.password! +
+      r'''`;
             document.forms[0].submit();
         }
         catch (e) {
             try{
-                document.getElementById('mobileUsername').value = "${info.id}";
-                document.getElementById('mobilePassword').value = "${info.password}";
+                document.getElementById('mobileUsername').value = String.raw`''' +
+      info.id! +
+      r'''`;
+                document.getElementById('mobilePassword').value = String.raw`''' +
+      info.password! +
+      r'''`;
                 document.forms[0].submit();
             }
             catch (e) {
