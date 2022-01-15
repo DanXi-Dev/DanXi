@@ -378,8 +378,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           if (call.arguments["token"] !=
               SettingsProvider.getInstance().lastPushToken) {
             OpenTreeHoleRepository.getInstance()
-                .updatePushNotificationToken(call.arguments["token"],
-                    call.arguments["id"], PushNotificationServiceType.APNS)
+                .updatePushNotificationToken(
+                    call.arguments["token"],
+                    await PlatformX.getUniqueDeviceId(),
+                    PushNotificationServiceType.APNS)
                 .then((value) {
               SettingsProvider.getInstance().lastPushToken =
                   call.arguments["token"];

@@ -45,11 +45,11 @@ import WatchConnectivity
                               didRegisterForRemoteNotificationsWithDeviceToken
                               deviceToken: Data) {
         let token: String = deviceToken.map { String(format: "%.2hhx", $0) }.joined()
-        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "null_device_id"
+        //let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "null_device_id"
         /* Send token to FDUHole */
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
-        channel.invokeMethod("upload_apns_token", arguments: ["token": token, "id": deviceId])
+        channel.invokeMethod("upload_apns_token", arguments: ["token": token])
     }
     
     

@@ -32,6 +32,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
@@ -72,8 +73,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           _token = SettingsProvider.getInstance().fduholeToken;
         }
       }
-      await deletePushNotificationToken(
-          SettingsProvider.getInstance().lastPushToken!);
+      await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     }
     clearCache();
     SettingsProvider.getInstance().deleteAllFduholeData();
@@ -563,7 +563,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {
     if (isUserInitialized) {
-      await dio!.post(_BASE_URL + "/users",
+      await dio!.post(_BASE_URL + "/users/push-tokens",
           data: {
             "service": service.toStringRepresentation(),
             "device_id": id,
@@ -578,19 +578,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  Future<void> deletePushNotificationToken(String token) async {
-    throw UnimplementedError(
-        "delete push notification token function has not yet been implemented, awaiting API negotiation.");
-    /*await dio!.delete(_BASE_URL + "/users",
+  Future<void> deletePushNotificationToken(String deviceId) async {
+    await dio!.delete(_BASE_URL + "/users/push-tokens",
         data: {
-          "service": service.toStringRepresentation(),
-          "device_id": id,
-          "token": token,
+          "device_id": deviceId,
         },
         options: Options(
           headers: _tokenHeader,
           validateStatus: (status) => status == 200,
-        ));*/
+        ));
   }
 
   @override
