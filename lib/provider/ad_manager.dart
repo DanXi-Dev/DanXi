@@ -57,7 +57,6 @@ class AdManager {
       onAdFailedToLoad: (Ad ad, LoadAdError error) {
         // Dispose the ad here to free resources.
         ad.dispose();
-        debugPrint('Ad failed to load: $error');
       },
       // Called when an ad opens an overlay that covers the screen.
       onAdOpened: (Ad ad) {},

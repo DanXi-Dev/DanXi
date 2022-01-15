@@ -159,7 +159,7 @@ class Constant {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
-          //color: ThemeData.light().cardColor.withOpacity(0.8),
+          color: ThemeData.light().cardColor,
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
@@ -169,8 +169,9 @@ class Constant {
     return ThemeData(
       brightness: Brightness.light,
       primarySwatch: Colors.blue,
-      cardTheme: const CardTheme(
-        margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
+      cardTheme: CardTheme(
+        margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        color: ThemeData.light().cardColor,
       ),
     );
   }
@@ -204,8 +205,9 @@ class Constant {
     }
     return ThemeData(
       brightness: Brightness.dark,
-      cardTheme: const CardTheme(
-        margin: EdgeInsets.fromLTRB(10, 8, 10, 8),
+      cardTheme: CardTheme(
+        margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        color: ThemeData.dark().cardColor,
       ),
     );
   }

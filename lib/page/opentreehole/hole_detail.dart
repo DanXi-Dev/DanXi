@@ -22,6 +22,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -199,6 +200,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _listViewController.replaceDataInRangeWith(value, 0);
       }, onError: (error, st) {});
     });
+    final bgImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(
       material: (_, __) =>
           MaterialScaffoldData(resizeToAvoidBottomInset: false),
@@ -233,33 +235,39 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ],
       ),
       body: Material(
-        child: SafeArea(
-          bottom: false,
-          child: RefreshIndicator(
-            color: Theme.of(context).colorScheme.secondary,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              await refreshSelf();
-            },
-            child: PagedListView<OTFloor>(
-              initialData: _post.floors?.prefetch,
-              pagedController: _listViewController,
-              withScrollbar: true,
-              scrollController: PrimaryScrollController.of(context),
-              dataReceiver: _loadContent,
-              shouldScrollToEnd: shouldScrollToEnd,
-              builder: _getListItems,
-              loadingBuilder: (BuildContext context) => Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(child: PlatformCircularProgressIndicator()),
-              ),
-              endBuilder: (context) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text((_post.view ?? -1) >= 0
-                      ? S.of(context).view_count(_post.view.toString())
-                      : S.of(context).end_reached),
+        child: Container(
+          decoration: bgImage == null
+              ? null
+              : BoxDecoration(
+                  image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
+          child: SafeArea(
+            bottom: false,
+            child: RefreshIndicator(
+              color: Theme.of(context).colorScheme.secondary,
+              backgroundColor: Theme.of(context).dialogBackgroundColor,
+              onRefresh: () async {
+                HapticFeedback.mediumImpact();
+                await refreshSelf();
+              },
+              child: PagedListView<OTFloor>(
+                initialData: _post.floors?.prefetch,
+                pagedController: _listViewController,
+                withScrollbar: true,
+                scrollController: PrimaryScrollController.of(context),
+                dataReceiver: _loadContent,
+                shouldScrollToEnd: shouldScrollToEnd,
+                builder: _getListItems,
+                loadingBuilder: (BuildContext context) => Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Center(child: PlatformCircularProgressIndicator()),
+                ),
+                endBuilder: (context) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text((_post.view ?? -1) >= 0
+                        ? S.of(context).view_count(_post.view.toString())
+                        : S.of(context).end_reached),
+                  ),
                 ),
               ),
             ),

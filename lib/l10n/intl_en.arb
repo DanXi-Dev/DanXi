@@ -188,7 +188,7 @@
     "not_undergraduate": "Not undergraduate?",
     "silence_notice": "No Permission to Post",
     "ban_post_until": "You are not allowed to post in this division until {date}",
-    "silence_detail": "Due to policy violations, you have been banned from posting in this division.\n\nIf you believe this is an error, please contact us at fduhole@gmail.com",
+    "silence_detail": "Due to policy violations, you have been banned from posting in this division.\n\nIf you believe this is an error, please contact us.",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
@@ -305,6 +305,10 @@
     "weekday": "Weekday",
     "enter_captcha": "Enter Captcha",
     "formula": "[Formula]",
+    "background_image": "FDUHole: Background Image",
+    "background_image_description": "Choose an image as FDUHole background",
+    "already_set": "Already Set",
+    "background_image_already_set": "A background image is already set, do you wish to remove it?",
 
     "sponsor_us": "Support Us 🍀",
     "sponsor_us_detail": "Thank you so much for your kindness to enable it! Danxi and FDUHole have been operating as independent projects for a long time. However, in the long run, we are a bit overwhelmed by the high server costs.\n\nRather than direct donations, we chose a more modest way - to display some ads provided by Google in Danxi. These ads won't interfere with your browsing, but they will bring us real income and motivate us to keep going.",

@@ -1,5 +1,3 @@
-
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -43,6 +41,6 @@ class Announcement extends BmobObject {
   Announcement(this.content);
 
   @override
-  Map getParams() =>
+  Map<String, dynamic> getParams() =>
       Map<String, dynamic>.from({"content": content, "maxVersion": maxVersion});
 }

@@ -271,7 +271,7 @@ class OTFloorWidget extends StatelessWidget {
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
-            : null,
+            : Theme.of(context).cardTheme.color?.withOpacity(0.8),
         child: floor.deleted == true
             ? ExpansionTileX(
                 title: Text(

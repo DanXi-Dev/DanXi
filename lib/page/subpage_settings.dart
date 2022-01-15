@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
 import 'package:dan_xi/generated/l10n.dart';
@@ -37,6 +39,7 @@ import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
@@ -49,7 +52,9 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -563,6 +568,55 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                         context, '/bbs/tags/blocklist');
                                     treeholePageKey.currentState
                                         ?.setState(() {});
+                                  },
+                                ),
+                                ListTile(
+                                  leading:
+                                      Icon(PlatformIcons(context).photoLibrary),
+                                  title: Text(S.of(context).background_image),
+                                  subtitle: Text(S
+                                      .of(context)
+                                      .background_image_description),
+                                  onTap: () async {
+                                    if (SettingsProvider.getInstance()
+                                            .backgroundImagePath ==
+                                        null) {
+                                      final ImagePickerProxy _picker =
+                                          ImagePickerProxy.createPicker();
+                                      final String? _file =
+                                          await _picker.pickImage();
+                                      if (_file == null) return;
+                                      final String path =
+                                          (await getApplicationDocumentsDirectory())
+                                              .path;
+                                      final File file = File(_file);
+                                      final imagePath = '$path/background';
+                                      await file.copy(imagePath);
+                                      SettingsProvider.getInstance()
+                                          .backgroundImagePath = imagePath;
+                                      treeholePageKey.currentState
+                                          ?.setState(() {});
+                                    } else {
+                                      if (await Noticing.showConfirmationDialog(
+                                              context,
+                                              S
+                                                  .of(context)
+                                                  .background_image_already_set,
+                                              title:
+                                                  S.of(context).already_set) ==
+                                          true) {
+                                        final file = File(
+                                            SettingsProvider.getInstance()
+                                                .backgroundImagePath!);
+                                        if (await file.exists()) {
+                                          await file.delete();
+                                        }
+                                        SettingsProvider.getInstance()
+                                            .backgroundImagePath = null;
+                                        treeholePageKey.currentState
+                                            ?.setState(() {});
+                                      }
+                                    }
                                   },
                                 ),
                                 // Clear Cache

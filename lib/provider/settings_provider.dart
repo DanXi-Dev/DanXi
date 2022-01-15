@@ -16,6 +16,8 @@
  */
 
 import 'dart:convert';
+import 'dart:core';
+import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -23,6 +25,7 @@ import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A class to manage [SharedPreferences] Settings
@@ -54,10 +57,37 @@ class SettingsProvider {
   static const String KEY_HIDDEN_HOLE = "hidden_hole";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
   static const String KEY_CELEBRATION = "celebration";
+  static const String KEY_BACKGROUND_IMAGE_PATH = "background";
 
   SettingsProvider._();
 
   factory SettingsProvider.getInstance() => _instance;
+
+  FileImage? get backgroundImage {
+    final path = backgroundImagePath;
+    if (path == null) return null;
+    try {
+      final File image = File(path);
+      return FileImage(image);
+    } catch (ignored) {
+      return null;
+    }
+  }
+
+  String? get backgroundImagePath {
+    if (preferences!.containsKey(KEY_BACKGROUND_IMAGE_PATH)) {
+      return preferences!.getString(KEY_BACKGROUND_IMAGE_PATH)!;
+    }
+    return null;
+  }
+
+  set backgroundImagePath(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_BACKGROUND_IMAGE_PATH, value);
+    } else {
+      preferences!.remove(KEY_BACKGROUND_IMAGE_PATH);
+    }
+  }
 
   Future<void> init() async =>
       preferences = await SharedPreferences.getInstance();

@@ -485,65 +485,72 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildPageBody() {
+    final bgImage = SettingsProvider.getInstance().backgroundImage;
     return Material(
-      child: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            await _refreshList();
-          },
-          child: PagedListView<OTHole>(
-              noneItem: OTHole.DUMMY_POST,
-              pagedController: _listViewController,
-              withScrollbar: true,
-              scrollController: widget.primaryScrollController(context),
-              startPage: 1,
-              builder: _buildListItem,
-              headBuilder: (_) => Column(
-                    children: [
-                      AutoBannerAdWidget(bannerAd: bannerAd),
-                      if (_postsType == PostsType.NORMAL_POSTS) ...[
-                        OTSearchWidget(focusNode: _searchFocus),
-                        _autoSilenceNotice(),
-                        _autoAdminNotice(),
-                        _autoPinnedPosts(),
+      child: Container(
+        decoration: bgImage == null
+            ? null
+            : BoxDecoration(
+                image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
+        child: SafeArea(
+          bottom: false,
+          child: RefreshIndicator(
+            color: Theme.of(context).colorScheme.secondary,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              await _refreshList();
+            },
+            child: PagedListView<OTHole>(
+                noneItem: OTHole.DUMMY_POST,
+                pagedController: _listViewController,
+                withScrollbar: true,
+                scrollController: widget.primaryScrollController(context),
+                startPage: 1,
+                builder: _buildListItem,
+                headBuilder: (_) => Column(
+                      children: [
+                        AutoBannerAdWidget(bannerAd: bannerAd),
+                        if (_postsType == PostsType.NORMAL_POSTS) ...[
+                          OTSearchWidget(focusNode: _searchFocus),
+                          _autoSilenceNotice(),
+                          _autoAdminNotice(),
+                          _autoPinnedPosts(),
+                        ],
                       ],
-                    ],
-                  ),
-              loadingBuilder: (BuildContext context) => Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
-                  ),
-              endBuilder: (context) => Center(
-                      child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(S.of(context).end_reached),
-                  )),
-              emptyBuilder: (_) {
-                if (_postsType == PostsType.FAVORED_DISCUSSION) {
-                  return _buildEmptyFavoritesPage();
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: Text(S.of(context).no_data)),
-                  );
-                }
-              },
-              fatalErrorBuilder: (_, e) {
-                if (e is NotLoginError) {
-                  return OTWelcomeWidget(loginCallback: () async {
-                    await smartNavigatorPush(context, "/bbs/login",
-                        arguments: {"info": StateProvider.personInfo.value!});
-                    _refreshList();
-                  });
-                }
-                return ErrorPageWidget.buildWidget(context, e,
-                    onTap: () => refreshSelf());
-              },
-              dataReceiver: _loadContent),
+                    ),
+                loadingBuilder: (BuildContext context) => Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Center(child: PlatformCircularProgressIndicator()),
+                    ),
+                endBuilder: (context) => Center(
+                        child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(S.of(context).end_reached),
+                    )),
+                emptyBuilder: (_) {
+                  if (_postsType == PostsType.FAVORED_DISCUSSION) {
+                    return _buildEmptyFavoritesPage();
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Center(child: Text(S.of(context).no_data)),
+                    );
+                  }
+                },
+                fatalErrorBuilder: (_, e) {
+                  if (e is NotLoginError) {
+                    return OTWelcomeWidget(loginCallback: () async {
+                      await smartNavigatorPush(context, "/bbs/login",
+                          arguments: {"info": StateProvider.personInfo.value!});
+                      _refreshList();
+                    });
+                  }
+                  return ErrorPageWidget.buildWidget(context, e,
+                      onTap: () => refreshSelf());
+                },
+                dataReceiver: _loadContent),
+          ),
         ),
       ),
     );
@@ -584,6 +591,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
 
     return Card(
+      color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
       child: Column(
         children: [
           ListTile(

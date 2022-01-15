@@ -87,7 +87,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
           ),
           PlatformWidget(
               material: (_, __) => DropdownButton<Campus>(
-                    items: _getItems() as List<DropdownMenuItem<Campus>>?,
+                    items: _getItems(),
                     // Don't select anything if _selectItem == Campus.NONE
                     value: _selectItem == Campus.NONE ? null : _selectItem,
                     hint: Text(_selectItem.displayTitle(context)!),

@@ -220,10 +220,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
       _loadStartDate().catchError((ignored) {});
-      _loadCelebration().catchError((ignored, st) {
-        print(ignored);
-        print(st);
-      });
+      _loadCelebration().catchError((ignored, st) {});
     }, onError: (e) {
       _dealWithBmobError();
     });
@@ -326,7 +323,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // This callback gets invoked every time brightness changes
       // What's wrong with this code? why does the app refresh on every launch?
       // The timer below is a workaround to the issue.
-          Timer(const Duration(milliseconds: 500), () {
+      Timer(const Duration(milliseconds: 500), () {
         if (WidgetsBinding.instance!.platformDispatcher.platformBrightness !=
             Theme.of(context).brightness) FlutterApp.restartApp(context);
       });
