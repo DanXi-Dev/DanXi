@@ -18,7 +18,9 @@
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -29,22 +31,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
-  // Popover crashes on iPad
-  static InAppBrowserClassOptions getOptions(BuildContext context) => isTablet()
-      ? InAppBrowserClassOptions(
-          inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(
-              javaScriptEnabled: true, useOnDownloadStart: true),
-        ))
-      : InAppBrowserClassOptions(
+  static InAppBrowserClassOptions getOptions(BuildContext context) =>
+      InAppBrowserClassOptions(
+          crossPlatform: InAppBrowserOptions(
+              toolbarTopBackgroundColor: Theme.of(context).cardTheme.color),
           android: AndroidInAppBrowserOptions(hideTitleBar: true),
-          ios: IOSInAppBrowserOptions(
-            presentationStyle: IOSUIModalPresentationStyle.POPOVER,
-          ),
+          ios: IOSInAppBrowserOptions(hideToolbarBottom: true),
           inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-            crossPlatform: InAppWebViewOptions(
-                javaScriptEnabled: true, useOnDownloadStart: true),
-          ));
+              crossPlatform: InAppWebViewOptions(
+                  javaScriptEnabled: true,
+                  useOnDownloadStart: true,
+                  incognito: true),
+              ios: IOSInAppWebViewOptions(sharedCookiesEnabled: true)));
 
   static openUrl(String url, BuildContext? context,
       [NonpersistentCookieJar? cookieJar]) async {
@@ -136,6 +134,33 @@ class CustomInAppBrowser extends InAppBrowser {
   @override
   void onDownloadStart(Uri url) {
     launch(url.toString());
+  }
+
+  String uisLoginJavaScript(PersonInfo info) => '''try{
+            document.getElementById('username').value = "${info.id}";
+            document.getElementById('password').value = "${info.password}";
+            document.forms[0].submit();
+        }
+        catch (e) {
+            try{
+                document.getElementById('mobileUsername').value = "${info.id}";
+                document.getElementById('mobilePassword').value = "${info.password}";
+                document.forms[0].submit();
+            }
+            catch (e) {
+                window.alert("DanXi: Failed to auto login UIS");
+            }
+        }''';
+
+  @override
+  Future<dynamic> onLoadStop(url) async {
+    if (url
+            ?.toString()
+            .startsWith("https://uis.fudan.edu.cn/authserver/login") ==
+        true) {
+      webViewController.evaluateJavascript(
+          source: uisLoginJavaScript(StateProvider.personInfo.value!));
+    }
   }
 
   @override

@@ -526,19 +526,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
-  /// Get sender username of a post, requires Admin privilege
-  /*Future<String> adminGetUser(int? discussionId, int? postId) async {
-    throw UnimplementedError();
-    final response = await dio!.post(_BASE_URL + "/admin/",
-        data: {
-          "operation": "get_user",
-          "discussion_id": discussionId,
-          "post_id": postId,
-        },
-        options: Options(headers: _tokenHeader));
-    return response.data.toString();
-  }*/
-
   Future<List<OTReport>> adminGetReports() async {
     final response = await dio!.get(_BASE_URL + "/reports",
         //queryParameters: {"category": page, "show_only_undealt": true},
@@ -546,17 +533,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
   }
-
-  /*Future<String> adminSetReportDealt(int? reportId) async {
-    throw UnimplementedError();
-    final response = await dio!.post(_BASE_URL + "/admin/",
-        data: {
-          "operation": "set_report_dealed",
-          "report_id": reportId,
-        },
-        options: Options(headers: _tokenHeader));
-    return response.data.toString();
-  }*/
 
   // Migrated
   /// Upload or update Push Notification token to server

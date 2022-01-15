@@ -76,21 +76,21 @@ class _AAONoticesListState extends State<AAONoticesList> {
             builder: (_, __, ___, Notice value) {
               return ThemedMaterial(
                   child: ListTile(
-                    leading: PlatformX.isMaterial(context)
+                leading: PlatformX.isMaterial(context)
                     ? const Icon(Icons.info)
                     : const Icon(CupertinoIcons.info_circle_fill),
                 title: Text(value.title),
                 subtitle: Text(value.time),
                 onTap: () async {
                   NonpersistentCookieJar? cookie;
-                  if (PlatformX.isMobile && !PlatformX.isIOS) {
+                  if (PlatformX.isMobile) {
                     ProgressFuture progressDialog = showProgressDialog(
                         loadingText: S.of(context).loading, context: context);
                     cookie = await FudanAAORepository.getInstance().thisCookies;
                     progressDialog.dismiss(showAnim: false);
                   }
                   BrowserUtil.openUrl(value.url, context, cookie);
-                }, // TODO: fix this for iOS
+                },
               ));
             },
             loadingBuilder: (_) => Center(
