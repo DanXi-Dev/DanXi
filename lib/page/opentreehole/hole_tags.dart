@@ -60,6 +60,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
         child: WithScrollbar(
           controller: PrimaryScrollController.of(context),
           child: SingleChildScrollView(
+            clipBehavior: Clip.none,
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
             primary: true,
             child: FutureWidget<List<OTTag>?>(

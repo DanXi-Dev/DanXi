@@ -240,34 +240,31 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               ? null
               : BoxDecoration(
                   image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
-          child: SafeArea(
-            bottom: false,
-            child: RefreshIndicator(
-              color: Theme.of(context).colorScheme.secondary,
-              backgroundColor: Theme.of(context).dialogBackgroundColor,
-              onRefresh: () async {
-                HapticFeedback.mediumImpact();
-                await refreshSelf();
-              },
-              child: PagedListView<OTFloor>(
-                initialData: _post.floors?.prefetch,
-                pagedController: _listViewController,
-                withScrollbar: true,
-                scrollController: PrimaryScrollController.of(context),
-                dataReceiver: _loadContent,
-                shouldScrollToEnd: shouldScrollToEnd,
-                builder: _getListItems,
-                loadingBuilder: (BuildContext context) => Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Center(child: PlatformCircularProgressIndicator()),
-                ),
-                endBuilder: (context) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text((_post.view ?? -1) >= 0
-                        ? S.of(context).view_count(_post.view.toString())
-                        : S.of(context).end_reached),
-                  ),
+          child: RefreshIndicator(
+            color: Theme.of(context).colorScheme.secondary,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              await refreshSelf();
+            },
+            child: PagedListView<OTFloor>(
+              initialData: _post.floors?.prefetch,
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: PrimaryScrollController.of(context),
+              dataReceiver: _loadContent,
+              shouldScrollToEnd: shouldScrollToEnd,
+              builder: _getListItems,
+              loadingBuilder: (BuildContext context) => Container(
+                padding: const EdgeInsets.all(8),
+                child: Center(child: PlatformCircularProgressIndicator()),
+              ),
+              endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text((_post.view ?? -1) >= 0
+                      ? S.of(context).view_count(_post.view.toString())
+                      : S.of(context).end_reached),
                 ),
               ),
             ),

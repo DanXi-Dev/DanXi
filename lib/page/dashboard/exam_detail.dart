@@ -142,18 +142,17 @@ class _ExamListState extends State<ExamList> {
           ],
         ),
         body: Material(
-            child: SafeArea(
-                child: FutureWidget<List<SemesterInfo>?>(
-                    future: _semesterFuture,
-                    successBuilder: (BuildContext context,
-                        AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                      _unpackedSemester = snapshot.data;
-                      semester ??= _unpackedSemester!.length - 5;
-                      return _loadExamGradeHybridView();
-                    },
-                    loadingBuilder:
-                        Center(child: PlatformCircularProgressIndicator()),
-                    errorBuilder: _loadGradeViewFromDataCenter))));
+            child: FutureWidget<List<SemesterInfo>?>(
+                future: _semesterFuture,
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
+                  _unpackedSemester = snapshot.data;
+                  semester ??= _unpackedSemester!.length - 5;
+                  return _loadExamGradeHybridView();
+                },
+                loadingBuilder:
+                    Center(child: PlatformCircularProgressIndicator()),
+                errorBuilder: _loadGradeViewFromDataCenter)));
   }
 
   Future<void> loadExamAndScore() async {
@@ -178,7 +177,7 @@ class _ExamListState extends State<ExamList> {
           child: PlatformCircularProgressIndicator(),
         ),
         errorBuilder: () => _loadGradeView());
-    return Column(
+    return ListView(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,7 +214,7 @@ class _ExamListState extends State<ExamList> {
           loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
           errorBuilder:
               (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
-                if (snapshot.error is RangeError) {
+            if (snapshot.error is RangeError) {
               return Padding(
                   child: Center(
                     child: Text(S.of(context).no_data),
@@ -227,18 +226,12 @@ class _ExamListState extends State<ExamList> {
 
   Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
           {bool isFallback = false}) =>
-      Column(children: [
-        Expanded(
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: WithScrollbar(
-                    controller: PrimaryScrollController.of(context),
-                    child: ListView(
-                        primary: true,
-                        children: _getListWidgetsGrade(snapshot.data!,
-                            isFallback: isFallback)))))
-      ]);
+      WithScrollbar(
+          controller: PrimaryScrollController.of(context),
+          child: ListView(
+              primary: true,
+              children: _getListWidgetsGrade(snapshot.data!,
+                  isFallback: isFallback)));
 
   Widget _loadGradeViewFromDataCenter() {
     return GestureDetector(

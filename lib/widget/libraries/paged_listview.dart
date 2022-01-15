@@ -280,6 +280,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       // Tell the listView not to try to load anymore.
       _shouldLoad = false;
       return ListView(
+        //clipBehavior: Clip.none,
         key: _scrollKey,
         controller: widget.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),

@@ -120,7 +120,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         _content = PostgraduateTimetableRepository.getInstance()
             .loadTimeTableRemotely(StateProvider.personInfo.value!,
                 (imageUrl) async {
-                  TextEditingController controller = TextEditingController();
+          TextEditingController controller = TextEditingController();
           await showPlatformDialog(
               context: context,
               builder: (cxt) {
@@ -206,7 +206,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           showPlatformModalSheet(
               context: context,
               builder: (BuildContext context) => PlatformWidget(
-                cupertino: (_, __) => CupertinoActionSheet(
+                    cupertino: (_, __) => CupertinoActionSheet(
                       actions: _buildShareList(context),
                       cancelButton: CupertinoActionSheetAction(
                         child: Text(S.of(context).cancel),
@@ -325,48 +325,45 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     _showingTime ??= _table!.now();
     final List<DayEvents> scheduleData = _table!
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
-    return SafeArea(
-      child: Material(
-        child: RefreshIndicator(
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            _manualLoad = true;
-            HapticFeedback.mediumImpact();
-            await refreshSelf();
-          },
-          child: ListView(
-            // This ListView is a workaround, so that we can apply a custom scroll physics to it.
-            controller: _dummyScrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              AutoBannerAdWidget(bannerAd: bannerAd),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  PlatformIconButton(
-                    icon: const Icon(Icons.chevron_left),
-                    onPressed: _showingTime!.week > 0 ? goToPrev : null,
-                  ),
-                  Text(S.of(context).week(_showingTime!.week)),
-                  PlatformIconButton(
-                    icon: const Icon(Icons.chevron_right),
-                    onPressed: _showingTime!.week < TimeTable.MAX_WEEK
-                        ? goToNext
-                        : null,
-                  )
-                ],
-              ),
-              ScheduleView(
-                scheduleData,
-                style,
-                _table!.now(),
-                _showingTime!.week,
-                widget.primaryScrollController(context),
-                tapCallback: _onTapCourse,
-              ),
-            ],
-          ),
+    return Material(
+      child: RefreshIndicator(
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          _manualLoad = true;
+          HapticFeedback.mediumImpact();
+          await refreshSelf();
+        },
+        child: ListView(
+          // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+          controller: _dummyScrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            AutoBannerAdWidget(bannerAd: bannerAd),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                PlatformIconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: _showingTime!.week > 0 ? goToPrev : null,
+                ),
+                Text(S.of(context).week(_showingTime!.week)),
+                PlatformIconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed:
+                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
+                )
+              ],
+            ),
+            ScheduleView(
+              scheduleData,
+              style,
+              _table!.now(),
+              _showingTime!.week,
+              widget.primaryScrollController(context),
+              tapCallback: _onTapCourse,
+            ),
+          ],
         ),
       ),
     );

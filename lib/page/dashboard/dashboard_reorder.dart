@@ -58,6 +58,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
         child: Material(
           child: WithScrollbar(
             child: ReorderableListView(
+              clipBehavior: Clip.none,
               buildDefaultDragHandles: true,
               primary: true,
               children: _getListWidgets() +
