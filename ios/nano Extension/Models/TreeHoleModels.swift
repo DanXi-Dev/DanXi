@@ -43,6 +43,18 @@ struct OTFloor: Hashable, Codable, Identifiable {
     let fold: [String]?
 }
 
+struct OTDivision: Hashable, Codable, Identifiable {
+    var id: Int {
+        get {
+            return self.division_id
+        }
+    }
+    
+    let division_id: Int
+    let name, description: String
+    let pinned: [OTHole]?
+}
+
 struct OTTag: Hashable, Codable {
     let name: String
     let tag_id, temperature: Int

@@ -64,9 +64,10 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
+const fduholeChannel = MethodChannel('fduhole');
+
 void sendFduholeTokenToWatch(String? token) {
-  const channel = MethodChannel('fduhole');
-  channel.invokeMethod("send_token", token);
+  fduholeChannel.invokeMethod("send_token", token);
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
@@ -358,7 +359,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    const fduholeChannel = MethodChannel('fduhole');
     fduholeChannel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
         case "launch_from_notification":
@@ -386,7 +386,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             }, onError: (value) => null);
           }
           break;
-        case 'getToken':
+        case 'get_token':
           // If we haven't loaded [StateProvider.personInfo]
           if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
             sendFduholeTokenToWatch(

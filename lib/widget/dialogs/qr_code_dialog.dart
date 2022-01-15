@@ -45,15 +45,6 @@ class QRHelper {
               personInfo: personInfo,
             ));
   }
-
-  //watchOS Support
-  static const channel = MethodChannel('watchQRValue');
-
-  static Future<void> sendQRtoWatch(PersonInfo personInfo) async {
-    String? qr = await QRCodeRepository.getInstance().getQRCode(personInfo);
-
-    channel.invokeMethod("sendStringToNative", qr.toString());
-  }
 }
 
 class QRDialog extends StatefulWidget {
@@ -66,7 +57,6 @@ class QRDialog extends StatefulWidget {
 }
 
 class _QRDialogState extends State<QRDialog> {
-
   @override
   Widget build(BuildContext context) {
     return PlatformAlertDialog(

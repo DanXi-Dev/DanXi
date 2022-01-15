@@ -18,10 +18,12 @@ import WatchConnectivity
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "fduhole",
-                                           binaryMessenger: controller.binaryMessenger)
-        channel.invokeMethod("get_token", arguments: nil)
+        DispatchQueue.main.async {
+            let controller : FlutterViewController = self.window?.rootViewController as! FlutterViewController
+            let channel = FlutterMethodChannel(name: "fduhole",
+                                               binaryMessenger: controller.binaryMessenger)
+            channel.invokeMethod("get_token", arguments: nil)
+        }
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
