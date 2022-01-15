@@ -53,6 +53,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 
+import 'common/constant.dart';
+
 /// The main entry of the whole app.
 /// Do some initial work here.
 void main() {
@@ -172,8 +174,10 @@ class DanxiApp extends StatelessWidget {
     return Phoenix(
       child: PlatformProvider(
         // initialPlatform: TargetPlatform.iOS,
-        builder: (BuildContext context) => const DynamicThemeController(
-          child: PlatformMasterDetailApp(
+        builder: (BuildContext context) => DynamicThemeController(
+          lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
+          darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
+          child: const PlatformMasterDetailApp(
             masterPage: HomePage(),
           ),
         ),

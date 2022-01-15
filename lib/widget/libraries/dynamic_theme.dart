@@ -15,15 +15,19 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 
-/// A ListView supporting paged loading and viewing.
+/// A Widget to dynamically switch theme for its children based on system settings
 class DynamicThemeController extends StatefulWidget {
   final Widget child;
+  final ThemeData lightTheme;
+  final ThemeData darkTheme;
 
-  const DynamicThemeController({Key? key, required this.child})
+  const DynamicThemeController(
+      {Key? key,
+      required this.child,
+      required this.lightTheme,
+      required this.darkTheme})
       : super(key: key);
 
   @override
@@ -53,8 +57,8 @@ class _DynamicThemeControllerState extends State<DynamicThemeController>
   Widget build(BuildContext context) {
     return Theme(
         data: _brightness == Brightness.light
-            ? Constant.lightTheme(!PlatformX.isMaterial(context))
-            : Constant.darkTheme(!PlatformX.isMaterial(context)),
+            ? widget.lightTheme
+            : widget.darkTheme,
         child: widget.child);
   }
 }
