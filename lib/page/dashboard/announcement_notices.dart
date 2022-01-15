@@ -54,8 +54,8 @@ class _AnnouncementListState extends State<AnnouncementList> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      iosContentBottomPadding: true,
-      iosContentPadding: true,
+      iosContentBottomPadding: false,
+      iosContentPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(
@@ -84,14 +84,11 @@ class _AnnouncementListState extends State<AnnouncementList> {
           return Column(
             children: [
               Expanded(
-                  child: MediaQuery.removePadding(
-                      context: context,
-                      removeTop: true,
-                      child: WithScrollbar(
-                          controller: PrimaryScrollController.of(context),
-                          child: ListView(
-                            children: _getListWidgets(),
-                          ))))
+                  child: WithScrollbar(
+                      controller: PrimaryScrollController.of(context),
+                      child: ListView(
+                        children: _getListWidgets(),
+                      )))
             ],
           );
         },
