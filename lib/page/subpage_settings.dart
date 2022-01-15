@@ -429,8 +429,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                               ExpansionTileX(
                                 leading:
                                     Icon(PlatformIcons(context).accountCircle),
-                                title: Text(
-                                    "${S.of(context).forum} ${S.of(context).account}"),
+                                title: Text(S.of(context).forum),
                                 subtitle: Text(OpenTreeHoleRepository
                                             .getInstance()
                                         .isUserInitialized
@@ -616,8 +615,8 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     ),
                                     // Clear Cache
                                     ListTile(
-                                      leading: Icon(
-                                          PlatformIcons(context).photoLibrary),
+                                      leading:
+                                          Icon(PlatformIcons(context).settings),
                                       title: Text(S.of(context).clear_cache),
                                       subtitle: Text(_clearCacheSubtitle ??
                                           S

@@ -150,6 +150,7 @@ class Constant {
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF)),
         toggleableActiveColor: const Color(0xFF007AFF),
+        indicatorColor: const Color(0xFF007AFF),
         canvasColor: const Color.fromRGBO(242, 242, 247, 1),
         backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
@@ -183,6 +184,7 @@ class Constant {
         colorScheme: const ColorScheme.dark().copyWith(
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF)),
+        indicatorColor: const Color(0xFF007AFF),
         toggleableActiveColor: const Color(0xFF007AFF),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,
