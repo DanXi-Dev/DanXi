@@ -45,6 +45,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -171,9 +172,8 @@ class DanxiApp extends StatelessWidget {
     return Phoenix(
       child: PlatformProvider(
         // initialPlatform: TargetPlatform.iOS,
-        builder: (BuildContext context) => Theme(
-          data: PlatformX.getTheme(context),
-          child: const PlatformMasterDetailApp(
+        builder: (BuildContext context) => const DynamicThemeController(
+          child: PlatformMasterDetailApp(
             masterPage: HomePage(),
           ),
         ),
