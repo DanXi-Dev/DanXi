@@ -74,45 +74,41 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      iosContentBottomPadding: true,
-      iosContentPadding: true,
+      iosContentBottomPadding: false,
+      iosContentPadding: false,
       appBar: PlatformAppBarX(
           title: TopController(
               controller: PrimaryScrollController.of(context),
               child: Text(S.of(context).dining_hall_crowdedness))),
-      body: Column(
-        children: [
-          SizedBox(
-            height: PlatformX.isMaterial(context) ? 0 : 10,
-          ),
-          PlatformWidget(
-              material: (_, __) => DropdownButton<Campus>(
-                    items: _getItems(),
-                    // Don't select anything if _selectItem == Campus.NONE
-                    value: _selectItem == Campus.NONE ? null : _selectItem,
-                    hint: Text(_selectItem.displayTitle(context)!),
-                    onChanged: (Campus? e) => _onSelectedItemChanged(e),
-                  ),
-              cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                    onValueChanged: (int? value) {
-                      _sliding = value;
-                      _onSelectedItemChanged(Campus.values[_sliding!]);
-                    },
-                    groupValue: _sliding,
-                    children: _getCupertinoItems(),
-                  )),
-          Expanded(
-              child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: WithScrollbar(
-                    controller: PrimaryScrollController.of(context),
-                    child: ListView(
-                      controller: PrimaryScrollController.of(context),
-                      children: _getListWidgets(),
-                    ),
-                  )))
-        ],
+      body: WithScrollbar(
+        controller: PrimaryScrollController.of(context),
+        child: ListView(
+          controller: PrimaryScrollController.of(context),
+          children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PlatformWidget(
+                      material: (_, __) => DropdownButton<Campus>(
+                            items: _getItems(),
+                            // Don't select anything if _selectItem == Campus.NONE
+                            value:
+                                _selectItem == Campus.NONE ? null : _selectItem,
+                            hint: Text(_selectItem.displayTitle(context)!),
+                            onChanged: (Campus? e) => _onSelectedItemChanged(e),
+                          ),
+                      cupertino: (_, __) =>
+                          CupertinoSlidingSegmentedControl<int>(
+                            onValueChanged: (int? value) {
+                              _sliding = value;
+                              _onSelectedItemChanged(Campus.values[_sliding!]);
+                            },
+                            groupValue: _sliding,
+                            children: _getCupertinoItems(),
+                          )),
+                ),
+              ] +
+              _getListWidgets(),
+        ),
       ),
     );
   }

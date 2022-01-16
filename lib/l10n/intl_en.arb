@@ -327,9 +327,9 @@
     "last_updated": "Last Updated: {date}",
 
     "classroom": "Classroom",
-    "morning": "Morning",
-    "afternoon": "Afternoon",
-    "evening": "Evening",
+    "morning": "A.M.",
+    "afternoon": "P.M.",
+    "evening": "Eve",
     "current_date": "Current date: ",
 
     "good_morning":"Every dawn is a new sunrise.",
