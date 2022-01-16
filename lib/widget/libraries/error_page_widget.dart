@@ -76,6 +76,11 @@ class ErrorPageWidget extends StatelessWidget {
       errorType = locale.require_login;
     } else if (error is FormatException) {
       errorType = locale.format_exception;
+    } else if (error is ArgumentError) {
+      if (error.message is String &&
+          error.message.contains("must return a value of the future's type")) {
+        errorType = locale.no_data_error;
+      }
     }
     return errorType;
   }

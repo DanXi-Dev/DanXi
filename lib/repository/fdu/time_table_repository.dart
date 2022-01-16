@@ -55,12 +55,11 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   Future<TimeTable?> loadTimeTableRemotely(PersonInfo? info,
-      {DateTime? startTime}) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadTimeTableRemotely(startTime: startTime),
-        (exception) async => await UISLoginTool.loginUIS(
-            dio!, LOGIN_URL, cookieJar!, info, true));
-  }
+          {DateTime? startTime}) =>
+      Retrier.tryAsyncWithFix(
+          () => _loadTimeTableRemotely(startTime: startTime),
+          (exception) async => await UISLoginTool.loginUIS(
+              dio!, LOGIN_URL, cookieJar!, info, true));
 
   Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
     Response idPage = await dio!.get(ID_URL);
