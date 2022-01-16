@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
@@ -641,14 +642,33 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
         ),
         Text(model.password!),
         const SizedBox(height: 16),
-        PlatformElevatedButton(
-          material: (_, __) =>
-              MaterialElevatedButtonData(icon: const Icon(Icons.done)),
-          child: Text(S.of(context).i_see),
-          onPressed: () {
-            Navigator.pop(state.context);
-          },
-        )
+        Stack(
+          children: [
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: PlatformTextButton(
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(S.of(context).copy_password)),
+                onPressed: () {
+                  FlutterClipboard.copy(model.password!).then((value) =>
+                      Noticing.showNotice(context, S.of(context).copy_success));
+                },
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: PlatformElevatedButton(
+                material: (_, __) =>
+                    MaterialElevatedButtonData(icon: const Icon(Icons.done)),
+                child: Text(S.of(context).i_see),
+                onPressed: () {
+                  Navigator.pop(state.context);
+                },
+              ),
+            )
+          ],
+        ),
       ],
     );
   }

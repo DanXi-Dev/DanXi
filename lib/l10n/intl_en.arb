@@ -229,6 +229,7 @@
     "secure_verification_description":"We have just sent you an email with an OTP code, input it below.",
     "secure_code":"OTP code",
     "forgot_password":"Password forgot",
+    "copy_password":"Copy Password",
 
     "new_post":"New Post",
     "posting":"Posting...",
