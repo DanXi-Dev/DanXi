@@ -340,7 +340,7 @@ class _ExpansionTileXState extends State<ExpansionTileX>
       ..begin = widget.collapsedTextColor ?? theme.textTheme.subtitle1!.color
       ..end = widget.textColor ?? colorScheme.primary;
     _iconColorTween
-      ..begin = widget.collapsedIconColor ?? colorScheme.primary
+      ..begin = widget.collapsedIconColor ?? theme.listTileTheme.iconColor
       ..end = widget.iconColor ?? colorScheme.primary;
     _backgroundColorTween
       ..begin = widget.collapsedBackgroundColor
