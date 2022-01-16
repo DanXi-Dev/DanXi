@@ -66,7 +66,7 @@
     "notification_settings": "推送通知",
     "notification_mention": "您的帖子被引用",
     "notification_favorite": "您收藏的树洞有新回复",
-    "notification_reported": "您的帖子被举报",
+    "notification_reported": "您的帖子因举报而被处理",
     "notification_mention_s": "引用",
     "notification_favorite_s": "收藏",
     "notification_reported_s": "举报",

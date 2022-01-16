@@ -169,7 +169,7 @@
     "notification_settings": "Notifications",
     "notification_mention": "Your post was quoted",
     "notification_favorite": "Your favorited post was updated",
-    "notification_reported": "Your post has been reported",
+    "notification_reported": "Your post has been deleted due to reports",
     "notification_mention_s": "Quote",
     "notification_favorite_s": "Favorite",
     "notification_reported_s": "Report",
