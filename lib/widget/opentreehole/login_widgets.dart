@@ -16,6 +16,7 @@
  */
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
@@ -76,9 +77,7 @@ class OTWelcomeWidget extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(
-                    PlatformX.isMaterial(context)
-                        ? Icons.superscript
-                        : CupertinoIcons.textformat_superscript,
+                    IconFont.tex,
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                   title: Text(S.of(context).welcome_3),

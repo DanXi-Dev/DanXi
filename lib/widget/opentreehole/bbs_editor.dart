@@ -451,7 +451,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                     S.of(context).markdown_description),
                 _buildIntroButton(
                     context,
-                    Icons.superscript,
+                    IconFont.tex,
                     S.of(context).latex_enabled,
                     S.of(context).latex_description),
               ],
