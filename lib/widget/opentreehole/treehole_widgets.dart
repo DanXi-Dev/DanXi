@@ -45,10 +45,10 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OTLeadingTag extends StatelessWidget {
-  final String colorString;
+  final Color color;
   final String text;
 
-  const OTLeadingTag({Key? key, required this.colorString, this.text = "DZ"})
+  const OTLeadingTag({Key? key, required this.color, this.text = "DZ"})
       : super(key: key);
 
   @override
@@ -56,16 +56,13 @@ class OTLeadingTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
       decoration: BoxDecoration(
-          color: Constant.getColorFromString(colorString).withOpacity(0.8),
+          color: color.withOpacity(0.8),
           borderRadius: const BorderRadius.all(Radius.circular(4.0))),
       child: Text(
         text,
         style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Constant.getColorFromString(colorString)
-                        .withOpacity(0.8)
-                        .computeLuminance() <=
-                    0.5
+            color: color.withOpacity(0.8).computeLuminance() <= 0.5
                 ? Colors.white
                 : Colors.black,
             fontSize: 12),
@@ -136,6 +133,9 @@ class OTFloorWidget extends StatelessWidget {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     }
 
+    final nameColor = Constant.getColorFromString(Constant.TAG_COLOR_LIST[
+        floor.anonyname.hashCode.abs() % Constant.TAG_COLOR_LIST.length]);
+
     final cardChild = ListTile(
       dense: true,
       title: Column(
@@ -159,22 +159,20 @@ class OTFloorWidget extends StatelessWidget {
                   children: [
                     if (floor.anonyname ==
                         parentHole?.floors?.first_floor?.anonyname) ...[
-                      OTLeadingTag(
-                          colorString: isInMention
-                              ? 'grey'
-                              : parentHole?.tags?.first.color ?? 'blue'),
+                      OTLeadingTag(color: nameColor),
                       const SizedBox(width: 4),
                     ],
                     Text(
                       "${floor.anonyname}",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800, color: nameColor),
                     ),
                   ],
                 ),
                 if (floor.deleted == true) ...[
                   const SizedBox(width: 4),
                   OTLeadingTag(
-                    colorString: 'red',
+                    color: Colors.red,
                     text: S.of(context).deleted,
                   ),
                 ]

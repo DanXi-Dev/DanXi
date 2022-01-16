@@ -515,22 +515,22 @@ class _BBSSubpageState extends State<BBSSubpage>
               startPage: 1,
               builder: _buildListItem,
               headBuilder: (_) => Column(
-                children: [
-                  AutoBannerAdWidget(bannerAd: bannerAd),
-                  if (_postsType == PostsType.NORMAL_POSTS) ...[
-                    OTSearchWidget(focusNode: _searchFocus),
-                    _autoSilenceNotice(),
-                    _autoAdminNotice(),
-                    _autoPinnedPosts(),
-                  ],
-                ],
-              ),
+                    children: [
+                      AutoBannerAdWidget(bannerAd: bannerAd),
+                      if (_postsType == PostsType.NORMAL_POSTS) ...[
+                        OTSearchWidget(focusNode: _searchFocus),
+                        _autoSilenceNotice(),
+                        _autoAdminNotice(),
+                        _autoPinnedPosts(),
+                      ],
+                    ],
+                  ),
               loadingBuilder: (BuildContext context) => Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(child: PlatformCircularProgressIndicator()),
-              ),
+                    padding: const EdgeInsets.all(8),
+                    child: Center(child: PlatformCircularProgressIndicator()),
+                  ),
               endBuilder: (context) => Center(
-                  child: Padding(
+                      child: Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(S.of(context).end_reached),
                   )),
@@ -617,7 +617,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                                   .useAccessibilityColoring),
                           if (isPinned)
                             OTLeadingTag(
-                              colorString: 'blue',
+                              color: Colors.blue,
                               text: S.of(context).pinned,
                             )
                         ]),
