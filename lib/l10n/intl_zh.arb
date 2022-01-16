@@ -153,6 +153,7 @@
     "school_bus_showing_all": "已显示全部校车班次",
     "school_bus_tap_to_not_show_all": "点击以筛选 {hh}:{mm} 以后的校车班次",
     "image": "图片",
+    "parse_fatal_error":"解析内容时遭遇致命错误。",
     "timetable_refresh_error": "新学期的课表现已可用，但我们无法从复旦服务器下载新的课表。\n\n请确保您已连接到复旦校园内网，然后尝试手动刷新课表。\n\n提示：您可以在“日程”页面下拉刷新课表。",
     "image_save_success": "图片已保存到相册",
     "image_save_failed": "图片保存失败，请检查您的权限设置",

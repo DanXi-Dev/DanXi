@@ -119,6 +119,7 @@
     "image": "Image",
     "image_save_success": "Image Saved",
     "image_save_failed": "Failed to save image. Check your permission settings.",
+    "parse_fatal_error":"A fatal error occurred when parsing this post.",
     "timetable_refresh_error": "Timetable for the new semester is available. However, we are unable to retrieve it from Fudan Servers.\n\nPlease make sure you are connected to the campus intranet, and try manually refreshing the timetable.\n\nTip: You can pull down at the Agenda page to refresh the timetable manually.",
 
     "handan_campus": "Handan",

@@ -201,6 +201,7 @@ class OTFloorWidget extends StatelessWidget {
                         }
                       })
                   : smartRender(
+                      context,
                       floor.filteredContent ?? S.of(context).fatal_error,
                       onLinkTap,
                       onImageTap)),

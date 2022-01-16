@@ -440,11 +440,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 }
 
-PostRenderWidget smartRender(String content, LinkTapCallback? onTapLink,
-        ImageTapCallback? onTapImage) =>
-    PostRenderWidget(
+StatelessWidget smartRender(BuildContext context, String content,
+    LinkTapCallback? onTapLink, ImageTapCallback? onTapImage) {
+  try {
+    return PostRenderWidget(
       render: kMarkdownRender,
       content: preprocessContentForDisplay(content),
       onTapImage: onTapImage,
       onTapLink: onTapLink,
     );
+  } catch (e) {
+    return Text(S.of(context).parse_fatal_error);
+  }
+}
