@@ -37,6 +37,8 @@ abstract class PlatformSubpage extends StatefulWidget {
 
   Create<List<AppBarButtonItem>> get trailing => (_) => [];
 
+  void onDoubleTapOnTab() {}
+
   @mustCallSuper
   void onViewStateChanged(SubpageViewState state) {
     if (this is PageWithPrimaryScrollController) {

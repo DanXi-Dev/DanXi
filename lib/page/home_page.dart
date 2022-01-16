@@ -590,6 +590,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               }
               _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
               setState(() => _pageIndex.value = index);
+            } else {
+              _subpage[index].onDoubleTapOnTab();
             }
           },
         ),

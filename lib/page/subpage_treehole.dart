@@ -226,6 +226,11 @@ class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
           }
         }),
       ];
+
+  @override
+  void onDoubleTapOnTab() {
+    RefreshBBSEvent().fire();
+  }
 }
 
 class AddNewPostEvent {}
@@ -262,6 +267,8 @@ class _BBSSubpageState extends State<BBSSubpage>
       StateStreamListener();
   final StateStreamListener<DivisionChangedEvent> _divisionChangedSubscription =
       StateStreamListener();
+  final GlobalKey<RefreshIndicatorState> _indicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   //final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
 
@@ -404,10 +411,10 @@ class _BBSSubpageState extends State<BBSSubpage>
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshBBSEvent>().listen((event) {
-          if (event.refreshAll == true) {
+          if (event.refreshAll) {
             refreshSelf();
           } else {
-            _refreshList();
+            _indicatorKey.currentState?.show();
           }
         }),
         hashCode);
@@ -493,6 +500,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             : BoxDecoration(
                 image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
         child: RefreshIndicator(
+          key: _indicatorKey,
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
@@ -507,22 +515,22 @@ class _BBSSubpageState extends State<BBSSubpage>
               startPage: 1,
               builder: _buildListItem,
               headBuilder: (_) => Column(
-                    children: [
-                      AutoBannerAdWidget(bannerAd: bannerAd),
-                      if (_postsType == PostsType.NORMAL_POSTS) ...[
-                        OTSearchWidget(focusNode: _searchFocus),
-                        _autoSilenceNotice(),
-                        _autoAdminNotice(),
-                        _autoPinnedPosts(),
-                      ],
-                    ],
-                  ),
+                children: [
+                  AutoBannerAdWidget(bannerAd: bannerAd),
+                  if (_postsType == PostsType.NORMAL_POSTS) ...[
+                    OTSearchWidget(focusNode: _searchFocus),
+                    _autoSilenceNotice(),
+                    _autoAdminNotice(),
+                    _autoPinnedPosts(),
+                  ],
+                ],
+              ),
               loadingBuilder: (BuildContext context) => Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
-                  ),
+                padding: const EdgeInsets.all(8),
+                child: Center(child: PlatformCircularProgressIndicator()),
+              ),
               endBuilder: (context) => Center(
-                      child: Padding(
+                  child: Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(S.of(context).end_reached),
                   )),

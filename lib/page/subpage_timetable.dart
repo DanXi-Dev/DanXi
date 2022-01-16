@@ -81,13 +81,10 @@ class TimetableSubPage extends PlatformSubpage
 
 class ShareTimetableEvent {}
 
-class RefreshTimetableEvent {}
 
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
-      StateStreamListener();
-  final StateStreamListener<RefreshTimetableEvent> _refreshSubscription =
       StateStreamListener();
   final ScrollController _dummyScrollController = ScrollController();
 
@@ -219,11 +216,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                         mainAxisSize: MainAxisSize.min,
                         children: _buildShareList(context)),
                   ));
-        }),
-        hashCode);
-    _refreshSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<RefreshTimetableEvent>().listen((_) {
-          refreshSelf();
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
