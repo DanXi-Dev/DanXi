@@ -29,7 +29,7 @@ class BmobDio {
 
   ///无参构造方法
   BmobDio() {
-    options = new BaseOptions(
+    options = BaseOptions(
       //基地址
       baseUrl: Bmob.bmobHost,
       //连接服务器的超时时间，单位是毫秒。
@@ -42,7 +42,7 @@ class BmobDio {
 //      },
     );
 
-    dio = new Dio(options);
+    dio = Dio(options);
   }
 
   ///获取16位随机字符串
@@ -72,22 +72,20 @@ class BmobDio {
 
   ///md5编码
   String generateMd5(String origin) {
-    var content = new Utf8Encoder().convert(origin);
+    var content = const Utf8Encoder().convert(origin);
     var digest = md5.convert(content);
     return hex.encode(digest.bytes);
   }
 
   ///获取时间戳 秒
   getSafeTimestamp() {
-    int second = (new DateTime.now().millisecondsSinceEpoch) ~/ 1000;
+    int second = (DateTime.now().millisecondsSinceEpoch) ~/ 1000;
     return second.toString();
   }
 
   ///单例模式
   static BmobDio? getInstance() {
-    if (instance == null) {
-      instance = BmobDio();
-    }
+    instance ??= BmobDio();
     return instance;
   }
 
@@ -171,7 +169,7 @@ class BmobDio {
 
   ///获取请求头
   getHeaders(path, data) {
-    Map<String, dynamic> map = Map();
+    Map<String, dynamic> map = {};
 
     if (Bmob.bmobAppId.isNotEmpty) {
       //没有加密

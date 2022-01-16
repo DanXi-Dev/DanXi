@@ -78,7 +78,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       });
 
   Future<Map<String, TrafficInfo>> _getCrowdednessInfo(int areaCode) async {
-    var result = Map<String, TrafficInfo>();
+    var result = <String, TrafficInfo>{};
     var response = await dio!.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
@@ -87,19 +87,19 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     }
     var dataString =
         response.data.toString().between("}", "</script>", headGreedy: false)!;
-    var jsonExtraction = new RegExp(r'\[.+\]').allMatches(dataString);
+    var jsonExtraction = RegExp(r'\[.+\]').allMatches(dataString);
     List names = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3)
         .group(0)!
-        .replaceAll("\'", "\""));
+        .replaceAll("'", "\""));
     List? cur = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 1)
         .group(0)!
-        .replaceAll("\'", "\""));
+        .replaceAll("'", "\""));
     List? max = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 2)
         .group(0)!
-        .replaceAll("\'", "\""));
+        .replaceAll("'", "\""));
     for (int i = 0; i < names.length; i++) {
       result[names[i]] = TrafficInfo(int.parse(cur![i]), int.parse(max![i]));
     }

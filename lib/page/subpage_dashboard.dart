@@ -221,10 +221,10 @@ class _HomeSubpageState extends State<HomeSubpage>
           onDismissed: () => _notifications.remove(e),
         )));
     List<Widget> _currentCardChildren = [];
-    widgetSequence.forEach((element) {
-      if (!element.enabled!) return;
+    for (var element in widgetSequence) {
+      if (!element.enabled!) continue;
       if (element.internalString == 'new_card') {
-        if (_currentCardChildren.isEmpty) return;
+        if (_currentCardChildren.isEmpty) continue;
         _widgets.add(Card(
           child: Column(
             children: _currentCardChildren,
@@ -243,12 +243,12 @@ class _HomeSubpageState extends State<HomeSubpage>
               widgetMap[element.internalString!] as FeatureContainer;
           if (!checkFeature(
               container.childFeature, StateProvider.personInfo.value!.group)) {
-            return;
+            continue;
           }
         }
         _currentCardChildren.add(widgetMap[element.internalString!]!);
       }
-    });
+    }
     if (_currentCardChildren.isNotEmpty) {
       _widgets.add(Card(
         child: Column(

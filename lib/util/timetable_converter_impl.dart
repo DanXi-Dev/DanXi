@@ -45,7 +45,7 @@ class ICSConverter extends TimetableConverter {
                           TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
                       minutes: TimeTable
                           .kCourseSlotStartTime[event.time.slot].minute!))
-                  .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE))));
+                  .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE))));
         }
       }
     }

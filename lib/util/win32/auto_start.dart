@@ -30,7 +30,7 @@ class WindowsAutoStart {
     String? path;
     try {
       path = Registry.getStringKey(hKey, KEY_NAME);
-    } catch (ignored) {} finally {
+    } finally {
       RegCloseKey(hKey);
     }
     return PlatformX.executablePath == path;

@@ -198,9 +198,7 @@ class Client {
             arguments[1] = ackParts[1];
           }
           String data = "";
-          if (arguments != null) {
-            data += "+" + arguments.toString();
-          }
+          data += "+" + arguments.toString();
           String part = parts[1];
           String ack = "6::$part$data";
           webSocket!.add(ack);

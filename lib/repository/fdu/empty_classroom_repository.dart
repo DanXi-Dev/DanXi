@@ -59,9 +59,9 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
         ? response.data
         : jsonDecode(response.data.toString());
     final Map buildingInfo = json['d']['list'];
-    buildingInfo.values.forEach((element) {
+    for (var element in buildingInfo.values) {
       if (element is List) {
-        element.forEach((element) {
+        for (var element in element) {
           RoomInfo info = RoomInfo(element['name'], date, element['roomrl']);
           info.busy = [];
           if (element['kxsds'] is Map) {
@@ -70,9 +70,9 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
                 .forEach((element) => info.busy!.add(element != "闲"));
             result.add(info);
           }
-        });
+        }
       }
-    });
+    }
     return result;
   }
 

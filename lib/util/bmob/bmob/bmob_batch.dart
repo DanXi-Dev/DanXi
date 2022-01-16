@@ -22,7 +22,7 @@ class BmobBatch {
 
   Future<List> process(String method, List<BmobObject> bmobObjects) async {
     List list = [];
-    Map params = Map();
+    Map params = {};
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userJson = prefs.get("user") as String?;
@@ -36,7 +36,7 @@ class BmobBatch {
         //过滤BmobUser类型的处理，因为批处理操作不支持对User表的操作
         debugPrint("BmobUser does not support batch operations");
       } else {
-        Map single = Map();
+        Map single = {};
         single["method"] = method;
         if (method == "PUT" || method == "DELETE") {
           //批量更新和批量删除

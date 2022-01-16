@@ -79,8 +79,8 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
   if (e == null || e.tags == null) return const SizedBox();
   List<Widget> _tags = [];
-  e.tags!.forEach((element) {
-    if (element.name == KEY_NO_TAG) return;
+  for (var element in e.tags!) {
+    if (element.name == KEY_NO_TAG) continue;
     _tags.add(Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -93,7 +93,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
                 : Constant.getColorFromString(element.color),
           ),
         ]));
-  });
+  }
   return Wrap(
     direction: Axis.horizontal,
     spacing: 4,

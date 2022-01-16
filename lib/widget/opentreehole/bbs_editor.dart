@@ -501,7 +501,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   final _controller = TextEditingController();
 
   /// Whether the send button is enabled
-  bool _canSend = true;
+  final bool _canSend = true;
 
   bool _isFullscreen = false;
   bool? _supportTags;

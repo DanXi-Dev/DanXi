@@ -59,8 +59,7 @@ class ExpansionTileX extends StatefulWidget {
     this.iconColor,
     this.collapsedIconColor,
     this.controlAffinity,
-  })  : assert(initiallyExpanded != null),
-        assert(maintainState != null),
+  })  : assert(maintainState != null),
         assert(
           expandedCrossAxisAlignment != CrossAxisAlignment.baseline,
           'CrossAxisAlignment.baseline is not supported since the expanded children '
