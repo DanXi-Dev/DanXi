@@ -70,6 +70,8 @@ class OTFloor {
   String? get filteredContent => SettingsProvider.getInstance().cleanMode
       ? CleanModeFilter.cleanText(content)
       : content;
+  String? get deleteReason => deleted == true ? content : null;
+  String? get foldReason => fold?.isNotEmpty == true ? fold?.join(' ') : null;
 
   @override
   String toString() {

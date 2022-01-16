@@ -273,10 +273,12 @@ class OTFloorWidget extends StatelessWidget {
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : Theme.of(context).cardTheme.color?.withOpacity(0.8),
-        child: floor.deleted == true
+        child: (floor.deleted == true || floor.fold?.isNotEmpty == true)
             ? ExpansionTileX(
                 title: Text(
-                  floor.content ?? "?",
+                  floor.deleteReason ??
+                      floor.foldReason ??
+                      "_error_incomplete_data_",
                   style: TextStyle(color: Theme.of(context).hintColor),
                 ),
                 children: [cardChild],

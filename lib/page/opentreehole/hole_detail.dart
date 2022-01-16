@@ -390,7 +390,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       {bool isNested = false}) {
     return OTFloorWidget(
       floor: floor,
-      index: index,
+      index: _searchKeyword == null ? index : null,
       isInMention: isNested,
       parentHole: _post,
       onLongPress: () {
