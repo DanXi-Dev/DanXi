@@ -36,6 +36,7 @@ class OTFloor {
   bool? is_me;
   bool? liked;
   List<String>? fold;
+  List? history;
   int? like;
   List<OTFloor>? mention;
 

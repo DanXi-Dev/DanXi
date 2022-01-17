@@ -187,6 +187,13 @@ class OTFloorWidget extends StatelessWidget {
                         text: S.of(context).deleted,
                       ),
                     ],
+                    if (floor.history?.isNotEmpty == true) ...[
+                      const SizedBox(width: 4),
+                      OTLeadingTag(
+                        color: Colors.red,
+                        text: S.of(context).modified,
+                      ),
+                    ],
                     if (floor.special_tag?.isNotEmpty == true) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(

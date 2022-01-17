@@ -21,7 +21,9 @@ OTFloor _$OTFloorFromJson(Map<String, dynamic> json) => OTFloor(
       (json['mention'] as List<dynamic>?)
           ?.map((e) => OTFloor.fromJson(e as Map<String, dynamic>))
           .toList(),
-    )..special_tag = json['special_tag'] as String?;
+    )
+      ..special_tag = json['special_tag'] as String?
+      ..history = json['history'] as List<dynamic>?;
 
 Map<String, dynamic> _$OTFloorToJson(OTFloor instance) => <String, dynamic>{
       'floor_id': instance.floor_id,
@@ -35,6 +37,7 @@ Map<String, dynamic> _$OTFloorToJson(OTFloor instance) => <String, dynamic>{
       'is_me': instance.is_me,
       'liked': instance.liked,
       'fold': instance.fold,
+      'history': instance.history,
       'like': instance.like,
       'mention': instance.mention,
     };
