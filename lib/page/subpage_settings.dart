@@ -51,6 +51,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -647,12 +648,20 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                               title: S.of(context).logout,
                                               isConfirmDestructive: true) ==
                                       true) {
-                                    OpenTreeHoleRepository.getInstance()
-                                        .logout();
-                                    settingsPageKey.currentState
-                                        ?.setState(() {});
-                                    treeholePageKey.currentState
-                                        ?.setState(() {});
+                                    ProgressFuture progressDialog =
+                                        showProgressDialog(
+                                            loadingText: S.of(context).logout,
+                                            context: context);
+                                    try {
+                                      await OpenTreeHoleRepository.getInstance()
+                                          .logout();
+                                      settingsPageKey.currentState
+                                          ?.setState(() {});
+                                      treeholePageKey.currentState
+                                          ?.setState(() {});
+                                    } finally {
+                                      progressDialog.dismiss();
+                                    }
                                   }
                                 },
                               ),
