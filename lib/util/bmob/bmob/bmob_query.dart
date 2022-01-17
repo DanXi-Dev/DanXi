@@ -1,14 +1,13 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:json_annotation/json_annotation.dart';
-
-import 'bmob.dart';
 import 'bmob_dio.dart';
 import 'response/bmob_results.dart';
 import 'table/bmob_installation.dart';
-import 'table/bmob_object.dart';
+
+import 'dart:convert';
+
+import 'package:json_annotation/json_annotation.dart';
+import 'bmob.dart';
 import 'table/bmob_user.dart';
+import 'table/bmob_object.dart';
 import 'type/bmob_pointer.dart';
 
 //此处与类名一致，由指令自动生成代码
@@ -17,29 +16,29 @@ part 'bmob_query.g.dart';
 ///查询数据，包括单条数据查询和多条数据查询
 @JsonSerializable()
 class BmobQuery<T> {
-  String? include;
-  int? limit;
-  int? skip;
-  String? order;
-  int? count;
+  String include;
+  int limit;
+  int skip;
+  String order;
+  int count;
 
-  String? c;
+  String c;
 
-  Map<String, dynamic>? where;
+  Map<String, dynamic> where;
 
-  Map<String, dynamic>? having;
+  Map<String, dynamic> having;
 
   /// 统计查询
-  String? groupby;
-  String? sum;
-  String? average;
-  String? max;
-  String? min;
-  bool? groupcount;
+  String groupby;
+  String sum;
+  String average;
+  String max;
+  String min;
+  bool groupcount;
 
   BmobQuery() {
-    where = {};
-    having = {};
+    where = Map();
+    having = Map();
   }
 
   //添加等于条件查询
@@ -80,7 +79,7 @@ class BmobQuery<T> {
 
   //复合查询条件or
   BmobQuery or(List<BmobQuery<T>> queries) {
-    List<Map<String, dynamic>?> list = [];
+    List<Map<String, dynamic>> list = [];
     for (BmobQuery<T> bmobQuery in queries) {
       list.add(bmobQuery.where);
     }
@@ -90,7 +89,7 @@ class BmobQuery<T> {
 
   //复合查询条件and
   BmobQuery and(List<BmobQuery<T>> queries) {
-    List<Map<String, dynamic>?> list = [];
+    List<Map<String, dynamic>> list = [];
     for (BmobQuery<T> bmobQuery in queries) {
       list.add(bmobQuery.where);
     }
@@ -99,7 +98,7 @@ class BmobQuery<T> {
   }
 
   BmobQuery addWhereContains(String key, Object value) {
-    String regex = "\\Q" + (value as String) + "\\E";
+    String regex = "\\Q" + value + "\\E";
     addWhereMatches(key, regex);
     return this;
   }
@@ -120,44 +119,44 @@ class BmobQuery<T> {
 
   ///是否返回统计的记录个数
   BmobQuery hasGroupCount(bool has) {
-    groupcount = has;
+    this.groupcount = has;
     return this;
   }
 
   ///分组 多个分组的列名
   BmobQuery groupByKeys(String keys) {
-    groupby = keys;
+    this.groupby = keys;
     return this;
   }
 
   ///求和  多个求和的列名
   BmobQuery sumKeys(String keys) {
-    sum = keys;
+    this.sum = keys;
     return this;
   }
 
   ///求均值 多个求平均值的列名
   BmobQuery averageKeys(String keys) {
-    average = keys;
+    this.average = keys;
     return this;
   }
 
   ///求最大值 多个求最大值的列名
   BmobQuery maxKeys(String keys) {
-    max = keys;
+    this.max = keys;
     return this;
   }
 
   ///求最小值 多个求最小值的列名
   BmobQuery minKeys(String keys) {
-    min = keys;
+    this.min = keys;
     return this;
   }
 
   ///获取数据个数
-  Future<int?> queryCount() async {
-    count = 1;
-    limit = 0;
+  Future<int> queryCount() async {
+    this.count = 1;
+    this.limit = 0;
 
     String tableName = T.toString();
     if (T.runtimeType is BmobUser) {
@@ -167,12 +166,11 @@ class BmobQuery<T> {
     }
     String url = Bmob.BMOB_API_CLASSES + tableName;
     url = url + "?";
-    if (where!.isNotEmpty) {
+    if (where.isNotEmpty) {
       url = url + "where=" + json.encode(where);
     }
-    Map map = await (BmobDio.getInstance()!.get(url, data: getParams())
-        as FutureOr<Map<dynamic, dynamic>>);
-    BmobResults bmobResults = BmobResults.fromJson(map as Map<String, dynamic>);
+    Map map = await BmobDio.getInstance().get(url, data: getParams());
+    BmobResults bmobResults = BmobResults.fromJson(map);
     return bmobResults.count;
   }
 
@@ -182,7 +180,7 @@ class BmobQuery<T> {
     return this;
   }
 
-  String addStatistics(String key, Object? value) {
+  String addStatistics(String key, Object value) {
     if (value == null) {
       return "";
     }
@@ -201,64 +199,64 @@ class BmobQuery<T> {
 
   String getStatistics() {
     String statistics = "";
-    statistics += addStatistics("sum", sum);
-    statistics += addStatistics("max", max);
-    statistics += addStatistics("min", min);
-    statistics += addStatistics("average", average);
-    statistics += addStatistics("groupby", groupby);
-    statistics += addStatistics("having", having);
-    statistics += addStatistics("groupcount", groupcount);
+    statistics += addStatistics("sum", this.sum);
+    statistics += addStatistics("max", this.max);
+    statistics += addStatistics("min", this.min);
+    statistics += addStatistics("average", this.average);
+    statistics += addStatistics("groupby", this.groupby);
+    statistics += addStatistics("having", this.having);
+    statistics += addStatistics("groupcount", this.groupcount);
     return statistics;
   }
 
-  void addCondition(String key, String? condition, Object value) {
+  void addCondition(String key, String condition, Object value) {
     if (condition == null) {
       if (value is BmobUser) {
         BmobUser bmobUser = value;
-        Map<String, dynamic> map = {};
+        Map<String, dynamic> map = new Map();
         map["__type"] = "Pointer";
         map["objectId"] = bmobUser.objectId;
         map["className"] = "_User";
-        where![key] = map;
+        where[key] = map;
       } else if (value is BmobObject) {
         BmobObject bmobObject = value;
-        Map<String, dynamic> map = {};
+        Map<String, dynamic> map = new Map();
         map["__type"] = "Pointer";
         map["objectId"] = bmobObject.objectId;
         map["className"] = value.runtimeType.toString();
-        where![key] = map;
+        where[key] = map;
       } else if (value is BmobPointer) {
-        Map<String, dynamic> map = {};
+        Map<String, dynamic> map = new Map();
         map["object"] = value;
-        where![key] = map;
+        where[key] = map;
       } else {
-        where![key] = value;
+        where[key] = value;
       }
     } else {
       if (value is BmobUser) {
         BmobUser bmobUser = value;
-        Map<String, dynamic> map = {};
+        Map<String, dynamic> map = new Map();
         map["__type"] = "Pointer";
         map["objectId"] = bmobUser.objectId;
         map["className"] = "_User";
 
-        Map<String, dynamic> map1 = {};
+        Map<String, dynamic> map1 = new Map();
         map1[condition] = map;
-        where![key] = map1;
+        where[key] = map1;
       } else if (value is BmobObject) {
         BmobObject bmobObject = value;
-        Map<String, dynamic> map = {};
+        Map<String, dynamic> map = new Map();
         map["__type"] = "Pointer";
         map["objectId"] = bmobObject.objectId;
         map["className"] = value.runtimeType.toString();
 
-        Map<String, dynamic> map1 = {};
+        Map<String, dynamic> map1 = new Map();
         map1[condition] = map;
-        where![key] = map1;
+        where[key] = map1;
       } else {
-        Map<String, dynamic> map = {};
+        Map<String, dynamic> map = new Map();
         map[condition] = value;
-        where![key] = map;
+        where[key] = map;
       }
     }
   }
@@ -311,29 +309,29 @@ class BmobQuery<T> {
 //    } else if (T.runtimeType is BmobInstallation) {
 //      tableName = "_Installation";
 //    }
-    return BmobDio.getInstance()!.get(
+    return BmobDio.getInstance().get(
         Bmob.BMOB_API_CLASSES + tableName + Bmob.BMOB_API_SLASH + objectId,
         data: getParams());
   }
 
   ///查询多条数据
-  Future<List<dynamic>?> queryUsers() async {
+  Future<List<dynamic>> queryUsers() async {
     return queryObjectsByTableName("_User");
   }
 
   ///查询多条数据
-  Future<List<dynamic>?> queryInstallations() async {
+  Future<List<dynamic>> queryInstallations() async {
     return queryObjectsByTableName("_Installation");
   }
 
   ///查询多条数据
-  Future<List<dynamic>?> queryObjects() async {
+  Future<List<dynamic>> queryObjects() async {
     String tableName = T.toString();
     return queryObjectsByTableName(tableName);
   }
 
   ///查询多条数据
-  Future<List<dynamic>?> queryObjectsByTableName(String tableName) async {
+  Future<List<dynamic>> queryObjectsByTableName(String tableName) async {
 //    String tableName = T.toString();
 //    if (T.runtimeType is BmobUser) {
 //      tableName = "_User";
@@ -341,13 +339,13 @@ class BmobQuery<T> {
 //      tableName = "_Installation";
 //    }
     String url = Bmob.BMOB_API_CLASSES + tableName;
-    if (where!.isNotEmpty) {
+    if (where.isNotEmpty) {
       url = url + "?";
       url = url + "where=" + json.encode(where);
     }
     url = url + getStatistics();
-    Map map = await (BmobDio.getInstance()!.get(url, data: getParams()));
-    BmobResults bmobResults = BmobResults.fromJson(map as Map<String, dynamic>);
+    Map map = await BmobDio.getInstance().get(url, data: getParams());
+    BmobResults bmobResults = BmobResults.fromJson(map);
     return bmobResults.results;
   }
 

@@ -23,24 +23,19 @@ part 'announcement.g.dart';
 @JsonSerializable()
 class Announcement extends BmobObject {
   // ignore: unused_field
-  final String __type = "Announcement";
+  String __type = "Announcement";
 
-  String? content;
-  int? maxVersion;
+  String content;
+  int maxVersion;
 
   factory Announcement.fromJson(Map<String, dynamic> json) =>
       _$AnnouncementFromJson(json);
-
-  @override
-  String toString() {
-    return 'Announcement{content: $content, maxVersion: $maxVersion}';
-  }
 
   Map<String, dynamic> toJson() => _$AnnouncementToJson(this);
 
   Announcement(this.content);
 
   @override
-  Map<String, dynamic> getParams() =>
-      Map<String, dynamic>.from({"content": content, "maxVersion": maxVersion});
+  Map getParams() => new Map<String, dynamic>.from(
+      {"content": content, "maxVersion": maxVersion});
 }

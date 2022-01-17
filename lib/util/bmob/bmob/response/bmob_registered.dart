@@ -5,9 +5,9 @@ part 'bmob_registered.g.dart';
 
 @JsonSerializable()
 class BmobRegistered {
-  String? createdAt;
-  String? objectId;
-  String? sessionToken;
+  String createdAt;
+  String objectId;
+  String sessionToken;
 
   BmobRegistered();
 

@@ -15,12 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/// VagueTime is a data class of time & date, which contains incomplete time fields to be
-/// filled later. It is useful to represent some schedule(e.g. 8:00 everyday).
+/// VagueTime is a data class of time & date, which contains incomplete time fields so that
+/// they could be filled later. It is useful to represent some schedule(e.g. 8:00 everyday).
 class VagueTime implements Comparable<VagueTime> {
-  final int? year, month, day, hour, minute, second, millisecond, microsecond;
+  int year, month, day, hour, minute, second, millisecond, microsecond;
 
-  const VagueTime(
+  VagueTime(
       {this.year,
       this.month,
       this.day,
@@ -36,15 +36,9 @@ class VagueTime implements Comparable<VagueTime> {
         hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
   }
 
-  factory VagueTime.onlymmdd(String mmdd) {
-    var splitTime = mmdd.split("-");
-    return VagueTime(
-        month: int.parse(splitTime[0]), day: int.parse(splitTime[1]));
-  }
-
   /// Merge the unfilled field with [exactDate], and return the filled time.
-  DateTime toExactTime([DateTime? exactDate]) {
-    exactDate ??= DateTime.now();
+  DateTime toExactTime([DateTime exactDate]) {
+    if (exactDate == null) exactDate = DateTime.now();
     return DateTime(
         year ?? exactDate.year,
         month ?? exactDate.month,
@@ -55,17 +49,6 @@ class VagueTime implements Comparable<VagueTime> {
         millisecond ?? exactDate.millisecond,
         microsecond ?? exactDate.microsecond);
   }
-
-  /// Compare to decide if it is matched with given [time].
-  /// If matched, return true.
-  bool match(DateTime time) => !((year != null && year != time.year) ||
-      (month != null && month != time.month) ||
-      (day != null && day != time.day) ||
-      (hour != null && hour != time.hour) ||
-      (minute != null && minute != time.minute) ||
-      (second != null && second != time.second) ||
-      (millisecond != null && millisecond != time.millisecond) ||
-      (microsecond != null && microsecond != time.microsecond));
 
   @override
   int compareTo(VagueTime other) =>

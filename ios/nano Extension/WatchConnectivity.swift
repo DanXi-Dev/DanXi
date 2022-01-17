@@ -9,7 +9,7 @@ import Foundation
 import WatchConnectivity
 import SwiftUI
 
-let KEY_FDUHOLE_TOKEN = "fduhole_token_v2"
+let KEY_FDUHOLE_TOKEN = "fduhole_token"
 
 class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
     let session = WCSession.default;

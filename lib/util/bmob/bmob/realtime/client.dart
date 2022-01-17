@@ -1,12 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:dan_xi/util/bmob/bmob/response/bmob_error.dart';
+import 'dart:io';
 
 import '../bmob.dart';
 import '../bmob_dio.dart';
 import 'change.dart';
 import 'message.dart';
+
+import 'dart:convert';
 
 class Client {
   ///更新表
@@ -41,10 +41,10 @@ class Client {
   /// 调用async函数必须使用await关键字。
   /// Future最主要的功能就是提供了链式调用。
   Future<dynamic> getServerConfiguration() async {
-    return BmobDio.getInstance()!.getByUrl(DEFAULT_REAL_TIME_DATA_HOST_HTTP);
+    return BmobDio.getInstance().getByUrl(DEFAULT_REAL_TIME_DATA_HOST_HTTP);
   }
 
-  WebSocket? webSocket;
+  WebSocket webSocket;
 
   ///监听
   Future listen(
@@ -84,7 +84,7 @@ class Client {
        */
       List<String> transports = transportsLine.split(",");
       if (!transports.contains(PROTOCOL_WEBSOCKET)) {
-        errorCallback(BmobError(9015, "websocket not supported"));
+        errorCallback(new BmobError(9015, "websocket not supported"));
       } else {
         ///获取配置信息成功后开始进行连接
         connect(session, heartbeatInt, onConnected: (Client client) {
@@ -107,7 +107,7 @@ class Client {
       {onConnected, onDisconnected, onDataChanged, onError}) async {
     String requestUrl =
         "$DEFAULT_REAL_TIME_DATA_HOST_WS$DEFAULT_REAL_TIME_DATA_PATH_WEBSOCKET$session";
-    Map<String, String> map = {};
+    Map<String, String> map = Map();
 
     map["GET"] = "HTTP/1.1";
     map["Upgrade"] = "websocket";
@@ -118,7 +118,7 @@ class Client {
     map["Sec-WebSocket-Version"] = "13";
 
     webSocket = await WebSocket.connect(requestUrl, headers: map);
-    webSocket!.listen((event) {
+    webSocket.listen((event) {
       String data = event.toString();
 
       List<String> parts = data.split(":");
@@ -130,17 +130,17 @@ class Client {
           // disconnect
           onDisconnected(this);
 
-          webSocket!.add("0::");
+          webSocket.add("0::");
           break;
         case 1:
           // connect
           onConnected(this);
 
-          webSocket!.add("1::");
+          webSocket.add("1::");
           break;
         case 2:
           // heartbeat
-          webSocket!.add("2::");
+          webSocket.add("2::");
           break;
         case 3:
           {
@@ -182,8 +182,8 @@ class Client {
 
             ///{"appKey":"12784168944a56ae41c4575686b7b332","tableName":"Blog","objectId":"","action":"updateTable","data":{"author":"7c7fd3afe1","content":"博客内容","createdAt":"2019-04-26 15:55:12","like":77,"objectId":"8913e0b65f","title":"博客标题","updatedAt":"2019-04-26 15:55:12"}}
             ///服务端发送消息给客户端，数据变化
-            if (message.name!.isNotEmpty && message.name == "server_pub") {
-              String arg = message.args![0];
+            if (message.name.isNotEmpty && message.name == "server_pub") {
+              String arg = message.args[0];
               Map<String, dynamic> map = json.decode(arg);
               Change change = Change.fromJson(map);
               onDataChanged(change);
@@ -198,33 +198,35 @@ class Client {
             arguments[1] = ackParts[1];
           }
           String data = "";
-          data += "+" + arguments.toString();
+          if (arguments != null) {
+            data += "+" + arguments.toString();
+          }
           String part = parts[1];
           String ack = "6::$part$data";
-          webSocket!.add(ack);
+          webSocket.add(ack);
           break;
         case 7:
           // error
-          onError(BmobError(int.parse(parts[2]), parts[3]));
+          onError(new BmobError(int.parse(parts[2]), parts[3]));
           break;
         case 8:
           // noop
           break;
         default:
-          throw Exception("unknown code");
+          throw new Exception("unknown code");
       }
     }, onDone: () {
-      webSocket!.add("1::");
-      webSocket!.add("2::");
+      webSocket.add("1::");
+      webSocket.add("2::");
     }, onError: (error) {
-      onError(BmobError(9015, error.toString()));
+      onError(new BmobError(9015, error.toString()));
     }, cancelOnError: true);
   }
 
   /// 关闭连接
   void close() {
     if (webSocket != null) {
-      webSocket!.close();
+      webSocket.close();
     }
   }
 
@@ -305,7 +307,7 @@ class Client {
   }
 
   String getArgs(String tableName, String objectId, String action) {
-    Map<String, dynamic> map = {};
+    Map<String, dynamic> map = Map();
     map["appKey"] = Bmob.bmobAppId;
     map["tableName"] = tableName;
     map["objectId"] = objectId;
@@ -315,7 +317,7 @@ class Client {
   }
 
   Future emit(String name, List<String> args) async {
-    Map<String, dynamic> data = {};
+    Map<String, dynamic> data = Map();
 
     data["name"] = name;
     data["args"] = args;
@@ -330,7 +332,7 @@ class Client {
     String ack = id + "+";
     String data = "$type:$ack::$message";
     //5:0+::{"name":"client_sub","args":["{\"appKey\":\"d59c62906f447317e41cea2fe47ef856\",\"tableName\":\"Category\",\"objectId\":\"\",\"action\":\"updateTable\"}"]}
-    webSocket!.add(data);
+    webSocket.add(data);
     ackCount++;
   }
 }

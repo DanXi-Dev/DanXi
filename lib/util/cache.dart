@@ -26,21 +26,22 @@ class Cache {
   /// [fetch] it from remote (usually from network), [encode] it and save it locally.
   ///
   /// Finally, return the cached data.
-  static Future<T> get<T>(String key, Future<T> Function() fetch,
-      T Function(String? cachedValue) decode, String Function(T object) encode,
-      {bool Function(String cachedValue)? validate}) async {
+  static Future<T> get<T>(String key, Future<T> fetch(),
+      T decode(String cachedValue), String encode(T object),
+      {bool validate(String cachedValue)}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    validate ??= (v) => true;
+    if (validate == null) {
+      validate = (v) => v != null;
+    }
     if (!preferences.containsKey(key)) {
       // Reload the cache
       T newValue = await fetch();
-      if (validate(encode(newValue))) {
+      if (validate(encode(newValue)))
         preferences.setString(key, encode(newValue));
-      }
       return newValue;
     }
-    String? result = preferences.getString(key);
-    if (validate(result!)) {
+    String result = preferences.getString(key);
+    if (validate(result)) {
       return decode(result);
     } else {
       T newValue = await fetch();
@@ -52,11 +53,13 @@ class Cache {
   /// Get a cached data.
   ///
   /// But network goes first.
-  static Future<T> getRemotely<T>(String key, Future<T> Function() fetch,
-      T Function(String? cachedValue) decode, String Function(T object) encode,
-      {bool Function(T value)? validate}) async {
+  static Future<T> getRemotely<T>(String key, Future<T> fetch(),
+      T decode(String cachedValue), String encode(T object),
+      {bool validate(T value)}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    validate ??= (v) => v != null;
+    if (validate == null) {
+      validate = (v) => v != null;
+    }
     T newValue = await fetch();
     if (validate(newValue)) {
       preferences.setString(key, encode(newValue));
@@ -64,7 +67,7 @@ class Cache {
     } else {
       // Fall back to local cache.
       return get(key, fetch, decode, encode,
-          validate: (v) => validate!(decode(v)));
+          validate: (v) => v != null && validate(decode(v)));
     }
   }
 }

@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct THPostDetailView: View {
-    var reply: OTFloor
+    var reply: THReply
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("[\(reply.anonyname)]")
+            Text("[\(reply.username)]")
             Text(preprocessTextForHtmlAndImage(text:reply.content))
         }
         .padding()
@@ -21,6 +21,6 @@ struct THPostDetailView: View {
 
 struct THPostDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        THPostDetailView(reply: OTFloor(floor_id: 1, hole_id: 2, like: 3, content: "he", anonyname: "MMM", time_updated: "", time_created: "", deleted: false, is_me: false, liked: false, fold: []))
+        THPostDetailView(reply: THReply(id: 456, discussion: 123, content: "HelloWorld", username: "Demo", date_created: "2021-01-01", reply_to: nil, is_me: false))
     }
 }

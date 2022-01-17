@@ -23,11 +23,8 @@ enum UserGroup {
   /// Not logged in
   VISITOR,
 
-  /// Log in as Fudan undergraduate student
-  FUDAN_UNDERGRADUATE_STUDENT,
-
-  /// Log in as Fudan postgraduate student
-  FUDAN_POSTGRADUATE_STUDENT,
+  /// Log in as Fudan student
+  FUDAN_STUDENT,
 
   /// Log in as Fudan staff (Not implemented)
   FUDAN_STAFF,
@@ -38,27 +35,19 @@ enum UserGroup {
 
 Map<UserGroup, Function> kUserGroupDescription = {
   UserGroup.VISITOR: (BuildContext context) => S.of(context).visitor,
-  UserGroup.FUDAN_UNDERGRADUATE_STUDENT: (BuildContext context) =>
-      S.of(context).login_uis,
-  UserGroup.FUDAN_POSTGRADUATE_STUDENT: (BuildContext context) =>
-      S.of(context).fudan_postgraduate_student,
+  UserGroup.FUDAN_STUDENT: (BuildContext context) => S.of(context).login_uis,
   UserGroup.FUDAN_STAFF: (BuildContext context) => S.of(context).fudan_staff,
   UserGroup.SJTU_STUDENT: (BuildContext context) => S.of(context).sjtu_student,
 };
 
 class PersonInfo {
   UserGroup group;
-  String? id, password, name;
+  String id, password, name;
 
   PersonInfo(this.id, this.password, this.name, this.group);
 
   PersonInfo.createNewInfo(this.id, this.password, this.group) {
     name = "";
-  }
-
-  @override
-  String toString() {
-    return 'PersonInfo{group: $group, id: $id, password: $password, name: $name}';
   }
 
   static bool verifySharedPreferences(SharedPreferences preferences) {
@@ -76,25 +65,15 @@ class PersonInfo {
         preferences.getString("password"),
         preferences.getString("name"),
         preferences.containsKey("user_group")
-            ? UserGroup.values.firstWhere(
-                (element) =>
-                    element.toString() == preferences.getString("user_group"),
-                orElse: () => UserGroup.FUDAN_UNDERGRADUATE_STUDENT)
-            : UserGroup.FUDAN_UNDERGRADUATE_STUDENT);
+            ? UserGroup.values.firstWhere((element) =>
+                element.toString() == preferences.getString("user_group"))
+            : UserGroup.FUDAN_STUDENT);
   }
 
   Future<void> saveAsSharedPreferences(SharedPreferences preferences) async {
-    await preferences.setString("id", id!);
-    await preferences.setString("password", password!);
-    await preferences.setString("name", name!);
+    await preferences.setString("id", id);
+    await preferences.setString("password", password);
+    await preferences.setString("name", name);
     await preferences.setString("user_group", group.toString());
-  }
-
-  static Future<void> removeFromSharedPreferences(
-      SharedPreferences preferences) async {
-    const fieldString = ["id", "password", "name", "user_group"];
-    for (var element in fieldString) {
-      if (preferences.containsKey(element)) await preferences.remove(element);
-    }
   }
 }

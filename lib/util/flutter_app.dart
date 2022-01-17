@@ -17,37 +17,18 @@
 
 import 'dart:io';
 
-import 'package:dan_xi/common/pubspec.yaml.g.dart';
-import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 class FlutterApp {
   static void exitApp() {
     if (PlatformX.isAndroid) {
       SystemNavigator.pop(animated: true);
     } else if (PlatformX.isIOS) {
-      const channel = MethodChannel('appControl');
+      const channel = const MethodChannel('appControl');
       channel.invokeMethod('exit');
     } else {
       exit(0);
     }
   }
-
-  static Future<void> restartApp(BuildContext context) async {
-    await BaseRepositoryWithDio.clearAllCookies();
-    OpenTreeHoleRepository.getInstance().clearCache();
-    StateProvider.initialize();
-    while (auxiliaryNavigatorState?.canPop() == true) {
-      auxiliaryNavigatorState?.pop();
-    }
-    Phoenix.rebirth(context);
-  }
-
-  static String get versionName => "$major.$minor.$patch";
 }

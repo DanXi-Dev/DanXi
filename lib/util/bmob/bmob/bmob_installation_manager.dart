@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import '../data_plugin.dart';
 import 'bmob_query.dart';
 import 'table/bmob_installation.dart';
@@ -15,8 +13,7 @@ class BmobInstallationManager {
     BmobQuery<BmobInstallation> bmobQuery = BmobQuery();
     bmobQuery.addWhereEqualTo("installationId", installationId);
 
-    List<dynamic> responseData =
-        await (bmobQuery.queryInstallations() as FutureOr<List<dynamic>>);
+    List<dynamic> responseData = await bmobQuery.queryInstallations();
     List<BmobInstallation> installations =
         responseData.map((i) => BmobInstallation.fromJson(i)).toList();
 

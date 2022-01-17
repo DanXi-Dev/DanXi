@@ -17,25 +17,58 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class EmptyClassroomFeature extends Feature {
-  @override
-  String get mainTitle => S.of(context!).empty_classrooms;
+  PersonInfo _info;
 
   @override
-  String get subTitle => S.of(context!).tap_to_view;
+  void buildFeature([Map<String, dynamic> arguments]) {
+    _info = StateProvider.personInfo.value;
+  }
 
   @override
-  Widget get icon => PlatformX.isMaterial(context!)
+  String get mainTitle => S.of(context).empty_classrooms;
+
+  @override
+  String get subTitle => S.of(context).tap_to_view;
+
+  @override
+  Widget get icon => PlatformX.isAndroid
       ? const Icon(Icons.room)
-      : const Icon(CupertinoIcons.building_2_fill);
+      : const Icon(SFSymbols.building_2_fill);
+
+  /*@override
+  Widget get trailing => InkWell(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(CupertinoIcons.bus),
+            const SizedBox(
+              height: 2,
+            ),
+            Text(
+              S.of(context).school_bus,
+              textScaleFactor: 0.8,
+            ),
+          ],
+        ),
+        onTap: () => BrowserUtil.openUrl(
+            "https://mp.weixin.qq.com/s/NZJKDz0j9FIXNImEQPquQw"),
+      );*/
 
   @override
-  void onTap() async => smartNavigatorPush(context!, '/room/detail');
+  void onTap() async {
+    smartNavigatorPush(context, '/room/detail');
+  }
 
   @override
   bool get clickable => true;

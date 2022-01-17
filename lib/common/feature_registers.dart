@@ -19,13 +19,12 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 
-/// A global register table of [Feature], which declares its compatibility of user group here.
+/// A static register table of [Feature], declaring its compatibility of user group.
 Map<String, List<UserGroup>> _kRegister = {};
 
 void registerFeature(Feature feature,
     {List<UserGroup> groups = const [
-      UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
-      UserGroup.FUDAN_POSTGRADUATE_STUDENT,
+      UserGroup.FUDAN_STUDENT,
       UserGroup.FUDAN_STAFF
     ]}) {
   _kRegister[feature.runtimeType.toString()] = groups;
@@ -33,11 +32,12 @@ void registerFeature(Feature feature,
 
 bool checkFeature(Feature feature, UserGroup group) {
   if (_kRegister.containsKey(feature.runtimeType.toString())) {
-    return _kRegister[feature.runtimeType.toString()]!.contains(group);
+    return _kRegister[feature.runtimeType.toString()].contains(group);
   } else {
     return false;
   }
 }
 
-bool checkGroup(List<UserGroup> groups, [PersonInfo? info]) =>
+bool checkGroup(List<UserGroup> groups, [PersonInfo info]) =>
+    groups != null &&
     groups.contains((info ?? StateProvider.personInfo.value)?.group);

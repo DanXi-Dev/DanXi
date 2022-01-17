@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/model/time_table.dart';
+import 'package:flutter/widgets.dart';
 
 /// [DayEvents] is a list of [Event]s on a specific day.
 class DayEvents {
@@ -26,8 +27,10 @@ class DayEvents {
   final List<Event> events;
 
   DayEvents({
-    required this.weekday,
-    required this.day,
-    required this.events,
-  });
+    @required this.weekday,
+    @required this.day,
+    @required this.events,
+  })  : assert(day != null),
+        assert(events != null),
+        assert(weekday != null);
 }

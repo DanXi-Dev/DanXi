@@ -18,36 +18,42 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/master_detail/master_detail_view.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/time_table_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/repository/table_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class NextCourseFeature extends Feature {
-  LiveCourseModel? _data;
+  LiveCourseModel _data;
   ConnectionStatus _status = ConnectionStatus.NONE;
+  PersonInfo _info;
 
   Future<void> _loadCourse() async {
     _status = ConnectionStatus.CONNECTING;
-    TimeTable? timetable = await Retrier.runAsyncWithRetry(() async {
-      await Future.delayed(const Duration(milliseconds: 500));
+    TimeTable timetable = await Retrier.runAsyncWithRetry(() async {
+      // TODO: Sometimes the server returns a 500 error.
+      // Put a delay before retrying.
+      await Future.delayed(Duration(milliseconds: 100));
       return await TimeTableRepository.getInstance()
           .loadTimeTableLocally(StateProvider.personInfo.value);
     });
-    _data = getNextCourse(timetable!);
+    _data = getNextCourse(timetable);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
 
   LiveCourseModel getNextCourse(TimeTable table) {
-    Event? thisCourse;
-    Event? nextCourse;
+    Event thisCourse;
+    Event nextCourse;
     int courseLeft = 0;
     TimeNow now = table.now();
     DayEvents dayEvents = table.toDayEvents(now.week,
@@ -58,13 +64,13 @@ class NextCourseFeature extends Feature {
       DateTime exactStartTime = startTime.toExactTime();
       if (exactStartTime.isBefore(DateTime.now()) &&
           exactStartTime
-              .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE))
+              .add(Duration(minutes: TimeTable.MINUTES_OF_COURSE))
               .isAfter(DateTime.now())) {
         thisCourse = element;
       }
       if (exactStartTime.isAfter(DateTime.now())) {
         // Only get the next course once.
-        nextCourse ??= element;
+        if (nextCourse == null) nextCourse = element;
         courseLeft++;
       }
     }
@@ -72,7 +78,8 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic>? arguments]) {
+  void buildFeature([Map<String, dynamic> arguments]) {
+    _info = StateProvider.personInfo.value;
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -85,29 +92,32 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!).today_course;
+  String get mainTitle => S.of(context).today_course;
 
   @override
-  Widget? get customSubtitle {
+  Widget get customSubtitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return Text(S.of(context!).loading);
+        return Text(S.of(context).loading);
       case ConnectionStatus.DONE:
         if (_data != null) {
-          if (_data!.nextCourse?.course.courseName != null) {
-            return Text(S.of(context!).next_course_is(
-                _data!.nextCourse?.course.courseName ?? "", _data!.courseLeft));
+          if (_data.nextCourse?.course?.courseName != null) {
+            // TODO make it more readable (like adding a [SmallTag], etc.)
+            return Text(S.of(context).next_course_is(
+                _data.nextCourse?.course?.courseName, _data.courseLeft));
           } else {
-            return Text(S.of(context!).next_course_none);
+            return Text(S.of(context).next_course_none);
           }
         } else {
           return null;
         }
+        break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
-        return Text(S.of(context!).failed);
+        return Text(S.of(context).failed);
     }
+    return null;
   }
 
   void refreshData() {
@@ -116,15 +126,20 @@ class NextCourseFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isMaterial(context!)
-      ? const Icon(Icons.today)
-      : const Icon(CupertinoIcons.today);
+  Widget get icon =>
+      PlatformX.isAndroid ? Icon(Icons.today) : Icon(SFSymbols.today);
 
   @override
   void onTap() {
-    refreshData();
+    if (_data != null) {
+      // Navigator.of(context)
+      //     .pushNamed("/notice/aao/list", arguments: {"initialData": _data});
+    } else {
+      refreshData();
+    }
   }
 
+  //TODO: Show this trailing only when exams are available.
   @override
   Widget get trailing => InkWell(
         child: Column(
@@ -136,12 +151,12 @@ class NextCourseFeature extends Feature {
               height: 2,
             ),
             Text(
-              S.of(context!).exam_schedule,
+              S.of(context).exam_schedule,
               textScaleFactor: 0.8,
             ),
           ],
         ),
-        onTap: () => smartNavigatorPush(context!, '/exam/detail'),
+        onTap: () => smartNavigatorPush(context, '/exam/detail'),
       );
 
   @override
@@ -149,8 +164,8 @@ class NextCourseFeature extends Feature {
 }
 
 class LiveCourseModel {
-  Event? nowCourse;
-  Event? nextCourse;
+  Event nowCourse;
+  Event nextCourse;
   int courseLeft;
 
   LiveCourseModel(this.nowCourse, this.nextCourse, this.courseLeft);

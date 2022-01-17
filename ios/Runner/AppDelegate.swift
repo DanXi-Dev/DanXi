@@ -1,5 +1,6 @@
 import UIKit
 import Flutter
+import Firebase
 import WatchConnectivity
 
 @available(iOS 9.3, *)
@@ -9,6 +10,12 @@ import WatchConnectivity
     let defaults = UserDefaults.standard
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        /*if (defaults.bool(forKey: "token_set")) {
+            let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+            let channel = FlutterMethodChannel(name: "fduhole",
+                                               binaryMessenger: controller.binaryMessenger)
+            channel.invokeMethod("get_token", arguments: nil)
+        }*/
     }
     
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
@@ -18,12 +25,10 @@ import WatchConnectivity
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        DispatchQueue.main.async {
-            let controller : FlutterViewController = self.window?.rootViewController as! FlutterViewController
-            let channel = FlutterMethodChannel(name: "fduhole",
-                                               binaryMessenger: controller.binaryMessenger)
-            channel.invokeMethod("get_token", arguments: nil)
-        }
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "fduhole",
+                                           binaryMessenger: controller.binaryMessenger)
+        channel.invokeMethod("get_token", arguments: nil)
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -41,78 +46,46 @@ import WatchConnectivity
         }
     }
     
-    override func application(_ application: UIApplication,
-                              didRegisterForRemoteNotificationsWithDeviceToken
-                              deviceToken: Data) {
-        let token: String = deviceToken.map { String(format: "%.2hhx", $0) }.joined()
-        //let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "null_device_id"
-        /* Send token to FDUHole */
-        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
-        channel.invokeMethod("upload_apns_token", arguments: ["token": token])
-    }
-    
-    
-    override func application(_ application: UIApplication,
-                              didFailToRegisterForRemoteNotificationsWithError
-                              error: Error) {
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().getNotificationSettings { settings in
-                guard (settings.authorizationStatus == .authorized) ||
-                        (settings.authorizationStatus == .notDetermined) else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
-                    application.registerForRemoteNotifications()
-                }
-            }
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
-                application.registerForRemoteNotifications()
-            }
-        }
-    }
-    
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        /* Flutter */
-        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
-        channel.setMethodCallHandler({
-            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            switch (call.method) {
-            case "request_notification_permission":
-                if #available(iOS 10.0, *) {
-                    let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-                    UNUserNotificationCenter.current().requestAuthorization(
-                        options: authOptions,
-                        completionHandler: {_, _ in })
-                } else {
-                    let settings: UIUserNotificationSettings =
-                    UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-                    application.registerUserNotificationSettings(settings)
-                }
-                // This gets called regardless of whether user grants permission or not.
-                application.registerForRemoteNotifications()
-            case "send_token":
-                self.sendString(text: call.arguments as! String)
-            default:
-                break
-            }
-        })
         
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self
-        }
-        // Clear badge on launch
-        UIApplication.shared.applicationIconBadgeNumber = 0
+        FirebaseApp.configure()
         
-        /* watchOS Support */
+        //watchOS Support
         if(WCSession.isSupported()){
             let session = WCSession.default;
             session.delegate = self;
             session.activate();
         }
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "fduhole",
+                                           binaryMessenger: controller.binaryMessenger)
+        channel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "send_token"){
+                // We will call a method called "sendStringToNative" in flutter.
+                self.sendString(text: call.arguments as! String)
+            }
+        })
+        
+        /*let appCtrlChannel = FlutterMethodChannel(name: "appControl",
+         binaryMessenger: controller.binaryMessenger)
+         
+         //TODO: WARNING This might not pass App Store Review
+         appCtrlChannel.setMethodCallHandler({
+         (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+         if(call.method == "exit"){
+         UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
+         Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { (timer) in
+         exit(0)
+         }
+         }
+         else if(call.method == "minimize"){
+         UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
+         }
+         })*/
         
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -124,31 +97,5 @@ import WatchConnectivity
         
         let channel = FlutterMethodChannel(name: "plugins.flutter.io/quick_actions", binaryMessenger: controller! as! FlutterBinaryMessenger)
         channel.invokeMethod("launch", arguments: shortcutItem.type)
-    }
-}
-
-@available(iOS 10.0, *)
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    
-    // This function will be called when the app receive notification
-    // This override is necessary to display notification while app is in foreground
-    override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        // show the notification alert (banner), and with sound
-        completionHandler([.alert, .sound, .badge])
-    }
-    
-    // This function will be called right after user tap on the notification
-    override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let controller = window.rootViewController as? FlutterViewController
-        let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller! as! FlutterBinaryMessenger)
-        /*let application = UIApplication.shared
-        if (application.applicationState == .active) {
-            print("user tapped the notification bar when the app is in foreground")
-        }
-        else if (application.applicationState == .inactive) {
-            print("user tapped the notification bar when the app is in background")
-        }*/
-        channel.invokeMethod("launch_from_notification", arguments: response.notification.request.content.userInfo)
-        completionHandler()
     }
 }

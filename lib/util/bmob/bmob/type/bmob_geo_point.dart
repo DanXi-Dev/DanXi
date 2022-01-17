@@ -11,11 +11,11 @@ class BmobGeoPoint {
 
   Map<String, dynamic> toJson() => _$BmobGeoPointToJson(this);
 
-  double? latitude;
-  double? longitude;
+  double latitude;
+  double longitude;
 
   @JsonKey(name: "__type")
-  String? type = "GeoPoint";
+  String type = "GeoPoint";
 
   BmobGeoPoint();
 }

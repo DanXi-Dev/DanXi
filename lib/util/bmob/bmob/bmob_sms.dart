@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:json_annotation/json_annotation.dart';
 
 import 'bmob.dart';
@@ -12,17 +10,16 @@ part 'bmob_sms.g.dart';
 
 @JsonSerializable()
 class BmobSms {
-  String? mobilePhoneNumber;
-  String? template;
+  String mobilePhoneNumber;
+  String template;
 
   BmobSms();
 
   ///查询单条数据
   Future<BmobSent> sendSms() async {
-    Map responseData = await (BmobDio.getInstance()!
-            .post(Bmob.BMOB_API_SEND_SMS_CODE, data: getParams())
-        as FutureOr<Map<dynamic, dynamic>>);
-    BmobSent sent = BmobSent.fromJson(responseData as Map<String, dynamic>);
+    Map responseData = await BmobDio.getInstance()
+        .post(Bmob.BMOB_API_SEND_SMS_CODE, data: getParams());
+    BmobSent sent = BmobSent.fromJson(responseData);
     return sent;
   }
 
@@ -30,11 +27,9 @@ class BmobSms {
   Future<BmobHandled> verifySmsCode(smsCode) async {
     Map params = getParams();
     params.remove("template");
-    Map responseData = await (BmobDio.getInstance()!
-            .post(Bmob.BMOB_API_VERIFY_SMS_CODE + smsCode, data: params)
-        as FutureOr<Map<dynamic, dynamic>>);
-    BmobHandled bmobHandled =
-        BmobHandled.fromJson(responseData as Map<String, dynamic>);
+    Map responseData = await BmobDio.getInstance()
+        .post(Bmob.BMOB_API_VERIFY_SMS_CODE + smsCode, data: params);
+    BmobHandled bmobHandled = BmobHandled.fromJson(responseData);
     return bmobHandled;
   }
 

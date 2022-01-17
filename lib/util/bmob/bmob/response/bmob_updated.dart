@@ -5,7 +5,7 @@ part 'bmob_updated.g.dart';
 
 @JsonSerializable()
 class BmobUpdated {
-  String? updatedAt;
+  String updatedAt;
 
   BmobUpdated();
 

@@ -21,38 +21,34 @@
 - 显示教务处通知
 - 查询期中/期末考试日程与导出至系统日历等
 - 查询期末绩点和专业排名
-- 查询校车班次
 
 欢迎各位大佬加入开发~
 
 # 安装
-如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/DanXi-Dev/DanXi/compare)。
+如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/w568w/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/w568w/DanXi/compare)。
 
 ## iOS(watchOS)/iPadOS
 
-从 [App Store](https://apps.apple.com/app/id1568629997) 下载
+从 [App Store](https://apps.apple.com/us/app/旦夕/id1568629997) 下载
 
 ## Android
-打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 apk 安装包，安装即可。  
+打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 apk 安装包，安装即可。  
 （依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
 
 ## Windows
-打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。  
+打开 [release 页面](https://github.com/w568w/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。  
 
 ## macOS
-使用 Apple Silicon 的用户可以直接从 [App Store](https://apps.apple.com/app/id1568629997) 下载。
-
-其他用户：我们将等待 Flutter 框架对 macOS 的支持稳定后考虑发行专属的 macOS 版本。
+由于 macOS 用户基数太少，专用于 macOS 的发行版本现在已经停止发布。如果有必要使用，可以考虑用iOS/iPadOS版本代替。
 
 # 构建
 ## 我们当前使用的 Flutter 编译版本
-
 ```shell script
 $ flutter --version
-Flutter 2.8.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 77d935af4d (16 hours ago) • 2021-12-16 08:37:33 -0800
-Engine • revision 890a5fca2e
-Tools • Dart 2.15.1
+Flutter 2.2.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision b22742018b (9 weeks ago) • 2021-05-14 19:12:57 -0700
+Engine • revision a9d88a4d18
+Tools • Dart 2.13.0
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
@@ -63,11 +59,11 @@ Tools • Dart 2.15.1
   
 如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。
    
-如果你正在为`iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835)`Xcode`。
+如果你正在为`iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/cn/app/xcode/id497799835)`Xcode`。
   
 确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。
 
 ## 赞助
-由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
-
+由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，您可以通过爱发电平台赞助我们 https://afdian.net/@danxi-dev  
+然而爱发电平台会抽成，所以有赞助希望能直接通过邮件联系我们！
 我们的邮箱：[danxi_dev@protonmail.com](mailto:danxi_dev@protonmail.com)

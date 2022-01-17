@@ -16,22 +16,20 @@
  */
 
 import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/main.dart';
 import 'package:flutter/material.dart';
+import 'package:dan_xi/public_extension_methods.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [Card].
 class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   final Feature feature;
-  final Map<String, dynamic>? arguments;
-  final Function? onDismissed;
+  final Map<String, dynamic> arguments;
+  final Function onDismissed;
 
   @override
   _FeatureCardItemState createState() => _FeatureCardItemState();
 
-  const FeatureCardItem(
-      {required this.feature, this.arguments, this.onDismissed, Key? key})
-      : super(key: key);
+  FeatureCardItem({@required this.feature, this.arguments, this.onDismissed});
 
   @override
   Feature get childFeature => feature;
@@ -39,7 +37,7 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
 
 class _FeatureCardItemState extends State<FeatureCardItem>
     with FeatureContainerState {
-  late Key _key;
+  Key _key;
 
   @override
   void initState() {
@@ -54,49 +52,43 @@ class _FeatureCardItemState extends State<FeatureCardItem>
       ..container = this
       ..buildFeature(widget.arguments);
 
-    List<String?> summary = [];
+    List<String> summary = [];
     summary.add(widget.feature.subTitle ?? "");
-    if (widget.feature.tertiaryTitle != null) {
+    if (widget.feature.tertiaryTitle != null)
       summary.add(widget.feature.tertiaryTitle);
-    }
     Widget card = Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(12),
         child: Column(
           children: [
             Row(
               children: [
                 widget.feature.icon,
-                const SizedBox(
+                SizedBox(
                   width: 8,
                 ),
                 Text(
-                  widget.feature.mainTitle!,
-                  style: const TextStyle(fontSize: 16),
+                  widget.feature.mainTitle,
+                  style: TextStyle(fontSize: 16),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 )
-              ]
-                  .takeWhile((value) => value != null)
-                  .map((e) => e!)
-                  .toList(growable: false),
+              ].takeWhile((value) => value != null).toList(),
             ),
-            const SizedBox(
+            SizedBox(
               height: 8,
             ),
-            widget.feature.customSubtitle ??
-                Text(
-                  summary.join("\n"),
-                  style: PlatformX.getTheme(context)
-                      .textTheme
-                      .headline1!
-                      .copyWith(fontSize: 12),
-                ),
+            widget.feature.customSubtitle == null
+                ? Text(
+                    summary.join("\n"),
+                    style: getTheme(context)
+                        .textTheme
+                        .headline1
+                        .copyWith(fontSize: 12),
+                  )
+                : widget.feature.customSubtitle,
             widget.feature.trailing
-          ]
-              .takeWhile((value) => value != null)
-              .map((e) => e!)
-              .toList(growable: false),
+          ].takeWhile((value) => value != null).toList(),
         ),
       ),
     );

@@ -16,33 +16,22 @@
  */
 
 import 'dart:convert';
-import 'dart:core';
-import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
-import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// A class to manage [SharedPreferences] Settings
-///
-/// Code Integrity Note:
-/// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
-/// Only return [null] when there is no default value.
 class SettingsProvider {
-  SharedPreferences? preferences;
-  static final _instance = SettingsProvider._();
+  SharedPreferences _preferences;
+
   static const String KEY_PREFERRED_CAMPUS = "campus";
 
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_LAST_PUSH_TOKEN = "push_token";
-  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v2";
+  static const String KEY_FDUHOLE_TOKEN = "fduhole_token";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
       "ec_last_choice";
@@ -50,122 +39,79 @@ class SettingsProvider {
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
   static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
       "last_recorded_semester_start_time";
-  static const String KEY_CLEAN_MODE = "clean_mode";
-  static const String KEY_DEBUG_MODE = "DEBUG";
-  static const String KEY_AD_ENABLED = "ad_enabled";
-  static const String KEY_HIDDEN_TAGS = "hidden_tags";
-  static const String KEY_HIDDEN_HOLE = "hidden_hole";
-  static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
-  static const String KEY_CELEBRATION = "celebration";
-  static const String KEY_BACKGROUND_IMAGE_PATH = "background";
+  static List<DashboardCard> _kDefaultDashboardCardList = [
+    DashboardCard("new_card", null, null, true),
+    DashboardCard("welcome_feature", null, null, true),
+    DashboardCard("next_course_feature", null, null, true),
+    DashboardCard("divider", null, null, true),
+    DashboardCard("ecard_balance_feature", null, null, true),
+    DashboardCard("dining_hall_crowdedness_feature", null, null, true),
+    DashboardCard("aao_notice_feature", null, null, true),
+    DashboardCard("empty_classroom_feature", null, null, true),
+    DashboardCard("bus_feature", null, null, true),
+    DashboardCard("pe_feature", null, null, true),
+    DashboardCard("new_card", null, null, true),
+    DashboardCard("fudan_daily_feature", null, null, true),
+    DashboardCard("new_card", null, null, true),
+    DashboardCard("qr_feature", null, null, true),
+  ];
 
-  SettingsProvider._();
+  SettingsProvider._(this._preferences);
 
-  factory SettingsProvider.getInstance() => _instance;
-
-  FileImage? get backgroundImage {
-    final path = backgroundImagePath;
-    if (path == null) return null;
-    try {
-      final File image = File(path);
-      return FileImage(image);
-    } catch (ignored) {
-      return null;
-    }
-  }
-
-  String? get backgroundImagePath {
-    if (preferences!.containsKey(KEY_BACKGROUND_IMAGE_PATH)) {
-      return preferences!.getString(KEY_BACKGROUND_IMAGE_PATH)!;
-    }
-    return null;
-  }
-
-  set backgroundImagePath(String? value) {
-    if (value != null) {
-      preferences!.setString(KEY_BACKGROUND_IMAGE_PATH, value);
-    } else {
-      preferences!.remove(KEY_BACKGROUND_IMAGE_PATH);
-    }
-  }
-
-  Future<void> init() async =>
-      preferences = await SharedPreferences.getInstance();
-
-  @Deprecated("SettingsProvider do not need a BuildContext any more.")
-  factory SettingsProvider.of(_) => SettingsProvider.getInstance();
-
-  bool get useAccessibilityColoring {
-    if (preferences!.containsKey(KEY_ACCESSIBILITY_COLORING)) {
-      return preferences!.getBool(KEY_ACCESSIBILITY_COLORING)!;
-    }
-    return false;
-  }
-
-  set useAccessibilityColoring(bool value) {
-    preferences!.setBool(KEY_ACCESSIBILITY_COLORING, value);
-  }
-
-  /// Whether user has opted-in to Ads
-  bool get isAdEnabled {
-    if (preferences!.containsKey(KEY_AD_ENABLED)) {
-      return preferences!.getBool(KEY_AD_ENABLED)!;
-    }
-    return false;
-  }
-
-  set isAdEnabled(bool value) {
-    preferences!.setBool(KEY_AD_ENABLED, value);
+  factory SettingsProvider.of(SharedPreferences preferences) {
+    return SettingsProvider._(preferences);
   }
 
   int get lastECBuildingChoiceRepresentation {
-    if (preferences!.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
-      return preferences!.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)!;
-    }
-    return 0;
-  }
-
-  set lastECBuildingChoiceRepresentation(int value) {
-    preferences!.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
-  }
-
-  String? get lastSemesterStartTime {
-    if (preferences!.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
-      return preferences!.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME)!;
+    if (_preferences.containsKey(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE)) {
+      return _preferences.getInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE);
     }
     return null;
   }
 
-  set lastSemesterStartTime(String? value) =>
-      preferences!.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value!);
+  set lastECBuildingChoiceRepresentation(int value) {
+    _preferences.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
+  }
+
+  String get lastSemesterStartTime {
+    if (_preferences.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
+      return _preferences.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME);
+    }
+    return null;
+  }
+
+  set lastSemesterStartTime(String value) {
+    _preferences.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value);
+  }
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting
   List<DashboardCard> get dashboardWidgetsSequence {
-    if (preferences!.containsKey(KEY_DASHBOARD_WIDGETS)) {
+    if (_preferences.containsKey(KEY_DASHBOARD_WIDGETS)) {
       var rawCardList =
-          (json.decode(preferences!.getString(KEY_DASHBOARD_WIDGETS)!) as List)
+          (json.decode(_preferences.getString(KEY_DASHBOARD_WIDGETS)) as List)
               .map((i) => DashboardCard.fromJson(i))
               .toList();
       // Merge new features which are added in the new version.
-      for (var element in Constant.defaultDashboardCardList) {
+      _kDefaultDashboardCardList.forEach((element) {
         if (!element.isSpecialCard &&
             !rawCardList
                 .any((card) => card.internalString == element.internalString)) {
           rawCardList.add(element);
         }
-      }
+      });
       return rawCardList;
     }
-    return Constant.defaultDashboardCardList;
+    return _kDefaultDashboardCardList;
   }
 
-  set dashboardWidgetsSequence(List<DashboardCard>? value) =>
-      preferences!.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+  set dashboardWidgetsSequence(List<DashboardCard> value) {
+    _preferences.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+  }
 
   Campus get campus {
-    if (preferences!.containsKey(KEY_PREFERRED_CAMPUS)) {
-      String? value = preferences!.getString(KEY_PREFERRED_CAMPUS);
+    if (_preferences.containsKey(KEY_PREFERRED_CAMPUS)) {
+      String value = _preferences.getString(KEY_PREFERRED_CAMPUS);
       return Constant.CAMPUS_VALUES
           .firstWhere((element) => element.toString() == value, orElse: () {
         campus = Campus.HANDAN_CAMPUS;
@@ -177,78 +123,72 @@ class SettingsProvider {
   }
 
   set campus(Campus campus) {
-    preferences!.setString(KEY_PREFERRED_CAMPUS, campus.toString());
+    _preferences.setString(KEY_PREFERRED_CAMPUS, campus.toString());
   }
 
-  //Push Token
-  String? get lastPushToken {
-    if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {
-      return preferences!.getString(KEY_LAST_PUSH_TOKEN)!;
+  //FudanDaily AutoTick
+  /*
+  String get autoTickCancelDate {
+    if (_preferences.containsKey(KEY_AUTOTICK_LAST_CANCEL_DATE)) {
+      return _preferences.getString(KEY_AUTOTICK_LAST_CANCEL_DATE);
     }
     return null;
   }
 
-  set lastPushToken(String? value) =>
-      preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);
+  set autoTickCancelDate(String datetime) {
+    _preferences.setString(KEY_AUTOTICK_LAST_CANCEL_DATE, datetime.toString());
+  }
+
+  //Theme
+  //int: 0 for Material, 1 for Cupertino
+  int get theme {
+    if (_preferences.containsKey(KEY_PREFERRED_THEME)) {
+      return _preferences.getInt(KEY_PREFERRED_THEME);
+    }
+    return null;
+  }
+
+  set theme(int theme) {
+    _preferences.setInt(KEY_PREFERRED_THEME, theme);
+  }*/
 
   //Token
-  String? get fduholeToken {
-    if (preferences!.containsKey(KEY_FDUHOLE_TOKEN)) {
-      return preferences!.getString(KEY_FDUHOLE_TOKEN)!;
+  String get fduholeToken {
+    if (_preferences.containsKey(KEY_FDUHOLE_TOKEN)) {
+      return _preferences.getString(KEY_FDUHOLE_TOKEN);
     }
     return null;
   }
 
-  set fduholeToken(String? value) {
-    if (value != null) {
-      preferences!.setString(KEY_FDUHOLE_TOKEN, value);
-    } else {
-      preferences!.remove(KEY_FDUHOLE_TOKEN);
-    }
-  }
+  set fduholeToken(String value) =>
+      _preferences.setString(KEY_FDUHOLE_TOKEN, value);
 
-  void deleteAllFduholeData() {
-    preferences!.remove(KEY_FDUHOLE_TOKEN);
-    preferences!.remove(KEY_LAST_PUSH_TOKEN);
-    preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
-    preferences!.remove(KEY_FDUHOLE_SORTORDER);
-    preferences!.remove(KEY_HIDDEN_HOLE);
-    preferences!.remove(KEY_HIDDEN_TAGS);
-  }
+  void deleteSavedFduholeToken() => _preferences.remove(KEY_FDUHOLE_TOKEN);
 
   //Debug Mode
-  bool get debugMode {
-    if (preferences!.containsKey(KEY_DEBUG_MODE)) {
-      return preferences!.getBool(KEY_DEBUG_MODE)!;
-    } else {
-      return false;
-    }
-  }
-
-  set debugMode(bool mode) => preferences!.setBool(KEY_DEBUG_MODE, mode);
+  bool get debugMode => _preferences.containsKey("DEBUG");
 
   //FDUHOLE Default Sorting Order
-  SortOrder? get fduholeSortOrder {
-    if (preferences!.containsKey(KEY_FDUHOLE_SORTORDER)) {
-      String? str = preferences!.getString(KEY_FDUHOLE_SORTORDER);
-      if (str == SortOrder.LAST_CREATED.getInternalString()) {
+  SortOrder get fduholeSortOrder {
+    if (_preferences.containsKey(KEY_FDUHOLE_SORTORDER)) {
+      String str = _preferences.getString(KEY_FDUHOLE_SORTORDER);
+      if (str == SortOrder.LAST_CREATED.getInternalString())
         return SortOrder.LAST_CREATED;
-      } else if (str == SortOrder.LAST_REPLIED.getInternalString()) {
+      else if (str == SortOrder.LAST_REPLIED.getInternalString())
         return SortOrder.LAST_REPLIED;
-      }
     }
     return null;
   }
 
-  set fduholeSortOrder(SortOrder? value) =>
-      preferences!.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString()!);
+  set fduholeSortOrder(SortOrder value) =>
+      _preferences.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString());
 
   /// FDUHOLE Folded Post Behavior
 
   /// NOTE: This getter defaults to a FOLD and won't return [null]
   FoldBehavior get fduholeFoldBehavior {
-    if (preferences!.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
-      int? savedPref = preferences!.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
+    if (_preferences.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
+      int savedPref = _preferences.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
       return FoldBehavior.values.firstWhere(
         (element) => element.index == savedPref,
         orElse: () => FoldBehavior.FOLD,
@@ -258,82 +198,34 @@ class SettingsProvider {
   }
 
   set fduholeFoldBehavior(FoldBehavior value) =>
-      preferences!.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
-
-  /// Clean Mode
-  bool get cleanMode {
-    if (preferences!.containsKey(KEY_CLEAN_MODE)) {
-      return preferences!.getBool(KEY_CLEAN_MODE)!;
-    } else {
-      return false;
-    }
-  }
-
-  set cleanMode(bool mode) => preferences!.setBool(KEY_CLEAN_MODE, mode);
-
-  /// Hidden tags
-  List<OTTag>? get hiddenTags {
-    try {
-      var json = jsonDecode(preferences!.getString(KEY_HIDDEN_TAGS)!);
-      if (json is Iterable) {
-        return json.map((e) => OTTag.fromJson(e)).toList();
-      }
-    } catch (ignored) {}
-    return null;
-  }
-
-  set hiddenTags(List<OTTag>? tags) {
-    if (tags == null) return;
-    preferences!.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
-  }
-
-  /// Hide FDUHole
-  bool get hideHole {
-    if (preferences!.containsKey(KEY_HIDDEN_HOLE)) {
-      return preferences!.getBool(KEY_HIDDEN_HOLE)!;
-    } else {
-      return false;
-    }
-  }
-
-  set hideHole(bool mode) => preferences!.setBool(KEY_HIDDEN_HOLE, mode);
-
-  /// Celebration words
-  List<Celebration> get celebrationWords =>
-      jsonDecode(preferences!.containsKey(KEY_CELEBRATION)
-              ? preferences!.getString(KEY_CELEBRATION)!
-              : Constant.SPECIAL_DAYS)
-          .map<Celebration>((e) => Celebration.fromJson(e))
-          .toList();
-
-  set celebrationWords(List<Celebration> lists) {
-    preferences!.setString(KEY_CELEBRATION, jsonEncode(lists));
-  }
+      _preferences.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }
 
-extension SortOrderEx on SortOrder? {
-  String? displayTitle(BuildContext context) {
+extension SortOrderEx on SortOrder {
+  String displayTitle(BuildContext context) {
     switch (this) {
       case SortOrder.LAST_REPLIED:
         return S.of(context).last_replied;
+        break;
       case SortOrder.LAST_CREATED:
         return S.of(context).last_created;
-      case null:
-        return null;
+        break;
     }
+    return null;
   }
 
-  String? getInternalString() {
+  String getInternalString() {
     switch (this) {
       case SortOrder.LAST_REPLIED:
         return "last_updated";
+        break;
       case SortOrder.LAST_CREATED:
         return "last_created";
-      case null:
-        return null;
+        break;
     }
+    return null;
   }
 }
 
@@ -341,88 +233,18 @@ extension SortOrderEx on SortOrder? {
 enum FoldBehavior { SHOW, FOLD, HIDE }
 
 extension FoldBehaviorEx on FoldBehavior {
-  String? displayTitle(BuildContext context) {
+  String displayTitle(BuildContext context) {
     switch (this) {
       case FoldBehavior.FOLD:
         return S.of(context).fold;
+        break;
       case FoldBehavior.HIDE:
         return S.of(context).hide;
+        break;
       case FoldBehavior.SHOW:
         return S.of(context).show;
+        break;
     }
-  }
-
-  String? internalString() {
-    switch (this) {
-      case FoldBehavior.FOLD:
-        return 'fold';
-      case FoldBehavior.HIDE:
-        return 'hide';
-      case FoldBehavior.SHOW:
-        return 'show';
-    }
-  }
-}
-
-FoldBehavior foldBehaviorFromInternalString(String? str) {
-  switch (str) {
-    case 'fold':
-      return FoldBehavior.FOLD;
-    case 'hide':
-      return FoldBehavior.HIDE;
-    case 'show':
-      return FoldBehavior.SHOW;
-    default:
-      return FoldBehavior.FOLD;
-  }
-}
-
-enum OTNotificationTypes { MENTION, FAVORITE, REPORT }
-
-extension OTNotificationTypesEx on OTNotificationTypes {
-  String? displayTitle(BuildContext context) {
-    switch (this) {
-      case OTNotificationTypes.MENTION:
-        return S.of(context).notification_mention;
-      case OTNotificationTypes.FAVORITE:
-        return S.of(context).notification_favorite;
-      case OTNotificationTypes.REPORT:
-        return S.of(context).notification_reported;
-    }
-  }
-
-  String? displayShortTitle(BuildContext context) {
-    switch (this) {
-      case OTNotificationTypes.MENTION:
-        return S.of(context).notification_mention_s;
-      case OTNotificationTypes.FAVORITE:
-        return S.of(context).notification_favorite_s;
-      case OTNotificationTypes.REPORT:
-        return S.of(context).notification_reported_s;
-    }
-  }
-
-  String internalString() {
-    switch (this) {
-      case OTNotificationTypes.MENTION:
-        return 'mention';
-      case OTNotificationTypes.FAVORITE:
-        return 'favorite';
-      case OTNotificationTypes.REPORT:
-        return 'report';
-    }
-  }
-}
-
-OTNotificationTypes? notificationTypeFromInternalString(String str) {
-  switch (str) {
-    case 'mention':
-      return OTNotificationTypes.MENTION;
-    case 'favorite':
-      return OTNotificationTypes.FAVORITE;
-    case 'report':
-      return OTNotificationTypes.REPORT;
-    default:
-      return null;
+    return null;
   }
 }

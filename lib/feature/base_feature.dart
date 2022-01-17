@@ -16,20 +16,12 @@
  */
 
 import 'package:dan_xi/feature/feature_map.dart';
-import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// A Feature is a functional item shown on the dashboard, with which user interacts via tapping.
 ///
-///
-/// ## Note: A Checklist After Creating a New [Feature]
-///
-/// 1. Register it in [FeatureMap].
-/// 2. Add it to [_HomeSubpageState.widgetMap] in [HomeSubpage],
-///   whose initialization you will find at [_HomeSubpageState._rebuild].
-/// 3. Insert it at a appropriate position to [Constant.defaultDashboardCardList].
-/// 4. Also add it to [Constant.getFeatureName].
+/// Notes: after creating a new [Feature], you may need to register it in [FeatureMap].
 abstract class Feature {
   /// Request FeatureContainer to update the content text/icon since they're changed
   @nonVirtual
@@ -37,25 +29,25 @@ abstract class Feature {
 
   bool get clickable => false;
 
-  Widget? get icon => null;
+  Widget get icon => null;
 
-  String? get mainTitle;
+  String get mainTitle;
 
-  String? get subTitle => null;
+  String get subTitle => null;
 
-  String? get tertiaryTitle => null;
+  String get tertiaryTitle => null;
 
-  Widget? get customSubtitle => null;
+  Widget get customSubtitle => null;
 
-  Widget? get trailing => null;
+  Widget get trailing => null;
 
   bool get removable => false;
 
-  late FeatureContainerState container;
+  FeatureContainerState container;
 
-  BuildContext? context;
+  BuildContext context;
 
-  void buildFeature([Map<String, dynamic>? arguments]) {}
+  void buildFeature([Map<String, dynamic> arguments]) {}
 
   /// Called when FeatureContainer invokes [initState].
   void initFeature() {}

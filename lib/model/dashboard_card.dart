@@ -1,5 +1,3 @@
-
-
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -23,10 +21,10 @@ part 'dashboard_card.g.dart';
 
 @JsonSerializable()
 class DashboardCard {
-  final String? internalString;
-  final String? title;
-  final String? link;
-  bool? enabled;
+  final String internalString;
+  final String title;
+  final String link;
+  bool enabled;
 
   DashboardCard(this.internalString, this.title, this.link, this.enabled);
 

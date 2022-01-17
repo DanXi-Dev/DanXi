@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct TreeHoleDetailsPage: View {
-    @State private var replyList: [OTFloor]
+    @State private var replyList: [THReply]
     @State private var currentPage: Int = 1
     @State private var isLoading = false
     @State private var endReached = false
     @State private var error: String? = nil
     @EnvironmentObject var fduholeLoginInfo: WatchSessionDelegate
     
-    init(replies: [OTFloor]) {
+    init(replies: [THReply]) {
         replyList = replies
     }
     
@@ -23,7 +23,7 @@ struct TreeHoleDetailsPage: View {
         currentPage += 1
         if (!isLoading) {
             isLoading = true
-            loadFloors(token: fduholeLoginInfo.token, page: currentPage, discussionId: replyList.first!.hole_id) { (T: [OTFloor]?, errorString: String?) -> Void in
+            loadReplies(token: fduholeLoginInfo.token, page: currentPage, discussionId: replyList.first!.discussion) { (T: [THReply]?, errorString: String?) -> Void in
                 error = errorString
                 if (errorString == nil) {
                     if (T!.isEmpty) {
@@ -56,12 +56,12 @@ struct TreeHoleDetailsPage: View {
                 Text("end_reached")
             }
         }
-        .navigationTitle("#\(replyList.first!.hole_id)")
+        .navigationTitle("#\(replyList.first!.discussion)")
     }
 }
 
 struct TreeHoleDetailsPage_Previews: PreviewProvider {
     static var previews: some View {
-        Text("too lazy to write preview")
+        TreeHoleDetailsPage(replies: [THReply(id: 456, discussion: 123, content: "HelloWorld", username: "Demo", date_created: "xxx", reply_to: nil, is_me: false), THReply(id: 456, discussion: 123, content: "HelloWorld", username: "Demo", date_created: "xxx", reply_to: nil, is_me: false)])
     }
 }

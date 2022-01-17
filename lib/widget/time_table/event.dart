@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/model/time_table.dart';
+import 'package:flutter/widgets.dart';
 
 /// [Event] represents a specific course at a specific time.
 ///
@@ -26,7 +27,8 @@ class Event {
   final CourseTime slot;
 
   Event({
-    required this.course,
-    required this.slot,
-  });
+    @required this.course,
+    @required this.slot,
+  })  : assert(course != null),
+        assert(slot != null);
 }

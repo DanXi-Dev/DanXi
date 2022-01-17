@@ -5,14 +5,14 @@ part 'bmob_date.g.dart';
 
 @JsonSerializable()
 class BmobDate {
-  String? iso;
+  String iso;
   @JsonKey(name: '__type')
-  String? type = "Date";
+  String type = "Date";
 
   BmobDate();
 
   void setDate(DateTime dateTime) {
-    iso = dateTime.toString();
+    this.iso = dateTime.toString();
   }
 
   //此处与类名一致，由指令自动生成代码

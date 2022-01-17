@@ -7,13 +7,13 @@
 
 import Foundation
 
-let BASE_URL = "https://api.fduhole.com"
+let BASE_URL = "https://www.fduhole.tk/v1"
 
-func loadHoles<T: Decodable>(token: String, startTime: String?, divisionId: Int?, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
-    var components = URLComponents(string: BASE_URL + "/holes")!
+func loadDiscussions<T: Decodable>(token: String, page: Int, sortOrder: SortOrder, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
+    var components = URLComponents(string: BASE_URL + "/discussions/")!
     components.queryItems = [
-        URLQueryItem(name: "start_time", value: startTime),
-        URLQueryItem(name: "division_id", value: String(divisionId ?? 1))
+        URLQueryItem(name: "page", value: String(page)),
+        URLQueryItem(name: "order", value: sortOrder.getString())
     ]
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
@@ -24,6 +24,7 @@ func loadHoles<T: Decodable>(token: String, startTime: String?, divisionId: Int?
         if (error == nil) {
             if let data = data {
                 if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
+                    // we have good data – go back to the main thread
                     completion(decodedResponse, nil)
                     return
                 }
@@ -35,34 +36,11 @@ func loadHoles<T: Decodable>(token: String, startTime: String?, divisionId: Int?
     }.resume()
 }
 
-func loadDivisions<T: Decodable>(token: String, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
-    var components = URLComponents(string: BASE_URL + "/divisions")!
-    components.queryItems = []
-    components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
-    var request = URLRequest(url: components.url!)
-    request.httpMethod = "GET"
-    request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
-    
-    URLSession.shared.dataTask(with: request) { data, response, error in
-        if (error == nil) {
-            if let data = data {
-                if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
-                    completion(decodedResponse, nil)
-                    return
-                }
-            }
-        }
-        else {
-            completion(nil, error!.localizedDescription)
-        }
-    }.resume()
-}
-
-func loadFloors<T: Decodable>(token: String, page: Int, discussionId: Int, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
-    var components = URLComponents(string: BASE_URL + "/floors")!
+func loadReplies<T: Decodable>(token: String, page: Int, discussionId: Int, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
+    var components = URLComponents(string: BASE_URL + "/posts/")!
     components.queryItems = [
-        URLQueryItem(name: "start_floor", value: String((page-1)*10)),
-        URLQueryItem(name: "hole_id", value: String(discussionId))
+        URLQueryItem(name: "page", value: String(page)),
+        URLQueryItem(name: "id", value: String(discussionId))
     ]
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
@@ -74,6 +52,7 @@ func loadFloors<T: Decodable>(token: String, page: Int, discussionId: Int, compl
         if (error == nil) {
             if let data = data {
                 if let decodedResponse = try? JSONDecoder().decode(T.self, from: data) {
+                    // we have good data – go back to the main thread
                     completion(decodedResponse, nil)
                     return
                 }
@@ -91,4 +70,20 @@ enum TreeHoleError: Error {
     case unauthorized
     case connectionFailed
     case invalidResponse
+}
+
+enum SortOrder {
+    case last_updated
+    case last_created
+}
+
+extension SortOrder {
+    public func getString() -> String {
+        switch (self) {
+        case .last_created:
+            return "last_created"
+        case .last_updated:
+            return "last_updated"
+        }
+    }
 }

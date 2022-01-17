@@ -6,21 +6,23 @@ part of 'bmob_query.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BmobQuery<T> _$BmobQueryFromJson<T>(Map<String, dynamic> json) => BmobQuery<T>()
-  ..include = json['include'] as String?
-  ..limit = json['limit'] as int?
-  ..skip = json['skip'] as int?
-  ..order = json['order'] as String?
-  ..count = json['count'] as int?
-  ..c = json['c'] as String?
-  ..where = json['where'] as Map<String, dynamic>?
-  ..having = json['having'] as Map<String, dynamic>?
-  ..groupby = json['groupby'] as String?
-  ..sum = json['sum'] as String?
-  ..average = json['average'] as String?
-  ..max = json['max'] as String?
-  ..min = json['min'] as String?
-  ..groupcount = json['groupcount'] as bool?;
+BmobQuery<T> _$BmobQueryFromJson<T>(Map<String, dynamic> json) {
+  return BmobQuery<T>()
+    ..include = json['include'] as String
+    ..limit = json['limit'] as int
+    ..skip = json['skip'] as int
+    ..order = json['order'] as String
+    ..count = json['count'] as int
+    ..c = json['c'] as String
+    ..where = json['where'] as Map<String, dynamic>
+    ..having = json['having'] as Map<String, dynamic>
+    ..groupby = json['groupby'] as String
+    ..sum = json['sum'] as String
+    ..average = json['average'] as String
+    ..max = json['max'] as String
+    ..min = json['min'] as String
+    ..groupcount = json['groupcount'] as bool;
+}
 
 Map<String, dynamic> _$BmobQueryToJson<T>(BmobQuery<T> instance) =>
     <String, dynamic>{

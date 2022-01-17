@@ -15,23 +15,34 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:screen_brightness/screen_brightness.dart';
+
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/services.dart';
 
 class ScreenProxy {
-  static Future<double?> get brightness async {
-    return await ScreenBrightness().current;
+  static const MethodChannel _channel =
+      const MethodChannel('github.com/clovisnicolas/flutter_screen');
+
+  static Future<double> get brightness async {
+    if (PlatformX.isMobile)
+      return (await _channel.invokeMethod('brightness')) as double;
+    else
+      return 1.0;
   }
 
-  static setBrightness(double brightness) async {
-    await ScreenBrightness().setScreenBrightness(brightness);
+  static setBrightness(double brightness) {
+    if (PlatformX.isMobile)
+      _channel.invokeMethod('setBrightness', {"brightness": brightness});
   }
 
-  static resetBrightness() async {
-    await ScreenBrightness().resetScreenBrightness();
+  static Future<bool> get isKeptOn async {
+    if (PlatformX.isMobile)
+      return (await _channel.invokeMethod('isKeptOn')) as bool;
+    else
+      return true;
   }
 
-  static keepOn(bool on) async {
-    // TODO: Use wakelock to keep screen on
-    throw UnimplementedError();
+  static keepOn(bool on) {
+    if (PlatformX.isMobile) _channel.invokeMethod('keepOn', {"on": on});
   }
 }

@@ -17,13 +17,12 @@
 
 import 'dart:io';
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
-import 'package:platform_device_id/platform_device_id.dart';
-import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
 class PlatformX {
@@ -45,34 +44,14 @@ class PlatformX {
 
   static bool get isDesktop => !isMobile;
 
-  static bool get isApplePlatform => isIOS || isMacOS;
-
-  static Future<String> getUniqueDeviceId() async {
-    String? deviceId;
-    try {
-      deviceId = await PlatformDeviceId.getDeviceId;
-    } catch (ignored) {}
-    if (deviceId == null) {
-      return const Uuid().v4();
-    } else {
-      return deviceId;
-    }
-  }
-
-  static ThemeData getTheme(BuildContext context) {
-    return PlatformX.isDarkMode
-        ? Constant.darkTheme(PlatformX.isCupertino(context))
-        : Constant.lightTheme(PlatformX.isCupertino(context));
-  }
-
-  static Color? backgroundColor(BuildContext context) {
+  static Color backgroundColor(BuildContext context) {
     return isMaterial(context) ? null : Theme.of(context).cardColor;
   }
 
   static Color backgroundAccentColor(BuildContext context) {
     return isMaterial(context)
         ? Theme.of(context).primaryColor
-        : Theme.of(context).colorScheme.secondary;
+        : Theme.of(context).accentColor;
   }
 
   static const illegalCharWindows = [r'\/', r':', r'@'];
@@ -87,16 +66,12 @@ class PlatformX {
     // Skip the disk letter(like "C:")
     for (int i = 1; i < pathSegment.length; i++) {
       if (isWindows) {
-        for (var char in illegalCharWindows) {
-          pathSegment[i] = pathSegment[i].replaceAll(RegExp(char), "");
-        }
+        illegalCharWindows.forEach((element) =>
+            pathSegment[i] = pathSegment[i].replaceAll(RegExp(element), ""));
       }
     }
     return File(pathSegment.join(fileSystemSlash));
   }
-
-  static String get executablePath =>
-      PlatformX.createPlatformFile(Platform.resolvedExecutable).path;
 
   static String getPathFromFile(String filePath) {
     if (filePath.lastIndexOf(fileSystemSlash) == -1) return filePath;
@@ -110,7 +85,13 @@ class PlatformX {
       platformImpl.isCupertino(context);
 
   static bool get isDarkMode =>
-      WidgetsBinding.instance!.window.platformBrightness == Brightness.dark;
+      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
 
-  static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode;
+  static bool isDebugMode(SharedPreferences preferences) {
+    if (preferences != null) {
+      return SettingsProvider.of(preferences).debugMode;
+    } else {
+      return false;
+    }
+  }
 }
