@@ -82,9 +82,10 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
         ),
         trailingActions: const [],
       ),
-      body: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
+      body: Builder(
+        // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
+        builder: (context) => RefreshIndicator(
+          edgeOffset: MediaQuery.of(context).padding.top,
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {

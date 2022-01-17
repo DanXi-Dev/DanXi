@@ -81,7 +81,6 @@ class TimetableSubPage extends PlatformSubpage
 
 class ShareTimetableEvent {}
 
-
 class _TimetableSubPageState extends State<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
@@ -319,6 +318,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return Material(
       child: RefreshIndicator(
+        edgeOffset: MediaQuery.of(context).padding.top,
         color: Theme.of(context).colorScheme.secondary,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {

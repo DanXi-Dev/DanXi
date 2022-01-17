@@ -479,7 +479,10 @@ class _BBSSubpageState extends State<BBSSubpage>
           appBar: PlatformAppBarX(
             title: Text(S.of(context).favorites),
           ),
-          body: _buildPageBody(),
+          body: Builder(
+            // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
+            builder: (context) => _buildPageBody(context),
+          ),
         );
       case PostsType.FILTER_BY_TAG:
         return PlatformScaffold(
@@ -489,14 +492,17 @@ class _BBSSubpageState extends State<BBSSubpage>
           appBar: PlatformAppBarX(
             title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
           ),
-          body: _buildPageBody(),
+          body: Builder(
+            // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
+            builder: (context) => _buildPageBody(context),
+          ),
         );
       case PostsType.NORMAL_POSTS:
-        return _buildPageBody();
+        return _buildPageBody(context);
     }
   }
 
-  Widget _buildPageBody() {
+  Widget _buildPageBody(BuildContext context) {
     final bgImage = SettingsProvider.getInstance().backgroundImage;
     return Material(
       child: Container(
@@ -505,6 +511,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             : BoxDecoration(
                 image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
         child: RefreshIndicator(
+          edgeOffset: MediaQuery.of(context).padding.top,
           key: _indicatorKey,
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,

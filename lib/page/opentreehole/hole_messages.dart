@@ -90,38 +90,42 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
         ),
         trailingActions: const [],
       ),
-      body: RefreshIndicator(
-        color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          refreshSelf();
-        },
-        child: Material(
-            child: PagedListView<OTMessage>(
-          startPage: 1,
-          pagedController: _listViewController,
-          withScrollbar: true,
-          scrollController: PrimaryScrollController.of(context),
-          dataReceiver: _loadContent,
-          builder: (_, __, ___, message) => OTMessageItem(message: message),
-          loadingBuilder: (BuildContext context) => Container(
-            padding: const EdgeInsets.all(8),
-            child: Center(child: PlatformCircularProgressIndicator()),
-          ),
-          endBuilder: (context) => Center(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(S.of(context).end_reached),
+      body: Builder(
+        // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
+        builder: (context) => RefreshIndicator(
+          edgeOffset: MediaQuery.of(context).padding.top,
+          color: Theme.of(context).colorScheme.secondary,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            refreshSelf();
+          },
+          child: Material(
+              child: PagedListView<OTMessage>(
+            startPage: 1,
+            pagedController: _listViewController,
+            withScrollbar: true,
+            scrollController: PrimaryScrollController.of(context),
+            dataReceiver: _loadContent,
+            builder: (_, __, ___, message) => OTMessageItem(message: message),
+            loadingBuilder: (BuildContext context) => Container(
+              padding: const EdgeInsets.all(8),
+              child: Center(child: PlatformCircularProgressIndicator()),
             ),
-          ),
-          emptyBuilder: (context) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(S.of(context).no_data),
+            endBuilder: (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(S.of(context).end_reached),
+              ),
             ),
-          ),
-        )),
+            emptyBuilder: (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(S.of(context).no_data),
+              ),
+            ),
+          )),
+        ),
       ),
     );
   }

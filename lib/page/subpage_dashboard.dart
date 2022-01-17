@@ -264,25 +264,24 @@ class _HomeSubpageState extends State<HomeSubpage>
     super.build(context);
     List<DashboardCard> widgetList =
         SettingsProvider.getInstance().dashboardWidgetsSequence;
-    return SafeArea(
-        child: WithScrollbar(
-            controller: widget.primaryScrollController(context),
-            child: RefreshIndicator(
-                color: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).dialogBackgroundColor,
-                onRefresh: () async {
-                  HapticFeedback.mediumImpact();
-                  _rebuild();
-                  refreshSelf();
-                },
-                child: Material(
-                    child: ListView(
-                  clipBehavior: Clip.none,
-                  controller: widget.primaryScrollController(context),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(4),
-                  children: _buildCards(widgetList),
-                )))));
+    return WithScrollbar(
+        controller: widget.primaryScrollController(context),
+        child: RefreshIndicator(
+            edgeOffset: MediaQuery.of(context).padding.top,
+            color: Theme.of(context).colorScheme.secondary,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              _rebuild();
+              refreshSelf();
+            },
+            child: Material(
+                child: ListView(
+              clipBehavior: Clip.none,
+              controller: widget.primaryScrollController(context),
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: _buildCards(widgetList),
+            ))));
   }
 
   @override

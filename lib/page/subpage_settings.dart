@@ -276,6 +276,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     return WithScrollbar(
         controller: widget.primaryScrollController(context),
         child: RefreshIndicator(
+            edgeOffset: MediaQuery.of(context).padding.top,
             color: Theme.of(context).colorScheme.secondary,
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
