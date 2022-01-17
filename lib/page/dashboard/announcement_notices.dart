@@ -105,7 +105,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
     for (var value in _data) {
       widgets.add(ThemedMaterial(
           child: ListTile(
-        leading: PlatformX.isAndroid
+        leading: PlatformX.isMaterial(context)
             ? const Icon(Icons.info)
             : const Icon(CupertinoIcons.info_circle_fill),
         title: Text(

@@ -31,7 +31,7 @@ class QRFeature extends Feature {
   String get subTitle => S.of(context!).tap_to_view;
 
   @override
-  Widget get icon => PlatformX.isAndroid
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.qr_code)
       : const Icon(CupertinoIcons.qrcode);
 

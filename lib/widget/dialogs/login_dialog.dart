@@ -218,7 +218,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
-                    icon: PlatformX.isAndroid
+                    icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.perm_identity)
                         : const Icon(CupertinoIcons.person_crop_circle)),
                 //),
@@ -233,7 +233,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                   labelText: S.of(context).login_uis_pwd,
-                  icon: PlatformX.isAndroid
+                  icon: PlatformX.isMaterial(context)
                       ? const Icon(Icons.lock_outline)
                       : const Icon(CupertinoIcons.lock_circle),
                 ),
@@ -329,9 +329,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 actions: _buildLoginAsList(),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
               material: (_, __) => Column(

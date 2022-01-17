@@ -72,7 +72,7 @@ class TimetableSubPage extends PlatformSubpage
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).share,
-            Icon(PlatformX.isAndroid
+            Icon(PlatformX.isMaterial(cxt)
                 ? Icons.share
                 : CupertinoIcons.square_arrow_up),
             () => ShareTimetableEvent().fire())
@@ -206,9 +206,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                       actions: _buildShareList(context),
                       cancelButton: CupertinoActionSheetAction(
                         child: Text(S.of(context).cancel),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
                     material: (_, __) => Column(

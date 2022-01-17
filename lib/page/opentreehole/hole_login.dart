@@ -29,7 +29,6 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -370,7 +369,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           controller: _usernameController,
           decoration: InputDecoration(
               labelText: S.of(context).login_uis_uid,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.perm_identity)
                   : const Icon(CupertinoIcons.person_crop_circle)),
         ),
@@ -379,7 +378,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           obscureText: true,
           decoration: InputDecoration(
             labelText: S.of(context).login_uis_pwd,
-            icon: PlatformX.isAndroid
+            icon: PlatformX.isMaterial(context)
                 ? const Icon(Icons.lock_outline)
                 : const Icon(CupertinoIcons.lock_circle),
           ),
@@ -579,7 +578,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
           controller: _verifyCodeController,
           decoration: InputDecoration(
               labelText: S.of(context).secure_code,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.perm_identity)
                   : const Icon(CupertinoIcons.person_crop_circle)),
         ),

@@ -156,16 +156,12 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                     actions: _buildContextMenu(context, e),
                     cancelButton: CupertinoActionSheetAction(
                       child: Text(S.of(context).cancel),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
-                  material: (_, __) => SizedBox(
-                    height: 300,
-                    child: Column(
-                      children: _buildContextMenu(context, e),
-                    ),
+                  material: (_, __) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _buildContextMenu(context, e),
                   ),
                 ));
       },

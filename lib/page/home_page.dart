@@ -548,7 +548,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           items: [
             BottomNavigationBarItem(
               //backgroundColor: Colors.purple,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.dashboard)
                   : const Icon(CupertinoIcons.square_stack_3d_up_fill),
               label: S.of(context).dashboard,
@@ -556,21 +556,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             if (!SettingsProvider.getInstance().hideHole)
               BottomNavigationBarItem(
                 //backgroundColor: Colors.indigo,
-                icon: PlatformX.isAndroid
+                icon: PlatformX.isMaterial(context)
                     ? const Icon(Icons.forum)
                     : const Icon(CupertinoIcons.text_bubble),
                 label: S.of(context).forum,
               ),
             BottomNavigationBarItem(
               //backgroundColor: Colors.blue,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.calendar_today)
                   : const Icon(CupertinoIcons.calendar),
               label: S.of(context).timetable,
             ),
             BottomNavigationBarItem(
               //backgroundColor: Theme.of(context).primaryColor,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.settings)
                   : const Icon(CupertinoIcons.gear_alt),
               label: S.of(context).settings,

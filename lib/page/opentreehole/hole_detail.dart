@@ -405,9 +405,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       actions: _buildContextMenu(context, floor),
                       cancelButton: CupertinoActionSheetAction(
                         child: Text(S.of(context).cancel),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
                 material: (_, __) => Column(

@@ -102,13 +102,19 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   Widget build(BuildContext context) {
     // Build tags and texts.
     _campusTags = Constant.CAMPUS_VALUES
-        .map((e) => Tag(e.displayTitle(context),
-            PlatformX.isAndroid ? Icons.location_on : CupertinoIcons.location))
+        .map((e) => Tag(
+            e.displayTitle(context),
+            PlatformX.isMaterial(context)
+                ? Icons.location_on
+                : CupertinoIcons.location))
         .toList();
     _buildingTags = Constant.CAMPUS_VALUES[_selectCampusIndex!]
         .getTeachingBuildings()!
         .map((e) => Tag(
-            e, PlatformX.isAndroid ? Icons.home_work : CupertinoIcons.location))
+            e,
+            PlatformX.isMaterial(context)
+                ? Icons.home_work
+                : CupertinoIcons.location))
         .toList();
     _buildingList = Constant.CAMPUS_VALUES[_selectCampusIndex!]
         .getTeachingBuildings()!

@@ -132,7 +132,7 @@ class PEFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isAndroid
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.wb_sunny)
       : const Icon(CupertinoIcons.sun_max);
 

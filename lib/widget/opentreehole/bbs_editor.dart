@@ -314,10 +314,10 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         ]),
                   ),
                 );
-                if (PlatformX.isMaterial(context)) {
-                  return body;
-                } else {
+                if (PlatformX.isCupertino(context)) {
                   return Card(child: body);
+                } else {
+                  return body;
                 }
               });
         });
@@ -549,10 +549,10 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   @override
   Widget build(BuildContext context) {
     Icon fullScreenIcon = _isFullscreen
-        ? (PlatformX.isAndroid
+        ? (PlatformX.isMaterial(context)
             ? const Icon(Icons.close_fullscreen)
             : const Icon(CupertinoIcons.fullscreen_exit))
-        : (PlatformX.isAndroid
+        : (PlatformX.isMaterial(context)
             ? const Icon(Icons.fullscreen)
             : const Icon(CupertinoIcons.fullscreen));
     return PlatformScaffold(
@@ -568,13 +568,13 @@ class BBSEditorPageState extends State<BBSEditorPage> {
               onPressed: () => setState(() => _isFullscreen = !_isFullscreen)),
           PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.photo)
                   : const Icon(CupertinoIcons.photo),
               onPressed: () => BBSEditor.uploadImage(context, _controller)),
           PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: PlatformX.isAndroid
+              icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.send)
                   : const Icon(CupertinoIcons.paperplane),
               onPressed: _canSend ? () => _sendDocument(_object) : null),

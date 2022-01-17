@@ -53,7 +53,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -358,17 +357,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                         cancelButton:
                                             CupertinoActionSheetAction(
                                           child: Text(S.of(context).cancel),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
                                         ),
                                       ),
-                                      material: (_, __) => SizedBox(
-                                        height: 300,
-                                        child: Column(
-                                          children:
-                                              _buildCampusAreaList(context),
-                                        ),
+                                      material: (_, __) => Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: _buildCampusAreaList(context),
                                       ),
                                     ));
                           },
@@ -1159,13 +1154,16 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   onTap: () {
                     showPlatformModalSheet(
                       context: context,
-                      builder: (BuildContext context) => const SafeArea(
-                        child: Card(
-                          child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: OTNotificationSettingsWidget()),
-                        ),
-                      ),
+                      builder: (BuildContext context) {
+                        const Widget body = Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: OTNotificationSettingsWidget());
+                        if (PlatformX.isCupertino(context)) {
+                          return const SafeArea(child: Card(child: body));
+                        } else {
+                          return const SafeArea(child: body);
+                        }
+                      },
                     ).then((value) => parentSetStateFunction());
                   },
                 ),

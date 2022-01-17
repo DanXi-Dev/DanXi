@@ -58,12 +58,21 @@ class _CardDetailPageState extends State<CardDetailPage> {
     _cardInfo = widget.arguments!['cardInfo'];
     _personInfo = StateProvider.personInfo.value;
     _tags = [
-      Tag(S.current.last_7_days,
-          PlatformX.isAndroid ? Icons.timelapse : CupertinoIcons.clock_fill),
-      Tag(S.current.last_15_days,
-          PlatformX.isAndroid ? Icons.timelapse : CupertinoIcons.clock_fill),
-      Tag(S.current.last_30_days,
-          PlatformX.isAndroid ? Icons.timelapse : CupertinoIcons.clock_fill),
+      Tag(
+          S.current.last_7_days,
+          PlatformX.isMaterial(context)
+              ? Icons.timelapse
+              : CupertinoIcons.clock_fill),
+      Tag(
+          S.current.last_15_days,
+          PlatformX.isMaterial(context)
+              ? Icons.timelapse
+              : CupertinoIcons.clock_fill),
+      Tag(
+          S.current.last_30_days,
+          PlatformX.isMaterial(context)
+              ? Icons.timelapse
+              : CupertinoIcons.clock_fill),
     ];
     _tagDays = [7, 15, 30];
   }
@@ -130,7 +139,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       for (var element in _cardInfo!.records!) {
         widgets.add(Material(
             child: ListTile(
-          // leading: PlatformX.isAndroid
+              // leading: PlatformX.isMaterial(context)
           //     ? Icon(Icons.monetization_on)
           //     : Icon(CupertinoIcons.money_dollar_circle_fill),
           title: Text(element.location),

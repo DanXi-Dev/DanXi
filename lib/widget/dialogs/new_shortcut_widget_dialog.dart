@@ -93,7 +93,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
             material: (_, __) => MaterialTextFieldData(
               decoration: InputDecoration(
                 labelText: S.of(context).name,
-                icon: PlatformX.isAndroid
+                icon: PlatformX.isMaterial(context)
                     ? const Icon(Icons.lock_outline)
                     : const Icon(CupertinoIcons.lock_circle),
               ),
@@ -116,7 +116,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
               material: (_, __) => MaterialTextFieldData(
                     decoration: InputDecoration(
                       labelText: S.of(context).link,
-                      icon: PlatformX.isAndroid
+                      icon: PlatformX.isMaterial(context)
                           ? const Icon(Icons.lock_outline)
                           : const Icon(CupertinoIcons.lock_circle),
                     ),
