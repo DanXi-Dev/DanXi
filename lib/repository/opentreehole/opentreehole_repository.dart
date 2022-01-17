@@ -87,6 +87,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _pushNotificationRegData = null;
     _floorCache = [];
     _divisionCache = [];
+    _tagCache = [];
   }
 
   OpenTreeHoleRepository._() {
