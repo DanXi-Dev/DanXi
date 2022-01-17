@@ -20,6 +20,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -243,12 +244,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       }
       if (snapshot.error is NotLoginError) {
         error = (snapshot.error as NotLoginError).errorMessage;
-      } else if (snapshot.error is DioError) {
-        error = (snapshot.error as DioError).message +
-            '\n' +
-            ((snapshot.error as DioError).response?.data?.toString() ?? "");
       } else {
-        error = snapshot.error.toString();
+        error = ErrorPageWidget.generateUserFriendlyDescription(
+            S.of(context), snapshot.error);
       }
     }
 

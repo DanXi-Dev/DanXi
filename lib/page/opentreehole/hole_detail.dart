@@ -194,7 +194,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    print(MediaQuery.of(context).padding.top);
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       // Replaced precached data with updated ones
       OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
