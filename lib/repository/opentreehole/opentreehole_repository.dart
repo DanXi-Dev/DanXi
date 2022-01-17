@@ -102,8 +102,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> initializeRepo() async {
-    debugPrint(
-        "WARNING: Certificate Pinning Disabled. Do not use for production builds.");
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
@@ -127,7 +125,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool> checkRegisterStatus(String email) async {
-    Response response = await dio!.get(_BASE_URL + "/verify/apikey",
+    Response response = await secureDio.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.generateOneTimeAPIKey(),
           "email": email,
@@ -137,8 +135,36 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.statusCode == 409;
   }
 
+  Dio get secureDio {
+    Dio secureDio = Dio();
+    //Pin HTTPS cert
+    (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
+        .onHttpClientCreate = (client) {
+      final SecurityContext sc = SecurityContext(withTrustedRoots: false);
+      HttpClient httpClient = HttpClient(context: sc);
+      httpClient.badCertificateCallback =
+          (X509Certificate certificate, String host, int port) {
+        // This badCertificateCallback will always be called since we have no trusted certificate.
+        final ASN1Parser p = ASN1Parser(certificate.der);
+        final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
+        final ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
+        final ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
+        final ASN1BitString pubKeyBits =
+            pubKeyElement.elements[1] as ASN1BitString;
+        if (listEquals(
+            pubKeyBits.stringValue, SecureConstant.PINNED_CERTIFICATE)) {
+          return true;
+        }
+        // Allow connection when public key matches
+        throw NotLoginError("Invalid HTTPS Certificate");
+      };
+      return httpClient;
+    };
+    return secureDio;
+  }
+
   Future<String?> getVerifyCode(String email) async {
-    Response response = await dio!.get(_BASE_URL + "/verify/apikey",
+    Response response = await secureDio.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.generateOneTimeAPIKey(),
           "email": email,
@@ -171,54 +197,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       'password': password,
     });
     return SettingsProvider.getInstance().fduholeToken = response.data["token"];
-  }
-
-  Future<String?> requestToken(PersonInfo info) async {
-    Dio secureDio = Dio();
-    //Pin HTTPS cert
-    (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
-        .onHttpClientCreate = (client) {
-      final SecurityContext sc = SecurityContext(withTrustedRoots: false);
-      HttpClient httpClient = HttpClient(context: sc);
-      httpClient.badCertificateCallback =
-          (X509Certificate certificate, String host, int port) {
-        return true;
-        // This badCertificateCallback will always be called since we have no trusted certificate.
-        final ASN1Parser p = ASN1Parser(certificate.der);
-        final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
-        final ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
-        final ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
-        final ASN1BitString pubKeyBits =
-            pubKeyElement.elements[1] as ASN1BitString;
-
-        if (listEquals(
-            pubKeyBits.stringValue, SecureConstant.PINNED_CERTIFICATE)) {
-          return true;
-        }
-        // Allow connection when public key matches
-        throw NotLoginError("Invalid HTTPS Certificate");
-      };
-      return httpClient;
-    };
-    //
-    // crypto.PublicKey publicKey =
-    //     RsaKeyHelper().parsePublicKeyFromPem(Secret.RSA_PUBLIC_KEY);
-
-    final Response response =
-        await secureDio.post(_BASE_URL + "/register/", data: {
-      'api-key': Secret.generateOneTimeAPIKey(),
-      'email': "${info.id}@fudan.edu.cn",
-      // Temporarily disable v2 API until the protocol is ready.
-      //'ID': base64.encode(utf8.encode(encrypt(info.id, publicKey)))
-    }).onError((dynamic error, stackTrace) {
-      return Future.error(error);
-    });
-    try {
-      return SettingsProvider.getInstance().fduholeToken =
-          response.data["token"];
-    } catch (e) {
-      return Future.error(e);
-    }
   }
 
   Map<String, String> get _tokenHeader {

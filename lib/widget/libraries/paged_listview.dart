@@ -282,6 +282,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         key: _scrollKey,
         controller: widget.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
           if (_hasHeadWidget) widget.headBuilder!(context),
           if (!_hasError && widget.emptyBuilder != null)
