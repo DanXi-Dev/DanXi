@@ -189,7 +189,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Rebuild everything and refresh itself.
   Future<void> refreshSelf({scrollToEnd = false}) async {
     //if (scrollToEnd) _listViewController.queueScrollToEnd();
-    await _listViewController.notifyUpdate(useInitialData: false);
+    await _listViewController.notifyUpdate(
+        useInitialData: false, queueDataClear: true);
   }
 
   @override
@@ -313,19 +314,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         if (e.is_me == true)
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(menuContext).pop();
-                BBSEditor.modifyReply(
+                await BBSEditor.modifyReply(
                     menuContext, e.hole_id, e.floor_id, e.content);
+                await refreshSelf();
               },
               child: Text(S.of(context).modify),
             ),
             material: (_, __) => ListTile(
               title: Text(S.of(context).modify),
-              onTap: () {
+              onTap: () async {
                 Navigator.of(menuContext).pop();
-                BBSEditor.modifyReply(
+                await BBSEditor.modifyReply(
                     menuContext, e.hole_id, e.floor_id, e.content);
+                await refreshSelf();
               },
             ),
           ),

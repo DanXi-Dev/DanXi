@@ -369,8 +369,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     _dataClearQueued = false;
   }
 
-  Future<void> notifyUpdate({useInitialData = true}) async {
-    initialize(useInitialData: useInitialData, queueDataClear: false);
+  Future<void> notifyUpdate(
+      {useInitialData = true, queueDataClear = false}) async {
+    initialize(useInitialData: useInitialData, queueDataClear: queueDataClear);
     refreshSelf();
     await _futureData;
   }
@@ -458,8 +459,9 @@ class PagedListViewController<T> implements ListProvider<T> {
     _state = state;
   }
 
-  Future<void> notifyUpdate({useInitialData = true}) =>
-      _state.notifyUpdate(useInitialData: useInitialData);
+  Future<void> notifyUpdate({useInitialData = true, queueDataClear = false}) =>
+      _state.notifyUpdate(
+          useInitialData: useInitialData, queueDataClear: queueDataClear);
 
   /// Returns whether the scroll was successful or not
   /// May fail due to RenderObject not cached
