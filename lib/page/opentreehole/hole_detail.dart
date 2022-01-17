@@ -197,7 +197,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       // Replaced precached data with updated ones
       OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
-        _listViewController.replaceDataInRangeWith(value, 0);
+        try {
+          _listViewController.replaceDataInRangeWith(value, 0);
+        } catch (_) {}
       }, onError: (error, st) {});
     });
     final bgImage = SettingsProvider.getInstance().backgroundImage;

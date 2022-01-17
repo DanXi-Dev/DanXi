@@ -57,13 +57,12 @@ class _CardDetailPageState extends State<CardDetailPage> {
     super.initState();
     _cardInfo = widget.arguments!['cardInfo'];
     _personInfo = StateProvider.personInfo.value;
-
     _tagDays = [7, 15, 30];
   }
 
   @override
   Widget build(BuildContext context) {
-    _tags = [
+    _tags ??= [
       Tag(
           S.current.last_7_days,
           PlatformX.isMaterial(context)
