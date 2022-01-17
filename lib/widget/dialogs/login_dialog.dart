@@ -215,31 +215,23 @@ class _LoginDialogState extends State<LoginDialog> {
                 controller: _nameController,
                 enabled: _group != UserGroup.VISITOR,
                 keyboardType: TextInputType.number,
-                //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.perm_identity)
                         : const Icon(CupertinoIcons.person_crop_circle)),
-                //),
-                /*cupertino: (_, __) => CupertinoTextFieldData(
-                placeholder: S.of(context).login_uis_uid),*/
                 autofocus: true,
               ),
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
               TextField(
                 controller: _pwdController,
                 enabled: _group != UserGroup.VISITOR,
-                //material: (_, __) => MaterialTextFieldData(
                 decoration: InputDecoration(
                   labelText: S.of(context).login_uis_pwd,
                   icon: PlatformX.isMaterial(context)
                       ? const Icon(Icons.lock_outline)
                       : const Icon(CupertinoIcons.lock_circle),
                 ),
-                //)),
-                /*cupertino: (_, __) => CupertinoTextFieldData(
-                placeholder: S.of(context).login_uis_pwd),*/
                 obscureText: true,
                 onSubmitted: (_) {
                   _tryLogin(_nameController.text, _pwdController.text)
@@ -254,7 +246,6 @@ class _LoginDialogState extends State<LoginDialog> {
                     } else {
                       _errorText = S.of(context).connection_failed;
                     }
-                    // _pwdController.text = "";
                     refreshSelf();
                   });
                 },

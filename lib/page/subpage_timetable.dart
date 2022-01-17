@@ -109,13 +109,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
-            TimeTableRepository.getInstance().loadTimeTableLocally(
+            TimeTableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value,
                 forceLoadFromRemote: _manualLoad)));
       } else if (_manualLoad) {
-        _content = PostgraduateTimetableRepository.getInstance()
-            .loadTimeTableRemotely(StateProvider.personInfo.value!,
-                (imageUrl) async {
+        _content = LazyFuture.pack(PostgraduateTimetableRepository.getInstance()
+            .loadTimeTable(StateProvider.personInfo.value!, (imageUrl) async {
           TextEditingController controller = TextEditingController();
           await showPlatformDialog(
               context: context,
@@ -132,18 +131,21 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                   actions: [
                     PlatformDialogAction(
                       child: Text(S.of(context).ok),
-                      onPressed: () {
-                        Navigator.of(cxt).pop();
-                      },
+                      onPressed: () => Navigator.of(cxt).pop(),
                     )
                   ],
                 );
               });
           return controller.text;
-        });
+        }, forceLoadFromRemote: _manualLoad));
       } else {
-        _content = LazyFuture.pack(Future<TimeTable?>.error(
-            NotLoginError(S.of(context).postgraduates_need_login)));
+        try {
+          _content = Future.value(PostgraduateTimetableRepository.getInstance()
+              .loadTimeTableLocally());
+        } catch (_) {
+          _content = LazyFuture.pack(Future<TimeTable?>.error(
+              NotLoginError(S.of(context).postgraduates_need_login)));
+        }
       }
       _manualLoad = false;
     } else {
@@ -153,7 +155,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   }
 
   void _startShare(TimetableConverter converter) async {
-    // Close the dialog
+    // Close the dialog first
     Navigator.of(context).pop();
     if (_table == null) {
       Noticing.showNotice(context, S.of(context).fatal_error);

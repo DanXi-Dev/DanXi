@@ -21,11 +21,14 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
+import 'package:dan_xi/util/cache.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_js/flutter_js.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   static const String TIME_TABLE_UG_URL =
@@ -80,15 +83,15 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     await _requestLogin(ug.id!, await encryptDES(ug.password!), yzm, yzmToken);
   }
 
-  Future<TimeTable> loadTimeTableRemotely(
+  Future<TimeTable?> loadTimeTableRemotely(
       PersonInfo info, OnCaptchaCallback callback,
       {DateTime? startTime}) {
     return Retrier.tryAsyncWithFix(
         () => _loadTimeTableRemotely(callback, startTime: startTime),
-        (exception) async => await _login(info, callback));
+        (exception) => _login(info, callback));
   }
 
-  Future<TimeTable> _loadTimeTableRemotely(OnCaptchaCallback callback,
+  Future<TimeTable?> _loadTimeTableRemotely(OnCaptchaCallback callback,
       {DateTime? startTime}) async {
     Response coursePage = await dio!.get(
         TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
@@ -101,6 +104,37 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
         coursePage.data is Map
             ? coursePage.data
             : jsonDecode(coursePage.data.toString()));
+  }
+
+  Future<TimeTable?> loadTimeTable(PersonInfo info, OnCaptchaCallback callback,
+      {DateTime? startTime, bool forceLoadFromRemote = false}) {
+    startTime ??= TimeTable.defaultStartTime;
+    if (forceLoadFromRemote) {
+      return Cache.getRemotely<TimeTable>(
+          TimeTableRepository.KEY_TIMETABLE_CACHE,
+          () async => (await loadTimeTableRemotely(info, callback,
+              startTime: startTime))!,
+          (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
+          (object) => jsonEncode(object.toJson()));
+    } else {
+      return Cache.get<TimeTable>(
+          TimeTableRepository.KEY_TIMETABLE_CACHE,
+          () async => (await loadTimeTableRemotely(info, callback,
+              startTime: startTime))!,
+          (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
+          (object) => jsonEncode(object.toJson()));
+    }
+  }
+
+  TimeTable? loadTimeTableLocally() {
+    // Use an ugly implementation here to avoid using async method [SharedPreferences.getInstance()].
+    SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
+    if (preferences.containsKey(TimeTableRepository.KEY_TIMETABLE_CACHE)) {
+      return TimeTable.fromJson(jsonDecode(
+          preferences.getString(TimeTableRepository.KEY_TIMETABLE_CACHE)!));
+    } else {
+      throw StateError("No local timetable now");
+    }
   }
 
   @override
