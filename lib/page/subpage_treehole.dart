@@ -336,7 +336,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     }
   }
 
-  Future<void> _refreshList() async {
+  Future<void> refreshList() async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await OpenTreeHoleRepository.getInstance()
@@ -345,9 +345,8 @@ class _BBSSubpageState extends State<BBSSubpage>
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);
       }
-    } catch (e) {
+    } finally {
       await _listViewController.notifyUpdate();
-      rethrow;
     }
   }
 
@@ -411,7 +410,7 @@ class _BBSSubpageState extends State<BBSSubpage>
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
               await BBSEditor.createNewPost(context, _divisionId);
-          if (success) _refreshList();
+          if (success) refreshList();
         }),
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
@@ -426,7 +425,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           StateProvider.divisionId = event.newDivision;
-          _refreshList();
+          refreshList();
         }),
         hashCode);
 
@@ -517,7 +516,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            await _refreshList();
+            await refreshList();
           },
           child: PagedListView<OTHole>(
               noneItem: OTHole.DUMMY_POST,
@@ -561,7 +560,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                   return OTWelcomeWidget(loginCallback: () async {
                     await smartNavigatorPush(context, "/bbs/login",
                         arguments: {"info": StateProvider.personInfo.value!});
-                    _refreshList();
+                    refreshList();
                   });
                 }
                 return ErrorPageWidget.buildWidget(context, e,

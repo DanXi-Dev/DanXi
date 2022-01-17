@@ -649,8 +649,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       true) {
                                     OpenTreeHoleRepository.getInstance()
                                         .logout();
-                                    settingsPageKey.currentState?.refreshSelf();
-                                    treeholePageKey.currentState?.refreshSelf();
+                                    settingsPageKey.currentState
+                                        ?.setState(() {});
+                                    treeholePageKey.currentState
+                                        ?.setState(() {});
                                   }
                                 },
                               ),
