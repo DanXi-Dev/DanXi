@@ -220,8 +220,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
-  Future<void> refreshSelf() async {
+  Future<void> refreshSelf({bool reloadWhenEmptyData = false}) async {
     _setContent();
+
+    // If there is no data before, we call setState once to show a ProgressIndicator.
+    if (reloadWhenEmptyData) setState(() {});
+
     await _content;
     setState(() {});
   }
@@ -256,8 +260,8 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               AsyncSnapshot<TimeTable?> snapshot) =>
           ErrorPageWidget.buildWidget(context, snapshot.error,
               stackTrace: snapshot.stackTrace, onTap: () {
-        _manualLoad = true;
-        refreshSelf();
+                _manualLoad = true;
+        refreshSelf(reloadWhenEmptyData: true);
       },
               buttonText:
                   snapshot.error is NotLoginError ? S.of(context).login : null),
