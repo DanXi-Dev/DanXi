@@ -20,31 +20,28 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomShortcutFeature extends Feature {
-  final String title;
-  final String link;
+  final String? title;
+  final String? link;
   CustomShortcutFeature({this.title, this.link});
 
   @override
-  String get mainTitle => title;
+  String? get mainTitle => title;
 
   @override
-  String get subTitle => link;
+  String? get subTitle => link;
 
   @override
-  Widget get icon => Icon(SFSymbols.bookmark);
+  Widget get icon => const Icon(CupertinoIcons.bookmark);
 
   @override
   void onTap() async {
-    if (await canLaunch(link)) {
-      BrowserUtil.openUrl(link, context);
+    if (await canLaunch(link!)) {
+      BrowserUtil.openUrl(link!, context);
     } else {
-      Noticing.showNotice(context, S.of(context).cannot_launch_url);
+      Noticing.showNotice(context!, S.of(context!).cannot_launch_url);
     }
   }
 

@@ -6,8 +6,8 @@ part 'server_time.g.dart';
 
 @JsonSerializable()
 class ServerTime {
-  int timestamp;
-  String datetime;
+  int? timestamp;
+  String? datetime;
 
   ServerTime();
 

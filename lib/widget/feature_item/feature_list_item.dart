@@ -16,19 +16,19 @@
  */
 
 import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/public_extension_methods.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [ListTile].
 class FeatureListItem extends StatefulWidget implements FeatureContainer {
   final Feature feature;
-  final Map<String, dynamic> arguments;
+  final Map<String, dynamic>? arguments;
 
   @override
   _FeatureListItemState createState() => _FeatureListItemState();
 
-  FeatureListItem({@required this.feature, this.arguments});
+  const FeatureListItem({required this.feature, this.arguments, Key? key})
+      : super(key: key);
 
   @override
   Feature get childFeature => feature;
@@ -43,23 +43,22 @@ class _FeatureListItemState extends State<FeatureListItem>
       ..container = this
       ..buildFeature(widget.arguments);
 
-    List<String> summary = [];
+    List<String?> summary = [];
     summary.add(widget.feature.subTitle ?? "");
-    if (widget.feature.tertiaryTitle != null)
+    if (widget.feature.tertiaryTitle != null) {
       summary.add(widget.feature.tertiaryTitle);
+    }
 
     var tile = ListTile(
       trailing: widget.feature.trailing,
       isThreeLine: widget.feature.tertiaryTitle != null,
       leading: widget.feature.icon,
       title: Text(
-        widget.feature.mainTitle,
+        widget.feature.mainTitle!,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: widget.feature.customSubtitle == null
-          ? Text(summary.join("\n"))
-          : widget.feature.customSubtitle,
+      subtitle: widget.feature.customSubtitle ?? Text(summary.join("\n")),
       onTap: widget.feature.clickable ? widget.feature.onTap : null,
     );
     widget.feature.onEvent(FeatureEvent.CREATE);

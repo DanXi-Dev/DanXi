@@ -15,18 +15,19 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// A helper class to convert [String],[WidgetBuilder],[List<Widget>] or something similar into [Widget].
 class SmartWidget {
   static Widget toWidget<T>(dynamic object, BuildContext context,
-      {Widget fallback,
-      AsyncSnapshot<T> snapshot,
-      int index,
-      Widget child,
-      VoidCallback onStepContinue,
-      VoidCallback onStepCancel}) {
-    if (fallback == null) fallback = Container();
+      {Widget? fallback,
+      AsyncSnapshot<T>? snapshot,
+      int? index,
+      Widget? child,
+      VoidCallback? onStepContinue,
+      VoidCallback? onStepCancel}) {
+    fallback ??= const SizedBox();
     if (object == null) return fallback;
 
     if (object is String) {
@@ -38,18 +39,22 @@ class SmartWidget {
       return object(context, index);
     } else if (object is TransitionBuilder) {
       return object(context, child);
-    } else if (object is AsyncWidgetBuilder<T>) {
-      return object(context, snapshot);
-    } else if (object is ControlsWidgetBuilder) {
+    } else if (object is AsyncWidgetBuilder<T> ||
+        object is AsyncWidgetBuilder<T?>) {
+      return object(context, snapshot!);
+    }
+    // TODO: Due to framework change, this has been temporarily disabled
+    /* else if (object is ControlsWidgetBuilder) {
       return object(context,
           onStepContinue: onStepContinue, onStepCancel: onStepCancel);
-    } else if (object is Function) {
+    } */
+    else if (object is Function) {
       return object();
     } else if (object is Widget) {
       return object;
     } else if (object is List) {
       return ListView(
-        children: object.map((e) => toWidget(e, context)),
+        children: object.map((e) => toWidget(e, context)) as List<Widget>,
       );
     }
     return fallback;

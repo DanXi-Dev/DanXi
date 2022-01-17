@@ -6,8 +6,8 @@ part 'bmob_error.g.dart';
 
 @JsonSerializable()
 class BmobError extends Error {
-  int code;
-  String error;
+  int? code;
+  String? error;
 
   BmobError(this.code, this.error);
 
@@ -18,11 +18,12 @@ class BmobError extends Error {
   //此处与类名一致，由指令自动生成代码
   Map<String, dynamic> toJson() => _$BmobErrorToJson(this);
 
-  String toString() => "BmobError [$code]:" + error;
+  @override
+  String toString() => "BmobError [$code]:" + error!;
 
   //转化DioError错误为BmobError类型
-  static BmobError convert(e) {
-    BmobError bmobError;
+  static BmobError? convert(e) {
+    BmobError? bmobError;
 
     if (e is BmobError) {
       bmobError = e;
@@ -43,7 +44,7 @@ class BmobError extends Error {
           break;
         case DioErrorType.response:
           bmobError = BmobError(
-              dioError.response.data['code'], dioError.response.data['error']);
+              dioError.response!.data['code'], dioError.response!.data['error']);
           break;
         case DioErrorType.connectTimeout:
           bmobError = BmobError(9015, dioError.message);

@@ -46,8 +46,8 @@ class StateStreamListener<T> extends StreamListener<T, int> {}
 // }
 
 class StreamListener<T, S> {
-  StreamSubscription<T> _subscription;
-  S _unitCode;
+  StreamSubscription<T>? _subscription;
+  S? _unitCode;
 
   bool bindOnlyInvalid(
       StreamSubscription<T> streamSubscription, S newUnitCode) {
@@ -65,8 +65,10 @@ class StreamListener<T, S> {
   }
 
   /// Notes: When calling it, you needn't determine if [_subscription] is null!
-  Future<void> cancel() async =>
-      _subscription?.cancel()?.catchError((ignored) {});
+  Future<void>? cancel() async => _subscription
+      ?.cancel()
+      .catchError((ignored) {})
+      .whenComplete(() => _subscription = null);
 
   bool isInvalid(S newUnitCode) {
     return _subscription == null || _unitCode != newUnitCode;

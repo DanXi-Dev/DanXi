@@ -11,8 +11,8 @@ class Message {
 
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 
-  String name;
-  List<String> args;
+  String? name;
+  List<String>? args;
 
   Message();
 }

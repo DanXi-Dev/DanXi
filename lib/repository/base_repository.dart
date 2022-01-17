@@ -28,23 +28,34 @@ abstract class BaseRepositoryWithDio {
   String get linkHost;
 
   @protected
-  Dio get dio {
+  Dio? get dio {
     if (!_dios.containsKey(linkHost)) {
       _dios[linkHost] = Dio();
-      _dios[linkHost].interceptors.add(CookieManager(cookieJar));
-      _dios[linkHost].interceptors.add(DioLogInterceptor());
+      _dios[linkHost]!.options = BaseOptions(
+          receiveDataWhenStatusError: true,
+          connectTimeout: 10000,
+          receiveTimeout: 10000,
+          sendTimeout: 10000);
+      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }
     return _dios[linkHost];
   }
 
   @protected
-  NonpersistentCookieJar get cookieJar {
+  NonpersistentCookieJar? get cookieJar {
     if (!_cookieJars.containsKey(linkHost)) {
       _cookieJars[linkHost] = NonpersistentCookieJar();
     }
     return _cookieJars[linkHost];
   }
 
-  static Map<String, NonpersistentCookieJar> _cookieJars = {};
-  static Map<String, Dio> _dios = {};
+  static Future<void> clearAllCookies() async {
+    for (NonpersistentCookieJar jar in _cookieJars.values) {
+      await jar.deleteAll();
+    }
+  }
+
+  static final Map<String, NonpersistentCookieJar> _cookieJars = {};
+  static final Map<String, Dio> _dios = {};
 }

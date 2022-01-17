@@ -18,9 +18,11 @@
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -29,32 +31,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
-  // Popover crashes on iPad
   static InAppBrowserClassOptions getOptions(BuildContext context) =>
-      isTablet(context)
-          ? InAppBrowserClassOptions(
-              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+      InAppBrowserClassOptions(
+          crossPlatform: InAppBrowserOptions(
+              toolbarTopBackgroundColor: Theme.of(context).cardTheme.color),
+          android: AndroidInAppBrowserOptions(hideTitleBar: true),
+          ios: IOSInAppBrowserOptions(hideToolbarBottom: true),
+          inAppWebViewGroupOptions: InAppWebViewGroupOptions(
               crossPlatform: InAppWebViewOptions(
-                  javaScriptEnabled: true, useOnDownloadStart: true),
-            ))
-          : InAppBrowserClassOptions(
-              android: AndroidInAppBrowserOptions(hideTitleBar: true),
-              ios: IOSInAppBrowserOptions(
-                presentationStyle: IOSUIModalPresentationStyle.POPOVER,
-              ),
-              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(
-                    javaScriptEnabled: true, useOnDownloadStart: true),
-              ));
+                  javaScriptEnabled: true,
+                  useOnDownloadStart: true,
+                  incognito: true),
+              ios: IOSInAppWebViewOptions(sharedCookiesEnabled: true)));
 
-  static openUrl(String url, BuildContext context,
-      [NonpersistentCookieJar cookieJar]) async {
+  static openUrl(String url, BuildContext? context,
+      [NonpersistentCookieJar? cookieJar]) async {
     // Sanitize URL
-    url = Uri.encodeFull(url);
+    url = Uri.encodeFull(Uri.decodeFull(url));
 
     if (cookieJar == null || PlatformX.isDesktop) {
-      launch(url, enableJavaScript: true);
-      return;
+      if (await canLaunch(url)) {
+        launch(url, enableJavaScript: true);
+        return;
+      }
+      throw "This URL cannot be launched.";
     }
 
     Uri uri = Uri.parse(url);
@@ -67,7 +67,7 @@ class BrowserUtil {
             CookieManager.instance().setCookie(
                 url: uri,
                 name: name,
-                path: cookie.cookie.path,
+                path: cookie.cookie.path!,
                 value: cookie.cookie.value,
                 domain: cookie.cookie.domain);
           });
@@ -79,7 +79,7 @@ class BrowserUtil {
             CookieManager.instance().setCookie(
                 url: uri,
                 name: name,
-                path: cookie.cookie.path,
+                path: cookie.cookie.path!,
                 value: cookie.cookie.value,
                 domain: cookie.cookie.domain);
           });
@@ -87,18 +87,18 @@ class BrowserUtil {
       });
     } else {
       var cookies = await cookieJar.loadForRequest(uri);
-      cookies.forEach((cookie) {
+      for (var cookie in cookies) {
         CookieManager.instance().setCookie(
             url: uri,
             name: cookie.name,
-            path: cookie.path,
+            path: cookie.path!,
             value: cookie.value,
             domain: cookie.domain);
-      });
+      }
     }
     CustomInAppBrowser().openUrlRequest(
         urlRequest: URLRequest(url: Uri.parse(url)),
-        options: getOptions(context));
+        options: getOptions(context!));
   }
 }
 
@@ -106,9 +106,10 @@ class CustomInAppBrowser extends InAppBrowser {
   @override
   Future<GeolocationPermissionShowPromptResponse>
       androidOnGeolocationPermissionsShowPrompt(String origin) {
-    if (origin == '''https://zlapp.fudan.edu.cn/''')
+    if (origin == '''https://zlapp.fudan.edu.cn/''') {
       return Future.value(GeolocationPermissionShowPromptResponse(
           origin: origin, allow: true, retain: true));
+    }
     // Only give geolocation permission on PAFD site
     return Future.value(GeolocationPermissionShowPromptResponse(
         origin: origin, allow: false, retain: false));
@@ -131,8 +132,44 @@ class CustomInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onDownloadStart(Uri uri) {
-    launch(uri.toString());
+  void onDownloadStart(Uri url) {
+    launch(url.toString());
+  }
+
+  String uisLoginJavaScript(PersonInfo info) =>
+      r'''try{
+            document.getElementById('username').value = String.raw`''' +
+      info.id! +
+      r'''`;
+            document.getElementById('password').value = String.raw`''' +
+      info.password! +
+      r'''`;
+            document.forms[0].submit();
+        }
+        catch (e) {
+            try{
+                document.getElementById('mobileUsername').value = String.raw`''' +
+      info.id! +
+      r'''`;
+                document.getElementById('mobilePassword').value = String.raw`''' +
+      info.password! +
+      r'''`;
+                document.forms[0].submit();
+            }
+            catch (e) {
+                window.alert("DanXi: Failed to auto login UIS");
+            }
+        }''';
+
+  @override
+  Future<dynamic> onLoadStop(url) async {
+    if (url
+            ?.toString()
+            .startsWith("https://uis.fudan.edu.cn/authserver/login") ==
+        true) {
+      webViewController.evaluateJavascript(
+          source: uisLoginJavaScript(StateProvider.personInfo.value!));
+    }
   }
 
   @override

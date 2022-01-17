@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'bmob.dart';
 import 'table/bmob_object.dart';
 import 'table/bmob_user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 class BmobBatch {
   Future<List> insertBatch(List<BmobObject> bmobObjects) async {
@@ -21,11 +22,11 @@ class BmobBatch {
 
   Future<List> process(String method, List<BmobObject> bmobObjects) async {
     List list = [];
-    Map params = Map();
+    Map params = {};
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userJson = prefs.get("user");
-    BmobUser bmobUser;
+    String? userJson = prefs.get("user") as String?;
+    BmobUser? bmobUser;
     if (userJson != null) {
       bmobUser = json.decode(userJson);
     }
@@ -33,19 +34,19 @@ class BmobBatch {
     for (BmobObject bmobObject in bmobObjects) {
       if (bmobObject is BmobUser) {
         //过滤BmobUser类型的处理，因为批处理操作不支持对User表的操作
-        print("BmobUser does not support batch operations");
+        debugPrint("BmobUser does not support batch operations");
       } else {
-        Map single = Map();
+        Map single = {};
         single["method"] = method;
         if (method == "PUT" || method == "DELETE") {
           //批量更新和批量删除
           if (userJson != null) {
-            single["token"] = bmobUser.sessionToken;
+            single["token"] = bmobUser!.sessionToken;
           }
           single["path"] = Bmob.BMOB_API_CLASSES +
               bmobObject.runtimeType.toString() +
               "/" +
-              bmobObject.objectId;
+              bmobObject.objectId!;
         } else {
           //批量添加
           single["path"] =

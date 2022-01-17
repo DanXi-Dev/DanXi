@@ -14,9 +14,10 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:dan_xi/master_detail/master_detail_utils.dart';
+import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:flutter/cupertino.dart';
 
+/// Some useful methods to help get an accurate size whether in mobile or tablet mode.
 class ViewportUtils {
   static double getViewportWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;
@@ -24,9 +25,11 @@ class ViewportUtils {
   static double getViewportHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
 
-  static double getMainNavigatorWidth(BuildContext context) => isTablet(context)
-      ? kTabletMasterContainerWidth
-      : getViewportWidth(context);
+  static Size getMainNavigatorSize(BuildContext context) =>
+      Size(getMainNavigatorWidth(context), getMainNavigatorHeight(context));
+
+  static double getMainNavigatorWidth(BuildContext context) =>
+      isTablet() ? kTabletMasterContainerWidth : getViewportWidth(context);
 
   static double getMainNavigatorHeight(BuildContext context) =>
       getViewportHeight(context);

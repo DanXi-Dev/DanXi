@@ -20,50 +20,43 @@ import 'dart:math';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/data_center_repository.dart';
+import 'package:dan_xi/repository/fdu/data_center_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/scale_transform.dart';
-import 'package:dan_xi/widget/small_tag.dart';
+import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:dan_xi/widget/libraries/small_tag.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
-  PersonInfo _info;
-  Map<String, TrafficInfo> _trafficInfos;
-  String _leastCrowdedCanteen;
-  String _mostCrowdedCanteen;
-  SharedPreferences _preferences;
+  PersonInfo? _info;
+  Map<String, TrafficInfo>? _trafficInfo;
+  String? _leastCrowdedCanteen;
+  String? _mostCrowdedCanteen;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
 
-  Future<void> _loadCrowdednessSummary(PersonInfo info) async {
-    _status = ConnectionStatus.CONNECTING;
-    Campus preferredCampus = SettingsProvider.of(_preferences).campus;
-    _trafficInfos = await DataCenterRepository.getInstance()
-        .getCrowdednessInfo(info, preferredCampus.index)
-        .catchError((e) {
-      if (e is UnsuitableTimeException) {
-        // If it's not time for a meal
-        _status = ConnectionStatus.FATAL_ERROR;
-      }
-    });
-    if (_status != ConnectionStatus.FATAL_ERROR)
+  Future<void> _loadCrowdednessSummary(PersonInfo? info) async {
+    Campus preferredCampus = SettingsProvider.getInstance().campus;
+    try {
+      _trafficInfo = await DataCenterRepository.getInstance()
+          .getCrowdednessInfo(info, preferredCampus.index);
       generateSummary(preferredCampus);
+    } on UnsuitableTimeException {
+      _status = ConnectionStatus.FATAL_ERROR;
+    } catch (e) {
+      _status = ConnectionStatus.FAILED;
+    }
     notifyUpdate();
   }
 
   void generateSummary(Campus preferredCampus) {
-    //TODO: DUE TO THE FACT THAT I'M NOT FAMILIAR WITH DART'S SYNTAX, THE FOLLOWING CODE IS SOMEHOW *STUPID* AND HAS HARDCODED CONTENTS. REVISE WHEN POSSIBLE
-    if (_trafficInfos != null) {
+    if (_trafficInfo != null) {
       if (preferredCampus == Campus.HANDAN_CAMPUS) {
         var crowdednessSum = List<num>.filled(5, 0);
         /* About crowdedness List
@@ -76,13 +69,13 @@ class DiningHallCrowdednessFeature extends Feature {
         // Map<String, Map<String, TrafficInfo>> zoneList =
         //     DiningHallCrowdednessRepository.getInstance()
         //         .toZoneList(preferredCampus.displayTitle(context), _trafficInfos);
-        _trafficInfos.forEach((keyUnprocessed, value) {
+        _trafficInfo!.forEach((keyUnprocessed, value) {
           if (value.current != 0) {
             //Ignore zero entries
-            var key = keyUnprocessed.split('\n')[0];
+            var keyList = keyUnprocessed.split('\n');
+            var key = keyList[0];
             var keySubtitle = '';
-            if (keyUnprocessed.length > 1)
-              keySubtitle = keyUnprocessed.split('\n')[1];
+            if (keyList.length > 1) keySubtitle = keyList[1];
             switch (key) {
               case '北区':
                 crowdednessSum[0] += value.current / value.max;
@@ -148,8 +141,8 @@ class DiningHallCrowdednessFeature extends Feature {
             _leastCrowdedCanteen = 'NULL';
         }
       } else {
-        var crowdedness = new Map<String, double>();
-        _trafficInfos.forEach((key, value) {
+        Map<String, double> crowdedness = {};
+        _trafficInfo!.forEach((key, value) {
           if (value.current != 0) crowdedness[key] = value.current / value.max;
         });
         _mostCrowdedCanteen = crowdedness.keys.firstWhere(
@@ -166,43 +159,40 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     _info = StateProvider.personInfo.value;
-    _preferences = Provider.of<SharedPreferences>(context);
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _trafficInfos = null;
+      _status = ConnectionStatus.CONNECTING;
+      _trafficInfo = null;
       _mostCrowdedCanteen = "";
       _leastCrowdedCanteen = "";
-      _loadCrowdednessSummary(_info).catchError((error) {
-        _status = ConnectionStatus.FAILED;
-        notifyUpdate();
-      });
+      _loadCrowdednessSummary(_info);
     }
   }
 
   @override
-  String get mainTitle => S.of(context).dining_hall_crowdedness;
+  String get mainTitle => S.of(context!).dining_hall_crowdedness;
 
   @override
   String get subTitle {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        return S.of(context).loading;
+        return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null)
-          return S.of(context).most_least_crowded_canteen(
-              _mostCrowdedCanteen, _leastCrowdedCanteen);
+        if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null) {
+          return S.of(context!).most_least_crowded_canteen(
+              _mostCrowdedCanteen!, _leastCrowdedCanteen!);
+        }
         return '';
       case ConnectionStatus.FAILED:
-        return S.of(context).failed;
+        return S.of(context!).failed;
       case ConnectionStatus.FATAL_ERROR:
-        return S.of(context).out_of_dining_time;
+        return S.of(context!).out_of_dining_time;
     }
-    return '';
   }
 
   @override
@@ -241,15 +231,15 @@ class DiningHallCrowdednessFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isAndroid
+  Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.stacked_line_chart)
-      : const Icon(SFSymbols.person_3_fill);
+      : const Icon(CupertinoIcons.person_3_fill);
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }
@@ -263,8 +253,8 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   void onTap() {
-    if (_trafficInfos != null) {
-      smartNavigatorPush(context, "/card/crowdData");
+    if (_trafficInfo != null) {
+      smartNavigatorPush(context!, "/card/crowdData");
     } else {
       refreshData();
     }

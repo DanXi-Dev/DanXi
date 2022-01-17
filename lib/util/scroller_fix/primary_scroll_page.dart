@@ -19,21 +19,29 @@ import 'package:dan_xi/util/scroller_fix/mirror_scroll_controller.dart';
 import 'package:flutter/cupertino.dart';
 
 mixin PageWithPrimaryScrollController {
-  MirrorScrollController _thisPrimaryScrollController;
+  MirrorScrollController? _thisPrimaryScrollController;
 
-  String get debugTag => null;
+  String? get debugTag => null;
+
+  bool shown = true;
 
   MirrorScrollController primaryScrollController(BuildContext context) {
     if (_thisPrimaryScrollController == null) {
       _thisPrimaryScrollController = MirrorScrollController(
-          PrimaryScrollController.of(context),
+          PrimaryScrollController.of(context), context,
           debugTag: debugTag);
+      _thisPrimaryScrollController!.addInterceptor(() => shown);
     }
-    return _thisPrimaryScrollController;
+    return _thisPrimaryScrollController!;
   }
 
-  void detachItself() => _thisPrimaryScrollController?.detachPosition?.call();
+  void detachItself() {
+    shown = false;
+    _thisPrimaryScrollController?.detachPosition.call();
+  }
 
-  void reattachItself() =>
-      _thisPrimaryScrollController?.reattachPosition?.call();
+  void reattachItself() {
+    shown = true;
+    _thisPrimaryScrollController?.reattachPosition.call();
+  }
 }

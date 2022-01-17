@@ -15,12 +15,29 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
+/// The base class of subpages showing in [HomePage].
+///
+/// It is equipped with a callback to help the implementation know when its state changes.
 abstract class PlatformSubpage extends StatefulWidget {
-  final bool needPadding = true;
+  const PlatformSubpage({Key? key}) : super(key: key);
+
+  @deprecated
+  final bool needPadding = false;
+  @deprecated
   final bool needBottomPadding = false;
+
+  Create<Widget> get title;
+
+  Create<List<AppBarButtonItem>> get leading => (_) => [];
+
+  Create<List<AppBarButtonItem>> get trailing => (_) => [];
+
+  void onDoubleTapOnTab() {}
 
   @mustCallSuper
   void onViewStateChanged(SubpageViewState state) {
@@ -35,6 +52,14 @@ abstract class PlatformSubpage extends StatefulWidget {
       }
     }
   }
+}
+
+class AppBarButtonItem {
+  final String caption;
+  final Widget widget;
+  final VoidCallback onPressed;
+
+  AppBarButtonItem(this.caption, this.widget, this.onPressed);
 }
 
 enum SubpageViewState { VISIBLE, INVISIBLE }

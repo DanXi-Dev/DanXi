@@ -34,7 +34,7 @@ func preprocessTextForHtmlAndImage(text: String) -> String {
 }
 
 struct THPostView: View {
-    var discussion: THDiscussion
+    var discussion: OTHole
     
     let KEY_NO_TAG = "默认"
     
@@ -42,13 +42,13 @@ struct THPostView: View {
         VStack(alignment: .leading) {
             
             // Discussion Tag
-            if (discussion.tag != nil && !discussion.tag!.isEmpty && !discussion.tag!.contains(where: {tag in if(tag.name == KEY_NO_TAG) {
+            if (discussion.tags != nil && !discussion.tags!.isEmpty && !discussion.tags!.contains(where: {tag in if(tag.name == KEY_NO_TAG) {
                 return true;
             }
             return false;
             })) {
                 HStack {
-                    ForEach(discussion.tag!, id: \.self) { tag in
+                    ForEach(discussion.tags!, id: \.self) { tag in
                         Text(tag.name)
                             .padding(EdgeInsets(top: 2,leading: 6,bottom: 2,trailing: 6))
                             .background(RoundedRectangle(cornerRadius: 24, style: .circular).stroke(Color.accentColor))
@@ -65,7 +65,7 @@ struct THPostView: View {
             }
             
             // Begin Content
-            if (discussion.is_folded) {
+            if (!discussion.floors.prefetch[0].fold!.isEmpty) {
                 /*Collapsible(
                     label: { Text("discussionFolded") },
                     content: {
@@ -84,14 +84,14 @@ struct THPostView: View {
                     .scaleEffect(0.8, anchor: .leading)
             }
             else {
-                Text(preprocessTextForHtmlAndImage(text: discussion.posts[0].content))
+                Text(preprocessTextForHtmlAndImage(text: discussion.floors.prefetch[0].content))
                     .lineLimit(5)
             }
             Spacer()
             
             // Comment Count
             HStack(alignment: .bottom) {
-                Label("\(discussion.count)", systemImage: "ellipsis.bubble")
+                Label(String(discussion.reply!), systemImage: "ellipsis.bubble")
                     .font(.footnote)
                     .imageScale(.small)
                 /*Label(humanReadableDateString(dateString: discussion.date_created) , systemImage: "clock")
@@ -139,6 +139,6 @@ struct Collapsible<Content: View>: View {
 
 struct THPostView_Previews: PreviewProvider {
     static var previews: some View {
-        THPostView(discussion: THDiscussion(id: 123, count: 21, posts: [THReply(id: 456, discussion: 123, content: "HelloWorld", username: "Demo", date_created: "2021-10-01", reply_to: nil, is_me: false)], last_post: nil, is_folded: false, date_created: "xxx", date_updated: "xxx", tag: [THTag(name: "test", color: "red", count: 5)]))
+        Text("too lazy to write preview")
     }
 }

@@ -18,18 +18,17 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/master_detail/master_detail_view.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fudan_aao_repository.dart';
+import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/scale_transform.dart';
+import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 class FudanAAONoticesFeature extends Feature {
-  List<Notice> _initialData;
+  List<Notice>? _initialData;
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   Future<void> _loadNotices() async {
@@ -43,7 +42,7 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  void buildFeature([Map<String, dynamic> arguments]) {
+  void buildFeature([Map<String, dynamic>? arguments]) {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -56,7 +55,7 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context).fudan_aao_notices;
+  String get mainTitle => S.of(context!).fudan_aao_notices;
 
   @override
   String get subTitle {
@@ -69,25 +68,25 @@ class FudanAAONoticesFeature extends Feature {
   }
 
   @override
-  Widget get icon => PlatformX.isAndroid
-      ? Icon(Icons.developer_board)
-      : Icon(SFSymbols.info_circle);
+  Widget get icon => PlatformX.isMaterial(context!)
+      ? const Icon(Icons.developer_board)
+      : const Icon(CupertinoIcons.info_circle);
 
   @override
   void onTap() {
     if (_initialData != null) {
-      smartNavigatorPush(context, "/notice/aao/list", arguments: {
-        "initialData": _initialData});
+      smartNavigatorPush(context!, "/notice/aao/list",
+          arguments: {"initialData": _initialData});
     } else {
       refreshData();
     }
   }
 
   @override
-  Widget get trailing {
+  Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
       return ScaleTransform(
-        scale: PlatformX.isMaterial(context) ? 0.5 : 1.0,
+        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
         child: PlatformCircularProgressIndicator(),
       );
     }

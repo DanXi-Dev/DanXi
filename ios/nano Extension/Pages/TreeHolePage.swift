@@ -7,10 +7,13 @@
 
 import SwiftUI
 
+let DUMMY_DIVISION = OTDivision(division_id: 1, name: "FDUHole", description: "", pinned: nil)
+
 struct TreeHolePage: View {
     @EnvironmentObject var fduholeLoginInfo: WatchSessionDelegate
-    @State private var discussions = [THDiscussion]()
-    @State private var currentPage = 1
+    @State private var currentDivision = DUMMY_DIVISION
+    @State private var divisions = [OTDivision]()
+    @State private var holes = [OTHole]()
     @State private var endReached = false
     @State private var error: String? = nil
     
@@ -18,28 +21,38 @@ struct TreeHolePage: View {
     @State private var isLoading = true
     
     func refreshDiscussions() {
-        currentPage = 1
         isLoading = true
-        loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
+        loadDivisions(token: fduholeLoginInfo.token) {(T: [OTDivision]?, errorString: String?) -> Void in
             error = errorString
             if (errorString == nil) {
-                discussions = T!
-                isLoading = false
+                divisions = T!
+                if (currentDivision == DUMMY_DIVISION) {
+                    currentDivision = divisions.first(where: { element in
+                        element.division_id == 1
+                    }) ?? DUMMY_DIVISION
+                }
+                
+                loadHoles(token: fduholeLoginInfo.token, startTime: nil, divisionId: currentDivision.division_id) {(T: [OTHole]?, errorString: String?) -> Void in
+                    error = errorString
+                    if (errorString == nil) {
+                        holes = T!
+                        isLoading = false
+                    }
+                }
             }
         }
     }
     
     func loadNextPage() {
-        currentPage += 1
         if (!isLoading) {
             isLoading = true
-            loadDiscussions(token: fduholeLoginInfo.token, page: currentPage, sortOrder: SortOrder.last_updated) {(T: [THDiscussion]?, errorString: String?) -> Void in
+            loadHoles(token: fduholeLoginInfo.token, startTime: holes.last?.time_updated, divisionId: currentDivision.division_id) {(T: [OTHole]?, errorString: String?) -> Void in
                 error = errorString
                 if (errorString == nil) {
                     if (T!.isEmpty) {
                         endReached = true
                     }
-                    discussions.append(contentsOf: T!)
+                    holes.append(contentsOf: T!)
                     isLoading = false
                 }
             }
@@ -48,7 +61,7 @@ struct TreeHolePage: View {
     
     var body: some View {
         if (error == nil) {
-            if (discussions.isEmpty) {
+            if (holes.isEmpty) {
                 List {
                     ProgressView()
                 }
@@ -65,10 +78,19 @@ struct TreeHolePage: View {
                             }
                         }
                     }
-                    ForEach(discussions) { discussion in
+                    Picker("division", selection: $currentDivision) {
+                        ForEach(divisions, id: \.self) {division in
+                            Text("\(division.name) - \(division.description)")
+                        }
+                    }
+                    .onChange(of: currentDivision) { newDivision in
+                        endReached = false
+                        refreshDiscussions()
+                    }
+                    ForEach(holes) { discussion in
                         ZStack(alignment: .leading) {
                             THPostView(discussion: discussion)
-                            NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.posts)) {
+                            NavigationLink(destination: TreeHoleDetailsPage(replies: discussion.floors.prefetch)) {
                                 EmptyView()
                             }
                         }

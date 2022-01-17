@@ -21,23 +21,23 @@
 class Retrier {
   /// Try to run [function] for [retryTimes] times synchronously.
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
-  static E runWithRetry<E>(E function(), {int retryTimes = 3}) {
-    Exception error;
+  static E runWithRetry<E>(E Function() function, {int retryTimes = 3}) {
+    Exception? error;
     for (int i = 0; i < retryTimes; i++) {
       try {
         return function();
       } catch (e) {
-        error = e;
+        error = e as Exception;
       }
     }
-    throw error;
+    throw error!;
   }
 
   /// Try to run [function] for [retryTimes] times asynchronously.
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
-  static Future<E> runAsyncWithRetry<E>(Future<E> function(),
-      {int retryTimes = 3}) async {
-    Function errorCatcher;
+  static Future<E> runAsyncWithRetry<E>(Future<E> Function() function,
+      {int retryTimes = 1}) async {
+    late Function errorCatcher;
     errorCatcher = (e) async {
       if (retryTimes > 0) {
         retryTimes--;
@@ -57,13 +57,18 @@ class Retrier {
   ///
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
   static Future<E> tryAsyncWithFix<E>(
-      Future<E> function(), Future<void> tryFix(exception),
-      {int retryTimes = 3}) async {
-    Function errorCatcher;
-    errorCatcher = (e) async {
+      Future<E> Function() function, Future<void> Function(dynamic) tryFix,
+      {int retryTimes = 2}) async {
+    late Function errorCatcher;
+    errorCatcher = (e, stack) async {
+      // debugPrintStack(stackTrace: stack);
       if (retryTimes > 0) {
         retryTimes--;
-        await tryFix(e).catchError((ignored) {});
+        await tryFix(e).catchError((error, stackTrace) {
+          // debugPrint("Error when trying fix ${function.runtimeType.toString()}:");
+          // debugPrint(error.toString());
+          // debugPrint(stackTrace.toString());
+        });
         return await function().catchError(errorCatcher);
       } else {
         throw e;
@@ -74,8 +79,9 @@ class Retrier {
 
   /// Try to run [function] asynchronously, and forever.
   /// Return the results of [function] if it executes successfully. Otherwise, it will be stuck in an infinite loop.
-  static Future<E> runAsyncWithRetryForever<E>(Future<E> function()) async {
-    Function errorCatcher;
+  static Future<E> runAsyncWithRetryForever<E>(
+      Future<E> Function() function) async {
+    late Function errorCatcher;
     errorCatcher = (e) async => await function().catchError(errorCatcher);
     return await function().catchError(errorCatcher);
   }

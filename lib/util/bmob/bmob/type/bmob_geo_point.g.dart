@@ -6,12 +6,10 @@ part of bmobgeopoint;
 // JsonSerializableGenerator
 // **************************************************************************
 
-BmobGeoPoint _$BmobGeoPointFromJson(Map<String, dynamic> json) {
-  return BmobGeoPoint()
-    ..latitude = (json['latitude'] as num)?.toDouble()
-    ..longitude = (json['longitude'] as num)?.toDouble()
-    ..type = json['__type'] as String;
-}
+BmobGeoPoint _$BmobGeoPointFromJson(Map<String, dynamic> json) => BmobGeoPoint()
+  ..latitude = (json['latitude'] as num?)?.toDouble()
+  ..longitude = (json['longitude'] as num?)?.toDouble()
+  ..type = json['__type'] as String?;
 
 Map<String, dynamic> _$BmobGeoPointToJson(BmobGeoPoint instance) =>
     <String, dynamic>{

@@ -10,9 +10,9 @@ class BmobPointer {
   Map<String, dynamic> toJson() => _$BmobPointerToJson(this);
 
   @JsonKey(name: "__type")
-  String type = "Pointer";
-  String className;
-  String objectId;
+  String? type = "Pointer";
+  String? className;
+  String? objectId;
 
   BmobPointer();
 }

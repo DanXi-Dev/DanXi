@@ -19,12 +19,10 @@ import 'dart:io';
 
 // ignore: implementation_imports
 import 'package:cookie_jar/src/cookie_jar.dart';
-
 // ignore: implementation_imports
 import 'package:cookie_jar/src/serializable_cookie.dart';
 
-//A copy of [DefaultCookieJar], but with an independent cookie storage.
-
+/// A copy of [DefaultCookieJar], but with an independent cookie storage.
 class NonpersistentCookieJar implements CookieJar {
   /// A array to save cookies.
   ///
@@ -36,24 +34,24 @@ class NonpersistentCookieJar implements CookieJar {
   ///
   final List<
           Map<
-              String, //domain or host
+              String?, //domain or host
               Map<
                   String, //path
                   Map<
                       String, //cookie name
                       SerializableCookie //cookie
                       >>>> _cookies =
-      <Map<String, Map<String, Map<String, SerializableCookie>>>>[
-    <String, Map<String, Map<String, SerializableCookie>>>{},
-    <String, Map<String, Map<String, SerializableCookie>>>{}
+      <Map<String?, Map<String, Map<String, SerializableCookie>>>>[
+    <String?, Map<String, Map<String, SerializableCookie>>>{},
+    <String?, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
   NonpersistentCookieJar({this.ignoreExpires = false});
 
-  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
+  Map<String?, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
       _cookies[0];
 
-  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
+  Map<String?, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
       _cookies[1];
 
   @override
@@ -65,12 +63,12 @@ class NonpersistentCookieJar implements CookieJar {
     for (final domain in hostCookies.keys) {
       if (hostname == domain) {
         final cookies =
-            hostCookies[domain].cast<String, Map<String, dynamic>>();
+            hostCookies[domain]!.cast<String, Map<String, dynamic>>();
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
           if (urlPath.toLowerCase().contains(path)) {
-            final values = cookies[path];
+            final values = cookies[path]!;
             for (final key in values.keys) {
               final SerializableCookie cookie = values[key];
               if (_check(uri.scheme, cookie)) {
@@ -86,8 +84,8 @@ class NonpersistentCookieJar implements CookieJar {
     }
     // Load cookies with "domain" attribute, Ignore port.
     domainCookies.forEach(
-        (String domain, Map<String, Map<String, SerializableCookie>> cookies) {
-      if (uri.host.contains(domain)) {
+        (String? domain, Map<String, Map<String, SerializableCookie>> cookies) {
+      if (uri.host.contains(domain!)) {
         cookies.forEach((String path, Map<String, SerializableCookie> values) {
           if (urlPath.toLowerCase().contains(path)) {
             values.forEach((String key, SerializableCookie v) {
@@ -145,8 +143,8 @@ class NonpersistentCookieJar implements CookieJar {
     hostCookies.remove(host);
     if (withDomainSharedCookie) {
       domainCookies.removeWhere(
-          (String domain, Map<String, Map<String, SerializableCookie>> v) =>
-              uri.host.contains(domain));
+          (String? domain, Map<String, Map<String, SerializableCookie>> v) =>
+              uri.host.contains(domain!));
     }
   }
 
@@ -157,8 +155,8 @@ class NonpersistentCookieJar implements CookieJar {
     hostCookies.clear();
   }
 
-  bool _isExpired(SerializableCookie cookie) {
-    return ignoreExpires ? false : cookie.isExpired();
+  bool _isExpired(SerializableCookie? cookie) {
+    return ignoreExpires ? false : cookie!.isExpired();
   }
 
   bool _check(String scheme, SerializableCookie cookie) {
@@ -174,15 +172,15 @@ class NonpersistentCookieJar implements CookieJar {
   }
 
   static _deepClone(
-      Map<String, Map<String, Map<String, SerializableCookie>>> from,
-      Map<String, Map<String, Map<String, SerializableCookie>>> to) {
+      Map<String?, Map<String, Map<String, SerializableCookie>>> from,
+      Map<String?, Map<String, Map<String, SerializableCookie>>> to) {
     to.clear();
     from.forEach((host, value) {
       to[host] = {};
       value.forEach((path, value) {
-        to[host][path] = {};
+        to[host]![path] = {};
         value.forEach((cookieName, value) {
-          to[host][path][cookieName] =
+          to[host]![path]![cookieName] =
               SerializableCookie.fromJson(value.toJson());
         });
       });
