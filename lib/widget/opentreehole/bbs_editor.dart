@@ -148,7 +148,7 @@ class BBSEditor {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
     final String? content = (await _showEditor(
             context, S.of(context).reason_report_post(postId ?? "?"),
-            editorType: BBSEditorType.DIALOG, object: object))
+            editorType: BBSEditorType.DIALOG, object: object, hasTip: false))
         ?.text;
     if (content == null || content.trim() == "") return;
 
@@ -168,7 +168,8 @@ class BBSEditor {
       {bool allowTags = false,
       required BBSEditorType? editorType,
       required EditorObject object,
-      String placeholder = ""}) async {
+      String placeholder = "",
+      bool hasTip = true}) async {
     final String randomTip = await Constant.randomFduholeTip;
     const BBSEditorType defaultType = BBSEditorType.PAGE;
     switch (editorType ?? defaultType) {
@@ -190,7 +191,7 @@ class BBSEditor {
                     controller: textController,
                     allowTags: allowTags,
                     editorObject: object,
-                    tip: randomTip,
+                    tip: hasTip ? randomTip : null,
                   ),
                   actions: [
                     PlatformDialogAction(
