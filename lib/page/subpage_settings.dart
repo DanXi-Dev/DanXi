@@ -652,6 +652,11 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     try {
                                       await OpenTreeHoleRepository.getInstance()
                                           .logout();
+                                      while (
+                                          auxiliaryNavigatorState?.canPop() ==
+                                              true) {
+                                        auxiliaryNavigatorState?.pop();
+                                      }
                                       settingsPageKey.currentState
                                           ?.setState(() {});
                                       treeholePageKey.currentState

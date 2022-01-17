@@ -65,7 +65,7 @@ class _PlatformMasterDetailAppState extends State<PlatformMasterDetailApp>
 
   @override
   Widget build(BuildContext context) {
-    if (!isTablet()) {
+    if (!isInTabletMode) {
       return PlatformApp(
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
