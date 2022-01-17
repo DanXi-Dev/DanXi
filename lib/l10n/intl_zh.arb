@@ -91,6 +91,7 @@
     "background_image_description": "选择一张图片作为 FDUHole 背景",
     "already_set": "已经设定",
     "background_image_already_set": "背景图片已设定，是否移除？",
+    "login_from_treehole_page": "请从树洞页面登录",
 
     "empty_classrooms": "空教室",
     "settings": "设置",
