@@ -627,11 +627,26 @@ class _BBSSubpageState extends State<BBSSubpage>
                           },
                               SettingsProvider.getInstance()
                                   .useAccessibilityColoring),
-                          if (isPinned)
-                            OTLeadingTag(
-                              color: Colors.blue,
-                              text: S.of(context).pinned,
-                            )
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (isPinned)
+                                OTLeadingTag(
+                                  color: Colors.blue,
+                                  text: S.of(context).pinned,
+                                ),
+                              if (postElement.floors?.first_floor?.special_tag
+                                      ?.isNotEmpty ==
+                                  true) ...[
+                                const SizedBox(width: 4),
+                                OTLeadingTag(
+                                  color: Colors.red,
+                                  text: postElement
+                                      .floors!.first_floor!.special_tag!,
+                                ),
+                              ]
+                            ],
+                          ),
                         ]),
                     const SizedBox(height: 10),
                     (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)

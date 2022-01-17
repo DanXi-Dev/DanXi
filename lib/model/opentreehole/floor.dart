@@ -31,6 +31,7 @@ class OTFloor {
   String? anonyname;
   String? time_updated;
   String? time_created;
+  String? special_tag;
   bool? deleted;
   bool? is_me;
   bool? liked;

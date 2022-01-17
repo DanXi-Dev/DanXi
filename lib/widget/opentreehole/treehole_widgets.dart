@@ -177,13 +177,25 @@ class OTFloorWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (floor.deleted == true) ...[
-                  const SizedBox(width: 4),
-                  OTLeadingTag(
-                    color: Colors.red,
-                    text: S.of(context).deleted,
-                  ),
-                ]
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (floor.deleted == true) ...[
+                      const SizedBox(width: 4),
+                      OTLeadingTag(
+                        color: Colors.red,
+                        text: S.of(context).deleted,
+                      ),
+                    ],
+                    if (floor.special_tag?.isNotEmpty == true) ...[
+                      const SizedBox(width: 4),
+                      OTLeadingTag(
+                        color: Colors.red,
+                        text: floor.special_tag!,
+                      ),
+                    ]
+                  ],
+                )
               ],
             ),
           ),
@@ -517,7 +529,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   },
                 ),
               ),
-            if (floor.is_me == true) ...[
+            if (floor.is_me == true && floor.deleted == false) ...[
               Expanded(
                 child: InkWell(
                   child: Padding(
