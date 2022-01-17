@@ -89,7 +89,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
   /// A map of all converters.
   ///
-  /// A converter is to export the time table as a single file, e.g. .ics.
+  /// A converter is used to export the time table as a single file, e.g. .ics.
   late Map<String, TimetableConverter> converters;
 
   /// The time table it fetched.
@@ -98,7 +98,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   ///The week it's showing on the time table.
   TimeNow? _showingTime;
 
-  Future<TimeTable?>? _content;
+  Future<TimeTable?>? _contentFuture;
 
   bool _manualLoad = false;
 
@@ -108,16 +108,18 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     if (checkGroup(kCompatibleUserGroup)) {
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
-        _content = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
+        _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value,
                 forceLoadFromRemote: _manualLoad)));
       } else if (_manualLoad) {
-        _content = LazyFuture.pack(PostgraduateTimetableRepository.getInstance()
-            .loadTimeTable(StateProvider.personInfo.value!, (imageUrl) async {
+        _contentFuture = LazyFuture.pack(
+            PostgraduateTimetableRepository.getInstance().loadTimeTable(
+                StateProvider.personInfo.value!, (imageUrl) async {
           TextEditingController controller = TextEditingController();
           await showPlatformDialog(
               context: context,
+              barrierDismissible: false,
               builder: (cxt) {
                 return PlatformAlertDialog(
                   title: Text(S.of(context).enter_captcha),
@@ -140,16 +142,17 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         }, forceLoadFromRemote: _manualLoad));
       } else {
         try {
-          _content = Future.value(PostgraduateTimetableRepository.getInstance()
-              .loadTimeTableLocally());
+          _contentFuture = Future.value(
+              PostgraduateTimetableRepository.getInstance()
+                  .loadTimeTableLocally());
         } catch (_) {
-          _content = LazyFuture.pack(Future<TimeTable?>.error(
+          _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
               NotLoginError(S.of(context).postgraduates_need_login)));
         }
       }
       _manualLoad = false;
     } else {
-      _content = LazyFuture.pack(Future<TimeTable?>.error(
+      _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
           NotLoginError(S.of(context).not_fudan_student)));
     }
   }
@@ -226,7 +229,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     // If there is no data before, we call setState once to show a ProgressIndicator.
     if (reloadWhenEmptyData) setState(() {});
 
-    await _content;
+    await _contentFuture;
     setState(() {});
   }
 
@@ -255,12 +258,12 @@ class _TimetableSubPageState extends State<TimetableSubPage>
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return _buildPage(snapshot.data);
       },
-      future: _content,
+      future: _contentFuture,
       errorBuilder: (BuildContext context,
               AsyncSnapshot<TimeTable?> snapshot) =>
           ErrorPageWidget.buildWidget(context, snapshot.error,
               stackTrace: snapshot.stackTrace, onTap: () {
-                _manualLoad = true;
+        _manualLoad = true;
         refreshSelf(reloadWhenEmptyData: true);
       },
               buttonText:

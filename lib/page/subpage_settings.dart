@@ -657,7 +657,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       treeholePageKey.currentState
                                           ?.setState(() {});
                                     } finally {
-                                      progressDialog.dismiss();
+                                      progressDialog.dismiss(showAnim: false);
                                     }
                                   }
                                 },
