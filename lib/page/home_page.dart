@@ -684,7 +684,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         StateProvider.personInfo.value != null) {
       // Update Timetable
       TimeTableRepository.getInstance()
-          .loadTimeTableLocally(StateProvider.personInfo.value,
+          .loadTimeTable(StateProvider.personInfo.value,
               forceLoadFromRemote: true)
           .onError((dynamic error, stackTrace) {
         Noticing.showNotice(context, S.of(context).timetable_refresh_error,

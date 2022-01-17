@@ -38,7 +38,7 @@ class NextCourseFeature extends Feature {
     TimeTable? timetable = await Retrier.runAsyncWithRetry(() async {
       await Future.delayed(const Duration(milliseconds: 500));
       return await TimeTableRepository.getInstance()
-          .loadTimeTableLocally(StateProvider.personInfo.value);
+          .loadTimeTable(StateProvider.personInfo.value);
     });
     _data = getNextCourse(timetable!);
     _status = ConnectionStatus.DONE;

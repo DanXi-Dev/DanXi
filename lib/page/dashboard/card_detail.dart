@@ -57,6 +57,12 @@ class _CardDetailPageState extends State<CardDetailPage> {
     super.initState();
     _cardInfo = widget.arguments!['cardInfo'];
     _personInfo = StateProvider.personInfo.value;
+
+    _tagDays = [7, 15, 30];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     _tags = [
       Tag(
           S.current.last_7_days,
@@ -74,11 +80,6 @@ class _CardDetailPageState extends State<CardDetailPage> {
               ? Icons.timelapse
               : CupertinoIcons.clock_fill),
     ];
-    _tagDays = [7, 15, 30];
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
@@ -107,7 +108,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                   _selectable = false;
                 });
                 _cardInfo!.records = await Retrier.runAsyncWithRetryForever(
-                    () => CardRepository.getInstance()
+                        () => CardRepository.getInstance()
                         .loadCardRecord(_tagDays[index]));
                 setState(() {
                   tag.checkedIcon = PlatformX.isMaterial(context)

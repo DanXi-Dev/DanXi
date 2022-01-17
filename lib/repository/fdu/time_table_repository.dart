@@ -83,15 +83,24 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         tablePage.data.toString());
   }
 
-  Future<TimeTable?> loadTimeTableLocally(PersonInfo? info,
+  Future<TimeTable?> loadTimeTable(PersonInfo? info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) {
     startTime ??= TimeTable.defaultStartTime;
-    return Cache.get<TimeTable>(
-        KEY_TIMETABLE_CACHE,
-        () async => (await loadTimeTableRemotely(info, startTime: startTime))!,
-        (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
-        (object) => jsonEncode(object.toJson()),
-        validate: (value) => !forceLoadFromRemote);
+    if (forceLoadFromRemote) {
+      return Cache.getRemotely<TimeTable>(
+          KEY_TIMETABLE_CACHE,
+          () async =>
+              (await loadTimeTableRemotely(info, startTime: startTime))!,
+          (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
+          (object) => jsonEncode(object.toJson()));
+    } else {
+      return Cache.get<TimeTable>(
+          KEY_TIMETABLE_CACHE,
+          () async =>
+              (await loadTimeTableRemotely(info, startTime: startTime))!,
+          (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
+          (object) => jsonEncode(object.toJson()));
+    }
   }
 
   @override
