@@ -425,7 +425,7 @@ class _BBSSubpageState extends State<BBSSubpage>
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           StateProvider.divisionId = event.newDivision;
-          refreshList();
+          _indicatorKey.currentState?.show();
         }),
         hashCode);
 
