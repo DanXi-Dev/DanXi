@@ -86,8 +86,12 @@ class _AAONoticesListState extends State<AAONoticesList> {
                   if (PlatformX.isMobile) {
                     ProgressFuture progressDialog = showProgressDialog(
                         loadingText: S.of(context).loading, context: context);
-                    cookie = await FudanAAORepository.getInstance().thisCookies;
-                    progressDialog.dismiss(showAnim: false);
+                    try {
+                      cookie =
+                          await FudanAAORepository.getInstance().thisCookies;
+                    } finally {
+                      progressDialog.dismiss(showAnim: false);
+                    }
                   }
                   BrowserUtil.openUrl(value.url, context, cookie);
                 },
