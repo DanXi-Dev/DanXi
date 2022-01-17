@@ -47,7 +47,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
     // only execute logging in when necessary.
     return Retrier.tryAsyncWithFix(
         () => _getBuildingRoomInfo(areaName, buildingName, date!),
-        (exception) async => await UISLoginTool.loginUIS(
+        (exception) => UISLoginTool.fixByLoginUIS(
             dio!, LOGIN_URL, cookieJar!, info, true));
   }
 

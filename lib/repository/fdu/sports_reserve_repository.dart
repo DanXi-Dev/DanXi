@@ -50,7 +50,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
       Retrier.tryAsyncWithFix(
           () => _getStadiumFullList(
               queryDate: queryDate, type: type, campus: campus),
-          (exception) async => await UISLoginTool.loginUIS(
+          (exception) => UISLoginTool.fixByLoginUIS(
               dio!, LOGIN_URL, cookieJar!, info, true));
 
   Future<int> _getStadiumPageNumber() async {
@@ -98,7 +98,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
           PersonInfo info, StadiumData stadium, DateTime date) async =>
       Retrier.tryAsyncWithFix(
           () => _getScheduleData(stadium, date),
-          (exception) async => await UISLoginTool.loginUIS(
+              (exception) => UISLoginTool.fixByLoginUIS(
               dio!, LOGIN_URL, cookieJar!, info, true));
 
   Future<StadiumScheduleData?> _getScheduleData(

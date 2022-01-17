@@ -35,8 +35,8 @@ class QRCodeRepository extends BaseRepositoryWithDio {
 
   Future<String?> getQRCode(PersonInfo? info) async => Retrier.tryAsyncWithFix(
       () => _getQRCode(),
-      (exception) async =>
-          await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+      (exception) =>
+          UISLoginTool.fixByLoginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
 
   Future<String?> _getQRCode() async {
     final res = await dio!.get(QR_URL);

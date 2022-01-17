@@ -19,10 +19,10 @@ import 'dart:convert';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
@@ -88,10 +88,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     var dataString =
         response.data.toString().between("}", "</script>", headGreedy: false)!;
     var jsonExtraction = RegExp(r'\[.+\]').allMatches(dataString);
-    List names = jsonDecode(jsonExtraction
-        .elementAt(areaCode * 3)
-        .group(0)!
-        .replaceAll("'", "\""));
+    List names = jsonDecode(
+        jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("'", "\""));
     List? cur = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 1)
         .group(0)!
@@ -117,8 +115,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   Future<List<ExamScore>?> loadAllExamScore(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadAllExamScore(),
-          (exception) =>
-              UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+          (exception) => UISLoginTool.fixByLoginUIS(
+              dio!, LOGIN_URL, cookieJar!, info, true));
 
   Future<List<ExamScore>?> _loadAllExamScore() async {
     Response r = await dio!.get(SCORE_DETAIL_URL);

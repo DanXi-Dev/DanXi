@@ -69,7 +69,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           {String? semesterId}) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamList(semesterId: semesterId),
-          (exception) => UISLoginTool.loginUIS(
+          (exception) => UISLoginTool.fixByLoginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<String?> get semesterIdFromCookie async =>
@@ -105,7 +105,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           {String? semesterId}) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamScore(semesterId),
-          (exception) => UISLoginTool.loginUIS(
+              (exception) => UISLoginTool.fixByLoginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<ExamScore>?> _loadExamScore([String? semesterId]) async {
@@ -120,13 +120,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<GPAListItem>> loadGPARemotely(PersonInfo? info) =>
+  Future<List<GPAListItem>?> loadGPARemotely(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadGPA(),
-          (exception) => UISLoginTool.loginUIS(
+          (exception) => UISLoginTool.fixByLoginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
-  Future<List<GPAListItem>> _loadGPA() async {
+  Future<List<GPAListItem>?> _loadGPA() async {
     final Response r = await dio!
         .get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data.toString());
@@ -143,7 +143,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<SemesterInfo>> loadSemesters(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadSemesters(),
-          (exception) => UISLoginTool.loginUIS(
+              (exception) => UISLoginTool.fixByLoginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<SemesterInfo>> _loadSemesters() async {

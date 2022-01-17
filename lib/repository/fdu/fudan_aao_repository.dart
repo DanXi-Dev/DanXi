@@ -17,8 +17,8 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/retryer.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
@@ -44,7 +44,8 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   Future<NonpersistentCookieJar?> get thisCookies async {
     // Log in before getting cookies.
     await Retrier.runAsyncWithRetry(
-        () => UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, _info, true),
+            () => UISLoginTool.fixByLoginUIS(
+            dio!, _LOGIN_URL, cookieJar!, _info, true),
         retryTimes: 3);
     return cookieJar;
   }
@@ -54,7 +55,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
     _info = info;
     return Retrier.tryAsyncWithFix(
         () => _getNotices(type, page),
-        (exception) async => await UISLoginTool.loginUIS(
+            (exception) => UISLoginTool.fixByLoginUIS(
             dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 

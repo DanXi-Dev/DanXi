@@ -39,8 +39,8 @@ class FudanDormRepository extends BaseRepositoryWithDio {
   Future<ElectricityItem> loadElectricityInfo(PersonInfo? info) {
     return Retrier.tryAsyncWithFix(
         () => _loadElectricityInfo(),
-        (exception) =>
-            UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true));
+        (exception) => UISLoginTool.fixByLoginUIS(
+            dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<ElectricityItem> _loadElectricityInfo() async {

@@ -43,8 +43,8 @@ class FudanBusRepository extends BaseRepositoryWithDio {
       {bool? holiday = false}) {
     return Retrier.tryAsyncWithFix(
         () => _loadBusList(holiday: holiday!),
-        (exception) =>
-            UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true));
+        (exception) => UISLoginTool.fixByLoginUIS(
+            dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<List<BusScheduleItem>> _loadBusList({bool holiday = false}) async {

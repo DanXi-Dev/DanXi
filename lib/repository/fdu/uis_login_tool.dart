@@ -18,9 +18,9 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/dio_utils.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/dio_log.dart';
@@ -29,6 +29,15 @@ class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
   static const String CREDENTIALS_INVALID = "密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
+
+  /// Log in Fudan UIS system and return the response.
+  ///
+  /// Warning: if having logged in, return null.
+  static Future<void> fixByLoginUIS(
+      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
+      [bool forceRelogin = false]) async {
+    await loginUIS(dio, serviceUrl, jar, info, forceRelogin);
+  }
 
   /// Log in Fudan UIS system and return the response.
   ///
