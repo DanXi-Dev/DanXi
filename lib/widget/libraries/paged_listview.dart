@@ -24,7 +24,6 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 const kDuration = Duration(milliseconds: 500);

@@ -54,6 +54,12 @@ class _DynamicThemeControllerState extends State<DynamicThemeController>
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Theme(
         data: _brightness == Brightness.light

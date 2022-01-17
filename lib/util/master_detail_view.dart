@@ -28,10 +28,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class PlatformMasterDetailApp extends StatelessWidget {
+class PlatformMasterDetailApp extends StatefulWidget {
   final Widget? masterPage;
 
   const PlatformMasterDetailApp({Key? key, this.masterPage}) : super(key: key);
+
+  @override
+  _PlatformMasterDetailAppState createState() =>
+      _PlatformMasterDetailAppState();
+}
+
+class _PlatformMasterDetailAppState extends State<PlatformMasterDetailApp>
+    with WidgetsBindingObserver {
+  late bool isInTabletMode;
+
+  @override
+  void initState() {
+    super.initState();
+    isInTabletMode = isTablet();
+    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance!.platformDispatcher.onMetricsChanged = () {
+      final newState = isTablet();
+      if (isInTabletMode != newState) {
+        setState(() {
+          isInTabletMode = newState;
+        });
+      }
+    };
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +86,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate
         ],
         supportedLocales: S.delegate.supportedLocales,
-        home: masterPage,
+        home: widget.masterPage,
         // Configure the page route behaviour of the whole app
         onGenerateRoute: (settings) {
           final Function? pageContentBuilder = DanxiApp.routes[settings.name!];
@@ -114,7 +144,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
                     GlobalCupertinoLocalizations.delegate
                   ],
                   supportedLocales: S.delegate.supportedLocales,
-                  home: masterPage,
+                  home: widget.masterPage,
                   // Configure the page route behaviour of the whole app
                   onGenerateRoute: (settings) {
                     final Function? pageContentBuilder =
