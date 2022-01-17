@@ -41,8 +41,14 @@ class OTTag extends Taggable {
   @override
   int get hashCode => tag_id!;
 
-  String get color => Constant
-      .TAG_COLOR_LIST[name.hashCode.abs() % Constant.TAG_COLOR_LIST.length];
+  String get color {
+    if (name == null || name!.isEmpty || name!.startsWith("*")) return 'red';
+    var sum = 0;
+    for (var code in name!.runes) {
+      sum += code;
+    }
+    return Constant.TAG_COLOR_LIST[sum % Constant.TAG_COLOR_LIST.length];
+  }
 
   @override
   List<Object> get props {
