@@ -337,13 +337,18 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Future<void> _refreshList() async {
-    if (_postsType == PostsType.FAVORED_DISCUSSION) {
-      await OpenTreeHoleRepository.getInstance()
-          .getFavoriteHoleId(forceUpdate: true);
-    } else if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-      await OpenTreeHoleRepository.getInstance().loadDivisions(useCache: false);
+    try {
+      if (_postsType == PostsType.FAVORED_DISCUSSION) {
+        await OpenTreeHoleRepository.getInstance()
+            .getFavoriteHoleId(forceUpdate: true);
+      } else if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
+        await OpenTreeHoleRepository.getInstance()
+            .loadDivisions(useCache: false);
+      }
+    } catch (e) {
+      await _listViewController.notifyUpdate();
+      rethrow;
     }
-    await _listViewController.notifyUpdate();
   }
 
   Widget _autoAdminNotice() {
