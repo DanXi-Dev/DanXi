@@ -632,10 +632,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     if (SettingsProvider.getInstance()
                                             .fduholeToken ==
                                         null) {
-                                      await smartNavigatorPush(
-                                          context, "/bbs/login", arguments: {
-                                        "info": StateProvider.personInfo.value!
-                                      });
+                                      Noticing.showNotice(
+                                          context,
+                                          S
+                                              .of(context)
+                                              .login_from_treehole_page,
+                                          title: S.of(context).login);
                                     }
                                     await OpenTreeHoleRepository.getInstance()
                                         .initializeRepo();

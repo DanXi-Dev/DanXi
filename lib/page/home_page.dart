@@ -71,10 +71,10 @@ void sendFduholeTokenToWatch(String? token) {
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
-GlobalKey<State> settingsPageKey = GlobalKey();
-GlobalKey<State> treeholePageKey = GlobalKey();
-GlobalKey<State> dashboardPageKey = GlobalKey();
-GlobalKey<State> timetablePageKey = GlobalKey();
+GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
+GlobalKey<State<BBSSubpage>> treeholePageKey = GlobalKey();
+GlobalKey<State<HomeSubpage>> dashboardPageKey = GlobalKey();
+GlobalKey<State<TimetableSubPage>> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
 
 /// The main page of DanXi.
