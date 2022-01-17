@@ -502,6 +502,14 @@ class PagedListViewController<T> implements ListProvider<T> {
     _state.replaceDataInRangeWith(data, start);
   }
 
+  replaceInitialData(Iterable<T> data) {
+    try {
+      _state.replaceDataInRangeWith(data, 0);
+    } catch (_) {
+      _state.widget.initialData?.setRange(0, data.length, data);
+    }
+  }
+
   @override
   T getElementAt(int index) => _state.getElementAt(index);
 
