@@ -62,7 +62,7 @@ class Registry {
         case ERROR_SUCCESS:
           return pvData.cast<Utf16>().toDartString();
         default:
-          throw Exception('unknown error');
+          throw Exception('unknown error $status');
       }
     } finally {
       free(pvData);
