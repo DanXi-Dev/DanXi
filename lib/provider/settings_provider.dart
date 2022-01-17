@@ -199,8 +199,13 @@ class SettingsProvider {
     return null;
   }
 
-  set fduholeToken(String? value) =>
-      preferences!.setString(KEY_FDUHOLE_TOKEN, value!);
+  set fduholeToken(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_FDUHOLE_TOKEN, value);
+    } else {
+      preferences!.remove(KEY_FDUHOLE_TOKEN);
+    }
+  }
 
   void deleteAllFduholeData() {
     preferences!.remove(KEY_FDUHOLE_TOKEN);

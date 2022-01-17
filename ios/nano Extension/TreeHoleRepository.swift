@@ -7,7 +7,7 @@
 
 import Foundation
 
-let BASE_URL = "https://hole.hath.top"
+let BASE_URL = "https://api.fduhole.com"
 
 func loadHoles<T: Decodable>(token: String, startTime: String?, divisionId: Int?, completion: @escaping (T?, _ error: String?) -> Void) -> Void {
     var components = URLComponents(string: BASE_URL + "/holes")!
