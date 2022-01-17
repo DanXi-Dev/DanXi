@@ -73,7 +73,7 @@ MarkdownStyleSheet _fontSizeOverride(
   );
 }
 
-BaseRender kMarkdownRender = (BuildContext context, String? content,
+final BaseRender kMarkdownRender = (BuildContext context, String? content,
     ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
@@ -139,8 +139,8 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
   }
 }
 
-BaseRender kMarkdownSelectorRender = (BuildContext context, String? content,
-    ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
+final BaseRender kMarkdownSelectorRender = (BuildContext context,
+    String? content, ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   return Markdown(
     softLineBreak: true,
     selectable: true,

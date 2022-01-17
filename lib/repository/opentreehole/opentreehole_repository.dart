@@ -28,7 +28,6 @@ import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/platform_bridge.dart';
@@ -110,7 +109,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
     try {
       PlatformBridge.registerRemoteNotification();
-    } catch (ignored) {}
+    } catch (_) {}
 
     if (_userInfo == null) await getUserProfile(forceUpdate: true);
     if (_divisionCache.isEmpty) await loadDivisions(useCache: false);
@@ -239,7 +238,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         final OTDivision cached =
             _divisionCache.firstWhere((e) => e.division_id == divisionId);
         return cached;
-      } catch (ignored) {}
+      } catch (_) {}
     }
     final Response response = await dio!.get(
         _BASE_URL + "/divisions/$divisionId",
