@@ -277,7 +277,6 @@ class _HomeSubpageState extends State<HomeSubpage>
             },
             child: Material(
                 child: ListView(
-              clipBehavior: Clip.none,
               controller: widget.primaryScrollController(context),
               physics: const AlwaysScrollableScrollPhysics(),
               children: _buildCards(widgetList),

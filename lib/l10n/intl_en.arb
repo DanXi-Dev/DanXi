@@ -228,7 +228,7 @@
     "input_your_email_secure_code":"Input your OTP code",
     "secure_verification_description":"We have just sent you an email with an OTP code, input it below.",
     "secure_code":"OTP code",
-    "forgot_password":"Password forgot",
+    "forgot_password":"Forget Password",
     "copy_password":"Copy Password",
 
     "new_post":"New Post",

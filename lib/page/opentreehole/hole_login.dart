@@ -385,39 +385,34 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
         const SizedBox(
           height: 16,
         ),
-        Stack(
+        Wrap(
+          alignment: WrapAlignment.spaceAround,
           children: [
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: PlatformTextButton(
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(S.of(context).forgot_password)),
-                onPressed: () => BrowserUtil.openUrl(
-                    Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
-              ),
+            PlatformTextButton(
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(S.of(context).forgot_password)),
+              onPressed: () => BrowserUtil.openUrl(
+                  Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: PlatformElevatedButton(
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(S.of(context).login)),
-                onPressed: () {
-                  model.selectedEmail = _usernameController.text;
-                  model.password = _passwordController.text;
-                  if (_passwordController.text.isNotEmpty &&
-                      _usernameController.text.isNotEmpty) {
-                    executeLogin(context).catchError((e, st) {
-                      state.jumpBackFromLoadingPage();
-                      debugPrintStack(stackTrace: st);
-                      Noticing.showNotice(state.context,
-                          S.of(state.context).login_problem_occurred);
-                    });
-                  }
-                },
-              ),
-            )
+            PlatformElevatedButton(
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(S.of(context).login)),
+              onPressed: () {
+                model.selectedEmail = _usernameController.text;
+                model.password = _passwordController.text;
+                if (_passwordController.text.isNotEmpty &&
+                    _usernameController.text.isNotEmpty) {
+                  executeLogin(context).catchError((e, st) {
+                    state.jumpBackFromLoadingPage();
+                    debugPrintStack(stackTrace: st);
+                    Noticing.showNotice(state.context,
+                        S.of(state.context).login_problem_occurred);
+                  });
+                }
+              },
+            ),
           ],
         )
       ],
@@ -642,31 +637,25 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
         ),
         Text(model.password!),
         const SizedBox(height: 16),
-        Stack(
+        Column(
           children: [
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: PlatformTextButton(
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(S.of(context).copy_password)),
-                onPressed: () {
-                  FlutterClipboard.copy(model.password!).then((value) =>
-                      Noticing.showNotice(context, S.of(context).copy_success));
-                },
-              ),
+            PlatformTextButton(
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(S.of(context).copy_password)),
+              onPressed: () {
+                FlutterClipboard.copy(model.password!).then((value) =>
+                    Noticing.showNotice(context, S.of(context).copy_success));
+              },
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: PlatformElevatedButton(
-                material: (_, __) =>
-                    MaterialElevatedButtonData(icon: const Icon(Icons.done)),
-                child: Text(S.of(context).i_see),
-                onPressed: () {
-                  Navigator.pop(state.context);
-                },
-              ),
-            )
+            PlatformElevatedButton(
+              material: (_, __) =>
+                  MaterialElevatedButtonData(icon: const Icon(Icons.done)),
+              child: Text(S.of(context).i_see),
+              onPressed: () {
+                Navigator.pop(state.context);
+              },
+            ),
           ],
         ),
       ],
