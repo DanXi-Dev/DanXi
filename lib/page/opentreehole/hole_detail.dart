@@ -202,10 +202,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     });
     final bgImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(
-      material: (_, __) =>
-          MaterialScaffoldData(resizeToAvoidBottomInset: false),
-      cupertino: (_, __) =>
-          CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
       iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
