@@ -344,6 +344,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       } else if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);
+        await OpenTreeHoleRepository.getInstance().loadTags(useCache: false);
       }
     } finally {
       await _listViewController.notifyUpdate();

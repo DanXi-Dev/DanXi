@@ -57,8 +57,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _floorCache.add(floor);
   }
 
-  /// Cached divisions
+  /// Cached OTDivisions
   List<OTDivision> _divisionCache = [];
+
+  /// Cached OTTags
+  List<OTTag> _tagCache = [];
 
   /// Push Notification Registration Cache
   PushNotificationRegData? _pushNotificationRegData;
@@ -325,11 +328,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTFloor.fromJson(e)).toList();
   }
 
-  Future<List<OTTag>> loadTags() async {
+  Future<List<OTTag>> loadTags({bool useCache = true}) async {
+    if (useCache && _tagCache.isNotEmpty) {
+      return _tagCache;
+    }
     final Response response = await dio!
         .get(_BASE_URL + "/tags", options: Options(headers: _tokenHeader));
     final List result = response.data;
-    return result.map((e) => OTTag.fromJson(e)).toList();
+    return _tagCache = result.map((e) => OTTag.fromJson(e)).toList();
   }
 
   Future<int?> newHole(int divisionId, String? content,
