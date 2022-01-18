@@ -38,6 +38,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -58,6 +59,16 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+Future<void> updateOTUserProfile(BuildContext context) async {
+  try {
+    await OpenTreeHoleRepository.getInstance().updateUserProfile();
+  } catch (e) {
+    Noticing.showNotice(context,
+        ErrorPageWidget.generateUserFriendlyDescription(S.of(context), e),
+        title: S.of(context).fatal_error, useSnackBar: false);
+  }
+}
 
 class SettingsSubpage extends PlatformSubpage
     with PageWithPrimaryScrollController {
@@ -248,13 +259,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     return list;
   }
 
-  List<Widget> _buildFoldBehaviorList(BuildContext context) {
+  List<Widget> _buildFoldBehaviorList(BuildContext menuContext) {
     List<Widget> list = [];
-    onTapListener(FoldBehavior value) {
+    onTapListener(FoldBehavior value) async {
       OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
           value.internalString();
+      updateOTUserProfile(context);
       treeholePageKey.currentState?.setState(() {});
-      Navigator.of(context).pop();
+      Navigator.of(menuContext).pop();
       refreshSelf();
     }
 
@@ -262,10 +274,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       list.add(PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
           onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)!),
+          child: Text(value.displayTitle(menuContext)!),
         ),
         material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)!),
+          title: Text(value.displayTitle(menuContext)!),
           onTap: () => onTapListener(value),
         ),
       ));
@@ -1086,9 +1098,11 @@ class _OTNotificationSettingsWidgetState
             if (newValue == true &&
                 !getNotifyListNonNull().contains(value.internalString())) {
               getNotifyListNonNull().add(value.internalString());
+              updateOTUserProfile(context);
             } else if (newValue == false &&
                 getNotifyListNonNull().contains(value.internalString())) {
               getNotifyListNonNull().remove(value.internalString());
+              updateOTUserProfile(context);
             }
             refreshSelf();
           }));

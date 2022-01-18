@@ -69,7 +69,6 @@ class ErrorPageWidget extends StatelessWidget {
           break;
         case DioErrorType.other:
           return generateUserFriendlyDescription(locale, error.error);
-          break;
       }
     } else if (error is StateError) {
       switch (error.message) {
@@ -105,32 +104,35 @@ class ErrorPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[icon!, const SizedBox(height: 8)],
-          Text(errorMessage),
-          const SizedBox(height: 8),
-          PlatformElevatedButton(
-            child: Text(buttonText),
-            onPressed: onTap,
-          ),
-          if (error != null) ...[
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[icon!, const SizedBox(height: 8)],
+            Text(errorMessage),
             const SizedBox(height: 8),
-            PlatformTextButton(
-              child: Text(S.of(context).error_detail),
-              onPressed: () {
-                String errorInfo = error.toString();
-                // DioError will insert its stack trace in the result of [toString] method.
-                if (trace != null && error is! DioError) {
-                  errorInfo += ("\n$trace");
-                }
-                Noticing.showModalNotice(context,
-                    title: S.of(context).error_detail, message: errorInfo);
-              },
-            )
+            PlatformElevatedButton(
+              child: Text(buttonText),
+              onPressed: onTap,
+            ),
+            if (error != null) ...[
+              const SizedBox(height: 8),
+              PlatformTextButton(
+                child: Text(S.of(context).error_detail),
+                onPressed: () {
+                  String errorInfo = error.toString();
+                  // DioError will insert its stack trace in the result of [toString] method.
+                  if (trace != null && error is! DioError) {
+                    errorInfo += ("\n$trace");
+                  }
+                  Noticing.showModalNotice(context,
+                      title: S.of(context).error_detail, message: errorInfo);
+                },
+              )
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

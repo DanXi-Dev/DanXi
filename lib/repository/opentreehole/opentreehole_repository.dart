@@ -52,6 +52,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   /// Cached floors, used by [mentions]
   List<OTFloor> _floorCache = [];
+
   void cacheFloor(OTFloor floor) {
     _floorCache.remove(floor);
     _floorCache.add(floor);
@@ -405,6 +406,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   OTUser? get userInfo => _userInfo;
+
   set userInfo(OTUser? value) {
     _userInfo = value;
     updateUserProfile();
@@ -420,9 +422,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<OTUser?> updateUserProfile() async {
-    final Response response = await dio!.put(_BASE_URL + "/users",
-        data: _userInfo!.toJson(), options: Options(headers: _tokenHeader));
-    _userInfo = OTUser.fromJson(response.data);
+    try {
+      final Response response = await dio!.put(_BASE_URL + "/users",
+          data: _userInfo!.toJson(), options: Options(headers: _tokenHeader));
+      _userInfo = OTUser.fromJson(response.data);
+    } catch (_) {}
     return _userInfo;
   }
 
@@ -558,6 +562,7 @@ enum SetFavoriteMode { ADD, DELETE }
 
 class NotLoginError implements FatalException {
   final String errorMessage;
+
   NotLoginError(this.errorMessage);
 }
 
@@ -568,5 +573,6 @@ class ImageUploadError implements Exception {}
 class PushNotificationRegData {
   final String deviceId, token;
   final PushNotificationServiceType type;
+
   PushNotificationRegData(this.deviceId, this.token, this.type);
 }
