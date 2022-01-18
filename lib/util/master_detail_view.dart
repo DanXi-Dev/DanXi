@@ -22,15 +22,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class PlatformMasterDetailApp extends StatelessWidget {
-  final Widget masterPage;
+  final RouteFactory? onGenerateRoute;
+  final GlobalKey<NavigatorState>? navigatorKey;
 
-  const PlatformMasterDetailApp({Key? key, required this.masterPage})
+  const PlatformMasterDetailApp(
+      {Key? key, this.onGenerateRoute, this.navigatorKey})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Widget masterNavigatorWidget = Navigator(
+      key: navigatorKey,
+      onGenerateRoute: onGenerateRoute,
+      initialRoute: '/home',
+    );
     if (!isTablet(context)) {
-      return masterPage;
+      return masterNavigatorWidget;
     }
     return Container(
       color: Theme.of(context).backgroundColor,
@@ -45,7 +52,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
                   border: Border(
                       right: BorderSide(
                           width: 1, color: Theme.of(context).dividerColor))),
-              child: masterPage),
+              child: masterNavigatorWidget),
           Container(
             width:
                 MediaQuery.of(context).size.width - kTabletMasterContainerWidth,

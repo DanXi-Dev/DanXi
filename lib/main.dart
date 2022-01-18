@@ -21,6 +21,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
 import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/feature/feature_map.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
 import 'package:dan_xi/page/dashboard/announcement_notices.dart';
 import 'package:dan_xi/page/dashboard/bus.dart';
@@ -49,7 +50,6 @@ import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:dan_xi/generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -133,6 +133,7 @@ class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
     '/placeholder': (context, {arguments}) => const SizedBox(),
+    '/home': (context, {arguments}) => const HomePage(),
     '/bbs/reports': (context, {arguments}) =>
         BBSReportDetail(arguments: arguments),
     '/card/detail': (context, {arguments}) =>
@@ -180,32 +181,27 @@ class DanxiApp extends StatelessWidget {
         builder: (BuildContext context) => DynamicThemeController(
           lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
           darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
-          child: MediaQuery(
-            data: MediaQueryData.fromWindow(window),
-            child: PlatformApp(
-              scrollBehavior: MyCustomScrollBehavior(),
-              useInheritedMediaQuery: true,
-              debugShowCheckedModeBanner: false,
-              // Fix cupertino UI text color issues
-              cupertino: (context, __) => CupertinoAppData(
-                  theme: CupertinoThemeData(
-                      textTheme: CupertinoTextThemeData(
-                          textStyle: TextStyle(
-                              color: PlatformX.getTheme(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .color)))),
-              // Configure i18n delegates
-              localizationsDelegates: const [
-                S.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate
-              ],
-              supportedLocales: S.delegate.supportedLocales,
-              home: const PlatformMasterDetailApp(
-                masterPage: HomePage(),
-              ),
+          child: PlatformApp(
+            scrollBehavior: MyCustomScrollBehavior(),
+            debugShowCheckedModeBanner: false,
+            // Fix cupertino UI text color issues
+            cupertino: (context, __) => CupertinoAppData(
+                theme: CupertinoThemeData(
+                    textTheme: CupertinoTextThemeData(
+                        textStyle: TextStyle(
+                            color: PlatformX.getTheme(context)
+                                .textTheme
+                                .bodyText1!
+                                .color)))),
+            // Configure i18n delegates
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            home: PlatformMasterDetailApp(
               // Configure the page route behaviour of the whole app
               onGenerateRoute: (settings) {
                 final Function? pageContentBuilder =

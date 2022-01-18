@@ -513,6 +513,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ChangeNotifierProvider.value(value: _pageIndex),
       ],
       child: PlatformScaffold(
+        cupertino: (_, __) => CupertinoPageScaffoldData(
+            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInsetTab: false),
+        material: (_, __) =>
+            MaterialScaffoldData(resizeToAvoidBottomInset: false),
         iosContentBottomPadding: false,
         iosContentPadding: false,
         appBar: PlatformAppBar(
