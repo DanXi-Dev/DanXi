@@ -36,7 +36,6 @@ import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -375,15 +374,13 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                       configureSuggestion: (tag) => SuggestionConfiguration(
                             title: Text(
                               tag.name!,
-                              style: TextStyle(
-                                  color:
-                                      Constant.getColorFromString(tag.color)),
+                              style: TextStyle(color: tag.color),
                             ),
                             subtitle: Row(
                               children: [
                                 Icon(
                                   CupertinoIcons.flame,
-                                  color: Constant.getColorFromString(tag.color),
+                                  color: tag.color,
                                   size: 12,
                                 ),
                                 const SizedBox(
@@ -391,10 +388,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 ),
                                 Text(
                                   tag.temperature.toString(),
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Constant.getColorFromString(
-                                          tag.color)),
+                                  style:
+                                      TextStyle(fontSize: 13, color: tag.color),
                                 ),
                               ],
                             ),
@@ -415,20 +410,14 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                           ),
                       configureChip: (tag) => ChipConfiguration(
                             label: Text(tag.name!),
-                            backgroundColor:
-                                Constant.getColorFromString(tag.color),
+                            backgroundColor: tag.color,
                             labelStyle: TextStyle(
-                                color: Constant.getColorFromString(tag.color)
-                                            .computeLuminance() >=
-                                        0.5
+                                color: tag.color.computeLuminance() >= 0.5
                                     ? Colors.black
                                     : Colors.white),
-                            deleteIconColor:
-                                Constant.getColorFromString(tag.color)
-                                            .computeLuminance() >=
-                                        0.5
-                                    ? Colors.black
-                                    : Colors.white,
+                            deleteIconColor: tag.color.computeLuminance() >= 0.5
+                                ? Colors.black
+                                : Colors.white,
                           ),
                       onChanged: () {}),
                 ),

@@ -15,7 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 extension StringEx on String {
@@ -120,3 +124,51 @@ extension ListEx<T> on List<T>? {
 }
 
 typedef FilterFunction<T> = bool Function(T element);
+
+extension HSL on Color {
+  Color withHue(double hue) {
+    return HSLColor.fromColor(this).withHue(hue).toColor();
+  }
+
+  Color withSaturation(double saturation) {
+    return HSLColor.fromColor(this).withSaturation(saturation).toColor();
+  }
+
+  Color withLightness(double lightness) {
+    return HSLColor.fromColor(this).withLightness(lightness).toColor();
+  }
+
+  Color autoAdapt() {
+    final HSLColor hslColor = HSLColor.fromColor(this);
+    if (PlatformX.isDarkMode) {
+      if (hslColor.lightness < 0.5) {
+        return hslColor
+            .withLightness((sqrt(hslColor.lightness) * 3 / 2))
+            .toColor();
+      }
+    } else {
+      if (hslColor.lightness > 0.5) {
+        return hslColor
+            .withLightness((hslColor.lightness * hslColor.lightness * 2 / 3))
+            .toColor();
+      }
+    }
+
+    return this;
+  }
+}
+
+extension HashColor on String {
+  Color hashColor() {
+    final String text = this;
+    if (text.isEmpty || text.startsWith("*")) return Colors.red;
+    var sum = 0;
+    for (var code in text.runes) {
+      sum += code;
+    }
+    return Constant.getColorFromString(
+                Constant.TAG_COLOR_LIST[sum % Constant.TAG_COLOR_LIST.length])[
+            PlatformX.isDarkMode ? 300 : 800] ??
+        Colors.red;
+  }
+}

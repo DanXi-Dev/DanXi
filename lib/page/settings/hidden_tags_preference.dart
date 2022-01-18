@@ -95,14 +95,13 @@ class _BBSHiddenTagsPreferencePageState
                 configureSuggestion: (tag) => SuggestionConfiguration(
                       title: Text(
                         tag.name!,
-                        style: TextStyle(
-                            color: Constant.getColorFromString(tag.color)),
+                        style: TextStyle(color: tag.color),
                       ),
                       subtitle: Row(
                         children: [
                           Icon(
                             CupertinoIcons.flame,
-                            color: Constant.getColorFromString(tag.color),
+                            color: tag.color,
                             size: 12,
                           ),
                           const SizedBox(
@@ -110,9 +109,7 @@ class _BBSHiddenTagsPreferencePageState
                           ),
                           Text(
                             tag.temperature.toString(),
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: Constant.getColorFromString(tag.color)),
+                            style: TextStyle(fontSize: 13, color: tag.color),
                           ),
                         ],
                       ),
@@ -133,16 +130,12 @@ class _BBSHiddenTagsPreferencePageState
                     ),
                 configureChip: (tag) => ChipConfiguration(
                       label: Text(tag.name!),
-                      backgroundColor: Constant.getColorFromString(tag.color),
+                      backgroundColor: tag.color,
                       labelStyle: TextStyle(
-                          color: Constant.getColorFromString(tag.color)
-                                      .computeLuminance() >=
-                                  0.5
+                          color: tag.color.computeLuminance() >= 0.5
                               ? Colors.black
                               : Colors.white),
-                      deleteIconColor: Constant.getColorFromString(tag.color)
-                                  .computeLuminance() >=
-                              0.5
+                      deleteIconColor: tag.color.computeLuminance() >= 0.5
                           ? Colors.black
                           : Colors.white,
                     ),

@@ -64,7 +64,7 @@ class _BBSTagsContainerState extends State<BBSTagsContainer> {
                         padding: const EdgeInsets.only(top: 16, right: 12),
                         child: RoundChip(
                             label: e.name,
-                            color: Constant.getColorFromString(e.color),
+                            color: e.color,
                             onTap: () => widget.onTap?.call(e))),
                   )
                   .toList())

@@ -17,7 +17,6 @@
 
 import 'dart:io';
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -31,6 +30,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -58,7 +58,7 @@ class OTLeadingTag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
       decoration: BoxDecoration(
           color: color.withOpacity(0.8),
-          borderRadius: const BorderRadius.all(Radius.circular(4.0))),
+          borderRadius: const BorderRadius.all(Radius.circular(2.0))),
       child: Text(
         text,
         style: TextStyle(
@@ -88,7 +88,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
             label: element.name,
             color: useAccessibilityColoring
                 ? Theme.of(context).textTheme.bodyText1!.color
-                : Constant.getColorFromString(element.color),
+                : element.color,
           ),
         ]));
   }
@@ -134,8 +134,7 @@ class OTFloorWidget extends StatelessWidget {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     }
 
-    final nameColor = Constant.getColorFromString(Constant.TAG_COLOR_LIST[
-        floor.anonyname.hashCode.abs() % Constant.TAG_COLOR_LIST.length]);
+    final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
     final cardChild = ListTile(
       dense: true,
@@ -184,14 +183,14 @@ class OTFloorWidget extends StatelessWidget {
                     if (floor.deleted == true) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
-                        color: Colors.red,
+                        color: Theme.of(context).colorScheme.primary,
                         text: S.of(context).deleted,
                       ),
                     ],
                     if (floor.history?.isNotEmpty == true) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
-                        color: Colors.red,
+                        color: Theme.of(context).colorScheme.primary,
                         text: S.of(context).modified,
                       ),
                     ],

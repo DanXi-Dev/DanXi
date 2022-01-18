@@ -17,8 +17,9 @@
 
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/taggable.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'tag.g.dart';
@@ -41,14 +42,7 @@ class OTTag extends Taggable {
   @override
   int get hashCode => tag_id!;
 
-  String get color {
-    if (name == null || name!.isEmpty || name!.startsWith("*")) return 'red';
-    var sum = 0;
-    for (var code in name!.runes) {
-      sum += code;
-    }
-    return Constant.TAG_COLOR_LIST[sum % Constant.TAG_COLOR_LIST.length];
-  }
+  Color get color => (name?.hashColor() ?? Colors.red);
 
   @override
   List<Object> get props {

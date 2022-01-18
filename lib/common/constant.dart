@@ -226,8 +226,8 @@ class Constant {
     'teal',
     'green',
     'light-green',
-    //'lime',
-    //'yellow',
+    'lime',
+    'yellow',
     'amber',
     'orange',
     'deep-orange',
@@ -240,7 +240,7 @@ class Constant {
       TAG_COLOR_LIST[Random().nextInt(TAG_COLOR_LIST.length)];
 
   /// Get the [Color] from a color string.
-  static Color getColorFromString(String? color) {
+  static MaterialColor getColorFromString(String? color) {
     switch (color) {
       case 'red':
         return Colors.red;
@@ -281,7 +281,7 @@ class Constant {
       case 'grey':
         return Colors.grey;
     }
-    return Colors.black;
+    return Colors.red;
   }
 
   /// A copy of [Campus.values], omitting [Campus.NONE].
