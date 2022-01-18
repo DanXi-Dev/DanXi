@@ -232,6 +232,8 @@
     "secure_code":"OTP code",
     "forgot_password":"Forget Password",
     "copy_password":"Copy Password",
+    "push_notification_reg_failed": "Push Notification Registeration Failed",
+    "push_notification_reg_failed_des": "You may not be able to receive notifications.\nError: {error}",
 
     "new_post":"New Post",
     "posting":"Posting...",
@@ -350,7 +352,7 @@
     "error_detail": "Show detail",
     "unknown_error": "Unknown Error",
     "connection_timeout": "Connection Timeout",
-    "response_error": "Server returned with an error code: ",
+    "response_error": "Server returned an error code: ",
     "connection_cancelled": "Connection cancelled unexpectedly",
     "no_data_error": "No data",
     "require_login": "You need to log in first.",

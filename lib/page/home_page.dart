@@ -45,6 +45,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -377,15 +378,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         case "upload_apns_token":
           if (call.arguments["token"] !=
               SettingsProvider.getInstance().lastPushToken) {
-            OpenTreeHoleRepository.getInstance()
-                .updatePushNotificationToken(
-                    call.arguments["token"],
-                    await PlatformX.getUniqueDeviceId(),
-                    PushNotificationServiceType.APNS)
-                .then((value) {
+            try {
+              await OpenTreeHoleRepository.getInstance()
+                  .updatePushNotificationToken(
+                      call.arguments["token"],
+                      await PlatformX.getUniqueDeviceId(),
+                      PushNotificationServiceType.APNS);
               SettingsProvider.getInstance().lastPushToken =
                   call.arguments["token"];
-            }, onError: (value) => null);
+            } catch (e) {
+              print(e);
+              Noticing.showNotice(
+                  context,
+                  S.of(context).push_notification_reg_failed_des(
+                      ErrorPageWidget.generateUserFriendlyDescription(
+                          S.of(context), e)),
+                  title: S.of(context).push_notification_reg_failed);
+            }
           }
           break;
         case 'get_token':
@@ -421,14 +430,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 (params.commandArguments?.isNotEmpty ?? false)) {
               String regId = params.commandArguments![0];
               if (regId != SettingsProvider.getInstance().lastPushToken) {
-                OpenTreeHoleRepository.getInstance()
-                    .updatePushNotificationToken(
-                        regId,
-                        await PlatformX.getUniqueDeviceId(),
-                        PushNotificationServiceType.MIPUSH)
-                    .then((value) {
+                try {
+                  await OpenTreeHoleRepository.getInstance()
+                      .updatePushNotificationToken(
+                          regId,
+                          await PlatformX.getUniqueDeviceId(),
+                          PushNotificationServiceType.MIPUSH);
                   SettingsProvider.getInstance().lastPushToken = regId;
-                }, onError: (value) => null);
+                } catch (e) {
+                  Noticing.showNotice(
+                      context,
+                      S.of(context).push_notification_reg_failed_des(
+                          ErrorPageWidget.generateUserFriendlyDescription(
+                              S.of(context), e)),
+                      title: S.of(context).push_notification_reg_failed);
+                }
               }
             }
             break;
