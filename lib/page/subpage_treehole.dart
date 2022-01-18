@@ -270,8 +270,6 @@ class _BBSSubpageState extends State<BBSSubpage>
   final GlobalKey<RefreshIndicatorState> _indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  //final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
-
   String? _tagFilter;
   final FocusNode _searchFocus = FocusNode();
   PostsType _postsType = PostsType.NORMAL_POSTS;
@@ -289,6 +287,8 @@ class _BBSSubpageState extends State<BBSSubpage>
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
 
   BannerAd? bannerAd;
+
+  FileImage? _backgroundImage;
 
   /// This is to prevent the entire page being rebuilt on iOS when the keyboard pops up
   late bool _fieldInitComplete;
@@ -503,13 +503,14 @@ class _BBSSubpageState extends State<BBSSubpage>
   }
 
   Widget _buildPageBody(BuildContext context) {
-    final bgImage = SettingsProvider.getInstance().backgroundImage;
+    _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Material(
       child: Container(
-        decoration: bgImage == null
+        decoration: _backgroundImage == null
             ? null
             : BoxDecoration(
-                image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
+                image: DecorationImage(
+                    image: _backgroundImage!, fit: BoxFit.cover)),
         child: RefreshIndicator(
           edgeOffset: MediaQuery.of(context).padding.top,
           key: _indicatorKey,
@@ -608,7 +609,9 @@ class _BBSSubpageState extends State<BBSSubpage>
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
 
     return Card(
-      color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
+      color: _backgroundImage != null
+          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+          : null,
       child: Column(
         children: [
           ListTile(

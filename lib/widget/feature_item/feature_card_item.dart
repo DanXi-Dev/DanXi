@@ -63,13 +63,12 @@ class _FeatureCardItemState extends State<FeatureCardItem>
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Wrap(
               children: [
                 widget.feature.icon,
-                const SizedBox(
-                  width: 8,
-                ),
+                const SizedBox(width: 8),
                 Text(
                   widget.feature.mainTitle!,
                   style: const TextStyle(fontSize: 16),
