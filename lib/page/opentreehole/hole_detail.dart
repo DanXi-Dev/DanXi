@@ -311,7 +311,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       );
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) => [
-        if (e.is_me == true)
+        if (e.is_me == true && e.deleted == false)
           PlatformWidget(
             cupertino: (_, __) => CupertinoActionSheetAction(
               onPressed: () async {
