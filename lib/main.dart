@@ -177,7 +177,7 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Phoenix(
       child: PlatformProvider(
-        initialPlatform: TargetPlatform.iOS,
+        // initialPlatform: TargetPlatform.iOS,
         builder: (BuildContext context) => DynamicThemeController(
           lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
           darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
