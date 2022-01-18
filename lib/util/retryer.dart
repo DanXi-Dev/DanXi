@@ -25,7 +25,7 @@ class Retrier {
   /// Note: 2022/1/18 Must specify [retryTimes], or won't retry.
   static E runWithRetry<E>(E Function() function, {int retryTimes = 0}) {
     Exception? error;
-    for (int i = 0; i < retryTimes; i++) {
+    for (int i = 0; i <= retryTimes; i++) {
       try {
         return function();
       } catch (e) {
@@ -65,14 +65,9 @@ class Retrier {
       {int retryTimes = 1}) async {
     late Function errorCatcher;
     errorCatcher = (e, stack) async {
-      // debugPrintStack(stackTrace: stack);
       if (retryTimes > 0) {
         retryTimes--;
-        await tryFix(e).catchError((error, stackTrace) {
-          // debugPrint("Error when trying fix ${function.runtimeType.toString()}:");
-          // debugPrint(error.toString());
-          // debugPrint(stackTrace.toString());
-        });
+        await tryFix(e).catchError((error, stackTrace) {});
         return await function().catchError(errorCatcher);
       } else {
         throw e;
