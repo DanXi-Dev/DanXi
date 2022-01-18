@@ -244,6 +244,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 0) {
           _lastRefreshTime = DateTime.now();
           dashboardPageKey.currentState?.rebuildFeatures();
+          dashboardPageKey.currentState?.setState(() {});
+          ;
         }
         break;
       case AppLifecycleState.inactive:

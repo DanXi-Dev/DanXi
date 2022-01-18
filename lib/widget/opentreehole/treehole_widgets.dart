@@ -666,9 +666,9 @@ class OTMessageItem extends StatelessWidget {
 }
 
 class OTSearchWidget extends StatelessWidget {
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
-  const OTSearchWidget({Key? key, required this.focusNode}) : super(key: key);
+  const OTSearchWidget({Key? key, this.focusNode}) : super(key: key);
 
   _goToPIDResultPage(BuildContext context, int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
