@@ -138,13 +138,13 @@ class FudanDailyFeature extends Feature {
   void _processForgetTickIssue() {
     showPlatformDialog(
         context: context!,
-        builder: (_) => PlatformAlertDialog(
+        builder: (cxt) => PlatformAlertDialog(
               title: Text(S.of(context!).fatal_error),
               content: Text(S.of(context!).tick_issue_1),
               actions: [
                 PlatformDialogAction(
                     child: Text(S.of(context!).i_see),
-                    onPressed: () => Navigator.of(context!).pop())
+                    onPressed: () => Navigator.of(cxt).pop())
               ],
             ));
   }

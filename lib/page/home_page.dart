@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     showPlatformDialog(
         barrierDismissible: false,
         context: context,
-        builder: (_) => PlatformAlertDialog(
+        builder: (context) => PlatformAlertDialog(
               title: Text(S.of(context).fatal_error),
               content: Text(S.of(context).login_issue_1),
               actions: [

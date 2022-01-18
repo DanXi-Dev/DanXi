@@ -49,7 +49,7 @@ class LanConnectionNotification extends Feature {
           // User needs to download the vpn software. Open an external browser.
           onPressed: () => showPlatformDialog(
               context: context!,
-              builder: (_) => PlatformAlertDialog(
+              builder: (cxt) => PlatformAlertDialog(
                     title:
                         Text(S.of(context!).lan_connection_issue_1_guide_title),
                     content: PostRenderWidget(
@@ -60,7 +60,7 @@ class LanConnectionNotification extends Feature {
                     actions: [
                       PlatformDialogAction(
                         child: Text(S.of(context!).i_see),
-                        onPressed: () => Navigator.of(context!).pop(),
+                        onPressed: () => Navigator.of(cxt).pop(),
                       )
                     ],
                   )),

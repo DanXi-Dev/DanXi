@@ -157,7 +157,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
     }
   }
 
-  void _startShare(TimetableConverter converter) async {
+  void _startShare(BuildContext context, TimetableConverter converter) async {
     // Close the dialog first
     Navigator.of(context).pop();
     if (_table == null) {
@@ -185,13 +185,13 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         .map<Widget>((MapEntry<String, TimetableConverter> e) {
       return PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () => _startShare(e.value),
+          onPressed: () => _startShare(context, e.value),
           child: Text(e.key),
         ),
         material: (_, __) => ListTile(
           title: Text(e.key),
           subtitle: Text(e.value.fileName),
-          onTap: () => _startShare(e.value),
+          onTap: () => _startShare(context, e.value),
         ),
       );
     }).toList();

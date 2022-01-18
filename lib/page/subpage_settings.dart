@@ -289,9 +289,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                   controller: widget.primaryScrollController(context),
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: <Widget>[
-                    AutoBannerAdWidget(
-                      bannerAd: myBanner,
-                    ),
+                    AutoBannerAdWidget(bannerAd: myBanner),
                     //Account Selection
                     Card(
                       child: Column(children: <Widget>[
@@ -772,7 +770,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
 
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (context) => AlertDialog(
             title: Text(S.of(context).fduhole_clean_mode),
             content: Column(
               mainAxisSize: MainAxisSize.min,

@@ -301,8 +301,8 @@ class _LoginDialogState extends State<LoginDialog> {
   _showSwitchGroupModal() {
     return showPlatformModalSheet(
         context: context,
-        builder: (_) => PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheet(
+        builder: (context) => PlatformWidget(
+              cupertino: (_, __) => CupertinoActionSheet(
                 actions: _buildLoginAsList(),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),

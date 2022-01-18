@@ -154,16 +154,15 @@ class _OTTitleState extends State<OTTitle> {
         onPointerUp: (PointerUpEvent details) {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
               OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty) {
-            Widget content = Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                    shrinkWrap: true,
-                    primary: false,
-                    children: _buildDivisionOptionsList(context)));
-
             showPlatformModalSheet(
                 context: context,
                 builder: (BuildContext context) {
+                  Widget content = Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ListView(
+                          shrinkWrap: true,
+                          primary: false,
+                          children: _buildDivisionOptionsList(context)));
                   if (PlatformX.isCupertino(context)) {
                     return SafeArea(child: Card(child: content));
                   } else {
