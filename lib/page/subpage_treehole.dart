@@ -271,7 +271,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
       GlobalKey<RefreshIndicatorState>();
 
   String? _tagFilter;
-  final FocusNode _searchFocus = FocusNode();
   PostsType _postsType = PostsType.NORMAL_POSTS;
 
   final PagedListViewController<OTHole> listViewController =
@@ -535,7 +534,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                     children: [
                       AutoBannerAdWidget(bannerAd: bannerAd),
                       if (_postsType == PostsType.NORMAL_POSTS) ...[
-                        OTSearchWidget(focusNode: _searchFocus),
+                        const OTSearchWidget(),
                         _autoSilenceNotice(),
                         _autoAdminNotice(),
                         _autoPinnedPosts(),
