@@ -216,7 +216,9 @@ class _HomeSubpageState extends State<HomeSubpage>
     ];
     _widgets.addAll(_notifications.map((e) => FeatureCardItem(
           feature: e,
-          onDismissed: () => _notifications.remove(e),
+          onDismissed: () {
+            removeNotification(e);
+          },
         )));
     List<Widget> _currentCardChildren = [];
     for (var element in widgetSequence) {
