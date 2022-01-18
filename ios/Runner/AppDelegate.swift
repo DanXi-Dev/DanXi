@@ -52,6 +52,10 @@ import WatchConnectivity
         channel.invokeMethod("upload_apns_token", arguments: ["token": token])
     }
     
+    override func applicationWillResignActive(_ application: UIApplication) {
+        UIApplication.shared.applicationIconBadgeNumber = 0
+    }
+    
     
     override func application(_ application: UIApplication,
                               didFailToRegisterForRemoteNotificationsWithError
