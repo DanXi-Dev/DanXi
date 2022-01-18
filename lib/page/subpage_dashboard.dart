@@ -201,7 +201,6 @@ class _HomeSubpageState extends State<HomeSubpage>
     _notifications.add(feature);
     refreshSelf();
   }
-
   void removeNotification(Feature feature) {
     _notifications.removeWhere((element) =>
         feature.runtimeType.toString() == element.runtimeType.toString());

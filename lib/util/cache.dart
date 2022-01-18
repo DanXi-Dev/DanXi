@@ -26,7 +26,7 @@ class Cache {
   /// [fetch] it from remote (usually from network), [encode] it and save it locally.
   ///
   /// Finally, return the cached data.
-  static Future<T> get<T>(String key, Future<T> Function() fetch,
+  static Future<T?> get<T>(String key, Future<T> Function() fetch,
       T Function(String? cachedValue) decode, String Function(T object) encode,
       {bool Function(String cachedValue)? validate}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -52,7 +52,7 @@ class Cache {
   /// Get a cached data.
   ///
   /// But network goes first.
-  static Future<T> getRemotely<T>(String key, Future<T> Function() fetch,
+  static Future<T?> getRemotely<T>(String key, Future<T> Function() fetch,
       T Function(String? cachedValue) decode, String Function(T object) encode,
       {bool Function(T value)? validate}) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
