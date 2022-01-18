@@ -26,6 +26,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -219,7 +220,10 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                 progressDialog.dismiss();
               } catch (error) {
                 progressDialog.dismiss();
-                Noticing.showNotice(context, error.toString(),
+                Noticing.showNotice(
+                    context,
+                    ErrorPageWidget.generateUserFriendlyDescription(
+                        S.of(context), error),
                     title: S.of(context).fatal_error);
               }
             }),

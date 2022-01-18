@@ -249,8 +249,9 @@ class _ExamListState extends State<ExamList> {
           BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
       ErrorPageWidget(
         errorMessage: S.of(context).failed +
-            '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
-            snapshot.error.toString(),
+            '\n${S.of(context).need_campus_network}\n\nError:\n' +
+            ErrorPageWidget.generateUserFriendlyDescription(
+                S.of(context), snapshot.error),
         error: snapshot.error,
         trace: snapshot.stackTrace,
         onTap: () => setState(() {

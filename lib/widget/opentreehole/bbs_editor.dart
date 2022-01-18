@@ -31,6 +31,7 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -61,10 +62,8 @@ class BBSEditor {
         .newHole(divisionId, content!.text, tags: content.tags)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
-      if (error is DioError) {
-        error = error.message + '\n' + (error.response?.data?.toString() ?? "");
-      }
-      Noticing.showNotice(context, error.toString(),
+      Noticing.showNotice(context,
+          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
           title: S.of(context).post_failed, useSnackBar: false);
       return -1;
     });
@@ -96,14 +95,9 @@ class BBSEditor {
         .newFloor(discussionId, content)
         .onError((dynamic error, stackTrace) {
       progressDialog.dismiss(showAnim: false);
-      if (error is DioError) {
-        Noticing.showNotice(context,
-            error.message + '\n' + (error.response?.data?.toString() ?? ""),
-            title: S.of(context).reply_failed(error.type), useSnackBar: false);
-      } else {
-        Noticing.showNotice(context, S.of(context).reply_failed(error),
-            title: S.of(context).fatal_error, useSnackBar: false);
-      }
+      Noticing.showNotice(context,
+          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
+          title: S.of(context).reply_failed, useSnackBar: false);
       return -1;
     });
     progressDialog.dismiss(showAnim: false);
@@ -131,14 +125,9 @@ class BBSEditor {
     await OpenTreeHoleRepository.getInstance()
         .modifyFloor(content, postId)
         .onError((dynamic error, stackTrace) {
-      if (error is DioError) {
-        Noticing.showNotice(context,
-            error.message + '\n' + (error.response?.data?.toString() ?? ""),
-            title: S.of(context).reply_failed(error.type), useSnackBar: false);
-      } else {
-        Noticing.showNotice(context, S.of(context).reply_failed(error),
-            title: S.of(context).fatal_error, useSnackBar: false);
-      }
+      Noticing.showNotice(context,
+          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
+          title: S.of(context).reply_failed, useSnackBar: false);
       return -1;
     });
     StateProvider.editorCache.remove(object);
@@ -152,15 +141,15 @@ class BBSEditor {
         ?.text;
     if (content == null || content.trim() == "") return;
 
-    int? responseCode =
-        await OpenTreeHoleRepository.getInstance().reportPost(postId, content);
-    if (responseCode == null || responseCode >= 400) {
-      Noticing.showNotice(
-          context, S.of(context).report_failed(responseCode ?? "?"),
-          title: S.of(context).fatal_error, useSnackBar: false);
-    } else {
+    try {
+      int? responseCode = await OpenTreeHoleRepository.getInstance()
+          .reportPost(postId, content);
       StateProvider.editorCache.remove(object);
       Noticing.showNotice(context, S.of(context).report_success);
+    } catch (error) {
+      Noticing.showNotice(context,
+          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
+          title: S.of(context).report_failed, useSnackBar: false);
     }
   }
 

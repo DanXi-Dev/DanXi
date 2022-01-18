@@ -31,6 +31,7 @@ import 'package:dan_xi/util/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
@@ -386,7 +387,10 @@ class OTFloorMentionWidget extends StatelessWidget {
                           progressDialog.dismiss();
                         } catch (e) {
                           progressDialog.dismiss();
-                          Noticing.showNotice(context, e.toString(),
+                          Noticing.showNotice(
+                              context,
+                              ErrorPageWidget.generateUserFriendlyDescription(
+                                  S.of(context), e),
                               title: S.of(context).fatal_error);
                         }
                       },
@@ -504,7 +508,10 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         .likeFloor(floor.floor_id!, floor.liked!);
                     setState(() {});
                   } catch (e) {
-                    Noticing.showNotice(context, e.toString(),
+                    Noticing.showNotice(
+                        context,
+                        ErrorPageWidget.generateUserFriendlyDescription(
+                            S.of(context), e),
                         title: S.of(context).fatal_error);
                   }
                 },
@@ -595,7 +602,10 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         await OpenTreeHoleRepository.getInstance()
                             .deleteFloor(floor.floor_id!);
                       } catch (e) {
-                        Noticing.showNotice(context, e.toString(),
+                        Noticing.showNotice(
+                            context,
+                            ErrorPageWidget.generateUserFriendlyDescription(
+                                S.of(context), e),
                             title: S.of(context).fatal_error);
                       }
                     }
@@ -673,7 +683,10 @@ class OTSearchWidget extends StatelessWidget {
         Noticing.showNotice(context, S.of(context).post_does_not_exist,
             title: S.of(context).fatal_error);
       } else {
-        Noticing.showNotice(context, error.toString(),
+        Noticing.showNotice(
+            context,
+            ErrorPageWidget.generateUserFriendlyDescription(
+                S.of(context), error),
             title: S.of(context).fatal_error);
       }
     }
