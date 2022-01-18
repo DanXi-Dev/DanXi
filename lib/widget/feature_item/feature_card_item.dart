@@ -64,7 +64,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            Row(
+            Wrap(
               children: [
                 widget.feature.icon,
                 const SizedBox(
