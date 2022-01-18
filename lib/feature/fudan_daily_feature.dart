@@ -21,7 +21,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/fudan_app_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -36,7 +35,6 @@ import 'package:permission_handler/permission_handler.dart';
 class FudanDailyFeature extends Feature {
   PersonInfo? _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
-  String? _subTitle;
   bool _hasTicked = true;
 
   //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
@@ -48,16 +46,6 @@ class FudanDailyFeature extends Feature {
         .hasTick(_info)
         .then((bool ticked) {
       _status = ConnectionStatus.DONE;
-
-      if (ticked) {
-        _subTitle = S.of(context!).fudan_daily_ticked;
-      } else {
-        if (SettingsProvider.getInstance().debugMode) {
-          _subTitle = S.of(context!).fudan_daily_tick;
-        } else {
-          _subTitle = S.of(context!).fudan_daily_tick_link;
-        }
-      }
       _hasTicked = ticked;
       notifyUpdate();
     });
@@ -71,30 +59,13 @@ class FudanDailyFeature extends Feature {
         if (e is NotTickYesterdayException) {
           _processForgetTickIssue();
         } else {
-          _subTitle = S.of(context!).tick_failed;
+          _status = ConnectionStatus.FATAL_ERROR;
           notifyUpdate();
           Noticing.showNotice(context!, S.of(context!).tick_failed);
         }
       });
     }
   }
-
-  /*void startCountdown() {
-    _subTitle = S.of(context).fudan_daily_tick_countdown(_countdownRemainingTime.toString());
-    notifyUpdate();
-    Timer(Duration(seconds: 1), handleTimeout);
-  }
-
-  void handleTimeout() {  // callback function
-    if (_countdownRemainingTime == 0) {
-      tickFudanDaily();
-      _countdownRemainingTime = -2;
-    }
-    else if (_countdownRemainingTime != -2) {
-      _countdownRemainingTime--;
-      startCountdown();
-    }
-  }*/
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
@@ -104,10 +75,9 @@ class FudanDailyFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _subTitle = S.of(context!).loading;
+      _status = ConnectionStatus.CONNECTING;
       _loadTickStatus().catchError((error) {
         _status = ConnectionStatus.FAILED;
-        _subTitle = S.of(context!).failed;
         notifyUpdate();
       });
     }
@@ -117,13 +87,28 @@ class FudanDailyFeature extends Feature {
   String get mainTitle => S.of(context!).fudan_daily;
 
   @override
-  String? get subTitle => _subTitle;
+  String? get subTitle {
+    switch (_status) {
+      case ConnectionStatus.NONE:
+      case ConnectionStatus.CONNECTING:
+        return S.of(context!).loading;
+      case ConnectionStatus.FAILED:
+        return S.of(context!).failed;
+      case ConnectionStatus.FATAL_ERROR:
+        return S.of(context!).tick_failed;
+      case ConnectionStatus.DONE:
+        if (_hasTicked) {
+          return S.of(context!).fudan_daily_ticked;
+        }
+        return S.of(context!).fudan_daily_tick_link;
+    }
+  }
 
   @override
   Widget? get customSubtitle => _hasTicked
       ? null
       : Text(
-    S.of(context!).fudan_daily_tick_link,
+          S.of(context!).fudan_daily_tick_link,
           style: const TextStyle(color: Colors.red),
         );
 
@@ -149,28 +134,9 @@ class FudanDailyFeature extends Feature {
             ));
   }
 
-  /*bool get shouldAutomaticallyTickToday {
-    DateTime now = new DateTime.now();
-    DateTime todayDate = new DateTime(now.year, now.month, now.day);
-    return SettingsProvider.of(_preferences).autoTickCancelDate !=
-        todayDate.toString();
-  }
-
-  set shouldAutomaticallyTickToday(bool value) {
-    DateTime now = new DateTime.now();
-    DateTime todayDate = new DateTime(now.year, now.month, now.day);
-    if (value) {
-      SettingsProvider.of(_preferences).autoTickCancelDate = "";
-    } else {
-      SettingsProvider.of(_preferences).autoTickCancelDate =
-          todayDate.toString();
-    }
-  }*/
-
   /// Restart the loading process
   void refreshData() {
     _status = ConnectionStatus.NONE;
-    _subTitle = S.of(context!).loading;
     notifyUpdate();
   }
 
@@ -178,36 +144,22 @@ class FudanDailyFeature extends Feature {
   void onTap() async {
     switch (_status) {
       case ConnectionStatus.DONE:
-        // If it's counting down, we'll cancel it
-        /*if (_countdownRemainingTime >= 0) {
-          _countdownRemainingTime = -2;
-          _subTitle = S.of(context).fudan_daily_tick;
-          //Don't try to tick again today
-          shouldAutomaticallyTickToday = false;
-          notifyUpdate();
-        } else {
-          tickFudanDaily();
-        }*/
-        if (SettingsProvider.getInstance().debugMode) {
-          tickFudanDaily();
-        } else {
-          if (PlatformX.isMobile) {
-            // Request Location Permission
-            if (await Permission.locationWhenInUse.request() !=
-                PermissionStatus.granted) {
-              Noticing.showNotice(
-                  context!, S.of(context!).location_permission_denied_promot);
-              return;
-            }
+        if (PlatformX.isMobile) {
+          // Request Location Permission
+          if (await Permission.locationWhenInUse.request() !=
+              PermissionStatus.granted) {
+            Noticing.showNotice(
+                context!, S.of(context!).location_permission_denied_promot);
+            return;
           }
-          BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
-              context, FudanCOVID19Repository.getInstance().thisCookies);
         }
+        BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
+            context, FudanCOVID19Repository.getInstance().thisCookies);
         break;
+      case ConnectionStatus.FATAL_ERROR:
       case ConnectionStatus.FAILED:
         refreshData();
         break;
-      case ConnectionStatus.FATAL_ERROR:
       case ConnectionStatus.CONNECTING:
       case ConnectionStatus.NONE:
         break;
