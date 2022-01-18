@@ -177,7 +177,7 @@ class _ExamListState extends State<ExamList> {
           child: PlatformCircularProgressIndicator(),
         ),
         errorBuilder: () => _loadGradeView());
-    List<Widget> mainWidgets = [
+    final List<Widget> mainWidgets = [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

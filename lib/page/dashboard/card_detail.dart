@@ -106,8 +106,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
                       : CupertinoIcons.hourglass;
                   _selectable = false;
                 });
-                _cardInfo!.records = await Retrier.runAsyncWithRetryForever(
-                        () => CardRepository.getInstance()
+                _cardInfo!.records = await Retrier.runAsyncWithRetry(() =>
+                    CardRepository.getInstance()
                         .loadCardRecord(_tagDays[index]));
                 setState(() {
                   tag.checkedIcon = PlatformX.isMaterial(context)
@@ -139,7 +139,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
       for (var element in _cardInfo!.records!) {
         widgets.add(Material(
             child: ListTile(
-              // leading: PlatformX.isMaterial(context)
+          // leading: PlatformX.isMaterial(context)
           //     ? Icon(Icons.monetization_on)
           //     : Icon(CupertinoIcons.money_dollar_circle_fill),
           title: Text(element.location),

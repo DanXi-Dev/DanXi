@@ -68,9 +68,10 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   }
 
   /// Rebuild everything and refresh itself.
-  void refreshSelf({scrollToEnd = false}) {
+  Future<void> refreshSelf({scrollToEnd = false}) async {
     if (scrollToEnd) _listViewController.queueScrollToEnd();
-    _listViewController.notifyUpdate(useInitialData: false);
+    await _listViewController.notifyUpdate(
+        useInitialData: false, queueDataClear: true);
   }
 
   @override
@@ -98,7 +99,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            refreshSelf();
+            await refreshSelf();
           },
           child: Material(
               child: PagedListView<OTMessage>(
