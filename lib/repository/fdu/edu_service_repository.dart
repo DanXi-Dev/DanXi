@@ -65,7 +65,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>> loadExamListRemotely(PersonInfo? info,
+  Future<List<Exam>?> loadExamListRemotely(PersonInfo? info,
           {String? semesterId}) =>
       Retrier.tryAsyncWithFix(
           () => _loadExamList(semesterId: semesterId),
@@ -78,7 +78,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               orElse: () => Cookie("semester.id", ""))
           .value;
 
-  Future<List<Exam>> _loadExamList({String? semesterId}) async {
+  Future<List<Exam>?> _loadExamList({String? semesterId}) async {
     String? oldSemesterId = await semesterIdFromCookie;
     // Set the semester id
     if (semesterId != null) {
@@ -140,13 +140,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load the semesters id & name, etc.
   ///
   /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>> loadSemesters(PersonInfo? info) =>
+  Future<List<SemesterInfo>?> loadSemesters(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadSemesters(),
-              (exception) => UISLoginTool.fixByLoginUIS(
+          (exception) => UISLoginTool.fixByLoginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
-  Future<List<SemesterInfo>> _loadSemesters() async {
+  Future<List<SemesterInfo>?> _loadSemesters() async {
     await dio!
         .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
     final Response semesterResponse = await dio!.post(SEMESTER_DATA_URL,

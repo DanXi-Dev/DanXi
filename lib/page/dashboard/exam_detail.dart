@@ -158,9 +158,9 @@ class _ExamListState extends State<ExamList> {
   Future<void> loadExamAndScore() async {
     _examData.clear();
     _cachedScoreData = null;
-    _examData = await EduServiceRepository.getInstance().loadExamListRemotely(
+    _examData = (await EduServiceRepository.getInstance().loadExamListRemotely(
         _info,
-        semesterId: _unpackedSemester![semester!].semesterId);
+        semesterId: _unpackedSemester![semester!].semesterId))!;
     _cachedScoreData = await EduServiceRepository.getInstance()
         .loadExamScoreRemotely(_info,
             semesterId: _unpackedSemester![semester!].semesterId);
@@ -177,7 +177,7 @@ class _ExamListState extends State<ExamList> {
           child: PlatformCircularProgressIndicator(),
         ),
         errorBuilder: () => _loadGradeView());
-    return ListView(
+    return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -249,9 +249,8 @@ class _ExamListState extends State<ExamList> {
           BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
       ErrorPageWidget(
         errorMessage: S.of(context).failed +
-            '\n${S.of(context).need_campus_network}\n\nError:\n' +
-            ErrorPageWidget.generateUserFriendlyDescription(
-                S.of(context), snapshot.error),
+            '\n${S.of(context).need_campus_network}\n\nThe error was:\n' +
+            snapshot.error.toString(),
         error: snapshot.error,
         trace: snapshot.stackTrace,
         onTap: () => setState(() {
