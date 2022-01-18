@@ -21,6 +21,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
 import 'package:dan_xi/util/dio_utils.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/dio_log.dart';
@@ -66,6 +67,7 @@ class UISLoginTool {
         receiveTimeout: 5000,
         sendTimeout: 5000);
     NonpersistentCookieJar workJar = NonpersistentCookieJar.createFrom(jar);
+    workDio.interceptors.add(UserAgentInterceptor());
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
 

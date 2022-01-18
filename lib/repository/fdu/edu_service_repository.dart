@@ -143,7 +143,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<SemesterInfo>?> loadSemesters(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(
           () => _loadSemesters(),
-          (exception) => UISLoginTool.fixByLoginUIS(
+              (exception) => UISLoginTool.fixByLoginUIS(
               dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
 
   Future<List<SemesterInfo>?> _loadSemesters() async {
