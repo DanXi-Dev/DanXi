@@ -684,15 +684,17 @@ class _BBSSubpageState extends State<BBSSubpage>
                             size: infoStyle.fontSize, color: infoStyle.color),
                         const SizedBox(width: 4),*/
                         Text("${postElement.reply} ", style: infoStyle),
-                        Icon(CupertinoIcons.ellipses_bubble,
-                            size: infoStyle.fontSize, color: infoStyle.color),
+                        Icon(
+                            PlatformX.isMaterial(context)
+                                ? Icons.sms_outlined
+                                : CupertinoIcons.ellipses_bubble,
+                            size: infoStyle.fontSize,
+                            color: infoStyle.color),
                       ]),
                     ]),
               ]),
-              onTap: () =>
-                  smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                    "post": postElement,
-                  })),
+              onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
+                  arguments: {"post": postElement})),
           if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
               postElement.floors?.last_floor !=
                   postElement.floors?.first_floor) ...[
@@ -716,7 +718,9 @@ class _BBSSubpageState extends State<BBSSubpage>
             ? Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Icon(
-                  CupertinoIcons.quote_bubble,
+                  PlatformX.isMaterial(context)
+                      ? Icons.sms_outlined
+                      : CupertinoIcons.quote_bubble,
                   color: Theme.of(context).hintColor,
                 ),
               )
