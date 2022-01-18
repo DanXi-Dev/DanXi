@@ -117,12 +117,13 @@ class _HomeSubpageState extends State<HomeSubpage>
             isRefreshQueued = false;
             refreshSelf();
           } else {
-            _rebuild();
+            _rebuildFeatures();
             refreshSelf();
           }
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(0); // 0 for main page
+    _rebuildFeatures();
   }
 
   void checkConnection() {
@@ -136,14 +137,14 @@ class _HomeSubpageState extends State<HomeSubpage>
   }
 
   @override
-  void didChangeDependencies() {
-    _rebuild();
-    super.didChangeDependencies();
+  void didUpdateWidget(HomeSubpage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _rebuildFeatures();
   }
 
   /// This function refreshes the content of Dashboard
   /// Call this when new (online) data should be loaded.
-  void _rebuild() {
+  void _rebuildFeatures() {
     checkConnection();
     widgetMap = {
       'welcome_feature': FeatureListItem(
@@ -201,6 +202,7 @@ class _HomeSubpageState extends State<HomeSubpage>
     _notifications.add(feature);
     refreshSelf();
   }
+
   void removeNotification(Feature feature) {
     _notifications.removeWhere((element) =>
         feature.runtimeType.toString() == element.runtimeType.toString());
@@ -214,10 +216,8 @@ class _HomeSubpageState extends State<HomeSubpage>
       )
     ];
     _widgets.addAll(_notifications.map((e) => FeatureCardItem(
-          feature: e,
-          onDismissed: () {
-            removeNotification(e);
-          },
+      feature: e,
+          onDismissed: () => removeNotification(e),
         )));
     List<Widget> _currentCardChildren = [];
     for (var element in widgetSequence) {
@@ -271,7 +271,7 @@ class _HomeSubpageState extends State<HomeSubpage>
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
-              _rebuild();
+              _rebuildFeatures();
               refreshSelf();
             },
             child: Material(

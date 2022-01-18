@@ -309,8 +309,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    // Init for firebase services.
-    // FirebaseHandler.initFirebase();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
       if (StateProvider.personInfo.value != null) {

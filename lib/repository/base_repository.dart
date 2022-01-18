@@ -37,10 +37,9 @@ abstract class BaseRepositoryWithDio {
           connectTimeout: 10000,
           receiveTimeout: 10000,
           sendTimeout: 10000);
-
+      _dios[linkHost]!.interceptors.add(UserAgentInterceptor());
       _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
-      _dios[linkHost]!.interceptors.add(UserAgentInterceptor());
     }
     return _dios[linkHost];
   }
