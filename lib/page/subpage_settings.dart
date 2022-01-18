@@ -240,7 +240,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     onTapListener(Campus campus) {
       SettingsProvider.getInstance().campus = campus;
       Navigator.of(context).pop();
+      dashboardPageKey.currentState?.rebuildFeatures();
       dashboardPageKey.currentState?.setState(() {});
+      ;
       refreshSelf();
     }
 
@@ -675,8 +677,9 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                       }
                                       settingsPageKey.currentState
                                           ?.setState(() {});
-                                      treeholePageKey.currentState
-                                          ?.setState(() {});
+                                      treeholePageKey
+                                          .currentState?.listViewController
+                                          .notifyUpdate();
                                     } finally {
                                       progressDialog.dismiss(showAnim: false);
                                     }

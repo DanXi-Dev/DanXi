@@ -73,8 +73,8 @@ void sendFduholeTokenToWatch(String? token) {
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
-GlobalKey<State<BBSSubpage>> treeholePageKey = GlobalKey();
-GlobalKey<State<HomeSubpage>> dashboardPageKey = GlobalKey();
+GlobalKey<TreeHoleSubpageState> treeholePageKey = GlobalKey();
+GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
 GlobalKey<State<TimetableSubPage>> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
 
@@ -84,10 +84,10 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences? _preferences;
 
   /// Listener to the failure of logging in caused by different reasons.
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _subpage = [
       HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
-        BBSSubpage(key: treeholePageKey),
+        TreeHoleSubpage(key: treeholePageKey),
       TimetableSubPage(key: timetablePageKey),
       SettingsSubpage(key: settingsPageKey),
     ];
@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     .compareTo(const Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
-          dashboardPageKey.currentState?.setState(() {});
+          dashboardPageKey.currentState?.rebuildFeatures();
         }
         break;
       case AppLifecycleState.inactive:

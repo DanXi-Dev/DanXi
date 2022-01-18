@@ -55,7 +55,7 @@ import 'package:provider/provider.dart';
 
 class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   @override
-  _HomeSubpageState createState() => _HomeSubpageState();
+  HomeSubpageState createState() => HomeSubpageState();
 
   HomeSubpage({Key? key}) : super(key: key);
 
@@ -95,7 +95,7 @@ class RefreshHomepageEvent {
   RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
 }
 
-class _HomeSubpageState extends State<HomeSubpage>
+class HomeSubpageState extends State<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
   static final StateStreamListener<RefreshHomepageEvent> _refreshSubscription =
       StateStreamListener();
@@ -117,13 +117,13 @@ class _HomeSubpageState extends State<HomeSubpage>
             isRefreshQueued = false;
             refreshSelf();
           } else {
-            _rebuildFeatures();
+            rebuildFeatures();
             refreshSelf();
           }
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(0); // 0 for main page
-    _rebuildFeatures();
+    rebuildFeatures();
   }
 
   void checkConnection() {
@@ -139,12 +139,12 @@ class _HomeSubpageState extends State<HomeSubpage>
   @override
   void didUpdateWidget(HomeSubpage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _rebuildFeatures();
+    //_rebuildFeatures();
   }
 
   /// This function refreshes the content of Dashboard
   /// Call this when new (online) data should be loaded.
-  void _rebuildFeatures() {
+  void rebuildFeatures() {
     checkConnection();
     widgetMap = {
       'welcome_feature': FeatureListItem(
@@ -216,7 +216,7 @@ class _HomeSubpageState extends State<HomeSubpage>
       )
     ];
     _widgets.addAll(_notifications.map((e) => FeatureCardItem(
-      feature: e,
+          feature: e,
           onDismissed: () => removeNotification(e),
         )));
     List<Widget> _currentCardChildren = [];
@@ -271,7 +271,7 @@ class _HomeSubpageState extends State<HomeSubpage>
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
-              _rebuildFeatures();
+              rebuildFeatures();
               refreshSelf();
             },
             child: Material(

@@ -422,11 +422,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<OTUser?> updateUserProfile() async {
-    try {
-      final Response response = await dio!.put(_BASE_URL + "/users",
-          data: _userInfo!.toJson(), options: Options(headers: _tokenHeader));
-      _userInfo = OTUser.fromJson(response.data);
-    } catch (_) {}
+    final Response response = await dio!.put(_BASE_URL + "/users",
+        data: _userInfo!.toJson(), options: Options(headers: _tokenHeader));
+    _userInfo = OTUser.fromJson(response.data);
     return _userInfo;
   }
 

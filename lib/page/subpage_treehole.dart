@@ -174,13 +174,14 @@ class _OTTitleState extends State<OTTitle> {
   }
 }
 
-class BBSSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
+class TreeHoleSubpage extends PlatformSubpage
+    with PageWithPrimaryScrollController {
   final Map<String, dynamic>? arguments;
 
   @override
-  _BBSSubpageState createState() => _BBSSubpageState();
+  TreeHoleSubpageState createState() => TreeHoleSubpageState();
 
-  BBSSubpage({Key? key, this.arguments}) : super(key: key);
+  TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
 
   @override
   String get debugTag => "BBSPage";
@@ -256,7 +257,7 @@ enum PostsType { FAVORED_DISCUSSION, FILTER_BY_TAG, NORMAL_POSTS }
 /// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
 /// the posts which is tagged with [tagFilter].
 ///
-class _BBSSubpageState extends State<BBSSubpage>
+class TreeHoleSubpageState extends State<TreeHoleSubpage>
     with AutomaticKeepAliveClientMixin {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
@@ -266,14 +267,14 @@ class _BBSSubpageState extends State<BBSSubpage>
       StateStreamListener();
   final StateStreamListener<DivisionChangedEvent> _divisionChangedSubscription =
       StateStreamListener();
-  final GlobalKey<RefreshIndicatorState> _indicatorKey =
+  final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
   String? _tagFilter;
   final FocusNode _searchFocus = FocusNode();
   PostsType _postsType = PostsType.NORMAL_POSTS;
 
-  final PagedListViewController<OTHole> _listViewController =
+  final PagedListViewController<OTHole> listViewController =
       PagedListViewController();
 
   final TimeBasedLoadAdaptLayer<OTHole> adaptLayer =
@@ -312,7 +313,7 @@ class _BBSSubpageState extends State<BBSSubpage>
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
-            .generateReceiver(_listViewController, (lastElement) {
+            .generateReceiver(listViewController, (lastElement) {
           DateTime time;
           if (lastElement != null) {
             time = DateTime.parse(lastElement.time_updated!);
@@ -350,7 +351,7 @@ class _BBSSubpageState extends State<BBSSubpage>
             .catchError((error) {});
       }
     } finally {
-      await _listViewController.notifyUpdate();
+      await listViewController.notifyUpdate();
     }
   }
 
@@ -422,14 +423,14 @@ class _BBSSubpageState extends State<BBSSubpage>
           if (event.refreshAll) {
             refreshSelf();
           } else {
-            _indicatorKey.currentState?.show();
+            indicatorKey.currentState?.show();
           }
         }),
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
           StateProvider.divisionId = event.newDivision;
-          _indicatorKey.currentState?.show();
+          indicatorKey.currentState?.show();
         }),
         hashCode);
 
@@ -516,7 +517,7 @@ class _BBSSubpageState extends State<BBSSubpage>
                     image: _backgroundImage!, fit: BoxFit.cover)),
         child: RefreshIndicator(
           edgeOffset: MediaQuery.of(context).padding.top,
-          key: _indicatorKey,
+          key: indicatorKey,
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
@@ -525,7 +526,7 @@ class _BBSSubpageState extends State<BBSSubpage>
           },
           child: PagedListView<OTHole>(
               noneItem: OTHole.DUMMY_POST,
-              pagedController: _listViewController,
+              pagedController: listViewController,
               withScrollbar: true,
               scrollController: widget.primaryScrollController(context),
               startPage: 1,

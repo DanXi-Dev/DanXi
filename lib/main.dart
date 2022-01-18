@@ -154,7 +154,7 @@ class DanxiApp extends StatelessWidget {
     '/dashboard/reorder': (context, {arguments}) =>
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
-        BBSSubpage(arguments: arguments),
+        TreeHoleSubpage(arguments: arguments),
     '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
     '/bbs/fullScreenEditor': (context, {arguments}) =>
         BBSEditorPage(arguments: arguments),

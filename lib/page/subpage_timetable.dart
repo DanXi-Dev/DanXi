@@ -220,6 +220,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
                   ));
         }),
         hashCode);
+    _setContent();
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
@@ -231,18 +232,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
 
     await _contentFuture;
     setState(() {});
-  }
-
-  @override
-  void didChangeDependencies() {
-    _setContent();
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(covariant TimetableSubPage oldWidget) {
-    _setContent();
-    super.didUpdateWidget(oldWidget);
   }
 
   @override

@@ -124,11 +124,12 @@ class Noticing {
     if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
     Widget content = Padding(
       padding: const EdgeInsets.all(16.0),
-      child: ListTile(
-          title: Text(title),
-          subtitle: Linkify(
-            text: message,
-          )),
+      child: SingleChildScrollView(
+          child: ListTile(
+              title: Text(title),
+              subtitle: Linkify(
+                text: message,
+              ))),
     );
     Widget body;
     if (PlatformX.isCupertino(context)) {
