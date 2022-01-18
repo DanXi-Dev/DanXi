@@ -56,16 +56,15 @@ class _BBSHiddenTagsPreferencePageState
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: false,
-      iosContentPadding: true,
+      iosContentPadding: false,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).fduhole_hidden_tags_title),
       ),
-      body: MediaQuery.removePadding(
-        removeTop: true,
-        context: context,
-        // TODO: it is ugly to copy the logic of [FlutterTagging] from [_BBSEditorWidgetState].
-        //  Consider packing it later.
-        child: ThemedMaterial(
+      body: SafeArea(
+        child:
+            // TODO: it is ugly to copy the logic of [FlutterTagging] from [_BBSEditorWidgetState].
+            //  Consider packing it later.
+            ThemedMaterial(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: FlutterTagging<OTTag>(

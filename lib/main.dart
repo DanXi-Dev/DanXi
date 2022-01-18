@@ -47,7 +47,10 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:dan_xi/generated/l10n.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -177,8 +180,46 @@ class DanxiApp extends StatelessWidget {
         builder: (BuildContext context) => DynamicThemeController(
           lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
           darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
-          child: const PlatformMasterDetailApp(
-            masterPage: HomePage(),
+          child: MediaQuery(
+            data: MediaQueryData.fromWindow(window),
+            child: PlatformApp(
+              scrollBehavior: MyCustomScrollBehavior(),
+              useInheritedMediaQuery: true,
+              debugShowCheckedModeBanner: false,
+              // Fix cupertino UI text color issues
+              cupertino: (context, __) => CupertinoAppData(
+                  theme: CupertinoThemeData(
+                      textTheme: CupertinoTextThemeData(
+                          textStyle: TextStyle(
+                              color: PlatformX.getTheme(context)
+                                  .textTheme
+                                  .bodyText1!
+                                  .color)))),
+              // Configure i18n delegates
+              localizationsDelegates: const [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              home: const PlatformMasterDetailApp(
+                masterPage: HomePage(),
+              ),
+              // Configure the page route behaviour of the whole app
+              onGenerateRoute: (settings) {
+                final Function? pageContentBuilder =
+                    DanxiApp.routes[settings.name!];
+                if (pageContentBuilder != null) {
+                  return platformPageRoute(
+                      context: context,
+                      builder: (context) => pageContentBuilder(context,
+                          arguments: settings.arguments));
+                }
+                return null;
+              },
+              navigatorKey: Catcher.navigatorKey,
+            ),
           ),
         ),
       ),
