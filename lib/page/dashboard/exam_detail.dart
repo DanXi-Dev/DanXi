@@ -177,31 +177,34 @@ class _ExamListState extends State<ExamList> {
           child: PlatformCircularProgressIndicator(),
         ),
         errorBuilder: () => _loadGradeView());
-    return ListView(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            PlatformIconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: semester! > 0
-                  ? () => setState(() => semester = semester! - 1)
-                  : null,
-            ),
-            Text(S.of(context).semester(
-                _unpackedSemester![semester!].schoolYear ?? "?",
-                _unpackedSemester![semester!].name ?? "?")),
-            PlatformIconButton(
-              icon: const Icon(Icons.chevron_right),
-              onPressed: semester! < _unpackedSemester!.length - 1
-                  ? () => setState(() => semester = semester! + 1)
-                  : null,
-            )
-          ],
-        ),
-        Expanded(child: body)
-      ],
-    );
+    List<Widget> mainWidgets = [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          PlatformIconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: semester! > 0
+                ? () => setState(() => semester = semester! - 1)
+                : null,
+          ),
+          Text(S.of(context).semester(
+              _unpackedSemester![semester!].schoolYear ?? "?",
+              _unpackedSemester![semester!].name ?? "?")),
+          PlatformIconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: semester! < _unpackedSemester!.length - 1
+                ? () => setState(() => semester = semester! + 1)
+                : null,
+          )
+        ],
+      ),
+      Expanded(child: body)
+    ];
+    if (PlatformX.isCupertino(context)) {
+      return ListView(children: mainWidgets);
+    } else {
+      return Column(children: mainWidgets);
+    }
   }
 
   Widget _loadGradeView({bool needReloadScoreData = true}) =>
@@ -451,7 +454,7 @@ class _ExamListState extends State<ExamList> {
                                         .level,
                                     textScaleFactor: 1.2),
                               ));
-                        } catch (ignored) {}
+                        } catch (_) {}
                       }
                       return const SizedBox();
                     },
