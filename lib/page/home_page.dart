@@ -387,7 +387,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               SettingsProvider.getInstance().lastPushToken =
                   call.arguments["token"];
             } catch (e) {
-              print(e);
               Noticing.showNotice(
                   context,
                   S.of(context).push_notification_reg_failed_des(
