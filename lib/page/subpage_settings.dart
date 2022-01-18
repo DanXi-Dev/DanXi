@@ -213,7 +213,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   String? _clearCacheSubtitle;
 
   Future<void> _deleteAllDataAndExit() async {
-    OpenTreeHoleRepository.getInstance().logout();
+    ProgressFuture progressDialog =
+        showProgressDialog(loadingText: S.of(context).logout, context: context);
+    try {
+      await OpenTreeHoleRepository.getInstance().logout();
+    } finally {
+      progressDialog.dismiss(showAnim: false);
+    }
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
