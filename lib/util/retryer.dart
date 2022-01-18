@@ -21,7 +21,9 @@
 class Retrier {
   /// Try to run [function] for [retryTimes] times synchronously.
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
-  static E runWithRetry<E>(E Function() function, {int retryTimes = 3}) {
+  ///
+  /// Note: 2022/1/18 Must specify [retryTimes], or won't retry.
+  static E runWithRetry<E>(E Function() function, {int retryTimes = 0}) {
     Exception? error;
     for (int i = 0; i < retryTimes; i++) {
       try {
@@ -35,8 +37,10 @@ class Retrier {
 
   /// Try to run [function] for [retryTimes] times asynchronously.
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
+  ///
+  /// Note: 2022/1/18 Must specify [retryTimes], or won't retry.
   static Future<E> runAsyncWithRetry<E>(Future<E> Function() function,
-      {int retryTimes = 1}) async {
+      {int retryTimes = 0}) async {
     late Function errorCatcher;
     errorCatcher = (e) async {
       if (retryTimes > 0) {
@@ -50,15 +54,15 @@ class Retrier {
   }
 
   /// Try to run [function] for [retryTimes] times asynchronously.
-  ///
   /// If [function] throws an error, run [tryFix] to fix the problem. Then run the function again.
-  ///
   /// Notes: Any errors thrown by [tryFix] will be ignored.
   ///
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
+  ///
+  /// Note: 2022/1/18 Must specify [retryTimes], or will only retry once.
   static Future<E> tryAsyncWithFix<E>(
       Future<E> Function() function, Future<void> Function(dynamic) tryFix,
-      {int retryTimes = 2}) async {
+      {int retryTimes = 1}) async {
     late Function errorCatcher;
     errorCatcher = (e, stack) async {
       // debugPrintStack(stackTrace: stack);
@@ -79,6 +83,7 @@ class Retrier {
 
   /// Try to run [function] asynchronously, and forever.
   /// Return the results of [function] if it executes successfully. Otherwise, it will be stuck in an infinite loop.
+  @Deprecated("Don't retry forever. Will cause excessive resource comsumption.")
   static Future<E> runAsyncWithRetryForever<E>(
       Future<E> Function() function) async {
     late Function errorCatcher;

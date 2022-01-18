@@ -110,8 +110,6 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
     _historyData ??=
         await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
     Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };

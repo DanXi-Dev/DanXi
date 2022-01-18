@@ -36,7 +36,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   Future<List<ExerciseItem>?> loadExerciseRecords(PersonInfo? info) {
     return Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info),
-        retryTimes: 3);
+        retryTimes: 1);
   }
 
   Future<List<ExerciseItem>?> _loadExerciseRecords(PersonInfo? info) async {

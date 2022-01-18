@@ -43,10 +43,8 @@ class FudanAAORepository extends BaseRepositoryWithDio {
 
   Future<NonpersistentCookieJar?> get thisCookies async {
     // Log in before getting cookies.
-    await Retrier.runAsyncWithRetry(
-            () => UISLoginTool.fixByLoginUIS(
-            dio!, _LOGIN_URL, cookieJar!, _info, true),
-        retryTimes: 3);
+    await Retrier.runAsyncWithRetry(() =>
+        UISLoginTool.fixByLoginUIS(dio!, _LOGIN_URL, cookieJar!, _info, true));
     return cookieJar;
   }
 
@@ -55,7 +53,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
     _info = info;
     return Retrier.tryAsyncWithFix(
         () => _getNotices(type, page),
-            (exception) => UISLoginTool.fixByLoginUIS(
+        (exception) => UISLoginTool.fixByLoginUIS(
             dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
