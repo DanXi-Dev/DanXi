@@ -341,9 +341,13 @@ class _BBSSubpageState extends State<BBSSubpage>
         await OpenTreeHoleRepository.getInstance()
             .getFavoriteHoleId(forceUpdate: true);
       } else if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-        await OpenTreeHoleRepository.getInstance()
-            .loadDivisions(useCache: false);
-        await OpenTreeHoleRepository.getInstance().loadTags(useCache: false);
+        OpenTreeHoleRepository.getInstance()
+            .loadDivisions(useCache: false)
+            .then((value) => setState(() {}))
+            .catchError((error) {});
+        OpenTreeHoleRepository.getInstance()
+            .loadTags(useCache: false)
+            .catchError((error) {});
       }
     } finally {
       await _listViewController.notifyUpdate();
@@ -526,7 +530,7 @@ class _BBSSubpageState extends State<BBSSubpage>
               scrollController: widget.primaryScrollController(context),
               startPage: 1,
               builder: _buildListItem,
-              headBuilder: (_) => Column(
+              headBuilder: (context) => Column(
                     children: [
                       AutoBannerAdWidget(bannerAd: bannerAd),
                       if (_postsType == PostsType.NORMAL_POSTS) ...[
