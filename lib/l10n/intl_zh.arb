@@ -111,7 +111,7 @@
     "logout_question_prompt_title": "确定要退出登录吗？",
     "logout_question_prompt": "所有存储在本地的数据将被删除。",
     "logout_prompt": "重新启动 App 以删除数据",
-    "fduhole_user_id": "用户 ID：{id}",
+    "fduhole_user_id": "已登录 ({id})",
     "windows_auto_start_title":"自动启动",
     "windows_auto_start_description":"在开机启动时自动打开旦夕",
     "windows_auto_start_wait_dialog_title":"等待弹出授权窗口",
