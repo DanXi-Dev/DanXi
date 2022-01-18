@@ -169,6 +169,22 @@ class _LoginDialogState extends State<LoginDialog> {
     return widgets;
   }
 
+  void _executeLogin() {
+    _tryLogin(_nameController.text, _pwdController.text).catchError((e) {
+      if (e is CredentialsInvalidException) {
+        _pwdController.text = "";
+        _errorText = S.of(context).credentials_invalid;
+      } else if (e is CaptchaNeededException) {
+        _errorText = S.of(context).captcha_needed;
+      } else if (e is GeneralLoginFailedException) {
+        _errorText = S.of(context).weak_password;
+      } else {
+        _errorText = S.of(context).connection_failed;
+      }
+      refreshSelf();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var defaultText =
@@ -233,22 +249,7 @@ class _LoginDialogState extends State<LoginDialog> {
                       : const Icon(CupertinoIcons.lock_circle),
                 ),
                 obscureText: true,
-                onSubmitted: (_) {
-                  _tryLogin(_nameController.text, _pwdController.text)
-                      .catchError((e) {
-                    if (e is CredentialsInvalidException) {
-                      _pwdController.text = "";
-                      _errorText = S.of(context).credentials_invalid;
-                    } else if (e is CaptchaNeededException) {
-                      _errorText = S.of(context).captcha_needed;
-                    } else if (e is GeneralLoginFailedException) {
-                      _errorText = S.of(context).weak_password;
-                    } else {
-                      _errorText = S.of(context).connection_failed;
-                    }
-                    refreshSelf();
-                  });
-                },
+                onSubmitted: (_) => _executeLogin(),
               ),
               const SizedBox(
                 height: 24,
@@ -286,22 +287,7 @@ class _LoginDialogState extends State<LoginDialog> {
               }),
         TextButton(
           child: Text(S.of(context).login),
-          onPressed: () {
-            _tryLogin(_nameController.text, _pwdController.text)
-                .catchError((e) {
-              if (e is CredentialsInvalidException) {
-                _errorText = S.of(context).credentials_invalid;
-              } else if (e is CaptchaNeededException) {
-                _errorText = S.of(context).captcha_needed;
-              } else if (e is GeneralLoginFailedException) {
-                _errorText = S.of(context).weak_password;
-              } else {
-                _errorText = S.of(context).connection_failed;
-              }
-              _pwdController.text = "";
-              refreshSelf();
-            });
-          },
+          onPressed: _executeLogin,
         ),
         TextButton(
             onPressed: () {

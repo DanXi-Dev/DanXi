@@ -105,10 +105,11 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
         child: PlatformScaffold(
             material: (_, __) =>
                 MaterialScaffoldData(resizeToAvoidBottomInset: false),
+            cupertino: (_, __) =>
+                CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
             iosContentBottomPadding: false,
             iosContentPadding: false,
             body: SafeArea(
-              bottom: false,
               child: Material(
                 child: AnimatedSwitcher(
                   switchInCurve: Curves.ease,
