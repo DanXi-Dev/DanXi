@@ -233,9 +233,9 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
           state: state,
         ),
         putInStack: false);
-    bool registered =
+    bool? registered =
         await OpenTreeHoleRepository.getInstance().checkRegisterStatus(email);
-    if (registered) {
+    if (registered!) {
       state.jumpTo(OTEmailPasswordLoginWidget(
         state: state,
       ));

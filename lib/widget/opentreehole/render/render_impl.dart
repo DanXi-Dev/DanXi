@@ -135,7 +135,7 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
     return OTFloorMentionWidget(
         future: OpenTreeHoleRepository.getInstance()
             .loadSpecificHole(int.parse(element.textContent))
-            .then((value) => value.floors!.first_floor!));
+            .then((value) => value?.floors?.first_floor));
   }
 }
 

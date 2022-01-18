@@ -212,19 +212,20 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               ProgressFuture progressDialog = showProgressDialog(
                   loadingText: S.of(context).loading, context: context);
               try {
-                final OTHole post = await OpenTreeHoleRepository.getInstance()
+                final OTHole? post = await OpenTreeHoleRepository.getInstance()
                     .loadSpecificHole(e.hole_id!);
                 smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                  "post": post,
+                  "post": post!,
                 });
-                progressDialog.dismiss();
+                progressDialog.dismiss(showAnim: false);
               } catch (error) {
-                progressDialog.dismiss();
+                progressDialog.dismiss(showAnim: false);
                 Noticing.showNotice(
                     context,
                     ErrorPageWidget.generateUserFriendlyDescription(
                         S.of(context), error),
-                    title: S.of(context).fatal_error);
+                    title: S.of(context).fatal_error,
+                    useSnackBar: false);
               }
             }),
       ),

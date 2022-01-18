@@ -127,7 +127,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  Future<bool> checkRegisterStatus(String email) async {
+  Future<bool?> checkRegisterStatus(String email) async {
     Response response = await secureDio.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.generateOneTimeAPIKey(),
@@ -193,7 +193,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return SettingsProvider.getInstance().fduholeToken = response.data["token"];
   }
 
-  Future<String> loginWithUsernamePassword(
+  Future<String?> loginWithUsernamePassword(
       String username, String password) async {
     final Response response = await dio!.post(_BASE_URL + "/login", data: {
       'email': username,
@@ -209,7 +209,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   bool get isUserInitialized => _token != null && _userInfo != null;
 
-  Future<List<OTDivision>> loadDivisions({bool useCache = true}) async {
+  Future<List<OTDivision>?> loadDivisions({bool useCache = true}) async {
     if (_divisionCache.isNotEmpty && useCache) {
       return _divisionCache;
     }
@@ -235,7 +235,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _divisionCache;
   }
 
-  Future<OTDivision> loadSpecificDivision(int divisionId,
+  Future<OTDivision?> loadSpecificDivision(int divisionId,
       {bool useCache = true}) async {
     if (useCache) {
       try {
@@ -254,7 +254,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>> loadHoles(DateTime startTime, int divisionId,
+  Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
       {int length = 10, int prefetchLength = 10, String? tag}) async {
     final Response response = await dio!.get(_BASE_URL + "/holes",
         queryParameters: {
@@ -269,7 +269,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  Future<OTHole> loadSpecificHole(int holeId) async {
+  Future<OTHole?> loadSpecificHole(int holeId) async {
     final Response response = await dio!.get(_BASE_URL + "/holes/$holeId",
         options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data);
@@ -283,7 +283,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return hole;
   }
 
-  Future<OTFloor> loadSpecificFloor(int floorId) async {
+  Future<OTFloor?> loadSpecificFloor(int floorId) async {
     try {
       return _floorCache.lastWhere((element) => element.floor_id == floorId);
     } catch (ignored) {
@@ -296,7 +296,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  Future<List<OTFloor>> loadFloors(OTHole post,
+  Future<List<OTFloor>?> loadFloors(OTHole post,
       {int? startFloor, int length = 10}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         queryParameters: {
@@ -315,7 +315,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return floors;
   }
 
-  Future<List<OTFloor>> loadSearchResults(String? searchString,
+  Future<List<OTFloor>?> loadSearchResults(String? searchString,
       {int? startFloor, int length = 10}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         //queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
@@ -329,7 +329,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map((e) => OTFloor.fromJson(e)).toList();
   }
 
-  Future<List<OTTag>> loadTags({bool useCache = true}) async {
+  Future<List<OTTag>?> loadTags({bool useCache = true}) async {
     if (useCache && _tagCache.isNotEmpty) {
       return _tagCache;
     }
@@ -387,7 +387,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.where((element) => element != null).toList();
   }*/
 
-  Future<OTFloor> likeFloor(int floorId, bool like) async {
+  Future<OTFloor?> likeFloor(int floorId, bool like) async {
     final Response response = await dio!.put(_BASE_URL + "/floors/$floorId",
         data: {
           "like": like ? "add" : "cancel",
@@ -426,7 +426,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _userInfo;
   }
 
-  Future<List<OTMessage>> loadMessages(
+  Future<List<OTMessage>?> loadMessages(
       {bool unreadOnly = true, DateTime? startTime}) async {
     final Response response = await dio!.get(_BASE_URL + "/messages",
         queryParameters: {
@@ -452,11 +452,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _userInfo?.is_admin ?? false;
   }
 
-  Future<List<int>> getFavoriteHoleId({bool forceUpdate = false}) async {
+  Future<List<int>?> getFavoriteHoleId({bool forceUpdate = false}) async {
     return (await getUserProfile(forceUpdate: forceUpdate))!.favorites!;
   }
 
-  Future<List<OTHole>> getFavoriteHoles({
+  Future<List<OTHole>?> getFavoriteHoles({
     int length = 10,
     int prefetchLength = 10,
   }) async {
@@ -503,7 +503,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
-  Future<List<OTReport>> adminGetReports() async {
+  Future<List<OTReport>?> adminGetReports() async {
     final response = await dio!.get(_BASE_URL + "/reports",
         //queryParameters: {"category": page, "show_only_undealt": true},
         options: Options(headers: _tokenHeader));

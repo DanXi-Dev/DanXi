@@ -315,7 +315,7 @@ class OTFloorWidget extends StatelessWidget {
 }
 
 class OTFloorMentionWidget extends StatelessWidget {
-  final Future<OTFloor> future;
+  final Future<OTFloor?> future;
   final bool showBottomBar;
 
   const OTFloorMentionWidget({
@@ -383,14 +383,15 @@ class OTFloorMentionWidget extends StatelessWidget {
                                 "locate": floor.floor_id!,
                                 // TODO: jump to specific floor after push
                               });
-                          progressDialog.dismiss();
+                          progressDialog.dismiss(showAnim: false);
                         } catch (e) {
-                          progressDialog.dismiss();
+                          progressDialog.dismiss(showAnim: false);
                           Noticing.showNotice(
                               context,
                               ErrorPageWidget.generateUserFriendlyDescription(
                                   S.of(context), e),
-                              title: S.of(context).fatal_error);
+                              title: S.of(context).fatal_error,
+                              useSnackBar: false);
                         }
                       },
                       child: Text(S.of(cxt).jump_to_hole),
@@ -413,10 +414,10 @@ class OTFloorMentionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureWidget(
+    return FutureWidget<OTFloor?>(
         future: future,
         successBuilder:
-            (BuildContext context, AsyncSnapshot<OTFloor> snapshot) {
+            (BuildContext context, AsyncSnapshot<OTFloor?> snapshot) {
           return OTFloorWidget(
             floor: snapshot.data!,
             isInMention: true,
@@ -503,15 +504,16 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     setState(() {
                       floor.liked = !floor.liked!;
                     });
-                    floor = await OpenTreeHoleRepository.getInstance()
-                        .likeFloor(floor.floor_id!, floor.liked!);
+                    floor = (await OpenTreeHoleRepository.getInstance()
+                        .likeFloor(floor.floor_id!, floor.liked!))!;
                     setState(() {});
                   } catch (e) {
                     Noticing.showNotice(
                         context,
                         ErrorPageWidget.generateUserFriendlyDescription(
                             S.of(context), e),
-                        title: S.of(context).fatal_error);
+                        title: S.of(context).fatal_error,
+                        useSnackBar: false);
                   }
                 },
               ),
@@ -605,7 +607,8 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                             context,
                             ErrorPageWidget.generateUserFriendlyDescription(
                                 S.of(context), e),
-                            title: S.of(context).fatal_error);
+                            title: S.of(context).fatal_error,
+                            useSnackBar: false);
                       }
                     }
                   },
@@ -671,25 +674,26 @@ class OTSearchWidget extends StatelessWidget {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      final OTHole post =
+      final OTHole? post =
           await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
       smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-        "post": post,
+        "post": post!,
       });
     } catch (error) {
       if (error is DioError &&
           error.response?.statusCode == HttpStatus.notFound) {
         Noticing.showNotice(context, S.of(context).post_does_not_exist,
-            title: S.of(context).fatal_error);
+            title: S.of(context).fatal_error, useSnackBar: false);
       } else {
         Noticing.showNotice(
             context,
             ErrorPageWidget.generateUserFriendlyDescription(
                 S.of(context), error),
-            title: S.of(context).fatal_error);
+            title: S.of(context).fatal_error,
+            useSnackBar: false);
       }
     }
-    progressDialog.dismiss();
+    progressDialog.dismiss(showAnim: false);
   }
 
   @override

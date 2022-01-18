@@ -199,7 +199,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // Replaced precached data with updated ones
       OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
         try {
-          _listViewController.replaceInitialData(value);
+          _listViewController.replaceInitialData(value!);
         } catch (_) {}
       }, onError: (_, __) {});
     });
@@ -436,7 +436,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             "post": await OpenTreeHoleRepository.getInstance()
                 .loadSpecificHole(floor.hole_id!)
           });
-          progressDialog.dismiss();
+          progressDialog.dismiss(showAnim: false);
         }
       },
     );
