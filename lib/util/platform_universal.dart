@@ -51,7 +51,7 @@ class PlatformX {
     String? deviceId;
     try {
       deviceId = await PlatformDeviceId.getDeviceId;
-    } catch (ignored) {}
+    } catch (_) {}
     if (deviceId == null) {
       return const Uuid().v4();
     } else {

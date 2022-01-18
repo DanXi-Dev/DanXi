@@ -33,7 +33,7 @@ class DormElectricityFeature extends Feature {
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
 
-  void _loadData() async {
+  Future<void> _loadData() async {
     _status = ConnectionStatus.CONNECTING;
     try {
       _electricity = await FudanDormRepository.getInstance()

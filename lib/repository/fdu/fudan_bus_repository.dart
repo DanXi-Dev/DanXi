@@ -39,7 +39,7 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
   factory FudanBusRepository.getInstance() => _instance;
 
-  Future<List<BusScheduleItem>> loadBusList(PersonInfo? info,
+  Future<List<BusScheduleItem>?> loadBusList(PersonInfo? info,
       {bool? holiday = false}) {
     return Retrier.tryAsyncWithFix(
         () => _loadBusList(holiday: holiday!),
@@ -47,7 +47,7 @@ class FudanBusRepository extends BaseRepositoryWithDio {
             dio!, _LOGIN_URL, cookieJar!, info, true));
   }
 
-  Future<List<BusScheduleItem>> _loadBusList({bool holiday = false}) async {
+  Future<List<BusScheduleItem>?> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];
     Response r = await dio!.post(_INFO_URL,
         data: FormData.fromMap(
