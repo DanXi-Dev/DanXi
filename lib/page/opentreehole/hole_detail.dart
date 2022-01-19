@@ -172,10 +172,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       // Replaced precached data with updated ones
       OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
-        try {
-          _listViewController.replaceInitialData(value!);
+        tryReplace() {
+          try {
+            _listViewController.replaceInitialData(value!);
+          }
           // It is not a problem if we cannot replace the data
-        } catch (_) {}
+          catch (_) {}
+        }
+
+        // Sleep to wait the slide in animation
+        if (PlatformX.isMaterial(context)) {
+          Future.delayed(const Duration(milliseconds: 250))
+              .then((_) => tryReplace());
+        } else {
+          tryReplace();
+        }
       }, onError: (_) {});
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
