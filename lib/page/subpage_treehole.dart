@@ -763,10 +763,10 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
   }
 
   String processCommentPreview(String content) {
-    if (content.startsWith('\n') ||
-        content.startsWith(RegExp("#{1,2}[0-9]+\\n"))) {
+    if (content.startsWith(RegExp("#{1,2}[0-9]+\\n"))) {
       content = content.substring(content.indexOf('\n') + 1);
     }
+    content.replaceAll('\n', ' ');
     return content;
   }
 

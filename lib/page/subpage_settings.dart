@@ -242,7 +242,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
       Navigator.of(context).pop();
       dashboardPageKey.currentState?.rebuildFeatures();
       dashboardPageKey.currentState?.setState(() {});
-      ;
       refreshSelf();
     }
 
