@@ -345,9 +345,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
             .loadDivisions(useCache: false)
             .then((value) => setState(() {}))
             .catchError((error) {});
-        OpenTreeHoleRepository.getInstance()
-            .loadTags(useCache: false)
-            .catchError((error) {});
       }
     } finally {
       await listViewController.notifyUpdate(
