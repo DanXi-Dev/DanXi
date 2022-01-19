@@ -40,7 +40,6 @@ class SettingsProvider {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_LAST_PUSH_TOKEN = "push_token";
   static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v2";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
@@ -179,7 +178,7 @@ class SettingsProvider {
     preferences!.setString(KEY_PREFERRED_CAMPUS, campus.toString());
   }
 
-  //Push Token
+  /*Push Token
   String? get lastPushToken {
     if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {
       return preferences!.getString(KEY_LAST_PUSH_TOKEN)!;
@@ -188,7 +187,7 @@ class SettingsProvider {
   }
 
   set lastPushToken(String? value) =>
-      preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);
+      preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);*/
 
   //Token
   String? get fduholeToken {
@@ -208,7 +207,7 @@ class SettingsProvider {
 
   void deleteAllFduholeData() {
     preferences!.remove(KEY_FDUHOLE_TOKEN);
-    preferences!.remove(KEY_LAST_PUSH_TOKEN);
+    //preferences!.remove(KEY_LAST_PUSH_TOKEN);
     preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
     preferences!.remove(KEY_FDUHOLE_SORTORDER);
     preferences!.remove(KEY_HIDDEN_HOLE);

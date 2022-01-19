@@ -376,24 +376,19 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               context, call.arguments['code'], map);
           break;
         case "upload_apns_token":
-          if (call.arguments["token"] !=
-              SettingsProvider.getInstance().lastPushToken) {
-            try {
-              await OpenTreeHoleRepository.getInstance()
-                  .updatePushNotificationToken(
-                      call.arguments["token"],
-                      await PlatformX.getUniqueDeviceId(),
-                      PushNotificationServiceType.APNS);
-              SettingsProvider.getInstance().lastPushToken =
-                  call.arguments["token"];
-            } catch (e) {
-              Noticing.showNotice(
-                  context,
-                  S.of(context).push_notification_reg_failed_des(
-                      ErrorPageWidget.generateUserFriendlyDescription(
-                          S.of(context), e)),
-                  title: S.of(context).push_notification_reg_failed);
-            }
+          try {
+            await OpenTreeHoleRepository.getInstance()
+                .updatePushNotificationToken(
+                    call.arguments["token"],
+                    await PlatformX.getUniqueDeviceId(),
+                    PushNotificationServiceType.APNS);
+          } catch (e) {
+            Noticing.showNotice(
+                context,
+                S.of(context).push_notification_reg_failed_des(
+                    ErrorPageWidget.generateUserFriendlyDescription(
+                        S.of(context), e)),
+                title: S.of(context).push_notification_reg_failed);
           }
           break;
         case 'get_token':
@@ -428,22 +423,19 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             if (params is MiPushCommandMessageEntity &&
                 (params.commandArguments?.isNotEmpty ?? false)) {
               String regId = params.commandArguments![0];
-              if (regId != SettingsProvider.getInstance().lastPushToken) {
-                try {
-                  await OpenTreeHoleRepository.getInstance()
-                      .updatePushNotificationToken(
-                          regId,
-                          await PlatformX.getUniqueDeviceId(),
-                          PushNotificationServiceType.MIPUSH);
-                  SettingsProvider.getInstance().lastPushToken = regId;
-                } catch (e) {
-                  Noticing.showNotice(
-                      context,
-                      S.of(context).push_notification_reg_failed_des(
-                          ErrorPageWidget.generateUserFriendlyDescription(
-                              S.of(context), e)),
-                      title: S.of(context).push_notification_reg_failed);
-                }
+              try {
+                await OpenTreeHoleRepository.getInstance()
+                    .updatePushNotificationToken(
+                        regId,
+                        await PlatformX.getUniqueDeviceId(),
+                        PushNotificationServiceType.MIPUSH);
+              } catch (e) {
+                Noticing.showNotice(
+                    context,
+                    S.of(context).push_notification_reg_failed_des(
+                        ErrorPageWidget.generateUserFriendlyDescription(
+                            S.of(context), e)),
+                    title: S.of(context).push_notification_reg_failed);
               }
             }
             break;

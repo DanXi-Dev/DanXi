@@ -68,13 +68,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   PushNotificationRegData? _pushNotificationRegData;
 
   Future<void> logout() async {
-    if (SettingsProvider.getInstance().lastPushToken != null) {
-      if (!isUserInitialized) {
-        if (SettingsProvider.getInstance().fduholeToken == null) {
-          return;
-        } else {
-          _token = SettingsProvider.getInstance().fduholeToken;
-        }
+    if (!isUserInitialized) {
+      if (SettingsProvider.getInstance().fduholeToken == null) {
+        return;
+      } else {
+        _token = SettingsProvider.getInstance().fduholeToken;
       }
       await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     }
