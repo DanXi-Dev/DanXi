@@ -32,7 +32,7 @@ import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
@@ -145,6 +145,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
           _contentFuture = Future.value(
               PostgraduateTimetableRepository.getInstance()
                   .loadTimeTableLocally());
+          // If throw an error, it means we don't have a valid timetable.
         } catch (_) {
           _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
               NotLoginError(S.of(context).postgraduates_need_login)));

@@ -20,7 +20,7 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 
 class FudanDormRepository extends BaseRepositoryWithDio {

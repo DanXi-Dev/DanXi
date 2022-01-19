@@ -18,8 +18,8 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
-import 'package:dan_xi/util/dio_utils.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
@@ -35,7 +35,7 @@ class UISLoginTool {
   ///
   /// Warning: if having logged in, return null.
   static Future<void> fixByLoginUIS(
-      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
+      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     await loginUIS(dio, serviceUrl, jar, info, forceRelogin);
   }
@@ -44,7 +44,7 @@ class UISLoginTool {
   ///
   /// Warning: if having logged in, return null.
   static Future<Response?> loginUIS(
-      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
+      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     dio.interceptors.requestLock.lock();
     Response? result = await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
@@ -57,7 +57,7 @@ class UISLoginTool {
   }
 
   static Future<Response?> _loginUIS(
-      Dio dio, String serviceUrl, NonpersistentCookieJar jar, PersonInfo? info,
+      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
@@ -66,7 +66,7 @@ class UISLoginTool {
         connectTimeout: 5000,
         receiveTimeout: 5000,
         sendTimeout: 5000);
-    NonpersistentCookieJar workJar = NonpersistentCookieJar.createFrom(jar);
+    IndependentCookieJar workJar = IndependentCookieJar.createFrom(jar);
     workDio.interceptors.add(UserAgentInterceptor());
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());

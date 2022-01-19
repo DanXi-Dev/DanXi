@@ -18,8 +18,8 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
-import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
+import 'package:dan_xi/repository/fdu/aao_repository.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -82,7 +82,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
                 title: Text(value.title),
                 subtitle: Text(value.time),
                 onTap: () async {
-                  NonpersistentCookieJar? cookie;
+                  IndependentCookieJar? cookie;
                   if (PlatformX.isMobile) {
                     ProgressFuture progressDialog = showProgressDialog(
                         loadingText: S.of(context).loading, context: context);

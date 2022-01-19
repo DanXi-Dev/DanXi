@@ -19,7 +19,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/retrier.dart';
 
 class QRCodeRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =

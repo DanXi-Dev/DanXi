@@ -21,8 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
-import 'package:dan_xi/util/master_detail_utils.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -45,7 +44,7 @@ class BrowserUtil {
               ios: IOSInAppWebViewOptions(sharedCookiesEnabled: true)));
 
   static openUrl(String url, BuildContext? context,
-      [NonpersistentCookieJar? cookieJar]) async {
+      [IndependentCookieJar? cookieJar]) async {
     // Sanitize URL
     url = Uri.encodeFull(Uri.decodeFull(url));
 

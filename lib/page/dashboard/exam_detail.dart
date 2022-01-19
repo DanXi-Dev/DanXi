@@ -454,6 +454,7 @@ class _ExamListState extends State<ExamList> {
                                         .level,
                                     textScaleFactor: 1.2),
                               ));
+                          // If we cannot find such an element, we will build an empty SizedBox.
                         } catch (_) {}
                       }
                       return const SizedBox();

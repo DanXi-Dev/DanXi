@@ -14,9 +14,9 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:intl/intl.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 /// Create human-readable duration, e.g.: 1 hour ago, 2 days ago
 class HumanDuration {

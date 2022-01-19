@@ -46,6 +46,7 @@ class WelcomeFeature extends Feature {
             celebrationWords[Random().nextInt(celebrationWords.length)];
         return;
       }
+      // It is no problem if we cannot obtain a festival celebration welcome sentence.
     } catch (_) {}
     int time = DateTime.now().hour;
     if (time >= 23 || time <= 4) {

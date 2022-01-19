@@ -22,7 +22,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';

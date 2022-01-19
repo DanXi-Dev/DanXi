@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021  DanXi-Dev
+ *     Copyright (C) 2022  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 import 'package:dio/dio.dart';
 
-/// Useful utils when processing network requests by dio.
+/// Useful utils when processing network requests with dio.
 class DioUtils {
   // ignore: non_constant_identifier_names
   static get NON_REDIRECT_OPTION_WITH_FORM_TYPE {
@@ -41,7 +41,7 @@ class DioUtils {
           });
 
   static Future<Response> processRedirect(Dio dio, Response response) async {
-    //Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
+    // Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&
         response.headers['location']!.isNotEmpty) {

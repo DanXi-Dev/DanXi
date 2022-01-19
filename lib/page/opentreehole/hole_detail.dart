@@ -200,8 +200,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
         try {
           _listViewController.replaceInitialData(value!);
+          // It is not a problem if we cannot replace the data
         } catch (_) {}
-      }, onError: (_, __) {});
+      }, onError: (_) {});
     });
     final bgImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(

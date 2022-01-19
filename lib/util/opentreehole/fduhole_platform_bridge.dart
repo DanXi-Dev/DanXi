@@ -18,7 +18,7 @@
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/services.dart';
 
-class PlatformBridge {
+class FDUHolePlatformBridge {
   static const FDUHOLE_CHANNEL = MethodChannel('fduhole');
 
   static void registerRemoteNotification() {

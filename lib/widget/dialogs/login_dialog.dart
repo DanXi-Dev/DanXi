@@ -17,8 +17,8 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/repository/fdu/card_repository.dart';
-import 'package:dan_xi/repository/fdu/fudan_ehall_repository.dart';
+import 'package:dan_xi/repository/fdu/ecard_repository.dart';
+import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -169,13 +169,13 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 
   void _executeLogin() {
-    _tryLogin(_nameController.text, _pwdController.text).catchError((e) {
-      if (e is CredentialsInvalidException) {
+    _tryLogin(_nameController.text, _pwdController.text).catchError((error) {
+      if (error is CredentialsInvalidException) {
         _pwdController.text = "";
         _errorText = S.of(context).credentials_invalid;
-      } else if (e is CaptchaNeededException) {
+      } else if (error is CaptchaNeededException) {
         _errorText = S.of(context).captcha_needed;
-      } else if (e is GeneralLoginFailedException) {
+      } else if (error is GeneralLoginFailedException) {
         _errorText = S.of(context).weak_password;
       } else {
         _errorText = S.of(context).connection_failed;

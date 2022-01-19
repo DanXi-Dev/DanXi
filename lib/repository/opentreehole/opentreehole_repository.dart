@@ -30,7 +30,7 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/util/platform_bridge.dart';
+import 'package:dan_xi/util/opentreehole/fduhole_platform_bridge.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
@@ -113,7 +113,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
 
     try {
-      PlatformBridge.registerRemoteNotification();
+      FDUHolePlatformBridge.registerRemoteNotification();
     } catch (_) {}
 
     if (_userInfo == null) await getUserProfile(forceUpdate: true);

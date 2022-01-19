@@ -19,7 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/fudan_aao_repository.dart';
+import 'package:dan_xi/repository/fdu/aao_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
@@ -47,7 +47,7 @@ class FudanAAONoticesFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _loadNotices().catchError((e) {
+      _loadNotices().catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });

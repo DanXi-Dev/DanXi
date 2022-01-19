@@ -23,7 +23,7 @@ import 'package:cookie_jar/src/cookie_jar.dart';
 import 'package:cookie_jar/src/serializable_cookie.dart';
 
 /// A copy of [DefaultCookieJar], but with an independent cookie storage.
-class NonpersistentCookieJar implements CookieJar {
+class IndependentCookieJar implements CookieJar {
   /// A array to save cookies.
   ///
   /// [domains[0]] save the cookies with "domain" attribute.
@@ -46,7 +46,7 @@ class NonpersistentCookieJar implements CookieJar {
     <String?, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
-  NonpersistentCookieJar({this.ignoreExpires = false});
+  IndependentCookieJar({this.ignoreExpires = false});
 
   Map<String?, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
       _cookies[0];
@@ -163,10 +163,10 @@ class NonpersistentCookieJar implements CookieJar {
     return cookie.cookie.secure && scheme == 'https' || !_isExpired(cookie);
   }
 
-  factory NonpersistentCookieJar.createFrom(NonpersistentCookieJar otherJar) =>
-      NonpersistentCookieJar()..cloneFrom(otherJar);
+  factory IndependentCookieJar.createFrom(IndependentCookieJar otherJar) =>
+      IndependentCookieJar()..cloneFrom(otherJar);
 
-  void cloneFrom(NonpersistentCookieJar otherJar) {
+  void cloneFrom(IndependentCookieJar otherJar) {
     _deepClone(otherJar.domainCookies, domainCookies);
     _deepClone(otherJar.hostCookies, hostCookies);
   }

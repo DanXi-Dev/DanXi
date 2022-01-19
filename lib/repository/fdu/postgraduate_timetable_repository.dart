@@ -23,9 +23,9 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
-import 'package:dan_xi/util/cache.dart';
+import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_js/flutter_js.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -126,7 +126,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     }
   }
 
-  TimeTable? loadTimeTableLocally() {
+  TimeTable loadTimeTableLocally() {
     // Use an ugly implementation here to avoid using async method [SharedPreferences.getInstance()].
     SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
     if (preferences.containsKey(TimeTableRepository.KEY_TIMETABLE_CACHE)) {

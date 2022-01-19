@@ -18,8 +18,8 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
@@ -41,7 +41,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
 
   factory FudanAAORepository.getInstance() => _instance;
 
-  Future<NonpersistentCookieJar?> get thisCookies async {
+  Future<IndependentCookieJar?> get thisCookies async {
     // Log in before getting cookies.
     await Retrier.runAsyncWithRetry(() =>
         UISLoginTool.fixByLoginUIS(dio!, _LOGIN_URL, cookieJar!, _info, true));

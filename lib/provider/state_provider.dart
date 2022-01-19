@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/editor_object.dart';
+import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:flutter/cupertino.dart';
 

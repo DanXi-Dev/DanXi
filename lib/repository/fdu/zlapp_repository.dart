@@ -20,13 +20,13 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/cache.dart';
-import 'package:dan_xi/util/dio_utils.dart';
+import 'package:dan_xi/util/io/cache.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:intl/intl.dart';
 
-import '../inpersistent_cookie_manager.dart';
+import '../independent_cookie_jar.dart';
 
 class FudanCOVID19Repository extends BaseRepositoryWithDio {
   dynamic _historyData;
@@ -49,7 +49,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
 
   factory FudanCOVID19Repository.getInstance() => _instance;
 
-  NonpersistentCookieJar? get thisCookies => cookieJar;
+  IndependentCookieJar? get thisCookies => cookieJar;
 
   Future<dynamic> _getHistoryInfo(PersonInfo? info) async {
     _info = info;

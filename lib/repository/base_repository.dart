@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/repository/inpersistent_cookie_manager.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -45,19 +45,19 @@ abstract class BaseRepositoryWithDio {
   }
 
   @protected
-  NonpersistentCookieJar? get cookieJar {
+  IndependentCookieJar? get cookieJar {
     if (!_cookieJars.containsKey(linkHost)) {
-      _cookieJars[linkHost] = NonpersistentCookieJar();
+      _cookieJars[linkHost] = IndependentCookieJar();
     }
     return _cookieJars[linkHost];
   }
 
   static Future<void> clearAllCookies() async {
-    for (NonpersistentCookieJar jar in _cookieJars.values) {
+    for (IndependentCookieJar jar in _cookieJars.values) {
       await jar.deleteAll();
     }
   }
 
-  static final Map<String, NonpersistentCookieJar> _cookieJars = {};
+  static final Map<String, IndependentCookieJar> _cookieJars = {};
   static final Map<String, Dio> _dios = {};
 }

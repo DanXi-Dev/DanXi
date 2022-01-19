@@ -23,9 +23,9 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/cache.dart';
-import 'package:dan_xi/util/dio_utils.dart';
-import 'package:dan_xi/util/retryer.dart';
+import 'package:dan_xi/util/io/cache.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
