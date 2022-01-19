@@ -269,6 +269,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
       StateStreamListener();
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
+  final GlobalKey searchFieldKey = GlobalKey();
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
@@ -524,7 +525,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                     children: [
                       AutoBannerAdWidget(bannerAd: bannerAd),
                       if (_postsType == PostsType.NORMAL_POSTS) ...[
-                        const OTSearchWidget(),
+                        OTSearchWidget(key: searchFieldKey),
                         _autoSilenceNotice(),
                         _autoAdminNotice(),
                         _autoPinnedPosts(),

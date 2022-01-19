@@ -713,11 +713,11 @@ class OTSearchWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RegExp pidPattern = RegExp(r'#[0-9]+');
-    return Container(
-      padding: Theme.of(context)
-          .cardTheme
-          .margin, //EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+    return Padding(
+      padding: Theme.of(context).cardTheme.margin ??
+          const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
+        autofocus: false,
         focusNode: focusNode,
         placeholder: S.of(context).search_hint,
         onSubmitted: (value) {
