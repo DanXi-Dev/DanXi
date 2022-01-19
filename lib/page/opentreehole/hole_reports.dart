@@ -177,7 +177,9 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                     child: smartRender(
                         context, e.reason!, onLinkTap, onImageTap, false)),
                 const Divider(),
-                Align(alignment: Alignment.topLeft, child: Text(e.content!)),
+                Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(e.content ?? "?")),
                 //smartRender(e.content, onLinkTap, onImageTap)),
               ],
             ),
