@@ -443,7 +443,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: smartRender(context, widget.controller!.text, null, null),
+              child: smartRender(
+                  context, widget.controller!.text, null, null, false),
             ),
           ]),
     );

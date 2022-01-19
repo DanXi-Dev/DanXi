@@ -174,8 +174,8 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               children: [
                 Align(
                     alignment: Alignment.topLeft,
-                    child:
-                        smartRender(context, e.reason!, onLinkTap, onImageTap)),
+                    child: smartRender(
+                        context, e.reason!, onLinkTap, onImageTap, false)),
                 const Divider(),
                 Align(alignment: Alignment.topLeft, child: Text(e.content!)),
                 //smartRender(e.content, onLinkTap, onImageTap)),

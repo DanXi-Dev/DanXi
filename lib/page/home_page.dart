@@ -650,8 +650,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         FlutterApp.versionName,
                         updateInfo.latestVersion ?? "?")),
                     PostRenderWidget(
-                        content: "```\n${updateInfo.changeLog}\n```",
-                        render: kMarkdownRender)
+                      content: "```\n${updateInfo.changeLog}\n```",
+                      render: kMarkdownRender,
+                      hasBackgroundImage: false,
+                    )
                   ],
                 ),
                 actions: <Widget>[

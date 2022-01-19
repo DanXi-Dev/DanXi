@@ -118,7 +118,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// These field should only be initialized once when created.
   late OTHole _post;
   String? _searchKeyword;
-
+  FileImage? _backgroundImage;
   final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
 
   /// Fields related to the display states.
@@ -204,7 +204,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         } catch (_) {}
       }, onError: (_) {});
     });
-    final bgImage = SettingsProvider.getInstance().backgroundImage;
+    _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(
       iosContentPadding: false,
       iosContentBottomPadding: false,
@@ -238,10 +238,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
         builder: (context) => Material(
           child: Container(
-            decoration: bgImage == null
+            decoration: _backgroundImage == null
                 ? null
                 : BoxDecoration(
-                    image: DecorationImage(image: bgImage, fit: BoxFit.cover)),
+                    image: DecorationImage(
+                        image: _backgroundImage!, fit: BoxFit.cover)),
             child: RefreshIndicator(
               edgeOffset: MediaQuery.of(context).padding.top,
               color: Theme.of(context).colorScheme.secondary,
@@ -395,6 +396,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       int index, OTFloor floor,
       {bool isNested = false}) {
     return OTFloorWidget(
+      hasBackgroundImage: _backgroundImage != null,
       floor: floor,
       index: _searchKeyword == null ? index : null,
       isInMention: isNested,
@@ -408,16 +410,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             // will result in incorrect Navigator.pop() behavior.
             builder: (BuildContext context) => PlatformWidget(
                 cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildContextMenu(context, floor),
-                      cancelButton: CupertinoActionSheetAction(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
+                  actions: _buildContextMenu(context, floor),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(context).cancel),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
                 material: (_, __) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: _buildContextMenu(context, floor),
-                    )));
+                  mainAxisSize: MainAxisSize.min,
+                  children: _buildContextMenu(context, floor),
+                )));
       },
       onTap: () async {
         if (_searchKeyword == null) {
@@ -444,14 +446,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 }
 
-StatelessWidget smartRender(BuildContext context, String content,
-    LinkTapCallback? onTapLink, ImageTapCallback? onTapImage) {
+StatelessWidget smartRender(
+    BuildContext context,
+    String content,
+    LinkTapCallback? onTapLink,
+    ImageTapCallback? onTapImage,
+    bool translucentCard) {
   try {
     return PostRenderWidget(
       render: kMarkdownRender,
       content: preprocessContentForDisplay(content),
       onTapImage: onTapImage,
       onTapLink: onTapLink,
+      hasBackgroundImage: translucentCard,
     );
   } catch (e) {
     return Text(S.of(context).parse_fatal_error);

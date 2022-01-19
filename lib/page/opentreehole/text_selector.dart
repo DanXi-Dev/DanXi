@@ -53,6 +53,7 @@ class _TextSelectorPageState extends State<TextSelectorPage> {
         body: PostRenderWidget(
           render: kMarkdownSelectorRender,
           content: widget.arguments!['text'],
+          hasBackgroundImage: false,
         ));
   }
 }

@@ -53,10 +53,12 @@ class LanConnectionNotification extends Feature {
                     title:
                         Text(S.of(context!).lan_connection_issue_1_guide_title),
                     content: PostRenderWidget(
-                        content:
-                            S.of(context!).lan_connection_issue_1_guide_content,
-                        render: kMarkdownRender,
-                        onTapLink: (url) => launch(url!)),
+                      content:
+                          S.of(context!).lan_connection_issue_1_guide_content,
+                      render: kMarkdownRender,
+                      onTapLink: (url) => launch(url!),
+                      hasBackgroundImage: false,
+                    ),
                     actions: [
                       PlatformDialogAction(
                         child: Text(S.of(context!).i_see),

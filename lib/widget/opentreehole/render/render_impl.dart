@@ -73,8 +73,11 @@ MarkdownStyleSheet _fontSizeOverride(
   );
 }
 
-final BaseRender kMarkdownRender = (BuildContext context, String? content,
-    ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
+final BaseRender kMarkdownRender = (BuildContext context,
+    String? content,
+    ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    bool translucentCard) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
   return MarkdownBody(
@@ -89,8 +92,8 @@ final BaseRender kMarkdownRender = (BuildContext context, String? content,
     builders: {
       'tex': MarkdownLatexSupport(),
       'texLine': MarkdownLatexMultiLineSupport(),
-      'floor_mention': MarkdownFloorMentionSupport(),
-      'hole_mention': MarkdownHoleMentionSupport(),
+      'floor_mention': MarkdownFloorMentionSupport(translucentCard),
+      'hole_mention': MarkdownHoleMentionSupport(translucentCard),
     },
     imageBuilder: (Uri uri, String? title, String? alt) {
       return Center(
@@ -121,26 +124,41 @@ class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
+  final bool hasBackgroundImage;
+
+  MarkdownFloorMentionSupport(this.hasBackgroundImage);
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return OTFloorMentionWidget(
-        future: OpenTreeHoleRepository.getInstance()
-            .loadSpecificFloor(int.parse(element.textContent)));
+      future: OpenTreeHoleRepository.getInstance()
+          .loadSpecificFloor(int.parse(element.textContent)),
+      hasBackgroundImage: hasBackgroundImage,
+    );
   }
 }
 
 class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
+  final bool hasBackgroundImage;
+
+  MarkdownHoleMentionSupport(this.hasBackgroundImage);
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return OTFloorMentionWidget(
-        future: OpenTreeHoleRepository.getInstance()
-            .loadSpecificHole(int.parse(element.textContent))
-            .then((value) => value?.floors?.first_floor));
+      future: OpenTreeHoleRepository.getInstance()
+          .loadSpecificHole(int.parse(element.textContent))
+          .then((value) => value?.floors?.first_floor),
+      hasBackgroundImage: hasBackgroundImage,
+    );
   }
 }
 
 final BaseRender kMarkdownSelectorRender = (BuildContext context,
-    String? content, ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
+    String? content,
+    ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    bool translucentCard) {
   return Markdown(
     softLineBreak: true,
     selectable: true,

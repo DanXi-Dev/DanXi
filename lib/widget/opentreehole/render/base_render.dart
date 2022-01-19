@@ -23,5 +23,9 @@ typedef ImageTapCallback = void Function(String? url);
 /// BaseRender is the base type of a render which renders the post raw [content] into a [Widget].
 ///
 /// [kHtmlRender] is one of its implementations.
-typedef BaseRender = Widget Function(BuildContext context, String? content,
-    ImageTapCallback? onTapImage, LinkTapCallback? onTapLink);
+typedef BaseRender = Widget Function(
+    BuildContext context,
+    String? content,
+    ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    bool translucentCard);

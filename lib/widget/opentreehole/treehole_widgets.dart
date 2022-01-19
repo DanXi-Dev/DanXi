@@ -45,6 +45,12 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+Color? getDefaultCardBackgroundColor(
+        BuildContext context, bool hasBackgroundImage) =>
+    hasBackgroundImage
+        ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+        : null;
+
 class OTLeadingTag extends StatelessWidget {
   final Color color;
   final String text;
@@ -105,7 +111,7 @@ class OTFloorWidget extends StatelessWidget {
 
   /// Whether this widget is called as a result of [mention]
   final bool isInMention;
-
+  final bool hasBackgroundImage;
   final bool showBottomBar;
   final OTHole? parentHole;
   final int? index;
@@ -121,6 +127,7 @@ class OTFloorWidget extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.parentHole,
+    required this.hasBackgroundImage,
   }) : super(key: key);
 
   @override
@@ -229,7 +236,8 @@ class OTFloorWidget extends StatelessWidget {
                       context,
                       floor.filteredContent ?? S.of(context).fatal_error,
                       onLinkTap,
-                      onImageTap)),
+                      onImageTap,
+                      hasBackgroundImage)),
         ],
       ),
       subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -297,7 +305,7 @@ class OTFloorWidget extends StatelessWidget {
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
-            : Theme.of(context).cardTheme.color?.withOpacity(0.8),
+            : getDefaultCardBackgroundColor(context, hasBackgroundImage),
         child: (floor.deleted == true || floor.fold?.isNotEmpty == true)
             ? ExpansionTileX(
                 title: Text(
@@ -317,11 +325,13 @@ class OTFloorWidget extends StatelessWidget {
 class OTFloorMentionWidget extends StatelessWidget {
   final Future<OTFloor?> future;
   final bool showBottomBar;
+  final bool hasBackgroundImage;
 
   const OTFloorMentionWidget({
     Key? key,
     required this.future,
     this.showBottomBar = false,
+    required this.hasBackgroundImage,
   }) : super(key: key);
 
   static void showFloorDetail(BuildContext context, OTFloor floor) {
@@ -333,6 +343,7 @@ class OTFloorMentionWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               OTFloorWidget(
+                hasBackgroundImage: false,
                 floor: floor,
                 showBottomBar: false,
               ),
@@ -419,6 +430,7 @@ class OTFloorMentionWidget extends StatelessWidget {
         successBuilder:
             (BuildContext context, AsyncSnapshot<OTFloor?> snapshot) {
           return OTFloorWidget(
+            hasBackgroundImage: hasBackgroundImage,
             floor: snapshot.data!,
             isInMention: true,
             showBottomBar: showBottomBar,
@@ -426,12 +438,14 @@ class OTFloorMentionWidget extends StatelessWidget {
           );
         },
         errorBuilder: OTFloorWidget(
+          hasBackgroundImage: hasBackgroundImage,
           floor: OTFloor.special(
               S.of(context).fatal_error, S.of(context).unable_to_find_quote),
           isInMention: true,
           showBottomBar: showBottomBar,
         ),
         loadingBuilder: OTFloorWidget(
+          hasBackgroundImage: hasBackgroundImage,
           floor: OTFloor.special(S.of(context).loading, S.of(context).loading),
           isInMention: true,
           showBottomBar: showBottomBar,

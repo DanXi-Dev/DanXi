@@ -807,6 +807,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CLEAN_MODE_EXAMPLE,
+                  hasBackgroundImage: false,
                 ),
                 const SizedBox(
                   height: 8,
@@ -818,6 +819,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CleanModeFilter.cleanText(CLEAN_MODE_EXAMPLE),
+                  hasBackgroundImage: false,
                 ),
               ],
             ),

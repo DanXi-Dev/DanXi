@@ -23,16 +23,18 @@ class PostRenderWidget extends StatelessWidget {
   final BaseRender render;
   final ImageTapCallback? onTapImage;
   final LinkTapCallback? onTapLink;
+  final bool hasBackgroundImage;
 
   const PostRenderWidget(
       {Key? key,
       required this.content,
       required this.render,
       this.onTapImage,
-      this.onTapLink})
+      this.onTapLink,
+      required this.hasBackgroundImage})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) =>
-      render.call(context, content, onTapImage, onTapLink);
+      render.call(context, content, onTapImage, onTapLink, hasBackgroundImage);
 }
