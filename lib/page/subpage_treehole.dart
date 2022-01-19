@@ -614,8 +614,10 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
               title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        alignment: WrapAlignment.spaceBetween,
+                        runSpacing: 8,
                         children: [
                           generateTagWidgets(context, postElement,
                               (String? tagName) {
@@ -625,7 +627,9 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                               SettingsProvider.getInstance()
                                   .useAccessibilityColoring),
                           Row(
-                            mainAxisSize: MainAxisSize.min,
+                            //mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               if (isPinned)
                                 OTLeadingTag(
@@ -645,7 +649,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                             ],
                           ),
                         ]),
-                    const SizedBox(height: 10),
                     (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
                         ? ExpansionTileX(
                             expandedCrossAxisAlignment:
@@ -748,9 +751,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
             Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Linkify(
-                    text: lastReplyContent.trim().isEmpty
-                        ? S.of(context).no_summary
-                        : lastReplyContent,
+                    text: processCommentPreview(lastReplyContent),
                     style: const TextStyle(fontSize: 14),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -759,6 +760,14 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
         ),
         onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": postElement, "scroll_to_end": true}));
+  }
+
+  String processCommentPreview(String content) {
+    if (content.startsWith('\n') ||
+        content.startsWith(RegExp("#{1,2}[0-9]+\\n"))) {
+      content = content.substring(content.indexOf('\n') + 1);
+    }
+    return content;
   }
 
   @override

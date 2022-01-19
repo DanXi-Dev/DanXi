@@ -47,52 +47,26 @@ import 'package:screen_capture_event/screen_capture_event.dart';
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
 /// (2) Markdown Images are converted to HTML images.
-String preprocessContentForDisplay(String content,
-    {bool forceMarkdown = false}) {
+String preprocessContentForDisplay(String content) {
   String result = "";
-  int hrefCount = 0;
 
-  /* Workaround Markdown images
-  content = content.replaceAllMapped(RegExp(r"!\[\]\((https://.*?)\)"),
-      (match) => "<img src=\"${match.group(1)}\"></img>");*/
-  if (isHtml(content) && !forceMarkdown) {
-    linkify(content, options: const LinkifyOptions(humanize: false))
-        .forEach((element) {
-      if (element is UrlElement) {
-        // Only add tag if tag has not yet been added.
-        if (hrefCount == 0) {
-          result += "<a href=\"" + element.url + "\">" + element.text + "</a>";
-        } else {
-          result += element.text;
-          hrefCount--;
-        }
+  linkify(content, options: const LinkifyOptions(humanize: false))
+      .forEach((element) {
+    if (element is UrlElement) {
+      // Only add tag if tag has not yet been added.
+      if (RegExp("\\[.*?\\]\\(${RegExp.escape(element.url)}\\)")
+              .hasMatch(content) ||
+          RegExp("\\[.*?${RegExp.escape(element.url)}.*?\\]\\(http.*?\\)")
+              .hasMatch(content)) {
+        result += element.url;
       } else {
-        if (element.text.contains('<a href=')) {
-          hrefCount++;
-        } else if (element.text.contains('<img src="')) {
-          hrefCount++;
-        }
-        result += element.text;
+        result += "[${element.text}](${element.url})";
       }
-    });
-  } else {
-    linkify(content, options: const LinkifyOptions(humanize: false))
-        .forEach((element) {
-      if (element is UrlElement) {
-        // Only add tag if tag has not yet been added.
-        if (RegExp("\\[.*?\\]\\(${RegExp.escape(element.url)}\\)")
-                .hasMatch(content) ||
-            RegExp("\\[.*?${RegExp.escape(element.url)}.*?\\]\\(http.*?\\)")
-                .hasMatch(content)) {
-          result += element.url;
-        } else {
-          result += "[${element.text}](${element.url})";
-        }
-      } else {
-        result += element.text;
-      }
-    });
-  }
+    } else {
+      result += element.text;
+    }
+  });
+
   return result;
 }
 
@@ -410,16 +384,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             // will result in incorrect Navigator.pop() behavior.
             builder: (BuildContext context) => PlatformWidget(
                 cupertino: (_, __) => CupertinoActionSheet(
-                  actions: _buildContextMenu(context, floor),
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(S.of(context).cancel),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
+                      actions: _buildContextMenu(context, floor),
+                      cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
                 material: (_, __) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: _buildContextMenu(context, floor),
-                )));
+                      mainAxisSize: MainAxisSize.min,
+                      children: _buildContextMenu(context, floor),
+                    )));
       },
       onTap: () async {
         if (_searchKeyword == null) {

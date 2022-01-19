@@ -61,7 +61,9 @@ class OTLeadingTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      //height: 18,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+      alignment: Alignment.center,
       decoration: BoxDecoration(
           color: color.withOpacity(0.8),
           borderRadius: const BorderRadius.all(Radius.circular(2.0))),

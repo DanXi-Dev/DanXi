@@ -82,7 +82,7 @@ final BaseRender kMarkdownRender = (BuildContext context,
 
   return MarkdownBody(
     softLineBreak: true,
-    selectable: true,
+    //selectable: true,
     data: content!,
     styleSheet: _fontSizeOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
