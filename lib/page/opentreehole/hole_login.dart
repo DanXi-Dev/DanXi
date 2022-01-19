@@ -536,7 +536,7 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
                 _agreed = newValue!;
                 if (_agreed) {
                   BrowserUtil.openUrl(
-                      "https://www.fduhole.com/#/licence", context);
+                      "https://www.fduhole.com/#/license", context);
                 }
               });
             }),
