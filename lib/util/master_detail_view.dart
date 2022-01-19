@@ -18,6 +18,7 @@
 import 'package:dan_xi/main.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -31,6 +32,26 @@ class PlatformMasterDetailApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (PlatformX.isCupertino(context)) {
+      return buildView(context);
+    } else {
+      return WillPopScope(
+          child: buildView(context),
+          onWillPop: () async {
+            if (isTablet(context) &&
+                (detailNavigatorKey.currentState?.canPop() ?? false)) {
+              detailNavigatorKey.currentState?.pop();
+              return false;
+            } else if (navigatorKey?.currentState?.canPop() ?? false) {
+              navigatorKey?.currentState?.pop();
+              return false;
+            }
+            return true;
+          });
+    }
+  }
+
+  Widget buildView(BuildContext context) {
     Widget masterNavigatorWidget = Navigator(
       key: navigatorKey,
       onGenerateRoute: onGenerateRoute,
@@ -55,7 +76,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
               child: masterNavigatorWidget),
           Container(
             width:
-                MediaQuery.of(context).size.width - kTabletMasterContainerWidth,
+            MediaQuery.of(context).size.width - kTabletMasterContainerWidth,
             height: MediaQuery.of(context).size.height,
             clipBehavior: Clip.hardEdge,
             decoration: const BoxDecoration(),
@@ -63,7 +84,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
               key: detailNavigatorKey,
               onGenerateRoute: (settings) {
                 final Function? pageContentBuilder =
-                    DanxiApp.routes[settings.name!];
+                DanxiApp.routes[settings.name!];
                 if (pageContentBuilder != null) {
                   return platformPageRoute(
                       context: context,
