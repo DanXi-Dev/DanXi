@@ -714,7 +714,8 @@ class OTSearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RegExp pidPattern = RegExp(r'#[0-9]+');
+    final RegExp pidPattern = RegExp(r'#{1}([0-9]+)');
+    final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
     return Padding(
       padding: Theme.of(context).cardTheme.margin ??
           const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -722,19 +723,42 @@ class OTSearchWidget extends StatelessWidget {
         autofocus: false,
         focusNode: focusNode,
         placeholder: S.of(context).search_hint,
-        onSubmitted: (value) {
+        onSubmitted: (value) async {
           value = value.trim();
           if (value.isEmpty) return;
           // Determine if user is using #PID pattern to reach a specific post
-          if (value.startsWith(pidPattern)) {
-            // We needn't deal with the situation that "id = null" here.
-            // If so, it will turn into a 404 http error.
+          try {
+            final floorMatch = floorPattern.firstMatch(value)!;
+            ProgressFuture progressDialog = showProgressDialog(
+                loadingText: S.of(context).logout, context: context);
             try {
-              _goToPIDResultPage(context,
-                  int.parse(pidPattern.firstMatch(value)![0]!.substring(1)));
-              return;
-            } catch (ignored) {}
-          }
+              final floor = (await OpenTreeHoleRepository.getInstance()
+                  .loadSpecificFloor(int.parse(floorMatch.group(1)!)))!;
+              progressDialog.dismiss(showAnim: false);
+              OTFloorMentionWidget.showFloorDetail(context, floor);
+            } catch (error) {
+              progressDialog.dismiss(showAnim: false);
+              if (error is DioError &&
+                  error.response?.statusCode == HttpStatus.notFound) {
+                Noticing.showNotice(context, S.of(context).post_does_not_exist,
+                    title: S.of(context).fatal_error, useSnackBar: false);
+              } else {
+                Noticing.showNotice(
+                    context,
+                    ErrorPageWidget.generateUserFriendlyDescription(
+                        S.of(context), error),
+                    title: S.of(context).fatal_error,
+                    useSnackBar: false);
+              }
+            }
+            return;
+          } catch (ignored) {}
+          try {
+            final pidMatch = pidPattern.firstMatch(value)!;
+            _goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
+            return;
+          } catch (ignored) {}
+
           smartNavigatorPush(context, "/bbs/postDetail",
               arguments: {"searchKeyword": value});
         },
