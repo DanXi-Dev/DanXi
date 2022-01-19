@@ -622,6 +622,14 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                                     });
                                   },
                                 ),
+                                ListTile(
+                                  leading: const SizedBox(),
+                                  title: Text(S.of(context).modify_password),
+                                  onTap: () => BrowserUtil.openUrl(
+                                      Constant
+                                          .OPEN_TREEHOLE_FORGOT_PASSWORD_URL,
+                                      context),
+                                ),
                               ],
                               ListTile(
                                 leading: const SizedBox(),

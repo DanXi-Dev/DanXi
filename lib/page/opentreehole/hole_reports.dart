@@ -117,7 +117,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     );
   }
 
-  _buildContextMenu(BuildContext context, OTReport e) => [
+  List<Widget> _buildContextMenu(BuildContext context, OTReport e) => [
         /*PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {

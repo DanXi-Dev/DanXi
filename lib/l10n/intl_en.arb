@@ -231,6 +231,7 @@
     "secure_verification_description":"We have just sent you an email with an OTP code, input it below.",
     "secure_code":"OTP code",
     "forgot_password":"Forget Password",
+    "modify_password":"Change Password",
     "copy_password":"Copy Password",
     "push_notification_reg_failed": "Push Notification Registeration Failed",
     "push_notification_reg_failed_des": "You may not be able to receive notifications.\nError: {error}",
