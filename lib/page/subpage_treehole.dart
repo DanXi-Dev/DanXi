@@ -350,7 +350,8 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
             .catchError((error) {});
       }
     } finally {
-      await listViewController.notifyUpdate();
+      await listViewController.notifyUpdate(
+          useInitialData: true, queueDataClear: true);
     }
   }
 
@@ -432,14 +433,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
           indicatorKey.currentState?.show();
         }),
         hashCode);
-
-    /*screenListener.addScreenRecordListener((recorded) {
-      Noticing.showScreenshotWarning(context);
-    });
-    screenListener.addScreenShotListener((filePath) {
-      Noticing.showScreenshotWarning(context);
-    });
-    screenListener.watch();*/
 
     bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
   }
