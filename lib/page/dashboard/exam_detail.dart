@@ -141,18 +141,19 @@ class _ExamListState extends State<ExamList> {
             ),
           ],
         ),
-        body: Material(
-            child: FutureWidget<List<SemesterInfo>?>(
-                future: _semesterFuture,
-                successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                  _unpackedSemester = snapshot.data;
-                  semester ??= _unpackedSemester!.length - 5;
-                  return _loadExamGradeHybridView();
-                },
-                loadingBuilder:
-                    Center(child: PlatformCircularProgressIndicator()),
-                errorBuilder: _loadGradeViewFromDataCenter)));
+        body: SafeArea(
+            child: Material(
+                child: FutureWidget<List<SemesterInfo>?>(
+                    future: _semesterFuture,
+                    successBuilder: (BuildContext context,
+                        AsyncSnapshot<List<SemesterInfo>?> snapshot) {
+                      _unpackedSemester = snapshot.data;
+                      semester ??= _unpackedSemester!.length - 5;
+                      return _loadExamGradeHybridView();
+                    },
+                    loadingBuilder:
+                        Center(child: PlatformCircularProgressIndicator()),
+                    errorBuilder: _loadGradeViewFromDataCenter))));
   }
 
   Future<void> loadExamAndScore() async {
@@ -200,11 +201,7 @@ class _ExamListState extends State<ExamList> {
       ),
       Expanded(child: body)
     ];
-    if (PlatformX.isCupertino(context)) {
-      return ListView(children: mainWidgets);
-    } else {
-      return Column(children: mainWidgets);
-    }
+    return Column(children: mainWidgets);
   }
 
   Widget _loadGradeView({bool needReloadScoreData = true}) =>
