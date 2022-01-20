@@ -328,6 +328,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     return const SizedBox();
   }
 
+  bool get isEnded => _isEnded;
+
   // Move things into a separate function to control reload more easily
   Future<List<T>?> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
@@ -457,6 +459,8 @@ class PagedListViewController<T> implements ListProvider<T> {
   setListener(_PagedListViewState<T> state) {
     _state = state;
   }
+
+  bool get isEnded => _state.isEnded;
 
   Future<void> notifyUpdate({useInitialData = true, queueDataClear = true}) =>
       _state.notifyUpdate(useInitialData, queueDataClear);
