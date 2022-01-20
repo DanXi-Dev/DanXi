@@ -28,6 +28,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
@@ -97,11 +98,15 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         context, CachedNetworkImageProvider(_url!));
   }
 
-  getFileName(String url) {
-    return RegExp(r'(.*)\..*')
-            .firstMatch(Uri.parse(url).pathSegments.last)!
-            .group(1)! +
-        '.png';
+  String getFileName(String url) {
+    try {
+      return RegExp(r'(.*)\..*')
+              .firstMatch(Uri.parse(url).pathSegments.last)!
+              .group(1)! +
+          '.png';
+    } catch (_) {
+      return "${DateFormat("yyyyMMddHHmmSSS").format(DateTime.now())}.png";
+    }
     //return Uri.parse(url).pathSegments.last;
   }
 
