@@ -53,11 +53,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Cached floors, used by [mentions]
   List<OTFloor> _floorCache = [];
 
-  void cacheFloor(OTFloor floor) {
-    _floorCache.remove(floor);
-    _floorCache.add(floor);
-  }
-
   /// Cached OTDivisions
   List<OTDivision> _divisionCache = [];
 
@@ -87,6 +82,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _floorCache = [];
     _divisionCache = [];
     _tagCache = [];
+  }
+
+  void cacheFloor(OTFloor floor) {
+    _floorCache.remove(floor);
+    _floorCache.add(floor);
+    if (_floorCache.length > 200) {
+      reduceFloorCache();
+    }
+  }
+
+  void reduceFloorCache({int factor = 2}) {
+    _floorCache = _floorCache.sublist(_floorCache.length ~/ factor);
   }
 
   OpenTreeHoleRepository._() {

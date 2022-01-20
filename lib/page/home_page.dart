@@ -121,6 +121,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ///
   /// It's usually called when user changes his account.
   void _rebuildPage() {
+    _lastRefreshTime = DateTime.now();
     _subpage = [
       HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
@@ -235,7 +236,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   DateTime? _lastRefreshTime;
 
   @override
+  void didHaveMemoryPressure() {
+    super.didHaveMemoryPressure();
+    OpenTreeHoleRepository.getInstance().reduceFloorCache();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
         // After the app returns from the background
@@ -628,7 +636,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    _lastRefreshTime = DateTime.now();
     Widget title = _subpage.isEmpty
         ? Text(S.of(context).app_name)
         : _subpage[_pageIndex.value].title.call(context);
