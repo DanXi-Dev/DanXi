@@ -48,7 +48,7 @@ import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

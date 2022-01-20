@@ -18,7 +18,7 @@
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Manage global states of the app.
@@ -31,7 +31,7 @@ class StateProvider {
   /// The user's basic information.
   static final ValueNotifier<PersonInfo?> personInfo = ValueNotifier(null);
 
-  /// Caches of [BBSEditor].
+  /// Caches of [OTEditor].
   static final Map<EditorObject?, PostEditorText> editorCache = {};
 
   /// The current division.

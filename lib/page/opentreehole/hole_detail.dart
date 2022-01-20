@@ -33,7 +33,7 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -217,7 +217,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
-                if (await BBSEditor.createNewReply(
+                if (await OTEditor.createNewReply(
                     context, _post.hole_id, null)) {
                   await refreshSelf();
                 }
@@ -337,7 +337,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () async {
               Navigator.of(menuContext).pop();
-              await BBSEditor.modifyReply(
+              await OTEditor.modifyReply(
                   menuContext, e.hole_id, e.floor_id, e.content);
               await refreshSelf();
             },
@@ -347,7 +347,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             title: Text(S.of(context).modify),
             onTap: () async {
               Navigator.of(menuContext).pop();
-              await BBSEditor.modifyReply(
+              await OTEditor.modifyReply(
                   menuContext, e.hole_id, e.floor_id, e.content);
               await refreshSelf();
             },
@@ -396,7 +396,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           isDestructiveAction: true,
           onPressed: () {
             Navigator.of(menuContext).pop();
-            BBSEditor.reportPost(menuContext, e.floor_id);
+            OTEditor.reportPost(menuContext, e.floor_id);
           },
           child: Text(S.of(menuContext).report),
         ),
@@ -404,7 +404,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           title: Text(S.of(menuContext).report),
           onTap: () {
             Navigator.of(menuContext).pop();
-            BBSEditor.reportPost(menuContext, e.floor_id);
+            OTEditor.reportPost(menuContext, e.floor_id);
           },
         ),
       ),
@@ -413,7 +413,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       menu.addAll([
         PlatformContextMenuItem(
           onPressed: () async {
-            await BBSEditor.modifyReply(
+            await OTEditor.modifyReply(
                 menuContext, e.hole_id, e.floor_id, e.content);
             await refreshSelf();
           },
@@ -491,7 +491,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             replyId = floor.floor_id;
             OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
-          if (await BBSEditor.createNewReply(context, _post.hole_id, replyId)) {
+          if (await OTEditor.createNewReply(context, _post.hole_id, replyId)) {
             await refreshSelf();
           }
         } else {

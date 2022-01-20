@@ -43,7 +43,7 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/widget/opentreehole/fake_search_widget.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -453,7 +453,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
-              await BBSEditor.createNewPost(context, divisionId);
+              await OTEditor.createNewPost(context, divisionId);
           if (success) refreshList();
         }),
         hashCode);

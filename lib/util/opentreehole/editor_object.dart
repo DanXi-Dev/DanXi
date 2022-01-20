@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 
 /// [EditorObject] represents an object the [BBSEditorWidget] replies or posts to.
 class EditorObject {

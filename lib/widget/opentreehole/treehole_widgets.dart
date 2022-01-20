@@ -38,7 +38,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -564,7 +564,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     ),
                   ),
                   onTap: () {
-                    BBSEditor.reportPost(context, floor.floor_id);
+                    OTEditor.reportPost(context, floor.floor_id);
                   },
                 ),
               ),
@@ -590,7 +590,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     ),
                   ),
                   onTap: () {
-                    BBSEditor.modifyReply(
+                    OTEditor.modifyReply(
                         context, floor.hole_id, floor.floor_id, floor.content);
                   },
                 ),

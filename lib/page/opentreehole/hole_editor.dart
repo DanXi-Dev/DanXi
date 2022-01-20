@@ -43,13 +43,13 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import 'tag_selector/flutter_tagging/tagging.dart';
+import '../../widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 
-enum BBSEditorType { DIALOG, PAGE }
+enum OTEditorType { DIALOG, PAGE }
 
-class BBSEditor {
+class OTEditor {
   static Future<bool> createNewPost(BuildContext context, int divisionId,
-      {BBSEditorType? editorType}) async {
+      {OTEditorType? editorType}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText? content = await _showEditor(
         context, S.of(context).new_post,
@@ -74,7 +74,7 @@ class BBSEditor {
 
   static Future<bool> createNewReply(
       BuildContext context, int? discussionId, int? postId,
-      {BBSEditorType? editorType}) async {
+      {OTEditorType? editorType}) async {
     final object = (postId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
         : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
@@ -107,7 +107,7 @@ class BBSEditor {
 
   static Future<void> modifyReply(BuildContext context, int? discussionId,
       int? postId, String? originalContent,
-      {BBSEditorType? editorType}) async {
+      {OTEditorType? editorType}) async {
     final object = (discussionId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
         : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
@@ -136,7 +136,7 @@ class BBSEditor {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
     final String? content = (await _showEditor(
             context, S.of(context).reason_report_post(postId ?? "?"),
-            editorType: BBSEditorType.DIALOG, object: object, hasTip: false))
+            editorType: OTEditorType.DIALOG, object: object, hasTip: false))
         ?.text;
     if (content == null || content.trim() == "") return;
 
@@ -154,14 +154,14 @@ class BBSEditor {
 
   static Future<PostEditorText?> _showEditor(BuildContext context, String title,
       {bool allowTags = false,
-      required BBSEditorType? editorType,
+      required OTEditorType? editorType,
       required EditorObject object,
       String placeholder = "",
       bool hasTip = true}) async {
     final String randomTip = await Constant.randomFduholeTip;
-    const BBSEditorType defaultType = BBSEditorType.PAGE;
+    const OTEditorType defaultType = OTEditorType.PAGE;
     switch (editorType ?? defaultType) {
-      case BBSEditorType.DIALOG:
+      case OTEditorType.DIALOG:
         if (!StateProvider.editorCache.containsKey(object)) {
           StateProvider.editorCache[object] =
               PostEditorText.newInstance(withText: placeholder);
@@ -204,7 +204,7 @@ class BBSEditor {
         // TODO: This dispose is causing more trouble than it's worth.
         //textController.dispose();
         return value;
-      case BBSEditorType.PAGE:
+      case OTEditorType.PAGE:
         // Receive the value with **dynamic** variable to prevent automatic type inference
         final dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
@@ -550,7 +550,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
               icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.photo)
                   : const Icon(CupertinoIcons.photo),
-              onPressed: () => BBSEditor.uploadImage(context, _controller)),
+              onPressed: () => OTEditor.uploadImage(context, _controller)),
           PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
