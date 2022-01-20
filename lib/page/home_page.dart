@@ -58,13 +58,13 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
-import 'package:screen_capture_event/screen_capture_event.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -249,7 +249,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           _lastRefreshTime = DateTime.now();
           dashboardPageKey.currentState?.rebuildFeatures();
           dashboardPageKey.currentState?.setState(() {});
-          ;
         }
         break;
       case AppLifecycleState.inactive:
