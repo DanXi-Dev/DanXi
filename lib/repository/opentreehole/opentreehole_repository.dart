@@ -427,15 +427,23 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTMessage>?> loadMessages(
-      {bool unreadOnly = true, DateTime? startTime}) async {
+      {bool unreadOnly = false, DateTime? startTime}) async {
     final Response response = await dio!.get(_BASE_URL + "/messages",
         queryParameters: {
-          "not_read": unreadOnly,
+          if (unreadOnly) "not_read": true,
           "start_time": startTime?.toIso8601String(),
         },
         options: Options(headers: _tokenHeader));
     final List result = response.data;
     return result.map((e) => OTMessage.fromJson(e)).toList();
+  }
+
+  Future<void> modifyMessage(OTMessage message) async {
+    await dio!.put(_BASE_URL + "/messages/${message.message_id}",
+        data: {
+          "has_read": message.has_read,
+        },
+        options: Options(headers: _tokenHeader));
   }
 
   Future<bool?> isUserAdmin() async {

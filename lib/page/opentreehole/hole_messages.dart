@@ -46,6 +46,11 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   final TimeBasedLoadAdaptLayer<OTMessage> adaptLayer =
       TimeBasedLoadAdaptLayer(10, 1);
 
+  final GlobalKey<RefreshIndicatorState> indicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  bool showUnreadOnly = false;
+
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTMessage>?> _loadContent(int page) async {
     //return OpenTreeHoleRepository.getInstance().loadMessages(unreadOnly: false);
@@ -58,7 +63,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
         time = DateTime.now();
       }
       return OpenTreeHoleRepository.getInstance()
-          .loadMessages(startTime: time, unreadOnly: false);
+          .loadMessages(startTime: time, unreadOnly: showUnreadOnly);
     }).call(page);
   }
 
@@ -85,11 +90,29 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
           controller: PrimaryScrollController.of(context),
           child: Text(S.of(context).messages),
         ),
-        trailingActions: const [],
+        trailingActions: [
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(
+              showUnreadOnly
+                  ? S.of(context).show_all
+                  : S.of(context).show_unread,
+              softWrap: true,
+              textScaleFactor: MediaQuery.textScaleFactorOf(context),
+            ),
+            onPressed: () async {
+              setState(() {
+                showUnreadOnly = !showUnreadOnly;
+              });
+              await indicatorKey.currentState?.show();
+            },
+          )
+        ],
       ),
       body: Builder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
         builder: (context) => RefreshIndicator(
+          key: indicatorKey,
           edgeOffset: MediaQuery.of(context).padding.top,
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,

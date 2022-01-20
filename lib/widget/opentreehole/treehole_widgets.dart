@@ -16,6 +16,7 @@
  */
 
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
@@ -338,100 +339,99 @@ class OTFloorMentionWidget extends StatelessWidget {
     required this.hasBackgroundImage,
   }) : super(key: key);
 
-  static void showFloorDetail(BuildContext context, OTFloor floor) {
-    showPlatformModalSheet(
-      context: context,
-      builder: (BuildContext cxt) => SafeArea(
-        child: Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxHeight: ViewportUtils.getViewportHeight(context) / 2),
-                child: SingleChildScrollView(
-                  primary: false,
-                  child: OTFloorWidget(
-                    hasBackgroundImage: false,
-                    floor: floor,
-                    showBottomBar: false,
+  static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor) =>
+      showPlatformModalSheet<bool?>(
+        context: context,
+        builder: (BuildContext cxt) => SafeArea(
+          child: Card(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: ViewportUtils.getViewportHeight(context) / 2),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    child: OTFloorWidget(
+                      hasBackgroundImage: false,
+                      floor: floor,
+                      showBottomBar: false,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        // Note how this code use [cxt] for some context but [context] for others.
-                        // This is to prevent looking up deactivated context after [pop].
-                        Navigator.pop(cxt);
-                        try {
-                          // Find the PagedListViewController
-                          final pagedListViewController = context
-                              .findAncestorWidgetOfExactType<
-                                  PagedListView<OTFloor>>()!
-                              .pagedController!;
-                          // If this floor is directly in the hole
-                          if (pagedListViewController.indexOf(floor) != -1) {
-                            // Scroll to the corresponding post
-                            while (!(await pagedListViewController
-                                .scrollToItem(floor))) {
-                              if (pagedListViewController
-                                      .getScrollController()!
-                                      .offset <
-                                  10) break; // Prevent deadlock
-                              await pagedListViewController.scrollDelta(
-                                  -100,
-                                  const Duration(milliseconds: 1),
-                                  Curves.linear);
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          // Note how this code use [cxt] for some context but [context] for others.
+                          // This is to prevent looking up deactivated context after [pop].
+                          Navigator.pop(cxt);
+                          try {
+                            // Find the PagedListViewController
+                            final pagedListViewController = context
+                                .findAncestorWidgetOfExactType<
+                                    PagedListView<OTFloor>>()!
+                                .pagedController!;
+                            // If this floor is directly in the hole
+                            if (pagedListViewController.indexOf(floor) != -1) {
+                              // Scroll to the corresponding post
+                              while (!(await pagedListViewController
+                                  .scrollToItem(floor))) {
+                                if (pagedListViewController
+                                        .getScrollController()!
+                                        .offset <
+                                    10) break; // Prevent deadlock
+                                await pagedListViewController.scrollDelta(
+                                    -100,
+                                    const Duration(milliseconds: 1),
+                                    Curves.linear);
+                              }
+                              return;
                             }
-                            return;
-                          }
-                        } catch (_) {}
+                          } catch (_) {}
 
-                        // If this floor is in another hole
-                        ProgressFuture progressDialog = showProgressDialog(
-                            loadingText: S.of(context).loading,
-                            context: context);
-                        try {
-                          smartNavigatorPush(context, "/bbs/postDetail",
-                              arguments: {
-                                "post":
-                                    await OpenTreeHoleRepository.getInstance()
-                                        .loadSpecificHole(floor.hole_id!),
-                                "locate": floor,
-                              });
-                        } catch (e) {
-                          Noticing.showNotice(
-                              context,
-                              ErrorPageWidget.generateUserFriendlyDescription(
-                                  S.of(context), e),
-                              title: S.of(context).fatal_error,
-                              useSnackBar: false);
-                        } finally {
-                          progressDialog.dismiss(showAnim: false);
-                        }
-                      },
-                      child: Text(S.of(cxt).jump_to_hole),
-                    ),
-                    TextButton(
-                      child: Text(S.of(cxt).ok),
-                      onPressed: () {
-                        Navigator.of(cxt).pop();
-                      },
-                    ),
-                  ],
+                          // If this floor is in another hole
+                          ProgressFuture progressDialog = showProgressDialog(
+                              loadingText: S.of(context).loading,
+                              context: context);
+                          try {
+                            smartNavigatorPush(context, "/bbs/postDetail",
+                                arguments: {
+                                  "post":
+                                      await OpenTreeHoleRepository.getInstance()
+                                          .loadSpecificHole(floor.hole_id!),
+                                  "locate": floor,
+                                });
+                          } catch (e) {
+                            Noticing.showNotice(
+                                context,
+                                ErrorPageWidget.generateUserFriendlyDescription(
+                                    S.of(context), e),
+                                title: S.of(context).fatal_error,
+                                useSnackBar: false);
+                          } finally {
+                            progressDialog.dismiss(showAnim: false);
+                          }
+                        },
+                        child: Text(S.of(cxt).jump_to_hole),
+                      ),
+                      TextButton(
+                        child: Text(S.of(cxt).ok),
+                        onPressed: () {
+                          Navigator.of(cxt).pop(true);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -646,13 +646,20 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   }
 }
 
-class OTMessageItem extends StatelessWidget {
+class OTMessageItem extends StatefulWidget {
   final OTMessage message;
 
   const OTMessageItem({Key? key, required this.message}) : super(key: key);
 
+  static Future<void> markMessageAsRead(OTMessage message) async {
+    if (message.has_read == true) return;
+    message.has_read = true;
+    await OpenTreeHoleRepository.getInstance().modifyMessage(message);
+  }
+
   static void dispMessageDetailBasedOnGuessedDataType(
-      BuildContext context, String? code, Map<String, dynamic>? data) {
+      BuildContext context, String? code, Map<String, dynamic>? data,
+      [int? id]) async {
     try {
       switch (code) {
         case 'mention':
@@ -661,7 +668,11 @@ class OTMessageItem extends StatelessWidget {
           // data should be [OTFloor]
           final floor = OTFloor.fromJson(data!);
           if (floor.floor_id == null) return;
-          OTFloorMentionWidget.showFloorDetail(context, floor);
+          if (await OTFloorMentionWidget.showFloorDetail(context, floor) ==
+                  true &&
+              id != null) {
+            markMessageAsRead(OTMessage(id, null, null, null, true, null));
+          }
           break;
         case 'report':
           //TODO: Unimplemented
@@ -674,17 +685,43 @@ class OTMessageItem extends StatelessWidget {
   }
 
   @override
+  _OTMessageItemState createState() => _OTMessageItemState();
+}
+
+class _OTMessageItemState extends State<OTMessageItem> {
+  late OTMessage message;
+
+  @override
+  void initState() {
+    super.initState();
+    message = widget.message;
+  }
+
+  @override
+  void didUpdateWidget(OTMessageItem oldWidget) {
+    message = widget.message;
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
           leading: PlatformX.isMaterial(context)
               ? const Icon(Icons.developer_board)
               : const Icon(CupertinoIcons.info_circle),
-          title: Text(message.message ?? "null"),
+          title: Text(message.message ?? "null",
+              style: (message.has_read == true)
+                  ? TextStyle(color: Theme.of(context).hintColor)
+                  : null),
           subtitle: Text(HumanDuration.tryFormat(
               context, DateTime.tryParse(message.time_created ?? ""))),
-          onTap: () => dispMessageDetailBasedOnGuessedDataType(
-              context, message.code, message.data)),
+          onTap: () async {
+            OTMessageItem.markMessageAsRead(message)
+                .then((value) => setState(() {}));
+            OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
+                context, message.code, message.data, message.message_id);
+          }),
     );
   }
 }

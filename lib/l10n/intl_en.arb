@@ -192,6 +192,8 @@
     "ban_post_until": "You are not allowed to post in this division until {date}",
     "silence_detail": "Due to policy violations, you have been banned from posting in this division.\n\nIf you believe this is an error, please contact us.",
     "login_from_treehole_page": "Please login from FDUHole page.",
+    "show_unread": "Show Unread",
+    "show_all": "Show All",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
