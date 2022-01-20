@@ -238,6 +238,8 @@
     "copy_password":"Copy Password",
     "push_notification_reg_failed": "Push Notification Registeration Failed",
     "push_notification_reg_failed_des": "You may not be able to receive notifications.\nError: {error}",
+    "quote": "Quote",
+    "tap_to_show_preview": "Tap to show preview",
 
     "new_post":"New Post",
     "posting":"Posting...",

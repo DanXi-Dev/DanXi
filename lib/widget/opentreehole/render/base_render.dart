@@ -28,4 +28,5 @@ typedef BaseRender = Widget Function(
     String? content,
     ImageTapCallback? onTapImage,
     LinkTapCallback? onTapLink,
-    bool translucentCard);
+    bool translucentCard,
+    bool isPreviewWidget);

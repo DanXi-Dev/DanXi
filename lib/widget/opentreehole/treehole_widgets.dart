@@ -246,60 +246,62 @@ class OTFloorWidget extends StatelessWidget {
         ],
       ),
       subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
-        const SizedBox(
-          height: 8,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            if (index == null)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "#${floor.hole_id}",
-                    style: TextStyle(
-                      color: Theme.of(context).hintColor,
+        if ((floor.hole_id ?? 0) > 0 || (floor.floor_id ?? 0) > 0) ...[
+          const SizedBox(
+            height: 8,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (index == null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "#${floor.hole_id}",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                      ),
                     ),
-                  ),
-                  Text(
-                    "  (##${floor.floor_id})",
-                    style: TextStyle(
-                      color: Theme.of(context).hintColor,
-                      fontSize: 10,
+                    Text(
+                      "  (##${floor.floor_id})",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontSize: 10,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              if (index != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "${index! + 1}F",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "  (##${floor.floor_id})",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              Text(
+                HumanDuration.tryFormat(
+                    context, DateTime.tryParse(floor.time_created ?? "")),
+                style:
+                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
-            if (index != null)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "${index! + 1}F",
-                    style: TextStyle(
-                      color: Theme.of(context).hintColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "  (##${floor.floor_id})",
-                    style: TextStyle(
-                      color: Theme.of(context).hintColor,
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
-              ),
-            Text(
-              HumanDuration.tryFormat(
-                  context, DateTime.tryParse(floor.time_created ?? "")),
-              style:
-                  TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
         if (showBottomBar) OTFloorWidgetBottomBar(floor: floor),
       ]),
       onTap: onTap,
@@ -324,6 +326,60 @@ class OTFloorWidget extends StatelessWidget {
             : cardChild,
       ),
     );
+  }
+}
+
+class OTMentionPreviewWidget extends StatefulWidget {
+  final int id;
+  final OTMentionType type;
+  final bool showBottomBar;
+  final bool hasBackgroundImage;
+
+  const OTMentionPreviewWidget({
+    Key? key,
+    required this.id,
+    required this.type,
+    this.showBottomBar = false,
+    required this.hasBackgroundImage,
+  }) : super(key: key);
+
+  @override
+  _OTMentionPreviewWidgetState createState() => _OTMentionPreviewWidgetState();
+}
+
+class _OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
+  bool isShowingPreview = false;
+
+  @override
+  void didUpdateWidget(OTMentionPreviewWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    isShowingPreview = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isShowingPreview) {
+      return OTFloorMentionWidget(
+        future: widget.type == OTMentionType.FLOOR
+            ? OpenTreeHoleRepository.getInstance().loadSpecificFloor(widget.id)
+            : OpenTreeHoleRepository.getInstance()
+                .loadSpecificHole(widget.id)
+                .then((value) => value?.floors?.first_floor),
+        hasBackgroundImage: widget.hasBackgroundImage,
+        showBottomBar: widget.showBottomBar,
+      );
+    } else {
+      return OTFloorWidget(
+        hasBackgroundImage: widget.hasBackgroundImage,
+        floor: OTFloor.special(
+            S.of(context).quote, S.of(context).tap_to_show_preview),
+        isInMention: true,
+        showBottomBar: widget.showBottomBar,
+        onTap: () => setState(() {
+          isShowingPreview = true;
+        }),
+      );
+    }
   }
 }
 
@@ -725,3 +781,5 @@ class _OTMessageItemState extends State<OTMessageItem> {
     );
   }
 }
+
+enum OTMentionType { FLOOR, HOLE }

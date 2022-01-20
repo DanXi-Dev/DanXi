@@ -189,9 +189,9 @@ class OTEditor {
                               textController.text;
                           Navigator.of(context).pop<PostEditorText>(null);
                         }),
-                    PlatformDialogAction(
+                    /*PlatformDialogAction(
                         child: Text(S.of(context).add_image),
-                        onPressed: () => uploadImage(context, textController)),
+                        onPressed: () => uploadImage(context, textController)),*/
                     PlatformDialogAction(
                         child: Text(S.of(context).submit),
                         onPressed: () async {
@@ -328,7 +328,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
       textAlignVertical: TextAlignVertical.top,
     );
     if (widget.fullscreen) {
-      return textField;
+      return Expanded(child: textField);
     }
     return SingleChildScrollView(
       child: Column(
@@ -444,7 +444,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: smartRender(
-                  context, widget.controller!.text, null, null, false),
+                  context, widget.controller!.text, null, null, false,
+                  preview: true),
             ),
           ]),
     );

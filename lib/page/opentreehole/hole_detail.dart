@@ -514,7 +514,8 @@ StatelessWidget smartRender(
     String content,
     LinkTapCallback? onTapLink,
     ImageTapCallback? onTapImage,
-    bool translucentCard) {
+    bool translucentCard,
+    {bool preview = false}) {
   try {
     return PostRenderWidget(
       render: kMarkdownRender,
@@ -522,6 +523,7 @@ StatelessWidget smartRender(
       onTapImage: onTapImage,
       onTapLink: onTapLink,
       hasBackgroundImage: translucentCard,
+      isPreviewWidget: preview,
     );
   } catch (e) {
     return Text(S.of(context).parse_fatal_error);

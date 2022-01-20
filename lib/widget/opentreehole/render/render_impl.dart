@@ -77,7 +77,8 @@ final BaseRender kMarkdownRender = (BuildContext context,
     String? content,
     ImageTapCallback? onTapImage,
     LinkTapCallback? onTapLink,
-    bool translucentCard) {
+    bool translucentCard,
+    bool isPreviewWidget) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
   return MarkdownBody(
@@ -92,8 +93,10 @@ final BaseRender kMarkdownRender = (BuildContext context,
     builders: {
       'tex': MarkdownLatexSupport(),
       'texLine': MarkdownLatexMultiLineSupport(),
-      'floor_mention': MarkdownFloorMentionSupport(translucentCard),
-      'hole_mention': MarkdownHoleMentionSupport(translucentCard),
+      'floor_mention':
+          MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
+      'hole_mention':
+          MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
     },
     imageBuilder: (Uri uri, String? title, String? alt) {
       return Center(
@@ -125,14 +128,15 @@ class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
 
 class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
   final bool hasBackgroundImage;
+  final bool isPreviewWidget;
 
-  MarkdownFloorMentionSupport(this.hasBackgroundImage);
+  MarkdownFloorMentionSupport(this.hasBackgroundImage, this.isPreviewWidget);
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return OTFloorMentionWidget(
-      future: OpenTreeHoleRepository.getInstance()
-          .loadSpecificFloor(int.parse(element.textContent)),
+    return OTMentionPreviewWidget(
+      id: int.parse(element.textContent),
+      type: OTMentionType.FLOOR,
       hasBackgroundImage: hasBackgroundImage,
     );
   }
@@ -140,15 +144,15 @@ class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
 
 class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
   final bool hasBackgroundImage;
+  final bool isPreviewWidget;
 
-  MarkdownHoleMentionSupport(this.hasBackgroundImage);
+  MarkdownHoleMentionSupport(this.hasBackgroundImage, this.isPreviewWidget);
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return OTFloorMentionWidget(
-      future: OpenTreeHoleRepository.getInstance()
-          .loadSpecificHole(int.parse(element.textContent))
-          .then((value) => value?.floors?.first_floor),
+    return OTMentionPreviewWidget(
+      id: int.parse(element.textContent),
+      type: OTMentionType.HOLE,
       hasBackgroundImage: hasBackgroundImage,
     );
   }
@@ -158,7 +162,8 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
     String? content,
     ImageTapCallback? onTapImage,
     LinkTapCallback? onTapLink,
-    bool translucentCard) {
+    bool translucentCard,
+    bool isPreviewWidget) {
   return Markdown(
     softLineBreak: true,
     selectable: true,

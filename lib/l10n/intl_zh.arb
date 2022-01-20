@@ -256,6 +256,8 @@
     "forgot_password":"忘记密码",
     "modify_password":"修改密码",
     "copy_password":"复制密码",
+    "quote": "引用",
+    "tap_to_show_preview": "点击以显示预览",
 
     "new_post":"发布新帖子",
     "posting":"正在发布内容...",

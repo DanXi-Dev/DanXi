@@ -48,8 +48,10 @@ class OTFloor {
   /// Generate an empty BBSPost for special sakes.
   factory OTFloor.dummy() =>
       OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, []);
-  factory OTFloor.special(String title, String content) =>
-      OTFloor(0, 0, content, title, '', '', false, [], 0, false, false, []);
+  factory OTFloor.special(String title, String content,
+          [int? holeId, int? floorId]) =>
+      OTFloor(floorId ?? 0, holeId ?? 0, content, title, '', '', false, [], 0,
+          false, false, []);
 
   @override
   bool operator ==(Object other) =>
