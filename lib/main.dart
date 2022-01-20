@@ -36,6 +36,7 @@ import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_login.dart';
 import 'package:dan_xi/page/opentreehole/hole_messages.dart';
 import 'package:dan_xi/page/opentreehole/hole_reports.dart';
+import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/opentreehole/text_selector.dart';
@@ -169,6 +170,7 @@ class DanxiApp extends StatelessWidget {
     '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
     '/bbs/messages': (context, {arguments}) =>
         OTMessagesPage(arguments: arguments),
+    '/bbs/search': (context, {arguments}) => OTSearchPage(arguments: arguments),
   };
 
   const DanxiApp({Key? key}) : super(key: key);

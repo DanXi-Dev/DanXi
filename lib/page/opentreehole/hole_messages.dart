@@ -77,10 +77,6 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      material: (_, __) =>
-          MaterialScaffoldData(resizeToAvoidBottomInset: false),
-      cupertino: (_, __) =>
-          CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
       iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

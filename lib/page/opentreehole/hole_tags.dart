@@ -70,7 +70,7 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
                 onTap: (e) =>
                     smartNavigatorPush(context, '/bbs/discussions', arguments: {
                   "tagFilter": e.name,
-                }),
+                }, forcePushOnMainNavigator: true),
               ),
               errorBuilder: (BuildContext context,
                       AsyncSnapshot<List<OTTag>?> snapShot) =>
