@@ -80,6 +80,7 @@ final RegExp mentionRegExp =
 String renderText(
     String content, String imagePlaceholder, String formulaPlaceholder,
     {bool removeMentions = true}) {
+  String originalContent = content;
   if (!isHtml(content)) {
     content = md.markdownToHtml(content, inlineSyntaxes: [
       LatexSyntax(),
@@ -100,8 +101,8 @@ String renderText(
   String result = soup.getText().trim();
 
   // If we have reduce the text to nothing, we would rather not remove mention texts.
-  if (result.isEmpty) {
-    return renderText(content, imagePlaceholder, formulaPlaceholder,
+  if (result.isEmpty && removeMentions) {
+    return renderText(originalContent, imagePlaceholder, formulaPlaceholder,
         removeMentions: false);
   } else {
     return result;
