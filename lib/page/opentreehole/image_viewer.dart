@@ -17,9 +17,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/image_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -29,7 +29,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share/share.dart';
@@ -82,7 +81,6 @@ class ImageViewerPage extends StatefulWidget {
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
-  Uint8List? _rawImageToSave;
   String? _fileName;
   String? _url;
 
@@ -91,11 +89,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     super.initState();
     _url = widget.arguments!['url'];
     _fileName = getFileName(_url!);
-  }
-
-  Future<void> _prepareImageForSaving() async {
-    _rawImageToSave ??= await ImageUtils.providerToBytes(
-        context, CachedNetworkImageProvider(_url!));
   }
 
   String getFileName(String url) {
@@ -110,31 +103,18 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     //return Uri.parse(url).pathSegments.last;
   }
 
-  Future<File> saveToFile(
-      String dirName, String? fileName, List<int> bytes) async {
-    Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = PlatformX.createPlatformFile(
-        "${documentDir.absolute.path}/$dirName/$fileName");
-    outputFile.createSync(recursive: true);
-    await outputFile.writeAsBytes(bytes, flush: true);
-    return outputFile;
-  }
-
   Future<void> shareImage() async {
-    await _prepareImageForSaving();
-    // Save the image temporarily
-    File outputFile =
-        await saveToFile('temp_image', _fileName, _rawImageToSave!);
+    File image = await DefaultCacheManager().getSingleFile(_url!);
     if (PlatformX.isMobile) {
-      Share.shareFiles([outputFile.absolute.path],
+      Share.shareFiles([image.absolute.path],
           mimeTypes: [ImageViewerPage.getMineType(_url)]);
     } else {
-      Noticing.showNotice(context, outputFile.absolute.path);
+      Noticing.showNotice(context, image.absolute.path);
     }
   }
 
   Future<void> saveImage() async {
-    await _prepareImageForSaving();
+    File image = await DefaultCacheManager().getSingleFile(_url!);
     if (PlatformX.isAndroid) {
       PermissionStatus status = await Permission.storage.status;
       if (!status.isGranted &&
@@ -143,16 +123,15 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         return;
       }
     }
-    File outputFile = await saveToFile('image', _fileName, _rawImageToSave!);
     if (PlatformX.isMobile) {
-      var result = await GallerySaver.saveImage(outputFile.absolute.path);
+      var result = await GallerySaver.saveImage(image.absolute.path);
       if (result != null && result) {
         Noticing.showNotice(context, S.of(context).image_save_success);
       } else {
         Noticing.showNotice(context, S.of(context).image_save_failed);
       }
     } else {
-      Noticing.showNotice(context, outputFile.absolute.path);
+      Noticing.showNotice(context, image.absolute.path);
     }
   }
 

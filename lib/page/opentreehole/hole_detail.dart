@@ -190,7 +190,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var route = ModalRoute.of(context);
+    final route = ModalRoute.of(context);
 
     // Defining an internal function to be able to remove the listener
     void handler(status) {
