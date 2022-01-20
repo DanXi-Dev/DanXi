@@ -64,6 +64,7 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
+import 'package:screen_capture_event/screen_capture_event.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -89,6 +90,8 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences? _preferences;
+
+  final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
@@ -133,6 +136,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
     _captchaSubscription.cancel();
+    screenListener.dispose();
     super.dispose();
   }
 
@@ -444,6 +448,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
       });
     }
+
+    screenListener.addScreenRecordListener((recorded) {
+      Noticing.showScreenshotWarning(context);
+    });
+    screenListener.addScreenShotListener((filePath) {
+      Noticing.showScreenshotWarning(context);
+    });
+    screenListener.watch();
   }
 
   @override

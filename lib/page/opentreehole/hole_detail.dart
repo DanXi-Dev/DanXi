@@ -23,6 +23,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -42,7 +43,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
-import 'package:screen_capture_event/screen_capture_event.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -93,7 +93,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   late OTHole _post;
   String? _searchKeyword;
   FileImage? _backgroundImage;
-  final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
 
   /// Fields related to the display states.
   bool? _isFavored;
@@ -101,7 +100,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
-  bool hasRegisteredScreenShotListener = false;
+
   final TimeBasedLoadAdaptLayer<OTFloor> adaptLayer =
       TimeBasedLoadAdaptLayer(10, 1);
 
@@ -144,21 +143,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (widget.arguments!.containsKey('locate')) {
       locateFloor = widget.arguments!["locate"];
     }
+    StateProvider.needScreenshotWarning = true;
   }
 
   void registerScreenShotListener() {
     // Prevents repeated listener registration
     // TODO: this is not ideal, should we really need multiple listeners, this will cause unexpected disposal.
-    screenListener.dispose();
-
-    screenListener.addScreenRecordListener((recorded) {
-      Noticing.showScreenshotWarning(context);
-    });
-    screenListener.addScreenShotListener((filePath) {
-      Noticing.showScreenshotWarning(context);
-    });
-    screenListener.watch();
-    hasRegisteredScreenShotListener = true;
   }
 
   Future<void> scrollDownToFloor(OTFloor floor) async {
@@ -175,12 +165,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     } catch (_) {}
   }
 
-  @override
-  void dispose() {
-    screenListener.dispose();
-    super.dispose();
-  }
-
   /// Rebuild everything and refresh itself.
   Future<void> refreshSelf({scrollToEnd = false}) async {
     //if (scrollToEnd) _listViewController.queueScrollToEnd();
@@ -189,38 +173,29 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final route = ModalRoute.of(context);
+  void dispose() {
+    StateProvider.needScreenshotWarning = false;
+    super.dispose();
+  }
 
-    // Defining an internal function to be able to remove the listener
-    void handler(status) {
-      Future<void> asyncCall() async {
-        try {
-          // Replaced precached data with updated ones
-          _listViewController.replaceInitialData(
-              (await OpenTreeHoleRepository.getInstance().loadFloors(_post))!);
-        } catch (_) {}
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      try {
+        // Replaced precached data with updated ones
+        _listViewController.replaceInitialData(
+            (await OpenTreeHoleRepository.getInstance().loadFloors(_post))!);
+      } catch (_) {}
+      if (locateFloor != null) {
         try {
           // Scroll to the specific floor
-          if (locateFloor != null) await scrollDownToFloor(locateFloor!);
+          await scrollDownToFloor(locateFloor!);
           locateFloor = null;
         } catch (_) {}
       }
-
-      if (status == AnimationStatus.completed) {
-        if (!hasRegisteredScreenShotListener) {
-          registerScreenShotListener();
-        }
-        asyncCall();
-        route?.animation?.removeStatusListener(handler);
-      }
-    }
-
-    route?.animation?.addStatusListener(handler);
-    // WidgetsBinding.instance?.addPostFrameCallback((_) {
-    //
-    // });
+    });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
+
     return PlatformScaffold(
       iosContentPadding: false,
       iosContentBottomPadding: false,

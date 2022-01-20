@@ -28,10 +28,6 @@ import 'package:flutter/cupertino.dart';
 /// Application layer, rather than in any classes of Util, Model or Repository.
 /// Do NOT break the decoupling of the project!
 class StateProvider {
-  StateProvider() {
-    throw UnimplementedError();
-  }
-
   /// The user's basic information.
   static final ValueNotifier<PersonInfo?> personInfo = ValueNotifier(null);
 
@@ -41,7 +37,11 @@ class StateProvider {
   /// The current division.
   static OTDivision? divisionId;
 
+  /// Whether need to display screenshot warning
+  static bool needScreenshotWarning = false;
+
   static void initialize() {
+    divisionId = null;
     personInfo.value = null;
     editorCache.clear();
   }
