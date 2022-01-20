@@ -15,12 +15,23 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 
 /// A list page showing the reports for administrators.
 class OTSearchPage extends StatefulWidget {
@@ -33,9 +44,82 @@ class OTSearchPage extends StatefulWidget {
 }
 
 class _OTSearchPageState extends State<OTSearchPage> {
-  @override
-  void initState() {
-    super.initState();
+  final RegExp pidPattern = RegExp(r'#{1}([0-9]+)');
+  final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
+
+  Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    try {
+      final OTHole? post =
+          await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
+      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+        "post": post!,
+      });
+    } catch (error) {
+      if (error is DioError &&
+          error.response?.statusCode == HttpStatus.notFound) {
+        Noticing.showNotice(context, S.of(context).post_does_not_exist,
+            title: S.of(context).fatal_error, useSnackBar: false);
+      } else {
+        Noticing.showNotice(
+            context,
+            ErrorPageWidget.generateUserFriendlyDescription(
+                S.of(context), error),
+            title: S.of(context).fatal_error,
+            useSnackBar: false);
+      }
+    }
+    progressDialog.dismiss(showAnim: false);
+  }
+
+  Future<void> submit(String value) async {
+    value = value.trim();
+    if (value.isEmpty) return;
+
+    final history = SettingsProvider.getInstance().searchHistory;
+    // Populate history
+    if (!history.contains(value)) {
+      setState(() {
+        SettingsProvider.getInstance().searchHistory = [value] + history;
+      });
+    }
+
+    // Determine if user is using #PID pattern to reach a specific post
+    try {
+      final floorMatch = floorPattern.firstMatch(value)!;
+      ProgressFuture progressDialog = showProgressDialog(
+          loadingText: S.of(context).logout, context: context);
+      try {
+        final floor = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificFloor(int.parse(floorMatch.group(1)!)))!;
+        progressDialog.dismiss(showAnim: false);
+        OTFloorMentionWidget.showFloorDetail(context, floor);
+      } catch (error) {
+        progressDialog.dismiss(showAnim: false);
+        if (error is DioError &&
+            error.response?.statusCode == HttpStatus.notFound) {
+          Noticing.showNotice(context, S.of(context).post_does_not_exist,
+              title: S.of(context).fatal_error, useSnackBar: false);
+        } else {
+          Noticing.showNotice(
+              context,
+              ErrorPageWidget.generateUserFriendlyDescription(
+                  S.of(context), error),
+              title: S.of(context).fatal_error,
+              useSnackBar: false);
+        }
+      }
+      return;
+    } catch (ignored) {}
+    try {
+      final pidMatch = pidPattern.firstMatch(value)!;
+      _goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
+      return;
+    } catch (ignored) {}
+
+    smartNavigatorPush(context, "/bbs/postDetail",
+        arguments: {"searchKeyword": value});
   }
 
   @override
@@ -45,28 +129,62 @@ class _OTSearchPageState extends State<OTSearchPage> {
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: TopController(
-          controller: PrimaryScrollController.of(context),
-          child: Text(S.of(context).messages),
-        ),
+        title: Text(S.of(context).search),
         trailingActions: const [],
       ),
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            const Hero(
+            Hero(
               transitionOnUserGestures: true,
               tag: 'OTSearchWidget',
-              child: OTSearchWidget(),
-            ),
-            /*Expanded(
-              child: SingleChildScrollView(
-                child: ListView(
-                  children: [],
+              child: Padding(
+                padding: Theme.of(context).cardTheme.margin ??
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: CupertinoSearchTextField(
+                  autofocus: true,
+                  placeholder: S.of(context).search_hint,
+                  onSubmitted: submit,
                 ),
               ),
-            ),*/
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(S.of(context).history),
+                  PlatformTextButton(
+                    alignment: Alignment.centerLeft,
+                    child: Text(S.of(context).clear),
+                    onPressed: () => setState(() {
+                      SettingsProvider.getInstance().searchHistory = null;
+                    }),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                primary: false,
+                shrinkWrap: true,
+                //reverse: true,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                children: SettingsProvider.getInstance()
+                    .searchHistory
+                    .map((e) => PlatformTextButton(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 16),
+                          alignment: Alignment.centerLeft,
+                          child: Text(e),
+                          onPressed: () => submit(e),
+                        ))
+                    .toList(growable: false),
+              ),
+            ),
           ],
         ),
       ),

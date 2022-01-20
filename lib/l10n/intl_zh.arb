@@ -111,7 +111,7 @@
     "logout_question_prompt_title": "确定要退出登录吗？",
     "logout_question_prompt": "所有存储在本地的数据将被删除。",
     "logout_prompt": "重新启动 App 以删除数据",
-    "fduhole_user_id": "已登录 ({id})",
+    "fduhole_user_id": "已登录 (ID: {id})",
     "windows_auto_start_title":"自动启动",
     "windows_auto_start_description":"在开机启动时自动打开旦夕",
     "windows_auto_start_wait_dialog_title":"等待弹出授权窗口",
@@ -221,6 +221,9 @@
     "week":"第 {week} 周",
     "postgraduates_need_login":"点击此处以登录课表系统。",
     "not_fudan_student":"非复旦学生暂不支持课表功能。",
+    "search": "搜索",
+    "history": "历史记录",
+    "clear": "清除",
 
     "you_need_login":"点击[登录]以登录到 FDUHole。",
     "select_login_method":"选择您的登录/注册方式",

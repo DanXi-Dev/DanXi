@@ -56,10 +56,27 @@ class SettingsProvider {
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
   static const String KEY_CELEBRATION = "celebration";
   static const String KEY_BACKGROUND_IMAGE_PATH = "background";
+  static const String KEY_SEARCH_HISTORY = "search_history";
 
   SettingsProvider._();
 
   factory SettingsProvider.getInstance() => _instance;
+
+  List<String> get searchHistory {
+    if (preferences!.containsKey(KEY_SEARCH_HISTORY)) {
+      return preferences!.getStringList(KEY_SEARCH_HISTORY) ??
+          List<String>.empty();
+    }
+    return List<String>.empty();
+  }
+
+  set searchHistory(List<String>? value) {
+    if (value != null) {
+      preferences!.setStringList(KEY_SEARCH_HISTORY, value);
+    } else if (preferences!.containsKey(KEY_SEARCH_HISTORY)) {
+      preferences!.remove(KEY_SEARCH_HISTORY);
+    }
+  }
 
   FileImage? get backgroundImage {
     final path = backgroundImagePath;

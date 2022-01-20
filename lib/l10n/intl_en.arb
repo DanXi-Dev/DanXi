@@ -78,7 +78,7 @@
     "logout_question_prompt_title": "Are you sure?",
     "logout_question_prompt": "All data stored locally will be deleted.",
     "logout_prompt": "You need to restart this app for changes to take effect.",
-    "fduhole_user_id": "Online ({id})",
+    "fduhole_user_id": "Online (ID: {id})",
     "windows_auto_start_title":"Auto start",
     "windows_auto_start_description":"Automatically start DanXi on boot",
     "windows_auto_start_wait_dialog_title":"Wait for permission",
@@ -285,6 +285,9 @@
     "delete": "Delete",
     "are_you_sure": "Are you sure?",
     "about_to_delete_floor": "You are about to delete floor #{floor}",
+    "search": "Search",
+    "history": "History",
+    "clear": "Clear",
 
     "fold": "Fold",
     "hide": "Hide",
