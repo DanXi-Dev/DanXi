@@ -100,6 +100,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
+  OTFloor? locateFloor;
   bool hasRegisteredScreenShotListener = false;
   final TimeBasedLoadAdaptLayer<OTFloor> adaptLayer =
       TimeBasedLoadAdaptLayer(10, 1);
@@ -140,6 +141,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
+    if (widget.arguments!.containsKey('locate')) {
+      locateFloor = widget.arguments!["locate"];
+    }
   }
 
   void registerScreenShotListener() {
@@ -155,6 +159,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     });
     screenListener.watch();
     hasRegisteredScreenShotListener = true;
+  }
+
+  Future<void> scrollDownToFloor(OTFloor floor) async {
+    try {
+      // Scroll to the corresponding post
+      while (!(await _listViewController.scrollToItem(floor))) {
+        // Prevent deadlock
+        if (_listViewController.isEnded) {
+          break;
+        }
+        await _listViewController.scrollDelta(
+            100, const Duration(milliseconds: 1), Curves.linear);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -176,18 +194,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
     // Defining an internal function to be able to remove the listener
     void handler(status) {
+      Future<void> asyncCall() async {
+        try {
+          // Replaced precached data with updated ones
+          _listViewController.replaceInitialData(
+              (await OpenTreeHoleRepository.getInstance().loadFloors(_post))!);
+        } catch (_) {}
+        try {
+          // Scroll to the specific floor
+          if (locateFloor != null) await scrollDownToFloor(locateFloor!);
+          locateFloor = null;
+        } catch (_) {}
+      }
+
       if (status == AnimationStatus.completed) {
         if (!hasRegisteredScreenShotListener) {
           registerScreenShotListener();
         }
-        // Replaced precached data with updated ones
-        OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
-          try {
-            _listViewController.replaceInitialData(value!);
-          }
-          // It is not a problem if we cannot replace the data
-          catch (_) {}
-        }, onError: (_) {});
+        asyncCall();
         route?.animation?.removeStatusListener(handler);
       }
     }

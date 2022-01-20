@@ -382,7 +382,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                             }
                             return;
                           }
-                        } catch (ignored) {}
+                        } catch (_) {}
 
                         // If this floor is in another hole
                         ProgressFuture progressDialog = showProgressDialog(
@@ -394,18 +394,18 @@ class OTFloorMentionWidget extends StatelessWidget {
                                 "post":
                                     await OpenTreeHoleRepository.getInstance()
                                         .loadSpecificHole(floor.hole_id!),
-                                "locate": floor.floor_id!,
+                                "locate": floor,
                                 // TODO: jump to specific floor after push
                               });
-                          progressDialog.dismiss(showAnim: false);
                         } catch (e) {
-                          progressDialog.dismiss(showAnim: false);
                           Noticing.showNotice(
                               context,
                               ErrorPageWidget.generateUserFriendlyDescription(
                                   S.of(context), e),
                               title: S.of(context).fatal_error,
                               useSnackBar: false);
+                        } finally {
+                          progressDialog.dismiss(showAnim: false);
                         }
                       },
                       child: Text(S.of(cxt).jump_to_hole),
