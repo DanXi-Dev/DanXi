@@ -31,6 +31,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -345,10 +346,17 @@ class OTFloorMentionWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              OTFloorWidget(
-                hasBackgroundImage: false,
-                floor: floor,
-                showBottomBar: false,
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxHeight: ViewportUtils.getViewportHeight(context) / 2),
+                child: SingleChildScrollView(
+                  primary: false,
+                  child: OTFloorWidget(
+                    hasBackgroundImage: false,
+                    floor: floor,
+                    showBottomBar: false,
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -395,7 +403,6 @@ class OTFloorMentionWidget extends StatelessWidget {
                                     await OpenTreeHoleRepository.getInstance()
                                         .loadSpecificHole(floor.hole_id!),
                                 "locate": floor,
-                                // TODO: jump to specific floor after push
                               });
                         } catch (e) {
                           Noticing.showNotice(
