@@ -203,6 +203,10 @@ class DanxiApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate
             ],
             supportedLocales: S.delegate.supportedLocales,
+            onUnknownRoute: (settings) {
+              throw AssertionError(
+                  "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code.");
+            },
             home: PlatformMasterDetailApp(
               // Configure the page route behaviour of the whole app
               onGenerateRoute: (settings) {

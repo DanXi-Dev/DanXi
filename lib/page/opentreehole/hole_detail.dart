@@ -327,25 +327,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           ),
 
         // Standard Operations
-        if (!isHtml(e.filteredContent!))
-          PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheetAction(
-              onPressed: () {
-                Navigator.of(menuContext).pop();
-                smartNavigatorPush(menuContext, "/text/detail",
-                    arguments: {"text": e.filteredContent});
-              },
-              child: Text(S.of(menuContext).free_select),
-            ),
-            material: (_, __) => ListTile(
-              title: Text(S.of(menuContext).free_select),
-              onTap: () {
-                Navigator.of(menuContext).pop();
-                smartNavigatorPush(menuContext, "/text/detail",
-                    arguments: {"text": e.filteredContent});
-              },
-            ),
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(menuContext).pop();
+              smartNavigatorPush(menuContext, "/text/detail",
+                  arguments: {"text": e.filteredContent});
+            },
+            child: Text(S.of(menuContext).free_select),
           ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(menuContext).free_select),
+            onTap: () {
+              Navigator.of(menuContext).pop();
+              smartNavigatorPush(menuContext, "/text/detail",
+                  arguments: {"text": e.filteredContent});
+            },
+          ),
+        ),
         PlatformWidget(
           cupertino: (_, __) => CupertinoActionSheetAction(
             onPressed: () {

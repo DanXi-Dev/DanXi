@@ -85,17 +85,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
             decoration: const BoxDecoration(),
             child: Navigator(
               key: detailNavigatorKey,
-              onGenerateRoute: (settings) {
-                final Function? pageContentBuilder =
-                    DanxiApp.routes[settings.name!];
-                if (pageContentBuilder != null) {
-                  return platformPageRoute(
-                      context: context,
-                      builder: (context) => pageContentBuilder(context,
-                          arguments: settings.arguments));
-                }
-                return null;
-              },
+              onGenerateRoute: onGenerateRoute,
               initialRoute: '/placeholder',
             ),
           ),
