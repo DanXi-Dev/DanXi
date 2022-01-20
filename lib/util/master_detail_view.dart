@@ -22,6 +22,8 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+GlobalKey<NavigatorState>? navigatorGlobalKey;
+
 class PlatformMasterDetailApp extends StatelessWidget {
   final RouteFactory? onGenerateRoute;
   final GlobalKey<NavigatorState>? navigatorKey;
@@ -32,6 +34,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    navigatorGlobalKey = navigatorKey;
     if (PlatformX.isCupertino(context)) {
       return buildView(context);
     } else {
@@ -112,7 +115,10 @@ Future<T?> smartNavigatorPush<T extends Object>(
     return detailNavigatorKey.currentState!
         .pushNamed<T?>(routeName, arguments: arguments);
   }
-  return Navigator.of(context).pushNamed<T?>(routeName, arguments: arguments);
+  var result = navigatorGlobalKey?.currentState
+      ?.pushNamed<T?>(routeName, arguments: arguments);
+  if (result != null) return result;
+  return Navigator.of(context).pushNamed(routeName, arguments: arguments);
 }
 
 NavigatorState? get auxiliaryNavigatorState => detailNavigatorKey.currentState;
