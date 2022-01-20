@@ -49,7 +49,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  bool showUnreadOnly = false;
+  bool showUnreadOnly = true;
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTMessage>?> _loadContent(int page) async {
