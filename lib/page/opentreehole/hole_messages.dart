@@ -21,6 +21,8 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -49,11 +51,10 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  bool showUnreadOnly = true;
+  bool showUnreadOnly = false;
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTMessage>?> _loadContent(int page) async {
-    //return OpenTreeHoleRepository.getInstance().loadMessages(unreadOnly: false);
     return await adaptLayer.generateReceiver(_listViewController,
         (lastElement) {
       DateTime? time;
@@ -105,6 +106,29 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
                 showUnreadOnly = !showUnreadOnly;
               });
               await indicatorKey.currentState?.show();
+            },
+          ),
+          const SizedBox(
+            width: 8,
+          ),
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(
+              S.of(context).mark_all_as_read,
+              softWrap: true,
+              textScaleFactor: MediaQuery.textScaleFactorOf(context),
+            ),
+            onPressed: () async {
+              try {
+                await OpenTreeHoleRepository.getInstance().clearMessages();
+                await indicatorKey.currentState?.show();
+              } catch (e) {
+                Noticing.showNotice(
+                    context,
+                    ErrorPageWidget.generateUserFriendlyDescription(
+                        S.of(context), e),
+                    title: S.of(context).fatal_error);
+              }
             },
           )
         ],

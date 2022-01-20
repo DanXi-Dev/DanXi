@@ -552,12 +552,12 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            await refreshList();
             try {
               await listViewController.scrollToIndex(0);
               // It is not important if [listViewController] is not attached to a ListView.
             } catch (_) {}
-            HapticFeedback.mediumImpact();
-            await refreshList();
           },
           child: PagedListView<OTHole>(
               noneItem: OTHole.DUMMY_POST,

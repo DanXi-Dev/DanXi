@@ -194,6 +194,7 @@
     "login_from_treehole_page": "Please login from FDUHole page.",
     "show_unread": "Show Unread",
     "show_all": "Show All",
+    "mark_all_as_read": "Read All",
 
     "last_7_days":"Last 7 days",
     "last_15_days":"Last 15 days",
