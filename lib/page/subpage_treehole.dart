@@ -154,6 +154,7 @@ class _OTTitleState extends State<OTTitle> {
         onPointerUp: (PointerUpEvent details) {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
               OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty) {
+            HapticFeedback.selectionClick();
             showPlatformModalSheet(
                 context: context,
                 builder: (BuildContext context) {
@@ -511,7 +512,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
-            HapticFeedback.mediumImpact();
+            HapticFeedback.selectionClick();
             await refreshList();
           },
           child: PagedListView<OTHole>(

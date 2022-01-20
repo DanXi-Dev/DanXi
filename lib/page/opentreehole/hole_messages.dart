@@ -98,7 +98,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
-            HapticFeedback.mediumImpact();
+            HapticFeedback.selectionClick();
             await refreshSelf();
           },
           child: Material(
