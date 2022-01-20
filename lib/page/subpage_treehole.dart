@@ -323,6 +323,10 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
           return OpenTreeHoleRepository.getInstance()
               .loadHoles(time, _divisionId, tag: _tagFilter);
         }).call(page);
+
+        // If not more posts, notify ListView that we reached the end.
+        if (loadedPost?.isEmpty ?? false) return [];
+
         // Filter blocked posts
         List<OTTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];

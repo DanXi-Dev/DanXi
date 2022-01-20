@@ -467,7 +467,7 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   /// Returns whether the scroll was successful or not
   /// May fail due to RenderObject not cached
-  /// in which case, try scrolling up
+  /// in which case, try scrolling up/down to find the item
   Future<bool> scrollToItem(T item,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     try {
