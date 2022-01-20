@@ -91,7 +91,7 @@ class BBSPostDetail extends StatefulWidget {
 class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
-  late OTHole _post;
+  late OTHole _hole;
   String? _searchKeyword;
   FileImage? _backgroundImage;
 
@@ -101,9 +101,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
-
-  final TimeBasedLoadAdaptLayer<OTFloor> adaptLayer =
-      TimeBasedLoadAdaptLayer(10, 1);
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
@@ -116,7 +113,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           startFloor: _listViewController.length());
     } else {
       return await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_post, startFloor: page * 10);
+          .loadFloors(_hole, startFloor: page * 10);
     }
   }
 
@@ -125,7 +122,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     final List<int>? favorites =
         await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
     return favorites!.any((element) {
-      return element == _post.hole_id;
+      return element == _hole.hole_id;
     });
   }
 
@@ -133,11 +130,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   void initState() {
     super.initState();
     if (widget.arguments!.containsKey('post')) {
-      _post = widget.arguments!['post'];
+      _hole = widget.arguments!['post'];
+      // Cache preloaded floor only when user views the Hole
+      for (var floor
+          in _hole.floors?.prefetch ?? List<OTFloor>.empty(growable: false)) {
+        OpenTreeHoleRepository.getInstance().cacheFloor(floor);
+      }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
       _searchKeyword = widget.arguments!['searchKeyword'];
       // Create a dummy post for displaying search result
-      _post = OTHole.dummy();
+      _hole = OTHole.dummy();
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
@@ -145,11 +147,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       locateFloor = widget.arguments!["locate"];
     }
     StateProvider.needScreenshotWarning = true;
-  }
-
-  void registerScreenShotListener() {
-    // Prevents repeated listener registration
-    // TODO: this is not ideal, should we really need multiple listeners, this will cause unexpected disposal.
   }
 
   Future<void> scrollDownToFloor(OTFloor floor) async {
@@ -185,7 +182,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       try {
         // Replaced precached data with updated ones
         _listViewController.replaceInitialData(
-            (await OpenTreeHoleRepository.getInstance().loadFloors(_post))!);
+            (await OpenTreeHoleRepository.getInstance().loadFloors(_hole))!);
       } catch (_) {}
       if (locateFloor != null) {
         try {
@@ -205,7 +202,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? "#${_post.hole_id}"
+              ? "#${_hole.hole_id}"
               : S.of(context).search_result),
         ),
         trailingActions: [
@@ -218,7 +215,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
                 if (await OTEditor.createNewReply(
-                    context, _post.hole_id, null)) {
+                    context, _hole.hole_id, null)) {
                   await refreshSelf();
                 }
               },
@@ -244,7 +241,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 await refreshSelf();
               },
               child: PagedListView<OTFloor>(
-                initialData: _post.floors?.prefetch,
+                initialData: _hole.floors?.prefetch,
                 pagedController: _listViewController,
                 withScrollbar: true,
                 scrollController: PrimaryScrollController.of(context),
@@ -258,8 +255,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 endBuilder: (context) => Center(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: Text((_post.view ?? -1) >= 0
-                        ? S.of(context).view_count(_post.view.toString())
+                    child: Text((_hole.view ?? -1) >= 0
+                        ? S.of(context).view_count(_hole.view.toString())
                         : S.of(context).end_reached),
                   ),
                 ),
@@ -294,7 +291,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           await OpenTreeHoleRepository.getInstance()
               .setFavorite(
                   _isFavored! ? SetFavoriteMode.ADD : SetFavoriteMode.DELETE,
-                  _post.hole_id)
+                  _hole.hole_id)
               .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
                 title: S.of(context).operation_failed, useSnackBar: false);
@@ -462,7 +459,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       floor: floor,
       index: _searchKeyword == null ? index : null,
       isInMention: isNested,
-      parentHole: _post,
+      parentHole: _hole,
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
@@ -487,11 +484,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         if (_searchKeyword == null) {
           int? replyId;
           // Set the replyId to null when tapping on the first reply.
-          if (_post.floors!.first_floor!.floor_id != floor.floor_id) {
+          if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
             replyId = floor.floor_id;
             OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
-          if (await OTEditor.createNewReply(context, _post.hole_id, replyId)) {
+          if (await OTEditor.createNewReply(context, _hole.hole_id, replyId)) {
             await refreshSelf();
           }
         } else {

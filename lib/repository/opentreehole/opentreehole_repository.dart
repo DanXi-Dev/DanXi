@@ -273,10 +273,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data);
     for (var floor in hole.floors!.prefetch!) {
+      cacheFloor(floor);
       floor.mention?.forEach((mention) {
-        _floorCache
-            .removeWhere((element) => element.floor_id == mention.floor_id);
-        _floorCache.add(mention);
+        cacheFloor(mention);
       });
     }
     return hole;
@@ -289,8 +288,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       final Response response = await dio!.get(_BASE_URL + "/floors/$floorId",
           options: Options(headers: _tokenHeader));
       final floor = OTFloor.fromJson(response.data);
-      _floorCache.removeWhere((element) => element.floor_id == floor.floor_id);
-      _floorCache.add(floor);
+      cacheFloor(floor);
       return floor;
     }
   }
@@ -307,6 +305,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final List result = response.data;
     final floors = result.map((e) => OTFloor.fromJson(e)).toList();
     for (var element in floors) {
+      cacheFloor(element);
       element.mention?.forEach((mention) {
         cacheFloor(mention);
       });

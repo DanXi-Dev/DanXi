@@ -134,11 +134,19 @@ class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return OTMentionPreviewWidget(
-      id: int.parse(element.textContent),
-      type: OTMentionType.FLOOR,
-      hasBackgroundImage: hasBackgroundImage,
-    );
+    if (isPreviewWidget) {
+      return OTMentionPreviewWidget(
+        id: int.parse(element.textContent),
+        type: OTMentionType.FLOOR,
+        hasBackgroundImage: hasBackgroundImage,
+      );
+    } else {
+      return OTFloorMentionWidget(
+        future: OpenTreeHoleRepository.getInstance()
+            .loadSpecificFloor(int.parse(element.textContent)),
+        hasBackgroundImage: hasBackgroundImage,
+      );
+    }
   }
 }
 
@@ -150,11 +158,20 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return OTMentionPreviewWidget(
-      id: int.parse(element.textContent),
-      type: OTMentionType.HOLE,
-      hasBackgroundImage: hasBackgroundImage,
-    );
+    if (isPreviewWidget) {
+      return OTMentionPreviewWidget(
+        id: int.parse(element.textContent),
+        type: OTMentionType.HOLE,
+        hasBackgroundImage: hasBackgroundImage,
+      );
+    } else {
+      return OTFloorMentionWidget(
+        future: OpenTreeHoleRepository.getInstance()
+            .loadSpecificHole(int.parse(element.textContent))
+            .then((value) => value?.floors?.first_floor),
+        hasBackgroundImage: hasBackgroundImage,
+      );
+    }
   }
 }
 

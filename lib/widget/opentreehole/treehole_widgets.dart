@@ -405,7 +405,8 @@ class OTFloorMentionWidget extends StatelessWidget {
               children: [
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                      maxHeight: ViewportUtils.getViewportHeight(context) / 2),
+                      maxHeight:
+                          ViewportUtils.getViewportHeight(context) * 0.85),
                   child: SingleChildScrollView(
                     primary: false,
                     child: OTFloorWidget(
