@@ -90,7 +90,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
-            HapticFeedback.selectionClick();
+            HapticFeedback.mediumImpact();
             refreshSelf();
           },
           child: Material(

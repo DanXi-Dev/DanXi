@@ -169,7 +169,7 @@ class _OTTitleState extends State<OTTitle> {
         onPointerUp: (PointerUpEvent details) {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
               OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty) {
-            HapticFeedback.selectionClick();
+            HapticFeedback.mediumImpact();
             showPlatformModalSheet(
                 context: context,
                 builder: (BuildContext context) {
@@ -556,7 +556,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
               await listViewController.scrollToIndex(0);
               // It is not important if [listViewController] is not attached to a ListView.
             } catch (_) {}
-            HapticFeedback.selectionClick();
+            HapticFeedback.mediumImpact();
             await refreshList();
           },
           child: PagedListView<OTHole>(

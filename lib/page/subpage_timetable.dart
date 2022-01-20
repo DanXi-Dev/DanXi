@@ -320,7 +320,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           _manualLoad = true;
-          HapticFeedback.selectionClick();
+          HapticFeedback.mediumImpact();
           await refreshSelf();
         },
         child: ListView(

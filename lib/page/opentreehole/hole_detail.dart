@@ -239,7 +239,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               color: Theme.of(context).colorScheme.secondary,
               backgroundColor: Theme.of(context).dialogBackgroundColor,
               onRefresh: () async {
-                HapticFeedback.selectionClick();
+                HapticFeedback.mediumImpact();
                 await refreshSelf();
               },
               child: PagedListView<OTFloor>(
