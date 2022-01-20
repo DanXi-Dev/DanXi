@@ -104,11 +104,12 @@ Future<T?> smartNavigatorPush<T extends Object>(
   if (isTablet(context) && !forcePushOnMainNavigator) {
     return detailNavigatorKey.currentState!
         .pushNamed<T?>(routeName, arguments: arguments);
+  } else if (navigatorGlobalKey?.currentState != null) {
+    return navigatorGlobalKey!.currentState!
+        .pushNamed<T?>(routeName, arguments: arguments);
+  } else {
+    return Navigator.of(context).pushNamed(routeName, arguments: arguments);
   }
-  var result = navigatorGlobalKey?.currentState
-      ?.pushNamed<T?>(routeName, arguments: arguments);
-  if (result != null) return result;
-  return Navigator.of(context).pushNamed(routeName, arguments: arguments);
 }
 
 NavigatorState? get auxiliaryNavigatorState => detailNavigatorKey.currentState;
