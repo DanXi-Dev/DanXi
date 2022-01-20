@@ -49,6 +49,8 @@ abstract class Feature {
 
   Widget? get trailing => null;
 
+  EdgeInsets? get padding => null;
+
   bool get removable => false;
 
   late FeatureContainerState container;

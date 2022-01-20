@@ -61,7 +61,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
     }
     Widget card = Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: widget.feature.padding ?? const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

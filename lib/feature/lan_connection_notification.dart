@@ -31,6 +31,9 @@ class LanConnectionNotification extends Feature {
   bool get removable => true;
 
   @override
+  EdgeInsets get padding => EdgeInsets.fromLTRB(12, 12, 12, 0);
+
+  @override
   String get subTitle => S.of(context!).lan_connection_issue_1_description;
 
   @override
@@ -38,36 +41,33 @@ class LanConnectionNotification extends Feature {
 
   @override
   Widget get trailing {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        TextButton(
-          child: Text(
-            S.of(context!).lan_connection_issue_1_action,
-            textScaleFactor: 0.8,
-          ),
-          // User needs to download the vpn software. Open an external browser.
-          onPressed: () => showPlatformDialog(
-              context: context!,
-              builder: (cxt) => PlatformAlertDialog(
-                    title:
-                        Text(S.of(context!).lan_connection_issue_1_guide_title),
-                    content: PostRenderWidget(
-                      content:
-                          S.of(context!).lan_connection_issue_1_guide_content,
-                      render: kMarkdownRender,
-                      onTapLink: (url) => launch(url!),
-                      hasBackgroundImage: false,
-                    ),
-                    actions: [
-                      PlatformDialogAction(
-                        child: Text(S.of(context!).i_see),
-                        onPressed: () => Navigator.of(cxt).pop(),
-                      )
-                    ],
-                  )),
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      PlatformTextButton(
+        padding: EdgeInsets.zero,
+        child: Text(
+          S.of(context!).lan_connection_issue_1_action,
+          textScaleFactor: 0.8,
         ),
-      ],
-    );
+        // User needs to download the vpn software. Open an external browser.
+        onPressed: () => showPlatformDialog(
+          context: context!,
+          builder: (cxt) => PlatformAlertDialog(
+            title: Text(S.of(context!).lan_connection_issue_1_guide_title),
+            content: PostRenderWidget(
+              content: S.of(context!).lan_connection_issue_1_guide_content,
+              render: kMarkdownRender,
+              onTapLink: (url) => launch(url!),
+              hasBackgroundImage: false,
+            ),
+            actions: [
+              PlatformDialogAction(
+                child: Text(S.of(context!).i_see),
+                onPressed: () => Navigator.of(cxt).pop(),
+              )
+            ],
+          ),
+        ),
+      ),
+    ]);
   }
 }
