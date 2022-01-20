@@ -446,6 +446,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
   }
 
+  Future<void> clearMessages() async {
+    await dio!.put(_BASE_URL + "/messages",
+        data: {
+          "clear_all": true,
+        },
+        options: Options(headers: _tokenHeader));
+  }
+
   Future<bool?> isUserAdmin() async {
     return (await getUserProfile())!.is_admin;
   }
