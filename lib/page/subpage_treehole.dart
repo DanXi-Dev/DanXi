@@ -663,7 +663,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                     Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
                         alignment: WrapAlignment.spaceBetween,
-                        runSpacing: 8,
+                        runSpacing: 4,
                         children: [
                           generateTagWidgets(context, postElement,
                               (String? tagName) {
@@ -696,6 +696,9 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                             ],
                           ),
                         ]),
+                    const SizedBox(
+                      height: 4,
+                    ),
                     (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
                         ? ExpansionTileX(
                             expandedCrossAxisAlignment:
@@ -713,7 +716,8 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                               ])
                         : postContentWidget,
                   ]),
-              subtitle: Column(children: [
+              subtitle:
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 const SizedBox(height: 12),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
