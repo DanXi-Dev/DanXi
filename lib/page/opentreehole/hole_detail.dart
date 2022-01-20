@@ -31,6 +31,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
@@ -303,84 +304,155 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) => [
-        if (e.is_me == true && e.deleted == false)
-          PlatformWidget(
-            cupertino: (_, __) => CupertinoActionSheetAction(
-              onPressed: () async {
-                Navigator.of(menuContext).pop();
-                await BBSEditor.modifyReply(
-                    menuContext, e.hole_id, e.floor_id, e.content);
-                await refreshSelf();
-              },
-              child: Text(S.of(context).modify),
-            ),
-            material: (_, __) => ListTile(
-              title: Text(S.of(context).modify),
-              onTap: () async {
-                Navigator.of(menuContext).pop();
-                await BBSEditor.modifyReply(
-                    menuContext, e.hole_id, e.floor_id, e.content);
-                await refreshSelf();
-              },
-            ),
-          ),
+  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
+    List<Widget> _buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
+      Future<void> onExecutePenalty(int level) async {
+        await OpenTreeHoleRepository.getInstance().adminAddPenalty(
+            e.floor_id, level, TreeHoleSubpageState.divisionId);
+        await refreshSelf();
+      }
 
-        // Standard Operations
-        PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(menuContext).pop();
-              smartNavigatorPush(menuContext, "/text/detail",
-                  arguments: {"text": e.filteredContent});
-            },
-            child: Text(S.of(menuContext).free_select),
-          ),
-          material: (_, __) => ListTile(
-            title: Text(S.of(menuContext).free_select),
-            onTap: () {
-              Navigator.of(menuContext).pop();
-              smartNavigatorPush(menuContext, "/text/detail",
-                  arguments: {"text": e.filteredContent});
-            },
-          ),
+      return [
+        PlatformContextMenuItem(
+          onPressed: () => onExecutePenalty(1),
+          child: const Text("Level 1: Ban for Day * 1 "),
+          menuContext: menuContext,
         ),
-        PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(menuContext).pop();
-              FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
-            },
-            child: Text(S.of(menuContext).copy),
-          ),
-          material: (_, __) => ListTile(
-            title: Text(S.of(menuContext).copy),
-            onTap: () {
-              Navigator.of(menuContext).pop();
-              FlutterClipboard.copy(renderText(e.filteredContent!, '', ''))
-                  .then((value) => Noticing.showNotice(
-                      menuContext, S.of(menuContext).copy_success));
-            },
-          ),
+        PlatformContextMenuItem(
+          onPressed: () => onExecutePenalty(2),
+          child: const Text("Level 2: Ban for Day * 5 "),
+          menuContext: menuContext,
         ),
-        PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            isDestructiveAction: true,
-            onPressed: () {
-              Navigator.of(menuContext).pop();
-              BBSEditor.reportPost(menuContext, e.floor_id);
-            },
-            child: Text(S.of(menuContext).report),
-          ),
-          material: (_, __) => ListTile(
-            title: Text(S.of(menuContext).report),
-            onTap: () {
-              Navigator.of(menuContext).pop();
-              BBSEditor.reportPost(menuContext, e.floor_id);
-            },
-          ),
-        ),
+        PlatformContextMenuItem(
+          onPressed: () => onExecutePenalty(3),
+          child: const Text("Level 3: BAN FOREVER"),
+          menuContext: menuContext,
+        )
       ];
+    }
+
+    List<Widget> menu = [
+      if (e.is_me == true && e.deleted == false)
+        PlatformWidget(
+          cupertino: (_, __) => CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.of(menuContext).pop();
+              await BBSEditor.modifyReply(
+                  menuContext, e.hole_id, e.floor_id, e.content);
+              await refreshSelf();
+            },
+            child: Text(S.of(context).modify),
+          ),
+          material: (_, __) => ListTile(
+            title: Text(S.of(context).modify),
+            onTap: () async {
+              Navigator.of(menuContext).pop();
+              await BBSEditor.modifyReply(
+                  menuContext, e.hole_id, e.floor_id, e.content);
+              await refreshSelf();
+            },
+          ),
+        ),
+
+      // Standard Operations
+      PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(menuContext).pop();
+            smartNavigatorPush(menuContext, "/text/detail",
+                arguments: {"text": e.filteredContent});
+          },
+          child: Text(S.of(menuContext).free_select),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(S.of(menuContext).free_select),
+          onTap: () {
+            Navigator.of(menuContext).pop();
+            smartNavigatorPush(menuContext, "/text/detail",
+                arguments: {"text": e.filteredContent});
+          },
+        ),
+      ),
+      PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(menuContext).pop();
+            FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
+          },
+          child: Text(S.of(menuContext).copy),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(S.of(menuContext).copy),
+          onTap: () {
+            Navigator.of(menuContext).pop();
+            FlutterClipboard.copy(renderText(e.filteredContent!, '', '')).then(
+                (value) => Noticing.showNotice(
+                    menuContext, S.of(menuContext).copy_success));
+          },
+        ),
+      ),
+      PlatformWidget(
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          isDestructiveAction: true,
+          onPressed: () {
+            Navigator.of(menuContext).pop();
+            BBSEditor.reportPost(menuContext, e.floor_id);
+          },
+          child: Text(S.of(menuContext).report),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(S.of(menuContext).report),
+          onTap: () {
+            Navigator.of(menuContext).pop();
+            BBSEditor.reportPost(menuContext, e.floor_id);
+          },
+        ),
+      ),
+    ];
+    if (OpenTreeHoleRepository.getInstance().isAdmin) {
+      menu.addAll([
+        PlatformContextMenuItem(
+          onPressed: () async {
+            await BBSEditor.modifyReply(
+                menuContext, e.hole_id, e.floor_id, e.content);
+            await refreshSelf();
+          },
+          child: const Text("Modify this floor"),
+          menuContext: menuContext,
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            if (await Noticing.showConfirmationDialog(context,
+                    "Are you sure to hide this floor? It is hard to undo the operation.",
+                    title: "Confirmation") ==
+                true) {
+              // TODO: Allow inputting delete reason here.
+              await OpenTreeHoleRepository.getInstance()
+                  .adminDeleteFloor(e.floor_id, "");
+              await refreshSelf();
+            }
+          },
+          child: const Text("Hide this floor"),
+          menuContext: menuContext,
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            showPlatformModalSheet(
+                context: context,
+                builder: (subMenuContext) => PlatformContextMenu(
+                    actions: _buildAdminPenaltyMenu(subMenuContext, e),
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () => Navigator.of(context).pop(),
+                    )));
+          },
+          child: const Text("Punish this user"),
+          menuContext: menuContext,
+        ),
+      ]);
+    }
+    return menu;
+  }
 
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,

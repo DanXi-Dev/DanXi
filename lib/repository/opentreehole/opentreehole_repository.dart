@@ -511,12 +511,29 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  /// Admin API below
   Future<List<OTReport>?> adminGetReports() async {
     final response = await dio!.get(_BASE_URL + "/reports",
         //queryParameters: {"category": page, "show_only_undealt": true},
         options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
+  }
+
+  Future<int?> adminDeleteFloor(int? floorId, String? deleteReason) async {
+    return (await dio!.delete(_BASE_URL + "/floors/$floorId",
+            data: {"delete_reason": deleteReason ?? ""},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
+  Future<int?> adminAddPenalty(
+      int? floorId, int penaltyLevel, int divisionId) async {
+    return (await dio!.post(_BASE_URL + "/penalty/$floorId",
+            data: jsonEncode(
+                {"penalty_level": penaltyLevel, "division_id": divisionId}),
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
   }
 
   /// Upload or update Push Notification token to server

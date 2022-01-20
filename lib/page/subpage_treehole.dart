@@ -299,7 +299,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
       TimeBasedLoadAdaptLayer(10, 1);
 
   /// Fields related to the display states.
-  int get _divisionId => StateProvider.divisionId?.division_id ?? 1;
+  static int get divisionId => StateProvider.divisionId?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
@@ -339,7 +339,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
             time = DateTime.now();
           }
           return OpenTreeHoleRepository.getInstance()
-              .loadHoles(time, _divisionId, tag: _tagFilter);
+              .loadHoles(time, divisionId, tag: _tagFilter);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.
@@ -393,7 +393,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
 
   Widget _autoSilenceNotice() {
     final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
-        .getSilenceDateForDivision(_divisionId)
+        .getSilenceDateForDivision(divisionId)
         ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
@@ -421,7 +421,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
   Widget _autoPinnedPosts() {
     return Column(
       children: OpenTreeHoleRepository.getInstance()
-          .getPinned(_divisionId)
+          .getPinned(divisionId)
           .map((e) => _buildListItem(context, null, null, e, isPinned: true))
           .toList(),
     );
@@ -453,7 +453,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
-              await BBSEditor.createNewPost(context, _divisionId);
+              await BBSEditor.createNewPost(context, divisionId);
           if (success) refreshList();
         }),
         hashCode);
@@ -634,8 +634,9 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
         (!isPinned &&
             OpenTreeHoleRepository.getInstance()
-                .getPinned(_divisionId)
+                .getPinned(divisionId)
                 .contains(postElement))) return const SizedBox();
+
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag, S.of(context).formula),
@@ -725,10 +726,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                                   .toLocal()),
                           style: infoStyle),
                       Row(children: [
-                        /*Text("${postElement.view} ", style: infoStyle),
-                        Icon(CupertinoIcons.eye,
-                            size: infoStyle.fontSize, color: infoStyle.color),
-                        const SizedBox(width: 4),*/
                         Text("${postElement.reply} ", style: infoStyle),
                         Icon(
                             PlatformX.isMaterial(context)

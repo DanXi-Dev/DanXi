@@ -15,12 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/main.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 GlobalKey<NavigatorState>? navigatorGlobalKey;
 
@@ -59,9 +57,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
       key: navigatorKey,
       onGenerateRoute: onGenerateRoute,
       initialRoute: '/home',
-      observers: [
-        HeroController(),
-      ],
+      observers: [HeroController()],
     );
     if (!isTablet(context)) {
       return masterNavigatorWidget;
