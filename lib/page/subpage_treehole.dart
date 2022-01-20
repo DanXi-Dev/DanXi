@@ -72,27 +72,40 @@ bool isHtml(String content) {
 
 final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
     multiLine: true, dotAll: true);
-//final RegExp mentionRegExp = RegExp(r"<(floor|hole)_mention>(.*?)</(floor|hole)_mention>");
+final RegExp mentionRegExp =
+    RegExp(r"<(floor|hole)_mention>(.*?)</(floor|hole)_mention>");
 
 /// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
 String renderText(
-    String content, String imagePlaceholder, String formulaPlaceholder) {
+    String content, String imagePlaceholder, String formulaPlaceholder,
+    {bool removeMentions = true}) {
   if (!isHtml(content)) {
     content = md.markdownToHtml(content, inlineSyntaxes: [
       LatexSyntax(),
       LatexMultiLineSyntax(),
-      //MentionSyntax()
+      if (removeMentions) MentionSyntax()
     ]);
   }
   // Deal with LaTex
   content = content.replaceAll(latexRegExp, formulaPlaceholder);
   // Deal with Mention
-  //content = content.replaceAll(mentionRegExp, "");
-  var soup = BeautifulSoup(content);
-  var images = soup.findAll("img");
-  if (images.isNotEmpty) return soup.getText().trim() + imagePlaceholder;
-  return soup.getText().trim();
+  if (removeMentions) content = content.replaceAll(mentionRegExp, "");
+  BeautifulSoup soup = BeautifulSoup(content);
+  List<Bs4Element> images = soup.findAll("img");
+  if (images.isNotEmpty) {
+    return soup.getText().trim() + imagePlaceholder;
+  }
+
+  String result = soup.getText().trim();
+
+  // If we have reduce the text to nothing, we would rather not remove mention texts.
+  if (result.isEmpty) {
+    return renderText(content, imagePlaceholder, formulaPlaceholder,
+        removeMentions: false);
+  } else {
+    return result;
+  }
 }
 
 const String KEY_NO_TAG = "默认";
