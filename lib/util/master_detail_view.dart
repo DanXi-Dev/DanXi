@@ -52,10 +52,13 @@ class PlatformMasterDetailApp extends StatelessWidget {
   }
 
   Widget buildView(BuildContext context) {
-    Widget masterNavigatorWidget = Navigator(
+    final Widget masterNavigatorWidget = Navigator(
       key: navigatorKey,
       onGenerateRoute: onGenerateRoute,
       initialRoute: '/home',
+      observers: [
+        HeroController(),
+      ],
     );
     if (!isTablet(context)) {
       return masterNavigatorWidget;
@@ -76,7 +79,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
               child: masterNavigatorWidget),
           Container(
             width:
-            MediaQuery.of(context).size.width - kTabletMasterContainerWidth,
+                MediaQuery.of(context).size.width - kTabletMasterContainerWidth,
             height: MediaQuery.of(context).size.height,
             clipBehavior: Clip.hardEdge,
             decoration: const BoxDecoration(),
@@ -84,7 +87,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
               key: detailNavigatorKey,
               onGenerateRoute: (settings) {
                 final Function? pageContentBuilder =
-                DanxiApp.routes[settings.name!];
+                    DanxiApp.routes[settings.name!];
                 if (pageContentBuilder != null) {
                   return platformPageRoute(
                       context: context,

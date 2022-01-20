@@ -44,6 +44,7 @@ import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/bbs_editor.dart';
+import 'package:dan_xi/widget/opentreehole/fake_search_widget.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -154,6 +155,7 @@ class _OTTitleState extends State<OTTitle> {
         onPointerUp: (PointerUpEvent details) {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
               OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty) {
+            HapticFeedback.selectionClick();
             showPlatformModalSheet(
                 context: context,
                 builder: (BuildContext context) {
@@ -208,15 +210,18 @@ class TreeHoleSubpage extends PlatformSubpage
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-            smartNavigatorPush(cxt, '/bbs/tags');
+            smartNavigatorPush(cxt, '/bbs/tags',
+                forcePushOnMainNavigator: true);
           }
         }),
         AppBarButtonItem(S.of(cxt).favorites, const Icon(CupertinoIcons.star),
             () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-            smartNavigatorPush(cxt, '/bbs/discussions', arguments: {
-              'showFavoredDiscussion': true,
-            });
+            smartNavigatorPush(cxt, '/bbs/discussions',
+                arguments: {
+                  'showFavoredDiscussion': true,
+                },
+                forcePushOnMainNavigator: true);
           }
         }),
         AppBarButtonItem(
@@ -269,7 +274,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
       StateStreamListener();
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  final GlobalKey searchFieldKey = GlobalKey();
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
@@ -409,6 +413,25 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
     );
   }
 
+  Widget _autoSearchWidget() {
+    return Hero(
+      transitionOnUserGestures: true,
+      tag: 'OTSearchWidget',
+      child: Padding(
+        padding: Theme.of(context).cardTheme.margin ??
+            const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        child: FakeCupertinoSearchTextField(
+          autofocus: false,
+          placeholder: S.of(context).search_hint,
+          onTap: () {
+            smartNavigatorPush(context, '/bbs/search',
+                forcePushOnMainNavigator: true);
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -519,7 +542,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
               await listViewController.scrollToIndex(0);
               // It is not important if [listViewController] is not attached to a ListView.
             } catch (_) {}
-            HapticFeedback.mediumImpact();
+            HapticFeedback.selectionClick();
             await refreshList();
           },
           child: PagedListView<OTHole>(
@@ -533,7 +556,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                     children: [
                       AutoBannerAdWidget(bannerAd: bannerAd),
                       if (_postsType == PostsType.NORMAL_POSTS) ...[
-                        OTSearchWidget(key: searchFieldKey),
+                        _autoSearchWidget(),
                         _autoSilenceNotice(),
                         _autoAdminNotice(),
                         _autoPinnedPosts(),
@@ -630,7 +653,8 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                           generateTagWidgets(context, postElement,
                               (String? tagName) {
                             smartNavigatorPush(context, '/bbs/discussions',
-                                arguments: {"tagFilter": tagName});
+                                arguments: {"tagFilter": tagName},
+                                forcePushOnMainNavigator: true);
                           },
                               SettingsProvider.getInstance()
                                   .useAccessibilityColoring),

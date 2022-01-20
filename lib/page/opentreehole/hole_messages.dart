@@ -77,10 +77,6 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      material: (_, __) =>
-          MaterialScaffoldData(resizeToAvoidBottomInset: false),
-      cupertino: (_, __) =>
-          CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
       iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -98,7 +94,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
-            HapticFeedback.mediumImpact();
+            HapticFeedback.selectionClick();
             await refreshSelf();
           },
           child: Material(

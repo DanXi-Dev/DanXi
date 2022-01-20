@@ -157,7 +157,8 @@ class OTFloorWidget extends StatelessWidget {
                 child:
                     generateTagWidgets(context, parentHole, (String? tagName) {
                   smartNavigatorPush(context, '/bbs/discussions',
-                      arguments: {"tagFilter": tagName});
+                      arguments: {"tagFilter": tagName},
+                      forcePushOnMainNavigator: true);
                 }, SettingsProvider.getInstance().useAccessibilityColoring)),
           Padding(
             padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
@@ -682,9 +683,7 @@ class OTMessageItem extends StatelessWidget {
 }
 
 class OTSearchWidget extends StatelessWidget {
-  final FocusNode? focusNode;
-
-  const OTSearchWidget({Key? key, this.focusNode}) : super(key: key);
+  const OTSearchWidget({Key? key}) : super(key: key);
 
   _goToPIDResultPage(BuildContext context, int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
@@ -720,8 +719,7 @@ class OTSearchWidget extends StatelessWidget {
       padding: Theme.of(context).cardTheme.margin ??
           const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: CupertinoSearchTextField(
-        autofocus: false,
-        focusNode: focusNode,
+        autofocus: true,
         placeholder: S.of(context).search_hint,
         onSubmitted: (value) async {
           value = value.trim();
