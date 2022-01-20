@@ -304,14 +304,13 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             },
             child: Material(
               child: ListView(
-                  //padding: const EdgeInsets.all(4),
                   controller: widget.primaryScrollController(context),
                   physics: const AlwaysScrollableScrollPhysics(),
-                  children: <Widget>[
+                  children: [
                     AutoBannerAdWidget(bannerAd: myBanner),
                     //Account Selection
                     Card(
-                      child: Column(children: <Widget>[
+                      child: Column(children: [
                         ListTile(
                           title: Text(S.of(context).account),
                           leading: PlatformX.isMaterial(context)
@@ -431,274 +430,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                       ),
 
                     // FDUHOLE
-                    Card(
-                      child: Column(
-                        children: [
-                          ExpansionTileX(
-                            leading: Icon(PlatformIcons(context).accountCircle),
-                            title: Text(S.of(context).forum),
-                            subtitle: Text(OpenTreeHoleRepository.getInstance()
-                                    .isUserInitialized
-                                ? S.of(context).fduhole_user_id(
-                                    (OpenTreeHoleRepository.getInstance()
-                                            .userInfo
-                                            ?.user_id)
-                                        .toString())
-                                : S.of(context).not_logged_in),
-                            children: [
-                              if (OpenTreeHoleRepository.getInstance()
-                                  .isUserInitialized) ...[
-                                FutureWidget<OTUser?>(
-                                  future: OpenTreeHoleRepository.getInstance()
-                                      .getUserProfile(),
-                                  successBuilder: (BuildContext context,
-                                          AsyncSnapshot<OTUser?> snapshot) =>
-                                      ListTile(
-                                    title: Text(
-                                        S.of(context).fduhole_nsfw_behavior),
-                                    leading: PlatformX.isMaterial(context)
-                                        ? const Icon(Icons.hide_image)
-                                        : const Icon(CupertinoIcons.eye_slash),
-                                    subtitle: Text(
-                                        foldBehaviorFromInternalString(snapshot
-                                                .data!.config!.show_folded!)
-                                            .displayTitle(context)!),
-                                    onTap: () {
-                                      showPlatformModalSheet(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              PlatformWidget(
-                                                cupertino: (_, __) =>
-                                                    CupertinoActionSheet(
-                                                  title: Text(S
-                                                      .of(context)
-                                                      .fduhole_nsfw_behavior),
-                                                  actions:
-                                                      _buildFoldBehaviorList(
-                                                          context),
-                                                  cancelButton:
-                                                      CupertinoActionSheetAction(
-                                                    child: Text(
-                                                        S.of(context).cancel),
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                  ),
-                                                ),
-                                                material: (_, __) => Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children:
-                                                      _buildFoldBehaviorList(
-                                                          context),
-                                                ),
-                                              ));
-                                    },
-                                  ),
-                                  errorBuilder: () {
-                                    return ListTile(
-                                      title: Text(
-                                          S.of(context).fduhole_nsfw_behavior),
-                                      leading: PlatformX.isMaterial(context)
-                                          ? const Icon(Icons.hide_image)
-                                          : const Icon(
-                                              CupertinoIcons.eye_slash),
-                                      subtitle: Text(S.of(context).fatal_error),
-                                      onTap: () {
-                                        refreshSelf();
-                                      },
-                                    );
-                                  },
-                                  loadingBuilder: ListTile(
-                                    title: Text(
-                                        S.of(context).fduhole_nsfw_behavior),
-                                    leading: PlatformX.isMaterial(context)
-                                        ? const Icon(Icons.hide_image)
-                                        : const Icon(CupertinoIcons.eye_slash),
-                                    subtitle: Text(S.of(context).loading),
-                                    onTap: () {
-                                      refreshSelf();
-                                    },
-                                  ),
-                                ),
-                                OTNotificationSettingsTile(
-                                  parentSetStateFunction: refreshSelf,
-                                ),
-                                SwitchListTile(
-                                  title: Text(S.of(context).fduhole_clean_mode),
-                                  secondary: const Icon(Icons.ac_unit),
-                                  subtitle: Text(S
-                                      .of(context)
-                                      .fduhole_clean_mode_description),
-                                  value:
-                                      SettingsProvider.getInstance().cleanMode,
-                                  onChanged: (bool value) {
-                                    if (value) {
-                                      _showCleanModeGuideDialog();
-                                    }
-                                    setState(() =>
-                                        SettingsProvider.getInstance()
-                                            .cleanMode = value);
-                                  },
-                                ),
-                                ListTile(
-                                  leading: Icon(PlatformIcons(context).tag),
-                                  title:
-                                      Text(S.of(context).fduhole_hidden_tags),
-                                  subtitle: Text(S
-                                      .of(context)
-                                      .fduhole_hidden_tags_description),
-                                  onTap: () async {
-                                    await smartNavigatorPush(
-                                        context, '/bbs/tags/blocklist');
-                                    treeholePageKey.currentState
-                                        ?.setState(() {});
-                                  },
-                                ),
-                                ListTile(
-                                  leading:
-                                      Icon(PlatformIcons(context).photoLibrary),
-                                  title: Text(S.of(context).background_image),
-                                  subtitle: Text(S
-                                      .of(context)
-                                      .background_image_description),
-                                  onTap: () async {
-                                    if (SettingsProvider.getInstance()
-                                            .backgroundImagePath ==
-                                        null) {
-                                      final ImagePickerProxy _picker =
-                                          ImagePickerProxy.createPicker();
-                                      final String? _file =
-                                          await _picker.pickImage();
-                                      if (_file == null) return;
-                                      final String path =
-                                          (await getApplicationDocumentsDirectory())
-                                              .path;
-                                      final File file = File(_file);
-                                      final imagePath = '$path/background';
-                                      await file.copy(imagePath);
-                                      SettingsProvider.getInstance()
-                                          .backgroundImagePath = imagePath;
-                                      treeholePageKey.currentState
-                                          ?.setState(() {});
-                                    } else {
-                                      if (await Noticing.showConfirmationDialog(
-                                              context,
-                                              S
-                                                  .of(context)
-                                                  .background_image_already_set,
-                                              title:
-                                                  S.of(context).already_set) ==
-                                          true) {
-                                        final file = File(
-                                            SettingsProvider.getInstance()
-                                                .backgroundImagePath!);
-                                        if (await file.exists()) {
-                                          await file.delete();
-                                          await FileImage(file).evict();
-                                        }
-                                        SettingsProvider.getInstance()
-                                            .backgroundImagePath = null;
-                                        treeholePageKey.currentState
-                                            ?.setState(() {});
-                                      }
-                                    }
-                                  },
-                                ),
-                                // Clear Cache
-                                ListTile(
-                                  leading:
-                                      Icon(PlatformIcons(context).settings),
-                                  title: Text(S.of(context).clear_cache),
-                                  subtitle: Text(_clearCacheSubtitle ??
-                                      S.of(context).clear_cache_description),
-                                  onTap: () async {
-                                    await DefaultCacheManager().emptyCache();
-                                    setState(() {
-                                      _clearCacheSubtitle =
-                                          S.of(context).cache_cleared;
-                                    });
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const SizedBox(),
-                                  title: Text(S.of(context).modify_password),
-                                  onTap: () => BrowserUtil.openUrl(
-                                      Constant
-                                          .OPEN_TREEHOLE_FORGOT_PASSWORD_URL,
-                                      context),
-                                ),
-                              ],
-                              ListTile(
-                                leading: const SizedBox(),
-                                title: OpenTreeHoleRepository.getInstance()
-                                        .isUserInitialized
-                                    ? Text(
-                                        S.of(context).logout,
-                                        style: TextStyle(
-                                            color:
-                                                Theme.of(context).errorColor),
-                                      )
-                                    : Text(
-                                        S.of(context).login,
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .indicatorColor),
-                                      ),
-                                onTap: () async {
-                                  if (!OpenTreeHoleRepository.getInstance()
-                                      .isUserInitialized) {
-                                    if (SettingsProvider.getInstance()
-                                            .fduholeToken ==
-                                        null) {
-                                      Noticing.showNotice(
-                                          context,
-                                          S
-                                              .of(context)
-                                              .login_from_treehole_page,
-                                          title: S.of(context).login);
-                                    }
-                                    await OpenTreeHoleRepository.getInstance()
-                                        .initializeRepo();
-                                    treeholePageKey.currentState
-                                        ?.setState(() {});
-                                    refreshSelf();
-                                  } else if (await Noticing
-                                          .showConfirmationDialog(context,
-                                              S.of(context).logout_fduhole,
-                                              title: S.of(context).logout,
-                                              isConfirmDestructive: true) ==
-                                      true) {
-                                    ProgressFuture progressDialog =
-                                        showProgressDialog(
-                                            loadingText: S.of(context).logout,
-                                            context: context);
-                                    try {
-                                      await OpenTreeHoleRepository.getInstance()
-                                          .logout();
-                                      while (
-                                          auxiliaryNavigatorState?.canPop() ==
-                                              true) {
-                                        auxiliaryNavigatorState?.pop();
-                                      }
-                                      settingsPageKey.currentState
-                                          ?.setState(() {});
-                                      treeholePageKey
-                                          .currentState?.listViewController
-                                          .notifyUpdate();
-                                    } finally {
-                                      progressDialog.dismiss(showAnim: false);
-                                    }
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
+                    _buildFDUHoleSettingsCard(context),
                     if (SettingsProvider.getInstance().debugMode)
                       //Theme Selection
                       Card(
@@ -710,13 +442,11 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           subtitle: Text(PlatformX.isMaterial(context)
                               ? S.of(context).material
                               : S.of(context).cupertino),
-                          onTap: () {
-                            PlatformX.isMaterial(context)
-                                ? PlatformProvider.of(context)!
-                                    .changeToCupertinoPlatform()
-                                : PlatformProvider.of(context)!
-                                    .changeToMaterialPlatform();
-                          },
+                          onTap: () => PlatformX.isMaterial(context)
+                              ? PlatformProvider.of(context)!
+                                  .changeToCupertinoPlatform()
+                              : PlatformProvider.of(context)!
+                                  .changeToMaterialPlatform(),
                         ),
                       ),
 
@@ -746,9 +476,206 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                       ),
 
                     // About
-                    _buildAboutCard()
+                    _buildAboutCard(context)
                   ]),
             )));
+  }
+
+  Widget _buildFDUHoleSettingsCard(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          ExpansionTileX(
+            leading: Icon(PlatformIcons(context).accountCircle),
+            title: Text(S.of(context).forum),
+            subtitle: Text(
+                OpenTreeHoleRepository.getInstance().isUserInitialized
+                    ? S.of(context).fduhole_user_id(
+                        (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
+                            .toString())
+                    : S.of(context).not_logged_in),
+            children: [
+              if (OpenTreeHoleRepository.getInstance().isUserInitialized) ...[
+                FutureWidget<OTUser?>(
+                  future: OpenTreeHoleRepository.getInstance().getUserProfile(),
+                  successBuilder:
+                      (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
+                          ListTile(
+                    title: Text(S.of(context).fduhole_nsfw_behavior),
+                    leading: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.hide_image)
+                        : const Icon(CupertinoIcons.eye_slash),
+                    subtitle: Text(foldBehaviorFromInternalString(
+                            snapshot.data!.config!.show_folded!)
+                        .displayTitle(context)!),
+                    onTap: () {
+                      showPlatformModalSheet(
+                          context: context,
+                          builder: (BuildContext context) => PlatformWidget(
+                                cupertino: (_, __) => CupertinoActionSheet(
+                                  title:
+                                      Text(S.of(context).fduhole_nsfw_behavior),
+                                  actions: _buildFoldBehaviorList(context),
+                                  cancelButton: CupertinoActionSheetAction(
+                                    child: Text(S.of(context).cancel),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                  ),
+                                ),
+                                material: (_, __) => Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: _buildFoldBehaviorList(context),
+                                ),
+                              ));
+                    },
+                  ),
+                  errorBuilder: ListTile(
+                    title: Text(S.of(context).fduhole_nsfw_behavior),
+                    leading: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.hide_image)
+                        : const Icon(CupertinoIcons.eye_slash),
+                    subtitle: Text(S.of(context).fatal_error),
+                    onTap: () => refreshSelf(),
+                  ),
+                  loadingBuilder: ListTile(
+                    title: Text(S.of(context).fduhole_nsfw_behavior),
+                    leading: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.hide_image)
+                        : const Icon(CupertinoIcons.eye_slash),
+                    subtitle: Text(S.of(context).loading),
+                    onTap: () => refreshSelf(),
+                  ),
+                ),
+                OTNotificationSettingsTile(
+                  parentSetStateFunction: refreshSelf,
+                ),
+                SwitchListTile(
+                  title: Text(S.of(context).fduhole_clean_mode),
+                  secondary: const Icon(Icons.ac_unit),
+                  subtitle: Text(S.of(context).fduhole_clean_mode_description),
+                  value: SettingsProvider.getInstance().cleanMode,
+                  onChanged: (bool value) {
+                    if (value) {
+                      _showCleanModeGuideDialog();
+                    }
+                    setState(
+                        () => SettingsProvider.getInstance().cleanMode = value);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(PlatformIcons(context).tag),
+                  title: Text(S.of(context).fduhole_hidden_tags),
+                  subtitle: Text(S.of(context).fduhole_hidden_tags_description),
+                  onTap: () async {
+                    await smartNavigatorPush(context, '/bbs/tags/blocklist');
+                    treeholePageKey.currentState?.setState(() {});
+                  },
+                ),
+                ListTile(
+                  leading: Icon(PlatformIcons(context).photoLibrary),
+                  title: Text(S.of(context).background_image),
+                  subtitle: Text(S.of(context).background_image_description),
+                  onTap: () async {
+                    if (SettingsProvider.getInstance().backgroundImagePath ==
+                        null) {
+                      final ImagePickerProxy _picker =
+                          ImagePickerProxy.createPicker();
+                      final String? _file = await _picker.pickImage();
+                      if (_file == null) return;
+                      final String path =
+                          (await getApplicationDocumentsDirectory()).path;
+                      final File file = File(_file);
+                      final imagePath = '$path/background';
+                      await file.copy(imagePath);
+                      SettingsProvider.getInstance().backgroundImagePath =
+                          imagePath;
+                      treeholePageKey.currentState?.setState(() {});
+                    } else {
+                      if (await Noticing.showConfirmationDialog(context,
+                              S.of(context).background_image_already_set,
+                              title: S.of(context).already_set) ==
+                          true) {
+                        final file = File(SettingsProvider.getInstance()
+                            .backgroundImagePath!);
+                        if (await file.exists()) {
+                          await file.delete();
+                          await FileImage(file).evict();
+                        }
+                        SettingsProvider.getInstance().backgroundImagePath =
+                            null;
+                        treeholePageKey.currentState?.setState(() {});
+                      }
+                    }
+                  },
+                ),
+                // Clear Cache
+                ListTile(
+                  leading: Icon(PlatformIcons(context).settings),
+                  title: Text(S.of(context).clear_cache),
+                  subtitle: Text(_clearCacheSubtitle ??
+                      S.of(context).clear_cache_description),
+                  onTap: () async {
+                    await DefaultCacheManager().emptyCache();
+                    setState(() {
+                      _clearCacheSubtitle = S.of(context).cache_cleared;
+                    });
+                  },
+                ),
+                ListTile(
+                  leading: const SizedBox(),
+                  title: Text(S.of(context).modify_password),
+                  onTap: () => BrowserUtil.openUrl(
+                      Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
+                ),
+              ],
+              ListTile(
+                leading: const SizedBox(),
+                title: OpenTreeHoleRepository.getInstance().isUserInitialized
+                    ? Text(
+                        S.of(context).logout,
+                        style: TextStyle(color: Theme.of(context).errorColor),
+                      )
+                    : Text(
+                        S.of(context).login,
+                        style:
+                            TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                onTap: () async {
+                  if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+                    if (SettingsProvider.getInstance().fduholeToken == null) {
+                      Noticing.showNotice(
+                          context, S.of(context).login_from_treehole_page,
+                          title: S.of(context).login);
+                    }
+                    await OpenTreeHoleRepository.getInstance().initializeRepo();
+                    treeholePageKey.currentState?.setState(() {});
+                    refreshSelf();
+                  } else if (await Noticing.showConfirmationDialog(
+                          context, S.of(context).logout_fduhole,
+                          title: S.of(context).logout,
+                          isConfirmDestructive: true) ==
+                      true) {
+                    ProgressFuture progressDialog = showProgressDialog(
+                        loadingText: S.of(context).logout, context: context);
+                    try {
+                      await OpenTreeHoleRepository.getInstance().logout();
+                      while (auxiliaryNavigatorState?.canPop() == true) {
+                        auxiliaryNavigatorState?.pop();
+                      }
+                      settingsPageKey.currentState?.setState(() {});
+                      treeholePageKey.currentState?.listViewController
+                          .notifyUpdate();
+                    } finally {
+                      progressDialog.dismiss(showAnim: false);
+                    }
+                  }
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   void _toggleAdDisplay() {
@@ -838,7 +765,7 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             ],
           ));
 
-  Card _buildAboutCard() {
+  Card _buildAboutCard(BuildContext context) {
     final inAppReview = InAppReview.instance;
     final Color _originalDividerColor = Theme.of(context).dividerColor;
     final double _avatarSize =

@@ -100,7 +100,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
-
+  bool hasRegisteredScreenShotListener = false;
   final TimeBasedLoadAdaptLayer<OTFloor> adaptLayer =
       TimeBasedLoadAdaptLayer(10, 1);
 
@@ -140,8 +140,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
+  }
 
-    // Prevents repeated listener registeration
+  void registerScreenShotListener() {
+    // Prevents repeated listener registration
     // TODO: this is not ideal, should we really need multiple listeners, this will cause unexpected disposal.
     screenListener.dispose();
 
@@ -152,6 +154,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       Noticing.showScreenshotWarning(context);
     });
     screenListener.watch();
+    hasRegisteredScreenShotListener = true;
   }
 
   @override
@@ -169,26 +172,30 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      // Replaced precached data with updated ones
-      OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
-        tryReplace() {
+    var route = ModalRoute.of(context);
+
+    // Defining an internal function to be able to remove the listener
+    void handler(status) {
+      if (status == AnimationStatus.completed) {
+        if (!hasRegisteredScreenShotListener) {
+          registerScreenShotListener();
+        }
+        // Replaced precached data with updated ones
+        OpenTreeHoleRepository.getInstance().loadFloors(_post).then((value) {
           try {
             _listViewController.replaceInitialData(value!);
           }
           // It is not a problem if we cannot replace the data
           catch (_) {}
-        }
+        }, onError: (_) {});
+        route?.animation?.removeStatusListener(handler);
+      }
+    }
 
-        // Sleep to wait the slide in animation
-        if (PlatformX.isMaterial(context)) {
-          Future.delayed(const Duration(milliseconds: 250))
-              .then((_) => tryReplace());
-        } else {
-          tryReplace();
-        }
-      }, onError: (_) {});
-    });
+    route?.animation?.addStatusListener(handler);
+    // WidgetsBinding.instance?.addPostFrameCallback((_) {
+    //
+    // });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(
       iosContentPadding: false,
