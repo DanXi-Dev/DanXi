@@ -515,6 +515,10 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
           color: Theme.of(context).colorScheme.secondary,
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
+            try {
+              await listViewController.scrollToIndex(0);
+              // It is not important if [listViewController] is not attached to a ListView.
+            } catch (_) {}
             HapticFeedback.mediumImpact();
             await refreshList();
           },
