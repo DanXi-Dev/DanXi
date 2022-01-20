@@ -428,7 +428,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               loadingText: S.of(context).loading, context: context);
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": await OpenTreeHoleRepository.getInstance()
-                .loadSpecificHole(floor.hole_id!)
+                .loadSpecificHole(floor.hole_id!),
+            "locate": floor
           });
           progressDialog.dismiss(showAnim: false);
         }
