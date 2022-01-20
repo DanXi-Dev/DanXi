@@ -226,7 +226,7 @@ class OTFloorWidget extends StatelessWidget {
                               S.of(context).image_tag, S.of(context).formula)
                           .trim(),
                       textScaleFactor: 0.8,
-                      maxLines: 2,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       onOpen: (link) async {
                         if (await canLaunch(link.url)) {

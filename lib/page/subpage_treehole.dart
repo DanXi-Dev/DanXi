@@ -796,7 +796,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
             Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Linkify(
-                    text: processCommentPreview(lastReplyContent),
+                    text: lastReplyContent,
                     style: const TextStyle(fontSize: 14),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -805,14 +805,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
         ),
         onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": postElement, "scroll_to_end": true}));
-  }
-
-  String processCommentPreview(String content) {
-    if (content.startsWith(RegExp("#{1,2}[0-9]+\\n"))) {
-      content = content.substring(content.indexOf('\n') + 1);
-    }
-    content.replaceAll('\n', ' ');
-    return content;
   }
 
   @override
