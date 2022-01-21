@@ -14,6 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -101,17 +102,16 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     _previewUrl = widget.arguments!['thumbUrl'];
     _originalUrl = widget.arguments!['url']!;
     safeShowingUrl = _previewUrl ?? _originalUrl;
-    loadOriginalImage();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      unawaited(cacheOriginalImage());
+    });
   }
 
-  Future<File?> loadOriginalImage() async {
-    if (_previewUrl == null) return null;
+  Future<void> cacheOriginalImage() async {
+    if (_previewUrl == null) return;
     try {
-      var result = await DefaultCacheManager().getSingleFile(_originalUrl);
-      setState(() {
-        originalLoading = false;
-      });
-      return result;
+      await DefaultCacheManager().getSingleFile(_originalUrl);
+      setState(() => originalLoading = false);
     } catch (e, st) {
       setState(() {
         originalLoading = false;
