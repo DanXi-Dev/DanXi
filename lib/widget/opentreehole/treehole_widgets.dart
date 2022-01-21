@@ -140,7 +140,11 @@ class OTFloorWidget extends StatelessWidget {
     }
 
     onImageTap(url) {
-      smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
+      smartNavigatorPush(context, '/image/detail', arguments: {
+        'thumbUrl': url,
+        'url': OpenTreeHoleRepository.getInstance()
+            .extractHighDefinitionImageUrl(url)
+      });
     }
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;

@@ -15,21 +15,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
-import 'package:flutter_cache_manager/src/result/file_info.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:intl/intl.dart';
@@ -40,8 +37,11 @@ import 'package:share/share.dart';
 /// An image display page, allowing user to share or save the image.
 ///
 /// Arguments:
-/// [Uint8List] raw_image: the raw byte array of the image.
 /// [String] url: the original url of the image, enabling the page to decide the file name.
+/// If [thumbUrl] not set, it should be put in [DefaultCacheManager] first.
+///
+/// [String] thumbUrl: the thumbnail url of the image. If set, it should be put in [DefaultCacheManager] first,
+/// and [ImageViewerPage] will put a hero attribute on [PhotoView] for transition animation.
 ///
 
 class ImageViewerPage extends StatefulWidget {
@@ -85,35 +85,48 @@ class ImageViewerPage extends StatefulWidget {
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
-  late String _previewUrl;
-  late String _hdUrl;
-  bool hdLoading = true;
-  String? hdLoadFailError;
-  late Future<FileInfo?> _highDefinitionImage;
+  String? _previewUrl;
+  late String _originalUrl;
+  late String safeShowingUrl;
+
+  bool originalLoading = true;
+  String? originalLoadFailError;
+  late Future<File?> _originalImageFuture;
 
   @override
   void initState() {
     super.initState();
-    _previewUrl = widget.arguments!['url'];
-    _hdUrl = OpenTreeHoleRepository.getInstance()
-        .extractHighDefinitionImageUrl(_previewUrl);
-    _highDefinitionImage =
-        (DefaultCacheManager().downloadFile(_hdUrl) as Future<FileInfo?>)
-            .onError((error, stackTrace) {
+    _previewUrl = widget.arguments!['thumbUrl'];
+    _originalUrl = widget.arguments!['url']!;
+    safeShowingUrl = _previewUrl ?? _originalUrl;
+    _originalImageFuture = loadOriginalImage();
+  }
+
+  Future<File?> loadOriginalImage() async {
+    if (_previewUrl == null) {
+      return await DefaultCacheManager().getSingleFile(_originalUrl);
+    }
+    try {
+      var result = await DefaultCacheManager().downloadFile(_originalUrl);
       setState(() {
-        hdLoadFailError = ErrorPageWidget.generateUserFriendlyDescription(
-            S.of(context), error);
+        originalLoading = false;
       });
-    }).whenComplete(() => setState(() {
-                  hdLoading = false;
-                }));
+      return result.file;
+    } catch (e, st) {
+      setState(() {
+        originalLoading = false;
+        originalLoadFailError = ErrorPageWidget.generateUserFriendlyDescription(
+            S.of(context), e,
+            stackTrace: st);
+      });
+    }
   }
 
   @override
   void didUpdateWidget(ImageViewerPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    hdLoading = true;
-    hdLoadFailError = null;
+    originalLoading = true;
+    originalLoadFailError = null;
   }
 
   static String getFileName(String url) {
@@ -129,17 +142,17 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> shareImage() async {
-    File image = await DefaultCacheManager().getSingleFile(_hdUrl);
+    File image = await DefaultCacheManager().getSingleFile(_originalUrl);
     if (PlatformX.isMobile) {
       Share.shareFiles([image.absolute.path],
-          mimeTypes: [ImageViewerPage.getMineType(_hdUrl)]);
+          mimeTypes: [ImageViewerPage.getMineType(_originalUrl)]);
     } else {
       Noticing.showNotice(context, image.absolute.path);
     }
   }
 
   Future<void> saveImage() async {
-    File image = await DefaultCacheManager().getSingleFile(_hdUrl);
+    File image = await DefaultCacheManager().getSingleFile(_originalUrl);
     if (PlatformX.isAndroid) {
       PermissionStatus status = await Permission.storage.status;
       if (!status.isGranted &&
@@ -160,11 +173,15 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     }
   }
 
+  PhotoViewHeroAttributes? get _heroAttribute => _previewUrl != null
+      ? PhotoViewHeroAttributes(
+          tag: _previewUrl!, transitionOnUserGestures: true)
+      : null;
+
   Widget _buildPhotoView(BuildContext context) {
     return PhotoView(
-      heroAttributes: PhotoViewHeroAttributes(
-          tag: _previewUrl, transitionOnUserGestures: true),
-      imageProvider: CachedNetworkImageProvider(_previewUrl),
+      heroAttributes: _heroAttribute,
+      imageProvider: CachedNetworkImageProvider(safeShowingUrl),
       backgroundDecoration: BoxDecoration(color: Theme.of(context).canvasColor),
     );
   }
@@ -177,18 +194,22 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       appBar: PlatformAppBarX(
         title: Row(mainAxisSize: MainAxisSize.min, children: [
           Text(S.of(context).image),
-          if (hdLoading) ...[
+          if (originalLoading) ...[
             const SizedBox(width: 4),
-            PlatformCircularProgressIndicator()
+            PlatformCircularProgressIndicator(
+              material: (_, __) => MaterialProgressIndicatorData(
+                  color: Theme.of(context).textTheme.bodyText1?.color),
+            )
           ],
-          if (hdLoadFailError != null) ...[
+          if (originalLoadFailError != null) ...[
             const SizedBox(width: 4),
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: Icon(PlatformIcons(context).error),
               color: Theme.of(context).errorColor,
-              onPressed: () => Noticing.showNotice(context, hdLoadFailError!,
-                  title: S.of(context).fatal_error),
+              onPressed: () => Noticing.showNotice(
+                  context, originalLoadFailError!,
+                  title: S.of(context).fatal_error, useSnackBar: false),
             ),
           ]
         ]),
@@ -210,20 +231,17 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
             )
         ],
       ),
-      body: FutureWidget<FileInfo?>(
-        future: _highDefinitionImage,
-        loadingBuilder: _buildPhotoView(context),
-        errorBuilder: _buildPhotoView(context),
-        successBuilder:
-            (BuildContext context, AsyncSnapshot<FileInfo?> snapshot) {
-          return PhotoView(
-            heroAttributes: PhotoViewHeroAttributes(
-                tag: _previewUrl, transitionOnUserGestures: true),
-            imageProvider: FileImage(snapshot.data!.file),
-            backgroundDecoration:
-                BoxDecoration(color: Theme.of(context).canvasColor),
-          );
-        },
+      body: FutureWidget<File?>(
+        future: _originalImageFuture,
+        loadingBuilder: () => _buildPhotoView(context),
+        errorBuilder: () => _buildPhotoView(context),
+        successBuilder: (BuildContext context, AsyncSnapshot<File?> snapshot) =>
+            PhotoView(
+          heroAttributes: _heroAttribute,
+          imageProvider: FileImage(snapshot.data!),
+          backgroundDecoration:
+              BoxDecoration(color: Theme.of(context).canvasColor),
+        ),
       ),
     );
   }

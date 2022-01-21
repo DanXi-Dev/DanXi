@@ -145,7 +145,11 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     }
 
     onImageTap(url) {
-      smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
+      smartNavigatorPush(context, '/image/detail', arguments: {
+        'thumbUrl': url,
+        'url': OpenTreeHoleRepository.getInstance()
+            .extractHighDefinitionImageUrl(url)
+      });
     }
 
     return GestureDetector(
