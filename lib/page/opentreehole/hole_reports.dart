@@ -29,7 +29,6 @@ import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -149,18 +148,19 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
     }
 
+    print(e);
     return GestureDetector(
-      onLongPress: () {
-        showPlatformModalSheet(
-            context: context,
-            builder: (BuildContext context) => PlatformContextMenu(
-                  actions: _buildContextMenu(context, e),
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(S.of(context).cancel),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ));
-      },
+      // onLongPress: () {
+      //   showPlatformModalSheet(
+      //       context: context,
+      //       builder: (BuildContext context) => PlatformContextMenu(
+      //             actions: _buildContextMenu(context, e),
+      //             cancelButton: CupertinoActionSheetAction(
+      //               child: Text(S.of(context).cancel),
+      //               onPressed: () => Navigator.of(context).pop(),
+      //             ),
+      //           ));
+      // },
       child: Card(
         child: ListTile(
             dense: true,
@@ -174,8 +174,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                 const Divider(),
                 Align(
                     alignment: Alignment.topLeft,
-                    child: Text(e.content ?? "?")),
-                //smartRender(e.content, onLinkTap, onImageTap)),
+                    child: Text(e.floor?.content ?? "?")),
               ],
             ),
             subtitle: Column(children: [
@@ -211,9 +210,8 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               try {
                 final OTHole? post = await OpenTreeHoleRepository.getInstance()
                     .loadSpecificHole(e.hole_id!);
-                smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                  "post": post!,
-                });
+                smartNavigatorPush(context, "/bbs/postDetail",
+                    arguments: {"post": post!, "locate": e.floor});
                 progressDialog.dismiss(showAnim: false);
               } catch (error) {
                 progressDialog.dismiss(showAnim: false);

@@ -49,6 +49,11 @@ class OTReport {
   int get hashCode => report_id!;
 
   @override
+  String toString() {
+    return 'OTReport{report_id: $report_id, reason: $reason, content: $content, floor: $floor, hole_id: $hole_id, time_created: $time_created, time_updated: $time_updated, dealed: $dealed, dealed_by: $dealed_by}';
+  }
+
+  @override
   bool operator ==(Object other) =>
       (other is OTReport) && report_id == other.report_id;
 
