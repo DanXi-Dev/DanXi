@@ -97,6 +97,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     _previewUrl = widget.arguments!['url'];
     _hdUrl = OpenTreeHoleRepository.getInstance()
         .extractHighDefinitionImageUrl(_previewUrl);
+    print(_previewUrl);
+    print(_hdUrl);
     _highDefinitionImage =
         (DefaultCacheManager().downloadFile(_hdUrl) as Future<FileInfo?>)
             .onError((error, stackTrace) {
