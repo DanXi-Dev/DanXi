@@ -382,6 +382,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data!['image']['display_url'];
   }
 
+  String extractRealImageUrl(String imageUrl) {
+    if (imageUrl.contains(_IMAGE_BASE_URL) && imageUrl.contains(".md.")) {
+      return imageUrl.replaceFirst(".md.", ".");
+    }
+    return imageUrl;
+  }
+
   Future<int?> newFloor(int? discussionId, String content) async {
     final Response response = await dio!.post(_BASE_URL + "/floors",
         data: {

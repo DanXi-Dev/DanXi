@@ -145,10 +145,11 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     }
 
     onImageTap(url) {
-      smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
+      smartNavigatorPush(context, '/image/detail', arguments: {
+        'url': OpenTreeHoleRepository.getInstance().extractRealImageUrl(url)
+      });
     }
 
-    print(e);
     return GestureDetector(
       // onLongPress: () {
       //   showPlatformModalSheet(

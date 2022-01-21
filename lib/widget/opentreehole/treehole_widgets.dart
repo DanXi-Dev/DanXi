@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:dan_xi/generated/l10n.dart';
@@ -23,6 +22,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -38,8 +38,6 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -142,7 +140,9 @@ class OTFloorWidget extends StatelessWidget {
     }
 
     onImageTap(url) {
-      smartNavigatorPush(context, '/image/detail', arguments: {'url': url});
+      smartNavigatorPush(context, '/image/detail', arguments: {
+        'url': OpenTreeHoleRepository.getInstance().extractRealImageUrl(url)
+      });
     }
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
