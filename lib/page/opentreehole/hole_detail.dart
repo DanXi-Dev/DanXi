@@ -324,6 +324,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () => onExecutePenalty(3),
           child: const Text("Level 3: BAN FOREVER"),
           menuContext: menuContext,
+          isDestructive: true,
         )
       ];
     }
@@ -423,9 +424,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     "Are you sure to hide this floor? It is hard to undo the operation.",
                     title: "Confirmation") ==
                 true) {
-              // TODO: Allow inputting delete reason here.
+              final reason = await Noticing.showInputDialog(
+                  context, "Delete Reason (cancel for default)");
               await OpenTreeHoleRepository.getInstance()
-                  .adminDeleteFloor(e.floor_id, "");
+                  .adminDeleteFloor(e.floor_id, reason);
               await refreshSelf();
             }
           },
@@ -434,13 +436,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            showPlatformModalSheet(
+            await showPlatformModalSheet(
                 context: context,
                 builder: (subMenuContext) => PlatformContextMenu(
                     actions: _buildAdminPenaltyMenu(subMenuContext, e),
                     cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(S.of(subMenuContext).cancel),
+                      onPressed: () => Navigator.of(subMenuContext).pop(),
                     )));
           },
           child: const Text("Punish this user"),
@@ -463,10 +465,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
-            // IMPORTANT:
-            // This BuildContext below is exclusive to this builder and must be passed
-            // to its children. Otherwise, context of bbs_post will be used, which
-            // will result in incorrect Navigator.pop() behavior.
             builder: (BuildContext context) => PlatformWidget(
                 cupertino: (_, __) => CupertinoActionSheet(
                       actions: _buildContextMenu(context, floor),

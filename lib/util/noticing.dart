@@ -77,6 +77,47 @@ class Noticing {
     }
   }
 
+  static Future<String?> showInputDialog(BuildContext context, String title,
+      {String? confirmText,
+      bool isConfirmDestructive = false,
+      int? maxLines,
+      String? hintText}) async {
+    TextEditingController controller = TextEditingController();
+    return await showPlatformDialog<String?>(
+      context: context,
+      builder: (BuildContext context) => PlatformAlertDialog(
+        title: Text(title),
+        content: PlatformTextField(
+          controller: controller,
+          maxLines: maxLines,
+          hintText: hintText,
+          onSubmitted: (value) {
+            Navigator.pop(context, value);
+            controller.dispose();
+          },
+        ),
+        actions: <Widget>[
+          PlatformDialogAction(
+              child: PlatformText(S.of(context).cancel),
+              onPressed: () {
+                Navigator.pop(context, null);
+                controller.dispose();
+              }),
+          PlatformDialogAction(
+              cupertino: (context, platform) => CupertinoDialogActionData(
+                  isDestructiveAction: isConfirmDestructive,
+                  isDefaultAction: true),
+              child: PlatformText(confirmText ?? S.of(context).i_see),
+              onPressed: () {
+                Navigator.pop(context, controller.text);
+                controller
+                    .dispose(); // TODO: dispose() is called before state is destroyed. how to resolve this?
+              }),
+        ],
+      ),
+    );
+  }
+
   static Future<bool?> showConfirmationDialog(
       BuildContext context, String message,
       {String? confirmText,
@@ -108,7 +149,7 @@ class Noticing {
                 PlatformDialogAction(
                     cupertino: (context, platform) =>
                         CupertinoDialogActionData(isDefaultAction: true),
-                    child: PlatformText(confirmText ?? S.of(context).cancel),
+                    child: PlatformText(S.of(context).cancel),
                     onPressed: () => Navigator.pop(context, false)),
                 PlatformDialogAction(
                     cupertino: (context, platform) => CupertinoDialogActionData(

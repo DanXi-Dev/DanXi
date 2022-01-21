@@ -536,7 +536,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<int?> adminDeleteFloor(int? floorId, String? deleteReason) async {
     return (await dio!.delete(_BASE_URL + "/floors/$floorId",
-            data: {"delete_reason": deleteReason ?? ""},
+            data: {
+              if (deleteReason?.isNotEmpty == true)
+                "delete_reason": deleteReason ?? ""
+            },
             options: Options(headers: _tokenHeader)))
         .statusCode;
   }

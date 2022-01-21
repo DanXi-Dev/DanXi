@@ -44,10 +44,15 @@ class PlatformContextMenu extends StatelessWidget {
 class PlatformContextMenuItem extends StatelessWidget {
   final BuildContext? menuContext;
   final VoidCallback? onPressed;
+  final bool isDestructive;
   final Widget child;
 
   const PlatformContextMenuItem(
-      {Key? key, this.menuContext, this.onPressed, required this.child})
+      {Key? key,
+      this.menuContext,
+      this.onPressed,
+      required this.child,
+      this.isDestructive = false})
       : super(key: key);
 
   @override
@@ -58,9 +63,11 @@ class PlatformContextMenuItem extends StatelessWidget {
           if (menuContext != null) Navigator.of(menuContext!).pop();
           onPressed?.call();
         },
+        isDestructiveAction: isDestructive,
         child: child,
       ),
       material: (_, __) => ListTile(
+        textColor: isDestructive ? Colors.red : null,
         title: child,
         onTap: () async {
           if (menuContext != null) Navigator.of(menuContext!).pop();

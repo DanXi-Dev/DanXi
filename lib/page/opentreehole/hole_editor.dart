@@ -134,15 +134,12 @@ class OTEditor {
 
   static Future<void> reportPost(BuildContext context, int? postId) async {
     final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
-    final String? content = (await _showEditor(
-            context, S.of(context).reason_report_post(postId ?? "?"),
-            editorType: OTEditorType.DIALOG, object: object, hasTip: false))
-        ?.text;
+    final String? content = (await Noticing.showInputDialog(
+        context, S.of(context).reason_report_post(postId ?? "?")));
     if (content == null || content.trim() == "") return;
 
     try {
-      int? responseCode = await OpenTreeHoleRepository.getInstance()
-          .reportPost(postId, content);
+      await OpenTreeHoleRepository.getInstance().reportPost(postId, content);
       StateProvider.editorCache.remove(object);
       Noticing.showNotice(context, S.of(context).report_success);
     } catch (error) {
