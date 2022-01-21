@@ -29,6 +29,7 @@ import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -152,17 +153,11 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
-            builder: (BuildContext context) => PlatformWidget(
-                  cupertino: (_, __) => CupertinoActionSheet(
-                    actions: _buildContextMenu(context, e),
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ),
-                  material: (_, __) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _buildContextMenu(context, e),
+            builder: (BuildContext context) => PlatformContextMenu(
+                  actions: _buildContextMenu(context, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(context).cancel),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ));
       },

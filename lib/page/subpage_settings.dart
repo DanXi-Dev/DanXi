@@ -42,6 +42,7 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -235,26 +236,20 @@ class _SettingsSubpageState extends State<SettingsSubpage>
     _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
 
-  List<Widget> _buildCampusAreaList(BuildContext context) {
+  List<Widget> _buildCampusAreaList(BuildContext menuContext) {
     List<Widget> list = [];
     onTapListener(Campus campus) {
       SettingsProvider.getInstance().campus = campus;
-      Navigator.of(context).pop();
       dashboardPageKey.currentState?.rebuildFeatures();
       dashboardPageKey.currentState?.setState(() {});
       refreshSelf();
     }
 
     for (var value in Constant.CAMPUS_VALUES) {
-      list.add(PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () => onTapListener(value),
-          child: Text(value.displayTitle(context)!),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(value.displayTitle(context)!),
-          onTap: () => onTapListener(value),
-        ),
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(value.displayTitle(menuContext)!),
+        onPressed: () => onTapListener(value),
       ));
     }
     return list;
@@ -267,21 +262,16 @@ class _SettingsSubpageState extends State<SettingsSubpage>
           value.internalString();
       updateOTUserProfile(context);
       treeholePageKey.currentState?.setState(() {});
-      Navigator.of(menuContext).pop();
       refreshSelf();
     }
 
     for (var value in FoldBehavior.values) {
-      list.add(PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
+      list.add(
+        PlatformContextMenuItem(
           onPressed: () => onTapListener(value),
           child: Text(value.displayTitle(menuContext)!),
         ),
-        material: (_, __) => ListTile(
-          title: Text(value.displayTitle(menuContext)!),
-          onTap: () => onTapListener(value),
-        ),
-      ));
+      );
     }
     return list;
   }
@@ -360,29 +350,15 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                           subtitle: Text(SettingsProvider.getInstance()
                               .campus
                               .displayTitle(context)!),
-                          onTap: () {
-                            showPlatformModalSheet(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    PlatformWidget(
-                                      cupertino: (_, __) =>
-                                          CupertinoActionSheet(
-                                        title:
-                                            Text(S.of(context).select_campus),
-                                        actions: _buildCampusAreaList(context),
-                                        cancelButton:
-                                            CupertinoActionSheetAction(
+                          onTap: () => showPlatformModalSheet(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  PlatformContextMenu(
+                                      actions: _buildCampusAreaList(context),
+                                      cancelButton: CupertinoActionSheetAction(
                                           child: Text(S.of(context).cancel),
                                           onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                        ),
-                                      ),
-                                      material: (_, __) => Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: _buildCampusAreaList(context),
-                                      ),
-                                    ));
-                          },
+                                              Navigator.of(context).pop()))),
                         ),
                       ]),
                     ),
@@ -511,20 +487,12 @@ class _SettingsSubpageState extends State<SettingsSubpage>
                     onTap: () {
                       showPlatformModalSheet(
                           context: context,
-                          builder: (BuildContext context) => PlatformWidget(
-                                cupertino: (_, __) => CupertinoActionSheet(
-                                  title:
-                                      Text(S.of(context).fduhole_nsfw_behavior),
-                                  actions: _buildFoldBehaviorList(context),
-                                  cancelButton: CupertinoActionSheetAction(
-                                    child: Text(S.of(context).cancel),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                  ),
-                                ),
-                                material: (_, __) => Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: _buildFoldBehaviorList(context),
+                          builder: (BuildContext context) =>
+                              PlatformContextMenu(
+                                actions: _buildFoldBehaviorList(context),
+                                cancelButton: CupertinoActionSheetAction(
+                                  child: Text(S.of(context).cancel),
+                                  onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ));
                     },
@@ -711,17 +679,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             ],
           ));*/
 
-  _showAdsThankDialog() => showPlatformDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).thankyouforenablingads),
-              ],
-            ),
-          ));
+  _showAdsThankDialog() {
+    Noticing.showNotice(context, S.of(context).thankyouforenablingads,
+        title: "", useSnackBar: false);
+  }
 
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,

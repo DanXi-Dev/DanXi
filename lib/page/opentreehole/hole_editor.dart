@@ -36,14 +36,13 @@ import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-
-import '../../widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
@@ -73,19 +72,19 @@ class OTEditor {
   }
 
   static Future<bool> createNewReply(
-      BuildContext context, int? discussionId, int? postId,
+      BuildContext context, int? discussionId, int? floorId,
       {OTEditorType? editorType}) async {
-    final object = (postId == null
+    final object = (floorId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
-        : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
+        : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
     final String? content = (await _showEditor(
             context,
-            postId == null
+            floorId == null
                 ? S.of(context).reply_to(discussionId ?? "?")
-                : S.of(context).reply_to_floor(postId),
+                : S.of(context).reply_to_floor(floorId),
             editorType: editorType,
             object: object,
-            placeholder: postId == null ? "" : "##$postId\n"))
+            placeholder: floorId == null ? "" : "##$floorId\n"))
         ?.text;
     if (content == null || content.trim() == "") return false;
     ProgressFuture progressDialog = showProgressDialog(
@@ -106,40 +105,39 @@ class OTEditor {
   }
 
   static Future<void> modifyReply(BuildContext context, int? discussionId,
-      int? postId, String? originalContent,
+      int? floorId, String? originalContent,
       {OTEditorType? editorType}) async {
     final object = (discussionId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
-        : EditorObject(postId, EditorObjectType.REPLY_TO_REPLY));
+        : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
     final String? content = (await _showEditor(
             context,
-            postId == null
+            floorId == null
                 ? S.of(context).reply_to(discussionId ?? "?")
-                : S.of(context).reply_to_floor(postId),
+                : S.of(context).reply_to_floor(floorId),
             editorType: editorType,
             object: object,
             placeholder: originalContent ?? ""))
         ?.text;
-    if (content == null || content.trim() == "") return;
+    if (content == null || content.trim().isEmpty) return;
     await OpenTreeHoleRepository.getInstance()
-        .modifyFloor(content, postId)
-        .onError((dynamic error, stackTrace) {
+        .modifyFloor(content, floorId)
+        .onError((error, stackTrace) {
       Noticing.showNotice(context,
           ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
           title: S.of(context).reply_failed, useSnackBar: false);
-      return -1;
     });
     StateProvider.editorCache.remove(object);
   }
 
-  static Future<void> reportPost(BuildContext context, int? postId) async {
-    final object = EditorObject(postId, EditorObjectType.REPORT_REPLY);
+  static Future<void> reportPost(BuildContext context, int? floorId) async {
+    final object = EditorObject(floorId, EditorObjectType.REPORT_FLOOR);
     final String? content = (await Noticing.showInputDialog(
-        context, S.of(context).reason_report_post(postId ?? "?")));
+        context, S.of(context).reason_report_post(floorId ?? "?")));
     if (content == null || content.trim() == "") return;
 
     try {
-      await OpenTreeHoleRepository.getInstance().reportPost(postId, content);
+      await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
       StateProvider.editorCache.remove(object);
       Noticing.showNotice(context, S.of(context).report_success);
     } catch (error) {
@@ -156,8 +154,8 @@ class OTEditor {
       String placeholder = "",
       bool hasTip = true}) async {
     final String randomTip = await Constant.randomFduholeTip;
-    const OTEditorType defaultType = OTEditorType.PAGE;
-    switch (editorType ?? defaultType) {
+
+    switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:
         if (!StateProvider.editorCache.containsKey(object)) {
           StateProvider.editorCache[object] =
@@ -222,21 +220,20 @@ class OTEditor {
     final ImagePickerProxy _picker = ImagePickerProxy.createPicker();
     final String? _file = await _picker.pickImage();
     if (_file == null) return;
+
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance().uploadImage(File(_file)).then(
-          (value) {
-        if (value != null) _controller.text += "![]($value)";
-        //"showAnim: true" makes it crash. Don't know the reason.
-        progressDialog.dismiss(showAnim: false);
-        return value;
-      }, onError: (e) {
-        progressDialog.dismiss(showAnim: false);
-        Noticing.showNotice(context, S.of(context).uploading_image_failed);
-        throw e;
-      });
-    } catch (ignored) {}
+      String? url =
+          await OpenTreeHoleRepository.getInstance().uploadImage(File(_file));
+      if (url != null) _controller.text += "![]($url)";
+      // "showAnim: true" makes it crash. Don't know the reason.
+      progressDialog.dismiss(showAnim: false);
+    } catch (ignored) {
+      Noticing.showNotice(context, S.of(context).uploading_image_failed);
+    } finally {
+      progressDialog.dismiss(showAnim: false);
+    }
   }
 }
 

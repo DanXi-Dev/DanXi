@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -93,52 +92,38 @@ class _BBSHiddenTagsPreferencePageState
                 additionCallback: (value) => OTTag(0, 0, value),
                 onAdded: (tag) => tag,
                 configureSuggestion: (tag) => SuggestionConfiguration(
-                      title: Text(
-                        tag.name!,
-                        style: TextStyle(color: tag.color),
-                      ),
+                      title:
+                          Text(tag.name!, style: TextStyle(color: tag.color)),
                       subtitle: Row(
                         children: [
-                          Icon(
-                            CupertinoIcons.flame,
-                            color: tag.color,
-                            size: 12,
-                          ),
-                          const SizedBox(
-                            width: 2,
-                          ),
-                          Text(
-                            tag.temperature.toString(),
-                            style: TextStyle(fontSize: 13, color: tag.color),
-                          ),
+                          Icon(CupertinoIcons.flame,
+                              color: tag.color, size: 12),
+                          const SizedBox(width: 2),
+                          Text(tag.temperature.toString(),
+                              style: TextStyle(fontSize: 13, color: tag.color)),
                         ],
                       ),
                       additionWidget: Chip(
-                        avatar: const Icon(
-                          Icons.add_circle,
-                          color: Colors.white,
-                        ),
-                        label: Text(S.of(context).add_new_tag),
-                        labelStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                      ),
+                          avatar:
+                              const Icon(Icons.add_circle, color: Colors.white),
+                          label: Text(S.of(context).add_new_tag),
+                          labelStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w300),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.secondary),
                     ),
                 configureChip: (tag) => ChipConfiguration(
-                      label: Text(tag.name!),
-                      backgroundColor: tag.color,
-                      labelStyle: TextStyle(
-                          color: tag.color.computeLuminance() >= 0.5
-                              ? Colors.black
-                              : Colors.white),
-                      deleteIconColor: tag.color.computeLuminance() >= 0.5
-                          ? Colors.black
-                          : Colors.white,
-                    ),
+                    label: Text(tag.name!),
+                    backgroundColor: tag.color,
+                    labelStyle: TextStyle(
+                        color: tag.color.computeLuminance() >= 0.5
+                            ? Colors.black
+                            : Colors.white),
+                    deleteIconColor: tag.color.computeLuminance() >= 0.5
+                        ? Colors.black
+                        : Colors.white),
                 onChanged: () {
                   SettingsProvider.getInstance().hiddenTags = tags;
                 }),

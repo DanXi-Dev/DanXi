@@ -24,7 +24,6 @@ import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -41,9 +40,7 @@ class QRHelper {
     showPlatformDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) => QRDialog(
-              personInfo: personInfo,
-            ));
+        builder: (BuildContext context) => QRDialog(personInfo: personInfo));
   }
 }
 
@@ -58,40 +55,38 @@ class QRDialog extends StatefulWidget {
 
 class _QRDialogState extends State<QRDialog> {
   @override
-  Widget build(BuildContext context) {
-    return PlatformAlertDialog(
-      title: Text(S.of(context).fudan_qr_code),
-      content: SizedBox(
-          width: double.maxFinite,
-          height: 200.0,
-          child: Center(
-            child: FutureWidget<String?>(
-              future: LazyFuture.pack(
-                  QRCodeRepository.getInstance().getQRCode(widget.personInfo)),
-              successBuilder: (_, snapshot) {
-                return QrImage(
-                    data: snapshot.data!,
-                    size: 200.0,
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.white);
-              },
-              loadingBuilder: Text(S.of(context).loading_qr_code),
-              errorBuilder:
-                  (BuildContext context, AsyncSnapshot<String?> snapShot) =>
-                      ErrorPageWidget.buildWidget(context, snapShot.error,
-                          stackTrace: snapShot.stackTrace,
-                          onTap: () => refreshSelf()),
-            ),
-          )),
-      actions: <Widget>[
-        TextButton(
-            child: PlatformText(S.of(context).i_see),
-            onPressed: () async {
-              ScreenProxy.resetBrightness();
-              //ScreenProxy.keepOn(false);
-              Navigator.pop(context);
-            }),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => PlatformAlertDialog(
+        title: Text(S.of(context).fudan_qr_code),
+        content: SizedBox(
+            width: double.maxFinite,
+            height: 200.0,
+            child: Center(
+              child: FutureWidget<String?>(
+                future: LazyFuture.pack(QRCodeRepository.getInstance()
+                    .getQRCode(widget.personInfo)),
+                successBuilder: (_, snapshot) {
+                  return QrImage(
+                      data: snapshot.data!,
+                      size: 200.0,
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.white);
+                },
+                loadingBuilder: Text(S.of(context).loading_qr_code),
+                errorBuilder:
+                    (BuildContext context, AsyncSnapshot<String?> snapShot) =>
+                        ErrorPageWidget.buildWidget(context, snapShot.error,
+                            stackTrace: snapShot.stackTrace,
+                            onTap: () => refreshSelf()),
+              ),
+            )),
+        actions: <Widget>[
+          TextButton(
+              child: PlatformText(S.of(context).i_see),
+              onPressed: () async {
+                ScreenProxy.resetBrightness();
+                //ScreenProxy.keepOn(false);
+                Navigator.pop(context);
+              }),
+        ],
+      );
 }

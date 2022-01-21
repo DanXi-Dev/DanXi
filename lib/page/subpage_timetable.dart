@@ -38,6 +38,7 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -116,28 +117,26 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value!, (imageUrl) async {
-          TextEditingController controller = TextEditingController();
+              TextEditingController controller = TextEditingController();
           await showPlatformDialog(
               context: context,
               barrierDismissible: false,
-              builder: (cxt) {
-                return PlatformAlertDialog(
-                  title: Text(S.of(context).enter_captcha),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.network(imageUrl),
-                      TextField(controller: controller)
+              builder: (cxt) => PlatformAlertDialog(
+                    title: Text(S.of(context).enter_captcha),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.network(imageUrl),
+                        TextField(controller: controller)
+                      ],
+                    ),
+                    actions: [
+                      PlatformDialogAction(
+                        child: Text(S.of(context).ok),
+                        onPressed: () => Navigator.of(cxt).pop(),
+                      )
                     ],
-                  ),
-                  actions: [
-                    PlatformDialogAction(
-                      child: Text(S.of(context).ok),
-                      onPressed: () => Navigator.of(cxt).pop(),
-                    )
-                  ],
-                );
-              });
+                  ));
           return controller.text;
         }, forceLoadFromRemote: _manualLoad));
       } else {
@@ -206,19 +205,15 @@ class _TimetableSubPageState extends State<TimetableSubPage>
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
           showPlatformModalSheet(
-              context: context,
-              builder: (BuildContext context) => PlatformWidget(
-                    cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildShareList(context),
-                      cancelButton: CupertinoActionSheetAction(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                    material: (_, __) => Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildShareList(context)),
-                  ));
+            context: context,
+            builder: (BuildContext context) => PlatformContextMenu(
+              actions: _buildShareList(context),
+              cancelButton: CupertinoActionSheetAction(
+                child: Text(S.of(context).cancel),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          );
         }),
         hashCode);
     _setContent();

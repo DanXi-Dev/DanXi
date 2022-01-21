@@ -40,8 +40,8 @@ class EditorObject {
 
 enum EditorObjectType {
   NONE,
-  REPLY_TO_REPLY,
+  REPLY_TO_FLOOR,
   REPLY_TO_DISCUSSION,
-  REPORT_REPLY,
+  REPORT_FLOOR,
   NEW_POST
 }

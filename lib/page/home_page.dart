@@ -199,13 +199,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with bmob error (e.g. unable to obtain data in [AnnouncementRepository]).
-  _dealWithBmobError() async {
-    await showPlatformDialog(
+  _dealWithBmobError() {
+    showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
-              title: Text(
-                S.of(context).fatal_error,
-              ),
+              title: Text(S.of(context).fatal_error),
               content: Text(S.of(context).login_issue_2),
               actions: <Widget>[
                 PlatformDialogAction(

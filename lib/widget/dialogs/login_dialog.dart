@@ -23,6 +23,7 @@ import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -149,19 +150,14 @@ class _LoginDialogState extends State<LoginDialog> {
     } catch (ignored) {}
   }
 
-  List<Widget> _buildLoginAsList() {
+  List<Widget> _buildLoginAsList(BuildContext menuContext) {
     List<Widget> widgets = [];
     for (var e in kCompatibleUserGroup) {
       if (e != _group) {
-        widgets.add(PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () => _switchLoginGroup(e),
-            child: Text(kUserGroupDescription[e]!(context)),
-          ),
-          material: (_, __) => ListTile(
-            title: Text(kUserGroupDescription[e]!(context)),
-            onTap: () => _switchLoginGroup(e),
-          ),
+        widgets.add(PlatformContextMenuItem(
+          menuContext: menuContext,
+          onPressed: () => _switchLoginGroup(e),
+          child: Text(kUserGroupDescription[e]!(menuContext)),
         ));
       }
     }
@@ -300,24 +296,16 @@ class _LoginDialogState extends State<LoginDialog> {
   _showSwitchGroupModal() {
     return showPlatformModalSheet(
         context: context,
-        builder: (context) => PlatformWidget(
-              cupertino: (_, __) => CupertinoActionSheet(
-                actions: _buildLoginAsList(),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              material: (_, __) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: _buildLoginAsList()),
-            ));
+        builder: (context) => PlatformContextMenu(
+            actions: _buildLoginAsList(context),
+            cancelButton: CupertinoActionSheetAction(
+              child: Text(S.of(context).cancel),
+              onPressed: () => Navigator.of(context).pop(),
+            )));
   }
 
   /// Change the login group and rebuild the dialog.
   _switchLoginGroup(UserGroup e) {
-    // Close the dialog
-    Navigator.of(context).pop();
     if (e == UserGroup.VISITOR) {
       _nameController.text = _pwdController.text = "visitor";
     } else {

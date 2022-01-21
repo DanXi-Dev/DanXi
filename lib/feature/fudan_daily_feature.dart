@@ -121,17 +121,8 @@ class FudanDailyFeature extends Feature {
       : const Icon(CupertinoIcons.arrow_up_doc);
 
   void _processForgetTickIssue() {
-    showPlatformDialog(
-        context: context!,
-        builder: (cxt) => PlatformAlertDialog(
-              title: Text(S.of(context!).fatal_error),
-              content: Text(S.of(context!).tick_issue_1),
-              actions: [
-                PlatformDialogAction(
-                    child: Text(S.of(context!).i_see),
-                    onPressed: () => Navigator.of(cxt).pop())
-              ],
-            ));
+    Noticing.showNotice(context!, S.of(context!).tick_issue_1,
+        title: S.of(context!).fatal_error, useSnackBar: false);
   }
 
   /// Restart the loading process

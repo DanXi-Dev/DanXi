@@ -21,6 +21,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -33,7 +34,6 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -331,80 +331,35 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
     List<Widget> menu = [
       if (e.is_me == true && e.deleted == false)
-        PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () async {
-              Navigator.of(menuContext).pop();
-              await OTEditor.modifyReply(
-                  menuContext, e.hole_id, e.floor_id, e.content);
-              await refreshSelf();
-            },
-            child: Text(S.of(context).modify),
-          ),
-          material: (_, __) => ListTile(
-            title: Text(S.of(context).modify),
-            onTap: () async {
-              Navigator.of(menuContext).pop();
-              await OTEditor.modifyReply(
-                  menuContext, e.hole_id, e.floor_id, e.content);
-              await refreshSelf();
-            },
-          ),
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          onPressed: () async {
+            await OTEditor.modifyReply(
+                menuContext, e.hole_id, e.floor_id, e.content);
+            await refreshSelf();
+          },
+          child: Text(S.of(context).modify),
         ),
 
       // Standard Operations
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(menuContext).pop();
-            smartNavigatorPush(menuContext, "/text/detail",
-                arguments: {"text": e.filteredContent});
-          },
-          child: Text(S.of(menuContext).free_select),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(menuContext).free_select),
-          onTap: () {
-            Navigator.of(menuContext).pop();
-            smartNavigatorPush(menuContext, "/text/detail",
-                arguments: {"text": e.filteredContent});
-          },
-        ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        onPressed: () => smartNavigatorPush(menuContext, "/text/detail",
+            arguments: {"text": e.filteredContent}),
+        child: Text(S.of(menuContext).free_select),
       ),
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(menuContext).pop();
-            FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
-          },
-          child: Text(S.of(menuContext).copy),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(menuContext).copy),
-          onTap: () {
-            Navigator.of(menuContext).pop();
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(menuContext).copy),
+        onPressed: () =>
             FlutterClipboard.copy(renderText(e.filteredContent!, '', '')).then(
                 (value) => Noticing.showNotice(
-                    menuContext, S.of(menuContext).copy_success));
-          },
-        ),
+                    menuContext, S.of(menuContext).copy_success)),
       ),
-      PlatformWidget(
-        cupertino: (_, __) => CupertinoActionSheetAction(
-          isDestructiveAction: true,
-          onPressed: () {
-            Navigator.of(menuContext).pop();
-            OTEditor.reportPost(menuContext, e.floor_id);
-          },
-          child: Text(S.of(menuContext).report),
-        ),
-        material: (_, __) => ListTile(
-          title: Text(S.of(menuContext).report),
-          onTap: () {
-            Navigator.of(menuContext).pop();
-            OTEditor.reportPost(menuContext, e.floor_id);
-          },
-        ),
+      PlatformContextMenuItem(
+        isDestructive: true,
+        onPressed: () => OTEditor.reportPost(menuContext, e.floor_id),
+        child: Text(S.of(menuContext).report),
       ),
     ];
     if (OpenTreeHoleRepository.getInstance().isAdmin) {
@@ -465,18 +420,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       onLongPress: () {
         showPlatformModalSheet(
             context: context,
-            builder: (BuildContext context) => PlatformWidget(
-                cupertino: (_, __) => CupertinoActionSheet(
-                      actions: _buildContextMenu(context, floor),
-                      cancelButton: CupertinoActionSheetAction(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                material: (_, __) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: _buildContextMenu(context, floor),
-                    )));
+            builder: (BuildContext context) => PlatformContextMenu(
+                actions: _buildContextMenu(context, floor),
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () => Navigator.of(context).pop(),
+                )));
       },
       onTap: () async {
         if (_searchKeyword == null) {
