@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
@@ -27,6 +28,7 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -123,11 +125,19 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
                 await OpenTreeHoleRepository.getInstance().clearMessages();
                 await indicatorKey.currentState?.show();
               } catch (e) {
-                Noticing.showNotice(
-                    context,
-                    ErrorPageWidget.generateUserFriendlyDescription(
-                        S.of(context), e),
-                    title: S.of(context).fatal_error);
+                if (e is DioError &&
+                    e.response?.statusCode == HttpStatus.notFound) {
+                  Noticing.showNotice(
+                      context, S.of(context).function_not_implemented,
+                      title: S.of(context).fatal_error, useSnackBar: false);
+                } else {
+                  Noticing.showNotice(
+                      context,
+                      ErrorPageWidget.generateUserFriendlyDescription(
+                          S.of(context), e),
+                      title: S.of(context).fatal_error,
+                      useSnackBar: false);
+                }
               }
             },
           )
