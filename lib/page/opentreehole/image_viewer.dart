@@ -97,8 +97,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     _previewUrl = widget.arguments!['url'];
     _hdUrl = OpenTreeHoleRepository.getInstance()
         .extractHighDefinitionImageUrl(_previewUrl);
-    print(_previewUrl);
-    print(_hdUrl);
     _highDefinitionImage =
         (DefaultCacheManager().downloadFile(_hdUrl) as Future<FileInfo?>)
             .onError((error, stackTrace) {
@@ -164,6 +162,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Widget _buildPhotoView(BuildContext context) {
     return PhotoView(
+      heroAttributes: PhotoViewHeroAttributes(
+          tag: _previewUrl, transitionOnUserGestures: true),
       imageProvider: CachedNetworkImageProvider(_previewUrl),
       backgroundDecoration: BoxDecoration(color: Theme.of(context).canvasColor),
     );
@@ -217,6 +217,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         successBuilder:
             (BuildContext context, AsyncSnapshot<FileInfo?> snapshot) {
           return PhotoView(
+            heroAttributes: PhotoViewHeroAttributes(
+                tag: _previewUrl, transitionOnUserGestures: true),
             imageProvider: FileImage(snapshot.data!.file),
             backgroundDecoration:
                 BoxDecoration(color: Theme.of(context).canvasColor),

@@ -63,29 +63,33 @@ class AutoBBSImage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         constraints: BoxConstraints(maxHeight: maxWidth!),
         child: GestureDetector(
-          child: CachedNetworkImage(
-              imageUrl: src,
-              width: maxWidth,
-              height: maxWidth,
-              // Ensure shape is the same as the loading indicator
-              fit: BoxFit.contain,
-              errorWidget: (context, url, error) {
-                return BBSImagePlaceholder(
-                  size: maxWidth,
-                  child: Icon(PlatformIcons(context).error,
-                      color: Theme.of(context).errorColor),
-                );
-              },
-              progressIndicatorBuilder: (context, url, progress) {
-                return BBSImagePlaceholder(
-                  size: maxWidth,
-                  child: progress.progress == null
-                      ? const SizedBox()
-                      : LinearProgressIndicator(
-                          value: progress.progress,
-                        ),
-                );
-              }),
+          child: Hero(
+            transitionOnUserGestures: true,
+            tag: src,
+            child: CachedNetworkImage(
+                imageUrl: src,
+                width: maxWidth,
+                height: maxWidth,
+                // Ensure shape is the same as the loading indicator
+                fit: BoxFit.contain,
+                errorWidget: (context, url, error) {
+                  return BBSImagePlaceholder(
+                    size: maxWidth,
+                    child: Icon(PlatformIcons(context).error,
+                        color: Theme.of(context).errorColor),
+                  );
+                },
+                progressIndicatorBuilder: (context, url, progress) {
+                  return BBSImagePlaceholder(
+                    size: maxWidth,
+                    child: progress.progress == null
+                        ? const SizedBox()
+                        : LinearProgressIndicator(
+                            value: progress.progress,
+                          ),
+                  );
+                }),
+          ),
           onTap: () {
             if (onTapImage != null) onTapImage!(src);
           },
