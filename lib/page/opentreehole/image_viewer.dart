@@ -21,7 +21,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -85,13 +84,16 @@ class ImageViewerPage extends StatefulWidget {
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
+  /// URL for preview image, if it is already in the cache, it makes loading faster.
   String? _previewUrl;
+
+  /// URL for the (high-definition) original image
   late String _originalUrl;
+
   late String safeShowingUrl;
 
   bool originalLoading = true;
   String? originalLoadFailError;
-  late Future<File?> _originalImageFuture;
 
   @override
   void initState() {
@@ -99,19 +101,17 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     _previewUrl = widget.arguments!['thumbUrl'];
     _originalUrl = widget.arguments!['url']!;
     safeShowingUrl = _previewUrl ?? _originalUrl;
-    _originalImageFuture = loadOriginalImage();
+    loadOriginalImage();
   }
 
   Future<File?> loadOriginalImage() async {
-    if (_previewUrl == null) {
-      return await DefaultCacheManager().getSingleFile(_originalUrl);
-    }
+    if (_previewUrl == null) return null;
     try {
-      var result = await DefaultCacheManager().downloadFile(_originalUrl);
+      var result = await DefaultCacheManager().getSingleFile(_originalUrl);
       setState(() {
         originalLoading = false;
       });
-      return result.file;
+      return result;
     } catch (e, st) {
       setState(() {
         originalLoading = false;
@@ -173,18 +173,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     }
   }
 
-  PhotoViewHeroAttributes? get _heroAttribute => _previewUrl != null
-      ? PhotoViewHeroAttributes(
-          tag: _previewUrl!, transitionOnUserGestures: true)
-      : null;
-
-  Widget _buildPhotoView(BuildContext context) {
-    return PhotoView(
-      heroAttributes: _heroAttribute,
-      imageProvider: CachedNetworkImageProvider(safeShowingUrl),
-      backgroundDecoration: BoxDecoration(color: Theme.of(context).canvasColor),
-    );
-  }
+  PhotoViewHeroAttributes? get _heroAttribute => PhotoViewHeroAttributes(
+      tag: safeShowingUrl, transitionOnUserGestures: true);
 
   @override
   Widget build(BuildContext context) {
@@ -231,17 +221,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
             )
         ],
       ),
-      body: FutureWidget<File?>(
-        future: _originalImageFuture,
-        loadingBuilder: () => _buildPhotoView(context),
-        errorBuilder: () => _buildPhotoView(context),
-        successBuilder: (BuildContext context, AsyncSnapshot<File?> snapshot) =>
-            PhotoView(
-          heroAttributes: _heroAttribute,
-          imageProvider: FileImage(snapshot.data!),
-          backgroundDecoration:
-              BoxDecoration(color: Theme.of(context).canvasColor),
-        ),
+      body: PhotoView(
+        gaplessPlayback: true,
+        heroAttributes: _heroAttribute,
+        imageProvider: originalLoading
+            ? CachedNetworkImageProvider(safeShowingUrl)
+            : CachedNetworkImageProvider(_originalUrl),
+        backgroundDecoration:
+            BoxDecoration(color: Theme.of(context).canvasColor),
       ),
     );
   }
