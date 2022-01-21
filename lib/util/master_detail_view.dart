@@ -86,6 +86,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
               key: detailNavigatorKey,
               onGenerateRoute: onGenerateRoute,
               initialRoute: '/placeholder',
+              observers: [HeroController()],
             ),
           ),
         ],

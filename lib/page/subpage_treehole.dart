@@ -211,7 +211,8 @@ class TreeHoleSubpage extends PlatformSubpage
               : CupertinoIcons.bell),
           () {
             if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-              smartNavigatorPush(cxt, '/bbs/messages');
+              smartNavigatorPush(cxt, '/bbs/messages',
+                  forcePushOnMainNavigator: true);
             }
           },
         )
