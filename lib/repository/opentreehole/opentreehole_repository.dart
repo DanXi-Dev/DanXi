@@ -382,7 +382,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data!['image']['display_url'];
   }
 
-  String extractRealImageUrl(String imageUrl) {
+  String extractHighDefinitionImageUrl(String imageUrl) {
     if (imageUrl.contains(_IMAGE_BASE_URL) && imageUrl.contains(".md.")) {
       return imageUrl.replaceFirst(".md.", ".");
     }
