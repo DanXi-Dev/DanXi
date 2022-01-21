@@ -44,6 +44,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   static const String _BASE_URL = "https://api.fduhole.com";
 
+  static const String _IMAGE_BASE_URL = "https://pic.hath.top";
+
   /// The token used for session authentication.
   String? _token;
 
@@ -360,18 +362,24 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<String?> uploadImage(File file) async {
+    final RegExp tokenReg = RegExp(r'PF\.obj\.config\.auth_token = "(\w+)"');
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
-    Response response = await dio!
-        .post(_BASE_URL + "/images",
+    Response<String> r = await dio!.get(_IMAGE_BASE_URL + "/upload");
+    String? token = tokenReg.firstMatch(r.data!)?.group(1);
+    Response<Map> response = await dio!
+        .post<Map>(_IMAGE_BASE_URL + "/json",
             data: FormData.fromMap({
-              "image": await MultipartFile.fromFile(path, filename: fileName)
+              "type": "file",
+              "action": "upload",
+              "auth_token": token!,
+              "source": await MultipartFile.fromFile(path, filename: fileName)
             }),
             options: Options(headers: _tokenHeader))
         .onError(((error, stackTrace) {
       throw ImageUploadError();
     }));
-    return response.data['url'];
+    return response.data!['image']['display_url'];
   }
 
   Future<int?> newFloor(int? discussionId, String content) async {
