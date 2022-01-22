@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>destination</key>
-	<string>upload</string>
-	<key>manageAppVersionAndBuildNumber</key>
+	<string>export</string>
+	<key>generateAppStoreInformation</key>
 	<true/>
 	<key>method</key>
 	<string>app-store</string>

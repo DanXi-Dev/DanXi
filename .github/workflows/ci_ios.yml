@@ -27,16 +27,16 @@ jobs:
           channel: 'stable'
           
       - name: Prepare Flutter Dependencies
-        run: flutter pub get
-      - name: Prepare Flutter I18n
-        run: flutter pub global activate intl_utils
-      - name: Generate Flutter I18n
-        run: flutter pub global run intl_utils:generate
+        run: |
+          mkdir private_keys
+          flutter pub get
+          flutter pub global activate intl_utils
+          flutter pub global run intl_utils:generate
           
-      - name: Bump Build Number - Step 1
-        run: flutter pub global activate cider
-      - name: Bump Build Number - Step 2
-        run: flutter pub global run cider bump build
+      - name: Bump Build Number
+        run: |
+          flutter pub global activate cider
+          flutter pub global run cider bump build
       
       - name: Get Flutter Version
         id: get_flutter_version
@@ -61,16 +61,22 @@ jobs:
           p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
           p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
           
-      - name: Import API Keys - Step 1
-        run: mkdir private_keys
-      - name: Import API Keys - Step 2
-        run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
-  
+      - name: Import API Keys
+        run: |
+          mkdir private_keys
+          echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
+
+      - name: Import Secret.dart
+        run: echo -n ${{ secrets.SECRET_DART_BASE64 }} | base64 -d > lib/common/Secret.dart
+
       - name: Configure Xcode
         run: flutter build ios --release --config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
 
-      - name: Build App
+      - name: Build App   # [flutter pub run build_runner build] will automatically run in this step
         run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
         
+      - name: Export Archive
+        run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist CI/ExportOptions.plist
+
       - name: Upload app to App Store Connect
-        run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist CI/ExportOptions.plist -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+        run: xcrun altool --upload-app -f build/ios/archive/Runner.ipa --type ios --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
