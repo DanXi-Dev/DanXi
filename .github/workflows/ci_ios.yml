@@ -77,11 +77,14 @@ jobs:
       - name: Import Secret.dart
         run: echo -n ${{ secrets.SECRET_DART_BASE64 }} | base64 -d > lib/common/Secret.dart
 
-      - name: Build
-        run: flutter build ios --release #--config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
+      - name: Configure Xcode
+        run: flutter build ios --release --config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
 
-      #- name: Build App   # [flutter pub run build_runner build] will automatically run in this step
-      #  run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+      - name: Build App - Pass 1 (account configuration)  # [flutter pub run build_runner build] will automatically run in this step
+        run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+        
+      - name: Build App - Pass 2 (real build)
+        run: flutter build ios --release # --bundle-sksl-path sksl_default.json # leave this to integration tests
         
       #- name: Export Archive
       #  run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist CI/ExportOptions.plist -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
