@@ -60,17 +60,20 @@ jobs:
         with: 
           p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
           p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
-  
-      - name: Archive IPA
-        run: flutter build ipa # --bundle-sksl-path sksl_default.json
-        
-      # - name: Export IPA
-      #   run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist build/ios/archive/RunnerOptions.plist
-      
+          
       - name: Import API Keys - Step 1
         run: mkdir private_keys
       - name: Import API Keys - Step 2
         run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
           
+      - name: Build # Note: this build was unnecessary as its only purpose was to download provisioning profiles. But since there is no way to pass args to xcodebuild from flutter, we have to do this.
+        run: xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -allowProvisioningUpdates -authenticationKeyPath ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+  
+      - name: Archive IPA
+        run: flutter build ipa # --bundle-sksl-path sksl_default.json # leave this to integration tests
+        
+      # - name: Export IPA
+      #   run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist build/ios/archive/RunnerOptions.plist
+              
       - name: Upload app to TestFlight
         run: xcrun altool --upload-app -f build/ios/archive/Runner.xcarchive --type ios --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
