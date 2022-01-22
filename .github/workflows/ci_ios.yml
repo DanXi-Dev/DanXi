@@ -72,7 +72,7 @@ jobs:
       - name: Import API Keys
         run: |
           mkdir private_keys
-          echo -n ${{ secrets.APP_STORE_API_KEY }} > ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
+          echo -e ${{ secrets.APP_STORE_API_KEY }} > ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
 
       - name: Import Secret.dart
         run: echo -n ${{ secrets.SECRET_DART_BASE64 }} | base64 -d > lib/common/Secret.dart
