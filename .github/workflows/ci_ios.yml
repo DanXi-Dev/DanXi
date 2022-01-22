@@ -1,8 +1,8 @@
 name: CI-iOS
 
 on:
-  #push:
-  #  branches: [ main ]
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -60,6 +60,9 @@ jobs:
         
       # - name: Export IPA
       #   run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist build/ios/archive/RunnerOptions.plist
+      
+      - run: mkdir private_keys
+      - run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
           
       - name: Upload app to TestFlight
-        run: xcrun altool --upload-app -f build/ios/archive/Runner.xcarchive --type ios --apiKey ${{ secrets.APP_STORE_API_KEY }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
+        run: xcrun altool --upload-app -f build/ios/archive/Runner.xcarchive --type ios --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
