@@ -26,11 +26,12 @@ jobs:
           channel: 'stable'
           
       - run: flutter pub get
+      - run: flutter pub global activate intl_utils
       - run: flutter pub run intl_utils:generate
           
-      - run: pub global activate cider
+      - run: flutter pub global activate cider
       - name: Bump Build Number
-        run: cider bump build
+        run: flutter pub run cider bump build
       
       - name: Get flutter version
         id: get_flutter_version
