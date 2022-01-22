@@ -25,6 +25,9 @@ jobs:
           flutter-version: '2.8.1'
           channel: 'stable'
           
+      - run: flutter pub get
+      - run: flutter pub run intl_utils:generate
+          
       - run: pub global activate cider
       - name: Bump Build Number
         run: cider bump build
@@ -45,9 +48,6 @@ jobs:
           git add .
           git commit -m "[GitHub Action] Bump Build Number"
           git push origin HEAD
-     
-      - run: flutter pub get
-      - run: flutter pub run intl_utils:generate
       
       - name: Import Codesign Certificates
         uses: apple-actions/import-codesign-certs@v1
@@ -56,12 +56,10 @@ jobs:
           p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
   
       - name: Archive IPA
-        run: flutter build ios # --bundle-sksl-path sksl_default.json
+        run: flutter build ipa # --bundle-sksl-path sksl_default.json
+        
+      # - name: Export IPA
+      #   run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist build/ios/archive/RunnerOptions.plist
           
       - name: Upload app to TestFlight
-        uses: Apple-Actions/upload-testflight-build@v1
-        with:
-          app-path: 'build/ios/iphoneos/Runner.ipa' 
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        run: xcrun altool --upload-app -f build/ios/archive/Runner.xcarchive --type ios --apiKey ${{ secrets.APP_STORE_API_KEY }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
