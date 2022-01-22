@@ -77,14 +77,14 @@ jobs:
       - name: Import Secret.dart
         run: echo -n ${{ secrets.SECRET_DART_BASE64 }} | base64 -d > lib/common/Secret.dart
 
-      - name: Configure Xcode
-        run: flutter build ios --release --config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
+      - name: Build
+        run: flutter build ios --release #--config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
 
-      - name: Build App   # [flutter pub run build_runner build] will automatically run in this step
-        run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+      #- name: Build App   # [flutter pub run build_runner build] will automatically run in this step
+      #  run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
         
-      - name: Export Archive
-        run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist CI/ExportOptions.plist -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+      #- name: Export Archive
+      #  run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist CI/ExportOptions.plist -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
 
       - name: Upload app to App Store Connect
-        run: xcrun altool --upload-package build/ios/archive/Runner.ipa --type ios --asc-public-id ${{ secrets.APP_STORE_API_ISSUER_ID }} --apple-id 1568629997 --bundle-version ${{ steps.get_flutter_version.outputs.build_number }} --bundle-short-version-string ${{ steps.get_flutter_version.outputs.version_number }} --bundle-id io.github.danxi-dev.dan-xi --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
+        run: xcrun altool --upload-package build/ios/iphoneos/Runner.ipa --type ios --asc-public-id ${{ secrets.APP_STORE_API_ISSUER_ID }} --apple-id 1568629997 --bundle-version ${{ steps.get_flutter_version.outputs.build_number }} --bundle-short-version-string ${{ steps.get_flutter_version.outputs.version_number }} --bundle-id io.github.danxi-dev.dan-xi --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
