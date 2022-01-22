@@ -53,12 +53,21 @@ jobs:
           git add .
           git commit -m "[GitHub Action] Bump Build Number"
           git push origin HEAD
+          
+      - name: Import Development Code Sign Certificates
+        id: dev-codesign
+        uses: apple-actions/import-codesign-certs@v1
+        with: 
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
       
       - name: Import Distribution Code Sign Certificates
         uses: apple-actions/import-codesign-certs@v1
         with: 
           p12-file-base64: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12 }}
           p12-password: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12_PASSWORD }}
+          keychain-password: ${{ steps.dev-codesign.outputs.keychain-password }}
+          create-keychain: false
           
       - name: Import API Keys
         run: |
