@@ -9,29 +9,34 @@ jobs:
   build_and_upload:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Select latest Xcode
+      - name: Select Latest Xcode
         uses: devbotsxyz/xcode-select@v1.1.0
         with:
           version: latest
           beta: false
       
-      - name: Install flutter
+      - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '2.8.1'
           channel: 'stable'
           
-      - run: flutter pub get
-      - run: flutter pub global activate intl_utils
-      - run: flutter pub global run intl_utils:generate
+      - name: Prepare Flutter Dependencies - Step 1
+        run: flutter pub get
+      - name: Prepare Flutter Dependencies - Step 2
+        run: flutter pub global activate intl_utils
+      - name: Prepare Flutter Dependencies - Step 3
+        run: flutter pub global run intl_utils:generate
           
-      - run: flutter pub global activate cider
-      - name: Bump Build Number
-        run: flutter pub run cider bump build
+      - name: Bump Build Number - Step 1
+        run: flutter pub global activate cider
+      - name: Bump Build Number - Step 2
+        run: flutter pub global run cider bump build
       
       - name: Get flutter version
         id: get_flutter_version
@@ -44,13 +49,13 @@ jobs:
           build-number: ${{ steps.get_flutter_version.outputs.build_number }}
           project-path: ios
       
-      - name: Commit build number update
+      - name: Commit Build Number Update
         run: |
           git add .
           git commit -m "[GitHub Action] Bump Build Number"
           git push origin HEAD
       
-      - name: Import Codesign Certificates
+      - name: Import Code Sign Certificates
         uses: apple-actions/import-codesign-certs@v1
         with: 
           p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
@@ -62,8 +67,10 @@ jobs:
       # - name: Export IPA
       #   run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist build/ios/archive/RunnerOptions.plist
       
-      - run: mkdir private_keys
-      - run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
+      - name: Import API Keys - Step 1
+        run: mkdir private_keys
+      - name: Import API Keys - Step 2
+        run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
           
       - name: Upload app to TestFlight
         run: xcrun altool --upload-app -f build/ios/archive/Runner.xcarchive --type ios --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
