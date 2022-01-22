@@ -194,6 +194,28 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
 
+    final pagedListView = PagedListView<OTFloor>(
+      initialData: _hole.floors?.prefetch,
+      pagedController: _listViewController,
+      withScrollbar: true,
+      scrollController: PrimaryScrollController.of(context),
+      dataReceiver: _loadContent,
+      shouldScrollToEnd: shouldScrollToEnd,
+      builder: _getListItems,
+      loadingBuilder: (BuildContext context) => Container(
+        padding: const EdgeInsets.all(8),
+        child: Center(child: PlatformCircularProgressIndicator()),
+      ),
+      endBuilder: (context) => Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Text((_hole.view ?? -1) >= 0
+              ? S.of(context).view_count(_hole.view.toString())
+              : S.of(context).end_reached),
+        ),
+      ),
+    );
+
     return PlatformScaffold(
       iosContentPadding: false,
       iosContentBottomPadding: false,
@@ -232,36 +254,18 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 : BoxDecoration(
                     image: DecorationImage(
                         image: _backgroundImage!, fit: BoxFit.cover)),
-            child: RefreshIndicator(
-              edgeOffset: MediaQuery.of(context).padding.top,
-              color: Theme.of(context).colorScheme.secondary,
-              backgroundColor: Theme.of(context).dialogBackgroundColor,
-              onRefresh: () async {
-                HapticFeedback.mediumImpact();
-                await refreshSelf();
-              },
-              child: PagedListView<OTFloor>(
-                initialData: _hole.floors?.prefetch,
-                pagedController: _listViewController,
-                withScrollbar: true,
-                scrollController: PrimaryScrollController.of(context),
-                dataReceiver: _loadContent,
-                shouldScrollToEnd: shouldScrollToEnd,
-                builder: _getListItems,
-                loadingBuilder: (BuildContext context) => Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Center(child: PlatformCircularProgressIndicator()),
-                ),
-                endBuilder: (context) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text((_hole.view ?? -1) >= 0
-                        ? S.of(context).view_count(_hole.view.toString())
-                        : S.of(context).end_reached),
-                  ),
-                ),
-              ),
-            ),
+            child: _searchKeyword == null
+                ? RefreshIndicator(
+                    edgeOffset: MediaQuery.of(context).padding.top,
+                    color: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: Theme.of(context).dialogBackgroundColor,
+                    onRefresh: () async {
+                      HapticFeedback.mediumImpact();
+                      await refreshSelf();
+                    },
+                    child: pagedListView,
+                  )
+                : pagedListView,
           ),
         ),
       ),
