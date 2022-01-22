@@ -28,7 +28,6 @@ jobs:
           
       - name: Prepare Flutter Dependencies
         run: |
-          mkdir private_keys
           flutter pub get
           flutter pub global activate intl_utils
           flutter pub global run intl_utils:generate
