@@ -1,0 +1,67 @@
+name: CI-iOS
+
+on:
+  #push:
+  #  branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build_and_upload:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Select latest Xcode
+        uses: devbotsxyz/xcode-select@v1.1.0
+        with:
+          version: latest
+          beta: false
+      
+      - name: Install flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '2.8.1'
+          channel: 'stable'
+          
+      - run: pub global activate cider
+      - name: Bump Build Number
+        run: cider bump build
+      
+      - name: Get flutter version
+        id: get_flutter_version
+        uses: its404/get-flutter-version@v1.0.0
+      
+      - name: Update Xcode build number
+        uses: yanamura/ios-bump-version@v1
+        with:
+          version: 1.1.0
+          build-number: ${{ steps.get_flutter_version.outputs.build_number }}
+          project-path: ios
+      
+      - name: Commit build number update
+        run: |
+          git add .
+          git commit -m "[GitHub Action] Bump Build Number"
+          git push origin HEAD
+     
+      - run: flutter pub get
+      - run: flutter pub run intl_utils:generate
+      
+      - name: Import Codesign Certificates
+        uses: apple-actions/import-codesign-certs@v1
+        with: 
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+  
+      - name: Archive IPA
+        run: flutter build ios # --bundle-sksl-path sksl_default.json
+          
+      - name: Upload app to TestFlight
+        uses: Apple-Actions/upload-testflight-build@v1
+        with:
+          app-path: 'build/ios/iphoneos/Runner.ipa' 
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
