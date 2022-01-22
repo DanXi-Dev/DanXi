@@ -4,8 +4,6 @@
 <dict>
 	<key>destination</key>
 	<string>export</string>
-	<key>generateAppStoreInformation</key>
-	<true/>
 	<key>method</key>
 	<string>app-store</string>
 	<key>signingStyle</key>
