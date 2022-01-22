@@ -65,15 +65,12 @@ jobs:
         run: mkdir private_keys
       - name: Import API Keys - Step 2
         run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
-
-      - name: Install CocoaPods
-        run: pod install --project-directory=ios
-          
-      - name: Build # Note: this build was unnecessary as its only purpose was to download provisioning profiles. But since there is no way to pass args to xcodebuild from flutter, we have to do this.
-        run: xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
   
-      - name: Archive IPA
-        run: flutter build ipa # --bundle-sksl-path sksl_default.json # leave this to integration tests
+      - name: Configure Xcode
+        run: flutter build ios --release --config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
+
+      - name: Build # Note: this build was unnecessary as its only purpose was to download provisioning profiles. But since there is no way to pass args to xcodebuild from flutter, we have to do this.
+        run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
         
       # - name: Export IPA
       #   run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/archive/Runner.ipa -exportOptionsPlist build/ios/archive/RunnerOptions.plist
