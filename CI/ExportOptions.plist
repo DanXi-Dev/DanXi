@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>destination</key>
-	<string>export</string>
+	<string>upload</string>
 	<key>method</key>
 	<string>app-store</string>
 	<key>signingStyle</key>
