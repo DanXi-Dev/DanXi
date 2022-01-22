@@ -26,11 +26,11 @@ jobs:
           flutter-version: '2.8.1'
           channel: 'stable'
           
-      - name: Prepare Flutter Dependencies - Step 1
+      - name: Prepare Flutter Dependencies
         run: flutter pub get
-      - name: Prepare Flutter Dependencies - Step 2
+      - name: Prepare Flutter I18n
         run: flutter pub global activate intl_utils
-      - name: Prepare Flutter Dependencies - Step 3
+      - name: Generate Flutter I18n
         run: flutter pub global run intl_utils:generate
           
       - name: Bump Build Number - Step 1
@@ -38,14 +38,14 @@ jobs:
       - name: Bump Build Number - Step 2
         run: flutter pub global run cider bump build
       
-      - name: Get flutter version
+      - name: Get Flutter Version
         id: get_flutter_version
         uses: its404/get-flutter-version@v1.0.0
       
-      - name: Update Xcode build number
+      - name: Update Xcode Build Number
         uses: yanamura/ios-bump-version@v1
         with:
-          version: 1.1.0
+          version: ${{ steps.get_flutter_version.outputs.version_number }}
           build-number: ${{ steps.get_flutter_version.outputs.build_number }}
           project-path: ios
       
@@ -67,7 +67,7 @@ jobs:
         run: echo -n ${{ secrets.APP_STORE_API_KEY_BASE64 }} | base64 -d -o ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
           
       - name: Build # Note: this build was unnecessary as its only purpose was to download provisioning profiles. But since there is no way to pass args to xcodebuild from flutter, we have to do this.
-        run: xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -allowProvisioningUpdates -authenticationKeyPath ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
+        run: xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
   
       - name: Archive IPA
         run: flutter build ipa # --bundle-sksl-path sksl_default.json # leave this to integration tests
