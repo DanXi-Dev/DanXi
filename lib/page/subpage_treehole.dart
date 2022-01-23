@@ -127,7 +127,7 @@ class _OTTitleState extends State<OTTitle> {
     super.initState();
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          StateProvider.divisionId = event.newDivision;
+          StateProvider.currentDivision = event.newDivision;
           refreshSelf();
         }),
         hashCode);
@@ -162,7 +162,7 @@ class _OTTitleState extends State<OTTitle> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(StateProvider.divisionId?.name ?? S.of(context).forum),
+            Text(StateProvider.currentDivision?.name ?? S.of(context).forum),
             const Icon(Icons.arrow_drop_down)
           ],
         ),
@@ -300,7 +300,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
       TimeBasedLoadAdaptLayer(10, 1);
 
   /// Fields related to the display states.
-  static int get divisionId => StateProvider.divisionId?.division_id ?? 1;
+  static int get divisionId => StateProvider.currentDivision?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
@@ -469,7 +469,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          StateProvider.divisionId = event.newDivision;
+          StateProvider.currentDivision = event.newDivision;
           indicatorKey.currentState?.show();
         }),
         hashCode);

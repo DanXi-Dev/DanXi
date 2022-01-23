@@ -390,7 +390,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               await refreshSelf();
             }
           },
-          child: const Text("Hide this floor"),
+          child: const Text("Delete this floor"),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
@@ -405,6 +405,25 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     )));
           },
           child: const Text("Punish this user"),
+          menuContext: menuContext,
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            var pinned = StateProvider.currentDivision!.pinned!
+                .map((hole) => hole.hole_id!)
+                .toList();
+            if (pinned.contains(e.hole_id!)) {
+              pinned.remove(e.hole_id!);
+            } else {
+              pinned.add(e.hole_id!);
+            }
+            await OpenTreeHoleRepository.getInstance().adminModifyDivision(
+                StateProvider.currentDivision!.division_id!,
+                null,
+                null,
+                pinned);
+          },
+          child: const Text("Pin/Unpin this hole"),
           menuContext: menuContext,
         ),
       ]);

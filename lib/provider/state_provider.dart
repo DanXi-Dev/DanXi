@@ -35,13 +35,13 @@ class StateProvider {
   static final Map<EditorObject?, PostEditorText> editorCache = {};
 
   /// The current division.
-  static OTDivision? divisionId;
+  static OTDivision? currentDivision;
 
   /// Whether need to display screenshot warning
   static bool needScreenshotWarning = false;
 
   static void initialize() {
-    divisionId = null;
+    currentDivision = null;
     personInfo.value = null;
     editorCache.clear();
   }

@@ -120,7 +120,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
-  Future<void> initializeRepo({bool loadDataAfterInit = true}) async {
+  Future<void> initializeRepo() async {
     initializeToken();
     try {
       FDUHolePlatformBridge.registerRemoteNotification();
@@ -139,7 +139,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    Response response = await secureDio.get(_BASE_URL + "/verify/apikey",
+    final response = await secureDio.get(_BASE_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.generateOneTimeAPIKey(),
           "email": email,
@@ -567,6 +567,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return (await dio!.post(_BASE_URL + "/penalty/$floorId",
             data: jsonEncode(
                 {"penalty_level": penaltyLevel, "division_id": divisionId}),
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
+  Future<int?> adminModifyDivision(
+      int id, String? name, String? description, List<int>? pinned) async {
+    return (await dio!.put(_BASE_URL + "/divisions/$id",
+            data: jsonEncode({
+              if (name != null) "name": name,
+              if (description != null) "description": description,
+              if (pinned != null) "pinned": pinned,
+            }),
             options: Options(headers: _tokenHeader)))
         .statusCode;
   }
