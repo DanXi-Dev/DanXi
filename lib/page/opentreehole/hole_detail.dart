@@ -353,13 +353,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         child: Text(S.of(menuContext).free_select),
       ),
       PlatformContextMenuItem(
-        menuContext: menuContext,
-        child: Text(S.of(menuContext).copy),
-        onPressed: () =>
-            FlutterClipboard.copy(renderText(e.filteredContent!, '', '')).then(
-                (value) => Noticing.showNotice(
-                    menuContext, S.of(menuContext).copy_success)),
-      ),
+          menuContext: menuContext,
+          child: Text(S.of(menuContext).copy),
+          onPressed: () async {
+            await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
+            if (PlatformX.isMaterial(context)) {
+              await Noticing.showNotice(
+                  menuContext, S.of(menuContext).copy_success);
+            }
+          }),
       PlatformContextMenuItem(
         isDestructive: true,
         onPressed: () => OTEditor.reportPost(menuContext, e.floor_id),

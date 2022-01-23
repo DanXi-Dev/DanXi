@@ -648,9 +648,12 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
               child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(S.of(context).copy_password)),
-              onPressed: () {
-                FlutterClipboard.copy(model.password!).then((value) =>
-                    Noticing.showNotice(context, S.of(context).copy_success));
+              onPressed: () async {
+                await FlutterClipboard.copy(model.password!);
+                if (PlatformX.isMaterial(context)) {
+                  await Noticing.showNotice(
+                      context, S.of(context).copy_success);
+                }
               },
             ),
             PlatformElevatedButton(
