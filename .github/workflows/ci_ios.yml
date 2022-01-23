@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Automated CI (iOS):
+  Automated-CI-iOS:
     runs-on: macos-latest
     steps:
       - name: Checkout
