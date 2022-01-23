@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Use Latest Xcode
         uses: devbotsxyz/xcode-select@v1.1.0
@@ -74,11 +72,20 @@ jobs:
           mkdir private_keys
           echo -e "${{ secrets.APP_STORE_API_KEY }}" > ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
 
-      - name: Import Secret.dart
-        run: echo -n ${{ secrets.SECRET_DART_BASE64 }} | base64 -d > lib/common/Secret.dart
+      - name: Import Secrets
+        uses: actions/checkout@v2
+        with:
+          repository: DanXi-Dev/DanXi-secrets
+          path: secrets
+          ssh-key: ${{ secrets.SECRETS_SSH_KEY }}
+      
+      - name: Populate Secrets
+        run: |
+          mv -f secrets/Secret.dart lib/common/Secret.dart
+          mv -f secrets/sksl_default.json CI/sksl_default.json
 
       - name: Configure Xcode
-        run: flutter build ios --release --config-only # --bundle-sksl-path sksl_default.json # leave this to integration tests
+        run: flutter build ios --release --config-only --bundle-sksl-path CI/sksl_default.json
 
       - name: Build App   # [flutter pub run build_runner build] will automatically run in this step
         run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
