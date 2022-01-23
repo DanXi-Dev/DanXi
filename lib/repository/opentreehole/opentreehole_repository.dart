@@ -112,13 +112,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     );
   }
 
-  Future<void> initializeRepo() async {
+  void initializeToken() {
     if (SettingsProvider.getInstance().fduholeToken != null) {
       _token = SettingsProvider.getInstance().fduholeToken;
     } else {
       throw NotLoginError("No token");
     }
+  }
 
+  Future<void> initializeRepo({bool loadDataAfterInit = true}) async {
+    initializeToken();
     try {
       FDUHolePlatformBridge.registerRemoteNotification();
     } catch (_) {}

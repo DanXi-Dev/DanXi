@@ -39,6 +39,7 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -317,6 +318,20 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     await _systemTray.setContextMenu(showingMenu);
   }
 
+  Future<void> onTapNotification(
+    BuildContext context,
+    String? code,
+    Map<String, dynamic>? data,
+  ) async {
+    if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+      // Do a quick initialization and push
+      OpenTreeHoleRepository.getInstance().initializeToken();
+    }
+    smartNavigatorPush(context, '/bbs/messages',
+        forcePushOnMainNavigator: true);
+    OTMessageItem.dispMessageDetailBasedOnGuessedDataType(context, code, data);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -381,8 +396,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             } catch (ignored) {}
             return value;
           });
-          OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
-              context, call.arguments['code'], map);
+          await onTapNotification(context, call.arguments['code'], map);
           break;
         case "upload_apns_token":
           try {
@@ -418,7 +432,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
             if (params is MiPushMessageEntity && params.content != null) {
               Map<String, String> obj = Uri.splitQueryString(params.content!);
-              OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
+              await onTapNotification(
                   context, obj['code'], jsonDecode(obj['data'] ?? ""));
             }
             break;
