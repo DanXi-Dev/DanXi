@@ -101,7 +101,10 @@ final BaseRender kMarkdownRender = (BuildContext context,
     imageBuilder: (Uri uri, String? title, String? alt) {
       return Center(
         child: AutoBBSImage(
-            src: uri.toString(), maxWidth: imageWidth, onTapImage: onTapImage),
+            key: UniqueKey(),
+            src: uri.toString(),
+            maxWidth: imageWidth,
+            onTapImage: onTapImage),
       );
     },
   );

@@ -37,10 +37,10 @@ import 'package:share/share.dart';
 /// An image display page, allowing user to share or save the image.
 ///
 /// Arguments:
-/// [String] url: the original url of the image, enabling the page to decide the file name.
-/// If [thumbUrl] not set, it should be put in [DefaultCacheManager] first.
+/// [String] hd_url: the original url of the image, enabling the page to decide the file name.
+/// If [preview_url] not set, it should be put in [DefaultCacheManager] first.
 ///
-/// [String] thumbUrl: the thumbnail url of the image. If set, it should be put in [DefaultCacheManager] first,
+/// [String] preview_url: the thumbnail url of the image. If set, it should be put in [DefaultCacheManager] first,
 /// and [ImageViewerPage] will put a hero attribute on [PhotoView] for transition animation.
 ///
 
@@ -90,8 +90,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   /// URL for the (high-definition) original image
   late String _originalUrl;
-
   late String safeShowingUrl;
+  late Object heroTag;
 
   bool originalLoading = true;
   String? originalLoadFailError;
@@ -99,8 +99,9 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   @override
   void initState() {
     super.initState();
-    _previewUrl = widget.arguments!['thumbUrl'];
-    _originalUrl = widget.arguments!['url']!;
+    _previewUrl = widget.arguments!['preview_url'];
+    _originalUrl = widget.arguments!['hd_url']!;
+    heroTag = widget.arguments!['hero_tag']!;
     safeShowingUrl = _previewUrl ?? _originalUrl;
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       unawaited(cacheOriginalImage());
@@ -216,7 +217,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       body: PhotoView(
         gaplessPlayback: true,
         heroAttributes: PhotoViewHeroAttributes(
-            tag: safeShowingUrl, transitionOnUserGestures: true),
+            tag: heroTag, transitionOnUserGestures: true),
         imageProvider: originalLoading
             ? CachedNetworkImageProvider(safeShowingUrl)
             : CachedNetworkImageProvider(_originalUrl),

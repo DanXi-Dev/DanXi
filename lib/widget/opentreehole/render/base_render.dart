@@ -18,7 +18,7 @@
 import 'package:flutter/cupertino.dart';
 
 typedef LinkTapCallback = void Function(String? url);
-typedef ImageTapCallback = void Function(String? url);
+typedef ImageTapCallback = void Function(String? url, Object heroTag);
 
 /// BaseRender is the base type of a render which renders the post raw [content] into a [Widget].
 ///

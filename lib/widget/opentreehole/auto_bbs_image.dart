@@ -65,7 +65,7 @@ class AutoBBSImage extends StatelessWidget {
         child: GestureDetector(
           child: Hero(
             transitionOnUserGestures: true,
-            tag: src,
+            tag: key ?? this,
             child: CachedNetworkImage(
                 imageUrl: src,
                 width: maxWidth,
@@ -91,7 +91,7 @@ class AutoBBSImage extends StatelessWidget {
                 }),
           ),
           onTap: () {
-            if (onTapImage != null) onTapImage!(src);
+            if (onTapImage != null) onTapImage!(src, key ?? this);
           },
         ),
       ),

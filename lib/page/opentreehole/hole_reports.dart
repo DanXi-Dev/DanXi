@@ -144,11 +144,12 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       BrowserUtil.openUrl(url!, context);
     }
 
-    onImageTap(url) {
+    onImageTap(url, heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
-        'thumbUrl': url,
-        'url': OpenTreeHoleRepository.getInstance()
-            .extractHighDefinitionImageUrl(url)
+        'preview_url': url,
+        'hd_url': OpenTreeHoleRepository.getInstance()
+            .extractHighDefinitionImageUrl(url),
+        'hero_tag': heroTag
       });
     }
 
