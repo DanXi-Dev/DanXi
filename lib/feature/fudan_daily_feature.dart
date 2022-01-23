@@ -145,7 +145,7 @@ class FudanDailyFeature extends Feature {
           }
         }
         BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
-            context, FudanCOVID19Repository.getInstance().thisCookies);
+            context, null, true);
         break;
       case ConnectionStatus.FATAL_ERROR:
       case ConnectionStatus.FAILED:

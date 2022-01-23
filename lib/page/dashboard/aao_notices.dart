@@ -82,18 +82,7 @@ class _AAONoticesListState extends State<AAONoticesList> {
                 title: Text(value.title),
                 subtitle: Text(value.time),
                 onTap: () async {
-                  IndependentCookieJar? cookie;
-                  if (PlatformX.isMobile) {
-                    ProgressFuture progressDialog = showProgressDialog(
-                        loadingText: S.of(context).loading, context: context);
-                    try {
-                      cookie =
-                          await FudanAAORepository.getInstance().thisCookies;
-                    } finally {
-                      progressDialog.dismiss(showAnim: false);
-                    }
-                  }
-                  BrowserUtil.openUrl(value.url, context, cookie);
+                  BrowserUtil.openUrl(value.url, context, null, true);
                 },
               ));
             },
