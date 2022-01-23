@@ -414,20 +414,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             var pinned = StateProvider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
                 .toList();
-            print(pinned);
             if (pinned.contains(e.hole_id!)) {
               pinned.remove(e.hole_id!);
             } else {
               pinned.add(e.hole_id!);
             }
-            print(pinned);
-            print(await OpenTreeHoleRepository.getInstance()
-                .adminModifyDivision(
-                    StateProvider.currentDivision!.division_id!,
-                    null,
-                    null,
-                    pinned)
-                .catchError((error, stackTrace) => print(error)));
+            await OpenTreeHoleRepository.getInstance().adminModifyDivision(
+                StateProvider.currentDivision!.division_id!,
+                null,
+                null,
+                pinned);
           },
           child: const Text("Pin/Unpin this hole"),
           menuContext: menuContext,

@@ -3,7 +3,7 @@ name: CI-iOS
 on:
   push:
     tags:        
-      - release.**
+      - '*'
   workflow_dispatch:
 
 jobs:
