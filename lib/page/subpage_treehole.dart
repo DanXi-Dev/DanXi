@@ -322,6 +322,8 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
     // If no token, NotLoginError will be thrown.
     if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().initializeRepo();
+      StateProvider.currentDivision =
+          OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
       settingsPageKey.currentState?.setState(() {});
     }
 

@@ -375,6 +375,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             await refreshSelf();
           },
           child: const Text("Modify this floor"),
+          isDestructive: true,
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
@@ -391,6 +392,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
           },
           child: const Text("Delete this floor"),
+          isDestructive: true,
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
@@ -412,18 +414,34 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             var pinned = StateProvider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
                 .toList();
+            print(pinned);
             if (pinned.contains(e.hole_id!)) {
               pinned.remove(e.hole_id!);
             } else {
               pinned.add(e.hole_id!);
             }
-            await OpenTreeHoleRepository.getInstance().adminModifyDivision(
-                StateProvider.currentDivision!.division_id!,
-                null,
-                null,
-                pinned);
+            print(pinned);
+            print(await OpenTreeHoleRepository.getInstance()
+                .adminModifyDivision(
+                    StateProvider.currentDivision!.division_id!,
+                    null,
+                    null,
+                    pinned)
+                .catchError((error, stackTrace) => print(error)));
           },
           child: const Text("Pin/Unpin this hole"),
+          menuContext: menuContext,
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            final tag = await Noticing.showInputDialog(context, "Special Tag");
+            if (tag == null) {
+              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
+            }
+            await OpenTreeHoleRepository.getInstance()
+                .adminAddSpecialTag(tag, e.floor_id);
+          },
+          child: const Text("Add Special Tag"),
           menuContext: menuContext,
         ),
       ]);

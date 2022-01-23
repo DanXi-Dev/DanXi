@@ -583,6 +583,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminAddSpecialTag(String tag, int? floorId) async {
+    return (await dio!.put(_BASE_URL + "/floors/$floorId",
+            data: {
+              "special_tag": tag,
+            },
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {
