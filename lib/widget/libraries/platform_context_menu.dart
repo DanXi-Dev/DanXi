@@ -34,9 +34,11 @@ class PlatformContextMenu extends StatelessWidget {
               actions: actions,
               cancelButton: cancelButton,
             ),
-        material: (_, __) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: actions,
+        material: (_, __) => SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: actions,
+              ),
             ));
   }
 }

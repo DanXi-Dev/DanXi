@@ -400,96 +400,101 @@ class OTFloorMentionWidget extends StatelessWidget {
   static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor) =>
       showPlatformModalSheet<bool?>(
         context: context,
-        builder: (BuildContext cxt) => SafeArea(
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxHeight:
-                          ViewportUtils.getViewportHeight(context) * 0.85),
-                  child: SingleChildScrollView(
-                    primary: false,
-                    child: OTFloorWidget(
-                      hasBackgroundImage: false,
-                      floor: floor,
-                      showBottomBar: false,
+        builder: (BuildContext cxt) {
+          final maxHeightRatio = PlatformX.isMaterial(context) ? 0.3 : 0.85;
+          return SafeArea(
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxHeight: ViewportUtils.getViewportHeight(context) *
+                            maxHeightRatio),
+                    child: SingleChildScrollView(
+                      primary: false,
+                      child: OTFloorWidget(
+                        hasBackgroundImage: false,
+                        floor: floor,
+                        showBottomBar: false,
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () async {
-                          // Note how this code use [cxt] for some context but [context] for others.
-                          // This is to prevent looking up deactivated context after [pop].
-                          Navigator.pop(cxt);
-                          try {
-                            // Find the PagedListViewController
-                            final pagedListViewController = context
-                                .findAncestorWidgetOfExactType<
-                                    PagedListView<OTFloor>>()!
-                                .pagedController!;
-                            // If this floor is directly in the hole
-                            if (pagedListViewController.indexOf(floor) != -1) {
-                              // Scroll to the corresponding post
-                              while (!(await pagedListViewController
-                                  .scrollToItem(floor))) {
-                                if (pagedListViewController
-                                        .getScrollController()!
-                                        .offset <
-                                    10) break; // Prevent deadlock
-                                await pagedListViewController.scrollDelta(
-                                    -100,
-                                    const Duration(milliseconds: 1),
-                                    Curves.linear);
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            // Note how this code use [cxt] for some context but [context] for others.
+                            // This is to prevent looking up deactivated context after [pop].
+                            Navigator.pop(cxt);
+                            try {
+                              // Find the PagedListViewController
+                              final pagedListViewController = context
+                                  .findAncestorWidgetOfExactType<
+                                      PagedListView<OTFloor>>()!
+                                  .pagedController!;
+                              // If this floor is directly in the hole
+                              if (pagedListViewController.indexOf(floor) !=
+                                  -1) {
+                                // Scroll to the corresponding post
+                                while (!(await pagedListViewController
+                                    .scrollToItem(floor))) {
+                                  if (pagedListViewController
+                                          .getScrollController()!
+                                          .offset <
+                                      10) break; // Prevent deadlock
+                                  await pagedListViewController.scrollDelta(
+                                      -100,
+                                      const Duration(milliseconds: 1),
+                                      Curves.linear);
+                                }
+                                return;
                               }
-                              return;
-                            }
-                          } catch (_) {}
+                            } catch (_) {}
 
-                          // If this floor is in another hole
-                          ProgressFuture progressDialog = showProgressDialog(
-                              loadingText: S.of(context).loading,
-                              context: context);
-                          try {
-                            smartNavigatorPush(context, "/bbs/postDetail",
-                                arguments: {
-                                  "post":
-                                      await OpenTreeHoleRepository.getInstance()
-                                          .loadSpecificHole(floor.hole_id!),
-                                  "locate": floor,
-                                });
-                          } catch (e) {
-                            Noticing.showNotice(
-                                context,
-                                ErrorPageWidget.generateUserFriendlyDescription(
-                                    S.of(context), e),
-                                title: S.of(context).fatal_error,
-                                useSnackBar: false);
-                          } finally {
-                            progressDialog.dismiss(showAnim: false);
-                          }
-                        },
-                        child: Text(S.of(cxt).jump_to_hole),
-                      ),
-                      TextButton(
-                        child: Text(S.of(cxt).ok),
-                        onPressed: () {
-                          Navigator.of(cxt).pop(true);
-                        },
-                      ),
-                    ],
+                            // If this floor is in another hole
+                            ProgressFuture progressDialog = showProgressDialog(
+                                loadingText: S.of(context).loading,
+                                context: context);
+                            try {
+                              smartNavigatorPush(context, "/bbs/postDetail",
+                                  arguments: {
+                                    "post": await OpenTreeHoleRepository
+                                            .getInstance()
+                                        .loadSpecificHole(floor.hole_id!),
+                                    "locate": floor,
+                                  });
+                            } catch (e) {
+                              Noticing.showNotice(
+                                  context,
+                                  ErrorPageWidget
+                                      .generateUserFriendlyDescription(
+                                          S.of(context), e),
+                                  title: S.of(context).fatal_error,
+                                  useSnackBar: false);
+                            } finally {
+                              progressDialog.dismiss(showAnim: false);
+                            }
+                          },
+                          child: Text(S.of(cxt).jump_to_hole),
+                        ),
+                        TextButton(
+                          child: Text(S.of(cxt).ok),
+                          onPressed: () {
+                            Navigator.of(cxt).pop(true);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       );
 
   @override
