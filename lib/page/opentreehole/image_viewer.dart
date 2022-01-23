@@ -173,26 +173,20 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     }
   }
 
-  PhotoViewHeroAttributes? get _heroAttribute => PhotoViewHeroAttributes(
-      tag: safeShowingUrl, transitionOnUserGestures: true);
-
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: false,
-      iosContentPadding: false,
+      iosContentPadding: true,
       appBar: PlatformAppBarX(
-        title: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(S.of(context).image),
+        title: Text(S.of(context).image),
+        trailingActions: [
           if (originalLoading) ...[
-            const SizedBox(width: 4),
             PlatformCircularProgressIndicator(
               material: (_, __) => MaterialProgressIndicatorData(
                   color: Theme.of(context).textTheme.bodyText1?.color),
             )
-          ],
-          if (originalLoadFailError != null) ...[
-            const SizedBox(width: 4),
+          ] else if (originalLoadFailError != null) ...[
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: Icon(PlatformIcons(context).error),
@@ -201,29 +195,28 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   context, originalLoadFailError!,
                   title: S.of(context).fatal_error, useSnackBar: false),
             ),
-          ]
-        ]),
-        trailingActions: [
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: Icon(PlatformX.isMaterial(context)
-                ? Icons.share
-                : CupertinoIcons.square_arrow_up),
-            onPressed: shareImage,
-          ),
-
-          // Not needed on iOS
-          if (!PlatformX.isIOS)
+          ] else ...[
             PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: const Icon(Icons.save),
-              onPressed: saveImage,
-            )
+              icon: Icon(PlatformX.isMaterial(context)
+                  ? Icons.share
+                  : CupertinoIcons.square_arrow_up),
+              onPressed: shareImage,
+            ),
+            // Not needed on iOS
+            if (!PlatformX.isIOS)
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.save),
+                onPressed: saveImage,
+              )
+          ]
         ],
       ),
       body: PhotoView(
         gaplessPlayback: true,
-        heroAttributes: _heroAttribute,
+        heroAttributes: PhotoViewHeroAttributes(
+            tag: safeShowingUrl, transitionOnUserGestures: true),
         imageProvider: originalLoading
             ? CachedNetworkImageProvider(safeShowingUrl)
             : CachedNetworkImageProvider(_originalUrl),
