@@ -134,7 +134,7 @@ class BusFeature extends Feature {
   }
 
   BusScheduleItem? nextBusForCampus(Campus campus) {
-    final filteredBusList = _busList!
+    final List<BusScheduleItem> filteredBusList = _busList!
         .where((element) => element.start == campus || element.end == campus)
         .toList();
     // Get the next bus time

@@ -135,15 +135,15 @@ class OTFloorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool generateTags = (index == 0);
-    onLinkTap(url) {
+    void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
     }
 
-    onImageTap(url, heroTag) {
+    void onImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
         'hd_url': OpenTreeHoleRepository.getInstance()
-            .extractHighDefinitionImageUrl(url),
+            .extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
     }

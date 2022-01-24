@@ -59,7 +59,7 @@ class FudanBusRepository extends BaseRepositoryWithDio {
             .map((e) => BusScheduleItem.fromRawJson(e)));
       }
     });
-    return items;
+    return items.filter((element) => element.realStartTime != null);
   }
 
   @override
@@ -96,6 +96,11 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
   @override
   int compareTo(BusScheduleItem other) =>
       realStartTime!.compareTo(other.realStartTime!);
+
+  @override
+  String toString() {
+    return 'BusScheduleItem{id: $id, start: $start, end: $end, startTime: $startTime, endTime: $endTime, direction: $direction, holidayRun: $holidayRun}';
+  }
 }
 
 enum BusDirection {

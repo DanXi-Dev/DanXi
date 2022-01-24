@@ -140,15 +140,15 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
 
   Widget _getListItems(BuildContext context,
       ListProvider<OTReport> dataProvider, int index, OTReport e) {
-    onLinkTap(url) {
+    void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
     }
 
-    onImageTap(url, heroTag) {
+    void onImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
         'hd_url': OpenTreeHoleRepository.getInstance()
-            .extractHighDefinitionImageUrl(url),
+            .extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
     }
