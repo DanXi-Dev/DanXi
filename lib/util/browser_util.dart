@@ -167,8 +167,9 @@ class CustomInAppBrowser extends InAppBrowser {
             ?.toString()
             .startsWith("https://uis.fudan.edu.cn/authserver/login") ==
         true) {
-      webViewController.evaluateJavascript(
-          source: uisLoginJavaScript(StateProvider.personInfo.value!));
+      Future.delayed(const Duration(milliseconds: 1000)).then((_) =>
+          webViewController.evaluateJavascript(
+              source: uisLoginJavaScript(StateProvider.personInfo.value!)));
     }
   }
 

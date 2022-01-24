@@ -94,6 +94,7 @@ class UISLoginTool {
     });
     data['username'] = info!.id;
     data["password"] = info.password;
+    await Future.delayed(const Duration(milliseconds: 800));
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
