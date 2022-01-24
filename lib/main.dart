@@ -33,6 +33,7 @@ import 'package:dan_xi/page/dashboard/exam_detail.dart';
 import 'package:dan_xi/page/dashboard/gpa_table.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_login.dart';
 import 'package:dan_xi/page/opentreehole/hole_messages.dart';
 import 'package:dan_xi/page/opentreehole/hole_reports.dart';
@@ -44,13 +45,14 @@ import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -177,54 +179,71 @@ class DanxiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Phoenix(
-      child: PlatformProvider(
-        // initialPlatform: TargetPlatform.iOS,
-        builder: (BuildContext context) => DynamicThemeController(
-          lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
-          darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
-          child: PlatformApp(
-            scrollBehavior: MyCustomScrollBehavior(),
-            debugShowCheckedModeBanner: false,
-            // Fix cupertino UI text color issues
-            cupertino: (context, __) => CupertinoAppData(
-                theme: CupertinoThemeData(
-                    textTheme: CupertinoTextThemeData(
-                        textStyle: TextStyle(
-                            color: PlatformX.getTheme(context)
-                                .textTheme
-                                .bodyText1!
-                                .color)))),
-            // Configure i18n delegates
-            localizationsDelegates: const [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            onUnknownRoute: (settings) {
-              throw AssertionError(
-                  "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code.");
+    final Widget mainApp = PlatformProvider(
+      // initialPlatform: TargetPlatform.iOS,
+      builder: (BuildContext context) => DynamicThemeController(
+        lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
+        darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
+        child: PlatformApp(
+          scrollBehavior: MyCustomScrollBehavior(),
+          debugShowCheckedModeBanner: false,
+          // Fix cupertino UI text color issues
+          cupertino: (context, __) => CupertinoAppData(
+              theme: CupertinoThemeData(
+                  textTheme: CupertinoTextThemeData(
+                      textStyle: TextStyle(
+                          color: PlatformX.getTheme(context)
+                              .textTheme
+                              .bodyText1!
+                              .color)))),
+          // Configure i18n delegates
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          onUnknownRoute: (settings) {
+            throw AssertionError(
+                "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code.");
+          },
+          home: PlatformMasterDetailApp(
+            // Configure the page route behaviour of the whole app
+            onGenerateRoute: (settings) {
+              final Function? pageContentBuilder =
+                  DanxiApp.routes[settings.name!];
+              if (pageContentBuilder != null) {
+                return platformPageRoute(
+                    context: context,
+                    builder: (context) => pageContentBuilder(context,
+                        arguments: settings.arguments));
+              }
+              return null;
             },
-            home: PlatformMasterDetailApp(
-              // Configure the page route behaviour of the whole app
-              onGenerateRoute: (settings) {
-                final Function? pageContentBuilder =
-                    DanxiApp.routes[settings.name!];
-                if (pageContentBuilder != null) {
-                  return platformPageRoute(
-                      context: context,
-                      builder: (context) => pageContentBuilder(context,
-                          arguments: settings.arguments));
-                }
-                return null;
-              },
-              navigatorKey: Catcher.navigatorKey,
-            ),
+            navigatorKey: Catcher.navigatorKey,
           ),
         ),
       ),
     );
+
+    if (PlatformX.isAndroid || PlatformX.isIOS) {
+      // Listen to Foreground / Background Event with [FGBGNotifier].
+      return Phoenix(
+          child: FGBGNotifier(
+              onEvent: (FGBGType value) {
+                switch (value) {
+                  case FGBGType.foreground:
+                    StateProvider.isForeground = true;
+                    break;
+                  case FGBGType.background:
+                    StateProvider.isForeground = false;
+                    break;
+                }
+              },
+              child: mainApp));
+    } else {
+      return Phoenix(child: mainApp);
+    }
   }
 }

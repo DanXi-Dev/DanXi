@@ -469,12 +469,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
 
     screenListener.addScreenRecordListener((recorded) {
-      if (StateProvider.needScreenshotWarning) {
+      if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {
         Noticing.showScreenshotWarning(context);
       }
     });
     screenListener.addScreenShotListener((filePath) {
-      if (StateProvider.needScreenshotWarning) {
+      if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {
         Noticing.showScreenshotWarning(context);
       }
     });

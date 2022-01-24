@@ -17,8 +17,8 @@
 
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Manage global states of the app.
@@ -40,9 +40,13 @@ class StateProvider {
   /// Whether need to display screenshot warning
   static bool needScreenshotWarning = false;
 
+  static bool isForeground = true;
+
   static void initialize() {
     currentDivision = null;
     personInfo.value = null;
+    isForeground = true;
+    needScreenshotWarning = false;
     editorCache.clear();
   }
 }
