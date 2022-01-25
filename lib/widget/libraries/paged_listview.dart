@@ -371,6 +371,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     _dataClearQueued = false;
   }
 
+  @override
+  void didUpdateWidget(PagedListView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    notifyUpdate(true, true);
+  }
+
   Future<void> notifyUpdate(bool useInitialData, bool queueDataClear) async {
     initialize(useInitialData: useInitialData, queueDataClear: queueDataClear);
     refreshSelf();

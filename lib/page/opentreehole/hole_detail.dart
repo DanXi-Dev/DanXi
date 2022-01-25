@@ -30,6 +30,7 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -166,7 +167,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Rebuild everything and refresh itself.
   Future<void> refreshSelf({scrollToEnd = false}) async {
-    //if (scrollToEnd) _listViewController.queueScrollToEnd();
+    if (scrollToEnd) _listViewController.queueScrollToEnd();
     await _listViewController.notifyUpdate(
         useInitialData: false, queueDataClear: true);
   }
@@ -179,6 +180,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
+    print("Build hole_detail");
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       try {
         // Replaced precached data with updated ones
@@ -204,7 +206,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
       allDataReceiver:
-          shouldScrollToEnd ? Future.value(_hole.floors?.prefetch) : null,
+      shouldScrollToEnd ? Future.value(_hole.floors?.prefetch) : null,
       shouldScrollToEnd: shouldScrollToEnd,
       builder: _getListItems,
       loadingBuilder: (BuildContext context) => Container(
@@ -234,6 +236,33 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         trailingActions: [
           if (_searchKeyword == null) ...[
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.vertical_align_bottom)
+                  : const Icon(CupertinoIcons.arrow_down_to_line),
+              onPressed: () async {
+                ProgressFuture dialog = showProgressDialog(
+                    loadingText: S.of(context).loading, context: context);
+                try {
+                  // If we haven't loaded before, we need to load all floors.
+                  if (!shouldScrollToEnd) await prefetchAllFloors(_hole);
+
+                  _listViewController.queueScrollToEnd();
+                  setState(() => shouldScrollToEnd = true);
+                } catch (error, st) {
+                  Noticing.showNotice(
+                      context,
+                      ErrorPageWidget.generateUserFriendlyDescription(
+                          S.of(context), error,
+                          stackTrace: st),
+                      title: S.of(context).fatal_error,
+                      useSnackBar: false);
+                } finally {
+                  dialog.dismiss(showAnim: false);
+                }
+              },
+            ),
             _buildFavoredActionButton(),
             PlatformIconButton(
               padding: EdgeInsets.zero,
@@ -257,19 +286,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             decoration: _backgroundImage == null
                 ? null
                 : BoxDecoration(
-                    image: DecorationImage(
-                        image: _backgroundImage!, fit: BoxFit.cover)),
+                image: DecorationImage(
+                    image: _backgroundImage!, fit: BoxFit.cover)),
             child: _searchKeyword == null
                 ? RefreshIndicator(
-                    edgeOffset: MediaQuery.of(context).padding.top,
-                    color: Theme.of(context).colorScheme.secondary,
-                    backgroundColor: Theme.of(context).dialogBackgroundColor,
-                    onRefresh: () async {
-                      HapticFeedback.mediumImpact();
-                      await refreshSelf();
-                    },
-                    child: pagedListView,
-                  )
+              edgeOffset: MediaQuery.of(context).padding.top,
+              color: Theme.of(context).colorScheme.secondary,
+              backgroundColor: Theme.of(context).dialogBackgroundColor,
+              onRefresh: () async {
+                HapticFeedback.mediumImpact();
+                await refreshSelf();
+              },
+              child: pagedListView,
+            )
                 : pagedListView,
           ),
         ),
