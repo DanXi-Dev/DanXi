@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -112,15 +113,15 @@ String renderText(
 }
 
 /// Return [OTHole] with all floors prefetched for increased performance when scrolling to the end.
-///
-/// Note: it changes [hole] itself too.
-Future<OTHole?> prefetchAllFloors(OTHole hole) async {
+Future<OTHole> prefetchAllFloors(OTHole hole) async {
   if (hole.reply != null && hole.reply! < Constant.POST_COUNT_PER_PAGE) {
     return hole;
   }
   List<OTFloor>? floors = await OpenTreeHoleRepository.getInstance()
       .loadFloors(hole, startFloor: 0, length: 0);
-  return hole..floors?.prefetch = floors;
+
+  var holeCopy = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
+  return holeCopy..floors?.prefetch = floors;
 }
 
 const String KEY_NO_TAG = "默认";

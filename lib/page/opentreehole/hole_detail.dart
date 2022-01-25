@@ -304,7 +304,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         loadingText: S.of(context).loading, context: context);
     try {
       // If we haven't loaded before, we need to load all floors.
-      if (!shouldScrollToEnd) await prefetchAllFloors(_hole);
+      if (!shouldScrollToEnd) _hole = await prefetchAllFloors(_hole);
 
       _listViewController.queueScrollToEnd();
       _listViewController.replaceDataWith((_hole.floors?.prefetch)!);
