@@ -132,7 +132,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   /// Whether the ListView should clear old data after refreshing.
   bool _dataClearQueued = false;
 
-  List<T> _data = [];
+  final List<T> _data = [];
   List<StateKey<T>> valueKeys = [];
   Future<List<T>?>? _futureData;
 

@@ -322,7 +322,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
       textAlignVertical: TextAlignVertical.top,
     );
     if (widget.fullscreen) {
-      return Expanded(child: textField);
+      return textField;
     }
     return SingleChildScrollView(
       child: Column(
