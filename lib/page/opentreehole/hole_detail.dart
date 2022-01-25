@@ -196,17 +196,20 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       }
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-
+    Future<List<OTFloor>>? future;
+    if (shouldScrollToEnd) {
+      future = Future.value(_hole.floors?.prefetch);
+    }
     final pagedListView = PagedListView<OTFloor>(
       initialData: _hole.floors?.prefetch,
       pagedController: _listViewController,
+      noneItem: OTFloor.dummy(),
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-      allDataReceiver:
-          shouldScrollToEnd ? Future.value(_hole.floors?.prefetch) : null,
+      allDataReceiver: future,
       shouldScrollToEnd: shouldScrollToEnd,
       builder: _getListItems,
       loadingBuilder: (BuildContext context) => Container(
@@ -518,10 +521,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
                 actions: _buildContextMenu(context, floor),
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(context).cancel),
-                      onPressed: () => Navigator.of(context).pop(),
-                    )));
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () => Navigator.of(context).pop(),
+                )));
       },
       onTap: () async {
         if (_searchKeyword == null) {

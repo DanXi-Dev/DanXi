@@ -308,7 +308,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
-      {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
+      {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         queryParameters: {
           "start_floor": startFloor,

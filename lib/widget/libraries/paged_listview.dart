@@ -348,7 +348,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       _shouldLoad = false;
       _isRefreshing = false;
       _isEnded = true;
-      return LazyFuture.pack(widget.allDataReceiver!.then((value) => value));
+      return widget.allDataReceiver!;
     }
   }
 
@@ -392,7 +392,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   /// to normal mode.
   replaceDataWith(List<T> data) {
     setState(() {
-      _data = data;
+      // @w568w (2022-1-25): NEVER USE A REFERENCE-ONLY COPY OF LIST.
+      // `_data = data;` makes me struggle with a weird bug
+      // that [data] get wrongly cleared by [_clearData] for half a day.
+      _data.clear();
+      _data.addAll(data);
+
       _isEnded = true;
       _isRefreshing = false;
       _shouldLoad = false;
