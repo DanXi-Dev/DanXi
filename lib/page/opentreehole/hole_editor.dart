@@ -113,8 +113,8 @@ class OTEditor {
     final String? content = (await _showEditor(
             context,
             floorId == null
-                ? S.of(context).reply_to(discussionId ?? "?")
-                : S.of(context).reply_to_floor(floorId),
+                ? S.of(context).modify_to(discussionId ?? "?")
+                : S.of(context).modify_to_floor(floorId),
             editorType: editorType,
             object: object,
             placeholder: originalContent ?? ""))

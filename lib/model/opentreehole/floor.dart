@@ -48,10 +48,13 @@ class OTFloor {
   /// Generate an empty BBSPost for special sakes.
   factory OTFloor.dummy() =>
       OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, []);
+
   factory OTFloor.special(String title, String content,
           [int? holeId, int? floorId]) =>
       OTFloor(floorId ?? 0, holeId ?? 0, content, title, '', '', false, [], 0,
           false, false, []);
+
+  factory OTFloor.onlyId(int floorId) => OTFloor.special('', '', null, floorId);
 
   @override
   bool operator ==(Object other) =>
@@ -74,7 +77,9 @@ class OTFloor {
   String? get filteredContent => SettingsProvider.getInstance().cleanMode
       ? CleanModeFilter.cleanText(content)
       : content;
+
   String? get deleteReason => deleted == true ? content : null;
+
   String? get foldReason => fold?.isNotEmpty == true ? fold?.join(' ') : null;
 
   @override

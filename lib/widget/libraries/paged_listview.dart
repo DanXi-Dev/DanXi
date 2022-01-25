@@ -374,7 +374,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   @override
   void didUpdateWidget(PagedListView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    notifyUpdate(true, true);
+    if (widget.allDataReceiver != oldWidget.allDataReceiver) {
+      notifyUpdate(true, true);
+    }
   }
 
   Future<void> notifyUpdate(bool useInitialData, bool queueDataClear) async {
@@ -384,13 +386,22 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
-  /// Will no longer load content on scroll after this is called.
+  /// Will no longer load content on scroll after called.
+  ///
+  /// Note: [_futureData] will be discarded after called. Call [notifyUpdate] to rebuild it and go back
+  /// to normal mode.
   replaceDataWith(List<T> data) {
     setState(() {
       _data = data;
       _isEnded = true;
       _isRefreshing = false;
       _shouldLoad = false;
+      // Replace value keys
+      valueKeys.clear();
+      valueKeys =
+          List.generate(_data.length, (index) => StateKey(_data[index]));
+      // Make [_futureData] silent
+      _futureData = Future.value(<T>[]);
     });
   }
 
@@ -416,8 +427,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           element.currentContext.findRenderObject() as RenderBox;
       return value + box.size.height;
     });
-    await currentController!
-        .animateTo(itemTop, duration: duration, curve: curve);
+    if (kDuration.inMicroseconds == 0) {
+      currentController!.jumpTo(itemTop);
+    } else {
+      await currentController!
+          .animateTo(itemTop, duration: duration, curve: curve);
+    }
   }
 
   Future<void> scrollDelta(double pixels,

@@ -166,7 +166,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Rebuild everything and refresh itself.
-  Future<void> refreshSelf({scrollToEnd = false}) async {
+  Future<void> refreshListView({scrollToEnd = false}) async {
     if (scrollToEnd) _listViewController.queueScrollToEnd();
     await _listViewController.notifyUpdate(
         useInitialData: false, queueDataClear: true);
@@ -180,7 +180,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    print("Build hole_detail");
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       try {
         // Replaced precached data with updated ones
@@ -206,7 +205,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
       allDataReceiver:
-      shouldScrollToEnd ? Future.value(_hole.floors?.prefetch) : null,
+          shouldScrollToEnd ? Future.value(_hole.floors?.prefetch) : null,
       shouldScrollToEnd: shouldScrollToEnd,
       builder: _getListItems,
       loadingBuilder: (BuildContext context) => Container(
@@ -249,7 +248,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   if (!shouldScrollToEnd) await prefetchAllFloors(_hole);
 
                   _listViewController.queueScrollToEnd();
-                  setState(() => shouldScrollToEnd = true);
+                  _listViewController
+                      .replaceDataWith((_hole.floors?.prefetch)!);
+                  shouldScrollToEnd = true;
                 } catch (error, st) {
                   Noticing.showNotice(
                       context,
@@ -272,7 +273,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () async {
                 if (await OTEditor.createNewReply(
                     context, _hole.hole_id, null)) {
-                  await refreshSelf();
+                  refreshListView(scrollToEnd: true);
                 }
               },
             ),
@@ -286,19 +287,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             decoration: _backgroundImage == null
                 ? null
                 : BoxDecoration(
-                image: DecorationImage(
-                    image: _backgroundImage!, fit: BoxFit.cover)),
+                    image: DecorationImage(
+                        image: _backgroundImage!, fit: BoxFit.cover)),
             child: _searchKeyword == null
                 ? RefreshIndicator(
-              edgeOffset: MediaQuery.of(context).padding.top,
-              color: Theme.of(context).colorScheme.secondary,
-              backgroundColor: Theme.of(context).dialogBackgroundColor,
-              onRefresh: () async {
-                HapticFeedback.mediumImpact();
-                await refreshSelf();
-              },
-              child: pagedListView,
-            )
+                    edgeOffset: MediaQuery.of(context).padding.top,
+                    color: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: Theme.of(context).dialogBackgroundColor,
+                    onRefresh: () async {
+                      HapticFeedback.mediumImpact();
+                      await refreshListView();
+                    },
+                    child: pagedListView,
+                  )
                 : pagedListView,
           ),
         ),
@@ -344,7 +345,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       Future<void> onExecutePenalty(int level) async {
         await OpenTreeHoleRepository.getInstance().adminAddPenalty(
             e.floor_id, level, TreeHoleSubpageState.divisionId);
-        await refreshSelf();
+        Noticing.showNotice(context, "Succeeded.");
       }
 
       return [
@@ -374,7 +375,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () async {
             await OTEditor.modifyReply(
                 menuContext, e.hole_id, e.floor_id, e.content);
-            await refreshSelf();
+            Noticing.showNotice(context, S.of(context).request_success);
+            // await refreshListView();
+            // // Set duration to 0 to execute [jumpTo] to the top.
+            // await _listViewController.scrollToIndex(0, const Duration());
+            // await scrollDownToFloor(e);
           },
           child: Text(S.of(context).modify),
         ),
@@ -408,7 +413,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () async {
             await OTEditor.modifyReply(
                 menuContext, e.hole_id, e.floor_id, e.content);
-            await refreshSelf();
+            Noticing.showNotice(context, "Succeeded.");
           },
           child: const Text("Modify this floor"),
           isDestructive: true,
@@ -424,7 +429,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   context, "Delete Reason (cancel for default)");
               await OpenTreeHoleRepository.getInstance()
                   .adminDeleteFloor(e.floor_id, reason);
-              await refreshSelf();
+              Noticing.showNotice(context, "Succeeded.");
             }
           },
           child: const Text("Delete this floor"),
@@ -460,6 +465,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 null,
                 null,
                 pinned);
+            Noticing.showNotice(context, "Succeeded.");
           },
           child: const Text("Pin/Unpin this hole"),
           menuContext: menuContext,
@@ -472,6 +478,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
             await OpenTreeHoleRepository.getInstance()
                 .adminAddSpecialTag(tag, e.floor_id);
+            Noticing.showNotice(context, "Succeeded.");
           },
           child: const Text("Add Special Tag"),
           menuContext: menuContext,
@@ -509,7 +516,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
           if (await OTEditor.createNewReply(context, _hole.hole_id, replyId)) {
-            await refreshSelf();
+            await refreshListView(scrollToEnd: true);
           }
         } else {
           ProgressFuture progressDialog = showProgressDialog(
