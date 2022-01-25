@@ -17,6 +17,7 @@
 
 import 'dart:ui';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -446,7 +447,8 @@ class OTFloorMentionWidget extends StatelessWidget {
                                   if (pagedListViewController
                                           .getScrollController()!
                                           .offset <
-                                      10) break; // Prevent deadlock
+                                      Constant.POST_COUNT_PER_PAGE)
+                                    break; // Prevent deadlock
                                   await pagedListViewController.scrollDelta(
                                       -100,
                                       const Duration(milliseconds: 1),

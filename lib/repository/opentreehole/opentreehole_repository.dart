@@ -266,7 +266,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
-      {int length = 10, int prefetchLength = 10, String? tag}) async {
+      {int length = Constant.POST_COUNT_PER_PAGE,
+      int prefetchLength = Constant.POST_COUNT_PER_PAGE,
+      String? tag}) async {
     final Response response = await dio!.get(_BASE_URL + "/holes",
         queryParameters: {
           "start_time": startTime.toIso8601String(),
@@ -306,7 +308,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
-      {int? startFloor, int length = 10}) async {
+      {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         queryParameters: {
           "start_floor": startFloor,
@@ -326,7 +328,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
-      {int? startFloor, int length = 10}) async {
+      {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
     final Response response = await dio!.get(_BASE_URL + "/floors",
         //queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
         queryParameters: {
@@ -497,8 +499,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTHole>?> getFavoriteHoles({
-    int length = 10,
-    int prefetchLength = 10,
+    int length = Constant.POST_COUNT_PER_PAGE,
+    int prefetchLength = Constant.POST_COUNT_PER_PAGE,
   }) async {
     final Response response = await dio!.get(_BASE_URL + "/user/favorites",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},

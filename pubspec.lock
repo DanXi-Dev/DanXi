@@ -562,7 +562,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "546d054c3f39d2fbeb12578f8d5b5dbb903ecff9"
+      resolved-ref: b083aa29dec19a3b6c9efe318d145dede57d1705
       url: "git://github.com/singularity-s0/flutter_progress_dialog.git"
     source: git
     version: "0.1.1"

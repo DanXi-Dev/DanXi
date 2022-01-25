@@ -18,6 +18,7 @@
 import 'dart:async';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -113,7 +114,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           startFloor: _listViewController.length());
     } else {
       return await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_hole, startFloor: page * 10);
+          .loadFloors(_hole, startFloor: page * Constant.POST_COUNT_PER_PAGE);
     }
   }
 
@@ -200,6 +201,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
+      // If we need to scroll to the end, we should prefetch all the data beforehand.
+      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
+      allDataReceiver:
+          shouldScrollToEnd ? Future.value(_hole.floors?.prefetch) : null,
       shouldScrollToEnd: shouldScrollToEnd,
       builder: _getListItems,
       loadingBuilder: (BuildContext context) => Container(

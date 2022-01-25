@@ -22,10 +22,12 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
+import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/home_page.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -43,7 +45,6 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/widget/opentreehole/fake_search_widget.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -53,6 +54,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
@@ -297,7 +299,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
       PagedListViewController();
 
   final TimeBasedLoadAdaptLayer<OTHole> adaptLayer =
-      TimeBasedLoadAdaptLayer(10, 1);
+      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   /// Fields related to the display states.
   static int get divisionId => StateProvider.currentDivision?.division_id ?? 1;
@@ -808,8 +810,36 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
                     onOpen: _launchUrlWithNotice)),
           ],
         ),
-        onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
-            arguments: {"post": postElement, "scroll_to_end": true}));
+        onTap: () async {
+          ProgressFuture dialog = showProgressDialog(
+              loadingText: S.of(context).loading, context: context);
+          try {
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+              "post": await prefetchAllFloors(postElement),
+              "scroll_to_end": true
+            });
+          } catch (error, st) {
+            Noticing.showNotice(
+                context,
+                ErrorPageWidget.generateUserFriendlyDescription(
+                    S.of(context), error,
+                    stackTrace: st),
+                title: S.of(context).fatal_error,
+                useSnackBar: false);
+          } finally {
+            dialog.dismiss(showAnim: false);
+          }
+        });
+  }
+
+  /// Return [OTHole] with all floors prefetched for increased performance when scrolling to the end.
+  Future<OTHole?> prefetchAllFloors(OTHole hole) async {
+    if (hole.reply != null && hole.reply! < Constant.POST_COUNT_PER_PAGE) {
+      return hole;
+    }
+    List<OTFloor>? floors = await OpenTreeHoleRepository.getInstance()
+        .loadFloors(hole, startFloor: 0, length: 0);
+    return hole..floors?.prefetch = floors;
   }
 
   @override

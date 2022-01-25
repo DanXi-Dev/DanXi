@@ -18,6 +18,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -48,7 +49,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
       PagedListViewController();
 
   final TimeBasedLoadAdaptLayer<OTMessage> adaptLayer =
-      TimeBasedLoadAdaptLayer(10, 1);
+      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
