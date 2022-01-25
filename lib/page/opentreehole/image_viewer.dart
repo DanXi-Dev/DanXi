@@ -183,9 +183,12 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         title: Text(S.of(context).image),
         trailingActions: [
           if (originalLoading) ...[
-            PlatformCircularProgressIndicator(
-              material: (_, __) => MaterialProgressIndicatorData(
-                  color: Theme.of(context).textTheme.bodyText1?.color),
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformCircularProgressIndicator(
+                material: (_, __) => MaterialProgressIndicatorData(
+                    color: Theme.of(context).colorScheme.secondaryVariant),
+              ),
             )
           ] else if (originalLoadFailError != null) ...[
             PlatformIconButton(

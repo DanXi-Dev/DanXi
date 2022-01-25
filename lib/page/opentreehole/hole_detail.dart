@@ -506,6 +506,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         _hole.floors?.first_floor?.anonyname != floor.anonyname) {
       return const SizedBox();
     }
+
     return OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
