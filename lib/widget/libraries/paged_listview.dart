@@ -374,9 +374,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   @override
   void didUpdateWidget(PagedListView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.allDataReceiver != oldWidget.allDataReceiver) {
-      notifyUpdate(true, true);
-    }
+    // if (widget.allDataReceiver != oldWidget.allDataReceiver) {
+    //   notifyUpdate(true, true);
+    // }
   }
 
   Future<void> notifyUpdate(bool useInitialData, bool queueDataClear) async {

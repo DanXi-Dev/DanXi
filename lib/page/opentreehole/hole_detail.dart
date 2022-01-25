@@ -99,6 +99,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Fields related to the display states.
   bool? _isFavored;
+  bool _onlyShowDZ = false;
   bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
@@ -235,35 +236,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         trailingActions: [
           if (_searchKeyword == null) ...[
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.vertical_align_bottom)
-                  : const Icon(CupertinoIcons.arrow_down_to_line),
-              onPressed: () async {
-                ProgressFuture dialog = showProgressDialog(
-                    loadingText: S.of(context).loading, context: context);
-                try {
-                  // If we haven't loaded before, we need to load all floors.
-                  if (!shouldScrollToEnd) await prefetchAllFloors(_hole);
-
-                  _listViewController.queueScrollToEnd();
-                  _listViewController
-                      .replaceDataWith((_hole.floors?.prefetch)!);
-                  shouldScrollToEnd = true;
-                } catch (error, st) {
-                  Noticing.showNotice(
-                      context,
-                      ErrorPageWidget.generateUserFriendlyDescription(
-                          S.of(context), error,
-                          stackTrace: st),
-                      title: S.of(context).fatal_error,
-                      useSnackBar: false);
-                } finally {
-                  dialog.dismiss(showAnim: false);
-                }
-              },
-            ),
             _buildFavoredActionButton(),
             PlatformIconButton(
               padding: EdgeInsets.zero,
@@ -277,6 +249,23 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 }
               },
             ),
+            PlatformPopupMenu(
+                options: [
+                  PopupMenuOption(
+                      label: S.of(context).scroll_to_end,
+                      onTap: _onTapScrollToEnd),
+                  PopupMenuOption(
+                      label: _onlyShowDZ
+                          ? S.of(context).show_all_replies
+                          : S.of(context).only_show_dz,
+                      onTap: (_) {
+                        setState(() => _onlyShowDZ = !_onlyShowDZ);
+                        refreshListView();
+                      })
+                ],
+                icon: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.more_vert)
+                    : const Icon(CupertinoIcons.ellipsis_vertical))
           ]
         ],
       ),
@@ -305,6 +294,28 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
       ),
     );
+  }
+
+  Future<void> _onTapScrollToEnd(_) async {
+    ProgressFuture dialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    try {
+      // If we haven't loaded before, we need to load all floors.
+      if (!shouldScrollToEnd) await prefetchAllFloors(_hole);
+
+      _listViewController.queueScrollToEnd();
+      _listViewController.replaceDataWith((_hole.floors?.prefetch)!);
+      shouldScrollToEnd = true;
+    } catch (error, st) {
+      Noticing.showNotice(
+          context,
+          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error,
+              stackTrace: st),
+          title: S.of(context).fatal_error,
+          useSnackBar: false);
+    } finally {
+      dialog.dismiss(showAnim: false);
+    }
   }
 
   Widget _buildFavoredActionButton() => PlatformIconButton(
@@ -491,6 +502,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
+    if (_onlyShowDZ &&
+        _hole.floors?.first_floor?.anonyname != floor.anonyname) {
+      return const SizedBox();
+    }
     return OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
@@ -502,10 +517,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
                 actions: _buildContextMenu(context, floor),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () => Navigator.of(context).pop(),
-                )));
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(context).cancel),
+                      onPressed: () => Navigator.of(context).pop(),
+                    )));
       },
       onTap: () async {
         if (_searchKeyword == null) {

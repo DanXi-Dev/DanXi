@@ -297,10 +297,12 @@
     "search": "Search",
     "history": "History",
     "clear": "Clear",
-
     "fold": "Fold",
     "hide": "Hide",
     "show": "Show",
+    "scroll_to_end": "Go to Bottom",
+    "only_show_dz": "Only Show DZ",
+    "show_all_replies": "Show All",
     "search_hint": "Search or #PID",
     "favorites": "Favorites",
     "no_favorites": "You have no favorites",
