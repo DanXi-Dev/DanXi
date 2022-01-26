@@ -91,7 +91,7 @@ String renderText(
       if (removeMentions) MentionSyntax()
     ]);
   }
-  // Deal with LaTex
+  // Deal with LaTeX
   content = content.replaceAll(latexRegExp, formulaPlaceholder);
   // Deal with Mention
   if (removeMentions) content = content.replaceAll(mentionRegExp, "");
