@@ -99,7 +99,7 @@ class Noticing {
       int? maxLines,
       String? hintText}) async {
     TextEditingController controller = TextEditingController();
-    return await showPlatformDialog<String?>(
+    String? value = await showPlatformDialog<String?>(
       context: context,
       builder: (BuildContext context) => PlatformAlertDialog(
         title: Text(title),
@@ -107,17 +107,13 @@ class Noticing {
           controller: controller,
           maxLines: maxLines,
           hintText: hintText,
-          onSubmitted: (value) {
-            Navigator.pop(context, value);
-            controller.dispose();
-          },
+          onSubmitted: (value) => Navigator.pop(context, value),
         ),
         actions: <Widget>[
           PlatformDialogAction(
               child: PlatformText(S.of(context).cancel),
               onPressed: () {
                 Navigator.pop(context, null);
-                controller.dispose();
               }),
           PlatformDialogAction(
               cupertino: (context, platform) => CupertinoDialogActionData(
@@ -130,14 +126,15 @@ class Noticing {
                               MaterialStateProperty.all<Color>(Colors.red))
                       : null),
               child: PlatformText(confirmText ?? S.of(context).i_see),
-              onPressed: () {
-                Navigator.pop(context, controller.text);
-                controller
-                    .dispose(); // TODO: dispose() is called before state is destroyed. how to resolve this?
-              }),
+              onPressed: () => Navigator.pop(context, controller.text)),
         ],
       ),
     );
+    // We won't dispose the controller, as it is only used in an anonymous function
+    //  rather than a [StatefulWidget]. So, it is unnecessary to release the resource.
+    //  (and at the time, [TextEditingController.dispose] only does debug and assertion work.)
+    // controller.dispose();
+    return value;
   }
 
   static Future<bool?> showConfirmationDialog(
