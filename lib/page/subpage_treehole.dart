@@ -832,13 +832,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
               "scroll_to_end": true
             });
           } catch (error, st) {
-            Noticing.showNotice(
-                context,
-                ErrorPageWidget.generateUserFriendlyDescription(
-                    S.of(context), error,
-                    stackTrace: st),
-                title: S.of(context).fatal_error,
-                useSnackBar: false);
+            Noticing.showModalError(context, error, trace: st);
           } finally {
             dialog.dismiss(showAnim: false);
           }

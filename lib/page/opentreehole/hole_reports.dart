@@ -26,7 +26,6 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -216,15 +215,10 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                     .loadSpecificHole(e.hole_id!);
                 smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"post": post!, "locate": e.floor});
+              } catch (error, st) {
+                Noticing.showModalError(context, error, trace: st);
+              } finally {
                 progressDialog.dismiss(showAnim: false);
-              } catch (error) {
-                progressDialog.dismiss(showAnim: false);
-                Noticing.showNotice(
-                    context,
-                    ErrorPageWidget.generateUserFriendlyDescription(
-                        S.of(context), error),
-                    title: S.of(context).fatal_error,
-                    useSnackBar: false);
               }
             }),
       ),

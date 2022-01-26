@@ -38,7 +38,6 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -64,10 +63,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> updateOTUserProfile(BuildContext context) async {
   try {
     await OpenTreeHoleRepository.getInstance().updateUserProfile();
-  } catch (e) {
-    Noticing.showNotice(context,
-        ErrorPageWidget.generateUserFriendlyDescription(S.of(context), e),
-        title: S.of(context).fatal_error, useSnackBar: false);
+  } catch (e, st) {
+    Noticing.showModalError(context, e, trace: st);
   }
 }
 

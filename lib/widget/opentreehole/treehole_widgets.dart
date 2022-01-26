@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
@@ -263,16 +261,12 @@ class OTFloorWidget extends StatelessWidget {
                   children: [
                     Text(
                       "#${floor.hole_id}",
-                      style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                      ),
+                      style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Text(
                       "  (##${floor.floor_id})",
                       style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                        fontSize: 10,
-                      ),
+                          color: Theme.of(context).hintColor, fontSize: 10),
                     ),
                   ],
                 ),
@@ -283,17 +277,14 @@ class OTFloorWidget extends StatelessWidget {
                     Text(
                       "${index! + 1}F",
                       style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          color: Theme.of(context).hintColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                     ),
                     Text(
                       "  (##${floor.floor_id})",
                       style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                        fontSize: 10,
-                      ),
+                          color: Theme.of(context).hintColor, fontSize: 10),
                     ),
                   ],
                 ),
@@ -379,9 +370,7 @@ class _OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
             S.of(context).quote, S.of(context).tap_to_show_preview),
         isInMention: true,
         showBottomBar: widget.showBottomBar,
-        onTap: () => setState(() {
-          isShowingPreview = true;
-        }),
+        onTap: () => setState(() => isShowingPreview = true),
       );
     }
   }
@@ -447,8 +436,9 @@ class OTFloorMentionWidget extends StatelessWidget {
                                   if (pagedListViewController
                                           .getScrollController()!
                                           .offset <
-                                      Constant.POST_COUNT_PER_PAGE)
-                                    break; // Prevent deadlock
+                                      Constant.POST_COUNT_PER_PAGE) {
+                                    break;
+                                  } // Prevent deadlock
                                   await pagedListViewController.scrollDelta(
                                       -100,
                                       const Duration(milliseconds: 1),
@@ -470,14 +460,8 @@ class OTFloorMentionWidget extends StatelessWidget {
                                         .loadSpecificHole(floor.hole_id!),
                                     "locate": floor,
                                   });
-                            } catch (e) {
-                              Noticing.showNotice(
-                                  context,
-                                  ErrorPageWidget
-                                      .generateUserFriendlyDescription(
-                                          S.of(context), e),
-                                  title: S.of(context).fatal_error,
-                                  useSnackBar: false);
+                            } catch (e, st) {
+                              Noticing.showModalError(context, e, trace: st);
                             } finally {
                               progressDialog.dismiss(showAnim: false);
                             }
@@ -693,13 +677,8 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       try {
                         await OpenTreeHoleRepository.getInstance()
                             .deleteFloor(floor.floor_id!);
-                      } catch (e) {
-                        Noticing.showNotice(
-                            context,
-                            ErrorPageWidget.generateUserFriendlyDescription(
-                                S.of(context), e),
-                            title: S.of(context).fatal_error,
-                            useSnackBar: false);
+                      } catch (e, st) {
+                        Noticing.showModalError(context, e, trace: st);
                       }
                     }
                   },

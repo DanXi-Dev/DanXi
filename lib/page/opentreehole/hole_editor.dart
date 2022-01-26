@@ -31,7 +31,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -56,17 +55,15 @@ class OTEditor {
     if (content?.text == null) return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
-    final int? success = await OpenTreeHoleRepository.getInstance()
-        .newHole(divisionId, content!.text, tags: content.tags)
-        .onError((dynamic error, stackTrace) {
+    try {
+      await OpenTreeHoleRepository.getInstance()
+          .newHole(divisionId, content!.text, tags: content.tags);
+    } catch (e, st) {
+      Noticing.showModalError(context, e, trace: st);
+      return false;
+    } finally {
       progressDialog.dismiss(showAnim: false);
-      Noticing.showNotice(context,
-          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
-          title: S.of(context).post_failed, useSnackBar: false);
-      return -1;
-    });
-    progressDialog.dismiss(showAnim: false);
-    if (success == -1) return false;
+    }
     StateProvider.editorCache.remove(object);
     return true;
   }
@@ -75,7 +72,7 @@ class OTEditor {
       BuildContext context, int? discussionId, int? floorId,
       {OTEditorType? editorType}) async {
     final object = (floorId == null
-        ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
+        ? EditorObject(discussionId, EditorObjectType.REPLY_TO_HOLE)
         : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
     final String? content = (await _showEditor(
             context,
@@ -89,27 +86,23 @@ class OTEditor {
     if (content == null || content.trim() == "") return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
-    final int? success = await OpenTreeHoleRepository.getInstance()
-        .newFloor(discussionId, content)
-        .onError((dynamic error, stackTrace) {
+    try {
+      await OpenTreeHoleRepository.getInstance()
+          .newFloor(discussionId, content);
+    } catch (e, st) {
+      Noticing.showModalError(context, e, trace: st);
+      return false;
+    } finally {
       progressDialog.dismiss(showAnim: false);
-      Noticing.showNotice(context,
-          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
-          title: S.of(context).reply_failed, useSnackBar: false);
-      return -1;
-    });
-    progressDialog.dismiss(showAnim: false);
-    if (success == -1) return false;
+    }
     StateProvider.editorCache.remove(object);
     return true;
   }
 
-  static Future<void> modifyReply(BuildContext context, int? discussionId,
+  static Future<bool> modifyReply(BuildContext context, int? discussionId,
       int? floorId, String? originalContent,
       {OTEditorType? editorType}) async {
-    final object = (discussionId == null
-        ? EditorObject(discussionId, EditorObjectType.REPLY_TO_DISCUSSION)
-        : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
+    final object = EditorObject(floorId, EditorObjectType.MODIFY_FLOOR);
     final String? content = (await _showEditor(
             context,
             floorId == null
@@ -119,31 +112,34 @@ class OTEditor {
             object: object,
             placeholder: originalContent ?? ""))
         ?.text;
-    if (content == null || content.trim().isEmpty) return;
-    await OpenTreeHoleRepository.getInstance()
-        .modifyFloor(content, floorId)
-        .onError((error, stackTrace) {
-      Noticing.showNotice(context,
-          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
-          title: S.of(context).reply_failed, useSnackBar: false);
-    });
+    if (content == null || content.trim().isEmpty) return false;
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).posting, context: context);
+    try {
+      await OpenTreeHoleRepository.getInstance().modifyFloor(content, floorId);
+    } catch (e, st) {
+      Noticing.showModalError(context, e,
+          trace: st, title: S.of(context).reply_failed);
+      return false;
+    } finally {
+      progressDialog.dismiss(showAnim: false);
+    }
     StateProvider.editorCache.remove(object);
+    return true;
   }
 
   static Future<void> reportPost(BuildContext context, int? floorId) async {
-    final object = EditorObject(floorId, EditorObjectType.REPORT_FLOOR);
     final String? content = (await Noticing.showInputDialog(
-        context, S.of(context).reason_report_post(floorId ?? "?")));
+        context, S.of(context).reason_report_post(floorId ?? "?"),
+        isConfirmDestructive: true));
     if (content == null || content.trim() == "") return;
 
     try {
       await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
-      StateProvider.editorCache.remove(object);
       Noticing.showNotice(context, S.of(context).report_success);
-    } catch (error) {
-      Noticing.showNotice(context,
-          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
-          title: S.of(context).report_failed, useSnackBar: false);
+    } catch (error, st) {
+      Noticing.showModalError(context, error,
+          trace: st, title: S.of(context).report_failed);
     }
   }
 

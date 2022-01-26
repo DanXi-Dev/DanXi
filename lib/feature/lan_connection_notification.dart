@@ -31,7 +31,7 @@ class LanConnectionNotification extends Feature {
   bool get removable => true;
 
   @override
-  EdgeInsets get padding => EdgeInsets.fromLTRB(12, 12, 12, 0);
+  EdgeInsets get padding => const EdgeInsets.fromLTRB(12, 12, 12, 0);
 
   @override
   String get subTitle => S.of(context!).lan_connection_issue_1_description;

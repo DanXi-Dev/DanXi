@@ -18,6 +18,7 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -75,6 +76,21 @@ class Noticing {
                 ],
               ));
     }
+  }
+
+  static showModalError(BuildContext context, dynamic error,
+      {StackTrace? trace,
+      String? title,
+      bool useSnackBar = false,
+      bool? centerContent}) {
+    title ??= S.of(context).fatal_error;
+    return Noticing.showNotice(
+        context,
+        ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error,
+            stackTrace: trace),
+        title: title,
+        useSnackBar: useSnackBar,
+        centerContent: centerContent);
   }
 
   static Future<String?> showInputDialog(BuildContext context, String title,

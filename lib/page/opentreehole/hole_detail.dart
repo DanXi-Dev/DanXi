@@ -30,7 +30,6 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -310,12 +309,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       _listViewController.replaceDataWith((_hole.floors?.prefetch)!);
       shouldScrollToEnd = true;
     } catch (error, st) {
-      Noticing.showNotice(
-          context,
-          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error,
-              stackTrace: st),
-          title: S.of(context).fatal_error,
-          useSnackBar: false);
+      Noticing.showModalError(context, error, trace: st);
     } finally {
       dialog.dismiss(showAnim: false);
     }
