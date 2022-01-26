@@ -23,7 +23,6 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio/dio.dart';
@@ -89,19 +88,14 @@ class _OTSearchPageState extends State<OTSearchPage> {
             .loadSpecificFloor(int.parse(floorMatch.group(1)!)))!;
         progressDialog.dismiss(showAnim: false);
         OTFloorMentionWidget.showFloorDetail(context, floor);
-      } catch (error) {
+      } catch (error, st) {
         progressDialog.dismiss(showAnim: false);
         if (error is DioError &&
             error.response?.statusCode == HttpStatus.notFound) {
           Noticing.showNotice(context, S.of(context).post_does_not_exist,
               title: S.of(context).fatal_error, useSnackBar: false);
         } else {
-          Noticing.showNotice(
-              context,
-              ErrorPageWidget.generateUserFriendlyDescription(
-                  S.of(context), error),
-              title: S.of(context).fatal_error,
-              useSnackBar: false);
+          Noticing.showModalError(context, error, trace: st);
         }
       }
       return;

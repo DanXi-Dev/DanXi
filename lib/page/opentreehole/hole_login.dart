@@ -27,7 +27,6 @@ import 'package:dan_xi/util/opentreehole/password_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -408,12 +407,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                     _usernameController.text.isNotEmpty) {
                   executeLogin(context).catchError((e, st) {
                     state.jumpBackFromLoadingPage();
-
-                    Noticing.showNotice(
-                        state.context,
-                        ErrorPageWidget.generateUserFriendlyDescription(
-                            S.of(state.context), e),
-                        title: S.of(state.context).fatal_error);
+                    Noticing.showModalError(context, e, trace: st);
                   });
                 }
               },

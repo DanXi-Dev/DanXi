@@ -32,7 +32,6 @@ import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
@@ -390,99 +389,102 @@ class OTFloorMentionWidget extends StatelessWidget {
 
   static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor) =>
       showPlatformModalSheet<bool?>(
-        context: context,
-        builder: (BuildContext cxt) {
-          final maxHeightRatio = PlatformX.isMaterial(context) ? 0.3 : 0.85;
-          return SafeArea(
-            child: Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxHeight: ViewportUtils.getViewportHeight(context) *
-                            maxHeightRatio),
-                    child: SingleChildScrollView(
-                      primary: false,
-                      child: OTFloorWidget(
-                        hasBackgroundImage: false,
-                        floor: floor,
-                        showBottomBar: false,
-                      ),
+          context: context,
+          builder: (BuildContext cxt) {
+            final maxHeightRatio = PlatformX.isMaterial(context) ? 0.3 : 0.85;
+            final Widget cardBody = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: ViewportUtils.getViewportHeight(context) *
+                          maxHeightRatio),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    child: OTFloorWidget(
+                      hasBackgroundImage: false,
+                      floor: floor,
+                      showBottomBar: false,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () async {
-                            // Note how this code use [cxt] for some context but [context] for others.
-                            // This is to prevent looking up deactivated context after [pop].
-                            Navigator.pop(cxt);
-                            try {
-                              // Find the PagedListViewController
-                              final pagedListViewController = context
-                                  .findAncestorWidgetOfExactType<
-                                      PagedListView<OTFloor>>()!
-                                  .pagedController!;
-                              // If this floor is directly in the hole
-                              if (pagedListViewController.indexOf(floor) !=
-                                  -1) {
-                                // Scroll to the corresponding post
-                                while (!(await pagedListViewController
-                                    .scrollToItem(floor))) {
-                                  if (pagedListViewController
-                                          .getScrollController()!
-                                          .offset <
-                                      Constant.POST_COUNT_PER_PAGE) {
-                                    break;
-                                  } // Prevent deadlock
-                                  await pagedListViewController.scrollDelta(
-                                      -100,
-                                      const Duration(milliseconds: 1),
-                                      Curves.linear);
-                                }
-                                return;
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          // Note how this code use [cxt] for some context but [context] for others.
+                          // This is to prevent looking up deactivated context after [pop].
+                          Navigator.pop(cxt);
+                          try {
+                            // Find the PagedListViewController
+                            final pagedListViewController = context
+                                .findAncestorWidgetOfExactType<
+                                    PagedListView<OTFloor>>()!
+                                .pagedController!;
+                            // If this floor is directly in the hole
+                            if (pagedListViewController.indexOf(floor) != -1) {
+                              // Scroll to the corresponding post
+                              while (!(await pagedListViewController
+                                  .scrollToItem(floor))) {
+                                if (pagedListViewController
+                                        .getScrollController()!
+                                        .offset <
+                                    Constant.POST_COUNT_PER_PAGE) {
+                                  break;
+                                } // Prevent deadlock
+                                await pagedListViewController.scrollDelta(
+                                    -100,
+                                    const Duration(milliseconds: 1),
+                                    Curves.linear);
                               }
-                            } catch (_) {}
-
-                            // If this floor is in another hole
-                            ProgressFuture progressDialog = showProgressDialog(
-                                loadingText: S.of(context).loading,
-                                context: context);
-                            try {
-                              smartNavigatorPush(context, "/bbs/postDetail",
-                                  arguments: {
-                                    "post": await OpenTreeHoleRepository
-                                            .getInstance()
-                                        .loadSpecificHole(floor.hole_id!),
-                                    "locate": floor,
-                                  });
-                            } catch (e, st) {
-                              Noticing.showModalError(context, e, trace: st);
-                            } finally {
-                              progressDialog.dismiss(showAnim: false);
+                              return;
                             }
-                          },
-                          child: Text(S.of(cxt).jump_to_hole),
-                        ),
-                        TextButton(
-                          child: Text(S.of(cxt).ok),
-                          onPressed: () {
-                            Navigator.of(cxt).pop(true);
-                          },
-                        ),
-                      ],
-                    ),
+                          } catch (_) {}
+
+                          // If this floor is in another hole
+                          ProgressFuture progressDialog = showProgressDialog(
+                              loadingText: S.of(context).loading,
+                              context: context);
+                          try {
+                            smartNavigatorPush(context, "/bbs/postDetail",
+                                arguments: {
+                                  "post":
+                                      await OpenTreeHoleRepository.getInstance()
+                                          .loadSpecificHole(floor.hole_id!),
+                                  "locate": floor,
+                                });
+                          } catch (e, st) {
+                            Noticing.showModalError(context, e, trace: st);
+                          } finally {
+                            progressDialog.dismiss(showAnim: false);
+                          }
+                        },
+                        child: Text(S.of(cxt).jump_to_hole),
+                      ),
+                      TextButton(
+                        child: Text(S.of(cxt).ok),
+                        onPressed: () {
+                          Navigator.of(cxt).pop(true);
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
+                ),
+              ],
+            );
+            if (PlatformX.isCupertino(context)) {
+              return SafeArea(
+                child: Card(
+                  child: cardBody,
+                ),
+              );
+            } else {
+              return SafeArea(child: cardBody);
+            }
+          });
 
   @override
   Widget build(BuildContext context) {
@@ -582,13 +584,8 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     floor = (await OpenTreeHoleRepository.getInstance()
                         .likeFloor(floor.floor_id!, floor.liked!))!;
                     setState(() {});
-                  } catch (e) {
-                    Noticing.showNotice(
-                        context,
-                        ErrorPageWidget.generateUserFriendlyDescription(
-                            S.of(context), e),
-                        title: S.of(context).fatal_error,
-                        useSnackBar: false);
+                  } catch (e, st) {
+                    Noticing.showModalError(context, e, trace: st);
                   }
                 },
               ),

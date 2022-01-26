@@ -405,7 +405,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     call.arguments["token"],
                     await PlatformX.getUniqueDeviceId(),
                     PushNotificationServiceType.APNS);
-          } catch (e) {
+          } catch (e, st) {
             Noticing.showNotice(
                 context,
                 S.of(context).push_notification_reg_failed_des(
