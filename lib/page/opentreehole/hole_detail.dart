@@ -324,8 +324,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               (BuildContext context, AsyncSnapshot<bool?> snapshot) {
             _isFavored = snapshot.data;
             return _isFavored!
-                ? const Icon(CupertinoIcons.star_fill)
-                : const Icon(CupertinoIcons.star);
+                ? Icon(PlatformX.isMaterial(context)
+                    ? Icons.star
+                    : CupertinoIcons.star_fill)
+                : Icon(PlatformX.isMaterial(context)
+                    ? Icons.star_outline
+                    : CupertinoIcons.star);
           },
           errorBuilder: () => Icon(
             PlatformIcons(context).error,

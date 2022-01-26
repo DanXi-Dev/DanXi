@@ -244,13 +244,14 @@ class TreeHoleSubpage extends PlatformSubpage
                 forcePushOnMainNavigator: true);
           }
         }),
-        AppBarButtonItem(S.of(cxt).favorites, const Icon(CupertinoIcons.star),
-            () {
+        AppBarButtonItem(
+            S.of(cxt).favorites,
+            Icon(PlatformX.isMaterial(cxt)
+                ? Icons.star_outline
+                : CupertinoIcons.star), () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/discussions',
-                arguments: {
-                  'showFavoredDiscussion': true,
-                },
+                arguments: {'showFavoredDiscussion': true},
                 forcePushOnMainNavigator: true);
           }
         }),
