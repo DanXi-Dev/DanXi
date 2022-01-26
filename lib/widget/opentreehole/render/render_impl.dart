@@ -112,20 +112,42 @@ final BaseRender kMarkdownRender = (BuildContext context,
 
 class MarkdownLatexSupport extends MarkdownElementBuilder {
   @override
-  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return Math.tex(element.textContent);
-  }
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) =>
+      SingleChildScrollView(
+          child: Math.tex(element.textContent),
+          scrollDirection: Axis.horizontal);
 }
 
 class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: [Math.tex(element.textContent)],
-    );
+    // This article is relatively useful for such a layout:
+    // https://www.jianshu.com/p/3b628bcaf6db
+
+    // To get the pass-down layout constraints from parent widget
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      // Enable the element to scroll i.f.f. its width is greater than the viewport width
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        // Give Row a infinity-large width, so it won't overflow itself
+        child: ConstrainedBox(
+          constraints: constraints.copyWith(
+              minWidth: constraints.maxWidth, maxWidth: double.infinity),
+          // Ensure Row to be wrapped in its intrinsic width, so it could be placed
+          // in SingleChildScrollView
+          child: IntrinsicWidth(
+            // Ensure the TeX widget to keep in the horizontal center
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [Math.tex(element.textContent)],
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 
@@ -213,9 +235,7 @@ class LatexMultiLineSyntax extends md.InlineSyntax {
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
-    parser.addNode(md.Element.empty("br"));
-    parser.addNode(md.Element.text("texLine", tex));
-    parser.addNode(md.Element.empty("br"));
+    parser.addNode(md.Element("p", [md.Element.text("texLine", tex)]));
     return true;
   }
 }
