@@ -12,7 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.4
 
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
@@ -60,7 +60,7 @@ dependencies:
   markdown: ^4.0.0
   system_tray: ^0.0.7
   bitsdojo_window: ^0.1.1+1
-  win32: ^2.2.5
+  win32: ^2.3.8
   file_picker: ^4.0.0
   cached_network_image: ^3.1.0
   google_mobile_ads: ^1.0.1
