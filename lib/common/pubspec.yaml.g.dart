@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.4+137';
+const String version = r'1.3.4+138';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,10 +55,10 @@ const int patch = 4;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'137'];
+const List<String> build = <String>[r'138'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1643111640;
+const int timestamp = 1643274209;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -94,7 +94,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_localizations': <String, Object>{
     'sdk': r'flutter',
   },
-  'cupertino_icons': r'^1.0.2',
+  'cupertino_icons': r'^1.0.4',
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
@@ -145,7 +145,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'markdown': r'^4.0.0',
   'system_tray': r'^0.0.7',
   'bitsdojo_window': r'^0.1.1+1',
-  'win32': r'^2.2.5',
+  'win32': r'^2.3.8',
   'file_picker': r'^4.0.0',
   'cached_network_image': r'^3.1.0',
   'google_mobile_ads': r'^1.0.1',
