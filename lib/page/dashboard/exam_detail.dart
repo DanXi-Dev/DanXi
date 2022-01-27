@@ -336,9 +336,12 @@ class _ExamListState extends State<ExamList> {
             },
             loadingBuilder: (_, __) => Text(S.of(context).loading),
           ),
-          onTap: () => smartNavigatorPush(context, "/exam/gpa", arguments: {
-            "gpalist": _gpa,
-          }),
+          onTap: () {
+            if (_gpa != null && _gpa!.isNotEmpty) {
+              smartNavigatorPush(context, "/exam/gpa",
+                  arguments: {"gpalist": _gpa});
+            }
+          },
         ),
       );
 
