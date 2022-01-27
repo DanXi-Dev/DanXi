@@ -76,7 +76,7 @@ class PagedListView<T> extends StatefulWidget {
   ///
   /// Note: You should not need to pack the future with [LazyFuture],
   /// since [PagedListView] will handle the situation.
-  final DataReceiver<T> dataReceiver;
+  final DataReceiver<T>? dataReceiver;
 
   /// The scrollController of the ListView. If not set, it will be PrimaryScrollController.
   final ScrollController? scrollController;
@@ -85,7 +85,7 @@ class PagedListView<T> extends StatefulWidget {
   final bool withScrollbar;
 
   /// If not null, will use this data source instead. Using this will turn PagedListView into a regular ListView with customizations.
-  final Future<List<T>>? allDataReceiver;
+  final Future<List<T>?>? allDataReceiver;
 
   /// Whether this should scroll to end upon loading complete
   /// Will be executed only once
@@ -101,7 +101,7 @@ class PagedListView<T> extends StatefulWidget {
       this.emptyBuilder,
       this.startPage = 0,
       required this.endBuilder,
-      required this.dataReceiver,
+      this.dataReceiver,
       this.scrollController,
       this.withScrollbar = false,
       this.allDataReceiver,
@@ -109,6 +109,7 @@ class PagedListView<T> extends StatefulWidget {
       this.noneItem,
       this.fatalErrorBuilder})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
+        assert(dataReceiver != null || allDataReceiver != null),
         super(key: key);
 
   @override
@@ -150,7 +151,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         pageIndex++;
         _isRefreshing = true;
         setState(() {
-          _futureData = LazyFuture.pack(widget.dataReceiver(pageIndex));
+          _futureData = LazyFuture.pack(widget.dataReceiver!(pageIndex));
         });
       }
       return false;
@@ -342,7 +343,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         return Future.value(widget.initialData!);
       } else {
         _isRefreshing = true;
-        return LazyFuture.pack(widget.dataReceiver(pageIndex));
+        return LazyFuture.pack(widget.dataReceiver!(pageIndex));
       }
     } else {
       _shouldLoad = false;

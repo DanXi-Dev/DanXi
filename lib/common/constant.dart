@@ -65,25 +65,24 @@ class Constant {
     }
   }
 
-  static Map<String, String> getFeatureName(BuildContext context) {
-    return {
-      'welcome_feature': S.of(context).welcome_feature,
-      'next_course_feature': S.of(context).today_course,
-      'divider': S.of(context).divider,
-      'ecard_balance_feature': S.of(context).ecard_balance,
-      'dining_hall_crowdedness_feature': S.of(context).dining_hall_crowdedness,
-      'fudan_library_crowdedness_feature':
-          S.of(context).fudan_library_crowdedness,
-      'aao_notice_feature': S.of(context).fudan_aao_notices,
-      'empty_classroom_feature': S.of(context).empty_classrooms,
-      'fudan_daily_feature': S.of(context).fudan_daily,
-      'new_card': S.of(context).add_new_card,
-      'qr_feature': S.of(context).fudan_qr_code,
-      'pe_feature': S.of(context).pe_exercises,
-      'bus_feature': S.of(context).bus_query,
-      'dorm_electricity_feature': S.of(context).dorm_electricity,
-    };
-  }
+  static Map<String, String> getFeatureName(BuildContext context) => {
+        'welcome_feature': S.of(context).welcome_feature,
+        'next_course_feature': S.of(context).today_course,
+        'divider': S.of(context).divider,
+        'ecard_balance_feature': S.of(context).ecard_balance,
+        'dining_hall_crowdedness_feature':
+            S.of(context).dining_hall_crowdedness,
+        'fudan_library_crowdedness_feature':
+            S.of(context).fudan_library_crowdedness,
+        'aao_notice_feature': S.of(context).fudan_aao_notices,
+        'empty_classroom_feature': S.of(context).empty_classrooms,
+        'fudan_daily_feature': S.of(context).fudan_daily,
+        'new_card': S.of(context).add_new_card,
+        'qr_feature': S.of(context).fudan_qr_code,
+        'pe_feature': S.of(context).pe_exercises,
+        'bus_feature': S.of(context).bus_query,
+        'dorm_electricity_feature': S.of(context).dorm_electricity,
+      };
 
   static List<DashboardCard> defaultDashboardCardList = [
     DashboardCard("new_card", null, null, true),
@@ -104,30 +103,28 @@ class Constant {
     DashboardCard("qr_feature", null, null, true),
   ];
 
-  static List<Developer> getDevelopers(BuildContext context) {
-    return [
-      Developer("w568w", "assets/graphics/w568w.jpeg",
-          "https://github.com/w568w", S.of(context).w568w_description),
-      Developer(
-          "singularity-s0",
-          "assets/graphics/kavinzhao.jpeg",
-          "https://github.com/singularity-s0",
-          S.of(context).singularity_s0_description),
-      Developer("KYLN24", "assets/graphics/kyln24.jpeg",
-          "https://github.com/KYLN24", S.of(context).KYLN24_description),
-      Developer("hasbai", "assets/graphics/hasbai.jpeg",
-          "https://github.com/hasbai", S.of(context).hasbai_description),
-      Developer("Dest1n1", "assets/graphics/Dest1n1.jpg",
-          "https://github.com/dest1n1s", S.of(context).Dest1n1_description),
-      Developer(
-          "Frankstein73",
-          "assets/graphics/Frankstein73.jpg",
-          "https://github.com/Frankstein73",
-          S.of(context).Frankstein73_description),
-      Developer("Ivan Fei", "assets/graphics/ivanfei.jpg",
-          "https://github.com/ivanfei-1", S.of(context).ivanfei_description),
-    ];
-  }
+  static List<Developer> getDevelopers(BuildContext context) => [
+        Developer("w568w", "assets/graphics/w568w.jpeg",
+            "https://github.com/w568w", S.of(context).w568w_description),
+        Developer(
+            "singularity-s0",
+            "assets/graphics/kavinzhao.jpeg",
+            "https://github.com/singularity-s0",
+            S.of(context).singularity_s0_description),
+        Developer("KYLN24", "assets/graphics/kyln24.jpeg",
+            "https://github.com/KYLN24", S.of(context).KYLN24_description),
+        Developer("hasbai", "assets/graphics/hasbai.jpeg",
+            "https://github.com/hasbai", S.of(context).hasbai_description),
+        Developer("Dest1n1", "assets/graphics/Dest1n1.jpg",
+            "https://github.com/dest1n1s", S.of(context).Dest1n1_description),
+        Developer(
+            "Frankstein73",
+            "assets/graphics/Frankstein73.jpg",
+            "https://github.com/Frankstein73",
+            S.of(context).Frankstein73_description),
+        Developer("Ivan Fei", "assets/graphics/ivanfei.jpg",
+            "https://github.com/ivanfei-1", S.of(context).ivanfei_description),
+      ];
 
   static String yuanSymbol(String? num) {
     if (num == null || num.trim().isEmpty) return "";

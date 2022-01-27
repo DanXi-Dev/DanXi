@@ -114,7 +114,7 @@ void main() {
   }
 }
 
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
+class TouchMouseScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
   Set<PointerDeviceKind> get dragDevices => {
@@ -180,14 +180,15 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget mainApp = PlatformProvider(
+      // Uncomment this line below to force the app to use Cupertino UI
       // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => DynamicThemeController(
         lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
         darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
         child: PlatformApp(
-          scrollBehavior: MyCustomScrollBehavior(),
+          scrollBehavior: TouchMouseScrollBehavior(),
           debugShowCheckedModeBanner: false,
-          // Fix cupertino UI text color issues
+          // Fix cupertino UI text color issue by override text color
           cupertino: (context, __) => CupertinoAppData(
               theme: CupertinoThemeData(
                   textTheme: CupertinoTextThemeData(

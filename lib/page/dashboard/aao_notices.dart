@@ -16,10 +16,8 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/aao_repository.dart';
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -29,7 +27,6 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 
 /// A list page showing AAO notices.
 ///
@@ -47,13 +44,11 @@ class AAONoticesList extends StatefulWidget {
 class _AAONoticesListState extends State<AAONoticesList> {
   List<Notice>? _data;
   ScrollController? _controller;
-  PersonInfo? _info;
 
   @override
   void initState() {
     super.initState();
     _data = widget.arguments!['initialData'];
-    _info = StateProvider.personInfo.value;
   }
 
   @override
@@ -73,19 +68,15 @@ class _AAONoticesListState extends State<AAONoticesList> {
               child: PagedListView<Notice>(
             withScrollbar: true,
             scrollController: PrimaryScrollController.of(context),
-            builder: (_, __, ___, Notice value) {
-              return ThemedMaterial(
-                  child: ListTile(
-                leading: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.info)
-                    : const Icon(CupertinoIcons.info_circle_fill),
-                title: Text(value.title),
-                subtitle: Text(value.time),
-                onTap: () async {
-                  BrowserUtil.openUrl(value.url, context, null, true);
-                },
-              ));
-            },
+            builder: (_, __, ___, Notice value) => ThemedMaterial(
+                child: ListTile(
+              leading: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.info)
+                  : const Icon(CupertinoIcons.info_circle_fill),
+              title: Text(value.title),
+              subtitle: Text(value.time),
+              onTap: () => BrowserUtil.openUrl(value.url, context, null, true),
+            )),
             loadingBuilder: (_) => Center(
               child: PlatformCircularProgressIndicator(),
             ),
@@ -99,9 +90,10 @@ class _AAONoticesListState extends State<AAONoticesList> {
               ],
             ),
             initialData: _data,
+            startPage: 1,
             dataReceiver: (index) => FudanAAORepository.getInstance()
-                .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
-                    index + 1, _info),
+                .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, index,
+                    StateProvider.personInfo.value),
           ))
         ],
       ),

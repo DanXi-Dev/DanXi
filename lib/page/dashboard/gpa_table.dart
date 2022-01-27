@@ -55,62 +55,33 @@ class _GpaTablePageState extends State<GpaTablePage> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                 controller: PrimaryScrollController.of(context),
-                child: Table(
-                  children: _buildGpaRow(),
-                ))));
+                child: Table(children: _buildGpaRow()))));
   }
 
   List<TableRow> _buildGpaRow() {
     List<TableRow> widgets = [
-      TableRow(children: [
-        Text(
-          S.of(context).major,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          S.of(context).gpa,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          S.of(context).credits,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          S.of(context).rank,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        )
-      ])
+      TableRow(
+          children: [
+        S.of(context).major,
+        S.of(context).gpa,
+        S.of(context).credits,
+        S.of(context).rank
+      ]
+              .map((headText) => Text(headText,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.bold)))
+              .toList())
     ];
+
     for (var element in gpaList!) {
       TextStyle? textColorStyle = element.name == NAME_HIDDEN
           ? null
           : TextStyle(color: Theme.of(context).colorScheme.secondary);
-      widgets.add(TableRow(children: [
-        Text(
-          element.major,
-          textAlign: TextAlign.center,
-          style: textColorStyle,
-        ),
-        Text(
-          element.gpa,
-          textAlign: TextAlign.center,
-          style: textColorStyle,
-        ),
-        Text(
-          element.credits,
-          textAlign: TextAlign.center,
-          style: textColorStyle,
-        ),
-        Text(
-          element.rank,
-          textAlign: TextAlign.center,
-          style: textColorStyle,
-        )
-      ]));
+      widgets.add(TableRow(
+          children: [element.major, element.gpa, element.credits, element.rank]
+              .map((itemText) => Text(itemText,
+                  textAlign: TextAlign.center, style: textColorStyle))
+              .toList()));
     }
     return widgets;
   }

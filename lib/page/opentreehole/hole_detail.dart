@@ -110,9 +110,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
     if (_searchKeyword != null) {
-      return OpenTreeHoleRepository.getInstance().loadSearchResults(
+      var result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
           _searchKeyword,
           startFloor: _listViewController.length());
+      result?.forEach(print);
+      return result;
     } else {
       return await OpenTreeHoleRepository.getInstance()
           .loadFloors(_hole, startFloor: page * Constant.POST_COUNT_PER_PAGE);
@@ -123,9 +125,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_isFavored != null) return _isFavored;
     final List<int>? favorites =
         await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
-    return favorites!.any((element) {
-      return element == _hole.hole_id;
-    });
+    return favorites!.any((elementId) => elementId == _hole.hole_id);
   }
 
   @override
@@ -459,6 +459,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       onPressed: () => Navigator.of(subMenuContext).pop(),
                     )));
           },
+          isDestructive: true,
           child: const Text("Punish this user"),
           menuContext: menuContext,
         ),

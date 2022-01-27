@@ -47,20 +47,13 @@ class _AnnouncementListState extends State<AnnouncementList> {
   bool _showingLatest = true;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: Text(
-          S.of(context).developer_announcement(''),
-        ),
+        title: Text(S.of(context).developer_announcement('')),
         trailingActions: [
           PlatformIconButton(
             padding: EdgeInsets.zero,

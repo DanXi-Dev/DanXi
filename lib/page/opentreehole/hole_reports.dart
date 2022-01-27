@@ -50,7 +50,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       PagedListViewController();
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<OTReport>?> _loadContent(int page) async {
+  Future<List<OTReport>?> _loadContent() async {
     return await OpenTreeHoleRepository.getInstance().adminGetReports();
   }
 
@@ -94,11 +94,11 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
           },
           child: Material(
               child: PagedListView<OTReport>(
-            startPage: 1,
+                startPage: 1,
             pagedController: _listViewController,
             withScrollbar: true,
             scrollController: PrimaryScrollController.of(context),
-            dataReceiver: _loadContent,
+            allDataReceiver: _loadContent(),
             builder: _getListItems,
             loadingBuilder: (BuildContext context) => Container(
               padding: const EdgeInsets.all(8),
