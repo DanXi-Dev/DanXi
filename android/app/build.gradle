@@ -47,9 +47,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     defaultConfig {
         applicationId "io.github.danxi_dev.dan_xi"
@@ -70,11 +67,13 @@ android {
         release {
             // Signing with the debug keys for now, so `flutter run --release` works.
             minifyEnabled true
-            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // Only used when building a released work.
              signingConfig signingConfigs.release
         }
+    }
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
