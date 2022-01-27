@@ -42,15 +42,18 @@ class FudanDailyFeature extends Feature {
   Future<void> _loadTickStatus() async {
     _status = ConnectionStatus.CONNECTING;
     // Get the status of reporting
+    debugPrint("Try loading tick status……");
     await FudanCOVID19Repository.getInstance()
         .hasTick(_info)
         .then((bool ticked) {
+      debugPrint("Load success!");
       _status = ConnectionStatus.DONE;
       _hasTicked = ticked;
       notifyUpdate();
     });
   }
 
+  @Deprecated("We do not use automatically ticking anymore.")
   void tickFudanDaily() {
     if (!_hasTicked) {
       FudanCOVID19Repository.getInstance().tick(_info).then((_) {
@@ -77,6 +80,7 @@ class FudanDailyFeature extends Feature {
     if (_status == ConnectionStatus.NONE) {
       _status = ConnectionStatus.CONNECTING;
       _loadTickStatus().catchError((error) {
+        debugPrint("Met with problem, error is $error");
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });

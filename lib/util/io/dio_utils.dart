@@ -16,6 +16,7 @@
  */
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 /// Useful utils when processing network requests with dio.
 class DioUtils {
@@ -50,6 +51,7 @@ class DioUtils {
       if (!Uri.parse(location).isAbsolute) {
         location = response.requestOptions.uri.origin + '/' + location;
       }
+      debugPrint("Relocating to $location");
       return processRedirect(dio,
           await dio.get(location, options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));
     } else {

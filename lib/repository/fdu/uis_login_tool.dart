@@ -42,10 +42,11 @@ class UISLoginTool {
 
   /// Log in Fudan UIS system and return the response.
   ///
-  /// Warning: if having logged in, return null.
+  /// Warning: if it has logged in or it's logging in, return null.
   static Future<Response?> loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
+    if (dio.interceptors.requestLock.locked) return null;
     dio.interceptors.requestLock.lock();
     Response? result = await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
         .whenComplete(() {
@@ -61,11 +62,11 @@ class UISLoginTool {
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
-    workDio.options = BaseOptions(
-        receiveDataWhenStatusError: true,
-        connectTimeout: 5000,
-        receiveTimeout: 5000,
-        sendTimeout: 5000);
+    // workDio.options = BaseOptions(
+    //     receiveDataWhenStatusError: true,
+    //     connectTimeout: 5000,
+    //     receiveTimeout: 5000,
+    //     sendTimeout: 5000);
     IndependentCookieJar workJar = IndependentCookieJar.createFrom(jar);
     workDio.interceptors.add(UserAgentInterceptor());
     workDio.interceptors.add(CookieManager(workJar));
@@ -94,7 +95,6 @@ class UISLoginTool {
     });
     data['username'] = info!.id;
     data["password"] = info.password;
-    await Future.delayed(const Duration(milliseconds: 800));
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);

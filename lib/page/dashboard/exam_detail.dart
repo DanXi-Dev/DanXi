@@ -153,7 +153,13 @@ class _ExamListState extends State<ExamList> {
                     },
                     loadingBuilder:
                         Center(child: PlatformCircularProgressIndicator()),
-                    errorBuilder: _loadGradeViewFromDataCenter))));
+                    // @w568w (2022-1-27): replacing following lines with `errorBuilder: _loadGradeViewFromDataCenter`
+                    // leads to a 100% execution of _loadGradeViewFromDataCenter.
+                    // I don't know why.
+                    errorBuilder: (BuildContext context,
+                        AsyncSnapshot<List<SemesterInfo>?> snapshot) {
+                      return _loadGradeViewFromDataCenter();
+                    }))));
   }
 
   Future<void> loadExamAndScore() async {

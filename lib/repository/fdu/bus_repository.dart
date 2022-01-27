@@ -29,7 +29,7 @@ import 'package:intl/intl.dart';
 
 class FudanBusRepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Ftac.fudan.edu.cn%2Fthirds%2Ftjb.act%3Fredir%3DsportScore";
+      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanbus%252Fwap%252Fdefault%252Flists%26from%3Dwap";
   static const String _INFO_URL =
       "https://zlapp.fudan.edu.cn/fudanbus/wap/default/lists";
 

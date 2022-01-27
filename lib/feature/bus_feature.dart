@@ -51,6 +51,7 @@ class BusFeature extends Feature {
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
       _loadBusList(StateProvider.personInfo.value).catchError((error) {
+        debugPrint("Bus list load failed, error is $error");
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });
@@ -64,8 +65,10 @@ class BusFeature extends Feature {
 
   _loadBusList(PersonInfo? personInfo) async {
     _status = ConnectionStatus.CONNECTING;
+    debugPrint("start loading Bus list……");
     _busList = await FudanBusRepository.getInstance()
         .loadBusList(personInfo, holiday: isHoliday);
+    debugPrint("Bus list loaded!");
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
