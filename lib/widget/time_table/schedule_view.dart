@@ -33,11 +33,10 @@ class ScheduleView extends StatefulWidget {
   final TimetableStyle timetableStyle;
   final TimeNow today;
   final int showingWeek;
-  final ScrollController controller;
   final OnTapCourseCallback? tapCallback;
 
-  const ScheduleView(this.laneEventsList, this.timetableStyle, this.today,
-      this.showingWeek, this.controller,
+  const ScheduleView(
+      this.laneEventsList, this.timetableStyle, this.today, this.showingWeek,
       {Key? key, this.tapCallback})
       : super(key: key);
 

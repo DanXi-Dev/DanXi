@@ -37,9 +37,11 @@ class TopController extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onDoubleTap: () {
-        TopController.scrollToTop(controller);
+        final currentController =
+            controller ?? PrimaryScrollController.of(context);
+        TopController.scrollToTop(currentController);
         if (onDoubleTap != null) {
-          onDoubleTap!();
+          onDoubleTap!.call();
         }
       },
       child: child,

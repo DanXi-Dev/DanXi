@@ -40,7 +40,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -205,17 +204,13 @@ class _OTTitleState extends State<OTTitle> {
   }
 }
 
-class TreeHoleSubpage extends PlatformSubpage
-    with PageWithPrimaryScrollController {
+class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   final Map<String, dynamic>? arguments;
 
   @override
   TreeHoleSubpageState createState() => TreeHoleSubpageState();
 
-  TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
-
-  @override
-  String get debugTag => "BBSPage";
+  const TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
@@ -264,9 +259,7 @@ class TreeHoleSubpage extends PlatformSubpage
       ];
 
   @override
-  void onDoubleTapOnTab() {
-    RefreshBBSEvent().fire();
-  }
+  void onDoubleTapOnTab() => RefreshBBSEvent().fire();
 }
 
 class AddNewPostEvent {}
@@ -293,8 +286,7 @@ enum PostsType { FAVORED_DISCUSSION, FILTER_BY_TAG, NORMAL_POSTS }
 /// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
 /// the posts which is tagged with [tagFilter].
 ///
-class TreeHoleSubpageState extends State<TreeHoleSubpage>
-    with AutomaticKeepAliveClientMixin {
+class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   final StateStreamListener<AddNewPostEvent> _postSubscription =
@@ -522,8 +514,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
+  Widget buildPage(BuildContext context) {
     switch (_postsType) {
       case PostsType.FAVORED_DISCUSSION:
         return PlatformScaffold(
@@ -582,7 +573,7 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
               noneItem: OTHole.DUMMY_POST,
               pagedController: listViewController,
               withScrollbar: true,
-              scrollController: widget.primaryScrollController(context),
+              scrollController: PrimaryScrollController.of(context),
               startPage: 1,
               builder: _buildListItem,
               headBuilder: (context) => Column(
@@ -840,8 +831,6 @@ class TreeHoleSubpageState extends State<TreeHoleSubpage>
         });
   }
 
-  @override
-  bool get wantKeepAlive => true;
 }
 
 /// This class is a workaround between Open Tree Hole's time-based content retrieval style

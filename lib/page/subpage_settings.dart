@@ -35,7 +35,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -68,22 +67,17 @@ Future<void> updateOTUserProfile(BuildContext context) async {
   }
 }
 
-class SettingsSubpage extends PlatformSubpage
-    with PageWithPrimaryScrollController {
+class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 
-  SettingsSubpage({Key? key}) : super(key: key);
-
-  @override
-  String get debugTag => "SettingsPage";
+  const SettingsSubpage({Key? key}) : super(key: key);
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
 }
 
-class _SettingsSubpageState extends State<SettingsSubpage>
-    with AutomaticKeepAliveClientMixin {
+class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
@@ -274,13 +268,10 @@ class _SettingsSubpageState extends State<SettingsSubpage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
-
+  Widget buildPage(BuildContext context) {
     // Load preference fields
-
     return WithScrollbar(
-        controller: widget.primaryScrollController(context),
+        controller: PrimaryScrollController.of(context),
         child: RefreshIndicator(
             edgeOffset: MediaQuery.of(context).padding.top,
             color: Theme.of(context).colorScheme.secondary,
@@ -291,7 +282,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
             },
             child: Material(
               child: ListView(
-                  controller: widget.primaryScrollController(context),
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
                     AutoBannerAdWidget(bannerAd: myBanner),
@@ -949,8 +939,6 @@ class _SettingsSubpageState extends State<SettingsSubpage>
         ]));
   }
 
-  @override
-  bool get wantKeepAlive => false;
 }
 
 class Developer {
