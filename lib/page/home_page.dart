@@ -272,14 +272,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> initSystemTray() async {
     if (!PlatformX.isWindows) return;
     // We first init the systray menu and then add the menu entries
-    await _systemTray.initSystemTray("system tray",
+    await _systemTray.initSystemTray(
+        title: S.of(context).app_name,
         iconPath: PlatformX.createPlatformFile(
                 PlatformX.getPathFromFile(Platform.resolvedExecutable) +
                     "/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
         toolTip: "DanXi is here~");
-    List<MenuItemBase> showingMenu;
-    late List<MenuItemBase> hidingMenu;
+    late List<MenuItemBase> showingMenu, hidingMenu;
     showingMenu = [
       MenuItem(
         label: 'Hide',
