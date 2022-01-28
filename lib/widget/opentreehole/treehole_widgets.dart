@@ -611,8 +611,11 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       ],
                     ),
                   ),
-                  onTap: () {
-                    OTEditor.reportPost(context, floor.floor_id);
+                  onTap: () async {
+                    if (await OTEditor.reportPost(context, floor.floor_id)) {
+                      Noticing.showMaterialNotice(
+                          context, S.of(context).report_success);
+                    }
                   },
                 ),
               ),
@@ -637,9 +640,12 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       ],
                     ),
                   ),
-                  onTap: () {
-                    OTEditor.modifyReply(
-                        context, floor.hole_id, floor.floor_id, floor.content);
+                  onTap: () async {
+                    if (await OTEditor.modifyReply(context, floor.hole_id,
+                        floor.floor_id, floor.content)) {
+                      Noticing.showMaterialNotice(
+                          context, S.of(context).request_success);
+                    }
                   },
                 ),
               ),

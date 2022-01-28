@@ -128,19 +128,24 @@ class OTEditor {
     return true;
   }
 
-  static Future<void> reportPost(BuildContext context, int? floorId) async {
+  static Future<bool> reportPost(BuildContext context, int? floorId) async {
     final String? content = (await Noticing.showInputDialog(
         context, S.of(context).reason_report_post(floorId ?? "?"),
         isConfirmDestructive: true));
-    if (content == null || content.trim() == "") return;
+    if (content == null || content.trim() == "") return false;
 
+    ProgressFuture progressDialog =
+        showProgressDialog(loadingText: S.of(context).report, context: context);
     try {
       await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
-      Noticing.showNotice(context, S.of(context).report_success);
     } catch (error, st) {
       Noticing.showModalError(context, error,
           trace: st, title: S.of(context).report_failed);
+      return false;
+    } finally {
+      progressDialog.dismiss(showAnim: false);
     }
+    return true;
   }
 
   static Future<PostEditorText?> _showEditor(BuildContext context, String title,

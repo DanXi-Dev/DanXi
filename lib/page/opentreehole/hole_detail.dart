@@ -358,9 +358,12 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
     List<Widget> _buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
       Future<void> onExecutePenalty(int level) async {
-        await OpenTreeHoleRepository.getInstance().adminAddPenalty(
-            e.floor_id, level, TreeHoleSubpageState.divisionId);
-        Noticing.showNotice(context, "Succeeded.");
+        int? result = await OpenTreeHoleRepository.getInstance()
+            .adminAddPenalty(
+                e.floor_id, level, TreeHoleSubpageState.divisionId);
+        if (result != null && result < 300) {
+          Noticing.showMaterialNotice(context, "Succeeded.");
+        }
       }
 
       return [
@@ -388,9 +391,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         PlatformContextMenuItem(
           menuContext: menuContext,
           onPressed: () async {
-            await OTEditor.modifyReply(
-                context, e.hole_id, e.floor_id, e.content);
-            Noticing.showNotice(context, S.of(context).request_success);
+            if (await OTEditor.modifyReply(
+                context, e.hole_id, e.floor_id, e.content)) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).request_success);
+            }
             // await refreshListView();
             // // Set duration to 0 to execute [jumpTo] to the top.
             // await _listViewController.scrollToIndex(0, const Duration());
@@ -411,15 +416,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: Text(S.of(menuContext).copy),
           onPressed: () async {
             await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
-            if (PlatformX.isMaterial(context)) {
-              await Noticing.showNotice(
-                  context, S.of(menuContext).copy_success);
-            }
+            Noticing.showMaterialNotice(
+                context, S.of(menuContext).copy_success);
           }),
       PlatformContextMenuItem(
         menuContext: menuContext,
         isDestructive: true,
-        onPressed: () => OTEditor.reportPost(context, e.floor_id),
+        onPressed: () async {
+          if (await OTEditor.reportPost(context, e.floor_id)) {
+            Noticing.showMaterialNotice(context, S.of(context).report_success);
+          }
+        },
         child: Text(S.of(menuContext).report),
       ),
     ];
@@ -427,9 +434,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       menu.addAll([
         PlatformContextMenuItem(
           onPressed: () async {
-            await OTEditor.modifyReply(
-                context, e.hole_id, e.floor_id, e.content);
-            Noticing.showNotice(context, "Succeeded.");
+            if (await OTEditor.modifyReply(
+                context, e.hole_id, e.floor_id, e.content)) {
+              Noticing.showMaterialNotice(context, "Succeeded.");
+            }
           },
           child: const Text("Modify this floor"),
           isDestructive: true,
@@ -443,9 +451,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 true) {
               final reason = await Noticing.showInputDialog(
                   context, "Delete Reason (cancel for default)");
-              await OpenTreeHoleRepository.getInstance()
+              int? result = await OpenTreeHoleRepository.getInstance()
                   .adminDeleteFloor(e.floor_id, reason);
-              Noticing.showNotice(context, "Succeeded.");
+              if (result != null && result < 300) {
+                Noticing.showMaterialNotice(context, "Succeeded.");
+              }
             }
           },
           child: const Text("Delete this floor"),
@@ -453,16 +463,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
-          onPressed: () async {
-            await showPlatformModalSheet(
-                context: context,
-                builder: (subMenuContext) => PlatformContextMenu(
-                    actions: _buildAdminPenaltyMenu(subMenuContext, e),
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(subMenuContext).cancel),
-                      onPressed: () => Navigator.of(subMenuContext).pop(),
-                    )));
-          },
+          onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (subMenuContext) => PlatformContextMenu(
+                  actions: _buildAdminPenaltyMenu(subMenuContext, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(subMenuContext).cancel),
+                    onPressed: () => Navigator.of(subMenuContext).pop(),
+                  ))),
           isDestructive: true,
           child: const Text("Punish this user"),
           menuContext: menuContext,
@@ -477,12 +485,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             } else {
               pinned.add(e.hole_id!);
             }
-            await OpenTreeHoleRepository.getInstance().adminModifyDivision(
-                StateProvider.currentDivision!.division_id!,
-                null,
-                null,
-                pinned);
-            Noticing.showNotice(context, "Succeeded.");
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminModifyDivision(
+                    StateProvider.currentDivision!.division_id!,
+                    null,
+                    null,
+                    pinned);
+            if (result != null && result < 300) {
+              Noticing.showMaterialNotice(context, "Succeeded.");
+            }
           },
           child: const Text("Pin/Unpin this hole"),
           menuContext: menuContext,
@@ -493,9 +504,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             if (tag == null) {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
-            await OpenTreeHoleRepository.getInstance()
+            int? result = await OpenTreeHoleRepository.getInstance()
                 .adminAddSpecialTag(tag, e.floor_id);
-            Noticing.showNotice(context, "Succeeded.");
+            if (result != null && result < 300) {
+              Noticing.showMaterialNotice(context, "Succeeded.");
+            }
           },
           child: const Text("Add Special Tag"),
           menuContext: menuContext,
