@@ -56,13 +56,11 @@ class ErrorPageWidget extends StatelessWidget {
           errorType = locale.connection_timeout;
           break;
         case DioErrorType.response:
+          errorType = locale.response_error +
+              (error.response?.statusCode?.toString() ?? locale.unknown_error);
           try {
-            errorType = error.response?.data['message'];
-          } catch (ignored) {
-            errorType = locale.response_error +
-                (error.response?.statusCode?.toString() ??
-                    locale.unknown_error);
-          }
+            errorType += "\n${error.response?.data['message']}";
+          } catch (_) {}
           break;
         case DioErrorType.cancel:
           errorType = locale.connection_cancelled;
