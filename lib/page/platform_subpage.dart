@@ -71,6 +71,12 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
     return _thisPrimaryScrollController!;
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _viewStateChangedSubscription.cancel();
+  }
+
   Widget buildPage(BuildContext context);
 
   void detachItself() {
