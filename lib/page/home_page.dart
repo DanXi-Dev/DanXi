@@ -47,7 +47,6 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -519,34 +518,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       );
 
   Widget _buildBody(Widget title) {
-    // Build action buttons.
-    PlatformIconButton? leadingButton;
-    List<PlatformIconButton> trailingButtons = [];
-    List<AppBarButtonItem> leadingItems =
-        _subpage[_pageIndex.value].leading.call(context);
-    List<AppBarButtonItem> trailingItems =
-        _subpage[_pageIndex.value].trailing.call(context);
-
-    if (leadingItems.isNotEmpty) {
-      leadingButton = PlatformIconButton(
-        material: (_, __) =>
-            MaterialIconButtonData(tooltip: leadingItems.first.caption),
-        padding: EdgeInsets.zero,
-        icon: leadingItems.first.widget,
-        onPressed: leadingItems.first.onPressed,
-      );
-    }
-
-    if (trailingItems.isNotEmpty) {
-      trailingButtons = trailingItems
-          .map((e) => PlatformIconButton(
-                material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
-                padding: EdgeInsets.zero,
-                icon: e.widget,
-                onPressed: e.onPressed,
-              ))
-          .toList();
-    }
     // Show debug button for [Dio].
     if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
 
@@ -555,28 +526,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ChangeNotifierProvider.value(value: _pageIndex),
       ],
       child: PlatformScaffold(
-        iosContentBottomPadding: false,
-        iosContentPadding: false,
-        appBar: PlatformAppBar(
-          cupertino: (_, __) => CupertinoNavigationBarData(
-            title: MediaQuery(
-              data: MediaQueryData(
-                  textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-              child: TopController(
-                child: title,
-                controller: PrimaryScrollController.of(context),
-              ),
-            ),
-          ),
-          material: (_, __) => MaterialAppBarData(
-            title: TopController(
-              child: title,
-              controller: PrimaryScrollController.of(context),
-            ),
-          ),
-          leading: leadingButton,
-          trailingActions: trailingButtons,
-        ),
         body: IndexedStack(
           index: _pageIndex.value,
           children: _subpage,
@@ -619,9 +568,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ],
           currentIndex: _pageIndex.value,
-          material: (_, __) => MaterialNavBarData(
-            type: BottomNavigationBarType.fixed,
-          ),
+          material: (_, __) =>
+              MaterialNavBarData(type: BottomNavigationBarType.fixed),
           itemChanged: (index) {
             if (index != _pageIndex.value) {
               // Dispatch [SubpageViewState] events.

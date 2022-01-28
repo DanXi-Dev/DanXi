@@ -42,7 +42,6 @@ import 'package:dan_xi/repository/fdu/library_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/feature_item/feature_card_item.dart';
 import 'package:dan_xi/widget/feature_item/feature_list_item.dart';
@@ -53,14 +52,11 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
-class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
+class HomeSubpage extends PlatformSubpage {
   @override
   HomeSubpageState createState() => HomeSubpageState();
 
-  HomeSubpage({Key? key}) : super(key: key);
-
-  @override
-  String get debugTag => "HomePage";
+  const HomeSubpage({Key? key}) : super(key: key);
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).app_name);
@@ -79,10 +75,7 @@ class HomeSubpage extends PlatformSubpage with PageWithPrimaryScrollController {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).dashboard_layout,
-            Text(
-              S.of(cxt).edit,
-              textScaleFactor: 1.2,
-            ),
+            Text(S.of(cxt).edit, textScaleFactor: 1.2),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
                 (value) => RefreshHomepageEvent(onlyIfQueued: true).fire()))
       ];
@@ -95,7 +88,7 @@ class RefreshHomepageEvent {
   RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
 }
 
-class HomeSubpageState extends State<HomeSubpage>
+class HomeSubpageState extends PlatformSubpageState<HomeSubpage>
     with AutomaticKeepAliveClientMixin {
   static final StateStreamListener<RefreshHomepageEvent> _refreshSubscription =
       StateStreamListener();
@@ -108,7 +101,6 @@ class HomeSubpageState extends State<HomeSubpage>
   @override
   void initState() {
     super.initState();
-    // initPlatformState();
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshHomepageEvent>().listen((event) {
           if (event.queueRefresh) {
@@ -136,11 +128,11 @@ class HomeSubpageState extends State<HomeSubpage>
     });
   }
 
-  @override
-  void didUpdateWidget(HomeSubpage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    //_rebuildFeatures();
-  }
+  // @override
+  // void didUpdateWidget(HomeSubpage oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   //_rebuildFeatures();
+  // }
 
   /// This function refreshes the content of Dashboard
   /// Call this when new (online) data should be loaded.
@@ -259,12 +251,14 @@ class HomeSubpageState extends State<HomeSubpage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget buildPage(BuildContext context) {
     List<DashboardCard> widgetList =
         SettingsProvider.getInstance().dashboardWidgetsSequence;
     return WithScrollbar(
-        controller: widget.primaryScrollController(context),
+        controller: PrimaryScrollController.of(context),
         child: RefreshIndicator(
             edgeOffset: MediaQuery.of(context).padding.top,
             color: Theme.of(context).colorScheme.secondary,
@@ -276,12 +270,8 @@ class HomeSubpageState extends State<HomeSubpage>
             },
             child: Material(
                 child: ListView(
-              controller: widget.primaryScrollController(context),
               physics: const AlwaysScrollableScrollPhysics(),
               children: _buildCards(widgetList),
             ))));
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

@@ -16,8 +16,9 @@
  */
 
 import 'package:dan_xi/page/home_page.dart';
-import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
+import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 /// The base class of subpages showing in [HomePage].
@@ -40,17 +41,56 @@ abstract class PlatformSubpage extends StatefulWidget {
   void onDoubleTapOnTab() {}
 
   @mustCallSuper
-  void onViewStateChanged(SubpageViewState state) {
-    if (this is PageWithPrimaryScrollController) {
-      switch (state) {
-        case SubpageViewState.VISIBLE:
-          (this as PageWithPrimaryScrollController).reattachItself();
-          break;
-        case SubpageViewState.INVISIBLE:
-          (this as PageWithPrimaryScrollController).detachItself();
-          break;
-      }
+  void onViewStateChanged(SubpageViewState state) {}
+}
+
+abstract class PlatformSubpageState<T extends PlatformSubpage>
+    extends State<T> {
+  Widget buildPage(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) {
+    // Build action buttons.
+    PlatformIconButton? leadingButton;
+    List<PlatformIconButton> trailingButtons = [];
+    List<AppBarButtonItem> leadingItems = widget.leading.call(context);
+    List<AppBarButtonItem> trailingItems = widget.trailing.call(context);
+
+    if (leadingItems.isNotEmpty) {
+      leadingButton = PlatformIconButton(
+        material: (_, __) =>
+            MaterialIconButtonData(tooltip: leadingItems.first.caption),
+        padding: EdgeInsets.zero,
+        icon: leadingItems.first.widget,
+        onPressed: leadingItems.first.onPressed,
+      );
     }
+
+    if (trailingItems.isNotEmpty) {
+      trailingButtons = trailingItems
+          .map((e) => PlatformIconButton(
+              material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
+              padding: EdgeInsets.zero,
+              icon: e.widget,
+              onPressed: e.onPressed))
+          .toList();
+    }
+    return PlatformScaffold(
+        iosContentBottomPadding: widget.needBottomPadding,
+        iosContentPadding: widget.needPadding,
+        appBar: PlatformAppBar(
+          cupertino: (_, __) => CupertinoNavigationBarData(
+            title: MediaQuery(
+                data: MediaQueryData(
+                    textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                child: TopController(child: widget.title(context))),
+          ),
+          material: (_, __) => MaterialAppBarData(
+              title: TopController(child: widget.title(context))),
+          leading: leadingButton,
+          trailingActions: trailingButtons,
+        ),
+        body: buildPage(context));
   }
 }
 

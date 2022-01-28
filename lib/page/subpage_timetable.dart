@@ -33,7 +33,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
-import 'package:dan_xi/util/scroller_fix/primary_scroll_page.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -56,15 +55,11 @@ const kCompatibleUserGroup = [
   UserGroup.FUDAN_POSTGRADUATE_STUDENT
 ];
 
-class TimetableSubPage extends PlatformSubpage
-    with PageWithPrimaryScrollController {
+class TimetableSubPage extends PlatformSubpage {
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 
-  TimetableSubPage({Key? key}) : super(key: key);
-
-  @override
-  String get debugTag => "TimetablePage";
+  const TimetableSubPage({Key? key}) : super(key: key);
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).timetable);
@@ -82,7 +77,7 @@ class TimetableSubPage extends PlatformSubpage
 
 class ShareTimetableEvent {}
 
-class _TimetableSubPageState extends State<TimetableSubPage>
+class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage>
     with AutomaticKeepAliveClientMixin {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
@@ -237,8 +232,7 @@ class _TimetableSubPageState extends State<TimetableSubPage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
+  Widget buildPage(BuildContext context) {
     return FutureWidget<TimeTable?>(
       successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return _buildPage(snapshot.data);
@@ -344,7 +338,6 @@ class _TimetableSubPageState extends State<TimetableSubPage>
               style,
               _table!.now(),
               _showingTime!.week,
-              widget.primaryScrollController(context),
               tapCallback: _onTapCourse,
             ),
           ],
