@@ -80,7 +80,6 @@ class ShareTimetableEvent {}
 class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
-  final ScrollController _dummyScrollController = ScrollController();
 
   /// A map of all converters.
   ///
@@ -111,7 +110,8 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value!, (imageUrl) async {
-              TextEditingController controller = TextEditingController();
+          TextEditingController controller = TextEditingController();
+          // TODO: dispose
           await showPlatformDialog(
               context: context,
               barrierDismissible: false,
@@ -313,7 +313,6 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         },
         child: ListView(
           // This ListView is a workaround, so that we can apply a custom scroll physics to it.
-          controller: _dummyScrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             AutoBannerAdWidget(bannerAd: bannerAd),
@@ -344,5 +343,4 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       ),
     );
   }
-
 }

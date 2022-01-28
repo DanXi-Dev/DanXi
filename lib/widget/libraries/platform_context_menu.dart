@@ -79,3 +79,120 @@ class PlatformContextMenuItem extends StatelessWidget {
     );
   }
 }
+
+class PlatformPopupMenuX extends StatelessWidget {
+  final List<PopupMenuOption> options;
+  final Widget icon;
+
+  final PlatformBuilder<CupertinoPopupMenuData>? cupertino;
+  final PlatformBuilder<MaterialPopupMenuData>? material;
+
+  const PlatformPopupMenuX({
+    required this.options,
+    required this.icon,
+    this.cupertino,
+    this.material,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PlatformWidget(
+      material: (context, _) => _materialPopupMenuButton(context),
+      cupertino: (context, _) => _cupertinoPopupBottomSheet(context),
+    );
+  }
+
+  Widget _cupertinoPopupBottomSheet(BuildContext context) {
+    return PlatformIconButton(
+      onPressed: () {
+        showPlatformModalSheet(
+          context: context,
+          builder: (context) => _cupertinoSheetContent(context),
+        );
+      },
+      padding: EdgeInsets.zero,
+      icon: icon,
+    );
+  }
+
+  Widget _cupertinoSheetContent(BuildContext context) {
+    final data = cupertino?.call(context, platform(context));
+    final cancelData = data?.cancelButtonData;
+
+    return CupertinoActionSheet(
+      key: data?.key ?? key,
+      title: data?.title,
+      message: data?.message,
+      actionScrollController: data?.actionScrollController,
+      messageScrollController: data?.messageScrollController,
+      actions: data?.actions ??
+          options.map(
+            (option) {
+              final data = option.cupertino?.call(context, platform(context));
+              return CupertinoActionSheetAction(
+                key: data?.key,
+                isDefaultAction: data?.isDefaultAction ?? false,
+                isDestructiveAction: data?.isDestructiveAction ?? false,
+                child: data?.child ?? Text(option.label),
+                onPressed: data?.onPressed ??
+                    () {
+                      Navigator.pop(context);
+                      option.onTap?.call(option);
+                    },
+              );
+            },
+          ).toList(),
+      cancelButton: cancelData == null
+          ? null
+          : CupertinoActionSheetAction(
+              key: cancelData.key,
+              child: cancelData.child,
+              isDefaultAction: cancelData.isDefaultAction ?? false,
+              isDestructiveAction: cancelData.isDestructiveAction ?? false,
+              onPressed: cancelData.onPressed ?? () => Navigator.pop(context),
+            ),
+    );
+  }
+
+  Widget _materialPopupMenuButton(BuildContext context) {
+    final data = material?.call(context, platform(context));
+
+    return PopupMenuButton<PopupMenuOption>(
+      onSelected: (option) {
+        option.onTap?.call(option);
+      },
+      icon: data?.icon ?? icon,
+      itemBuilder: data?.itemBuilder ??
+          (context) => options.map(
+                (option) {
+                  final data =
+                      option.material?.call(context, platform(context));
+                  return PopupMenuItem(
+                    value: option,
+                    child: data?.child ?? Text(option.label),
+                    enabled: data?.enabled ?? true,
+                    height: data?.height ?? kMinInteractiveDimension,
+                    key: data?.key,
+                    mouseCursor: data?.mouseCursor,
+                    onTap: data?.onTap,
+                    padding: data?.padding,
+                    textStyle: data?.textStyle,
+                  );
+                },
+              ).toList(),
+      child: data?.child,
+      color: data?.color,
+      elevation: data?.elevation,
+      enableFeedback: data?.enableFeedback,
+      enabled: data?.enabled ?? true,
+      iconSize: data?.iconSize,
+      initialValue: data?.initialValue,
+      key: data?.key ?? key,
+      offset: data?.offset ?? Offset.zero,
+      onCanceled: data?.onCanceled,
+      padding: data?.padding ?? const EdgeInsets.all(8.0),
+      shape: data?.shape,
+    );
+  }
+}

@@ -113,7 +113,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       var result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
           _searchKeyword,
           startFloor: _listViewController.length());
-      result?.forEach(print);
       return result;
     } else {
       return await OpenTreeHoleRepository.getInstance()
@@ -251,23 +250,27 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 }
               },
             ),
-            PlatformPopupMenu(
-                options: [
-                  PopupMenuOption(
-                      label: S.of(context).scroll_to_end,
-                      onTap: _onTapScrollToEnd),
-                  PopupMenuOption(
-                      label: _onlyShowDZ
-                          ? S.of(context).show_all_replies
-                          : S.of(context).only_show_dz,
-                      onTap: (_) {
-                        setState(() => _onlyShowDZ = !_onlyShowDZ);
-                        refreshListView();
-                      })
-                ],
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.more_vert)
-                    : const Icon(CupertinoIcons.ellipsis_vertical))
+            PlatformPopupMenuX(
+              options: [
+                PopupMenuOption(
+                    label: S.of(context).scroll_to_end,
+                    onTap: _onTapScrollToEnd),
+                PopupMenuOption(
+                    label: _onlyShowDZ
+                        ? S.of(context).show_all_replies
+                        : S.of(context).only_show_dz,
+                    onTap: (_) {
+                      setState(() => _onlyShowDZ = !_onlyShowDZ);
+                      refreshListView();
+                    })
+              ],
+              cupertino: (context, platform) => CupertinoPopupMenuData(
+                  cancelButtonData: CupertinoPopupMenuCancelButtonData(
+                      child: Text(S.of(context).cancel))),
+              icon: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.more_vert)
+                  : const Icon(CupertinoIcons.ellipsis),
+            ),
           ]
         ],
       ),
