@@ -67,7 +67,7 @@ Future<void> updateOTUserProfile(BuildContext context) async {
   }
 }
 
-class SettingsSubpage extends PlatformSubpage {
+class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
   _SettingsSubpageState createState() => _SettingsSubpageState();
 

@@ -52,7 +52,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
-class HomeSubpage extends PlatformSubpage {
+class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   @override
   HomeSubpageState createState() => HomeSubpageState();
 

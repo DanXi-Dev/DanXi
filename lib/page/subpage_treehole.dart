@@ -204,7 +204,7 @@ class _OTTitleState extends State<OTTitle> {
   }
 }
 
-class TreeHoleSubpage extends PlatformSubpage {
+class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   final Map<String, dynamic>? arguments;
 
   @override

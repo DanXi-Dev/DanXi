@@ -55,7 +55,7 @@ const kCompatibleUserGroup = [
   UserGroup.FUDAN_POSTGRADUATE_STUDENT
 ];
 
-class TimetableSubPage extends PlatformSubpage {
+class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   @override
   _TimetableSubPageState createState() => _TimetableSubPageState();
 
