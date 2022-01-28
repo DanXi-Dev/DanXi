@@ -525,65 +525,67 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider.value(value: _pageIndex),
       ],
-      child: PlatformScaffold(
-        body: IndexedStack(
-          index: _pageIndex.value,
-          children: _subpage,
-        ),
+      child: PageWithTab(
+        child: PlatformScaffold(
+          body: IndexedStack(
+            index: _pageIndex.value,
+            children: _subpage,
+          ),
 
-        // 2021-5-19 @w568w:
-        // Override the builder to prevent the repeatedly built states on iOS.
-        // I don't know why it works...
-        cupertinoTabChildBuilder: (_, index) => _subpage[index],
-        bottomNavBar: PlatformNavBar(
-          items: [
-            BottomNavigationBarItem(
-              //backgroundColor: Colors.purple,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.dashboard)
-                  : const Icon(CupertinoIcons.square_stack_3d_up_fill),
-              label: S.of(context).dashboard,
-            ),
-            if (!SettingsProvider.getInstance().hideHole)
+          // 2021-5-19 @w568w:
+          // Override the builder to prevent the repeatedly built states on iOS.
+          // I don't know why it works...
+          cupertinoTabChildBuilder: (_, index) => _subpage[index],
+          bottomNavBar: PlatformNavBar(
+            items: [
               BottomNavigationBarItem(
-                //backgroundColor: Colors.indigo,
+                //backgroundColor: Colors.purple,
                 icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.forum)
-                    : const Icon(CupertinoIcons.text_bubble),
-                label: S.of(context).forum,
+                    ? const Icon(Icons.dashboard)
+                    : const Icon(CupertinoIcons.square_stack_3d_up_fill),
+                label: S.of(context).dashboard,
               ),
-            BottomNavigationBarItem(
-              //backgroundColor: Colors.blue,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.calendar_today)
-                  : const Icon(CupertinoIcons.calendar),
-              label: S.of(context).timetable,
-            ),
-            BottomNavigationBarItem(
-              //backgroundColor: Theme.of(context).primaryColor,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.settings)
-                  : const Icon(CupertinoIcons.gear_alt),
-              label: S.of(context).settings,
-            ),
-          ],
-          currentIndex: _pageIndex.value,
-          material: (_, __) =>
-              MaterialNavBarData(type: BottomNavigationBarType.fixed),
-          itemChanged: (index) {
-            if (index != _pageIndex.value) {
-              // Dispatch [SubpageViewState] events.
-              for (int i = 0; i < _subpage.length; i++) {
-                if (index != i) {
-                  _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
+              if (!SettingsProvider.getInstance().hideHole)
+                BottomNavigationBarItem(
+                  //backgroundColor: Colors.indigo,
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.forum)
+                      : const Icon(CupertinoIcons.text_bubble),
+                  label: S.of(context).forum,
+                ),
+              BottomNavigationBarItem(
+                //backgroundColor: Colors.blue,
+                icon: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.calendar_today)
+                    : const Icon(CupertinoIcons.calendar),
+                label: S.of(context).timetable,
+              ),
+              BottomNavigationBarItem(
+                //backgroundColor: Theme.of(context).primaryColor,
+                icon: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.settings)
+                    : const Icon(CupertinoIcons.gear_alt),
+                label: S.of(context).settings,
+              ),
+            ],
+            currentIndex: _pageIndex.value,
+            material: (_, __) =>
+                MaterialNavBarData(type: BottomNavigationBarType.fixed),
+            itemChanged: (index) {
+              if (index != _pageIndex.value) {
+                // Dispatch [SubpageViewState] events.
+                for (int i = 0; i < _subpage.length; i++) {
+                  if (index != i) {
+                    _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
+                  }
                 }
+                _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
+                setState(() => _pageIndex.value = index);
+              } else {
+                _subpage[index].onDoubleTapOnTab();
               }
-              _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
-              setState(() => _pageIndex.value = index);
-            } else {
-              _subpage[index].onDoubleTapOnTab();
-            }
-          },
+            },
+          ),
         ),
       ),
     );

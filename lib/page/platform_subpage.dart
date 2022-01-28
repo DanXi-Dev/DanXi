@@ -27,6 +27,9 @@ import 'package:provider/provider.dart';
 /// The base class of subpages showing in [HomePage].
 ///
 /// It is equipped with a callback to help the implementation know when its state changes.
+///
+/// Note: a [PlatformSubpage] must have a parent widget [PageWithTab]. Otherwise, it will
+/// suppose that it is NOT in a tab page, and functions like a empty [Container].
 abstract class PlatformSubpage<T> extends StatefulWidget {
   const PlatformSubpage({Key? key}) : super(key: key);
 
@@ -48,6 +51,16 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
       Constant.eventBus.fire(_ViewStateChangedNotification<T>(state));
 }
 
+/// Flag that the page has some [PlatformSubpage] subwidgets.
+class PageWithTab extends StatelessWidget {
+  final Widget child;
+
+  const PageWithTab({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => child;
+}
+
 class _ViewStateChangedNotification<T> {
   final SubpageViewState newState;
 
@@ -60,6 +73,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
   bool _isOnShow = true;
   final StateStreamListener<_ViewStateChangedNotification<T>>
       _viewStateChangedSubscription = StateStreamListener();
+  bool _isInTab = true;
 
   MirrorScrollController _buildPrimaryScrollController(BuildContext context) {
     if (_thisPrimaryScrollController == null) {
@@ -68,6 +82,12 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
       _thisPrimaryScrollController!.addInterceptor(() => _isOnShow);
     }
     return _thisPrimaryScrollController!;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _isInTab = context.findAncestorWidgetOfExactType<PageWithTab>() != null;
   }
 
   @override
@@ -110,6 +130,8 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInTab) return buildPage(context);
+
     // Build action buttons.
     PlatformIconButton? leadingButton;
     List<PlatformIconButton> trailingButtons = [];
@@ -129,10 +151,10 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
     if (trailingItems.isNotEmpty) {
       trailingButtons = trailingItems
           .map((e) => PlatformIconButton(
-              material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
-              padding: EdgeInsets.zero,
-              icon: e.widget,
-              onPressed: e.onPressed))
+          material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
+          padding: EdgeInsets.zero,
+          icon: e.widget,
+          onPressed: e.onPressed))
           .toList();
     }
     return PrimaryScrollController(

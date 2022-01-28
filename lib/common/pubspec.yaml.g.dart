@@ -58,13 +58,14 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'139'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1643341757;
+const int timestamp = 1643372743;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description = r'Maybe the best all-rounded service app for Fudan University students.';
+const String description =
+    r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
