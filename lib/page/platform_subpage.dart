@@ -90,7 +90,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
           leading: leadingButton,
           trailingActions: trailingButtons,
         ),
-        body: buildPage(context));
+        body: Builder(builder: buildPage));
   }
 }
 
