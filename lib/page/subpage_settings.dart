@@ -77,8 +77,7 @@ class SettingsSubpage extends PlatformSubpage {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
 }
 
-class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage>
-    with AutomaticKeepAliveClientMixin {
+class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
@@ -940,8 +939,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage>
         ]));
   }
 
-  @override
-  bool get wantKeepAlive => false;
 }
 
 class Developer {

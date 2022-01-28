@@ -88,8 +88,7 @@ class RefreshHomepageEvent {
   RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
 }
 
-class HomeSubpageState extends PlatformSubpageState<HomeSubpage>
-    with AutomaticKeepAliveClientMixin {
+class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   static final StateStreamListener<RefreshHomepageEvent> _refreshSubscription =
       StateStreamListener();
   late Map<String, Widget> widgetMap;
@@ -249,9 +248,6 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage>
     }
     return _widgets;
   }
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   Widget buildPage(BuildContext context) {

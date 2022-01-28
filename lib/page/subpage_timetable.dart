@@ -77,8 +77,7 @@ class TimetableSubPage extends PlatformSubpage {
 
 class ShareTimetableEvent {}
 
-class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage>
-    with AutomaticKeepAliveClientMixin {
+class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
   final ScrollController _dummyScrollController = ScrollController();
@@ -346,6 +345,4 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage>
     );
   }
 
-  @override
-  bool get wantKeepAlive => true;
 }

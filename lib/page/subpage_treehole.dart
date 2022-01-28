@@ -286,8 +286,7 @@ enum PostsType { FAVORED_DISCUSSION, FILTER_BY_TAG, NORMAL_POSTS }
 /// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
 /// the posts which is tagged with [tagFilter].
 ///
-class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage>
-    with AutomaticKeepAliveClientMixin {
+class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   final StateStreamListener<AddNewPostEvent> _postSubscription =
@@ -832,8 +831,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage>
         });
   }
 
-  @override
-  bool get wantKeepAlive => true;
 }
 
 /// This class is a workaround between Open Tree Hole's time-based content retrieval style
