@@ -51,7 +51,7 @@ class PlatformContextMenuItem extends StatelessWidget {
 
   const PlatformContextMenuItem(
       {Key? key,
-      this.menuContext,
+      required this.menuContext,
       this.onPressed,
       required this.child,
       this.isDestructive = false})

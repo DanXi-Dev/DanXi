@@ -273,7 +273,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!PlatformX.isWindows) return;
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
-        title: S.of(context).app_name,
+        title: 'DanXi',
         iconPath: PlatformX.createPlatformFile(
                 PlatformX.getPathFromFile(Platform.resolvedExecutable) +
                     "/data/flutter_assets/assets/graphics/app_icon.ico")

@@ -389,7 +389,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           onPressed: () async {
             await OTEditor.modifyReply(
-                menuContext, e.hole_id, e.floor_id, e.content);
+                context, e.hole_id, e.floor_id, e.content);
             Noticing.showNotice(context, S.of(context).request_success);
             // await refreshListView();
             // // Set duration to 0 to execute [jumpTo] to the top.
@@ -402,7 +402,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // Standard Operations
       PlatformContextMenuItem(
         menuContext: menuContext,
-        onPressed: () => smartNavigatorPush(menuContext, "/text/detail",
+        onPressed: () => smartNavigatorPush(context, "/text/detail",
             arguments: {"text": e.filteredContent}),
         child: Text(S.of(menuContext).free_select),
       ),
@@ -413,12 +413,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
             if (PlatformX.isMaterial(context)) {
               await Noticing.showNotice(
-                  menuContext, S.of(menuContext).copy_success);
+                  context, S.of(menuContext).copy_success);
             }
           }),
       PlatformContextMenuItem(
+        menuContext: menuContext,
         isDestructive: true,
-        onPressed: () => OTEditor.reportPost(menuContext, e.floor_id),
+        onPressed: () => OTEditor.reportPost(context, e.floor_id),
         child: Text(S.of(menuContext).report),
       ),
     ];
@@ -427,7 +428,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         PlatformContextMenuItem(
           onPressed: () async {
             await OTEditor.modifyReply(
-                menuContext, e.hole_id, e.floor_id, e.content);
+                context, e.hole_id, e.floor_id, e.content);
             Noticing.showNotice(context, "Succeeded.");
           },
           child: const Text("Modify this floor"),

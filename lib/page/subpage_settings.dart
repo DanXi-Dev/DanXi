@@ -248,8 +248,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
   List<Widget> _buildFoldBehaviorList(BuildContext menuContext) {
     List<Widget> list = [];
-    onTapListener(FoldBehavior value) async {
-      Navigator.of(menuContext).pop();
+    void onTapListener(FoldBehavior value) {
       OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
           value.internalString();
       updateOTUserProfile(context);
@@ -260,6 +259,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     for (var value in FoldBehavior.values) {
       list.add(
         PlatformContextMenuItem(
+          menuContext: menuContext,
           onPressed: () => onTapListener(value),
           child: Text(value.displayTitle(menuContext)!),
         ),
