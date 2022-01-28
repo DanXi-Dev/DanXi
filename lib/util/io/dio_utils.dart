@@ -51,7 +51,6 @@ class DioUtils {
       if (!Uri.parse(location).isAbsolute) {
         location = response.requestOptions.uri.origin + '/' + location;
       }
-      debugPrint("Relocating to $location");
       return processRedirect(dio,
           await dio.get(location, options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));
     } else {
