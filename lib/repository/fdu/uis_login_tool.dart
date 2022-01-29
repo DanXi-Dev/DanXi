@@ -20,8 +20,9 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/io/queued_interceptor.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/dio_log.dart';
@@ -68,6 +69,7 @@ class UISLoginTool {
     //     receiveTimeout: 5000,
     //     sendTimeout: 5000);
     IndependentCookieJar workJar = IndependentCookieJar.createFrom(jar);
+    workDio.interceptors.add(LimitedQueuedInterceptor.getInstance());
     workDio.interceptors.add(UserAgentInterceptor());
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());

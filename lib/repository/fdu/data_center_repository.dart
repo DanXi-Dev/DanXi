@@ -25,7 +25,7 @@ import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as DOM;
+import 'package:html/dom.dart' as dom;
 
 class DataCenterRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
@@ -121,7 +121,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   Future<List<ExamScore>?> _loadAllExamScore() async {
     Response r = await dio!.get(SCORE_DETAIL_URL);
     BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    DOM.Element tableBody = soup.find("tbody")!.element!;
+    dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromDataCenterHtml(e))

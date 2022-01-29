@@ -16,7 +16,8 @@
  */
 
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
-import 'package:dan_xi/util/user_agent_interceptor.dart';
+import 'package:dan_xi/util/io/queued_interceptor.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/interceptor/dio_log_interceptor.dart';
@@ -37,6 +38,7 @@ abstract class BaseRepositoryWithDio {
           connectTimeout: 10000,
           receiveTimeout: 10000,
           sendTimeout: 10000);
+      _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor());
       _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
