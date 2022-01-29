@@ -447,7 +447,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () async {
             if (await Noticing.showConfirmationDialog(context,
                     "Are you sure to hide this floor? It is hard to undo the operation.",
-                    title: "Confirmation") ==
+                    isConfirmDestructive: true, title: "Confirmation") ==
                 true) {
               final reason = await Noticing.showInputDialog(
                   context, "Delete Reason (cancel for default)");

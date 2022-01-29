@@ -184,9 +184,16 @@ class Noticing {
                 onPressed: () => Navigator.pop(context, false)),
             PlatformDialogAction(
                 cupertino: (context, platform) => CupertinoDialogActionData(
-                    isDestructiveAction: isConfirmDestructive),
-                child: PlatformText(confirmText ?? S.of(context).i_see),
-                onPressed: () => Navigator.pop(context, true)),
+                        isDestructiveAction: isConfirmDestructive),
+                    material: (context, platform) => MaterialDialogActionData(
+                        style: isConfirmDestructive
+                            ? ButtonStyle(
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.red))
+                            : null),
+                    child: PlatformText(confirmText ?? S.of(context).i_see),
+                    onPressed: () => Navigator.pop(context, true)),
           ],
         ));
   }
