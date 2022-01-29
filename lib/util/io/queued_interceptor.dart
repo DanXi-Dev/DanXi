@@ -39,6 +39,12 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
 
   factory LimitedQueuedInterceptor.getInstance() => _instance;
 
+  void dropAllRequest() {
+    while (_requestWorkingQueue.isNotEmpty) {
+      _requestWorkingQueue.removeLast().complete();
+    }
+  }
+
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
     // Notify a completer in queue to complete itself.
@@ -46,7 +52,9 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     // Note: We do NOT care the match between [RequestOptions] and [Completer<void>],
     // so we just arbitrarily pop up the first completer here.
     // The queue is only used to indicate how many requests are being executed now.
-    _requestWorkingQueue.removeAt(0).complete();
+    if (_requestWorkingQueue.isNotEmpty) {
+      _requestWorkingQueue.removeAt(0).complete();
+    }
     print(
         "-> New error, working queue length = ${_requestWorkingQueue.length}");
     handler.next(err);
@@ -55,7 +63,9 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     // Notify a completer in queue to complete itself.
-    _requestWorkingQueue.removeAt(0).complete();
+    if (_requestWorkingQueue.isNotEmpty) {
+      _requestWorkingQueue.removeAt(0).complete();
+    }
     print(
         "-> New response, working queue length = ${_requestWorkingQueue.length}");
     handler.next(response);

@@ -39,6 +39,7 @@ import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/library_repository.dart';
+import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -261,6 +262,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
+              LimitedQueuedInterceptor.getInstance().dropAllRequest();
               rebuildFeatures();
               refreshSelf();
             },
