@@ -56,6 +56,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
@@ -527,7 +528,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ],
       child: PageWithTab(
         child: PlatformScaffold(
-          body: IndexedStack(
+          body: LazyLoadIndexedStack(
             index: _pageIndex.value,
             children: _subpage,
           ),

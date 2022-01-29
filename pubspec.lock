@@ -739,6 +739,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.1.4"
+  lazy_load_indexed_stack:
+    dependency: "direct main"
+    description:
+      name: lazy_load_indexed_stack
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.2"
   linkify:
     dependency: "direct main"
     description:
