@@ -564,6 +564,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminDeleteHole(int? holeId) async {
+    return (await dio!.delete(_BASE_URL + "/holes/$holeId",
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   Future<int?> adminAddPenalty(
       int? floorId, int penaltyLevel, int divisionId) async {
     return (await dio!.post(_BASE_URL + "/penalty/$floorId",

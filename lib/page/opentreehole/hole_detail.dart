@@ -463,6 +463,23 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
+          onPressed: () async {
+            if (await Noticing.showConfirmationDialog(context,
+                    "Are you sure to hide this WHOLE HOLE? It is hard to undo the operation.",
+                    isConfirmDestructive: true, title: "Confirmation") ==
+                true) {
+              int? result = await OpenTreeHoleRepository.getInstance()
+                  .adminDeleteHole(e.hole_id);
+              if (result != null && result < 300) {
+                Noticing.showMaterialNotice(context, "Succeeded.");
+              }
+            }
+          },
+          child: const Text("Delete this hole"),
+          isDestructive: true,
+          menuContext: menuContext,
+        ),
+        PlatformContextMenuItem(
           onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (subMenuContext) => PlatformContextMenu(
