@@ -43,8 +43,9 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
   void onError(DioError err, ErrorInterceptorHandler handler) {
     // Notify a completer in queue to complete itself.
     //
-    // Note: We do NOT care the matches between [RequestOptions] and [Completer<void>],
-    // the queue is only used to indicate how many requests are being executed now.
+    // Note: We do NOT care the match between [RequestOptions] and [Completer<void>],
+    // so we just arbitrarily pop up the first completer here.
+    // The queue is only used to indicate how many requests are being executed now.
     _requestWorkingQueue.removeAt(0).complete();
     print(
         "-> New error, working queue length = ${_requestWorkingQueue.length}");
