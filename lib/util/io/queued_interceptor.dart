@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:dan_xi/model/pair.dart';
 import 'package:dio/dio.dart';
@@ -29,11 +30,12 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
       LimitedQueuedInterceptor._();
 
   /// The completer of requests executing at the moment.
-  final List<Completer<void>> _requestWorkingQueue = [];
+  final Queue<Completer<void>> _requestWorkingQueue = Queue<Completer<void>>();
 
   /// The requests waiting to be executed.
-  final List<Pair<RequestOptions, RequestInterceptorHandler>>
-      _requestWaitingQueue = [];
+  final Queue<Pair<RequestOptions, RequestInterceptorHandler>>
+      _requestWaitingQueue =
+      Queue<Pair<RequestOptions, RequestInterceptorHandler>>();
 
   LimitedQueuedInterceptor._();
 
@@ -46,7 +48,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     // Note: We do NOT care the match between [RequestOptions] and [Completer<void>],
     // so we just arbitrarily pop up the first completer here.
     // The queue is only used to indicate how many requests are being executed now.
-    _requestWorkingQueue.removeAt(0).complete();
+    _requestWorkingQueue.removeFirst().complete();
     print(
         "-> New error, working queue length = ${_requestWorkingQueue.length}");
     handler.next(err);
@@ -55,7 +57,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     // Notify a completer in queue to complete itself.
-    _requestWorkingQueue.removeAt(0).complete();
+    _requestWorkingQueue.removeFirst().complete();
     print(
         "-> New response, working queue length = ${_requestWorkingQueue.length}");
     handler.next(response);
@@ -79,7 +81,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     Future.any(_requestWorkingQueue.map((e) => e.future)).then((_) {
       // Launch the request when we have free rocket pod.
       Pair<RequestOptions, RequestInterceptorHandler> requestHandlerPair =
-          _requestWaitingQueue.removeAt(0);
+          _requestWaitingQueue.removeFirst();
       _requestWorkingQueue.add(Completer());
       print(
           "<! New request finally gets its turn, working queue length = ${_requestWorkingQueue.length}");
