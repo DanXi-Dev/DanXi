@@ -151,9 +151,10 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     }
   }
 
-  void _startShare(BuildContext context, TimetableConverter converter) async {
+  void _startShare(
+      BuildContext menuContext, TimetableConverter converter) async {
     // Close the dialog first
-    Navigator.of(context).pop();
+    Navigator.of(menuContext).pop();
     if (_table == null) {
       Noticing.showNotice(context, S.of(context).fatal_error);
       return;
