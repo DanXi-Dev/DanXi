@@ -356,7 +356,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
                     // Accessibility
                     Card(
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(S.of(context).accessibility_coloring),
                         secondary: const Icon(Icons.accessibility_new_rounded),
                         value: SettingsProvider.getInstance()
@@ -370,7 +370,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     ),
                     if (PlatformX.isWindows)
                       Card(
-                        child: SwitchListTile(
+                        child: SwitchListTile.adaptive(
                             title: Text(S.of(context).windows_auto_start_title),
                             secondary: const Icon(Icons.settings_power),
                             subtitle: Text(
@@ -503,7 +503,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 OTNotificationSettingsTile(
                   parentSetStateFunction: refreshSelf,
                 ),
-                SwitchListTile(
+                SwitchListTile.adaptive(
                   title: Text(S.of(context).fduhole_clean_mode),
                   secondary: const Icon(Icons.ac_unit),
                   subtitle: Text(S.of(context).fduhole_clean_mode_description),
@@ -1060,7 +1060,7 @@ class _OTNotificationSettingsWidgetState
     getNotifyListNonNull() =>
         OpenTreeHoleRepository.getInstance().userInfo!.config!.notify!;
     for (var value in OTNotificationTypes.values) {
-      list.add(CheckboxListTile(
+      list.add(SwitchListTile.adaptive(
           title: Text(value.displayTitle(context) ?? "null"),
           value: getNotifyListNonNull().contains(value.internalString()),
           onChanged: (newValue) {
