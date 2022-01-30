@@ -362,5 +362,6 @@
   "second_ago": "{num}秒前",
   "minute_ago": "{num}分钟前",
   "hour_ago": "{num}小时前",
-  "day_ago": "{num}天前"
+  "day_ago": "{num}天前",
+  "select_semester": "スケジュールに表示する学期"
 }

@@ -378,16 +378,14 @@
     "Dest1n1_description":"FDUHole Frontend Developer",
     "Frankstein73_description":"DanXi Developer",
     "ivanfei_description":"FDUHole Frontend Developer",
-
     "acknowledgement_name_1": "Ivan Fei",
     "acknowledgement_link_1": "https://github.com/ivanfei-1",
-
     "feedback_email": "danxi_dev@protonmail.com",
-    "privacy_policy_url" : "https://danxi.fduhole.com/privacy",
-
-    "moment_ago":"A moment ago",
-    "second_ago":"{num} sec ago",
-    "minute_ago":"{num} min ago",
-    "hour_ago":"{num} hr ago",
-    "day_ago":"{num}d ago"
+    "privacy_policy_url": "https://danxi.fduhole.com/privacy",
+    "moment_ago": "A moment ago",
+    "second_ago": "{num} sec ago",
+    "minute_ago": "{num} min ago",
+    "hour_ago": "{num} hr ago",
+    "day_ago": "{num}d ago",
+    "select_semester": "Select Timetable Semester"
 }

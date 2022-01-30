@@ -57,6 +57,7 @@ class SettingsProvider {
   static const String KEY_CELEBRATION = "celebration";
   static const String KEY_BACKGROUND_IMAGE_PATH = "background";
   static const String KEY_SEARCH_HISTORY = "search_history";
+  static const String KEY_TIMETABLE_SEMESTER = "timetable_semester";
 
   SettingsProvider._();
 
@@ -76,6 +77,17 @@ class SettingsProvider {
     } else if (preferences!.containsKey(KEY_SEARCH_HISTORY)) {
       preferences!.remove(KEY_SEARCH_HISTORY);
     }
+  }
+
+  String? get timetableSemester {
+    if (preferences!.containsKey(KEY_TIMETABLE_SEMESTER)) {
+      return preferences!.getString(KEY_TIMETABLE_SEMESTER);
+    }
+    return null;
+  }
+
+  set timetableSemester(String? value) {
+    preferences!.setString(KEY_TIMETABLE_SEMESTER, value!);
   }
 
   FileImage? get backgroundImage {

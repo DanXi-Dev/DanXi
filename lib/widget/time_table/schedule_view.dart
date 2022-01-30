@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -215,7 +216,8 @@ class _ScheduleViewState extends State<ScheduleView> {
   Widget _buildScheduleBlock(ScheduleBlock block) {
     Widget body;
     if (block.event.length > 1) {
-      Course copiedCourse = Course.fromJson(block.event.first.course.toJson());
+      Course copiedCourse =
+          Course.fromJson(jsonDecode(jsonEncode(block.event.first.course)));
       copiedCourse.courseName = copiedCourse.courseName! + S.current.and_more;
       body = _buildCourseBody(copiedCourse);
     } else {

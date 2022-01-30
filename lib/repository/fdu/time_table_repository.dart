@@ -61,7 +61,28 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           (exception) => UISLoginTool.fixByLoginUIS(
               dio!, LOGIN_URL, cookieJar!, info, true));
 
+  Future<String?> getDefaultSemesterId(PersonInfo? info) =>
+      Retrier.tryAsyncWithFix(() async {
+        await dio!.get(ID_URL);
+        return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
+            .firstWhere((element) => element.name == "semester.id")
+            .value;
+      },
+          (exception) => UISLoginTool.fixByLoginUIS(
+              dio!, LOGIN_URL, cookieJar!, info, true));
+
   Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
+    Future<String?> getAppropriateSemesterId() async {
+      String? setValue = SettingsProvider.getInstance().timetableSemester;
+      if (setValue == null || setValue.isEmpty) {
+        return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
+            .firstWhere((element) => element.name == "semester.id")
+            .value;
+      } else {
+        return setValue;
+      }
+    }
+
     Response idPage = await dio!.get(ID_URL);
     String? termId = _getIds(idPage.data.toString());
     Response tablePage = await dio!.post(TIME_TABLE_URL,
@@ -70,9 +91,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           "setting.kind": "std",
           "startWeek": "1",
           "ids": termId,
-          "semester.id": (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-              .firstWhere((element) => element.name == "semester.id")
-              .value
+          "semester.id": await getAppropriateSemesterId()
         },
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     return TimeTable.fromHtml(
