@@ -24,6 +24,10 @@ import 'package:dio/dio.dart';
 /// The number of how many requests we allow to be executed simultaneously.
 const _kQueueLengthLimit = 4;
 
+/// How many seconds the request can wait before it goes into the working queue
+/// regardless of the length of [_requestWorkingQueue] > [_kQueueLengthLimit].
+const _kWaitingSeconds = 2;
+
 /// A [QueuedInterceptor] can limit the number of concurrent requests.
 class LimitedQueuedInterceptor extends QueuedInterceptor {
   static final LimitedQueuedInterceptor _instance =
@@ -88,7 +92,8 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
         "!! New request has to wait now, because working queue length = ${_requestWorkingQueue.length}");
     _requestWaitingQueue.add(Pair(options, handler));
 
-    Future.any(_requestWorkingQueue.map((e) => e.future)).then((_) {
+    Future.any(_requestWorkingQueue.map((e) => e.future).followedBy(
+        [Future.delayed(const Duration(seconds: _kWaitingSeconds))])).then((_) {
       // Launch the request when we have free rocket pod.
       Pair<RequestOptions, RequestInterceptorHandler> requestHandlerPair =
           _requestWaitingQueue.removeFirst();
