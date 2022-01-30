@@ -353,20 +353,15 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
                     // Accessibility
                     Card(
-                      child: ListTile(
+                      child: SwitchListTile(
                         title: Text(S.of(context).accessibility_coloring),
-                        leading: const Icon(Icons.accessibility_new_rounded),
-                        subtitle: Text(SettingsProvider.getInstance()
-                                .useAccessibilityColoring
-                            ? S.of(context).enabled
-                            : S.of(context).disabled),
-                        onTap: () {
-                          SettingsProvider.getInstance()
-                                  .useAccessibilityColoring =
-                              !SettingsProvider.getInstance()
-                                  .useAccessibilityColoring;
+                        secondary: const Icon(Icons.accessibility_new_rounded),
+                        value: SettingsProvider.getInstance()
+                            .useAccessibilityColoring,
+                        onChanged: (bool value) {
                           treeholePageKey.currentState?.setState(() {});
-                          setState(() {});
+                          setState(() => SettingsProvider.getInstance()
+                              .useAccessibilityColoring = value);
                         },
                       ),
                     ),

@@ -34,9 +34,8 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<ExerciseItem>?> loadExerciseRecords(PersonInfo? info) {
-    return Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info));
-  }
+  Future<List<ExerciseItem>?> loadExerciseRecords(PersonInfo? info) =>
+      Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info));
 
   Future<List<ExerciseItem>?> _loadExerciseRecords(PersonInfo? info) async {
     // PE system request a token from UIS to log in.
