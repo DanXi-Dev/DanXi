@@ -1,0 +1,34 @@
+/* 
+  Localizable.strings
+  DanXi-native
+
+  Created by Kavin Zhao on 2021/6/29.
+  
+*/
+
+// Content View
+"dashboard" = "Dashboard";
+"treehole" = "Tree Hole";
+
+// Login Page
+"login" = "Login";
+"uisLogin" = "UIS Login";
+"studentId" = "Student ID";
+"pwd" = "Password";
+"fduholeLogin" = "FDUHOLE Login";
+"loginWithFduhole" = "Login with FDUHOLE";
+"fduholeLogin_footer" = "You will be able to use only FDUHOLE features if you login with this option.";
+
+// Tree Hole
+"selectAPost" = "Select a post to view";
+"report" = "Report";
+"gettingtoken" = "Waiting for account information from iPhone...";
+"image_tag" = " [Image] ";
+"iphoneunreachable" = "iPhone Unreachable. Tap to retry";
+"manualInputToken" = "Manually import Token";
+"error" = "Error";
+"discussionFolded" = "Content hidden. Tap to view";
+"end_reached" = "You have reached the end";
+"refresh" = "Refresh";
+"retry_login" = "Retry Login";
+"division" = "Topic";
