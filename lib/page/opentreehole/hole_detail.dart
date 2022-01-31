@@ -77,6 +77,7 @@ String preprocessContentForDisplay(String content) {
 /// Arguments:
 /// [OTHole] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
 /// Otherwise as a list of search result.
+/// [String] searchKeyword: if set, the page will show the result of searching [searchKeyword].
 /// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
 /// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
 ///
@@ -194,9 +195,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       }
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    Future<List<OTFloor>>? future;
+    Future<List<OTFloor>>? allDataReceiver;
     if (shouldScrollToEnd) {
-      future = Future.value(_hole.floors?.prefetch);
+      allDataReceiver = Future.value(_hole.floors?.prefetch);
     }
     final pagedListView = PagedListView<OTFloor>(
       initialData: _hole.floors?.prefetch,
@@ -207,7 +208,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       dataReceiver: _loadContent,
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-      allDataReceiver: future,
+      allDataReceiver: allDataReceiver,
       shouldScrollToEnd: shouldScrollToEnd,
       builder: _getListItems,
       loadingBuilder: (BuildContext context) => Container(
@@ -310,6 +311,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
       _listViewController.queueScrollToEnd();
       _listViewController.replaceDataWith((_hole.floors?.prefetch)!);
+      setState(() {});
       shouldScrollToEnd = true;
     } catch (error, st) {
       Noticing.showModalError(context, error, trace: st);

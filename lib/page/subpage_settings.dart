@@ -32,6 +32,7 @@ import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
@@ -963,7 +964,7 @@ class _SemesterSelectionTileState extends State<SemesterSelectionTile> {
   @override
   void initState() {
     super.initState();
-    _future = loadSemesterInfo();
+    _future = LazyFuture.pack(loadSemesterInfo());
   }
 
   Future<void> loadSemesterInfo() async {
@@ -1021,7 +1022,7 @@ class _SemesterSelectionTileState extends State<SemesterSelectionTile> {
               title: Text(S.of(context).select_semester),
               subtitle: Text(S.of(context).failed),
               onTap: () => setState(() {
-                _future = loadSemesterInfo();
+                _future = LazyFuture.pack(loadSemesterInfo());
               }),
             ),
         loadingBuilder: () => ListTile(
