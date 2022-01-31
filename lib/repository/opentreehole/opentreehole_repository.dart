@@ -456,7 +456,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       {bool unreadOnly = false, DateTime? startTime}) async {
     final Response response = await dio!.get(_BASE_URL + "/messages",
         queryParameters: {
-          if (unreadOnly) "not_read": true,
+          "not_read": unreadOnly,
           "start_time": startTime?.toIso8601String(),
         },
         options: Options(headers: _tokenHeader));
