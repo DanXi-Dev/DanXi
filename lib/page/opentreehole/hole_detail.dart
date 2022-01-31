@@ -138,6 +138,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           in _hole.floors?.prefetch ?? List<OTFloor>.empty(growable: false)) {
         OpenTreeHoleRepository.getInstance().cacheFloor(floor);
       }
+      // Update hole view count
+      if (_hole.hole_id != null) {
+        unawaited(OpenTreeHoleRepository.getInstance()
+            .updateHoleViewCount(_hole.hole_id!));
+      }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
       _searchKeyword = widget.arguments!['searchKeyword'];
       // Create a dummy post for displaying search result

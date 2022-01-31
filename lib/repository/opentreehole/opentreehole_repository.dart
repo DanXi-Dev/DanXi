@@ -452,6 +452,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _userInfo;
   }
 
+  Future<void> updateHoleViewCount(int holeId) async {
+    await dio!.patch(_BASE_URL + "/holes/$holeId",
+        options: Options(headers: _tokenHeader));
+  }
+
   Future<List<OTMessage>?> loadMessages(
       {bool unreadOnly = false, DateTime? startTime}) async {
     final Response response = await dio!.get(_BASE_URL + "/messages",
