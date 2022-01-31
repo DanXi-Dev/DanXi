@@ -197,8 +197,7 @@ class OTEditor {
                         }),
                   ],
                 ));
-        // TODO: This dispose is causing more trouble than it's worth.
-        //textController.dispose();
+        textController.dispose();
         return value;
       case OTEditorType.PAGE:
         // Receive the value with **dynamic** variable to prevent automatic type inference
@@ -239,7 +238,7 @@ class OTEditor {
 }
 
 class BBSEditorWidget extends StatefulWidget {
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final EditorObject? editorObject;
   final bool? allowTags;
   final bool fullscreen;
@@ -247,7 +246,7 @@ class BBSEditorWidget extends StatefulWidget {
 
   const BBSEditorWidget(
       {Key? key,
-      this.controller,
+      required this.controller,
       this.allowTags,
       this.editorObject,
       this.fullscreen = false,
@@ -261,10 +260,16 @@ class BBSEditorWidget extends StatefulWidget {
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
   List<OTTag>? _allTags;
 
+  late ValueNotifier<String> previewText;
+
   @override
   void initState() {
     super.initState();
-    widget.controller!.addListener(() => refreshSelf());
+    // TODO: We don't need [TextEditingController] if we use [ValueNotifier]
+    previewText = ValueNotifier(widget.controller.text);
+    widget.controller.addListener(() {
+      previewText.value = widget.controller.text;
+    });
   }
 
   Widget _buildIntroButton(BuildContext context, IconData iconData,
@@ -438,9 +443,12 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: smartRender(
-                  context, widget.controller!.text, null, null, false,
-                  preview: true),
+              child: ValueListenableBuilder<String>(
+                builder: (context, value, child) => smartRender(
+                    context, value, null, null, false,
+                    preview: true),
+                valueListenable: previewText,
+              ),
             ),
           ]),
     );
