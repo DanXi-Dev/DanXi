@@ -254,7 +254,7 @@
   "new_post": "发布新帖子",
   "posting": "正在发布内容...",
   "uploading_image": "正在上传图片...",
-  "uploading_image_failed": "上传图片失败，请检查网络连接",
+  "uploading_image_failed": "上传图片失败",
   "loading_bbs_secure_connection": "正在进行服务器安全性检查，请稍等...",
   "report": "举报",
   "copy": "全部复制",

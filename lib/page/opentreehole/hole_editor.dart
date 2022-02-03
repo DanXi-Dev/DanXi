@@ -31,6 +31,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -229,8 +230,10 @@ class OTEditor {
       if (url != null) _controller.text += "![]($url)";
       // "showAnim: true" makes it crash. Don't know the reason.
       progressDialog.dismiss(showAnim: false);
-    } catch (ignored) {
-      Noticing.showNotice(context, S.of(context).uploading_image_failed);
+    } catch (error) {
+      Noticing.showNotice(context,
+          ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
+          title: S.of(context).uploading_image_failed);
     } finally {
       progressDialog.dismiss(showAnim: false);
     }

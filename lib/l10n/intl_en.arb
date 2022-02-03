@@ -245,7 +245,7 @@
     "new_post":"New Post",
     "posting":"Posting...",
     "uploading_image":"Uploading image...",
-    "uploading_image_failed":"Failed to upload image. Please check your internet connection.",
+    "uploading_image_failed":"Failed to upload image",
     "loading_bbs_secure_connection": "Performing server security check, please wait...",
     "report":"Report",
     "copy":"Copy All",
