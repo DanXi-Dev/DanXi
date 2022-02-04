@@ -88,7 +88,7 @@ jobs:
           mv -f secrets/sksl_default.json CI/sksl_default.json
 
       - name: Configure Xcode
-        run: flutter build ios --release --config-only --bundle-sksl-path CI/sksl_default.json
+        run: flutter build ios --release --config-only #--bundle-sksl-path CI/sksl_default.json
 
       - name: Build App
         run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -allowProvisioningDeviceRegistration -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
