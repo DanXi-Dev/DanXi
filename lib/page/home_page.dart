@@ -410,7 +410,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 context,
                 S.of(context).push_notification_reg_failed_des(
                     ErrorPageWidget.generateUserFriendlyDescription(
-                        S.of(context), e)),
+                        S.of(context), e,
+                        stackTrace: st)),
                 title: S.of(context).push_notification_reg_failed);
           }
           break;
@@ -452,12 +453,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         regId,
                         await PlatformX.getUniqueDeviceId(),
                         PushNotificationServiceType.MIPUSH);
-              } catch (e) {
+              } catch (e, st) {
                 Noticing.showNotice(
                     context,
                     S.of(context).push_notification_reg_failed_des(
                         ErrorPageWidget.generateUserFriendlyDescription(
-                            S.of(context), e)),
+                            S.of(context), e,
+                            stackTrace: st)),
                     title: S.of(context).push_notification_reg_failed);
               }
             }
@@ -488,13 +490,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
     // Also, otherwise it will call [setState] before the frame is completed.
     WidgetsBinding.instance!
-        .addPostFrameCallback((_) => _loadOrInitPersonInfo());
+        .addPostFrameCallback((_) => _loadPersonInfoOrLogin());
   }
 
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
   ///
   /// If user hasn't logged in before, request him to do so.
-  void _loadOrInitPersonInfo() {
+  void _loadPersonInfoOrLogin() {
     _preferences = SettingsProvider.getInstance().preferences;
 
     if (PersonInfo.verifySharedPreferences(_preferences!)) {
