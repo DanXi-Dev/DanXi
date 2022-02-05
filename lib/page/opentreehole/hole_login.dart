@@ -197,12 +197,12 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
           const SizedBox(
             height: 32,
           ),
-          ListTile(
-            title: Text(S.of(context).fudan_uis_quick_login),
-            onTap: () => state.jumpTo(OTEmailSelectionWidget(
-              state: state,
-            )),
-          ),
+          // ListTile(
+          //   title: Text(S.of(context).fudan_uis_quick_login),
+          //   onTap: () => state.jumpTo(OTEmailSelectionWidget(
+          //     state: state,
+          //   )),
+          // ),
           const Divider(),
           ListTile(
             title: Text(S.of(context).login_by_email_password),
