@@ -36,9 +36,6 @@ jobs:
           flutter pub global activate cider
           flutter pub global run cider bump build
       
-      - name: Generate Models
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-      
       - name: Get Flutter Version
         id: get_flutter_version
         uses: its404/get-flutter-version@v1.0.0
@@ -54,26 +51,6 @@ jobs:
         run: |
           git add .
           git commit -m "[GitHub Action] Bump Build Number"
-          
-      - name: Import Development Code Sign Certificates
-        id: dev-codesign
-        uses: apple-actions/import-codesign-certs@v1
-        with: 
-          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
-          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
-      
-      - name: Import Distribution Code Sign Certificates
-        uses: apple-actions/import-codesign-certs@v1
-        with: 
-          p12-file-base64: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12 }}
-          p12-password: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12_PASSWORD }}
-          keychain-password: ${{ steps.dev-codesign.outputs.keychain-password }}
-          create-keychain: false
-          
-      - name: Import API Keys
-        run: |
-          mkdir private_keys
-          echo -e "${{ secrets.APP_STORE_API_KEY }}" > ./private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8
 
       - name: Import Secrets
         uses: actions/checkout@v2
@@ -90,14 +67,14 @@ jobs:
       - name: Configure Xcode
         run: flutter build ios --release --config-only #--bundle-sksl-path CI/sksl_default.json
 
-      - name: Build App
-        run: xcodebuild archive -archivePath build/ios/archive/Runner.xcarchive -workspace ios/Runner.xcworkspace -scheme Runner -quiet -allowProvisioningUpdates -allowProvisioningDeviceRegistration -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
-        
-      - name: Export Archive
-        run: xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/Runner -exportOptionsPlist CI/ExportOptions.plist -allowProvisioningUpdates -allowProvisioningDeviceRegistration -authenticationKeyPath $(pwd)/private_keys/AuthKey_${{ secrets.APP_STORE_API_KEY_ID }}.p8 -authenticationKeyID ${{ secrets.APP_STORE_API_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.APP_STORE_API_ISSUER_ID }}
-
-      - name: Upload app to App Store Connect
-        run: xcrun altool --show-progress --upload-package build/ios/Runner/dan-xi.ipa --type ios --asc-public-id ${{ secrets.APP_STORE_API_ISSUER_ID }} --apple-id 1568629997 --bundle-version ${{ steps.get_flutter_version.outputs.build_number }} --bundle-short-version-string ${{ steps.get_flutter_version.outputs.version_number }} --bundle-id io.github.danxi-dev.dan-xi --apiKey ${{ secrets.APP_STORE_API_KEY_ID }} --apiIssuer ${{ secrets.APP_STORE_API_ISSUER_ID }}
+      - name: Fastlane Action
+        uses: maierj/fastlane-action@v2.1.0
+        with:
+          lane: 'beta'
+          subdirectory: 'ios'
+          skip-tracking: true
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         
       - name: Push Build Number Update
         run: git push origin main
