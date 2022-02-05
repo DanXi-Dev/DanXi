@@ -55,7 +55,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:in_app_review/in_app_review.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -171,8 +170,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "ical", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dartclub/ical"),
     LicenseItem("platform_device_id", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/BestBurning/platform_device_id"),
-    LicenseItem("in_app_review", LICENSE_MIT,
-        "https://github.com/britannio/in_app_review"),
+    // LicenseItem("in_app_review", LICENSE_MIT,
+    //     "https://github.com/britannio/in_app_review"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
     LicenseItem("json_serializable", LICENSE_BSD,
         "https://github.com/google/json_serializable.dart/tree/master/json_serializable"),
@@ -713,7 +712,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
           ));
 
   Card _buildAboutCard(BuildContext context) {
-    final inAppReview = InAppReview.instance;
+    // final inAppReview = InAppReview.instance;
     final Color _originalDividerColor = Theme.of(context).dividerColor;
     final double _avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 8;
@@ -893,24 +892,24 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FutureBuilder<bool>(
-                    builder:
-                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                      if (snapshot.hasError || snapshot.data == false) {
-                        return const SizedBox();
-                      }
-                      return TextButton(
-                        child: Text(S.of(context).rate),
-                        onPressed: () {
-                          inAppReview.openStoreListing(
-                            appStoreId: Constant.APPSTORE_APPID,
-                          );
-                        },
-                      );
-                    },
-                    future: inAppReview.isAvailable(),
-                  ),
-                  const SizedBox(width: 8),
+                  // FutureBuilder<bool>(
+                  //   builder:
+                  //       (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  //     if (snapshot.hasError || snapshot.data == false) {
+                  //       return const SizedBox();
+                  //     }
+                  //     return TextButton(
+                  //       child: Text(S.of(context).rate),
+                  //       onPressed: () {
+                  //         inAppReview.openStoreListing(
+                  //           appStoreId: Constant.APPSTORE_APPID,
+                  //         );
+                  //       },
+                  //     );
+                  //   },
+                  //   future: inAppReview.isAvailable(),
+                  // ),
+                  // const SizedBox(width: 8),
                   TextButton(
                     child: Text(S.of(context).contact_us),
                     onPressed: () async {

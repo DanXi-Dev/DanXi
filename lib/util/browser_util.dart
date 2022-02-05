@@ -15,18 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:math';
-
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:in_app_review/in_app_review.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BrowserUtil {
@@ -117,18 +112,18 @@ class CustomInAppBrowser extends InAppBrowser {
 
   // Prompts the user with a In-App Review UI, when certain conditions are met.
   Future<void> requestStoreReviewWhenAppropriate() async {
-    final InAppReview inAppReview = InAppReview.instance;
-    if (await inAppReview.isAvailable()) {
-      // Ensure requestReview is called only after the user used the app for a while
-      // And ensure that the API is not called too frequently.
-      // TODO: Any better ways to implement this?
-      final SharedPreferences preferences =
-          await SharedPreferences.getInstance();
-      if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
-          preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
-        if (Random().nextDouble() > 0.997) inAppReview.requestReview();
-      }
-    }
+    // final InAppReview inAppReview = InAppReview.instance;
+    // if (await inAppReview.isAvailable()) {
+    //   // Ensure requestReview is called only after the user used the app for a while
+    //   // And ensure that the API is not called too frequently.
+    //   // TODO: Any better ways to implement this?
+    //   final SharedPreferences preferences =
+    //       await SharedPreferences.getInstance();
+    //   if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
+    //       preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
+    //     if (Random().nextDouble() > 0.997) inAppReview.requestReview();
+    //   }
+    // }
   }
 
   @override
@@ -175,7 +170,7 @@ class CustomInAppBrowser extends InAppBrowser {
 
   @override
   void onExit() {
-    // Request App Store/Google Play review after user closes the broswer.
+    // Request App Store/Google Play review after user closes the browser.
     requestStoreReviewWhenAppropriate();
   }
 }
