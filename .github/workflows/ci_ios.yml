@@ -54,9 +54,9 @@ jobs:
 
       - name: Import Keys
         run: |
-          echo -n "${{ secrets.MATCH_SSH_KEY_BASE64 }}" | base64 -d -o $HOME/match_ssh_key
-          chmod 400 $HOME/match_ssh_key
-          export MATCH_GIT_PRIVATE_KEY=$HOME/match_ssh_key
+          echo -n "${{ secrets.MATCH_SSH_KEY_BASE64 }}" | base64 -d -o $HOME/.ssh/id_rsa
+          chmod 400 $HOME/.ssh/id_rsa
+          export MATCH_GIT_PRIVATE_KEY=$HOME/.ssh/id_rsa
 
       - name: Import Secrets
         uses: actions/checkout@v2
@@ -81,6 +81,11 @@ jobs:
           skip-tracking: true
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        
+      - uses: actions/checkout@v2
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
         
       - name: Push Build Number Update
         run: git push origin main
