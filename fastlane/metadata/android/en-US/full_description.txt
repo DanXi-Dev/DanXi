@@ -1,0 +1,16 @@
+Maybe the best all-rounded service app for Fudan University students!
+
+- Campus card balance and transactions
+- Dining hall traffic
+- Automatic COVID-19 Safety Check-in
+- Shortcut for Fudan QR Code (with support for Apple Watch)
+- View empty classrooms
+- Tree Hole
+- View compulsory-exercise records
+- View timetable and export as .ics file
+- Show Notices from Academic Affairs Office
+- View exam schedule and export as .ics file
+- View final exam GPA and ranking
+- View school bus schedule
+
+Come to our website to know more about DanXi: https://danxi.fduhole.com/
