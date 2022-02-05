@@ -55,7 +55,7 @@ jobs:
       - name: Import Keys
         run: |
           mkdir private_keys
-          echo -n "${{ secrets.MATCH_SSH_KEY_BASE64 }}" | base64 -d > ./private_keys/match_ssh_key
+          echo -n "${{ secrets.MATCH_SSH_KEY_BASE64 }}" | base64 -d -o ${{ env.RUNNER_TEMP }}/match_ssh_key
 
       - name: Import Secrets
         uses: actions/checkout@v2
@@ -80,7 +80,7 @@ jobs:
           skip-tracking: true
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_PRIVATE_KEY: ./private_keys/match_ssh_key
+          MATCH_GIT_PRIVATE_KEY: ${{ env.RUNNER_TEMP }}/match_ssh_key
         
       - name: Push Build Number Update
         run: git push origin main

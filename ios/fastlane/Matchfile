@@ -1,4 +1,4 @@
-git_url("https://github.com/singularity-s0/secrets.git")
+git_url("git@github.com:singularity-s0/secrets.git")
 
 storage_mode("git")
 
