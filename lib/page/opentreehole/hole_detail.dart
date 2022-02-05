@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -550,6 +551,29 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       return const SizedBox();
     }
 
+    Future<List<ImageUrlInfo>?> loadPageImage(
+        BuildContext pageContext, int pageIndex) async {
+      List<OTFloor>? result;
+      if (_searchKeyword != null) {
+        result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
+            _searchKeyword,
+            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE);
+      } else {
+        result = await OpenTreeHoleRepository.getInstance().loadFloors(_hole,
+            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE);
+      }
+      if (result == null || result.isEmpty) {
+        return null;
+      } else {
+        List<ImageUrlInfo> imageList = [];
+        for (var floor in result) {
+          if (floor.content == null) continue;
+          imageList.addAll(extractAllImagesInFloor(floor.content!));
+        }
+        return imageList;
+      }
+    }
+
     return OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
@@ -588,7 +612,40 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           progressDialog.dismiss(showAnim: false);
         }
       },
+      onTapImage: (String? url, Object heroTag) {
+        final int length = _listViewController.length();
+        smartNavigatorPush(context, '/image/detail', arguments: {
+          'preview_url': url,
+          'hd_url': OpenTreeHoleRepository.getInstance()
+              .extractHighDefinitionImageUrl(url!),
+          'hero_tag': heroTag,
+          'image_list': extractAllImages(),
+          'loader': loadPageImage,
+          'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
+              ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
+              : length ~/ Constant.POST_COUNT_PER_PAGE
+        });
+      },
     );
+  }
+
+  Iterable<ImageUrlInfo> extractAllImagesInFloor(String content) {
+    final imageExp = RegExp(r'\!\[.*?\]\((.*?)\)');
+    return imageExp.allMatches(content).map((e) => ImageUrlInfo(
+        e.group(1),
+        OpenTreeHoleRepository.getInstance()
+            .extractHighDefinitionImageUrl(e.group(1)!)));
+  }
+
+  List<ImageUrlInfo> extractAllImages() {
+    List<ImageUrlInfo> imageList = [];
+    final int length = _listViewController.length();
+    for (int i = 0; i < length; i++) {
+      var floor = _listViewController.getElementAt(i);
+      if (floor.content == null) continue;
+      imageList.addAll(extractAllImagesInFloor(floor.content!));
+    }
+    return imageList;
   }
 }
 

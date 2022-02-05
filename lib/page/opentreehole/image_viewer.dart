@@ -25,6 +25,7 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -37,13 +38,19 @@ import 'package:share/share.dart';
 /// An image display page, allowing user to share or save the image.
 ///
 /// Arguments:
-/// [String] hd_url: the original url of the image, enabling the page to decide the file name.
+/// [String] hd_url (Required): the original url of the image, enabling the page to decide the file name.
 /// If [preview_url] not set, it should be put in [DefaultCacheManager] first.
 ///
 /// [String] preview_url: the thumbnail url of the image. If set, it should be put in [DefaultCacheManager] first,
 /// and [ImageViewerPage] will put a hero attribute on [PhotoView] for transition animation.
 ///
-
+/// [Object] hero_tag: a hero object used to show animation between page transition.
+///
+/// [List<ImageUrlInfo>] image_list: a list of images to be shown. If set, <preview_url,hd_url> should be in the list.
+///
+/// [ImageLoadCallback] loader: a method to load more image on the next page.
+///
+/// [int] last_page: the page index of the last image of the list. It should be set with [loader]. Default value is 0.
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
   @protected
@@ -61,7 +68,9 @@ class ImageViewerPage extends StatefulWidget {
   @override
   _ImageViewerPageState createState() => _ImageViewerPageState();
 
-  ImageViewerPage({Key? key, this.arguments}) : super(key: key);
+  ImageViewerPage({Key? key, this.arguments})
+      : assert(arguments == null || arguments['hd_url'] != null),
+        super(key: key);
 
   static bool isImage(String url) {
     if (url.isEmpty || Uri.tryParse(url) == null) return false;
@@ -85,49 +94,45 @@ class ImageViewerPage extends StatefulWidget {
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
-  /// URL for preview image, if it is already in the cache, it makes loading faster.
-  String? _previewUrl;
+  late List<ImageUrlInfo> _imageList;
+  ImageLoadCallback? _imageLoader;
+  late ImageUrlInfo _initInfo;
+  Object? heroTag;
 
-  /// URL for the (high-definition) original image
-  late String _originalUrl;
-  late String safeShowingUrl;
-  late Object heroTag;
+  late int initialIndex;
+  late PageController controller;
 
-  bool originalLoading = true;
-  String? originalLoadFailError;
+  Map<ImageUrlInfo, String?> originalLoadFailError = {};
+  Map<ImageUrlInfo, bool> originalLoading = {};
+  bool nextPageLoading = false;
+
+  late int showIndex;
+  late int lastIndex;
 
   @override
   void initState() {
     super.initState();
-    _previewUrl = widget.arguments!['preview_url'];
-    _originalUrl = widget.arguments!['hd_url']!;
+    _initInfo = ImageUrlInfo(
+        widget.arguments!['preview_url'], widget.arguments!['hd_url']!);
+    _imageList = widget.arguments!['image_list'] ?? [_initInfo];
+    _imageLoader = widget.arguments!['loader'];
+    lastIndex = widget.arguments!['last_page'] ?? 0;
+    initialIndex = showIndex = _imageList.indexOf(_initInfo);
+    controller = PageController(initialPage: initialIndex);
     heroTag = widget.arguments!['hero_tag']!;
-    safeShowingUrl = _previewUrl ?? _originalUrl;
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      unawaited(cacheOriginalImage());
-    });
   }
 
-  Future<void> cacheOriginalImage() async {
-    if (_previewUrl == null) return;
-    try {
-      await DefaultCacheManager().getSingleFile(_originalUrl);
-      setState(() => originalLoading = false);
-    } catch (e, st) {
-      setState(() {
-        originalLoading = false;
-        originalLoadFailError = ErrorPageWidget.generateUserFriendlyDescription(
-            S.of(context), e,
-            stackTrace: st);
-      });
-    }
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 
   @override
   void didUpdateWidget(ImageViewerPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    originalLoading = true;
-    originalLoadFailError = null;
+    originalLoading.clear();
+    originalLoadFailError.clear();
   }
 
   static String getFileName(String url) {
@@ -143,17 +148,22 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> shareImage() async {
-    File image = await DefaultCacheManager().getSingleFile(_originalUrl);
+    File image =
+        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isMobile) {
-      Share.shareFiles([image.absolute.path],
-          mimeTypes: [ImageViewerPage.getMineType(_originalUrl)]);
+      Share.shareFiles([
+        image.absolute.path
+      ], mimeTypes: [
+        ImageViewerPage.getMineType(_imageList[showIndex].hdUrl)
+      ]);
     } else {
       Noticing.showNotice(context, image.absolute.path);
     }
   }
 
   Future<void> saveImage() async {
-    File image = await DefaultCacheManager().getSingleFile(_originalUrl);
+    File image =
+        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isAndroid) {
       PermissionStatus status = await Permission.storage.status;
       if (!status.isGranted &&
@@ -180,23 +190,25 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       iosContentBottomPadding: false,
       iosContentPadding: true,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).image),
+        title: Text(_imageList.length == 1
+            ? S.of(context).image
+            : "${S.of(context).image} (${showIndex + 1}/${_imageList.length})"),
         trailingActions: [
-          if (originalLoading) ...[
+          if (originalLoading[_imageList[showIndex]] != false) ...[
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformCircularProgressIndicator(
                 material: (_, __) => MaterialProgressIndicatorData(
-                    color: Theme.of(context).colorScheme.secondaryVariant),
+                    color: Theme.of(context).colorScheme.surface),
               ),
             )
-          ] else if (originalLoadFailError != null) ...[
+          ] else if (originalLoadFailError[_imageList[showIndex]] != null) ...[
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: Icon(PlatformIcons(context).error),
               color: Theme.of(context).errorColor,
               onPressed: () => Noticing.showNotice(
-                  context, originalLoadFailError!,
+                  context, originalLoadFailError[_imageList[showIndex]]!,
                   title: S.of(context).fatal_error, useSnackBar: false),
             ),
           ] else ...[
@@ -217,16 +229,138 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
           ]
         ],
       ),
-      body: PhotoView(
-        gaplessPlayback: true,
-        heroAttributes: PhotoViewHeroAttributes(
-            tag: heroTag, transitionOnUserGestures: true),
-        imageProvider: originalLoading
-            ? CachedNetworkImageProvider(safeShowingUrl)
-            : CachedNetworkImageProvider(_originalUrl),
-        backgroundDecoration:
-            BoxDecoration(color: Theme.of(context).canvasColor),
+      body: NotificationListener<ImageLoadNotification>(
+        onNotification: (ImageLoadNotification notification) {
+          setState(() {
+            originalLoading[notification.imageInfo] =
+                notification.originalLoaded;
+            originalLoadFailError[notification.imageInfo] =
+                notification.originalLoadError;
+          });
+          return true;
+        },
+        child: PhotoViewGestureDetectorScope(
+          axis: Axis.horizontal,
+          child: PageView.builder(
+            controller: controller,
+            dragStartBehavior: DragStartBehavior.down,
+            itemCount: _imageList.length,
+            itemBuilder: (BuildContext context, int page) {
+              print("load page $page");
+              return ImageViewerBodyView(
+                imageInfo: _imageList[page],
+                heroTag: _initInfo == _imageList[page] ? heroTag : null,
+              );
+            },
+            onPageChanged: (int pageIndex) {
+              setState(() {
+                showIndex = pageIndex;
+              });
+              if (showIndex == _imageList.length - 1 &&
+                  _imageLoader != null &&
+                  !nextPageLoading) {
+                _imageLoader?.call(context, ++lastIndex).then((value) {
+                  setState(() => _imageList.addAll(value!));
+                }, onError: (e, st) {}).whenComplete(() {
+                  nextPageLoading = false;
+                });
+              }
+            },
+          ),
+        ),
       ),
     );
   }
 }
+
+class ImageViewerBodyView extends StatefulWidget {
+  final ImageUrlInfo imageInfo;
+  final Object? heroTag;
+
+  const ImageViewerBodyView({Key? key, required this.imageInfo, this.heroTag})
+      : super(key: key);
+
+  @override
+  _ImageViewerBodyViewState createState() => _ImageViewerBodyViewState();
+}
+
+class _ImageViewerBodyViewState extends State<ImageViewerBodyView> {
+  late String safeShowingUrl;
+  String? originalLoadFailError;
+  bool originalLoading = true;
+
+  Future<void> cacheOriginalImage() async {
+    print("Start loading originalImage ${widget.imageInfo.hdUrl}");
+    if (widget.imageInfo.thumbUrl == null) return;
+    try {
+      await DefaultCacheManager().getSingleFile(widget.imageInfo.hdUrl);
+      print("Loaded originalImage ${widget.imageInfo.hdUrl}");
+      setState(() => originalLoading = false);
+    } catch (e, st) {
+      setState(() {
+        originalLoading = false;
+        originalLoadFailError = ErrorPageWidget.generateUserFriendlyDescription(
+            S.of(context), e,
+            stackTrace: st);
+      });
+    } finally {
+      ImageLoadNotification(
+              widget.imageInfo, originalLoading, originalLoadFailError)
+          .dispatch(context);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    safeShowingUrl = widget.imageInfo.thumbUrl ?? widget.imageInfo.hdUrl;
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      unawaited(cacheOriginalImage());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PhotoView(
+      gaplessPlayback: true,
+      heroAttributes: widget.heroTag != null
+          ? PhotoViewHeroAttributes(
+              tag: widget.heroTag!, transitionOnUserGestures: true)
+          : null,
+      imageProvider: originalLoading
+          ? CachedNetworkImageProvider(safeShowingUrl)
+          : CachedNetworkImageProvider(widget.imageInfo.hdUrl),
+      backgroundDecoration: BoxDecoration(color: Theme.of(context).canvasColor),
+    );
+  }
+}
+
+class ImageLoadNotification extends Notification {
+  final ImageUrlInfo imageInfo;
+  final bool originalLoaded;
+  final String? originalLoadError;
+
+  ImageLoadNotification(
+      this.imageInfo, this.originalLoaded, this.originalLoadError);
+}
+
+class ImageUrlInfo {
+  final String? thumbUrl;
+  final String hdUrl;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageUrlInfo &&
+          runtimeType == other.runtimeType &&
+          thumbUrl == other.thumbUrl &&
+          hdUrl == other.hdUrl;
+
+  @override
+  int get hashCode => thumbUrl.hashCode ^ hdUrl.hashCode;
+
+  ImageUrlInfo(this.thumbUrl, this.hdUrl);
+}
+
+typedef ImageLoadCallback = Future<List<ImageUrlInfo>?> Function(
+    BuildContext pageContext, int pageIndex);

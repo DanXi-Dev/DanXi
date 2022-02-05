@@ -36,6 +36,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -117,6 +118,7 @@ class OTFloorWidget extends StatelessWidget {
   final int? index;
   final void Function()? onTap;
   final void Function()? onLongPress;
+  final ImageTapCallback? onTapImage;
 
   const OTFloorWidget({
     Key? key,
@@ -128,6 +130,7 @@ class OTFloorWidget extends StatelessWidget {
     this.onLongPress,
     this.parentHole,
     required this.hasBackgroundImage,
+    this.onTapImage,
   }) : super(key: key);
 
   @override
@@ -137,7 +140,7 @@ class OTFloorWidget extends StatelessWidget {
       BrowserUtil.openUrl(url!, context);
     }
 
-    void onImageTap(String? url, Object heroTag) {
+    void defaultOnImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
         'hd_url': OpenTreeHoleRepository.getInstance()
@@ -239,10 +242,10 @@ class OTFloorWidget extends StatelessWidget {
                         }
                       })
                   : smartRender(
-                      context,
+                  context,
                       floor.filteredContent ?? S.of(context).fatal_error,
                       onLinkTap,
-                      onImageTap,
+                      onTapImage ?? defaultOnImageTap,
                       hasBackgroundImage)),
         ],
       ),
