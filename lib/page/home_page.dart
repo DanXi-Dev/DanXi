@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -62,10 +61,6 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart';
-import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
-import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
-import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
-import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -427,48 +422,48 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           break;
       }
     });
-    if (PlatformX.isAndroid) {
-      XiaoMiPushPlugin.addListener((type, params) async {
-        switch (type) {
-          case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
-            if (params is MiPushMessageEntity && params.content != null) {
-              Map<String, String> obj = Uri.splitQueryString(params.content!);
-              await onTapNotification(
-                  context, obj['code'], jsonDecode(obj['data'] ?? ""));
-            }
-            break;
-          case XiaoMiPushListenerTypeEnum.RequirePermissions:
-            break;
-          case XiaoMiPushListenerTypeEnum.ReceivePassThroughMessage:
-            break;
-          case XiaoMiPushListenerTypeEnum.CommandResult:
-            break;
-          case XiaoMiPushListenerTypeEnum.ReceiveRegisterResult:
-            if (params is MiPushCommandMessageEntity &&
-                (params.commandArguments?.isNotEmpty ?? false)) {
-              String regId = params.commandArguments![0];
-              try {
-                await OpenTreeHoleRepository.getInstance()
-                    .updatePushNotificationToken(
-                        regId,
-                        await PlatformX.getUniqueDeviceId(),
-                        PushNotificationServiceType.MIPUSH);
-              } catch (e, st) {
-                Noticing.showNotice(
-                    context,
-                    S.of(context).push_notification_reg_failed_des(
-                        ErrorPageWidget.generateUserFriendlyDescription(
-                            S.of(context), e,
-                            stackTrace: st)),
-                    title: S.of(context).push_notification_reg_failed);
-              }
-            }
-            break;
-          case XiaoMiPushListenerTypeEnum.NotificationMessageArrived:
-            break;
-        }
-      });
-    }
+    // if (PlatformX.isAndroid) {
+    //   XiaoMiPushPlugin.addListener((type, params) async {
+    //     switch (type) {
+    //       case XiaoMiPushListenerTypeEnum.NotificationMessageClicked:
+    //         if (params is MiPushMessageEntity && params.content != null) {
+    //           Map<String, String> obj = Uri.splitQueryString(params.content!);
+    //           await onTapNotification(
+    //               context, obj['code'], jsonDecode(obj['data'] ?? ""));
+    //         }
+    //         break;
+    //       case XiaoMiPushListenerTypeEnum.RequirePermissions:
+    //         break;
+    //       case XiaoMiPushListenerTypeEnum.ReceivePassThroughMessage:
+    //         break;
+    //       case XiaoMiPushListenerTypeEnum.CommandResult:
+    //         break;
+    //       case XiaoMiPushListenerTypeEnum.ReceiveRegisterResult:
+    //         if (params is MiPushCommandMessageEntity &&
+    //             (params.commandArguments?.isNotEmpty ?? false)) {
+    //           String regId = params.commandArguments![0];
+    //           try {
+    //             await OpenTreeHoleRepository.getInstance()
+    //                 .updatePushNotificationToken(
+    //                     regId,
+    //                     await PlatformX.getUniqueDeviceId(),
+    //                     PushNotificationServiceType.MIPUSH);
+    //           } catch (e, st) {
+    //             Noticing.showNotice(
+    //                 context,
+    //                 S.of(context).push_notification_reg_failed_des(
+    //                     ErrorPageWidget.generateUserFriendlyDescription(
+    //                         S.of(context), e,
+    //                         stackTrace: st)),
+    //                 title: S.of(context).push_notification_reg_failed);
+    //           }
+    //         }
+    //         break;
+    //       case XiaoMiPushListenerTypeEnum.NotificationMessageArrived:
+    //         break;
+    //     }
+    //   });
+    // }
 
     screenListener.addScreenRecordListener((recorded) {
       if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {

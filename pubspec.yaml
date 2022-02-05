@@ -19,10 +19,10 @@ dependencies:
     git:
       url: git://github.com/singularity-s0/flutter_progress_dialog.git
       ref: master
-  xiao_mi_push_plugin:
-    git:
-      url: git://github.com/w568w/FlutterXiaoMiPushPlugin.git
-      ref: master
+  #  xiao_mi_push_plugin:
+  #    git:
+  #      url: git://github.com/w568w/FlutterXiaoMiPushPlugin.git
+  #      ref: master
   beautiful_soup_dart: ^0.2.0
   quick_actions: ^0.6.0+9
   qr_flutter: ^4.0.0

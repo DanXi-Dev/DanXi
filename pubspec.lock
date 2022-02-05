@@ -1474,15 +1474,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.2.0+1"
-  xiao_mi_push_plugin:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "6f3ab002930444e2f4a79ba6907f862c35d6f9ef"
-      url: "git://github.com/w568w/FlutterXiaoMiPushPlugin.git"
-    source: git
-    version: "2.0.0"
   xml:
     dependency: transitive
     description:

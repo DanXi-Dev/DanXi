@@ -56,7 +56,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -163,8 +162,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html"),
     LicenseItem("gallery_saver", LICENSE_APACHE_2_0,
         "https://github.com/CarnegieTechnologies/gallery_saver"),
-    LicenseItem("xiao_mi_push_plugin", LICENSE_APACHE_2_0,
-        "https://github.com/w568w/FlutterXiaoMiPushPlugin"),
+    // LicenseItem("xiao_mi_push_plugin", LICENSE_APACHE_2_0,
+    //     "https://github.com/w568w/FlutterXiaoMiPushPlugin"),
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
     LicenseItem(
         "ical", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dartclub/ical"),
@@ -1100,89 +1099,89 @@ class OTNotificationSettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (PlatformX.isApplePlatform || PlatformX.isAndroid) {
-      final loadingBuilder = ListTile(
-          title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
-          subtitle: Text(S.of(context).loading),
-          onTap: () => parentSetStateFunction());
-      final errorBuilder = ListTile(
-          title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
-          subtitle: Text(S.of(context).fatal_error),
-          onTap: () => parentSetStateFunction());
-      return FutureWidget<bool>(
-          future: Permission.notification.isGranted,
-          successBuilder:
-              (BuildContext context, AsyncSnapshot<bool> permissionSnapshot) {
-            if (permissionSnapshot.data == true) {
-              if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
-                return ListTile(
-                  title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
-                  subtitle: Text(S.of(context).not_logged_in),
-                  onTap: () => parentSetStateFunction(),
-                );
-              }
-
-              return FutureWidget<OTUser?>(
-                future: OpenTreeHoleRepository.getInstance().getUserProfile(),
-                successBuilder:
-                    (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
-                        ListTile(
-                  title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
-                  subtitle: Text(_generateNotificationSettingsSummary(
-                      context, snapshot.data?.config?.notify)),
-                  onTap: () {
-                    showPlatformModalSheet(
-                      context: context,
-                      builder: (BuildContext context) {
-                        const Widget body = Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: OTNotificationSettingsWidget());
-                        if (PlatformX.isCupertino(context)) {
-                          return const SafeArea(child: Card(child: body));
-                        } else {
-                          return const SafeArea(child: body);
-                        }
-                      },
-                    ).then((value) => parentSetStateFunction());
-                  },
-                ),
-                errorBuilder: errorBuilder,
-                loadingBuilder: loadingBuilder,
-              );
-            } else {
-              return ListTile(
-                  title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
-                  subtitle: Text(S.of(context).unauthorized),
-                  onTap: () {
-                    parentSetStateFunction();
-                  });
-            }
-          },
-          errorBuilder: errorBuilder,
-          loadingBuilder: loadingBuilder);
-    } else {
-      return ListTile(
-          title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
-          subtitle: Text(S.of(context).unsupported),
-          enabled: false);
-    }
+    // if (PlatformX.isApplePlatform || PlatformX.isAndroid) {
+    //   final loadingBuilder = ListTile(
+    //       title: Text(S.of(context).notification_settings),
+    //       leading: PlatformX.isMaterial(context)
+    //           ? const Icon(Icons.notifications)
+    //           : const Icon(CupertinoIcons.bell),
+    //       subtitle: Text(S.of(context).loading),
+    //       onTap: () => parentSetStateFunction());
+    //   final errorBuilder = ListTile(
+    //       title: Text(S.of(context).notification_settings),
+    //       leading: PlatformX.isMaterial(context)
+    //           ? const Icon(Icons.notifications)
+    //           : const Icon(CupertinoIcons.bell),
+    //       subtitle: Text(S.of(context).fatal_error),
+    //       onTap: () => parentSetStateFunction());
+    //   return FutureWidget<bool>(
+    //       future: Permission.notification.isGranted,
+    //       successBuilder:
+    //           (BuildContext context, AsyncSnapshot<bool> permissionSnapshot) {
+    //         if (permissionSnapshot.data == true) {
+    //           if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+    //             return ListTile(
+    //               title: Text(S.of(context).notification_settings),
+    //               leading: PlatformX.isMaterial(context)
+    //                   ? const Icon(Icons.notifications)
+    //                   : const Icon(CupertinoIcons.bell),
+    //               subtitle: Text(S.of(context).not_logged_in),
+    //               onTap: () => parentSetStateFunction(),
+    //             );
+    //           }
+    //
+    //           return FutureWidget<OTUser?>(
+    //             future: OpenTreeHoleRepository.getInstance().getUserProfile(),
+    //             successBuilder:
+    //                 (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
+    //                     ListTile(
+    //               title: Text(S.of(context).notification_settings),
+    //               leading: PlatformX.isMaterial(context)
+    //                   ? const Icon(Icons.notifications)
+    //                   : const Icon(CupertinoIcons.bell),
+    //               subtitle: Text(_generateNotificationSettingsSummary(
+    //                   context, snapshot.data?.config?.notify)),
+    //               onTap: () {
+    //                 showPlatformModalSheet(
+    //                   context: context,
+    //                   builder: (BuildContext context) {
+    //                     const Widget body = Padding(
+    //                         padding: EdgeInsets.all(16.0),
+    //                         child: OTNotificationSettingsWidget());
+    //                     if (PlatformX.isCupertino(context)) {
+    //                       return const SafeArea(child: Card(child: body));
+    //                     } else {
+    //                       return const SafeArea(child: body);
+    //                     }
+    //                   },
+    //                 ).then((value) => parentSetStateFunction());
+    //               },
+    //             ),
+    //             errorBuilder: errorBuilder,
+    //             loadingBuilder: loadingBuilder,
+    //           );
+    //         } else {
+    //           return ListTile(
+    //               title: Text(S.of(context).notification_settings),
+    //               leading: PlatformX.isMaterial(context)
+    //                   ? const Icon(Icons.notifications)
+    //                   : const Icon(CupertinoIcons.bell),
+    //               subtitle: Text(S.of(context).unauthorized),
+    //               onTap: () {
+    //                 parentSetStateFunction();
+    //               });
+    //         }
+    //       },
+    //       errorBuilder: errorBuilder,
+    //       loadingBuilder: loadingBuilder);
+    // } else {
+    return ListTile(
+        title: Text(S.of(context).notification_settings),
+        leading: PlatformX.isMaterial(context)
+            ? const Icon(Icons.notifications)
+            : const Icon(CupertinoIcons.bell),
+        subtitle: Text(S.of(context).unsupported),
+        enabled: false);
+    // }
   }
 }
