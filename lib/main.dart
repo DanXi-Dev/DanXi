@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -48,6 +49,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +93,7 @@ void main() {
 
   // Init Feature registration.
   FeatureMap.registerAllFeatures();
+  unawaited(ScreenProxy.init());
   SettingsProvider.getInstance().init().then((_) {
     // Initialize Ad only if user has opted-in to save resources
     // If user decides to opt-in after the app has started,
