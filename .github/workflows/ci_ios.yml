@@ -55,6 +55,7 @@ jobs:
       - name: Import Keys
         run: |
           echo -n "${{ secrets.MATCH_SSH_KEY_BASE64 }}" | base64 -d -o $HOME/match_ssh_key
+          chmod 400 $HOME/match_ssh_key
           export MATCH_GIT_PRIVATE_KEY=$HOME/match_ssh_key
 
       - name: Import Secrets
