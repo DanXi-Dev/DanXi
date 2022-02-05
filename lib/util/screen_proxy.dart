@@ -18,6 +18,10 @@
 import 'package:screen_brightness/screen_brightness.dart';
 
 class ScreenProxy {
+  static Future<void> init() async {
+    await ScreenBrightness().setAutoReset(false);
+  }
+
   static Future<double?> get brightness async {
     return await ScreenBrightness().current;
   }

@@ -2,8 +2,6 @@ import UIKit
 import Flutter
 import WatchConnectivity
 
-@available(iOS 9.3, *)
-
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, WCSessionDelegate {
     let defaults = UserDefaults.standard
@@ -60,15 +58,9 @@ import WatchConnectivity
     override func application(_ application: UIApplication,
                               didFailToRegisterForRemoteNotificationsWithError
                               error: Error) {
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().getNotificationSettings { settings in
-                guard (settings.authorizationStatus == .authorized) ||
-                        (settings.authorizationStatus == .notDetermined) else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
-                    application.registerForRemoteNotifications()
-                }
-            }
-        } else {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard (settings.authorizationStatus == .authorized) ||
+                    (settings.authorizationStatus == .notDetermined) else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
                 application.registerForRemoteNotifications()
             }
@@ -105,9 +97,7 @@ import WatchConnectivity
             }
         })
         
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self
-        }
+        UNUserNotificationCenter.current().delegate = self
         // Clear badge on launch
         UIApplication.shared.applicationIconBadgeNumber = 0
         
@@ -131,8 +121,7 @@ import WatchConnectivity
     }
 }
 
-@available(iOS 10.0, *)
-extension AppDelegate: UNUserNotificationCenterDelegate {
+extension AppDelegate {
     
     // This function will be called when the app receive notification
     // This override is necessary to display notification while app is in foreground
@@ -146,12 +135,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let controller = window.rootViewController as? FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller! as! FlutterBinaryMessenger)
         /*let application = UIApplication.shared
-        if (application.applicationState == .active) {
-            print("user tapped the notification bar when the app is in foreground")
-        }
-        else if (application.applicationState == .inactive) {
-            print("user tapped the notification bar when the app is in background")
-        }*/
+         if (application.applicationState == .active) {
+         print("user tapped the notification bar when the app is in foreground")
+         }
+         else if (application.applicationState == .inactive) {
+         print("user tapped the notification bar when the app is in background")
+         }*/
         channel.invokeMethod("launch_from_notification", arguments: response.notification.request.content.userInfo)
         completionHandler()
     }
