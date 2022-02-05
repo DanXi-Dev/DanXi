@@ -73,7 +73,7 @@ jobs:
       - name: Configure Xcode
         run: flutter build ios --release --config-only #--bundle-sksl-path CI/sksl_default.json
 
-      - name: Fastlane Action
+      - name: Build and Upload via Fastlane
         uses: maierj/fastlane-action@v2.1.0
         with:
           lane: 'beta'
@@ -81,11 +81,6 @@ jobs:
           skip-tracking: true
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        
-      - uses: actions/checkout@v2
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
         
       - name: Push Build Number Update
         run: git push origin main

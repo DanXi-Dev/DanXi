@@ -132,7 +132,7 @@ PODS:
   - PromisesObjC (2.0.0)
   - quick_actions (0.0.1):
     - Flutter
-  - screen_brightness_ios (0.0.4):
+  - screen_brightness_ios (0.0.5):
     - Flutter
   - screen_capture_event (0.0.1):
     - Flutter
@@ -288,7 +288,7 @@ SPEC CHECKSUMS:
   platform_device_id: 81b3e2993881f87d0c82ef151dc274df4869aef5
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   quick_actions: cd83314083fa994182e6cd9e7516167a215a4f83
-  screen_brightness_ios: e5f17b7c7a48abc4350c0143c6d9b1420fe064b9
+  screen_brightness_ios: dd110ebfe9602013ea863d59770a9192ebbb7ac7
   screen_capture_event: bcf965bb31968a51c08ad3698725c5ad8c597124
   SDWebImage: 4dc3e42d9ec0c1028b960a33ac6b637bb432207b
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
@@ -298,6 +298,6 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher_ios: 02f1989d4e14e998335b02b67a7590fa34f971af
 
-PODFILE CHECKSUM: 4e1466f43a4ae70755a9c51f70ac455bcfc02830
+PODFILE CHECKSUM: 402ca1dbc65ab091f9caa450e4fdf6d5665fc06e
 
 COCOAPODS: 1.11.2
