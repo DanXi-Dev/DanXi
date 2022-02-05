@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -28,8 +27,8 @@ class AdManager {
       : Constant.ADMOB_APP_ID_IOS;
 
   static get unitIdList => PlatformX.isAndroid
-      ? Secret.ADMOB_UNIT_ID_LIST_ANDROID
-      : Secret.ADMOB_UNIT_ID_LIST_IOS;
+      ? Constant.ADMOB_UNIT_ID_LIST_ANDROID
+      : Constant.ADMOB_UNIT_ID_LIST_IOS;
 
   /// Initialize the banner Ad
   ///

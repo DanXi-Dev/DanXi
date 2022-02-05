@@ -19,7 +19,6 @@ import 'dart:ui';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:catcher/catcher.dart';
-import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
@@ -81,7 +80,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Init Bmob database.
-  Bmob.init("https://api2.bmob.cn", Secret.APP_ID, Secret.API_KEY);
+  Bmob.init(
+      "https://api2.bmob.cn", Constant.BMOB_APP_ID, Constant.BMOB_API_KEY);
 
   // Init Mi push Service.
   if (PlatformX.isAndroid) {

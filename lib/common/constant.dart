@@ -30,12 +30,31 @@ class Constant {
   static const POST_COUNT_PER_PAGE = 10;
   static const bool IS_PRODUCTION_ENVIRONMENT =
       bool.fromEnvironment('dart.vm.product');
+
+  static const BMOB_APP_ID = "d651f7399053222e2b4d2575f7ca8ddb";
+  static const BMOB_API_KEY = "bd9e3d90d593c053d4832c817b620890";
+
   static const String APPSTORE_APPID = '1568629997';
 
   static const String ADMOB_APP_ID_ANDROID =
       "ca-app-pub-4420475240805528~7573357474";
   static const String ADMOB_APP_ID_IOS =
       "ca-app-pub-4420475240805528~1122982272";
+
+  /// One unit id for each Ad placement.
+  /// Respectively, Dashboard, TreeHole, Agenda, Settings.
+  static const List<String> ADMOB_UNIT_ID_LIST_ANDROID = [
+    "ca-app-pub-4420475240805528/9095994576",
+    "ca-app-pub-4420475240805528/5760203038",
+    "ca-app-pub-4420475240805528/9738976495",
+    "ca-app-pub-4420475240805528/4447121366",
+  ];
+  static const List<String> ADMOB_UNIT_ID_LIST_IOS = [
+    "ca-app-pub-4420475240805528/6845054570",
+    "ca-app-pub-4420475240805528/6065507131",
+    "ca-app-pub-4420475240805528/6308694497",
+    "ca-app-pub-4420475240805528/4752425464",
+  ];
 
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://www.fduhole.com/#/forgetpassword";
