@@ -16,10 +16,8 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdManager {
   static get appId => PlatformX.isAndroid
@@ -48,30 +46,7 @@ class AdManager {
   static BannerAd? loadBannerAd(int index) {
     if (!PlatformX.isMobile) return null;
 
-    BannerAd bannerAd;
-    final BannerAdListener listener = BannerAdListener(
-      // Called when an ad is successfully received.
-      onAdLoaded: (Ad ad) {},
-      // Called when an ad request failed.
-      onAdFailedToLoad: (Ad ad, LoadAdError error) {
-        // Dispose the ad here to free resources.
-        ad.dispose();
-      },
-      // Called when an ad opens an overlay that covers the screen.
-      onAdOpened: (Ad ad) {},
-      // Called when an ad removes an overlay that covers the screen.
-      onAdClosed: (Ad ad) {},
-      // Called when an impression occurs on the ad.
-      onAdImpression: (Ad ad) {},
-    );
-    bannerAd = BannerAd(
-      adUnitId: unitIdList[index],
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: listener,
-    );
-    bannerAd.load();
-    return bannerAd;
+    return const BannerAd();
   }
 }
 
@@ -85,20 +60,16 @@ class AutoBannerAdWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (SettingsProvider.getInstance().isAdEnabled &&
-        bannerAd != null &&
-        bannerAd!.responseInfo?.responseId != null) {
-      const double padding = 8.0;
-      return Center(
-        child: Container(
-          padding: const EdgeInsets.only(bottom: padding),
-          alignment: Alignment.center,
-          child: AdWidget(ad: bannerAd!),
-          width: bannerAd!.size.width.toDouble(),
-          height: bannerAd!.size.height.toDouble() + padding,
-        ),
-      );
-    }
     return const SizedBox();
+  }
+}
+
+/// Dummy BannerAd
+class BannerAd extends StatelessWidget {
+  const BannerAd({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }

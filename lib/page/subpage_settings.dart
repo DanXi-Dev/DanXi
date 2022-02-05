@@ -55,7 +55,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -112,8 +111,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/flutter/plugins/tree/master/packages/image_picker/image_picker"),
     LicenseItem("Kotlin Stdlib Jdk7", LICENSE_APACHE_2_0,
         "https://github.com/JetBrains/kotlin"),
-    LicenseItem("google_mobile_ads", LICENSE_APACHE_2_0,
-        "https://github.com/googleads/googleads-mobile-flutter"),
+    // LicenseItem("google_mobile_ads", LICENSE_APACHE_2_0,
+    //     "https://github.com/googleads/googleads-mobile-flutter"),
     LicenseItem("auto_size_text", LICENSE_MIT,
         "https://github.com/leisim/auto_size_text"),
     LicenseItem("beautiful_soup_dart", LICENSE_MIT,
@@ -414,29 +413,29 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ),
 
                     // Sponsor Option
-                    if (PlatformX.isMobile)
-                      Card(
-                        child: ListTile(
-                          isThreeLine:
-                              !SettingsProvider.getInstance().isAdEnabled,
-                          leading: Icon(
-                            PlatformIcons(context).heartSolid,
-                          ),
-                          title: Text(S.of(context).sponsor_us),
-                          subtitle: Text(
-                              SettingsProvider.getInstance().isAdEnabled
-                                  ? S.of(context).sponsor_us_enabled
-                                  : S.of(context).sponsor_us_disabled),
-                          onTap: () async {
-                            if (SettingsProvider.getInstance().isAdEnabled) {
-                              _toggleAdDisplay();
-                            } else {
-                              _toggleAdDisplay();
-                              await _showAdsThankDialog();
-                            }
-                          },
-                        ),
-                      ),
+                    // if (PlatformX.isMobile)
+                    //   Card(
+                    //     child: ListTile(
+                    //       isThreeLine:
+                    //           !SettingsProvider.getInstance().isAdEnabled,
+                    //       leading: Icon(
+                    //         PlatformIcons(context).heartSolid,
+                    //       ),
+                    //       title: Text(S.of(context).sponsor_us),
+                    //       subtitle: Text(
+                    //           SettingsProvider.getInstance().isAdEnabled
+                    //               ? S.of(context).sponsor_us_enabled
+                    //               : S.of(context).sponsor_us_disabled),
+                    //       onTap: () async {
+                    //         if (SettingsProvider.getInstance().isAdEnabled) {
+                    //           _toggleAdDisplay();
+                    //         } else {
+                    //           _toggleAdDisplay();
+                    //           await _showAdsThankDialog();
+                    //         }
+                    //       },
+                    //     ),
+                    //   ),
 
                     // About
                     _buildAboutCard(context)
