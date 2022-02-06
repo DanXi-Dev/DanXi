@@ -351,7 +351,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                           onPressed: () =>
                                               Navigator.of(context).pop()))),
                         ),
-                        const SemesterSelectionTile()
                       ]),
                     ),
 
@@ -359,6 +358,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     Card(
                       child: SwitchListTile.adaptive(
                         title: Text(S.of(context).accessibility_coloring),
+                        subtitle:
+                            Text(S.of(context).high_contrast_color_description),
                         secondary: const Icon(Icons.accessibility_new_rounded),
                         value: SettingsProvider.getInstance()
                             .useAccessibilityColoring,
@@ -947,92 +948,6 @@ class Developer {
   final String url;
 
   const Developer(this.name, this.imageUrl, this.url, this.description);
-}
-
-class SemesterSelectionTile extends StatefulWidget {
-  const SemesterSelectionTile({Key? key}) : super(key: key);
-
-  @override
-  _SemesterSelectionTileState createState() => _SemesterSelectionTileState();
-}
-
-class _SemesterSelectionTileState extends State<SemesterSelectionTile> {
-  List<SemesterInfo>? _semesterInfo;
-  SemesterInfo? _selectionInfo;
-  late Future<void> _future;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = LazyFuture.pack(loadSemesterInfo());
-  }
-
-  Future<void> loadSemesterInfo() async {
-    _semesterInfo = await EduServiceRepository.getInstance()
-        .loadSemesters(StateProvider.personInfo.value);
-    String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
-    if (chosenSemester == null || chosenSemester.isEmpty) {
-      chosenSemester = await TimeTableRepository.getInstance()
-          .getDefaultSemesterId(StateProvider.personInfo.value);
-    }
-    _selectionInfo = _semesterInfo!
-        .firstWhere((element) => element.semesterId == chosenSemester!);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureWidget<void>(
-        future: _future,
-        nullable: true,
-        successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          return ListTile(
-            leading: Icon(PlatformX.isMaterial(context)
-                ? Icons.event_available
-                : CupertinoIcons.calendar),
-            title: Text(S.of(context).select_semester),
-            subtitle:
-                Text("${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
-            onTap: () => showPlatformModalSheet(
-                context: context,
-                builder: (menuContext) => SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _semesterInfo!
-                            .map((e) => ListTile(
-                                selected:
-                                    e.semesterId == _selectionInfo?.semesterId,
-                                onTap: () {
-                                  Navigator.of(menuContext).pop();
-                                  SettingsProvider.getInstance()
-                                      .timetableSemester = e.semesterId;
-                                  setState(() {
-                                    _selectionInfo = e;
-                                  });
-                                },
-                                title: Text("${e.schoolYear} ${e.name!}")))
-                            .toList(),
-                      ),
-                    )),
-          );
-        },
-        errorBuilder: () => ListTile(
-              leading: Icon(PlatformX.isMaterial(context)
-                  ? Icons.event_available
-                  : CupertinoIcons.calendar),
-              title: Text(S.of(context).select_semester),
-              subtitle: Text(S.of(context).failed),
-              onTap: () => setState(() {
-                _future = LazyFuture.pack(loadSemesterInfo());
-              }),
-            ),
-        loadingBuilder: () => ListTile(
-              leading: Icon(PlatformX.isMaterial(context)
-                  ? Icons.event_available
-                  : CupertinoIcons.calendar),
-              title: Text(S.of(context).select_semester),
-              subtitle: Text(S.of(context).loading),
-            ));
-  }
 }
 
 class OTNotificationSettingsWidget extends StatefulWidget {

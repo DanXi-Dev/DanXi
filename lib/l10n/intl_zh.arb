@@ -367,5 +367,6 @@
   "minute_ago": "{num}分钟前",
   "hour_ago": "{num}小时前",
   "day_ago": "{num}天前",
-  "select_semester": "选择课表学期"
+  "select_semester": "选择课表学期",
+  "high_contrast_color_description": "空教室查询和 FDUHole 标签将使用高对比度颜色"
 }

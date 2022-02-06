@@ -330,6 +330,7 @@
     "background_image_description": "Choose an image as FDUHole background",
     "already_set": "Already Set",
     "background_image_already_set": "A background image is already set, do you wish to remove it?",
+    "high_contrast_color_description": "Empty Classroom View and FDUHole Tags will use high contrast colors",
 
     "sponsor_us": "Support Us 🍀",
     "sponsor_us_detail": "Thank you so much for your kindness to enable it! Danxi and FDUHole have been operating as independent projects for a long time. However, in the long run, we are a bit overwhelmed by the high server costs.\n\nRather than direct donations, we chose a more modest way - to display some ads provided by Google in Danxi. These ads won't interfere with your browsing, but they will bring us real income and motivate us to keep going.",
