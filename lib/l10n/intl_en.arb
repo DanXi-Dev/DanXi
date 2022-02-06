@@ -330,6 +330,7 @@
     "background_image_description": "Choose an image as FDUHole background",
     "already_set": "Already Set",
     "background_image_already_set": "A background image is already set, do you wish to remove it?",
+    "high_contrast_color_description": "Empty Classroom View and FDUHole Tags will use high contrast colors",
 
     "sponsor_us": "Support Us 🍀",
     "sponsor_us_detail": "Thank you so much for your kindness to enable it! Danxi and FDUHole have been operating as independent projects for a long time. However, in the long run, we are a bit overwhelmed by the high server costs.\n\nRather than direct donations, we chose a more modest way - to display some ads provided by Google in Danxi. These ads won't interfere with your browsing, but they will bring us real income and motivate us to keep going.",
@@ -360,6 +361,7 @@
     "credentials_invalid": "Invalid username or password",
     "captcha_needed": "Captcha needed, please following the on-screen instructions.",
     "weak_password": "Login failed. Unknown error.\nNote: DanXi does not support weak password. If UIS warns of weak password at login, please change your password at UIS Portal and try again.",
+    "under_maintenance": "Unable to connect to the Fudan Campus Intranet, so we cannot log in now.\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet.",
     "fail_to_acquire_qr": "Failed to obtain QR code. Please make sure you have activated the QR code in eHall.",
     "error_detail": "Show detail",
     "unknown_error": "Unknown Error",

@@ -24,7 +24,9 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -70,7 +72,13 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
             Icon(PlatformX.isMaterial(cxt)
                 ? Icons.share
                 : CupertinoIcons.square_arrow_up),
-            () => ShareTimetableEvent().fire())
+            () => ShareTimetableEvent().fire()),
+      ];
+
+  @override
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+        AppBarButtonItem(
+            S.of(cxt).select_semester, const SemesterSelectionButton(), null)
       ];
 }
 
@@ -342,5 +350,83 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         ),
       ),
     );
+  }
+}
+
+class SemesterSelectionButton extends StatefulWidget {
+  const SemesterSelectionButton({Key? key}) : super(key: key);
+
+  @override
+  _SemesterSelectionButtonState createState() =>
+      _SemesterSelectionButtonState();
+}
+
+class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
+  List<SemesterInfo>? _semesterInfo;
+  SemesterInfo? _selectionInfo;
+  late Future<void> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = LazyFuture.pack(loadSemesterInfo());
+  }
+
+  Future<void> loadSemesterInfo() async {
+    _semesterInfo = await EduServiceRepository.getInstance()
+        .loadSemesters(StateProvider.personInfo.value);
+    String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
+    if (chosenSemester == null || chosenSemester.isEmpty) {
+      chosenSemester = await TimeTableRepository.getInstance()
+          .getDefaultSemesterId(StateProvider.personInfo.value);
+    }
+    _selectionInfo = _semesterInfo!
+        .firstWhere((element) => element.semesterId == chosenSemester!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureWidget<void>(
+        future: _future,
+        nullable: true,
+        successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          return PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon:
+                Text("${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
+            onPressed: () => showPlatformModalSheet(
+                context: context,
+                builder: (menuContext) => SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: _semesterInfo!
+                            .map((e) => ListTile(
+                                selected:
+                                    e.semesterId == _selectionInfo?.semesterId,
+                                onTap: () {
+                                  Navigator.of(menuContext).pop();
+                                  SettingsProvider.getInstance()
+                                      .timetableSemester = e.semesterId;
+                                  setState(() {
+                                    _selectionInfo = e;
+                                  });
+                                },
+                                title: Text("${e.schoolYear} ${e.name!}")))
+                            .toList(),
+                      ),
+                    )),
+          );
+        },
+        errorBuilder: () => PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Text(S.of(context).failed),
+              onPressed: () => setState(() {
+                _future = LazyFuture.pack(loadSemesterInfo());
+              }),
+            ),
+        loadingBuilder: () => PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Text(S.of(context).loading),
+            ));
   }
 }

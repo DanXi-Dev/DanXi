@@ -31,6 +31,7 @@ class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
   static const String CREDENTIALS_INVALID = "密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
+  static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
 
   /// Log in Fudan UIS system and return the response.
   ///
@@ -108,6 +109,8 @@ class UISLoginTool {
       // Notify [main.dart] to show up a dialog to guide users to log in manually.
       CaptchaNeededException().fire();
       throw CaptchaNeededException();
+    } else if (response.data.toString().contains(UNDER_MAINTENANCE)) {
+      throw NetworkMaintenanceException();
     } else if (response.data.toString().contains(WEAK_PASSWORD)) {
       throw GeneralLoginFailedException();
     }
@@ -121,5 +124,7 @@ class UISLoginTool {
 class CaptchaNeededException implements Exception {}
 
 class CredentialsInvalidException implements Exception {}
+
+class NetworkMaintenanceException implements Exception {}
 
 class GeneralLoginFailedException implements Exception {}

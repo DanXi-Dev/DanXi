@@ -346,6 +346,7 @@
   "credentials_invalid": "您输入的用户名或密码有误",
   "captcha_needed": "需要输入验证码，请遵循屏幕上的提示。",
   "weak_password": "登录失败，未知错误\n请注意：如果在登录 UIS 时总是提示密码较弱，请尝试修改密码后重试。",
+  "under_maintenance": "无法连接到复旦内部网络。\n你可以使用校园 VPN (Easy Connect) 在校外访问校园网。",
   "fail_to_acquire_qr": "无法获取复活码，请确保您已在 eHall 中开通复活码。",
   "error_detail": "详细信息",
   "unknown_error": "未知错误",
@@ -367,5 +368,6 @@
   "minute_ago": "{num}分钟前",
   "hour_ago": "{num}小时前",
   "day_ago": "{num}天前",
-  "select_semester": "选择课表学期"
+  "select_semester": "选择课表学期",
+  "high_contrast_color_description": "空教室查询和 FDUHole 标签将使用高对比度颜色"
 }

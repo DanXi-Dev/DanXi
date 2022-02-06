@@ -368,7 +368,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
         TextField(
           controller: _usernameController,
           decoration: InputDecoration(
-              labelText: S.of(context).login_uis_uid,
+              labelText: S.of(context).email,
               icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.perm_identity)
                   : const Icon(CupertinoIcons.person_crop_circle)),
@@ -377,7 +377,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           controller: _passwordController,
           obscureText: true,
           decoration: InputDecoration(
-            labelText: S.of(context).login_uis_pwd,
+            labelText: S.of(context).password,
             icon: PlatformX.isMaterial(context)
                 ? const Icon(Icons.lock_outline)
                 : const Icon(CupertinoIcons.lock_circle),
