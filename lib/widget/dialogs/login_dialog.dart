@@ -122,7 +122,7 @@ class _LoginDialogState extends State<LoginDialog> {
           try {
             await CardRepository.getInstance().init(newInfo);
             newInfo.name = await CardRepository.getInstance().getName();
-            if (newInfo.name?.isNotEmpty == true) {
+            if (newInfo.name?.isEmpty ?? true) {
               throw GeneralLoginFailedException();
             }
             await _deleteAllData();
@@ -171,6 +171,8 @@ class _LoginDialogState extends State<LoginDialog> {
         _errorText = S.of(context).credentials_invalid;
       } else if (error is CaptchaNeededException) {
         _errorText = S.of(context).captcha_needed;
+      } else if (error is NetworkMaintenanceException) {
+        _errorText = S.of(context).under_maintenance;
       } else if (error is GeneralLoginFailedException) {
         _errorText = S.of(context).weak_password;
       } else {

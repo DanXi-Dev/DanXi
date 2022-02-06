@@ -360,6 +360,7 @@
     "credentials_invalid": "Invalid username or password",
     "captcha_needed": "Captcha needed, please following the on-screen instructions.",
     "weak_password": "Login failed. Unknown error.\nNote: DanXi does not support weak password. If UIS warns of weak password at login, please change your password at UIS Portal and try again.",
+    "under_maintenance": "Unable to connect to the Fudan Campus Intranet, so we cannot log in now.\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet.",
     "fail_to_acquire_qr": "Failed to obtain QR code. Please make sure you have activated the QR code in eHall.",
     "error_detail": "Show detail",
     "unknown_error": "Unknown Error",
