@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.4+141';
+const String version = r'1.3.5+143';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,16 +49,16 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 4;
+const int patch = 5;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'141'];
+const List<String> build = <String>[r'143'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1643386763;
+const int timestamp = 1644125398;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -162,6 +162,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'lunar': r'^1.2.15',
   'animated_text_kit': r'^4.2.1',
   'flutter_fgbg': r'^0.1.0',
+  'lazy_load_indexed_stack': r'^0.1.2',
 };
 
 /// Developer dependencies

@@ -151,10 +151,10 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
     if (trailingItems.isNotEmpty) {
       trailingButtons = trailingItems
           .map((e) => PlatformIconButton(
-          material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
-          padding: EdgeInsets.zero,
-          icon: e.widget,
-          onPressed: e.onPressed))
+              material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
+              padding: EdgeInsets.zero,
+              icon: e.widget,
+              onPressed: e.onPressed))
           .toList();
     }
     return PrimaryScrollController(
@@ -182,7 +182,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
 class AppBarButtonItem {
   final String caption;
   final Widget widget;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   AppBarButtonItem(this.caption, this.widget, this.onPressed);
 }
