@@ -40,6 +40,7 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -398,7 +399,7 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
             onPressed: () => showPlatformModalSheet(
               context: context,
-              builder: (menuContext) => Material(
+              builder: (menuContext) => ThemedMaterial(
                   child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

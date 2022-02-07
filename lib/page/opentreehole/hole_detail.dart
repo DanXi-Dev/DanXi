@@ -35,6 +35,7 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -614,11 +615,13 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               context: context,
               builder: (BuildContext context) => PlatformAlertDialog(
                 title: const Text("Select hole tags/division"),
-                content: Column(
-                  children: [
-                    divisionOptionsView,
-                    OTTagSelector(initialTags: newTagsList),
-                  ],
+                content: ThemedMaterial(
+                  child: Column(
+                    children: [
+                      divisionOptionsView,
+                      OTTagSelector(initialTags: newTagsList),
+                    ],
+                  ),
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
