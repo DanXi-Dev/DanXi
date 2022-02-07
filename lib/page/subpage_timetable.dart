@@ -397,31 +397,32 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
             icon: AutoSizeText(
                 "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
             onPressed: () => showPlatformModalSheet(
-                context: context,
-                builder: (menuContext) => SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _semesterInfo!.map((e) {
-                          final body = ListTile(
-                              selected:
-                                  e.semesterId == _selectionInfo?.semesterId,
-                              onTap: () {
-                                Navigator.of(menuContext).pop();
-                                SettingsProvider.getInstance()
-                                    .timetableSemester = e.semesterId;
-                                setState(() {
-                                  _selectionInfo = e;
-                                });
-                              },
-                              title: Text("${e.schoolYear} ${e.name!}"));
-                          if (PlatformX.isCupertino(context)) {
-                            return Material(child: body);
-                          } else {
-                            return body;
-                          }
-                        }).toList(),
-                      ),
-                    )),
+              context: context,
+              builder: (menuContext) => Material(
+                  child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _semesterInfo!.map((e) {
+                    final body = ListTile(
+                        selected: e.semesterId == _selectionInfo?.semesterId,
+                        onTap: () {
+                          Navigator.of(menuContext).pop();
+                          SettingsProvider.getInstance().timetableSemester =
+                              e.semesterId;
+                          setState(() {
+                            _selectionInfo = e;
+                          });
+                        },
+                        title: Text("${e.schoolYear} ${e.name!}"));
+                    if (PlatformX.isCupertino(context)) {
+                      return Material(child: body);
+                    } else {
+                      return body;
+                    }
+                  }).toList(),
+                ),
+              )),
+            ),
           );
         },
         errorBuilder: () => PlatformIconButton(
