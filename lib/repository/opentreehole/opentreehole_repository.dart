@@ -613,6 +613,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminFoldFloor(List<String> fold, int? floorId) async {
+    return (await dio!.put(_BASE_URL + "/floors/$floorId",
+            data: {"fold": fold}, options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {

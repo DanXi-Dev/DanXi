@@ -357,17 +357,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           await OpenTreeHoleRepository.getInstance()
               .setFavorite(
                   _isFavored! ? SetFavoriteMode.ADD : SetFavoriteMode.DELETE,
-              _hole.hole_id)
+                  _hole.hole_id)
               .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
-                title: S
-                    .of(context)
-                    .operation_failed, useSnackBar: false);
+                title: S.of(context).operation_failed, useSnackBar: false);
             setState(() => _isFavored = !_isFavored!);
             return null;
           });
         },
-  );
+      );
 
   List<OTTag> deepCopyTagList(List<OTTag> list) =>
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
@@ -377,7 +375,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
             .adminAddPenalty(
-            e.floor_id, level, TreeHoleSubpageState.divisionId);
+                e.floor_id, level, TreeHoleSubpageState.divisionId);
         if (result != null && result < 300) {
           Noticing.showMaterialNotice(context, "Succeeded.");
         }
@@ -534,7 +532,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            final tag = await Noticing.showInputDialog(context, "Special Tag");
+            final tag = await Noticing.showInputDialog(
+                context, "Special Tag. Leave empty to remove tag");
             if (tag == null) {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
@@ -553,7 +552,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 .getDivisions()
                 .firstWhere(
                     (element) => element.division_id == _hole.division_id,
-                orElse: () => OTDivision(_hole.division_id, '', '', null));
+                    orElse: () => OTDivision(_hole.division_id, '', '', null));
 
             List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
               List<Widget> list = [];
@@ -574,25 +573,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
 
             final Widget divisionOptionsView = StatefulBuilder(
-                builder: (BuildContext context, Function setState) =>
-                    Listener(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(selectedDivision.name ?? "?"),
-                            const Icon(Icons.arrow_drop_down)
-                          ],
-                        ),
-                        onPointerUp: (PointerUpEvent details) async {
-                          if (OpenTreeHoleRepository
-                              .getInstance()
+                builder: (BuildContext context, Function setState) => Listener(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(selectedDivision.name ?? "?"),
+                        const Icon(Icons.arrow_drop_down)
+                      ],
+                    ),
+                    onPointerUp: (PointerUpEvent details) async {
+                      if (OpenTreeHoleRepository.getInstance()
                               .isUserInitialized &&
-                              OpenTreeHoleRepository
-                                  .getInstance()
-                                  .getDivisions()
-                                  .isNotEmpty) {
-                            selectedDivision =
-                                (await showPlatformModalSheet<OTDivision>(
+                          OpenTreeHoleRepository.getInstance()
+                              .getDivisions()
+                              .isNotEmpty) {
+                        selectedDivision =
+                            (await showPlatformModalSheet<OTDivision>(
                                     context: context,
                                     builder: (BuildContext context) {
                                       final Widget content = Padding(
@@ -601,56 +597,67 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                                               shrinkWrap: true,
                                               primary: false,
                                               children:
-                                              _buildDivisionOptionsList(
-                                                  context)));
+                                                  _buildDivisionOptionsList(
+                                                      context)));
                                       return PlatformX.isCupertino(context)
                                           ? SafeArea(
-                                          child: Card(child: content))
+                                              child: Card(child: content))
                                           : SafeArea(child: content);
                                     })) ??
-                                    selectedDivision;
-                            setState(() {});
-                          }
-                        }));
+                                selectedDivision;
+                        setState(() {});
+                      }
+                    }));
 
             final newTagsList = deepCopyTagList(_hole.tags ?? []);
             bool? comfirmChanged = await showPlatformDialog<bool>(
               context: context,
-              builder: (BuildContext context) =>
-                  PlatformAlertDialog(
-                    title: const Text("Select hole tags/division"),
-                    content: Column(
-                      children: [
-                        divisionOptionsView,
-                        OTTagSelector(initialTags: newTagsList),
-                      ],
-                    ),
-                    actions: <Widget>[
-                      PlatformDialogAction(
-                          child: PlatformText(S
-                              .of(context)
-                              .cancel),
-                          onPressed: () => Navigator.pop(context, false)),
-                      PlatformDialogAction(
-                          cupertino: (context, platform) =>
-                              CupertinoDialogActionData(isDefaultAction: true),
-                          child: PlatformText(S
-                              .of(context)
-                              .i_see),
-                          onPressed: () => Navigator.pop(context, true)),
-                    ],
-                  ),
+              builder: (BuildContext context) => PlatformAlertDialog(
+                title: const Text("Select hole tags/division"),
+                content: Column(
+                  children: [
+                    divisionOptionsView,
+                    OTTagSelector(initialTags: newTagsList),
+                  ],
+                ),
+                actions: <Widget>[
+                  PlatformDialogAction(
+                      child: PlatformText(S.of(context).cancel),
+                      onPressed: () => Navigator.pop(context, false)),
+                  PlatformDialogAction(
+                      cupertino: (context, platform) =>
+                          CupertinoDialogActionData(isDefaultAction: true),
+                      child: PlatformText(S.of(context).i_see),
+                      onPressed: () => Navigator.pop(context, true)),
+                ],
+              ),
             );
             if (comfirmChanged ?? false) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
-                  newTagsList, _hole.hole_id, selectedDivision.division_id);
+                      newTagsList, _hole.hole_id, selectedDivision.division_id);
               if (result != null && result < 300) {
                 Noticing.showMaterialNotice(context, "Succeeded.");
               }
             }
           },
           child: const Text("Modify Hole Tags/Division"),
+          menuContext: menuContext,
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            final reason = await Noticing.showInputDialog(
+                context, "Input fold reason. Leave empty to unfold");
+            if (reason == null) {
+              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
+            }
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminFoldFloor(reason.isEmpty ? [] : [reason], e.floor_id);
+            if (result != null && result < 300) {
+              Noticing.showMaterialNotice(context, "Succeeded.");
+            }
+          },
+          child: const Text("Fold this floor"),
           menuContext: menuContext,
         ),
       ]);
