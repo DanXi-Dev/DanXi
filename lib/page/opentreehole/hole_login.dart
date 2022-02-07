@@ -407,7 +407,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                     _usernameController.text.isNotEmpty) {
                   executeLogin(context).catchError((e, st) {
                     state.jumpBackFromLoadingPage();
-                    Noticing.showModalError(context, e, trace: st);
+                    Noticing.showModalError(state.context, e, trace: st);
                   });
                 }
               },
