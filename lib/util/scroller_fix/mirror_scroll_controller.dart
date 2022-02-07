@@ -47,12 +47,10 @@ class MirrorScrollController extends ScrollController {
   String? debugTag;
   final BuildContext context;
   final List<AttachInterceptor> _interceptors = [];
-  late bool _isMaterial;
 
   MirrorScrollController(this.originController, this.context, {this.debugTag})
       : assert(originController is! MirrorScrollController) {
     debugTag = debugTag ?? hashCode.toString();
-    _isMaterial = PlatformX.isMaterial(context);
   }
 
   @override
@@ -131,8 +129,7 @@ class MirrorScrollController extends ScrollController {
   }
 
   void reattachPosition() {
-    if (_isMaterial &&
-        _oldPosition != null &&
+    if (_oldPosition != null &&
         !originController!.positions.contains(_oldPosition)) {
       try {
         originController!.attach(_oldPosition!);
