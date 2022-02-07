@@ -660,6 +660,27 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           child: const Text("Fold this floor"),
           menuContext: menuContext,
         ),
+        if (e.history != null && e.history!.isNotEmpty)
+          PlatformContextMenuItem(
+            onPressed: () async {
+              StringBuffer content = StringBuffer();
+              for (int i = 0; i < e.history!.length; i++) {
+                var record = e.history![i];
+                content.writeln("Time: ${record.altered_time}");
+                content.writeln("Altered By: ${record.altered_by}");
+                content.writeln("Original Content (Below): ");
+                content.writeln(record.content);
+                if (i < e.history!.length - 1) {
+                  content.writeln("================");
+                }
+              }
+              Noticing.showModalNotice(context,
+                  title: "History of ##${e.floor_id}",
+                  message: content.toString());
+            },
+            child: const Text("View modification history"),
+            menuContext: menuContext,
+          ),
       ]);
     }
     return menu;
