@@ -30,19 +30,16 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
+import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
@@ -340,89 +337,11 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           children: [
             if (widget.allowTags!)
               Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 4),
                 child: ThemedMaterial(
-                  child: FlutterTagging<OTTag>(
-                      initialItems:
-                          StateProvider.editorCache[widget.editorObject]!.tags,
-                      emptyBuilder: (context) => Wrap(
-                            alignment: WrapAlignment.spaceAround,
-                            children: [
-                              Text(S.of(context).failed),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {});
-                                },
-                                child: Text(S.of(context).retry),
-                              ),
-                            ],
-                          ),
-                      textFieldConfiguration: TextFieldConfiguration(
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(fontSize: 12),
-                          labelText: S.of(context).select_tags,
-                        ),
-                      ),
-                      findSuggestions: (String filter) async {
-                        _allTags ??= await OpenTreeHoleRepository.getInstance()
-                            .loadTags();
-                        return _allTags!
-                            .where((value) => value.name!
-                                .toLowerCase()
-                                .contains(filter.toLowerCase()))
-                            .toList();
-                      },
-                      additionCallback: (value) => OTTag(0, 0, value),
-                      onAdded: (tag) => tag,
-                      configureSuggestion: (tag) => SuggestionConfiguration(
-                            title: Text(
-                              tag.name!,
-                              style: TextStyle(color: tag.color),
-                            ),
-                            subtitle: Row(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.flame,
-                                  color: tag.color,
-                                  size: 12,
-                                ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
-                                Text(
-                                  tag.temperature.toString(),
-                                  style:
-                                      TextStyle(fontSize: 13, color: tag.color),
-                                ),
-                              ],
-                            ),
-                            additionWidget: Chip(
-                              avatar: const Icon(
-                                Icons.add_circle,
-                                color: Colors.white,
-                              ),
-                              label: Text(S.of(context).add_new_tag),
-                              labelStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w300,
-                              ),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
-                      configureChip: (tag) => ChipConfiguration(
-                            label: Text(tag.name!),
-                            backgroundColor: tag.color,
-                            labelStyle: TextStyle(
-                                color: tag.color.computeLuminance() >= 0.5
-                                    ? Colors.black
-                                    : Colors.white),
-                            deleteIconColor: tag.color.computeLuminance() >= 0.5
-                                ? Colors.black
-                                : Colors.white,
-                          ),
-                      onChanged: () {}),
+                  child: OTTagSelector(
+                      initialTags:
+                          StateProvider.editorCache[widget.editorObject]!.tags),
                 ),
               ),
             Row(

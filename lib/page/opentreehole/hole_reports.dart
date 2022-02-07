@@ -59,11 +59,6 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     super.initState();
   }
 
-  /// Rebuild everything and refresh itself.
-  void refreshSelf({scrollToEnd = false}) {
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
-    _listViewController.notifyUpdate(useInitialData: false);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,12 +71,10 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: TopController(
-          controller: PrimaryScrollController.of(context),
-          child: const Text("Reports"),
-        ),
-        trailingActions: const [],
-      ),
+          title: TopController(
+        controller: PrimaryScrollController.of(context),
+        child: const Text("Reports"),
+      )),
       body: Builder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
         builder: (context) => RefreshIndicator(
@@ -90,7 +83,8 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
-            refreshSelf();
+            setState(() {});
+            await _listViewController.notifyUpdate(useInitialData: false);
           },
           child: Material(
               child: PagedListView<OTReport>(

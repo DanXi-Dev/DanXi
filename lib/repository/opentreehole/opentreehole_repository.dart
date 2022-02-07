@@ -605,6 +605,20 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminUpdateTagAndDivision(
+      List<OTTag> tag, int? holeId, int? divisionId) async {
+    return (await dio!.put(_BASE_URL + "/holes/$holeId",
+            data: {"tags": tag, "division_id": divisionId},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
+  Future<int?> adminFoldFloor(List<String> fold, int? floorId) async {
+    return (await dio!.put(_BASE_URL + "/floors/$floorId",
+            data: {"fold": fold}, options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {

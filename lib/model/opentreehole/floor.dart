@@ -21,6 +21,8 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'history.dart';
+
 part 'floor.g.dart';
 
 @JsonSerializable()
@@ -36,7 +38,7 @@ class OTFloor {
   bool? is_me;
   bool? liked;
   List<String>? fold;
-  List? history;
+  List<OTHistory>? history;
   int? like;
   List<OTFloor>? mention;
 
