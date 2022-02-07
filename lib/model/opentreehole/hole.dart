@@ -33,6 +33,7 @@ class OTHole {
   int? view;
   int? reply;
   OTFloors? floors;
+  bool? hidden;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 

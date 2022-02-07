@@ -702,6 +702,13 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                                   text: postElement
                                       .floors!.first_floor!.special_tag!,
                                 ),
+                              ],
+                              if (postElement.hidden == true) ...[
+                                const SizedBox(width: 4),
+                                const OTLeadingTag(
+                                  color: Colors.red,
+                                  text: "Hidden",
+                                ),
                               ]
                             ],
                           ),
@@ -830,7 +837,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           }
         });
   }
-
 }
 
 /// This class is a workaround between Open Tree Hole's time-based content retrieval style
