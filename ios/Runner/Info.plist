@@ -59,7 +59,7 @@
 	<string>为向系统日历中添加课程表和考试日程</string>
 	<key>NSCameraUsageDescription</key>
 	<string>为上传图片至树洞</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>为平安复旦打卡提供位置信息</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>为上传图片至树洞</string>
