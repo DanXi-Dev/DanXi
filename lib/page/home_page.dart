@@ -77,7 +77,7 @@ GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
 GlobalKey<TreeHoleSubpageState> treeholePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
-GlobalKey<State<TimetableSubPage>> timetablePageKey = GlobalKey();
+GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
 
 /// The main page of DanXi.

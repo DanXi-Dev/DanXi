@@ -23,6 +23,7 @@ import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -61,7 +62,7 @@ const kCompatibleUserGroup = [
 
 class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   @override
-  _TimetableSubPageState createState() => _TimetableSubPageState();
+  TimetableSubPageState createState() => TimetableSubPageState();
 
   const TimetableSubPage({Key? key}) : super(key: key);
 
@@ -80,14 +81,17 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(
-            S.of(cxt).select_semester, const SemesterSelectionButton(), null)
+        AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
+          onSelectionUpdate: () {
+            timetablePageKey.currentState?.refresh(forceReloadFromRemote: true);
+          },
+        ), null)
       ];
 }
 
 class ShareTimetableEvent {}
 
-class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
+class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
 
@@ -104,7 +108,7 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   Future<TimeTable?>? _contentFuture;
 
-  bool _manualLoad = false;
+  bool forceLoadFromRemote = false;
 
   BannerAd? bannerAd;
 
@@ -115,8 +119,8 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value,
-                forceLoadFromRemote: _manualLoad)));
-      } else if (_manualLoad) {
+                forceLoadFromRemote: forceLoadFromRemote)));
+      } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value!, (imageUrl) async {
@@ -142,7 +146,7 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     ],
                   ));
           return controller.text;
-        }, forceLoadFromRemote: _manualLoad));
+        }, forceLoadFromRemote: forceLoadFromRemote));
       } else {
         try {
           _contentFuture = Future.value(
@@ -154,7 +158,7 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
               NotLoginError(S.of(context).postgraduates_need_login)));
         }
       }
-      _manualLoad = false;
+      forceLoadFromRemote = false;
     } else {
       _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
           NotLoginError(S.of(context).not_fudan_student)));
@@ -225,7 +229,10 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
-  Future<void> refreshSelf({bool reloadWhenEmptyData = false}) async {
+  Future<void> refresh(
+      {bool reloadWhenEmptyData = false,
+      bool forceReloadFromRemote = false}) async {
+    if (forceReloadFromRemote) forceLoadFromRemote = true;
     _setContent();
 
     // If there is no data before, we call setState once to show a ProgressIndicator.
@@ -252,8 +259,8 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
               AsyncSnapshot<TimeTable?> snapshot) =>
           ErrorPageWidget.buildWidget(context, snapshot.error,
               stackTrace: snapshot.stackTrace, onTap: () {
-        _manualLoad = true;
-        refreshSelf(reloadWhenEmptyData: true);
+        forceLoadFromRemote = true;
+        refresh(reloadWhenEmptyData: true);
       },
               buttonText:
                   snapshot.error is NotLoginError ? S.of(context).login : null),
@@ -318,9 +325,9 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         color: Theme.of(context).colorScheme.secondary,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
-          _manualLoad = true;
+          forceLoadFromRemote = true;
           HapticFeedback.mediumImpact();
-          await refreshSelf();
+          await refresh();
         },
         child: ListView(
           // This ListView is a workaround, so that we can apply a custom scroll physics to it.
@@ -357,7 +364,9 @@ class _TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 }
 
 class SemesterSelectionButton extends StatefulWidget {
-  const SemesterSelectionButton({Key? key}) : super(key: key);
+  final void Function()? onSelectionUpdate;
+  const SemesterSelectionButton({Key? key, this.onSelectionUpdate})
+      : super(key: key);
 
   @override
   _SemesterSelectionButtonState createState() =>
@@ -399,30 +408,25 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
             onPressed: () => showPlatformModalSheet(
               context: context,
-              builder: (menuContext) => ThemedMaterial(
-                  child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: _semesterInfo!.map((e) {
-                    final body = ListTile(
-                        selected: e.semesterId == _selectionInfo?.semesterId,
-                        onTap: () {
+              builder: (menuContext) => PlatformContextMenu(
+                cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(menuContext).cancel),
+                    onPressed: () => Navigator.of(menuContext).pop()),
+                actions: _semesterInfo!
+                    .map((e) => PlatformContextMenuItem(
+                        menuContext: menuContext,
+                        onPressed: () {
                           Navigator.of(menuContext).pop();
                           SettingsProvider.getInstance().timetableSemester =
                               e.semesterId;
                           setState(() {
                             _selectionInfo = e;
                           });
+                          widget.onSelectionUpdate?.call();
                         },
-                        title: Text("${e.schoolYear} ${e.name!}"));
-                    if (PlatformX.isCupertino(context)) {
-                      return Material(child: body);
-                    } else {
-                      return body;
-                    }
-                  }).toList(),
-                ),
-              )),
+                        child: Text("${e.schoolYear} ${e.name!}")))
+                    .toList(),
+              ),
             ),
           );
         },
