@@ -27,6 +27,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -94,11 +95,12 @@ class ImageViewerPage extends StatefulWidget {
 }
 
 class _ImageViewerPageState extends State<ImageViewerPage> {
+  final FocusNode _focusNode = FocusNode();
+
   late List<ImageUrlInfo> _imageList;
   ImageLoadCallback? _imageLoader;
   late ImageUrlInfo _initInfo;
   Object? heroTag;
-
   late int initialIndex;
   late PageController controller;
 
@@ -138,8 +140,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   static String getFileName(String url) {
     try {
       return RegExp(r'(.*)\..*')
-              .firstMatch(Uri.parse(url).pathSegments.last)!
-              .group(1)! +
+          .firstMatch(Uri.parse(url).pathSegments.last)!
+          .group(1)! +
           '.png';
     } catch (_) {
       return "${DateFormat("yyyyMMddHHmmSSS").format(DateTime.now())}.png";
@@ -149,7 +151,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> shareImage() async {
     File image =
-        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+    await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isMobile) {
       Share.shareFiles([
         image.absolute.path
@@ -163,7 +165,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> saveImage() async {
     File image =
-        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+    await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isAndroid) {
       PermissionStatus status = await Permission.storage.status;
       if (!status.isGranted &&
@@ -186,86 +188,101 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-      iosContentBottomPadding: false,
-      iosContentPadding: true,
-      appBar: PlatformAppBarX(
-        title: Text(_imageList.length == 1
-            ? S.of(context).image
-            : "${S.of(context).image} (${showIndex + 1}/${_imageList.length})"),
-        trailingActions: [
-          if (originalLoading[_imageList[showIndex]] != false) ...[
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: PlatformCircularProgressIndicator(
-                material: (_, __) => MaterialProgressIndicatorData(
-                    color: Theme.of(context).colorScheme.surface),
-              ),
-            )
-          ] else if (originalLoadFailError[_imageList[showIndex]] != null) ...[
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(PlatformIcons(context).error),
-              color: Theme.of(context).errorColor,
-              onPressed: () => Noticing.showNotice(
-                  context, originalLoadFailError[_imageList[showIndex]]!,
-                  title: S.of(context).fatal_error, useSnackBar: false),
-            ),
-          ] else ...[
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(PlatformX.isMaterial(context)
-                  ? Icons.share
-                  : CupertinoIcons.square_arrow_up),
-              onPressed: shareImage,
-            ),
-            // Not needed on iOS
-            if (!PlatformX.isIOS)
+    return KeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKeyEvent: (KeyEvent keyEvent) {
+        if (keyEvent is KeyUpEvent) return;
+        if (keyEvent.logicalKey == LogicalKeyboardKey.arrowLeft &&
+            showIndex - 1 >= 0) {
+          controller.jumpToPage(--showIndex);
+        } else if (keyEvent.logicalKey == LogicalKeyboardKey.arrowRight &&
+            showIndex + 1 < _imageList.length) {
+          controller.jumpToPage(++showIndex);
+        }
+      },
+      child: PlatformScaffold(
+        iosContentBottomPadding: false,
+        iosContentPadding: true,
+        appBar: PlatformAppBarX(
+          title: Text(_imageList.length == 1
+              ? S.of(context).image
+              : "${S.of(context).image} (${showIndex + 1}/${_imageList.length})"),
+          trailingActions: [
+            if (originalLoading[_imageList[showIndex]] != false) ...[
               PlatformIconButton(
                 padding: EdgeInsets.zero,
-                icon: const Icon(Icons.save),
-                onPressed: saveImage,
+                icon: PlatformCircularProgressIndicator(
+                  material: (_, __) => MaterialProgressIndicatorData(
+                      color: Theme.of(context).colorScheme.surface),
+                ),
               )
-          ]
-        ],
-      ),
-      body: NotificationListener<ImageLoadNotification>(
-        onNotification: (ImageLoadNotification notification) {
-          setState(() {
-            originalLoading[notification.imageInfo] =
-                notification.originalLoaded;
-            originalLoadFailError[notification.imageInfo] =
-                notification.originalLoadError;
-          });
-          return true;
-        },
-        child: PhotoViewGestureDetectorScope(
-          axis: Axis.horizontal,
-          child: PageView.builder(
-            controller: controller,
-            dragStartBehavior: DragStartBehavior.down,
-            itemCount: _imageList.length,
-            itemBuilder: (BuildContext context, int page) {
-              print("load page $page");
-              return ImageViewerBodyView(
-                imageInfo: _imageList[page],
-                heroTag: _initInfo == _imageList[page] ? heroTag : null,
-              );
-            },
-            onPageChanged: (int pageIndex) {
-              setState(() {
-                showIndex = pageIndex;
-              });
-              if (showIndex == _imageList.length - 1 &&
-                  _imageLoader != null &&
-                  !nextPageLoading) {
-                _imageLoader?.call(context, ++lastIndex).then((value) {
-                  setState(() => _imageList.addAll(value!));
-                }, onError: (e, st) {}).whenComplete(() {
-                  nextPageLoading = false;
+            ] else if (originalLoadFailError[_imageList[showIndex]] !=
+                null) ...[
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(PlatformIcons(context).error),
+                color: Theme.of(context).errorColor,
+                onPressed: () => Noticing.showNotice(
+                    context, originalLoadFailError[_imageList[showIndex]]!,
+                    title: S.of(context).fatal_error, useSnackBar: false),
+              ),
+            ] else ...[
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(PlatformX.isMaterial(context)
+                    ? Icons.share
+                    : CupertinoIcons.square_arrow_up),
+                onPressed: shareImage,
+              ),
+              // Not needed on iOS
+              if (!PlatformX.isIOS)
+                PlatformIconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.save),
+                  onPressed: saveImage,
+                )
+            ]
+          ],
+        ),
+        body: NotificationListener<ImageLoadNotification>(
+          onNotification: (ImageLoadNotification notification) {
+            setState(() {
+              originalLoading[notification.imageInfo] =
+                  notification.originalLoaded;
+              originalLoadFailError[notification.imageInfo] =
+                  notification.originalLoadError;
+            });
+            return true;
+          },
+          child: PhotoViewGestureDetectorScope(
+            axis: Axis.horizontal,
+            child: PageView.builder(
+              controller: controller,
+              dragStartBehavior: DragStartBehavior.down,
+              itemCount: _imageList.length,
+              itemBuilder: (BuildContext context, int page) {
+                print("load page $page");
+                return ImageViewerBodyView(
+                  imageInfo: _imageList[page],
+                  heroTag: _initInfo == _imageList[page] ? heroTag : null,
+                );
+              },
+              onPageChanged: (int pageIndex) {
+                setState(() {
+                  showIndex = pageIndex;
                 });
-              }
-            },
+                if (showIndex == _imageList.length - 1 &&
+                    _imageLoader != null &&
+                    !nextPageLoading) {
+                  _imageLoader?.call(context, ++lastIndex).then((value) {
+                    setState(() => _imageList.addAll(value!));
+                  }, onError: (e, st) {}).whenComplete(() {
+                    nextPageLoading = false;
+                  });
+                }
+              },
+            ),
           ),
         ),
       ),
