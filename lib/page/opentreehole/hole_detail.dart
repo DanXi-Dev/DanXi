@@ -34,6 +34,7 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -80,12 +81,17 @@ String preprocessContentForDisplay(String content) {
 /// A list page showing the content of a bbs post.
 ///
 /// Arguments:
-/// [OTHole] or [Future<List<Reply>>] post: if [post] is BBSPost, show the page as a post.
+/// [OTHole] or [Future<List<OTFloor>>] post: if [post] is [OTHole], show the page as a post.
 /// Otherwise as a list of search result.
-/// [String] searchKeyword: if set, the page will show the result of searching [searchKeyword].
-/// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
-/// the post as soon as the page shows. This implies that [post] should be a [BBSPost].
+/// When [post] is [OTHole] and its [prefetch] is more than [Constant.POST_COUNT_PER_PAGE], it supposes *all* the floors has been prefetched.
 ///
+/// [String] searchKeyword: if set, the page will show the result of searching [searchKeyword].
+///
+/// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
+/// the post as soon as the page shows. This implies that [post] should be a [OTHole].
+/// If [scroll_to_end] is true, *all* the floors should be prefetched beforehand.
+///
+/// * See [hasPrefetchedAllData] below.
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
@@ -105,13 +111,16 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
   /// Fields related to the display states.
   bool? _isFavored;
   bool _onlyShowDZ = false;
-  bool shouldUsePreloadedContent = true;
 
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
+
+  bool get hasPrefetchedAllData =>
+      shouldScrollToEnd ||
+      (_hole.floors?.prefetch?.length ?? -1) > Constant.POST_COUNT_PER_PAGE;
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
@@ -166,11 +175,17 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // Scroll to the corresponding post
       while (!(await _listViewController.scrollToItem(floor))) {
         // Prevent deadlock
-        if (_listViewController.isEnded) {
+        if ((_listViewController.getScrollController()?.position.extentAfter ??
+                0) <
+            10) {
           break;
         }
+
+        // fixme: Will scrolling at height of viewportHeight bring problems?
         await _listViewController.scrollDelta(
-            100, const Duration(milliseconds: 1), Curves.linear);
+            ViewportUtils.getViewportHeight(context),
+            const Duration(milliseconds: 1),
+            Curves.linear);
       }
     } catch (_) {}
   }
@@ -206,7 +221,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     Future<List<OTFloor>>? allDataReceiver;
-    if (shouldScrollToEnd) {
+    if (hasPrefetchedAllData) {
       allDataReceiver = Future.value(_hole.floors?.prefetch);
     }
     final pagedListView = PagedListView<OTFloor>(
