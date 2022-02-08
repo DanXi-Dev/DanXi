@@ -185,7 +185,6 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget mainApp = PlatformProvider(
-      settings: PlatformSettingsData(iosUsesMaterialWidgets: true),
       // Uncomment this line below to force the app to use Cupertino UI
       // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => DynamicThemeController(

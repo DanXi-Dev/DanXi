@@ -59,7 +59,6 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
@@ -73,7 +72,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       appBar: PlatformAppBarX(
           title: TopController(
         controller: PrimaryScrollController.of(context),
-        child: const Text("Reports"),
+        child: Text(S.of(context).reports),
       )),
       body: Builder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -88,7 +87,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
           },
           child: Material(
               child: PagedListView<OTReport>(
-                startPage: 1,
+            startPage: 1,
             pagedController: _listViewController,
             withScrollbar: true,
             scrollController: PrimaryScrollController.of(context),

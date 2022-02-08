@@ -365,8 +365,8 @@ extension CampusEx on Campus? {
       case Campus.ZHANGJIANG_CAMPUS:
         return ['Z2'];
       case Campus.NONE:
-        break;
       case null:
+      default:
         return ['?'];
     }
   }

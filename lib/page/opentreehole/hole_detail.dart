@@ -36,6 +36,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -392,120 +393,80 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             .adminAddPenalty(
                 e.floor_id, level, TreeHoleSubpageState.divisionId);
         if (result != null && result < 300) {
-          Noticing.showMaterialNotice(context, "Succeeded.");
+          Noticing.showMaterialNotice(
+              context, S.of(context).operation_successful);
         }
       }
 
       return [
         PlatformContextMenuItem(
           onPressed: () => onExecutePenalty(1),
-          child: const Text("Level 1: Ban for Day * 1 "),
+          child: Text(S.of(context).level(1)),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
           onPressed: () => onExecutePenalty(2),
-          child: const Text("Level 2: Ban for Day * 5 "),
+          child: Text(S.of(context).level(2)),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
           onPressed: () => onExecutePenalty(3),
-          child: const Text("Level 3: BAN FOREVER"),
+          child: Text(S.of(context).level(3)),
           menuContext: menuContext,
           isDestructive: true,
         )
       ];
     }
 
-    List<Widget> menu = [
-      if (e.is_me == true && e.deleted == false)
+    List<Widget> _buildAdminMenu(BuildContext menuContext, OTFloor e) {
+      return [
         PlatformContextMenuItem(
-          menuContext: menuContext,
           onPressed: () async {
             if (await OTEditor.modifyReply(
                 context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
-                  context, S.of(context).request_success);
-            }
-            // await refreshListView();
-            // // Set duration to 0 to execute [jumpTo] to the top.
-            // await _listViewController.scrollToIndex(0, const Duration());
-            // await scrollDownToFloor(e);
-          },
-          child: Text(S.of(context).modify),
-        ),
-
-      // Standard Operations
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        onPressed: () => smartNavigatorPush(context, "/text/detail",
-            arguments: {"text": e.filteredContent}),
-        child: Text(S.of(menuContext).free_select),
-      ),
-      PlatformContextMenuItem(
-          menuContext: menuContext,
-          child: Text(S.of(menuContext).copy),
-          onPressed: () async {
-            await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
-            Noticing.showMaterialNotice(
-                context, S.of(menuContext).copy_success);
-          }),
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        isDestructive: true,
-        onPressed: () async {
-          if (await OTEditor.reportPost(context, e.floor_id)) {
-            Noticing.showMaterialNotice(context, S.of(context).report_success);
-          }
-        },
-        child: Text(S.of(menuContext).report),
-      ),
-    ];
-    if (OpenTreeHoleRepository.getInstance().isAdmin) {
-      menu.addAll([
-        PlatformContextMenuItem(
-          onPressed: () async {
-            if (await OTEditor.modifyReply(
-                context, e.hole_id, e.floor_id, e.content)) {
-              Noticing.showMaterialNotice(context, "Succeeded.");
+                  context, S.of(context).operation_successful);
             }
           },
-          child: const Text("Modify this floor"),
+          child: Text(S.of(context).modify_floor),
           isDestructive: true,
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await Noticing.showConfirmationDialog(context,
-                    "Are you sure to hide this floor? It is hard to undo the operation.",
-                    isConfirmDestructive: true, title: "Confirmation") ==
+            if (await Noticing.showConfirmationDialog(
+                    context, S.of(context).are_you_sure,
+                    isConfirmDestructive: true) ==
                 true) {
               final reason = await Noticing.showInputDialog(
-                  context, "Delete Reason (cancel for default)");
+                  context, S.of(context).input_reason);
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminDeleteFloor(e.floor_id, reason);
               if (result != null && result < 300) {
-                Noticing.showMaterialNotice(context, "Succeeded.");
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
               }
             }
           },
-          child: const Text("Delete this floor"),
+          child: Text(S.of(context).delete_floor),
           isDestructive: true,
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await Noticing.showConfirmationDialog(context,
-                    "Are you sure to hide this WHOLE HOLE? It is hard to undo the operation.",
-                    isConfirmDestructive: true, title: "Confirmation") ==
+            if (await Noticing.showConfirmationDialog(
+                    context, S.of(context).are_you_sure,
+                    isConfirmDestructive: true) ==
                 true) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminDeleteHole(e.hole_id);
               if (result != null && result < 300) {
-                Noticing.showMaterialNotice(context, "Succeeded.");
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
               }
             }
           },
-          child: const Text("Delete this hole"),
+          child: Text(S.of(context).hide_hole),
           isDestructive: true,
           menuContext: menuContext,
         ),
@@ -519,7 +480,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     onPressed: () => Navigator.of(subMenuContext).pop(),
                   ))),
           isDestructive: true,
-          child: const Text("Punish this user"),
+          child: Text(S.of(context).add_penalty),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
@@ -539,26 +500,28 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     null,
                     pinned);
             if (result != null && result < 300) {
-              Noticing.showMaterialNotice(context, "Succeeded.");
+              Noticing.showMaterialNotice(
+                  context, S.of(context).operation_successful);
             }
           },
-          child: const Text("Pin/Unpin this hole"),
+          child: Text(S.of(context).pin_unpin_hole),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             final tag = await Noticing.showInputDialog(
-                context, "Special Tag. Leave empty to remove tag");
+                context, S.of(context).input_reason);
             if (tag == null) {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminAddSpecialTag(tag, e.floor_id);
             if (result != null && result < 300) {
-              Noticing.showMaterialNotice(context, "Succeeded.");
+              Noticing.showMaterialNotice(
+                  context, S.of(context).operation_successful);
             }
           },
-          child: const Text("Add Special Tag"),
+          child: Text(S.of(context).add_special_tag),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
@@ -628,12 +591,14 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             bool? comfirmChanged = await showPlatformDialog<bool>(
               context: context,
               builder: (BuildContext context) => PlatformAlertDialog(
-                title: const Text("Select hole tags/division"),
-                content: Column(
-                  children: [
-                    divisionOptionsView,
-                    OTTagSelector(initialTags: newTagsList),
-                  ],
+                title: Text(S.of(context).modify_tag_division),
+                content: ThemedMaterial(
+                  child: Column(
+                    children: [
+                      divisionOptionsView,
+                      OTTagSelector(initialTags: newTagsList),
+                    ],
+                  ),
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
@@ -652,27 +617,29 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   .adminUpdateTagAndDivision(
                       newTagsList, _hole.hole_id, selectedDivision.division_id);
               if (result != null && result < 300) {
-                Noticing.showMaterialNotice(context, "Succeeded.");
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
               }
             }
           },
-          child: const Text("Modify Hole Tags/Division"),
+          child: Text(S.of(context).modify_tag_division),
           menuContext: menuContext,
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             final reason = await Noticing.showInputDialog(
-                context, "Input fold reason. Leave empty to unfold");
+                context, S.of(context).input_reason);
             if (reason == null) {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminFoldFloor(reason.isEmpty ? [] : [reason], e.floor_id);
             if (result != null && result < 300) {
-              Noticing.showMaterialNotice(context, "Succeeded.");
+              Noticing.showMaterialNotice(
+                  context, S.of(context).operation_successful);
             }
           },
-          child: const Text("Fold this floor"),
+          child: Text(S.of(context).fold_floor),
           menuContext: menuContext,
         ),
         if (e.history != null && e.history!.isNotEmpty)
@@ -681,23 +648,86 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               StringBuffer content = StringBuffer();
               for (int i = 0; i < e.history!.length; i++) {
                 var record = e.history![i];
-                content.writeln("Time: ${record.altered_time}");
-                content.writeln("Altered By: ${record.altered_by}");
-                content.writeln("Original Content (Below): ");
+                content.writeln(
+                    S.of(context).history_time(record.altered_time ?? "?"));
+                content.writeln(
+                    S.of(context).history_altered_by(record.altered_by ?? "?"));
+                content.writeln(S.of(context).original_content);
                 content.writeln(record.content);
                 if (i < e.history!.length - 1) {
                   content.writeln("================");
                 }
               }
               Noticing.showModalNotice(context,
-                  title: "History of ##${e.floor_id}",
+                  title: S.of(context).history_of(e.floor_id ?? "?"),
                   message: content.toString());
             },
-            child: const Text("View modification history"),
+            child: Text(S.of(context).view_history),
             menuContext: menuContext,
           ),
-      ]);
+      ];
     }
+
+    List<Widget> menu = [
+      if (e.is_me == true && e.deleted == false)
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          onPressed: () async {
+            if (await OTEditor.modifyReply(
+                context, e.hole_id, e.floor_id, e.content)) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).request_success);
+            }
+            // await refreshListView();
+            // // Set duration to 0 to execute [jumpTo] to the top.
+            // await _listViewController.scrollToIndex(0, const Duration());
+            // await scrollDownToFloor(e);
+          },
+          child: Text(S.of(context).modify),
+        ),
+
+      // Standard Operations
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        onPressed: () => smartNavigatorPush(context, "/text/detail",
+            arguments: {"text": e.filteredContent}),
+        child: Text(S.of(menuContext).free_select),
+      ),
+      PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: Text(S.of(menuContext).copy),
+          onPressed: () async {
+            await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
+            Noticing.showMaterialNotice(
+                context, S.of(menuContext).copy_success);
+          }),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        isDestructive: true,
+        onPressed: () async {
+          if (await OTEditor.reportPost(context, e.floor_id)) {
+            Noticing.showMaterialNotice(context, S.of(context).report_success);
+          }
+        },
+        child: Text(S.of(menuContext).report),
+      ),
+      if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+        PlatformContextMenuItem(
+          onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (subMenuContext) => PlatformContextMenu(
+                  actions: _buildAdminMenu(subMenuContext, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(subMenuContext).cancel),
+                    onPressed: () => Navigator.of(subMenuContext).pop(),
+                  ))),
+          isDestructive: true,
+          child: Text(S.of(context).admin_options),
+          menuContext: menuContext,
+        ),
+      ]
+    ];
+
     return menu;
   }
 
