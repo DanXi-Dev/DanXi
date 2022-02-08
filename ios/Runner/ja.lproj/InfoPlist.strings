@@ -7,7 +7,8 @@
 */
 
 CFBundleDisplayName = "DanXi";
-NSLocationAlwaysAndWhenInUseUsageDescription = "To provide location information for Safety Fudan check-in";
+NSLocationWhenInUseUsageDescription = "To provide location information for Safety Fudan check-in";
+NSLocationAlwaysUsageDescription = "To provide location information for Safety Fudan check-in";
 NSPhotoLibraryUsageDescription = "To upload images to FDUHole";
 NSCameraUsageDescription = "To upload images to FDUHole";
 NSCalendarsUsageDescription = "To save events to your calendar";
