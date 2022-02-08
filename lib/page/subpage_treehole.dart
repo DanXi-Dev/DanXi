@@ -679,7 +679,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                             children: [
                               if (isPinned)
                                 OTLeadingTag(
-                                  color: Colors.blue,
+                                  color: Theme.of(context).primaryColor,
                                   text: S.of(context).pinned,
                                 ),
                               if (postElement.floors?.first_floor?.special_tag
@@ -694,9 +694,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                               ],
                               if (postElement.hidden == true) ...[
                                 const SizedBox(width: 4),
-                                const OTLeadingTag(
-                                  color: Colors.red,
-                                  text: "Hidden",
+                                OTLeadingTag(
+                                  color: Theme.of(context).primaryColor,
+                                  text: S.of(context).hide_hole,
                                 ),
                               ]
                             ],

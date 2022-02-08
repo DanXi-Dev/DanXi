@@ -408,5 +408,6 @@
     "original_content": "Original Content",
     "history_of": "History of ##{floor}",
     "input_reason": "Input Content (leave empty to restore)",
-    "operation_successful": "The operation completed successfully"
+    "operation_successful": "The operation completed successfully",
+    "hole_hidden": "Hidden Hole"
 }

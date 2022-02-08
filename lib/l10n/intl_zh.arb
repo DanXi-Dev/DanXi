@@ -388,5 +388,6 @@
   "original_content": "原内容",
   "history_of": "##{floor} 的修改历史",
   "input_reason": "输入内容（留空以还原）",
-  "operation_successful": "操作成功"
+  "operation_successful": "操作成功",
+  "hole_hidden": "已隐藏"
 }
