@@ -17,11 +17,8 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -47,7 +44,6 @@ class CardDetailPage extends StatefulWidget {
 
 class _CardDetailPageState extends State<CardDetailPage> {
   CardInfo? _cardInfo;
-  PersonInfo? _personInfo; // ignore: unused_field
   List<Tag>? _tags;
   late List<int> _tagDays;
   bool _selectable = true;
@@ -56,7 +52,6 @@ class _CardDetailPageState extends State<CardDetailPage> {
   void initState() {
     super.initState();
     _cardInfo = widget.arguments!['cardInfo'];
-    _personInfo = StateProvider.personInfo.value;
     _tagDays = [7, 15, 30];
   }
 
@@ -106,9 +101,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
                       : CupertinoIcons.hourglass;
                   _selectable = false;
                 });
-                _cardInfo!.records = await Retrier.runAsyncWithRetry(() =>
-                    CardRepository.getInstance()
-                        .loadCardRecord(_tagDays[index]));
+                _cardInfo!.records = await CardRepository.getInstance()
+                    .loadCardRecord(_tagDays[index]);
                 setState(() {
                   tag.checkedIcon = PlatformX.isMaterial(context)
                       ? Icons.check
