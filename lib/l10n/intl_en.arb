@@ -409,5 +409,6 @@
     "history_of": "History of ##{floor}",
     "input_reason": "Input Content (leave empty to restore)",
     "operation_successful": "The operation completed successfully",
-    "hole_hidden": "Hidden Hole"
+    "hole_hidden": "Hidden Hole",
+    "semester_start_date": "First day of the semester"
 }

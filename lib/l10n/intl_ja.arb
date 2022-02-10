@@ -364,5 +364,6 @@
   "minute_ago": "{num}分前",
   "hour_ago": "{num}時間前",
   "day_ago": "{num}日前",
-  "select_semester": "スケジュールに表示する学期"
+  "select_semester": "スケジュールに表示する学期",
+  "semester_start_date": "学期開始日"
 }

@@ -21,18 +21,16 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
-import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
-import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
@@ -57,6 +55,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -350,6 +349,34 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                           child: Text(S.of(context).cancel),
                                           onPressed: () =>
                                               Navigator.of(context).pop()))),
+                        ),
+
+                        // Timetable Start date
+                        ListTile(
+                          title: Text(S.of(context).semester_start_date),
+                          leading: PlatformX.isMaterial(context)
+                              ? const Icon(Icons.calendar_today)
+                              : const Icon(CupertinoIcons.calendar_badge_plus),
+                          subtitle: Text(DateFormat("yyyy-MM-dd")
+                              .format(TimeTable.defaultStartTime)),
+                          onTap: () async {
+                            DateTime? newDate = await showPlatformDatePicker(
+                                context: context,
+                                initialDate: TimeTable.defaultStartTime,
+                                firstDate:
+                                    DateTime.fromMillisecondsSinceEpoch(0),
+                                lastDate: TimeTable.defaultStartTime
+                                    .add(const Duration(days: 365 * 100)));
+                            if (newDate != null) {
+                              setState(() {
+                                TimeTable.defaultStartTime = newDate;
+                                SettingsProvider.getInstance()
+                                        .lastSemesterStartTime =
+                                    TimeTable.defaultStartTime
+                                        .toIso8601String();
+                              });
+                            }
+                          },
                         ),
                       ]),
                     ),
