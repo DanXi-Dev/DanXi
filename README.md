@@ -2,7 +2,7 @@
 [官方网站](https://danxi-dev.github.io)  
 
 # 旦夕
-![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)  
+[![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
   
 （原名旦兮）
 
