@@ -355,7 +355,7 @@
   "connection_cancelled": "连接被异常断开",
   "no_data_error": "数据为空",
   "require_login": "您需要先登录后再使用本功能。",
-  "format_exception": "解析错误。如果您正在访问校园服务，这通常是由于未能成功登录校园服务器。查看详细信息获得更多帮助。",
+  "format_exception": "解析错误",
   "w568w_description": "旦夕创建者 & 开发者",
   "singularity_s0_description": "旦夕开发者 & 树洞后端",
   "KYLN24_description": "树洞前端",
