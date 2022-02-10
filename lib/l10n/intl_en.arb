@@ -370,7 +370,7 @@
     "connection_cancelled": "Connection cancelled unexpectedly",
     "no_data_error": "No data",
     "require_login": "You need to log in first.",
-    "format_exception": "Parse error. This usually happens when DanXi cannot log in on the campus server.\nSee detail for more information.",
+    "format_exception": "An error occurred while parsing data",
 
     "project_url": "https://danxi.fduhole.com",
     "w568w_description":"DanXi Founder / Developer",
