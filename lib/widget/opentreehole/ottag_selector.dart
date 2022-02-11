@@ -100,7 +100,8 @@ class _OTTagSelectorState extends State<OTTagSelector> {
                     color: tag.color,
                     onTap: () async {
                       if (await Noticing.showConfirmationDialog(
-                              context, S.of(context).delete_this_tag) ==
+                              context, tag.name ?? "",
+                              title: S.of(context).delete_this_tag) ==
                           true) {
                         onDelete.call();
                       }
