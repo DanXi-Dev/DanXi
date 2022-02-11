@@ -49,7 +49,6 @@ import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -470,14 +469,22 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     }
 
-    screenListener.addScreenRecordListener((recorded) {
-      if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {
-        Noticing.showScreenshotWarning(context);
+    screenListener.addScreenRecordListener((recorded) async {
+      if (StateProvider.needScreenshotWarning &&
+          StateProvider.isForeground &&
+          !StateProvider.showingScreenshotWarning) {
+        StateProvider.showingScreenshotWarning = true;
+        await Noticing.showScreenshotWarning(context);
+        StateProvider.showingScreenshotWarning = false;
       }
     });
-    screenListener.addScreenShotListener((filePath) {
-      if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {
-        Noticing.showScreenshotWarning(context);
+    screenListener.addScreenShotListener((filePath) async {
+      if (StateProvider.needScreenshotWarning &&
+          StateProvider.isForeground &&
+          !StateProvider.showingScreenshotWarning) {
+        StateProvider.showingScreenshotWarning = true;
+        await Noticing.showScreenshotWarning(context);
+        StateProvider.showingScreenshotWarning = false;
       }
     });
     screenListener.watch();
