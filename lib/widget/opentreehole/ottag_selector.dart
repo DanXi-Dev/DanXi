@@ -18,6 +18,8 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configurations.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
@@ -78,6 +80,7 @@ class _OTTagSelectorState extends State<OTTagSelector> {
                     const SizedBox(width: 2),
                     Text(tag.temperature.toString(),
                         style: TextStyle(fontSize: 13, color: tag.color)),
+                    const Divider(),
                   ],
                 ),
                 additionWidget: Chip(
@@ -89,6 +92,20 @@ class _OTTagSelectorState extends State<OTTagSelector> {
                         fontWeight: FontWeight.w300),
                     backgroundColor: Theme.of(context).colorScheme.secondary),
               ),
+          customChipBuilder: (tag, onDelete) {
+            return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: RoundChip(
+                    label: tag.name,
+                    color: tag.color,
+                    onTap: () async {
+                      if (await Noticing.showConfirmationDialog(
+                              context, S.of(context).delete_this_tag) ==
+                          true) {
+                        onDelete.call();
+                      }
+                    }));
+          },
           configureChip: (tag) => ChipConfiguration(
               label: Text(tag.name!),
               backgroundColor: tag.color,

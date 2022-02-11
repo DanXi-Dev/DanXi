@@ -29,28 +29,32 @@ class RoundChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
+        InkWell(
+          borderRadius: BorderRadius.circular(16),
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
             height: 24,
             decoration: BoxDecoration(
               border: Border.all(
-                color: color!,
+                color: effectiveColor,
                 width: 1,
               ),
-              color: PlatformX.isDarkMode ? color!.withOpacity(0.3) : null,
+              color:
+                  PlatformX.isDarkMode ? effectiveColor.withOpacity(0.3) : null,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
-                label!,
+                label ?? "",
                 style: TextStyle(
                     fontSize: 14,
-                    color: PlatformX.isDarkMode ? Colors.white : color),
+                    color:
+                        PlatformX.isDarkMode ? Colors.white : effectiveColor),
               ),
             ),
           ),

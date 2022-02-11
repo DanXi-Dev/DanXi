@@ -12,6 +12,10 @@ import 'taggable.dart';
 
 ///
 class FlutterTagging<T extends Taggable> extends StatefulWidget {
+  /// Override the chip builder of this widget
+  /// You may customize the widget as you like, but the [onDelete] callback must be called when the tag is about to be deleted.
+  final Widget Function(T, VoidCallback)? customChipBuilder;
+
   /// Called every time the value changes.
   ///  i.e. when items are selected or removed.
   final VoidCallback? onChanged;
@@ -155,7 +159,8 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
       this.animationDuration = const Duration(milliseconds: 500),
       this.animationStart = 0.25,
       this.onAdded,
-      Key? key})
+      Key? key,
+      this.customChipBuilder})
       : super(key: key);
 
   @override
@@ -216,7 +221,7 @@ class _FlutterTaggingState<T extends Taggable>
           transitionBuilder: widget.transitionBuilder,
           loadingBuilder: (context) =>
               widget.loadingBuilder?.call(context) ??
-                  const SizedBox(
+              const SizedBox(
                 height: 3.0,
                 child: LinearProgressIndicator(),
               ),
@@ -294,6 +299,13 @@ class _FlutterTaggingState<T extends Taggable>
           textDirection: widget.wrapConfiguration.textDirection,
           verticalDirection: widget.wrapConfiguration.verticalDirection,
           children: widget.initialItems.map<Widget>((item) {
+            if (widget.customChipBuilder != null) {
+              return widget.customChipBuilder!.call(item, () {
+                widget.initialItems.remove(item);
+                setState(() {});
+                widget.onChanged?.call();
+              });
+            }
             final conf = widget.configureChip(item);
             return Chip(
               label: conf.label,
