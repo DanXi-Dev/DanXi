@@ -66,13 +66,13 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
         time = DateTime.now();
       }
       return OpenTreeHoleRepository.getInstance()
-          .loadMessages(startTime: time, unreadOnly: showUnreadOnly);
+          .loadMessages(startTime: time, unreadOnly: showUnreadOnly)
+          .then((value) {
+        // Automatically clear all messages after loading, assuming that the user has already read them.
+        unawaited(OpenTreeHoleRepository.getInstance().clearMessages());
+        return value;
+      });
     }).call(page);
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   /// Rebuild everything and refresh itself.
@@ -110,32 +110,6 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
               await indicatorKey.currentState?.show();
             },
           ),
-          const SizedBox(
-            width: 8,
-          ),
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: Text(
-              S.of(context).mark_all_as_read,
-              softWrap: true,
-              textScaleFactor: MediaQuery.textScaleFactorOf(context),
-            ),
-            onPressed: () async {
-              try {
-                await OpenTreeHoleRepository.getInstance().clearMessages();
-                await indicatorKey.currentState?.show();
-              } catch (e, st) {
-                if (e is DioError &&
-                    e.response?.statusCode == HttpStatus.notFound) {
-                  Noticing.showNotice(
-                      context, S.of(context).function_not_implemented,
-                      title: S.of(context).fatal_error, useSnackBar: false);
-                } else {
-                  Noticing.showModalError(context, e, trace: st);
-                }
-              }
-            },
-          )
         ],
       ),
       body: Builder(

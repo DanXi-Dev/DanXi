@@ -224,7 +224,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
                   forcePushOnMainNavigator: true);
             }
           },
-        )
+        ),
       ];
 
   @override
@@ -232,6 +232,12 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+        if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+          AppBarButtonItem(S.of(cxt).reports,
+              const Icon(CupertinoIcons.exclamationmark_octagon), () {
+            smartNavigatorPush(cxt, "/bbs/reports");
+          })
+        ],
         AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/tags',
@@ -383,22 +389,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       await listViewController.notifyUpdate(
           useInitialData: true, queueDataClear: true);
     }
-  }
-
-  Widget _autoAdminNotice() {
-    {
-      if (OpenTreeHoleRepository.getInstance().isAdmin) {
-        return Card(
-          child: ListTile(
-            title: const Text("FDUHole Administrative Interface"),
-            onTap: () {
-              smartNavigatorPush(context, "/bbs/reports");
-            },
-          ),
-        );
-      }
-    }
-    return const SizedBox();
   }
 
   Widget _autoSilenceNotice() {
@@ -581,7 +571,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                       if (_postsType == PostsType.NORMAL_POSTS) ...[
                         _autoSearchWidget(),
                         _autoSilenceNotice(),
-                        _autoAdminNotice(),
                         _autoPinnedPosts(),
                       ],
                     ],
@@ -689,7 +678,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                             children: [
                               if (isPinned)
                                 OTLeadingTag(
-                                  color: Colors.blue,
+                                  color: Theme.of(context).colorScheme.primary,
                                   text: S.of(context).pinned,
                                 ),
                               if (postElement.floors?.first_floor?.special_tag
@@ -704,9 +693,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                               ],
                               if (postElement.hidden == true) ...[
                                 const SizedBox(width: 4),
-                                const OTLeadingTag(
-                                  color: Colors.red,
-                                  text: "Hidden",
+                                OTLeadingTag(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  text: S.of(context).hole_hidden,
                                 ),
                               ]
                             ],

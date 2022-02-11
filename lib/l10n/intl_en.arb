@@ -330,7 +330,7 @@
     "background_image_description": "Choose an image as FDUHole background",
     "already_set": "Already Set",
     "background_image_already_set": "A background image is already set, do you wish to remove it?",
-    "high_contrast_color_description": "Empty Classroom View and FDUHole Tags will use high contrast colors",
+    "high_contrast_color_description": "Empty Classroom View and FDUHole Tags",
 
     "sponsor_us": "Support Us 🍀",
     "sponsor_us_detail": "Thank you so much for your kindness to enable it! Danxi and FDUHole have been operating as independent projects for a long time. However, in the long run, we are a bit overwhelmed by the high server costs.\n\nRather than direct donations, we chose a more modest way - to display some ads provided by Google in Danxi. These ads won't interfere with your browsing, but they will bring us real income and motivate us to keep going.",
@@ -370,7 +370,7 @@
     "connection_cancelled": "Connection cancelled unexpectedly",
     "no_data_error": "No data",
     "require_login": "You need to log in first.",
-    "format_exception": "Parse error. This usually happens when DanXi cannot log in on the campus server.\nSee detail for more information.",
+    "format_exception": "An error occurred while parsing data",
 
     "project_url": "https://danxi.fduhole.com",
     "w568w_description":"DanXi Founder / Developer",
@@ -389,5 +389,26 @@
     "minute_ago": "{num} min ago",
     "hour_ago": "{num} hr ago",
     "day_ago": "{num}d ago",
-    "select_semester": "Select Timetable Semester"
+    "select_semester": "Select Timetable Semester",
+
+    "admin_options": "Administrative Actions",
+    "reports": "Reports",
+    "modify_floor": "Modify Floor",
+    "delete_floor": "Delete Floor",
+    "hide_hole": "Hide Hole",
+    "add_penalty": "Penalize User",
+    "level": "Level {level}",
+    "add_special_tag":"Add Special Tag",
+    "pin_unpin_hole": "Pin/Unpin Hole",
+    "modify_tag_division": "Change Tags/Division",
+    "fold_floor": "Fold Floor",
+    "view_history": "View History",
+    "history_time": "Time: {time}",
+    "history_altered_by": "Altered By: {user}",
+    "original_content": "Original Content",
+    "history_of": "History of ##{floor}",
+    "input_reason": "Input Content (leave empty to restore)",
+    "operation_successful": "The operation completed successfully",
+    "hole_hidden": "Hidden Hole",
+    "semester_start_date": "First day of the semester"
 }

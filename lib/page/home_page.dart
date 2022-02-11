@@ -48,7 +48,6 @@ import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +71,7 @@ GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
 GlobalKey<TreeHoleSubpageState> treeholePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
-GlobalKey<State<TimetableSubPage>> timetablePageKey = GlobalKey();
+GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
 
 /// The main page of DanXi.
@@ -324,7 +323,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     smartNavigatorPush(context, '/bbs/messages',
         forcePushOnMainNavigator: true);
-    OTMessageItem.dispMessageDetailBasedOnGuessedDataType(context, code, data);
+    //OTMessageItem.dispMessageDetailBasedOnGuessedDataType(context, code, data);
   }
 
   @override
@@ -465,14 +464,22 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //   });
     // }
 
-    screenListener.addScreenRecordListener((recorded) {
-      if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {
-        Noticing.showScreenshotWarning(context);
+    screenListener.addScreenRecordListener((recorded) async {
+      if (StateProvider.needScreenshotWarning &&
+          StateProvider.isForeground &&
+          !StateProvider.showingScreenshotWarning) {
+        StateProvider.showingScreenshotWarning = true;
+        await Noticing.showScreenshotWarning(context);
+        StateProvider.showingScreenshotWarning = false;
       }
     });
-    screenListener.addScreenShotListener((filePath) {
-      if (StateProvider.needScreenshotWarning && StateProvider.isForeground) {
-        Noticing.showScreenshotWarning(context);
+    screenListener.addScreenShotListener((filePath) async {
+      if (StateProvider.needScreenshotWarning &&
+          StateProvider.isForeground &&
+          !StateProvider.showingScreenshotWarning) {
+        StateProvider.showingScreenshotWarning = true;
+        await Noticing.showScreenshotWarning(context);
+        StateProvider.showingScreenshotWarning = false;
       }
     });
     screenListener.watch();

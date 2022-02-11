@@ -121,8 +121,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   /// The key for ListView.
   final GlobalKey _scrollKey = GlobalKey();
 
-  /// Whether the ListView should load anymore after reaching the bottom.
+  /// Whether the ListView should load any more after reaching the bottom.
   bool _shouldLoad = true;
+
   int pageIndex = 1;
   bool _isRefreshing = false;
   bool _isEnded = false;

@@ -61,8 +61,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     if (_requestWorkingQueue.isNotEmpty) {
       _requestWorkingQueue.removeFirst().complete();
     }
-    print(
-        "-> New error, working queue length = ${_requestWorkingQueue.length}");
+    //print("-> New error, working queue length = ${_requestWorkingQueue.length}");
     handler.next(err);
   }
 
@@ -72,8 +71,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     if (_requestWorkingQueue.isNotEmpty) {
       _requestWorkingQueue.removeFirst().complete();
     }
-    print(
-        "-> New response, working queue length = ${_requestWorkingQueue.length}");
+    //print("-> New response, working queue length = ${_requestWorkingQueue.length}");
     handler.next(response);
   }
 
@@ -82,14 +80,12 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     // If there are fewer requests than [_kQueueLengthLimit], we just request at once.
     if (_requestWorkingQueue.length < _kQueueLengthLimit) {
       _requestWorkingQueue.add(Completer());
-      print(
-          "<- New request directly goes, working queue length = ${_requestWorkingQueue.length}");
+      //print("<- New request directly goes, working queue length = ${_requestWorkingQueue.length}");
       handler.next(options);
       return;
     }
     // Else, we add it to the [_requestWaitingQueue] and wait for any request to complete.
-    print(
-        "!! New request has to wait now, because working queue length = ${_requestWorkingQueue.length}");
+    //print("!! New request has to wait now, because working queue length = ${_requestWorkingQueue.length}");
     _requestWaitingQueue.add(Pair(options, handler));
 
     Future.any(_requestWorkingQueue.map((e) => e.future).followedBy(
@@ -98,8 +94,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
       Pair<RequestOptions, RequestInterceptorHandler> requestHandlerPair =
           _requestWaitingQueue.removeFirst();
       _requestWorkingQueue.add(Completer());
-      print(
-          "<! New request finally gets its turn, working queue length = ${_requestWorkingQueue.length}");
+      //print("<! New request finally gets its turn, working queue length = ${_requestWorkingQueue.length}");
       requestHandlerPair.second.next(requestHandlerPair.first);
     });
   }

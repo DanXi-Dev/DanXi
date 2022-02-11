@@ -40,13 +40,16 @@ class StateProvider {
   /// Whether need to display screenshot warning
   static bool needScreenshotWarning = false;
 
+  /// Whether showing a warning
+  static bool showingScreenshotWarning = false;
+
   static bool isForeground = true;
 
   static void initialize() {
     currentDivision = null;
     personInfo.value = null;
     isForeground = true;
-    needScreenshotWarning = false;
+    needScreenshotWarning = showingScreenshotWarning = false;
     editorCache.clear();
   }
 }

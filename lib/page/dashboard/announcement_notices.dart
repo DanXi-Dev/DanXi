@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -45,6 +46,13 @@ class AnnouncementList extends StatefulWidget {
 class _AnnouncementListState extends State<AnnouncementList> {
   List<Announcement> _data = [];
   bool _showingLatest = true;
+  late Future<bool?> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = LazyFuture.pack(AnnouncementRepository.getInstance().loadData());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +77,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
         ],
       ),
       body: FutureWidget<bool?>(
-        future: AnnouncementRepository.getInstance().loadData(),
+        future: _future,
         successBuilder: (_, snapShot) {
           _data = _showingLatest
               ? AnnouncementRepository.getInstance().getAnnouncements()

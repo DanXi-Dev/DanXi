@@ -140,8 +140,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   static String getFileName(String url) {
     try {
       return RegExp(r'(.*)\..*')
-          .firstMatch(Uri.parse(url).pathSegments.last)!
-          .group(1)! +
+              .firstMatch(Uri.parse(url).pathSegments.last)!
+              .group(1)! +
           '.png';
     } catch (_) {
       return "${DateFormat("yyyyMMddHHmmSSS").format(DateTime.now())}.png";
@@ -151,7 +151,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> shareImage() async {
     File image =
-    await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isMobile) {
       Share.shareFiles([
         image.absolute.path
@@ -165,7 +165,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> saveImage() async {
     File image =
-    await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isAndroid) {
       PermissionStatus status = await Permission.storage.status;
       if (!status.isGranted &&
@@ -262,7 +262,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               dragStartBehavior: DragStartBehavior.down,
               itemCount: _imageList.length,
               itemBuilder: (BuildContext context, int page) {
-                print("load page $page");
                 return ImageViewerBodyView(
                   imageInfo: _imageList[page],
                   heroTag: _initInfo == _imageList[page] ? heroTag : null,
@@ -307,11 +306,9 @@ class _ImageViewerBodyViewState extends State<ImageViewerBodyView> {
   bool originalLoading = true;
 
   Future<void> cacheOriginalImage() async {
-    print("Start loading originalImage ${widget.imageInfo.hdUrl}");
     if (widget.imageInfo.thumbUrl == null) return;
     try {
       await DefaultCacheManager().getSingleFile(widget.imageInfo.hdUrl);
-      print("Loaded originalImage ${widget.imageInfo.hdUrl}");
       setState(() => originalLoading = false);
     } catch (e, st) {
       setState(() {

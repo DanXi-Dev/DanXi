@@ -22,6 +22,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/empty_classroom_repository.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -295,12 +296,13 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                 ),
                 Expanded(
                   child: FutureWidget<List<RoomInfo>?>(
-                      future: EmptyClassroomRepository.getInstance()
-                          .getBuildingRoomInfo(
-                              _personInfo,
-                              _buildingList[_selectBuildingIndex]!.data![0],
-                              _buildingList[_selectBuildingIndex]!.data,
-                              selectDate),
+                      future: LazyFuture.pack(
+                          EmptyClassroomRepository.getInstance()
+                              .getBuildingRoomInfo(
+                                  _personInfo,
+                                  _buildingList[_selectBuildingIndex]!.data![0],
+                                  _buildingList[_selectBuildingIndex]!.data,
+                                  selectDate)),
                       successBuilder: (BuildContext context,
                               AsyncSnapshot<dynamic> snapshot) =>
                           WithScrollbar(
@@ -450,5 +452,4 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   Widget _buildLoadingWidget() => Center(
         child: PlatformCircularProgressIndicator(),
       );
-
 }

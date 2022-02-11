@@ -242,7 +242,7 @@ class OTFloorWidget extends StatelessWidget {
                         }
                       })
                   : smartRender(
-                  context,
+                      context,
                       floor.filteredContent ?? S.of(context).fatal_error,
                       onLinkTap,
                       onTapImage ?? defaultOnImageTap,
@@ -452,11 +452,13 @@ class OTFloorMentionWidget extends StatelessWidget {
                               loadingText: S.of(context).loading,
                               context: context);
                           try {
+                            OTHole? hole =
+                                await OpenTreeHoleRepository.getInstance()
+                                    .loadSpecificHole(floor.hole_id!);
+
                             smartNavigatorPush(context, "/bbs/postDetail",
                                 arguments: {
-                                  "post":
-                                      await OpenTreeHoleRepository.getInstance()
-                                          .loadSpecificHole(floor.hole_id!),
+                                  "post": await prefetchAllFloors(hole!),
                                   "locate": floor,
                                 });
                           } catch (e, st) {
