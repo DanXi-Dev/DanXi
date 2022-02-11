@@ -36,6 +36,13 @@ Go to [release page](https://github.com/w568w/DanXi/releases), just download the
 Go to [release page](https://github.com/w568w/DanXi/releases), just download the apk file and install it.   
 (Depending on the device, you may need to allow "Install apps from unknown sources" in the settings.)  
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/io.github.danxi_dev.dan_xi/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=io.github.danxi_dev.dan_xi)
+
 ## iOS/iPadOS
 Download from [App Store](https://apps.apple.com/us/app/旦夕/id1568629997)
 
