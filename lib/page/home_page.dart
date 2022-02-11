@@ -24,7 +24,6 @@ import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
@@ -33,7 +32,6 @@ import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
@@ -679,24 +677,27 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadStartDate() async {
-    TimeTable.defaultStartTime =
-        AnnouncementRepository.getInstance().getStartDate();
-    // Determine if Timetable needs to be updated
-    if (SettingsProvider.getInstance().lastSemesterStartTime !=
-            TimeTable.defaultStartTime.toIso8601String() &&
-        StateProvider.personInfo.value != null) {
-      // Update Timetable
-      TimeTableRepository.getInstance()
-          .loadTimeTable(StateProvider.personInfo.value,
-              forceLoadFromRemote: true)
-          .onError((dynamic error, stackTrace) {
-        Noticing.showNotice(context, S.of(context).timetable_refresh_error,
-            title: S.of(context).fatal_error, useSnackBar: false);
-      });
+    // @w568w(2022-2-11):
+    // TODO: disable loading start date temporarily.
 
-      SettingsProvider.getInstance().lastSemesterStartTime =
-          TimeTable.defaultStartTime.toIso8601String();
-    }
+    // TimeTable.defaultStartTime =
+    //     AnnouncementRepository.getInstance().getStartDate();
+    // // Determine if Timetable needs to be updated
+    // if (SettingsProvider.getInstance().lastSemesterStartTime !=
+    //         TimeTable.defaultStartTime.toIso8601String() &&
+    //     StateProvider.personInfo.value != null) {
+    //   // Update Timetable
+    //   TimeTableRepository.getInstance()
+    //       .loadTimeTable(StateProvider.personInfo.value,
+    //           forceLoadFromRemote: true)
+    //       .onError((dynamic error, stackTrace) {
+    //     Noticing.showNotice(context, S.of(context).timetable_refresh_error,
+    //         title: S.of(context).fatal_error, useSnackBar: false);
+    //   });
+    //
+    //   SettingsProvider.getInstance().lastSemesterStartTime =
+    //       TimeTable.defaultStartTime.toIso8601String();
+    // }
   }
 
   Future<void> _loadCelebration() async {
