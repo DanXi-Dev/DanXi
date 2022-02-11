@@ -316,6 +316,15 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     const TimetableStyle style = TimetableStyle();
     _table = table;
     _showingTime ??= _table!.now();
+
+    // Limit [_showingTime] to an appropriate range
+    if (_showingTime!.week < 0) _showingTime!.week = 0;
+    if (_showingTime!.week > TimeTable.MAX_WEEK) {
+      _showingTime!.week = TimeTable.MAX_WEEK;
+    }
+    if (_showingTime!.weekday < 0) _showingTime!.weekday = 0;
+    if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
+
     final List<DayEvents> scheduleData = _table!
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return Material(
@@ -364,6 +373,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
+
   const SemesterSelectionButton({Key? key, this.onSelectionUpdate})
       : super(key: key);
 
