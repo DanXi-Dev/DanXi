@@ -410,5 +410,7 @@
     "input_reason": "Input Content (leave empty to restore)",
     "operation_successful": "The operation completed successfully",
     "hole_hidden": "Hidden Hole",
-    "semester_start_date": "First day of the semester"
+
+    "semester_start_date": "First day of the semester",
+    "delete_this_tag": "Delete this tag?"
 }

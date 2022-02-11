@@ -390,5 +390,7 @@
   "input_reason": "输入内容（留空以还原）",
   "operation_successful": "操作成功",
   "hole_hidden": "已隐藏",
-  "semester_start_date": "学期开始日期"
+
+  "semester_start_date": "学期开始日期",
+  "delete_this_tag": "删除此标签？"
 }
