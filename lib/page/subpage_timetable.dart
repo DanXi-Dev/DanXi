@@ -78,6 +78,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
             () => ShareTimetableEvent().fire()),
       ];
 
+  /*
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
@@ -85,7 +86,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
             timetablePageKey.currentState?.refresh(forceReloadFromRemote: true);
           },
         ), null)
-      ];
+      ];*/
 }
 
 class ShareTimetableEvent {}
