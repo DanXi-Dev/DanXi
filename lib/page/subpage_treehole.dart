@@ -234,8 +234,11 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
-          AppBarButtonItem(S.of(cxt).reports,
-              const Icon(CupertinoIcons.exclamationmark_octagon), () {
+          AppBarButtonItem(
+              S.of(cxt).reports,
+              Icon(PlatformX.isMaterial(cxt)
+                  ? Icons.report_outlined
+                  : CupertinoIcons.exclamationmark_octagon), () {
             smartNavigatorPush(cxt, "/bbs/reports");
           })
         ],
