@@ -49,10 +49,10 @@ If necessary, consider using the iOS/iPadOS version instead.
 
 ```shell script
 $ flutter --version
-Flutter 2.10.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 5f105a6ca7 (3 days ago) • 2022-02-01 14:15:42 -0800
-Engine • revision 776efd2034
-Tools • Dart 2.16.0 • DevTools 2.9.2
+Flutter 2.10.1 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision db747aa133 (2 days ago) • 2022-02-09 13:57:35 -0600
+Engine • revision ab46186b24
+Tools • Dart 2.16.1 • DevTools 2.9.2
 ```
 ## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  
