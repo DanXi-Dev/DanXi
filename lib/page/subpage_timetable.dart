@@ -23,7 +23,6 @@ import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -77,6 +76,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
             () => ShareTimetableEvent().fire()),
       ];
 
+  /*
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
@@ -84,7 +84,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
             timetablePageKey.currentState?.refresh(forceReloadFromRemote: true);
           },
         ), null)
-      ];
+      ];*/
 }
 
 class ShareTimetableEvent {}
@@ -315,6 +315,15 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     const TimetableStyle style = TimetableStyle();
     _table = table;
     _showingTime ??= _table!.now();
+
+    // Limit [_showingTime] to an appropriate range
+    if (_showingTime!.week < 0) _showingTime!.week = 0;
+    if (_showingTime!.week > TimeTable.MAX_WEEK) {
+      _showingTime!.week = TimeTable.MAX_WEEK;
+    }
+    if (_showingTime!.weekday < 0) _showingTime!.weekday = 0;
+    if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
+
     final List<DayEvents> scheduleData = _table!
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return Material(
@@ -363,6 +372,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
+
   const SemesterSelectionButton({Key? key, this.onSelectionUpdate})
       : super(key: key);
 

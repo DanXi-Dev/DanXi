@@ -49,15 +49,15 @@
 
 ```shell script
 $ flutter --version
-Flutter 2.10.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 5f105a6ca7 (3 days ago) • 2022-02-01 14:15:42 -0800
-Engine • revision 776efd2034
-Tools • Dart 2.16.0 • DevTools 2.9.2
+Flutter 2.10.1 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision db747aa133 (2 days ago) • 2022-02-09 13:57:35 -0600
+Engine • revision ab46186b24
+Tools • Dart 2.16.1 • DevTools 2.9.2
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
   
-为了构建本应用，您需要按照`Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装`Flutter SDK`。    
+为了构建本应用，您需要按照`Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装`Flutter SDK`。
   
 如果您正在为`Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/)`Visual Studio`。  
   

@@ -176,10 +176,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       // Scroll to the corresponding post
       while (!(await _listViewController.scrollToItem(floor))) {
         // Prevent deadlock
-        if ((_listViewController.getScrollController()?.position.extentAfter ??
-                0) <
-            10) {
-          break;
+        if (hasPrefetchedAllData) {
+          if ((_listViewController
+                      .getScrollController()
+                      ?.position
+                      .extentAfter ??
+                  0) <
+              10) break;
+        } else {
+          if (_listViewController.isEnded) break;
         }
 
         // fixme: Will scrolling at height of viewportHeight bring problems?

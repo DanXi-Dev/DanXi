@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -38,37 +39,39 @@ class _BBSTagsContainerState extends State<BBSTagsContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTapDown: (_) {
-        if (_searchFocus.hasFocus) _searchFocus.unfocus();
-      },
-      child: Column(
-        children: [
-          CupertinoSearchTextField(
-            focusNode: _searchFocus,
-            onChanged: (filter) {
-              setState(() {
-                filteredTags = widget.tags!
-                    .where((value) => value.name!
-                        .toLowerCase()
-                        .contains(filter.toLowerCase()))
-                    .toList();
-              });
-            },
-          ),
-          Wrap(
-              children: (filteredTags ?? widget.tags)!
-                  .map(
-                    (e) => Padding(
-                        padding: const EdgeInsets.only(top: 16, right: 12),
-                        child: RoundChip(
-                            label: e.name,
-                            color: e.color,
-                            onTap: () => widget.onTap?.call(e))),
-                  )
-                  .toList())
-        ],
+    return ThemedMaterial(
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTapDown: (_) {
+          if (_searchFocus.hasFocus) _searchFocus.unfocus();
+        },
+        child: Column(
+          children: [
+            CupertinoSearchTextField(
+              focusNode: _searchFocus,
+              onChanged: (filter) {
+                setState(() {
+                  filteredTags = widget.tags!
+                      .where((value) => value.name!
+                          .toLowerCase()
+                          .contains(filter.toLowerCase()))
+                      .toList();
+                });
+              },
+            ),
+            Wrap(
+                children: (filteredTags ?? widget.tags)!
+                    .map(
+                      (e) => Padding(
+                          padding: const EdgeInsets.only(top: 16, right: 12),
+                          child: RoundChip(
+                              label: e.name,
+                              color: e.color,
+                              onTap: () => widget.onTap?.call(e))),
+                    )
+                    .toList())
+          ],
+        ),
       ),
     );
   }
