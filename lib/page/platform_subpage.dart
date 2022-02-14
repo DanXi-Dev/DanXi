@@ -20,6 +20,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/scroller_fix/mirror_scroll_controller.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
@@ -133,19 +134,23 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
     if (!_isInTab) return buildPage(context);
 
     // Build action buttons.
-    PlatformIconButton? leadingButton;
+    Widget? leadingButton;
     List<PlatformIconButton> trailingButtons = [];
     List<AppBarButtonItem> leadingItems = widget.leading.call(context);
     List<AppBarButtonItem> trailingItems = widget.trailing.call(context);
 
     if (leadingItems.isNotEmpty) {
-      leadingButton = PlatformIconButton(
-        material: (_, __) =>
-            MaterialIconButtonData(tooltip: leadingItems.first.caption),
-        padding: EdgeInsets.zero,
-        icon: leadingItems.first.widget,
-        onPressed: leadingItems.first.onPressed,
-      );
+      if (leadingItems.first.useCustomWidget) {
+        leadingButton = leadingItems.first.widget;
+      } else {
+        leadingButton = PlatformIconButton(
+          material: (_, __) =>
+              MaterialIconButtonData(tooltip: leadingItems.first.caption),
+          padding: EdgeInsets.zero,
+          icon: leadingItems.first.widget,
+          onPressed: leadingItems.first.onPressed,
+        );
+      }
     }
 
     if (trailingItems.isNotEmpty) {
@@ -183,8 +188,10 @@ class AppBarButtonItem {
   final String caption;
   final Widget widget;
   final VoidCallback? onPressed;
+  final bool useCustomWidget;
 
-  AppBarButtonItem(this.caption, this.widget, this.onPressed);
+  AppBarButtonItem(this.caption, this.widget, this.onPressed,
+      {this.useCustomWidget = false});
 }
 
 enum SubpageViewState { VISIBLE, INVISIBLE }

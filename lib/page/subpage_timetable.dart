@@ -82,9 +82,9 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
           onSelectionUpdate: () {
-            timetablePageKey.currentState?.refresh(forceReloadFromRemote: true);
+            timetablePageKey.currentState?.indicatorKey.currentState?.show();
           },
-        ), null)
+        ), null, useCustomWidget: true)
       ];
 }
 
@@ -110,6 +110,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   bool forceLoadFromRemote = false;
 
   BannerAd? bannerAd;
+
+  final GlobalKey<RefreshIndicatorState> indicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup)) {
@@ -329,6 +332,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return Material(
       child: RefreshIndicator(
+        key: indicatorKey,
         edgeOffset: MediaQuery.of(context).padding.top,
         color: Theme.of(context).colorScheme.secondary,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
@@ -353,7 +357,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 PlatformIconButton(
                   icon: const Icon(Icons.chevron_right),
                   onPressed:
-                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
+                  _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
                 )
               ],
             ),
@@ -396,6 +400,8 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   Future<void> loadSemesterInfo() async {
     _semesterInfo = await EduServiceRepository.getInstance()
         .loadSemesters(StateProvider.personInfo.value);
+    // Reverse the order to make the newest item at top
+    _semesterInfo = _semesterInfo?.reversed.toList();
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
       chosenSemester = await TimeTableRepository.getInstance()
@@ -410,34 +416,59 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
     return FutureWidget<void>(
         future: _future,
         nullable: true,
-        successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          return PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: AutoSizeText(
-                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
-            onPressed: () => showPlatformModalSheet(
-              context: context,
-              builder: (menuContext) => PlatformContextMenu(
-                cancelButton: CupertinoActionSheetAction(
-                    child: Text(S.of(menuContext).cancel),
-                    onPressed: () => Navigator.of(menuContext).pop()),
-                actions: _semesterInfo!
-                    .map((e) => PlatformContextMenuItem(
-                        menuContext: menuContext,
-                        onPressed: () {
-                          SettingsProvider.getInstance().timetableSemester =
-                              e.semesterId;
-                          setState(() {
-                            _selectionInfo = e;
-                          });
-                          widget.onSelectionUpdate?.call();
-                        },
-                        child: Text("${e.schoolYear} ${e.name!}")))
-                    .toList(),
+        successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: AutoSizeText(
+                  "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
+              onPressed: () => showPlatformModalSheet(
+                context: context,
+                builder: (menuContext) => PlatformContextMenu(
+                  cancelButton: CupertinoActionSheetAction(
+                      child: Text(S.of(menuContext).cancel),
+                      onPressed: () => Navigator.of(menuContext).pop()),
+                  actions: _semesterInfo!
+                      .map((e) => PlatformContextMenuItem(
+                          menuContext: menuContext,
+                          onPressed: () {
+                            print(e.semesterId);
+                            SettingsProvider.getInstance().timetableSemester =
+                                e.semesterId;
+                            setState(() => _selectionInfo = e);
+
+                            // Try to parse the start date
+                            String? parsedStartDate =
+                                SettingsProvider.getInstance()
+                                    .semesterStartDates
+                                    ?.parseStartDate(
+                                        StateProvider.personInfo.value!.group,
+                                        e.semesterId!);
+                            if (parsedStartDate != null) {
+                              SettingsProvider.getInstance()
+                                  .thisSemesterStartDate = parsedStartDate;
+                            } else {
+                              Noticing.showNotice(
+                                  this.context,
+                                  S.of(context).unknown_start_date(
+                                      "${e.schoolYear} ${e.name!}"));
+                            }
+
+                            widget.onSelectionUpdate?.call();
+                          },
+                          child: Text(
+                            "${e.schoolYear} ${e.name!}",
+                            // Highlight the selected item
+                            style: TextStyle(
+                                color: PlatformX.isMaterial(context) &&
+                                        e.semesterId ==
+                                            _selectionInfo?.semesterId
+                                    ? Theme.of(context).primaryColor
+                                    : null),
+                          )))
+                      .toList(),
+                ),
               ),
             ),
-          );
-        },
         errorBuilder: () => PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: Text(S.of(context).failed),

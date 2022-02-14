@@ -23,6 +23,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -677,27 +678,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadStartDate() async {
-    // @w568w(2022-2-11):
-    // TODO: disable loading start date temporarily.
-
-    // TimeTable.defaultStartTime =
-    //     AnnouncementRepository.getInstance().getStartDate();
-    // // Determine if Timetable needs to be updated
-    // if (SettingsProvider.getInstance().lastSemesterStartTime !=
-    //         TimeTable.defaultStartTime.toIso8601String() &&
-    //     StateProvider.personInfo.value != null) {
-    //   // Update Timetable
-    //   TimeTableRepository.getInstance()
-    //       .loadTimeTable(StateProvider.personInfo.value,
-    //           forceLoadFromRemote: true)
-    //       .onError((dynamic error, stackTrace) {
-    //     Noticing.showNotice(context, S.of(context).timetable_refresh_error,
-    //         title: S.of(context).fatal_error, useSnackBar: false);
-    //   });
-    //
-    //   SettingsProvider.getInstance().lastSemesterStartTime =
-    //       TimeTable.defaultStartTime.toIso8601String();
-    // }
+    TimeTableExtra? startDateData;
+    try {
+      startDateData = AnnouncementRepository.getInstance().getStartDates();
+    } catch (_) {}
+    if (startDateData != null) {
+      SettingsProvider.getInstance().semesterStartDates = startDateData;
+    }
   }
 
   Future<void> _loadCelebration() async {

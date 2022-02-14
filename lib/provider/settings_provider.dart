@@ -23,6 +23,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,8 +47,8 @@ class SettingsProvider {
       "ec_last_choice";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
-  static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
-      "last_recorded_semester_start_time";
+  static const String KEY_THIS_SEMESTER_START_DATE = "this_semester_start_date";
+  static const String KEY_SEMESTER_START_DATES = "semester_start_dates";
   static const String KEY_CLEAN_MODE = "clean_mode";
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
@@ -156,15 +157,26 @@ class SettingsProvider {
     preferences!.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
   }
 
-  String? get lastSemesterStartTime {
-    if (preferences!.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
-      return preferences!.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME)!;
+  String? get thisSemesterStartDate {
+    if (preferences!.containsKey(KEY_THIS_SEMESTER_START_DATE)) {
+      return preferences!.getString(KEY_THIS_SEMESTER_START_DATE)!;
     }
     return null;
   }
 
-  set lastSemesterStartTime(String? value) =>
-      preferences!.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value!);
+  set thisSemesterStartDate(String? value) =>
+      preferences!.setString(KEY_THIS_SEMESTER_START_DATE, value!);
+
+  TimeTableExtra? get semesterStartDates {
+    if (preferences!.containsKey(KEY_SEMESTER_START_DATES)) {
+      return TimeTableExtra.fromJson(
+          jsonDecode(preferences!.getString(KEY_SEMESTER_START_DATES)!));
+    }
+    return null;
+  }
+
+  set semesterStartDates(TimeTableExtra? value) =>
+      preferences!.setString(KEY_SEMESTER_START_DATES, jsonEncode(value!));
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting

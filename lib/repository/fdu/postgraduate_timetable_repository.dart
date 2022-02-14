@@ -99,7 +99,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     return TimeTable.fromUGjson(
         startTime ??
             DateTime.tryParse(
-                SettingsProvider.getInstance().lastSemesterStartTime ?? "") ??
+                SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
             Constant.DEFAULT_SEMESTER_START_TIME,
         coursePage.data is Map
             ? coursePage.data

@@ -369,12 +369,14 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                     .add(const Duration(days: 365 * 100)));
                             if (newDate != null) {
                               setState(() {
-                                TimeTable.defaultStartTime = newDate;
                                 SettingsProvider.getInstance()
-                                        .lastSemesterStartTime =
+                                        .thisSemesterStartDate =
                                     TimeTable.defaultStartTime
                                         .toIso8601String();
                               });
+                              Noticing.showMaterialNotice(this.context,
+                                  S.of(context).refresh_timetable_for_new_data,
+                                  useSnackBar: true);
                             }
                           },
                         ),
