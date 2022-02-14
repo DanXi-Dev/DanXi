@@ -352,7 +352,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         ),
 
                         // Timetable Start date
-                        /*
                         ListTile(
                           title: Text(S.of(context).semester_start_date),
                           leading: PlatformX.isMaterial(context)
@@ -379,7 +378,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                   useSnackBar: true);
                             }
                           },
-                        ),*/
+                        ),
                       ]),
                     ),
 
