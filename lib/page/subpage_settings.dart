@@ -371,8 +371,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               setState(() {
                                 SettingsProvider.getInstance()
                                         .thisSemesterStartDate =
-                                    TimeTable.defaultStartTime
-                                        .toIso8601String();
+                                    newDate.toIso8601String();
                               });
                               Noticing.showMaterialNotice(this.context,
                                   S.of(context).refresh_timetable_for_new_data,
