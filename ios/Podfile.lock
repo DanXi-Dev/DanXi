@@ -277,7 +277,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 837649ad3987936c232f6717c5680216f6243d24
   GoogleUserMessagingPlatform: ab890ce5f6620f293a21b6bdd82e416a2c73aeca
   GoogleUtilities: 684ee790a24f73ebb2d1d966e9711c203f2a4237
-  image_picker: 0d37d1cb66231c2473a0e3ccb8d062d0c2b3d297
+  image_picker: 541dcbb3b9cf32d87eacbd957845d8651d6c62c3
   in_app_review: 4a97249f7a2f539a0f294c2d9196b7fe35e49541
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
@@ -292,11 +292,11 @@ SPEC CHECKSUMS:
   screen_capture_event: bcf965bb31968a51c08ad3698725c5ad8c597124
   SDWebImage: 4dc3e42d9ec0c1028b960a33ac6b637bb432207b
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
-  shared_preferences_ios: aef470a42dc4675a1cdd50e3158b42e3d1232b32
+  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   SwiftyGif: 5d4af95df24caf1c570dbbcb32a3b8a0763bc6d7
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
-  url_launcher_ios: 02f1989d4e14e998335b02b67a7590fa34f971af
+  url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
 
 PODFILE CHECKSUM: 402ca1dbc65ab091f9caa450e4fdf6d5665fc06e
 
