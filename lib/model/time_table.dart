@@ -121,9 +121,21 @@ class TimeTable {
         slot = i;
       }
     }
-    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    if (diff.isNegative) {
+      var days = diff.inDays;
+      // If the day of duration is not exactly an integer, we need to go back one more day.
+      // e.g. [startTime] is 02-12 00:00:00, and the time now is 02-11 18:00:00. Then [diff.inDays] == 0, but
+      //      in fact we suppose the [days] to be `-1`.
+      if (diff != Duration(days: days)) days--;
+
+      // Similarly, special rounding method should be used here to get correct result.
+      return TimeNow(days % 7 == 0 ? days ~/ 7 + 1 : days ~/ 7, days % 7, slot);
+    } else {
+      return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    }
   }
 
+  /// See [now]() for details.
   static TimeNow defaultNow() {
     DateTime now = DateTime.now();
     Duration diff = now.difference(defaultStartTime);
@@ -133,7 +145,13 @@ class TimeTable {
         slot = i;
       }
     }
-    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    if (diff.isNegative) {
+      var days = diff.inDays;
+      if (diff != Duration(days: days)) days--;
+      return TimeNow(days % 7 == 0 ? days ~/ 7 + 1 : days ~/ 7, days % 7, slot);
+    } else {
+      return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    }
   }
 
   Map<int, List<Event>> toWeekCourses(int week) {

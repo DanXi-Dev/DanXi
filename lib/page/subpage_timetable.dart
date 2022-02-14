@@ -253,9 +253,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   Widget buildPage(BuildContext context) {
     return FutureWidget<TimeTable?>(
-      successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return _buildPage(snapshot.data);
-      },
+      successBuilder:
+          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
+              _buildPage(snapshot.data!),
       future: _contentFuture,
       errorBuilder: (BuildContext context,
               AsyncSnapshot<TimeTable?> snapshot) =>
@@ -357,7 +357,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 PlatformIconButton(
                   icon: const Icon(Icons.chevron_right),
                   onPressed:
-                  _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
+                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
                 )
               ],
             ),

@@ -49,11 +49,6 @@ class _ScheduleViewState extends State<ScheduleView> {
   int _maxSlot = 0;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Widget table;
     for (var laneEvent in widget.laneEventsList) {
