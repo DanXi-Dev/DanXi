@@ -58,6 +58,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 
 import 'common/constant.dart';
@@ -184,7 +185,7 @@ class DanxiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget mainApp = PlatformProvider(
+    Widget mainApp = PlatformProvider(
       // Uncomment this line below to force the app to use Cupertino UI
       // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => DynamicThemeController(
@@ -232,24 +233,26 @@ class DanxiApp extends StatelessWidget {
         ),
       ),
     );
-
     if (PlatformX.isAndroid || PlatformX.isIOS) {
       // Listen to Foreground / Background Event with [FGBGNotifier].
-      return Phoenix(
-          child: FGBGNotifier(
-              onEvent: (FGBGType value) {
-                switch (value) {
-                  case FGBGType.foreground:
-                    StateProvider.isForeground = true;
-                    break;
-                  case FGBGType.background:
-                    StateProvider.isForeground = false;
-                    break;
-                }
-              },
-              child: mainApp));
-    } else {
-      return Phoenix(child: mainApp);
+      mainApp = FGBGNotifier(
+          onEvent: (FGBGType value) {
+            switch (value) {
+              case FGBGType.foreground:
+                StateProvider.isForeground = true;
+                break;
+              case FGBGType.background:
+                StateProvider.isForeground = false;
+                break;
+            }
+          },
+          child: mainApp);
     }
+
+    return Phoenix(
+      child: MultiProvider(providers: [
+        ChangeNotifierProvider.value(value: SettingsProvider.getInstance())
+      ], child: mainApp),
+    );
   }
 }
