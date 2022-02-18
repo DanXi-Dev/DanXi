@@ -49,6 +49,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -69,22 +70,30 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).timetable);
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) =>
+  [
         AppBarButtonItem(
-            S.of(cxt).share,
-            Icon(PlatformX.isMaterial(cxt)
-                ? Icons.share
-                : CupertinoIcons.square_arrow_up),
-            () => ShareTimetableEvent().fire()),
+          S.of(cxt).share,
+          Icon(PlatformX.isMaterial(cxt)
+              ? Icons.share
+              : CupertinoIcons.square_arrow_up),
+          () => ShareTimetableEvent().fire(),
+        ),
+        AppBarButtonItem(
+            S.of(cxt).semester_start_date, // Timetable Start date
+            const StartDateSelectionButton(),
+            null,
+            useCustomWidget: true)
       ];
 
   @override
-  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+  Create<List<AppBarButtonItem>> get leading => (cxt) =>
+  [
         AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
           onSelectionUpdate: () {
             timetablePageKey.currentState?.indicatorKey.currentState?.show();
           },
-        ), null, useCustomWidget: true)
+        ), null, useCustomWidget: true),
       ];
 }
 
@@ -431,7 +440,6 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                       .map((e) => PlatformContextMenuItem(
                           menuContext: menuContext,
                           onPressed: () {
-                            print(e.semesterId);
                             SettingsProvider.getInstance().timetableSemester =
                                 e.semesterId;
                             setState(() => _selectionInfo = e);
@@ -452,7 +460,6 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                                   S.of(context).unknown_start_date(
                                       "${e.schoolYear} ${e.name!}"));
                             }
-
                             widget.onSelectionUpdate?.call();
                           },
                           child: Text(
@@ -480,5 +487,41 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
               padding: EdgeInsets.zero,
               icon: Text(S.of(context).loading),
             ));
+  }
+}
+
+class StartDateSelectionButton extends StatefulWidget {
+  const StartDateSelectionButton({Key? key}) : super(key: key);
+
+  @override
+  _StartDateSelectionButtonState createState() =>
+      _StartDateSelectionButtonState();
+}
+
+class _StartDateSelectionButtonState extends State<StartDateSelectionButton> {
+  @override
+  Widget build(BuildContext context) {
+    return PlatformIconButton(
+      padding: EdgeInsets.zero,
+      icon: AutoSizeText(
+          DateFormat("yyyy-MM-dd").format(TimeTable.defaultStartTime)),
+      onPressed: () async {
+        DateTime? newDate = await showPlatformDatePicker(
+            context: context,
+            initialDate: TimeTable.defaultStartTime,
+            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+            lastDate: TimeTable.defaultStartTime
+                .add(const Duration(days: 365 * 100)));
+        if (newDate != null) {
+          setState(() {
+            SettingsProvider.getInstance().thisSemesterStartDate =
+                newDate.toIso8601String();
+          });
+          Noticing.showMaterialNotice(
+              this.context, S.of(context).refresh_timetable_for_new_data,
+              useSnackBar: true);
+        }
+      },
+    );
   }
 }
