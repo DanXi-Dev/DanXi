@@ -70,8 +70,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).timetable);
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) =>
-  [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
           S.of(cxt).share,
           Icon(PlatformX.isMaterial(cxt)
@@ -87,8 +86,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
       ];
 
   @override
-  Create<List<AppBarButtonItem>> get leading => (cxt) =>
-  [
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
           onSelectionUpdate: () {
             timetablePageKey.currentState?.indicatorKey.currentState?.show();
@@ -501,22 +499,25 @@ class StartDateSelectionButton extends StatefulWidget {
 class _StartDateSelectionButtonState extends State<StartDateSelectionButton> {
   @override
   Widget build(BuildContext context) {
+    DateTime startTime = context.select<SettingsProvider, DateTime>((value) {
+      var startDateStr = value.thisSemesterStartDate;
+      DateTime? startDate;
+      if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
+      return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
+    });
+
     return PlatformIconButton(
       padding: EdgeInsets.zero,
-      icon: AutoSizeText(
-          DateFormat("yyyy-MM-dd").format(TimeTable.defaultStartTime)),
+      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime)),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
-            initialDate: TimeTable.defaultStartTime,
+            initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-            lastDate: TimeTable.defaultStartTime
-                .add(const Duration(days: 365 * 100)));
+            lastDate: startTime.add(const Duration(days: 365 * 100)));
         if (newDate != null) {
-          setState(() {
-            SettingsProvider.getInstance().thisSemesterStartDate =
-                newDate.toIso8601String();
-          });
+          SettingsProvider.getInstance().thisSemesterStartDate =
+              newDate.toIso8601String();
           Noticing.showMaterialNotice(
               this.context, S.of(context).refresh_timetable_for_new_data,
               useSnackBar: true);
