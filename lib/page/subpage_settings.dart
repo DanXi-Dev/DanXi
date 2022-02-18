@@ -353,18 +353,21 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
                     // Accessibility
                     Card(
-                      child: SwitchListTile.adaptive(
-                        title: Text(S.of(context).accessibility_coloring),
-                        subtitle:
-                            Text(S.of(context).high_contrast_color_description),
-                        secondary: const Icon(Icons.accessibility_new_rounded),
-                        value: SettingsProvider.getInstance()
-                            .useAccessibilityColoring,
-                        onChanged: (bool value) {
-                          setState(() => SettingsProvider.getInstance()
-                              .useAccessibilityColoring = value);
-                          treeholePageKey.currentState?.setState(() {});
-                        },
+                      child: Selector<SettingsProvider, bool>(
+                        selector: (_, model) => model.useAccessibilityColoring,
+                        builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).accessibility_coloring),
+                          subtitle: Text(
+                              S.of(context).high_contrast_color_description),
+                          secondary:
+                              const Icon(Icons.accessibility_new_rounded),
+                          value: value,
+                          onChanged: (bool value) {
+                            SettingsProvider.getInstance()
+                                .useAccessibilityColoring = value;
+                            treeholePageKey.currentState?.setState(() {});
+                          },
+                        ),
                       ),
                     ),
                     if (PlatformX.isWindows)
@@ -502,19 +505,21 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 OTNotificationSettingsTile(
                   parentSetStateFunction: refreshSelf,
                 ),
-                SwitchListTile.adaptive(
-                  title: Text(S.of(context).fduhole_clean_mode),
-                  secondary: const Icon(Icons.ac_unit),
-                  subtitle: Text(S.of(context).fduhole_clean_mode_description),
-                  value: SettingsProvider.getInstance().cleanMode,
-                  onChanged: (bool value) {
-                    if (value) {
-                      _showCleanModeGuideDialog();
-                    }
-                    setState(
-                        () => SettingsProvider.getInstance().cleanMode = value);
-                  },
-                ),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).fduhole_clean_mode),
+                          secondary: const Icon(Icons.ac_unit),
+                          subtitle: Text(
+                              S.of(context).fduhole_clean_mode_description),
+                          value: value,
+                          onChanged: (bool value) {
+                            if (value) {
+                              _showCleanModeGuideDialog();
+                            }
+                            SettingsProvider.getInstance().cleanMode = value;
+                          },
+                        ),
+                    selector: (_, model) => model.cleanMode),
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),
