@@ -36,7 +36,8 @@ import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/util/win32/auto_start.dart';
+import 'package:dan_xi/util/win32/auto_start.dart'
+    if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';

@@ -78,6 +78,7 @@ dependencies:
   animated_text_kit: ^4.2.1
   flutter_fgbg: ^0.1.0
   lazy_load_indexed_stack: ^0.1.2
+  js: ^0.6.3
 
 dependency_overrides:
   device_info_plus: ^3.2.1

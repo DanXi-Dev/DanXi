@@ -24,10 +24,11 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/io/cache.dart';
+import 'package:dan_xi/util/js/js.dart'
+    if (dart.library.js) 'package:dan_xi/util/js/js_web.dart' as js;
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_js/flutter_js.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
@@ -56,12 +57,8 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     return temp['data']['token'];
   }
 
-  Future<String> encryptDES(String pwd) async {
-    var flutterJs = getJavascriptRuntime();
-    JsEvalResult jsResult =
-        flutterJs.evaluate(DES_JS.replaceFirst("PASSWORD", pwd));
-    return jsResult.stringResult;
-  }
+  String encryptDES(String pwd) =>
+      js.evaluate(DES_JS.replaceFirst("PASSWORD", pwd));
 
   Future<void> _requestLogin(
       String id, String pwd, String yzm, String token) async {
