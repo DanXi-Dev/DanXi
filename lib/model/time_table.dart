@@ -17,6 +17,8 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -43,7 +45,22 @@ class Event {
 @JsonSerializable()
 class TimeTable {
   /// Start time of the term.
-  static DateTime defaultStartTime = DateTime(2021, 3, 1);
+  ///
+  /// We decide what the start date is in this priority order:
+  /// 1. StartDate passed in as a parameters
+  /// 2. [TimeTable.defaultStartTime] (It should be same as [SettingsProvider.getInstance().thisSemesterStartDate])
+  /// 3. [Constant.DEFAULT_SEMESTER_START_TIME].
+  ///
+  /// When user changes the semester, we should look for the semester id in [SettingsProvider.getInstance().semesterStartDates],
+  /// which was obtained from Bmob Database.
+  /// If found, we set [defaultStartTime] to that date.
+  /// Otherwise we do nothing and notify the user to set [TimeTable.defaultStartTime] manually.
+  static DateTime get defaultStartTime {
+    var startDateStr = SettingsProvider.getInstance().thisSemesterStartDate;
+    DateTime? startDate;
+    if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
+    return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
+  }
 
   static final DateTime kMonday = DateTime(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
@@ -104,9 +121,21 @@ class TimeTable {
         slot = i;
       }
     }
-    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    if (diff.isNegative) {
+      var days = diff.inDays;
+      // If the day of duration is not exactly an integer, we need to go back one more day.
+      // e.g. [startTime] is 02-12 00:00:00, and the time now is 02-11 18:00:00. Then [diff.inDays] == 0, but
+      //      in fact we suppose the [days] to be `-1`.
+      if (diff != Duration(days: days)) days--;
+
+      // Similarly, special rounding method should be used here to get correct result.
+      return TimeNow(days % 7 == 0 ? days ~/ 7 + 1 : days ~/ 7, days % 7, slot);
+    } else {
+      return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    }
   }
 
+  /// See [now]() for details.
   static TimeNow defaultNow() {
     DateTime now = DateTime.now();
     Duration diff = now.difference(defaultStartTime);
@@ -116,7 +145,13 @@ class TimeTable {
         slot = i;
       }
     }
-    return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    if (diff.isNegative) {
+      var days = diff.inDays;
+      if (diff != Duration(days: days)) days--;
+      return TimeNow(days % 7 == 0 ? days ~/ 7 + 1 : days ~/ 7, days % 7, slot);
+    } else {
+      return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
+    }
   }
 
   Map<int, List<Event>> toWeekCourses(int week) {

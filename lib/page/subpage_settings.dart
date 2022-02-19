@@ -348,52 +348,26 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                           onPressed: () =>
                                               Navigator.of(context).pop()))),
                         ),
-
-                        // Timetable Start date
-                        /*
-                        ListTile(
-                          title: Text(S.of(context).semester_start_date),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.calendar_today)
-                              : const Icon(CupertinoIcons.calendar_badge_plus),
-                          subtitle: Text(DateFormat("yyyy-MM-dd")
-                              .format(TimeTable.defaultStartTime)),
-                          onTap: () async {
-                            DateTime? newDate = await showPlatformDatePicker(
-                                context: context,
-                                initialDate: TimeTable.defaultStartTime,
-                                firstDate:
-                                    DateTime.fromMillisecondsSinceEpoch(0),
-                                lastDate: TimeTable.defaultStartTime
-                                    .add(const Duration(days: 365 * 100)));
-                            if (newDate != null) {
-                              setState(() {
-                                TimeTable.defaultStartTime = newDate;
-                                SettingsProvider.getInstance()
-                                        .lastSemesterStartTime =
-                                    TimeTable.defaultStartTime
-                                        .toIso8601String();
-                              });
-                            }
-                          },
-                        ),*/
                       ]),
                     ),
 
                     // Accessibility
                     Card(
-                      child: SwitchListTile.adaptive(
-                        title: Text(S.of(context).accessibility_coloring),
-                        subtitle:
-                            Text(S.of(context).high_contrast_color_description),
-                        secondary: const Icon(Icons.accessibility_new_rounded),
-                        value: SettingsProvider.getInstance()
-                            .useAccessibilityColoring,
-                        onChanged: (bool value) {
-                          setState(() => SettingsProvider.getInstance()
-                              .useAccessibilityColoring = value);
-                          treeholePageKey.currentState?.setState(() {});
-                        },
+                      child: Selector<SettingsProvider, bool>(
+                        selector: (_, model) => model.useAccessibilityColoring,
+                        builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).accessibility_coloring),
+                          subtitle: Text(
+                              S.of(context).high_contrast_color_description),
+                          secondary:
+                              const Icon(Icons.accessibility_new_rounded),
+                          value: value,
+                          onChanged: (bool value) {
+                            SettingsProvider.getInstance()
+                                .useAccessibilityColoring = value;
+                            treeholePageKey.currentState?.setState(() {});
+                          },
+                        ),
                       ),
                     ),
                     if (PlatformX.isWindows)
@@ -528,20 +502,24 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     onTap: () => refreshSelf(),
                   ),
                 ),
-                OTNotificationSettingsTile(parentSetStateFunction: refreshSelf),
-                SwitchListTile.adaptive(
-                  title: Text(S.of(context).fduhole_clean_mode),
-                  secondary: const Icon(Icons.ac_unit),
-                  subtitle: Text(S.of(context).fduhole_clean_mode_description),
-                  value: SettingsProvider.getInstance().cleanMode,
-                  onChanged: (bool value) {
-                    if (value) {
-                      _showCleanModeGuideDialog();
-                    }
-                    setState(
-                        () => SettingsProvider.getInstance().cleanMode = value);
-                  },
+                OTNotificationSettingsTile(
+                  parentSetStateFunction: refreshSelf,
                 ),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).fduhole_clean_mode),
+                          secondary: const Icon(Icons.ac_unit),
+                          subtitle: Text(
+                              S.of(context).fduhole_clean_mode_description),
+                          value: value,
+                          onChanged: (bool value) {
+                            if (value) {
+                              _showCleanModeGuideDialog();
+                            }
+                            SettingsProvider.getInstance().cleanMode = value;
+                          },
+                        ),
+                    selector: (_, model) => model.cleanMode),
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),
@@ -704,25 +682,17 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(S.of(context).fduhole_clean_mode_detail),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text(S.of(context).before_enabled),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CLEAN_MODE_EXAMPLE,
                   hasBackgroundImage: false,
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text(S.of(context).after_enabled),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CleanModeFilter.cleanText(CLEAN_MODE_EXAMPLE),
@@ -791,9 +761,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         color: _originalDividerColor,
                       ),
                       Text(S.of(context).app_description),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       //Terms and Conditions
                       Text(
                         S.of(context).terms_and_conditions_title,
@@ -830,17 +798,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                   context, "/about/openLicense",
                                   arguments: {"items": _LICENSE_ITEMS})),
                       ])),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       //Acknowledgement
                       Text(
                         S.of(context).acknowledgements,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(
-                        color: _originalDividerColor,
-                      ),
+                      Divider(color: _originalDividerColor),
                       RichText(
                           text: TextSpan(children: [
                         TextSpan(
@@ -860,21 +824,15 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         ),
                       ])),
 
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
 
                       // Authors
                       Text(
                         S.of(context).authors,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(
-                        color: _originalDividerColor,
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
+                      Divider(color: _originalDividerColor),
+                      const SizedBox(height: 4),
                       Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1021,7 +979,7 @@ class _OTNotificationSettingsWidgetState
 }
 
 class OTNotificationSettingsTile extends StatelessWidget {
-  final Function parentSetStateFunction;
+  final void Function() parentSetStateFunction;
 
   const OTNotificationSettingsTile(
       {Key? key, required this.parentSetStateFunction})
@@ -1041,21 +999,21 @@ class OTNotificationSettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = PlatformX.isMaterial(context)
+        ? const Icon(Icons.notifications)
+        : const Icon(CupertinoIcons.bell);
+
     if (PlatformX.isApplePlatform || PlatformX.isAndroid) {
       final loadingBuilder = ListTile(
           title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
+          leading: icon,
           subtitle: Text(S.of(context).loading),
-          onTap: () => parentSetStateFunction());
+          onTap: parentSetStateFunction);
       final errorBuilder = ListTile(
           title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
+          leading: icon,
           subtitle: Text(S.of(context).fatal_error),
-          onTap: () => parentSetStateFunction());
+          onTap: parentSetStateFunction);
       return FutureWidget<bool>(
           future: Permission.notification.isGranted,
           successBuilder:
@@ -1064,23 +1022,18 @@ class OTNotificationSettingsTile extends StatelessWidget {
               if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
                 return ListTile(
                   title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
+                  leading: icon,
                   subtitle: Text(S.of(context).not_logged_in),
-                  onTap: () => parentSetStateFunction(),
+                  onTap: parentSetStateFunction,
                 );
               }
-
               return FutureWidget<OTUser?>(
                 future: OpenTreeHoleRepository.getInstance().getUserProfile(),
                 successBuilder:
                     (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
                         ListTile(
                   title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
+                  leading: icon,
                   subtitle: Text(_generateNotificationSettingsSummary(
                       context, snapshot.data?.config?.notify)),
                   onTap: () {
@@ -1090,11 +1043,9 @@ class OTNotificationSettingsTile extends StatelessWidget {
                         const Widget body = Padding(
                             padding: EdgeInsets.all(16.0),
                             child: OTNotificationSettingsWidget());
-                        if (PlatformX.isCupertino(context)) {
-                          return const SafeArea(child: Card(child: body));
-                        } else {
-                          return const SafeArea(child: body);
-                        }
+                        return PlatformX.isCupertino(context)
+                            ? const SafeArea(child: Card(child: body))
+                            : const SafeArea(child: body);
                       },
                     ).then((value) => parentSetStateFunction());
                   },
@@ -1105,13 +1056,9 @@ class OTNotificationSettingsTile extends StatelessWidget {
             } else {
               return ListTile(
                   title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
+                  leading: icon,
                   subtitle: Text(S.of(context).unauthorized),
-                  onTap: () {
-                    parentSetStateFunction();
-                  });
+                  onTap: parentSetStateFunction);
             }
           },
           errorBuilder: errorBuilder,
@@ -1119,9 +1066,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
     } else {
       return ListTile(
           title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
+          leading: icon,
           subtitle: Text(S.of(context).unsupported),
           enabled: false);
     }

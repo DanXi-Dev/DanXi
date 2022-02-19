@@ -21,6 +21,7 @@ import 'package:beautiful_soup_dart/src/extensions.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,7 @@ class AnnouncementRepository {
   static const _ID_LATEST_VERSION = -2;
   static const _ID_CHANGE_LOG = -3;
   static const _ID_CELEBRATION = -4;
+  static const _ID_EXTRA_DATA = -5;
 
   AnnouncementRepository._();
 
@@ -82,9 +84,18 @@ class AnnouncementRepository {
   List<Announcement> getAllAnnouncements() =>
       _announcementCache.filter((element) => element.maxVersion! >= 0);
 
+  @Deprecated(
+      "Never use single start date any more. Call getStartDates() instead")
   DateTime getStartDate() => DateTime.parse(_announcementCache!
       .firstWhere((element) => element.maxVersion == _ID_START_DATE)
       .content!);
+
+  TimeTableExtra? getStartDates() {
+    return Extra.fromJson(jsonDecode(_announcementCache!
+            .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
+            .content!))
+        .timetable;
+  }
 
   UpdateInfo checkVersion() => UpdateInfo(
       _announcementCache!
