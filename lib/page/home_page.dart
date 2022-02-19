@@ -90,7 +90,8 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences? _preferences;
 
-  final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
+  final ScreenCaptureEvent? screenListener =
+      PlatformX.isWeb ? null : ScreenCaptureEvent();
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
@@ -136,7 +137,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
     _captchaSubscription.cancel();
-    screenListener.dispose();
+    screenListener?.dispose();
     super.dispose();
   }
 
@@ -468,7 +469,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     }
 
-    screenListener.addScreenRecordListener((recorded) async {
+    screenListener?.addScreenRecordListener((recorded) async {
       if (StateProvider.needScreenshotWarning &&
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
@@ -477,7 +478,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         StateProvider.showingScreenshotWarning = false;
       }
     });
-    screenListener.addScreenShotListener((filePath) async {
+    screenListener?.addScreenShotListener((filePath) async {
       if (StateProvider.needScreenshotWarning &&
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
@@ -486,7 +487,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         StateProvider.showingScreenshotWarning = false;
       }
     });
-    screenListener.watch();
+    screenListener?.watch();
   }
 
   @override
