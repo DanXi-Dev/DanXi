@@ -999,7 +999,7 @@ class _OTNotificationSettingsWidgetState
 }
 
 class OTNotificationSettingsTile extends StatelessWidget {
-  final Function parentSetStateFunction;
+  final void Function() parentSetStateFunction;
 
   const OTNotificationSettingsTile(
       {Key? key, required this.parentSetStateFunction})
@@ -1019,21 +1019,21 @@ class OTNotificationSettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = PlatformX.isMaterial(context)
+        ? const Icon(Icons.notifications)
+        : const Icon(CupertinoIcons.bell);
+
     if (PlatformX.isApplePlatform || PlatformX.isAndroid) {
       final loadingBuilder = ListTile(
           title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
+          leading: icon,
           subtitle: Text(S.of(context).loading),
-          onTap: () => parentSetStateFunction());
+          onTap: parentSetStateFunction);
       final errorBuilder = ListTile(
           title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
+          leading: icon,
           subtitle: Text(S.of(context).fatal_error),
-          onTap: () => parentSetStateFunction());
+          onTap: parentSetStateFunction);
       return FutureWidget<bool>(
           future: Permission.notification.isGranted,
           successBuilder:
@@ -1042,23 +1042,18 @@ class OTNotificationSettingsTile extends StatelessWidget {
               if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
                 return ListTile(
                   title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
+                  leading: icon,
                   subtitle: Text(S.of(context).not_logged_in),
-                  onTap: () => parentSetStateFunction(),
+                  onTap: parentSetStateFunction,
                 );
               }
-
               return FutureWidget<OTUser?>(
                 future: OpenTreeHoleRepository.getInstance().getUserProfile(),
                 successBuilder:
                     (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
-                        ListTile(
-                  title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
+                    ListTile(
+                      title: Text(S.of(context).notification_settings),
+                  leading: icon,
                   subtitle: Text(_generateNotificationSettingsSummary(
                       context, snapshot.data?.config?.notify)),
                   onTap: () {
@@ -1068,28 +1063,22 @@ class OTNotificationSettingsTile extends StatelessWidget {
                         const Widget body = Padding(
                             padding: EdgeInsets.all(16.0),
                             child: OTNotificationSettingsWidget());
-                        if (PlatformX.isCupertino(context)) {
-                          return const SafeArea(child: Card(child: body));
-                        } else {
-                          return const SafeArea(child: body);
-                        }
+                        return PlatformX.isCupertino(context)
+                            ? const SafeArea(child: Card(child: body))
+                            : const SafeArea(child: body);
                       },
-                    ).then((value) => parentSetStateFunction());
-                  },
-                ),
+                        ).then((value) => parentSetStateFunction());
+                      },
+                    ),
                 errorBuilder: errorBuilder,
                 loadingBuilder: loadingBuilder,
               );
             } else {
               return ListTile(
                   title: Text(S.of(context).notification_settings),
-                  leading: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.notifications)
-                      : const Icon(CupertinoIcons.bell),
+                  leading: icon,
                   subtitle: Text(S.of(context).unauthorized),
-                  onTap: () {
-                    parentSetStateFunction();
-                  });
+                  onTap: parentSetStateFunction);
             }
           },
           errorBuilder: errorBuilder,
@@ -1097,9 +1086,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
     } else {
       return ListTile(
           title: Text(S.of(context).notification_settings),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.notifications)
-              : const Icon(CupertinoIcons.bell),
+          leading: icon,
           subtitle: Text(S.of(context).unsupported),
           enabled: false);
     }

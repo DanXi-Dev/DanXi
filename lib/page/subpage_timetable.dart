@@ -419,84 +419,75 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureWidget<void>(
-        future: _future,
-        nullable: true,
-        successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: AutoSizeText(
-                  "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
-              onPressed: () => showPlatformModalSheet(
-                context: context,
-                builder: (menuContext) => PlatformContextMenu(
-                  cancelButton: CupertinoActionSheetAction(
-                      child: Text(S.of(menuContext).cancel),
-                      onPressed: () => Navigator.of(menuContext).pop()),
-                  actions: _semesterInfo!
-                      .map((e) => PlatformContextMenuItem(
-                          menuContext: menuContext,
-                          onPressed: () {
-                            SettingsProvider.getInstance().timetableSemester =
-                                e.semesterId;
-                            setState(() => _selectionInfo = e);
+  Widget build(BuildContext context) => FutureWidget<void>(
+      future: _future,
+      nullable: true,
+      successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: AutoSizeText(
+                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
+            onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (menuContext) => PlatformContextMenu(
+                cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(menuContext).cancel),
+                    onPressed: () => Navigator.of(menuContext).pop()),
+                actions: _semesterInfo!
+                    .map((e) => PlatformContextMenuItem(
+                        menuContext: menuContext,
+                        onPressed: () {
+                          SettingsProvider.getInstance().timetableSemester =
+                              e.semesterId;
+                          setState(() => _selectionInfo = e);
 
-                            // Try to parse the start date
-                            String? parsedStartDate =
-                                SettingsProvider.getInstance()
-                                    .semesterStartDates
-                                    ?.parseStartDate(
-                                        StateProvider.personInfo.value!.group,
-                                        e.semesterId!);
-                            if (parsedStartDate != null) {
+                          // Try to parse the start date
+                          String? parsedStartDate =
                               SettingsProvider.getInstance()
-                                  .thisSemesterStartDate = parsedStartDate;
-                            } else {
-                              Noticing.showNotice(
-                                  this.context,
-                                  S.of(context).unknown_start_date(
-                                      "${e.schoolYear} ${e.name!}"));
-                            }
-                            widget.onSelectionUpdate?.call();
-                          },
-                          child: Text(
-                            "${e.schoolYear} ${e.name!}",
-                            // Highlight the selected item
-                            style: TextStyle(
-                                color: PlatformX.isMaterial(context) &&
-                                        e.semesterId ==
-                                            _selectionInfo?.semesterId
-                                    ? Theme.of(context).primaryColor
-                                    : null),
-                          )))
-                      .toList(),
-                ),
+                                  .semesterStartDates
+                                  ?.parseStartDate(
+                                      StateProvider.personInfo.value!.group,
+                                      e.semesterId!);
+                          if (parsedStartDate != null) {
+                            SettingsProvider.getInstance()
+                                .thisSemesterStartDate = parsedStartDate;
+                          } else {
+                            Noticing.showNotice(
+                                this.context,
+                                S.of(context).unknown_start_date(
+                                    "${e.schoolYear} ${e.name!}"));
+                          }
+                          widget.onSelectionUpdate?.call();
+                        },
+                        child: Text(
+                          "${e.schoolYear} ${e.name!}",
+                          // Highlight the selected item
+                          style: TextStyle(
+                              color: PlatformX.isMaterial(context) &&
+                                      e.semesterId == _selectionInfo?.semesterId
+                                  ? Theme.of(context).primaryColor
+                                  : null),
+                        )))
+                    .toList(),
               ),
             ),
-        errorBuilder: () => PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Text(S.of(context).failed),
-              onPressed: () => setState(() {
-                _future = LazyFuture.pack(loadSemesterInfo());
-              }),
-            ),
-        loadingBuilder: () => PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Text(S.of(context).loading),
-            ));
-  }
+          ),
+      errorBuilder: () => PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(S.of(context).failed),
+            onPressed: () => setState(() {
+              _future = LazyFuture.pack(loadSemesterInfo());
+            }),
+          ),
+      loadingBuilder: () => PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(S.of(context).loading),
+          ));
 }
 
-class StartDateSelectionButton extends StatefulWidget {
+class StartDateSelectionButton extends StatelessWidget {
   const StartDateSelectionButton({Key? key}) : super(key: key);
 
-  @override
-  _StartDateSelectionButtonState createState() =>
-      _StartDateSelectionButtonState();
-}
-
-class _StartDateSelectionButtonState extends State<StartDateSelectionButton> {
   @override
   Widget build(BuildContext context) {
     DateTime startTime = context.select<SettingsProvider, DateTime>((value) {
@@ -519,7 +510,7 @@ class _StartDateSelectionButtonState extends State<StartDateSelectionButton> {
           SettingsProvider.getInstance().thisSemesterStartDate =
               newDate.toIso8601String();
           Noticing.showMaterialNotice(
-              this.context, S.of(context).refresh_timetable_for_new_data,
+              context, S.of(context).refresh_timetable_for_new_data,
               useSnackBar: true);
         }
       },
