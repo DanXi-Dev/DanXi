@@ -503,7 +503,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   ),
                 ),
                 OTNotificationSettingsTile(
-                  parentSetStateFunction: refreshSelf,
+                  onSettingsUpdate: refreshSelf,
                 ),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
@@ -979,10 +979,9 @@ class _OTNotificationSettingsWidgetState
 }
 
 class OTNotificationSettingsTile extends StatelessWidget {
-  final void Function() parentSetStateFunction;
+  final void Function() onSettingsUpdate;
 
-  const OTNotificationSettingsTile(
-      {Key? key, required this.parentSetStateFunction})
+  const OTNotificationSettingsTile({Key? key, required this.onSettingsUpdate})
       : super(key: key);
 
   String _generateNotificationSettingsSummary(
@@ -1008,12 +1007,12 @@ class OTNotificationSettingsTile extends StatelessWidget {
           title: Text(S.of(context).notification_settings),
           leading: icon,
           subtitle: Text(S.of(context).loading),
-          onTap: parentSetStateFunction);
+          onTap: onSettingsUpdate);
       final errorBuilder = ListTile(
           title: Text(S.of(context).notification_settings),
           leading: icon,
           subtitle: Text(S.of(context).fatal_error),
-          onTap: parentSetStateFunction);
+          onTap: onSettingsUpdate);
       return FutureWidget<bool>(
           future: Permission.notification.isGranted,
           successBuilder:
@@ -1024,7 +1023,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   title: Text(S.of(context).notification_settings),
                   leading: icon,
                   subtitle: Text(S.of(context).not_logged_in),
-                  onTap: parentSetStateFunction,
+                  onTap: onSettingsUpdate,
                 );
               }
               return FutureWidget<OTUser?>(
@@ -1047,7 +1046,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
                             ? const SafeArea(child: Card(child: body))
                             : const SafeArea(child: body);
                       },
-                    ).then((value) => parentSetStateFunction());
+                    ).then((value) => onSettingsUpdate());
                   },
                 ),
                 errorBuilder: errorBuilder,
@@ -1058,7 +1057,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   title: Text(S.of(context).notification_settings),
                   leading: icon,
                   subtitle: Text(S.of(context).unauthorized),
-                  onTap: parentSetStateFunction);
+                  onTap: onSettingsUpdate);
             }
           },
           errorBuilder: errorBuilder,
