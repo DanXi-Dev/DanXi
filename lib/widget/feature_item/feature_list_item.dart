@@ -67,4 +67,10 @@ class _FeatureListItemState extends State<FeatureListItem>
 
   @override
   void doUpdate() => refreshSelf();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.feature.initFeature();
+  }
 }

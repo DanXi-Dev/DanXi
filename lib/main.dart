@@ -44,6 +44,7 @@ import 'package:dan_xi/page/opentreehole/text_selector.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
@@ -251,7 +252,8 @@ class DanxiApp extends StatelessWidget {
 
     return Phoenix(
       child: MultiProvider(providers: [
-        ChangeNotifierProvider.value(value: SettingsProvider.getInstance())
+        ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider())
       ], child: mainApp),
     );
   }

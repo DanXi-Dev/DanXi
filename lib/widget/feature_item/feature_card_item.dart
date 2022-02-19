@@ -19,6 +19,7 @@ import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [Card].
 class FeatureCardItem extends StatefulWidget implements FeatureContainer {
@@ -45,6 +46,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
   void initState() {
     super.initState();
     _key = Key(runtimeType.toString());
+    widget.feature.initFeature();
   }
 
   @override
@@ -55,42 +57,50 @@ class _FeatureCardItemState extends State<FeatureCardItem>
       ..buildFeature(widget.arguments);
 
     List<String?> summary = [];
-    summary.add(widget.feature.subTitle ?? "");
+    if (widget.feature.subTitle != null) {
+      summary.add(widget.feature.subTitle);
+    }
     if (widget.feature.tertiaryTitle != null) {
       summary.add(widget.feature.tertiaryTitle);
     }
     Widget card = Card(
       child: Padding(
-        padding: widget.feature.padding ?? const EdgeInsets.all(12),
+        padding:
+            widget.feature.padding ?? const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Wrap(
-              children: [
-                widget.feature.icon,
-                const SizedBox(width: 8),
-                Text(
-                  widget.feature.mainTitle!,
-                  style: const TextStyle(fontSize: 16),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                )
-              ]
-                  .takeWhile((value) => value != null)
-                  .map((e) => e!)
-                  .toList(growable: false),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            widget.feature.customSubtitle ??
-                Text(
-                  summary.join("\n"),
-                  style: PlatformX.getTheme(context)
-                      .textTheme
-                      .headline1!
-                      .copyWith(fontSize: 12),
+            Wrap(children: [
+              if (widget.feature.icon != null) ...[
+                PlatformWidget(
+                  cupertino: (_, __) => widget.feature.icon,
+                  material: (context, __) => IconTheme(
+                      data: IconThemeData(color: Theme.of(context).hintColor),
+                      child: widget.feature.icon!),
                 ),
+                const SizedBox(width: 12),
+              ],
+              Text(
+                widget.feature.mainTitle!,
+                style: const TextStyle(fontSize: 16),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )
+            ]),
+            if (widget.feature.customSubtitle != null ||
+                summary.isNotEmpty) ...[
+              const SizedBox(
+                height: 8,
+              ),
+              widget.feature.customSubtitle ??
+                  Text(
+                    summary.join("\n"),
+                    style: PlatformX.getTheme(context)
+                        .textTheme
+                        .headline1!
+                        .copyWith(fontSize: 12),
+                  )
+            ],
             widget.feature.trailing
           ]
               .takeWhile((value) => value != null)
