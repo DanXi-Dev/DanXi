@@ -366,6 +366,6 @@
   "day_ago": "{num}日前",
   "select_semester": "スケジュールに表示する学期",
   "semester_start_date": "学期開始日",
-  "unknown_start_date": "学期({semesterName})の開始日はまだわかりませんので、設定ページで手動で設定してください",
+  "unknown_start_date": "学期({semesterName})の開始日はまだわかりませんので、手動で設定してください",
   "refresh_timetable_for_new_data": "新しいデータを取得するためにスケジュールを更新してください"
 }

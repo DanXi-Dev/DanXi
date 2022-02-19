@@ -392,6 +392,6 @@
   "hole_hidden": "已隐藏",
   "semester_start_date": "学期开始日期",
   "delete_this_tag": "删除此标签？",
-  "unknown_start_date": "我们对该学期({semesterName})的开学日期尚不了解，请在「设置」页面手动设置日期",
+  "unknown_start_date": "我们对该学期({semesterName})的开学日期尚不了解，请在右上角手动设置日期",
   "refresh_timetable_for_new_data": "刷新课程表获得更新数据"
 }

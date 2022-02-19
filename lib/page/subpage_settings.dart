@@ -682,25 +682,17 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(S.of(context).fduhole_clean_mode_detail),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text(S.of(context).before_enabled),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CLEAN_MODE_EXAMPLE,
                   hasBackgroundImage: false,
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text(S.of(context).after_enabled),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CleanModeFilter.cleanText(CLEAN_MODE_EXAMPLE),
@@ -769,9 +761,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         color: _originalDividerColor,
                       ),
                       Text(S.of(context).app_description),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       //Terms and Conditions
                       Text(
                         S.of(context).terms_and_conditions_title,
@@ -808,17 +798,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                   context, "/about/openLicense",
                                   arguments: {"items": _LICENSE_ITEMS})),
                       ])),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       //Acknowledgement
                       Text(
                         S.of(context).acknowledgements,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(
-                        color: _originalDividerColor,
-                      ),
+                      Divider(color: _originalDividerColor),
                       RichText(
                           text: TextSpan(children: [
                         TextSpan(
@@ -838,21 +824,15 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         ),
                       ])),
 
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
 
                       // Authors
                       Text(
                         S.of(context).authors,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(
-                        color: _originalDividerColor,
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
+                      Divider(color: _originalDividerColor),
+                      const SizedBox(height: 4),
                       Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1051,8 +1031,8 @@ class OTNotificationSettingsTile extends StatelessWidget {
                 future: OpenTreeHoleRepository.getInstance().getUserProfile(),
                 successBuilder:
                     (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
-                    ListTile(
-                      title: Text(S.of(context).notification_settings),
+                        ListTile(
+                  title: Text(S.of(context).notification_settings),
                   leading: icon,
                   subtitle: Text(_generateNotificationSettingsSummary(
                       context, snapshot.data?.config?.notify)),
@@ -1067,9 +1047,9 @@ class OTNotificationSettingsTile extends StatelessWidget {
                             ? const SafeArea(child: Card(child: body))
                             : const SafeArea(child: body);
                       },
-                        ).then((value) => parentSetStateFunction());
-                      },
-                    ),
+                    ).then((value) => parentSetStateFunction());
+                  },
+                ),
                 errorBuilder: errorBuilder,
                 loadingBuilder: loadingBuilder,
               );

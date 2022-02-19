@@ -399,6 +399,6 @@
   "hole_hidden": "Hidden Hole",
   "semester_start_date": "First day of the semester",
   "delete_this_tag": "Delete this tag?",
-  "unknown_start_date": "We know little for the semester ({semesterName}) you have selected. Please set the start date in Setting page manually.",
+  "unknown_start_date": "We know little for the semester ({semesterName}) you have selected. Please set the start date manually.",
   "refresh_timetable_for_new_data": "Refresh the timetable to fetch new data"
 }
