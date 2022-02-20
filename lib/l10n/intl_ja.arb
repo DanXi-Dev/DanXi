@@ -372,7 +372,8 @@
   "fudan_daily_warning_notification_action": "チェックイン",
   "abnormal_entry_permission": "校内へ立入禁止",
   "everything_is_ok": "問題ない",
-  "entry_permission": "入校権限：{permission}",
+  "entry_permission": "入校権限",
   "diagnostic_information": "診断情報",
+  "failed_exam_no_grade": "追試験の成績はアカデミックサービスでご確認ください",
   "set_semester_start_date": "始業日を設定する"
 }
