@@ -186,7 +186,6 @@ class Constant {
     return ThemeData(
       brightness: Brightness.light,
       primarySwatch: Colors.blue,
-      backgroundColor: Colors.white,
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
@@ -224,7 +223,6 @@ class Constant {
     }
     return ThemeData(
       brightness: Brightness.dark,
-      backgroundColor: Colors.black,
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.dark().cardColor,
