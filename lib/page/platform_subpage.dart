@@ -135,7 +135,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
 
     // Build action buttons.
     Widget? leadingButton;
-    List<PlatformIconButton> trailingButtons = [];
+    List<Widget> trailingButtons = [];
     List<AppBarButtonItem> leadingItems = widget.leading.call(context);
     List<AppBarButtonItem> trailingItems = widget.trailing.call(context);
 
@@ -154,13 +154,14 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
     }
 
     if (trailingItems.isNotEmpty) {
-      trailingButtons = trailingItems
-          .map((e) => PlatformIconButton(
-              material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
-              padding: EdgeInsets.zero,
-              icon: e.widget,
-              onPressed: e.onPressed))
-          .toList();
+      trailingButtons = trailingItems.map((e) {
+        if (e.useCustomWidget) return e.widget;
+        return PlatformIconButton(
+            material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
+            padding: EdgeInsets.zero,
+            icon: e.widget,
+            onPressed: e.onPressed);
+      }).toList();
     }
     return PrimaryScrollController(
       controller: _buildPrimaryScrollController(context),

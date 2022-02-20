@@ -406,5 +406,6 @@
   "abnormal_entry_permission": "No rights",
   "everything_is_ok": "All Okay",
   "entry_permission": "Entry permission",
-  "diagnostic_information": "诊断信息"
+  "diagnostic_information": "Diagnose Info",
+  "set_semester_start_date": "Set Start Date"
 }

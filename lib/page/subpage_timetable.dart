@@ -49,7 +49,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -426,7 +425,8 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: AutoSizeText(
-                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
+                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}",
+                minFontSize: 10),
             onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (menuContext) => PlatformContextMenu(
@@ -498,11 +498,16 @@ class StartDateSelectionButton extends StatelessWidget {
     });
 
     return PlatformIconButton(
-      padding: EdgeInsets.zero,
-      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime)),
+      padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
+      icon: PlatformX.isCupertino(context)
+          ? AutoSizeText(S.of(context).semester_start_date, minFontSize: 10)
+          : const Icon(Icons.event),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
+            material: (context, __) => MaterialDatePickerData(
+                helpText: S.of(context).semester_start_date,
+                confirmText: S.of(context).set_semester_start_date),
             initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));

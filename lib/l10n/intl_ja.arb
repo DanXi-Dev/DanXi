@@ -373,5 +373,6 @@
   "abnormal_entry_permission": "校内へ立入禁止",
   "everything_is_ok": "問題ない",
   "entry_permission": "入校権限",
-  "diagnostic_information": "诊断信息"
+  "diagnostic_information": "診断情報",
+  "set_semester_start_date": "始業日を設定する"
 }
