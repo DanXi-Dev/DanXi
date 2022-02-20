@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';

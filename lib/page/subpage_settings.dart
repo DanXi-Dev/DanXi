@@ -875,55 +875,58 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     ]),
               ),
               const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  FutureBuilder<bool>(
-                    builder:
-                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                      if (snapshot.hasError || snapshot.data == false) {
-                        return const SizedBox();
-                      }
-                      return TextButton(
-                        child: Text(S.of(context).rate),
-                        onPressed: () {
-                          inAppReview.openStoreListing(
-                            appStoreId: Constant.APPSTORE_APPID,
-                          );
-                        },
-                      );
-                    },
-                    future: inAppReview.isAvailable(),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: Text(S.of(context).contact_us),
-                    onPressed: () async {
-                      final Email email = Email(
-                        body: '',
-                        subject: S.of(context).app_feedback,
-                        recipients: [S.of(context).feedback_email],
-                        isHTML: false,
-                      );
-                      await FlutterEmailSender.send(email);
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: Text(S.of(context).project_page),
-                    onPressed: () {
-                      BrowserUtil.openUrl(S.of(context).project_url, context);
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: Text(S.of(context).diagnostic_information),
-                    onPressed: () {
-                      smartNavigatorPush(context, "/diagnose");
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                ],
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  children: <Widget>[
+                    FutureBuilder<bool>(
+                      builder:
+                          (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                        if (snapshot.hasError || snapshot.data == false) {
+                          return const SizedBox();
+                        }
+                        return TextButton(
+                          child: Text(S.of(context).rate),
+                          onPressed: () {
+                            inAppReview.openStoreListing(
+                              appStoreId: Constant.APPSTORE_APPID,
+                            );
+                          },
+                        );
+                      },
+                      future: inAppReview.isAvailable(),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      child: Text(S.of(context).contact_us),
+                      onPressed: () async {
+                        final Email email = Email(
+                          body: '',
+                          subject: S.of(context).app_feedback,
+                          recipients: [S.of(context).feedback_email],
+                          isHTML: false,
+                        );
+                        await FlutterEmailSender.send(email);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      child: Text(S.of(context).project_page),
+                      onPressed: () {
+                        BrowserUtil.openUrl(S.of(context).project_url, context);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      child: Text(S.of(context).diagnostic_information),
+                      onPressed: () {
+                        smartNavigatorPush(context, "/diagnose");
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                ),
               ),
             ],
           ),

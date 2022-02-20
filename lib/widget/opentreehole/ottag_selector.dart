@@ -25,7 +25,6 @@ import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configur
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 /// A tag selector for [OTTag].
