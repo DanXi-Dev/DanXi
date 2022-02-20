@@ -427,7 +427,8 @@ class _ExamListState extends State<ExamList> {
                       ),
                   ],
                 ),
-                if (value.type != "补考" && value.type != "缓考") ...[
+                if (!value.type.contains("补考") &&
+                    !value.type.contains("缓考")) ...[
                   Align(
                     alignment: Alignment.centerLeft,
                     child: FutureWidget<List<ExamScore>?>(
