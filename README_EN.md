@@ -47,18 +47,16 @@ Go to [release page](https://github.com/w568w/DanXi/releases), just download the
 Download from [App Store](https://apps.apple.com/us/app/旦夕/id1568629997)
 
 ## macOS 
-Distributions for macOS are uncontinued now because of very few users. 
-
-If necessary, consider using the iOS/iPadOS version instead.
+Will consider after Flutter macOS support becomes stable.
 
 # Compile
 ## Flutter version that we're using
 
 ```shell script
 $ flutter --version
-Flutter 2.10.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision db747aa133 (2 days ago) • 2022-02-09 13:57:35 -0600
-Engine • revision ab46186b24
+Flutter 2.10.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 097d3313d8 (8 hours ago) • 2022-02-18 19:33:08 -0600
+Engine • revision a83ed0e5e3
 Tools • Dart 2.16.1 • DevTools 2.9.2
 ```
 ## Notes on compilation

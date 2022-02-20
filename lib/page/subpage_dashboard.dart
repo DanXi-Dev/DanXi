@@ -36,6 +36,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
+import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/library_repository.dart';
@@ -93,7 +94,6 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
       StateStreamListener();
   late Map<String, Widget> widgetMap;
   bool isRefreshQueued = false;
-  final List<Feature> _notifications = [];
 
   BannerAd? bannerAd;
 
@@ -120,9 +120,13 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   void checkConnection() {
     FudanLibraryRepository.getInstance().checkConnection().then((connected) {
       if (connected) {
-        removeNotification(LanConnectionNotification());
+        context
+            .read<NotificationProvider>()
+            .removeNotification(LanConnectionNotification());
       } else {
-        addNotification(LanConnectionNotification());
+        context
+            .read<NotificationProvider>()
+            .addNotification(LanConnectionNotification());
       }
     });
   }
@@ -185,30 +189,16 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     _refreshSubscription.cancel();
   }
 
-  void addNotification(Feature feature) {
-    if (_notifications.any((element) =>
-        element.runtimeType.toString() == feature.runtimeType.toString())) {
-      return;
-    }
-    _notifications.add(feature);
-    refreshSelf();
-  }
-
-  void removeNotification(Feature feature) {
-    _notifications.removeWhere((element) =>
-        feature.runtimeType.toString() == element.runtimeType.toString());
-    refreshSelf();
-  }
-
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
     List<Widget> _widgets = [
       AutoBannerAdWidget(
         bannerAd: bannerAd,
       )
     ];
-    _widgets.addAll(_notifications.map((e) => FeatureCardItem(
+    NotificationProvider provider = context.watch<NotificationProvider>();
+    _widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
           feature: e,
-          onDismissed: () => removeNotification(e),
+          onDismissed: () => provider.removeNotification(e),
         )));
     List<Widget> _currentCardChildren = [];
     for (var element in widgetSequence) {

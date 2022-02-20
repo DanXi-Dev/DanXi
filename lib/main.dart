@@ -44,6 +44,7 @@ import 'package:dan_xi/page/opentreehole/text_selector.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
@@ -57,7 +58,7 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
+import 'package:provider/provider.dart';
 import 'common/constant.dart';
 
 /// The main entry of the whole app.
@@ -182,7 +183,7 @@ class DanxiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget mainApp = PlatformProvider(
+    Widget mainApp = PlatformProvider(
       // Uncomment this line below to force the app to use Cupertino UI
       // initialPlatform: TargetPlatform.iOS,
       builder: (BuildContext context) => DynamicThemeController(
@@ -230,24 +231,27 @@ class DanxiApp extends StatelessWidget {
         ),
       ),
     );
-
     if (PlatformX.isAndroid || PlatformX.isIOS) {
       // Listen to Foreground / Background Event with [FGBGNotifier].
-      return Phoenix(
-          child: FGBGNotifier(
-              onEvent: (FGBGType value) {
-                switch (value) {
-                  case FGBGType.foreground:
-                    StateProvider.isForeground = true;
-                    break;
-                  case FGBGType.background:
-                    StateProvider.isForeground = false;
-                    break;
-                }
-              },
-              child: mainApp));
-    } else {
-      return Phoenix(child: mainApp);
+      mainApp = FGBGNotifier(
+          onEvent: (FGBGType value) {
+            switch (value) {
+              case FGBGType.foreground:
+                StateProvider.isForeground = true;
+                break;
+              case FGBGType.background:
+                StateProvider.isForeground = false;
+                break;
+            }
+          },
+          child: mainApp);
     }
+
+    return Phoenix(
+      child: MultiProvider(providers: [
+        ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider())
+      ], child: mainApp),
+    );
   }
 }

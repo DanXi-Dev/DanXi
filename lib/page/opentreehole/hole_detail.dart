@@ -196,11 +196,33 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     } catch (_) {}
   }
 
-  /// Rebuild everything and refresh itself.
-  Future<void> refreshListView({scrollToEnd = false}) async {
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
-    await _listViewController.notifyUpdate(
-        useInitialData: false, queueDataClear: true);
+  /// Refresh the list view.
+  ///
+  /// if [ignorePrefetch] and [hasPrefetchedAllData], it will discard the prefetched data first.
+  Future<void> refreshListView(
+      {bool scrollToEnd = false, bool ignorePrefetch = true}) async {
+    Future<void> _realRefresh() async {
+      if (scrollToEnd) _listViewController.queueScrollToEnd();
+      await _listViewController.notifyUpdate(
+          useInitialData: false, queueDataClear: true);
+    }
+
+    if (ignorePrefetch && hasPrefetchedAllData) {
+      // Reset variable to make [hasPrefetchedAllData] false
+      setState(() {
+        shouldScrollToEnd = false;
+        _hole.floors?.prefetch =
+            _hole.floors?.prefetch?.take(Constant.POST_COUNT_PER_PAGE).toList();
+      });
+
+      // Wait build() complete (so `allDataReceiver` has been set to `null`), then trigger a refresh in
+      // the list view.
+      Completer<void> _completer = Completer();
+      WidgetsBinding.instance?.addPostFrameCallback((_) => _realRefresh()
+          .then(_completer.complete, onError: _completer.completeError));
+      return _completer.future;
+    }
+    return _realRefresh();
   }
 
   @override
@@ -230,6 +252,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (hasPrefetchedAllData) {
       allDataReceiver = Future.value(_hole.floors?.prefetch);
     }
+    print("build ${hasPrefetchedAllData}");
     final pagedListView = PagedListView<OTFloor>(
       initialData: _hole.floors?.prefetch,
       pagedController: _listViewController,
@@ -293,7 +316,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                         : S.of(context).only_show_dz,
                     onTap: (_) {
                       setState(() => _onlyShowDZ = !_onlyShowDZ);
-                      refreshListView();
+                      refreshListView(ignorePrefetch: false);
                     })
               ],
               cupertino: (context, platform) => CupertinoPopupMenuData(

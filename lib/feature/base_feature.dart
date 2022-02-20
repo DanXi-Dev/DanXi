@@ -23,7 +23,7 @@ import 'package:flutter/widgets.dart';
 /// A Feature is a functional item shown on the dashboard, with which user interacts via tapping.
 ///
 ///
-/// ## Note: A Checklist After Creating a New [Feature]
+/// ## Note: A Checklist After Creating a New [Feature] (For a Notification, you don't need to do these!)
 ///
 /// 1. Register it in [FeatureMap].
 /// 2. Add it to [_HomeSubpageState.widgetMap] in [HomeSubpage],

@@ -31,9 +31,6 @@ class LanConnectionNotification extends Feature {
   bool get removable => true;
 
   @override
-  EdgeInsets get padding => const EdgeInsets.fromLTRB(12, 12, 12, 0);
-
-  @override
   String get subTitle => S.of(context!).lan_connection_issue_1_description;
 
   @override
@@ -44,10 +41,7 @@ class LanConnectionNotification extends Feature {
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       PlatformTextButton(
         padding: EdgeInsets.zero,
-        child: Text(
-          S.of(context!).lan_connection_issue_1_action,
-          textScaleFactor: 0.8,
-        ),
+        child: Text(S.of(context!).lan_connection_issue_1_action),
         // User needs to download the vpn software. Open an external browser.
         onPressed: () => showPlatformDialog(
           context: context!,

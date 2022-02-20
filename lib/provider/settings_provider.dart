@@ -23,6 +23,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +33,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Code Integrity Note:
 /// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
 /// Only return [null] when there is no default value.
-class SettingsProvider {
+class SettingsProvider with ChangeNotifier {
   SharedPreferences? preferences;
   static final _instance = SettingsProvider._();
   static const String KEY_PREFERRED_CAMPUS = "campus";
@@ -46,8 +47,8 @@ class SettingsProvider {
       "ec_last_choice";
   static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
-  static const String KEY_LAST_RECORDED_SEMESTER_START_TIME =
-      "last_recorded_semester_start_time";
+  static const String KEY_THIS_SEMESTER_START_DATE = "this_semester_start_date";
+  static const String KEY_SEMESTER_START_DATES = "semester_start_dates";
   static const String KEY_CLEAN_MODE = "clean_mode";
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
@@ -77,6 +78,7 @@ class SettingsProvider {
     } else if (preferences!.containsKey(KEY_SEARCH_HISTORY)) {
       preferences!.remove(KEY_SEARCH_HISTORY);
     }
+    notifyListeners();
   }
 
   String? get timetableSemester {
@@ -88,6 +90,7 @@ class SettingsProvider {
 
   set timetableSemester(String? value) {
     preferences!.setString(KEY_TIMETABLE_SEMESTER, value!);
+    notifyListeners();
   }
 
   FileImage? get backgroundImage {
@@ -114,12 +117,14 @@ class SettingsProvider {
     } else {
       preferences!.remove(KEY_BACKGROUND_IMAGE_PATH);
     }
+    notifyListeners();
   }
 
   Future<void> init() async =>
       preferences = await SharedPreferences.getInstance();
 
-  @Deprecated("SettingsProvider do not need a BuildContext any more.")
+  @Deprecated(
+      "SettingsProvider do not need a BuildContext any more. Use SettingsProvider.getInstance() instead")
   factory SettingsProvider.of(_) => SettingsProvider.getInstance();
 
   bool get useAccessibilityColoring {
@@ -131,6 +136,7 @@ class SettingsProvider {
 
   set useAccessibilityColoring(bool value) {
     preferences!.setBool(KEY_ACCESSIBILITY_COLORING, value);
+    notifyListeners();
   }
 
   /// Whether user has opted-in to Ads
@@ -143,6 +149,7 @@ class SettingsProvider {
 
   set isAdEnabled(bool value) {
     preferences!.setBool(KEY_AD_ENABLED, value);
+    notifyListeners();
   }
 
   int get lastECBuildingChoiceRepresentation {
@@ -154,17 +161,33 @@ class SettingsProvider {
 
   set lastECBuildingChoiceRepresentation(int value) {
     preferences!.setInt(KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE, value);
+    notifyListeners();
   }
 
-  String? get lastSemesterStartTime {
-    if (preferences!.containsKey(KEY_LAST_RECORDED_SEMESTER_START_TIME)) {
-      return preferences!.getString(KEY_LAST_RECORDED_SEMESTER_START_TIME)!;
+  String? get thisSemesterStartDate {
+    if (preferences!.containsKey(KEY_THIS_SEMESTER_START_DATE)) {
+      return preferences!.getString(KEY_THIS_SEMESTER_START_DATE)!;
     }
     return null;
   }
 
-  set lastSemesterStartTime(String? value) =>
-      preferences!.setString(KEY_LAST_RECORDED_SEMESTER_START_TIME, value!);
+  set thisSemesterStartDate(String? value) {
+    preferences!.setString(KEY_THIS_SEMESTER_START_DATE, value!);
+    notifyListeners();
+  }
+
+  TimeTableExtra? get semesterStartDates {
+    if (preferences!.containsKey(KEY_SEMESTER_START_DATES)) {
+      return TimeTableExtra.fromJson(
+          jsonDecode(preferences!.getString(KEY_SEMESTER_START_DATES)!));
+    }
+    return null;
+  }
+
+  set semesterStartDates(TimeTableExtra? value) {
+    preferences!.setString(KEY_SEMESTER_START_DATES, jsonEncode(value!));
+    notifyListeners();
+  }
 
   /// User's preferences of Dashboard Widgets
   /// This getter always return a non-null value, defaults to default setting
@@ -187,8 +210,10 @@ class SettingsProvider {
     return Constant.defaultDashboardCardList;
   }
 
-  set dashboardWidgetsSequence(List<DashboardCard>? value) =>
-      preferences!.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+  set dashboardWidgetsSequence(List<DashboardCard>? value) {
+    preferences!.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+    notifyListeners();
+  }
 
   Campus get campus {
     if (preferences!.containsKey(KEY_PREFERRED_CAMPUS)) {
@@ -205,6 +230,7 @@ class SettingsProvider {
 
   set campus(Campus campus) {
     preferences!.setString(KEY_PREFERRED_CAMPUS, campus.toString());
+    notifyListeners();
   }
 
   /*Push Token
@@ -232,6 +258,7 @@ class SettingsProvider {
     } else {
       preferences!.remove(KEY_FDUHOLE_TOKEN);
     }
+    notifyListeners();
   }
 
   void deleteAllFduholeData() {
@@ -252,7 +279,10 @@ class SettingsProvider {
     }
   }
 
-  set debugMode(bool mode) => preferences!.setBool(KEY_DEBUG_MODE, mode);
+  set debugMode(bool mode) {
+    preferences!.setBool(KEY_DEBUG_MODE, mode);
+    notifyListeners();
+  }
 
   //FDUHOLE Default Sorting Order
   SortOrder? get fduholeSortOrder {
@@ -267,8 +297,10 @@ class SettingsProvider {
     return null;
   }
 
-  set fduholeSortOrder(SortOrder? value) =>
-      preferences!.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString()!);
+  set fduholeSortOrder(SortOrder? value) {
+    preferences!.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString()!);
+    notifyListeners();
+  }
 
   /// FDUHOLE Folded Post Behavior
 
@@ -284,8 +316,10 @@ class SettingsProvider {
     return FoldBehavior.FOLD;
   }
 
-  set fduholeFoldBehavior(FoldBehavior value) =>
-      preferences!.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+  set fduholeFoldBehavior(FoldBehavior value) {
+    preferences!.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+    notifyListeners();
+  }
 
   /// Clean Mode
   bool get cleanMode {
@@ -296,7 +330,10 @@ class SettingsProvider {
     }
   }
 
-  set cleanMode(bool mode) => preferences!.setBool(KEY_CLEAN_MODE, mode);
+  set cleanMode(bool mode) {
+    preferences!.setBool(KEY_CLEAN_MODE, mode);
+    notifyListeners();
+  }
 
   /// Hidden tags
   List<OTTag>? get hiddenTags {
@@ -312,6 +349,7 @@ class SettingsProvider {
   set hiddenTags(List<OTTag>? tags) {
     if (tags == null) return;
     preferences!.setString(KEY_HIDDEN_TAGS, jsonEncode(tags));
+    notifyListeners();
   }
 
   /// Hide FDUHole
@@ -323,7 +361,10 @@ class SettingsProvider {
     }
   }
 
-  set hideHole(bool mode) => preferences!.setBool(KEY_HIDDEN_HOLE, mode);
+  set hideHole(bool mode) {
+    preferences!.setBool(KEY_HIDDEN_HOLE, mode);
+    notifyListeners();
+  }
 
   /// Celebration words
   List<Celebration> get celebrationWords =>
@@ -335,6 +376,7 @@ class SettingsProvider {
 
   set celebrationWords(List<Celebration> lists) {
     preferences!.setString(KEY_CELEBRATION, jsonEncode(lists));
+    notifyListeners();
   }
 }
 

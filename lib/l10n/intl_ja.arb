@@ -365,5 +365,9 @@
   "hour_ago": "{num}時間前",
   "day_ago": "{num}日前",
   "select_semester": "スケジュールに表示する学期",
-  "semester_start_date": "学期開始日"
+  "semester_start_date": "学期開始日",
+  "unknown_start_date": "学期({semesterName})の開始日はまだわかりませんので、手動で設定してください",
+  "refresh_timetable_for_new_data": "新しいデータを取得するためにスケジュールを更新してください",
+  "fudan_daily_warning_notification": "今日は平安復旦チェックインしません",
+  "fudan_daily_warning_notification_action": "チェックイン"
 }

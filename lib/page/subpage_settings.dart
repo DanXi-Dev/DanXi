@@ -21,7 +21,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
-import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
@@ -37,7 +36,8 @@ import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/util/win32/auto_start.dart';
+import 'package:dan_xi/util/win32/auto_start.dart'
+    if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -347,52 +347,26 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                           onPressed: () =>
                                               Navigator.of(context).pop()))),
                         ),
-
-                        // Timetable Start date
-                        /*
-                        ListTile(
-                          title: Text(S.of(context).semester_start_date),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.calendar_today)
-                              : const Icon(CupertinoIcons.calendar_badge_plus),
-                          subtitle: Text(DateFormat("yyyy-MM-dd")
-                              .format(TimeTable.defaultStartTime)),
-                          onTap: () async {
-                            DateTime? newDate = await showPlatformDatePicker(
-                                context: context,
-                                initialDate: TimeTable.defaultStartTime,
-                                firstDate:
-                                    DateTime.fromMillisecondsSinceEpoch(0),
-                                lastDate: TimeTable.defaultStartTime
-                                    .add(const Duration(days: 365 * 100)));
-                            if (newDate != null) {
-                              setState(() {
-                                TimeTable.defaultStartTime = newDate;
-                                SettingsProvider.getInstance()
-                                        .lastSemesterStartTime =
-                                    TimeTable.defaultStartTime
-                                        .toIso8601String();
-                              });
-                            }
-                          },
-                        ),*/
                       ]),
                     ),
 
                     // Accessibility
                     Card(
-                      child: SwitchListTile.adaptive(
-                        title: Text(S.of(context).accessibility_coloring),
-                        subtitle:
-                            Text(S.of(context).high_contrast_color_description),
-                        secondary: const Icon(Icons.accessibility_new_rounded),
-                        value: SettingsProvider.getInstance()
-                            .useAccessibilityColoring,
-                        onChanged: (bool value) {
-                          setState(() => SettingsProvider.getInstance()
-                              .useAccessibilityColoring = value);
-                          treeholePageKey.currentState?.setState(() {});
-                        },
+                      child: Selector<SettingsProvider, bool>(
+                        selector: (_, model) => model.useAccessibilityColoring,
+                        builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).accessibility_coloring),
+                          subtitle: Text(
+                              S.of(context).high_contrast_color_description),
+                          secondary:
+                              const Icon(Icons.accessibility_new_rounded),
+                          value: value,
+                          onChanged: (bool value) {
+                            SettingsProvider.getInstance()
+                                .useAccessibilityColoring = value;
+                            treeholePageKey.currentState?.setState(() {});
+                          },
+                        ),
                       ),
                     ),
                     if (PlatformX.isWindows)
@@ -528,21 +502,23 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   ),
                 ),
                 OTNotificationSettingsTile(
-                  parentSetStateFunction: refreshSelf,
+                  onSettingsUpdate: refreshSelf,
                 ),
-                SwitchListTile.adaptive(
-                  title: Text(S.of(context).fduhole_clean_mode),
-                  secondary: const Icon(Icons.ac_unit),
-                  subtitle: Text(S.of(context).fduhole_clean_mode_description),
-                  value: SettingsProvider.getInstance().cleanMode,
-                  onChanged: (bool value) {
-                    if (value) {
-                      _showCleanModeGuideDialog();
-                    }
-                    setState(
-                        () => SettingsProvider.getInstance().cleanMode = value);
-                  },
-                ),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).fduhole_clean_mode),
+                          secondary: const Icon(Icons.ac_unit),
+                          subtitle: Text(
+                              S.of(context).fduhole_clean_mode_description),
+                          value: value,
+                          onChanged: (bool value) {
+                            if (value) {
+                              _showCleanModeGuideDialog();
+                            }
+                            SettingsProvider.getInstance().cleanMode = value;
+                          },
+                        ),
+                    selector: (_, model) => model.cleanMode),
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),
@@ -705,25 +681,17 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(S.of(context).fduhole_clean_mode_detail),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text(S.of(context).before_enabled),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CLEAN_MODE_EXAMPLE,
                   hasBackgroundImage: false,
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text(S.of(context).after_enabled),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
                   content: CleanModeFilter.cleanText(CLEAN_MODE_EXAMPLE),
@@ -792,9 +760,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         color: _originalDividerColor,
                       ),
                       Text(S.of(context).app_description),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       //Terms and Conditions
                       Text(
                         S.of(context).terms_and_conditions_title,
@@ -831,17 +797,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                   context, "/about/openLicense",
                                   arguments: {"items": _LICENSE_ITEMS})),
                       ])),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       //Acknowledgement
                       Text(
                         S.of(context).acknowledgements,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(
-                        color: _originalDividerColor,
-                      ),
+                      Divider(color: _originalDividerColor),
                       RichText(
                           text: TextSpan(children: [
                         TextSpan(
@@ -861,21 +823,15 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         ),
                       ])),
 
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
 
                       // Authors
                       Text(
                         S.of(context).authors,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(
-                        color: _originalDividerColor,
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
+                      Divider(color: _originalDividerColor),
+                      const SizedBox(height: 4),
                       Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1022,10 +978,9 @@ class _OTNotificationSettingsWidgetState
 }
 
 class OTNotificationSettingsTile extends StatelessWidget {
-  final Function parentSetStateFunction;
+  final void Function() onSettingsUpdate;
 
-  const OTNotificationSettingsTile(
-      {Key? key, required this.parentSetStateFunction})
+  const OTNotificationSettingsTile({Key? key, required this.onSettingsUpdate})
       : super(key: key);
 
   String _generateNotificationSettingsSummary(

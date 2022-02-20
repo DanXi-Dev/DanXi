@@ -67,17 +67,21 @@ class _BBSTagsPageState extends State<BBSTagsPage> {
               future: _content,
               successBuilder: (context, snapshot) => BBSTagsContainer(
                 tags: snapshot.data,
-                onTap: (e) =>
-                    smartNavigatorPush(context, '/bbs/discussions', arguments: {
-                  "tagFilter": e.name,
-                }, forcePushOnMainNavigator: true),
+                onTap: (e) => smartNavigatorPush(context, '/bbs/discussions',
+                    arguments: {
+                      "tagFilter": e.name,
+                    },
+                    forcePushOnMainNavigator: true),
               ),
               errorBuilder: (BuildContext context,
                       AsyncSnapshot<List<OTTag>?> snapShot) =>
                   ErrorPageWidget.buildWidget(context, snapShot.error,
                       stackTrace: snapShot.stackTrace,
-                      onTap: () => setState(() => _content = LazyFuture.pack(
-                          OpenTreeHoleRepository.getInstance().loadTags()))),
+                      onTap: () => setState(() {
+                            _content = LazyFuture.pack(
+                                OpenTreeHoleRepository.getInstance()
+                                    .loadTags());
+                          })),
               loadingBuilder: Center(
                 child: PlatformCircularProgressIndicator(),
               ),

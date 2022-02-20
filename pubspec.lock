@@ -432,7 +432,7 @@ packages:
       name: flutter_blurhash
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.6.0"
+    version: "0.6.4"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -467,7 +467,7 @@ packages:
       name: flutter_js
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.5.0+5"
+    version: "0.5.0+6"
   flutter_keyboard_visibility:
     dependency: transitive
     description:
@@ -549,7 +549,7 @@ packages:
       name: flutter_platform_widgets
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.12.1"
+    version: "1.20.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -698,7 +698,7 @@ packages:
     source: hosted
     version: "1.0.3"
   js:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: js
       url: "https://pub.flutter-io.cn"

@@ -23,6 +23,7 @@ import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -69,22 +70,27 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
-            S.of(cxt).share,
-            Icon(PlatformX.isMaterial(cxt)
-                ? Icons.share
-                : CupertinoIcons.square_arrow_up),
-            () => ShareTimetableEvent().fire()),
+          S.of(cxt).share,
+          Icon(PlatformX.isMaterial(cxt)
+              ? Icons.share
+              : CupertinoIcons.square_arrow_up),
+          () => ShareTimetableEvent().fire(),
+        ),
+        AppBarButtonItem(
+            S.of(cxt).semester_start_date, // Timetable Start date
+            const StartDateSelectionButton(),
+            null,
+            useCustomWidget: true)
       ];
 
-  /*
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
         AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
           onSelectionUpdate: () {
-            timetablePageKey.currentState?.refresh(forceReloadFromRemote: true);
+            timetablePageKey.currentState?.indicatorKey.currentState?.show();
           },
-        ), null)
-      ];*/
+        ), null, useCustomWidget: true),
+      ];
 }
 
 class ShareTimetableEvent {}
@@ -109,6 +115,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   bool forceLoadFromRemote = false;
 
   BannerAd? bannerAd;
+
+  final GlobalKey<RefreshIndicatorState> indicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup)) {
@@ -249,9 +258,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   Widget buildPage(BuildContext context) {
     return FutureWidget<TimeTable?>(
-      successBuilder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return _buildPage(snapshot.data);
-      },
+      successBuilder:
+          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
+              _buildPage(snapshot.data!),
       future: _contentFuture,
       errorBuilder: (BuildContext context,
               AsyncSnapshot<TimeTable?> snapshot) =>
@@ -328,6 +337,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return Material(
       child: RefreshIndicator(
+        key: indicatorKey,
         edgeOffset: MediaQuery.of(context).padding.top,
         color: Theme.of(context).colorScheme.secondary,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
@@ -395,6 +405,8 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   Future<void> loadSemesterInfo() async {
     _semesterInfo = await EduServiceRepository.getInstance()
         .loadSemesters(StateProvider.personInfo.value);
+    // Reverse the order to make the newest item at top
+    _semesterInfo = _semesterInfo?.reversed.toList();
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
       chosenSemester = await TimeTableRepository.getInstance()
@@ -405,12 +417,11 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureWidget<void>(
-        future: _future,
-        nullable: true,
-        successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          return PlatformIconButton(
+  Widget build(BuildContext context) => FutureWidget<void>(
+      future: _future,
+      nullable: true,
+      successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
+          PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: AutoSizeText(
                 "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
@@ -426,27 +437,81 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                         onPressed: () {
                           SettingsProvider.getInstance().timetableSemester =
                               e.semesterId;
-                          setState(() {
-                            _selectionInfo = e;
-                          });
+                          setState(() => _selectionInfo = e);
+
+                          // Try to parse the start date
+                          String? parsedStartDate =
+                              SettingsProvider.getInstance()
+                                  .semesterStartDates
+                                  ?.parseStartDate(
+                                      StateProvider.personInfo.value!.group,
+                                      e.semesterId!);
+                          if (parsedStartDate != null) {
+                            SettingsProvider.getInstance()
+                                .thisSemesterStartDate = parsedStartDate;
+                          } else {
+                            Noticing.showNotice(
+                                this.context,
+                                S.of(context).unknown_start_date(
+                                    "${e.schoolYear} ${e.name!}"));
+                          }
                           widget.onSelectionUpdate?.call();
                         },
-                        child: Text("${e.schoolYear} ${e.name!}")))
+                        child: Text(
+                          "${e.schoolYear} ${e.name!}",
+                          // Highlight the selected item
+                          style: TextStyle(
+                              color: PlatformX.isMaterial(context) &&
+                                      e.semesterId == _selectionInfo?.semesterId
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : null),
+                        )))
                     .toList(),
               ),
             ),
-          );
-        },
-        errorBuilder: () => PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Text(S.of(context).failed),
-              onPressed: () => setState(() {
-                _future = LazyFuture.pack(loadSemesterInfo());
-              }),
-            ),
-        loadingBuilder: () => PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Text(S.of(context).loading),
-            ));
+          ),
+      errorBuilder: () => PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(S.of(context).failed),
+            onPressed: () => setState(() {
+              _future = LazyFuture.pack(loadSemesterInfo());
+            }),
+          ),
+      loadingBuilder: () => PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(S.of(context).loading),
+          ));
+}
+
+class StartDateSelectionButton extends StatelessWidget {
+  const StartDateSelectionButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime startTime = context.select<SettingsProvider, DateTime>((value) {
+      var startDateStr = value.thisSemesterStartDate;
+      DateTime? startDate;
+      if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
+      return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
+    });
+
+    return PlatformIconButton(
+      padding: EdgeInsets.zero,
+      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime)),
+      onPressed: () async {
+        DateTime? newDate = await showPlatformDatePicker(
+            context: context,
+            initialDate: startTime,
+            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+            lastDate: startTime.add(const Duration(days: 365 * 100)));
+        if (newDate != null) {
+          SettingsProvider.getInstance().thisSemesterStartDate =
+              newDate.toIso8601String();
+          Noticing.showMaterialNotice(
+              context, S.of(context).refresh_timetable_for_new_data,
+              useSnackBar: true);
+        }
+      },
+    );
   }
 }

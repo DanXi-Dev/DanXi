@@ -19,8 +19,10 @@ import 'dart:async';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
+import 'package:dan_xi/feature/fudan_daily_warning_notification.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/zlapp_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -31,6 +33,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 class FudanDailyFeature extends Feature {
   PersonInfo? _info;
@@ -47,12 +50,21 @@ class FudanDailyFeature extends Feature {
         .then((bool ticked) {
       _status = ConnectionStatus.DONE;
       _hasTicked = ticked;
+      if (_hasTicked) {
+        context!
+            .read<NotificationProvider>()
+            .removeNotification(FudanDailyWarningNotification());
+      } else {
+        context!
+            .read<NotificationProvider>()
+            .addNotification(FudanDailyWarningNotification());
+      }
       notifyUpdate();
     });
   }
 
   @Deprecated("We do not use automatically ticking anymore.")
-  void tickFudanDaily() {
+  void _tickFudanDaily() {
     if (!_hasTicked) {
       FudanCOVID19Repository.getInstance().tick(_info).then((_) {
         refreshData();
@@ -132,21 +144,25 @@ class FudanDailyFeature extends Feature {
     notifyUpdate();
   }
 
+  static pushFudanDailyWebPage(BuildContext context) async {
+    if (PlatformX.isMobile) {
+      // Request Location Permission
+      if (await Permission.locationWhenInUse.request() !=
+          PermissionStatus.granted) {
+        Noticing.showNotice(
+            context, S.of(context).location_permission_denied_promot);
+        return;
+      }
+    }
+    BrowserUtil.openUrl(
+        "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily", context, null, true);
+  }
+
   @override
   void onTap() async {
     switch (_status) {
       case ConnectionStatus.DONE:
-        if (PlatformX.isMobile) {
-          // Request Location Permission
-          if (await Permission.locationWhenInUse.request() !=
-              PermissionStatus.granted) {
-            Noticing.showNotice(
-                context!, S.of(context!).location_permission_denied_promot);
-            return;
-          }
-        }
-        BrowserUtil.openUrl("https://zlapp.fudan.edu.cn/site/ncov/fudanDaily",
-            context, null, true);
+        pushFudanDailyWebPage(context!);
         break;
       case ConnectionStatus.FATAL_ERROR:
       case ConnectionStatus.FAILED:

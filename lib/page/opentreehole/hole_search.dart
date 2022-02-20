@@ -30,6 +30,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:provider/provider.dart';
 
 /// A list page showing the reports for administrators.
 class OTSearchPage extends StatefulWidget {
@@ -73,9 +74,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
     final history = SettingsProvider.getInstance().searchHistory;
     // Populate history
     if (!history.contains(value)) {
-      setState(() {
-        SettingsProvider.getInstance().searchHistory = [value] + history;
-      });
+      SettingsProvider.getInstance().searchHistory = [value] + history;
     }
 
     // Determine if user is using #PID pattern to reach a specific post
@@ -145,33 +144,32 @@ class _OTSearchPageState extends State<OTSearchPage> {
                 children: [
                   Text(S.of(context).history),
                   PlatformTextButton(
-                    alignment: Alignment.centerLeft,
-                    child: Text(S.of(context).clear),
-                    onPressed: () => setState(() {
-                      SettingsProvider.getInstance().searchHistory = null;
-                    }),
-                  ),
+                      alignment: Alignment.centerLeft,
+                      child: Text(S.of(context).clear),
+                      onPressed: () =>
+                          SettingsProvider.getInstance().searchHistory = null),
                 ],
               ),
             ),
             Expanded(
-              child: ListView(
-                primary: false,
-                shrinkWrap: true,
-                //reverse: true,
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                children: SettingsProvider.getInstance()
-                    .searchHistory
-                    .map((e) => PlatformTextButton(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 16),
-                          alignment: Alignment.centerLeft,
-                          child: Text(e),
-                          onPressed: () => submit(e),
-                        ))
-                    .toList(growable: false),
-              ),
+              child: Selector<SettingsProvider, List<String>>(
+                  selector: (_, model) => model.searchHistory,
+                  builder: (_, value, __) => ListView(
+                        primary: false,
+                        shrinkWrap: true,
+                        //reverse: true,
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        children: value
+                            .map((e) => PlatformTextButton(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 16),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(e),
+                                  onPressed: () => submit(e),
+                                ))
+                            .toList(growable: false),
+                      )),
             ),
           ],
         ),

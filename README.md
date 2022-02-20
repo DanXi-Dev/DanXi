@@ -56,9 +56,9 @@
 
 ```shell script
 $ flutter --version
-Flutter 2.10.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision db747aa133 (2 days ago) • 2022-02-09 13:57:35 -0600
-Engine • revision ab46186b24
+Flutter 2.10.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 097d3313d8 (8 hours ago) • 2022-02-18 19:33:08 -0600
+Engine • revision a83ed0e5e3
 Tools • Dart 2.16.1 • DevTools 2.9.2
 ```
 ## 编译说明

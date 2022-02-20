@@ -22,8 +22,8 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
@@ -32,7 +32,6 @@ import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/test/test.dart';
@@ -86,7 +85,8 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences? _preferences;
 
-  final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
+  final ScreenCaptureEvent? screenListener =
+      PlatformX.isWeb ? null : ScreenCaptureEvent();
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
@@ -132,7 +132,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
     _captchaSubscription.cancel();
-    screenListener.dispose();
+    screenListener?.dispose();
     super.dispose();
   }
 
@@ -464,7 +464,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //   });
     // }
 
-    screenListener.addScreenRecordListener((recorded) async {
+    screenListener?.addScreenRecordListener((recorded) async {
       if (StateProvider.needScreenshotWarning &&
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
@@ -473,7 +473,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         StateProvider.showingScreenshotWarning = false;
       }
     });
-    screenListener.addScreenShotListener((filePath) async {
+    screenListener?.addScreenShotListener((filePath) async {
       if (StateProvider.needScreenshotWarning &&
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
@@ -482,7 +482,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         StateProvider.showingScreenshotWarning = false;
       }
     });
-    screenListener.watch();
+    screenListener?.watch();
   }
 
   @override
@@ -527,69 +527,66 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
 
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: _pageIndex),
-      ],
+      providers: [ValueListenableProvider.value(value: _pageIndex)],
       child: PageWithTab(
-        child: PlatformScaffold(
-          body: LazyLoadIndexedStack(
-            index: _pageIndex.value,
-            children: _subpage,
-          ),
+        child: Consumer<int>(
+          builder: (BuildContext context, pageIndex, _) => PlatformScaffold(
+            body: LazyLoadIndexedStack(
+              index: pageIndex,
+              children: _subpage,
+            ),
 
-          // 2021-5-19 @w568w:
-          // Override the builder to prevent the repeatedly built states on iOS.
-          // I don't know why it works...
-          cupertinoTabChildBuilder: (_, index) => _subpage[index],
-          bottomNavBar: PlatformNavBar(
-            items: [
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.purple,
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.dashboard)
-                    : const Icon(CupertinoIcons.square_stack_3d_up_fill),
-                label: S.of(context).dashboard,
-              ),
-              if (!SettingsProvider.getInstance().hideHole)
+            // 2021-5-19 @w568w:
+            // Override the builder to prevent the repeatedly built states on iOS.
+            // I don't know why it works...
+            cupertinoTabChildBuilder: (_, index) => _subpage[index],
+            bottomNavBar: PlatformNavBar(
+              items: [
                 BottomNavigationBarItem(
-                  //backgroundColor: Colors.indigo,
                   icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.forum)
-                      : const Icon(CupertinoIcons.text_bubble),
-                  label: S.of(context).forum,
+                      ? const Icon(Icons.dashboard)
+                      : const Icon(CupertinoIcons.square_stack_3d_up_fill),
+                  label: S.of(context).dashboard,
                 ),
-              BottomNavigationBarItem(
-                //backgroundColor: Colors.blue,
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.calendar_today)
-                    : const Icon(CupertinoIcons.calendar),
-                label: S.of(context).timetable,
-              ),
-              BottomNavigationBarItem(
-                //backgroundColor: Theme.of(context).primaryColor,
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.settings)
-                    : const Icon(CupertinoIcons.gear_alt),
-                label: S.of(context).settings,
-              ),
-            ],
-            currentIndex: _pageIndex.value,
-            material: (_, __) =>
-                MaterialNavBarData(type: BottomNavigationBarType.fixed),
-            itemChanged: (index) {
-              if (index != _pageIndex.value) {
-                // Dispatch [SubpageViewState] events.
-                for (int i = 0; i < _subpage.length; i++) {
-                  if (index != i) {
-                    _subpage[i].onViewStateChanged(SubpageViewState.INVISIBLE);
+                if (!SettingsProvider.getInstance().hideHole)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.forum)
+                        : const Icon(CupertinoIcons.text_bubble),
+                    label: S.of(context).forum,
+                  ),
+                BottomNavigationBarItem(
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.calendar_today)
+                      : const Icon(CupertinoIcons.calendar),
+                  label: S.of(context).timetable,
+                ),
+                BottomNavigationBarItem(
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.settings)
+                      : const Icon(CupertinoIcons.gear_alt),
+                  label: S.of(context).settings,
+                ),
+              ],
+              currentIndex: pageIndex,
+              material: (_, __) =>
+                  MaterialNavBarData(type: BottomNavigationBarType.fixed),
+              itemChanged: (index) {
+                if (index != pageIndex) {
+                  // Dispatch [SubpageViewState] events.
+                  for (int i = 0; i < _subpage.length; i++) {
+                    if (index != i) {
+                      _subpage[i]
+                          .onViewStateChanged(SubpageViewState.INVISIBLE);
+                    }
                   }
+                  _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
+                  _pageIndex.value = index;
+                } else {
+                  _subpage[index].onDoubleTapOnTab();
                 }
-                _subpage[index].onViewStateChanged(SubpageViewState.VISIBLE);
-                setState(() => _pageIndex.value = index);
-              } else {
-                _subpage[index].onDoubleTapOnTab();
-              }
-            },
+              },
+            ),
           ),
         ),
       ),
@@ -674,23 +671,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadStartDate() async {
-    TimeTable.defaultStartTime =
-        AnnouncementRepository.getInstance().getStartDate();
-    // Determine if Timetable needs to be updated
-    if (SettingsProvider.getInstance().lastSemesterStartTime !=
-            TimeTable.defaultStartTime.toIso8601String() &&
-        StateProvider.personInfo.value != null) {
-      // Update Timetable
-      TimeTableRepository.getInstance()
-          .loadTimeTable(StateProvider.personInfo.value,
-              forceLoadFromRemote: true)
-          .onError((dynamic error, stackTrace) {
-        Noticing.showNotice(context, S.of(context).timetable_refresh_error,
-            title: S.of(context).fatal_error, useSnackBar: false);
-      });
-
-      SettingsProvider.getInstance().lastSemesterStartTime =
-          TimeTable.defaultStartTime.toIso8601String();
+    TimeTableExtra? startDateData;
+    try {
+      startDateData = AnnouncementRepository.getInstance().getStartDates();
+    } catch (_) {}
+    if (startDateData != null) {
+      SettingsProvider.getInstance().semesterStartDates = startDateData;
     }
   }
 
