@@ -372,7 +372,7 @@
   "fudan_daily_warning_notification_action": "チェックイン",
   "abnormal_entry_permission": "校内へ立入禁止",
   "everything_is_ok": "問題ない",
-  "entry_permission": "入校権限",
+  "entry_permission": "入校権限：{permission}",
   "diagnostic_information": "診断情報",
   "set_semester_start_date": "始業日を設定する"
 }

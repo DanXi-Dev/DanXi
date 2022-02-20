@@ -71,7 +71,7 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
   @override
   Widget build(BuildContext context) => PlatformScaffold(
         iosContentBottomPadding: true,
-        iosContentPadding: false,
+        iosContentPadding: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar:
             PlatformAppBarX(title: Text(S.of(context).diagnostic_information)),

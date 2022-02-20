@@ -77,11 +77,6 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
               : CupertinoIcons.square_arrow_up),
           () => ShareTimetableEvent().fire(),
         ),
-        AppBarButtonItem(
-            S.of(cxt).semester_start_date, // Timetable Start date
-            const StartDateSelectionButton(),
-            null,
-            useCustomWidget: true)
       ];
 
   @override
@@ -374,6 +369,11 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
               _showingTime!.week,
               tapCallback: _onTapCourse,
             ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(S.of(context).semester_start_date),
+              StartDateSelectionButton(
+                  onUpdate: (() => indicatorKey.currentState?.show())),
+            ]),
           ],
         ),
       ),
@@ -486,7 +486,9 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
 }
 
 class StartDateSelectionButton extends StatelessWidget {
-  const StartDateSelectionButton({Key? key}) : super(key: key);
+  const StartDateSelectionButton({Key? key, this.onUpdate}) : super(key: key);
+
+  final void Function()? onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -496,7 +498,6 @@ class StartDateSelectionButton extends StatelessWidget {
       if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
       return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
     });
-
     return PlatformIconButton(
       padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
       icon: PlatformX.isCupertino(context)
@@ -511,12 +512,10 @@ class StartDateSelectionButton extends StatelessWidget {
             initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
-        if (newDate != null) {
+        if (newDate != null && newDate != startTime) {
           SettingsProvider.getInstance().thisSemesterStartDate =
               newDate.toIso8601String();
-          Noticing.showMaterialNotice(
-              context, S.of(context).refresh_timetable_for_new_data,
-              useSnackBar: true);
+          onUpdate?.call();
         }
       },
     );

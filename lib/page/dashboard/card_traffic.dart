@@ -29,7 +29,6 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A list page showing how crowded each of the campus dining halls is.
@@ -92,7 +91,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                   padding: const EdgeInsets.all(8.0),
                   child: PlatformWidget(
                       material: (_, __) => DropdownButton<Campus>(
-                        items: _getItems(),
+                            items: _getItems(),
                             isExpanded: true,
                             // Don't select anything if _selectItem == Campus.NONE
                             value:
