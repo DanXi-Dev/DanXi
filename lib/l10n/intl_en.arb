@@ -405,5 +405,6 @@
   "fudan_daily_warning_notification_action": "Check In",
   "abnormal_entry_permission": "No rights",
   "everything_is_ok": "All Okay",
-  "entry_permission": "Entry permission"
+  "entry_permission": "Entry permission",
+  "diagnostic_information": "诊断信息"
 }

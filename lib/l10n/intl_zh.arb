@@ -398,5 +398,6 @@
   "fudan_daily_warning_notification_action": "去填写",
   "abnormal_entry_permission": "进校权限异常",
   "everything_is_ok": "一切正常",
-  "entry_permission": "入校权限"
+  "entry_permission": "入校权限",
+  "diagnostic_information": "诊断信息"
 }

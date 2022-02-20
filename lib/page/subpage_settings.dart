@@ -916,6 +916,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     },
                   ),
                   const SizedBox(width: 8),
+                  TextButton(
+                    child: Text(S.of(context).diagnostic_information),
+                    onPressed: () {
+                      smartNavigatorPush(context, "/diagnose");
+                    },
+                  ),
+                  const SizedBox(width: 8),
                 ],
               ),
             ],
