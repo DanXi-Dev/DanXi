@@ -465,7 +465,7 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                           style: TextStyle(
                               color: PlatformX.isMaterial(context) &&
                                       e.semesterId == _selectionInfo?.semesterId
-                                  ? Theme.of(context).primaryColor
+                                  ? Theme.of(context).colorScheme.secondary
                                   : null),
                         )))
                     .toList(),
