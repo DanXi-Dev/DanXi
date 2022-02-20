@@ -95,10 +95,6 @@ class WelcomeFeature extends Feature {
   String get subTitle => _helloQuote;
 
   @override
-  String? get tertiaryTitle =>
-      S.of(context!).entry_permission(_cardInfos?.first.permission ?? "");
-
-  /*@override
   Widget? get customSubtitle {
     if (SettingsProvider.getInstance().debugMode) {
       return const Text(
@@ -170,5 +166,5 @@ class WelcomeFeature extends Feature {
         }
       },
     );
-  }*/
+  }
 }
