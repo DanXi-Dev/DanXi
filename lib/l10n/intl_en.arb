@@ -407,5 +407,6 @@
   "everything_is_ok": "All Okay",
   "entry_permission": "Entry Permission",
   "diagnostic_information": "Diagnostics",
+  "failed_exam_no_grade": "Please check jwfw for make-up exam grades.",
   "set_semester_start_date": "Set Start Date"
 }

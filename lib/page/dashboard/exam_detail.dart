@@ -354,7 +354,8 @@ class _ExamListState extends State<ExamList> {
     if (_examData.isEmpty) return widgets;
     for (var value in _examData) {
       if (value.testCategory.trim() == "论文" ||
-          value.testCategory.trim() == "其他") {
+          value.testCategory.trim() == "其他" ||
+          value.type != "期末考试") {
         secondaryWidgets.add(_buildCardHybrid(value, context));
       } else {
         widgets.add(_buildCardHybrid(value, context));
@@ -426,47 +427,51 @@ class _ExamListState extends State<ExamList> {
                       ),
                   ],
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: FutureWidget<List<ExamScore>?>(
-                    // Using our cached data here
-                    future: _cachedScoreData == null
-                        ? EduServiceRepository.getInstance()
-                            .loadExamScoreRemotely(_info,
-                                semesterId:
-                                    _unpackedSemester![semester!].semesterId)
-                        : Future.value(_cachedScoreData),
-                    loadingBuilder: PlatformCircularProgressIndicator(),
-                    errorBuilder: const SizedBox(),
-                    successBuilder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        _cachedScoreData = snapshot.data;
-                        try {
-                          return Container(
-                              height: 28,
-                              width: 28,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 1,
+                if (value.type != "补考" && value.type != "缓考") ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FutureWidget<List<ExamScore>?>(
+                      // Using our cached data here
+                      future: _cachedScoreData == null
+                          ? EduServiceRepository.getInstance()
+                              .loadExamScoreRemotely(_info,
+                                  semesterId:
+                                      _unpackedSemester![semester!].semesterId)
+                          : Future.value(_cachedScoreData),
+                      loadingBuilder: PlatformCircularProgressIndicator(),
+                      errorBuilder: const SizedBox(),
+                      successBuilder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          _cachedScoreData = snapshot.data;
+                          try {
+                            return Container(
+                                height: 28,
+                                width: 28,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 1,
+                                  ),
+                                  //borderRadius: BorderRadius.circular(16),
                                 ),
-                                //borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Center(
-                                child: Text(
-                                    _cachedScoreData!
-                                        .firstWhere((element) =>
-                                            element.name == value.name)
-                                        .level,
-                                    textScaleFactor: 1.2),
-                              ));
-                          // If we cannot find such an element, we will build an empty SizedBox.
-                        } catch (_) {}
-                      }
-                      return const SizedBox();
-                    },
-                  ),
-                )
+                                child: Center(
+                                  child: Text(
+                                      _cachedScoreData!
+                                          .firstWhere((element) =>
+                                              element.name == value.name)
+                                          .level,
+                                      textScaleFactor: 1.2),
+                                ));
+                            // If we cannot find such an element, we will build an empty SizedBox.
+                          } catch (_) {}
+                        }
+                        return const SizedBox();
+                      },
+                    ),
+                  )
+                ] else ...[
+                  Text(S.of(context).failed_exam_no_grade)
+                ]
               ],
             )),
       ));
