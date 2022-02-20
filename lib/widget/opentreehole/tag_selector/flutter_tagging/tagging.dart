@@ -307,26 +307,29 @@ class _FlutterTaggingState<T extends Taggable>
               });
             }
             final conf = widget.configureChip(item);
-            return Chip(
-              label: conf.label,
-              shape: conf.shape,
-              avatar: conf.avatar,
-              backgroundColor: conf.backgroundColor,
-              clipBehavior: conf.clipBehavior,
-              deleteButtonTooltipMessage: conf.deleteButtonTooltipMessage,
-              deleteIcon: conf.deleteIcon,
-              deleteIconColor: conf.deleteIconColor,
-              elevation: conf.elevation,
-              labelPadding: conf.labelPadding,
-              labelStyle: conf.labelStyle,
-              materialTapTargetSize: conf.materialTapTargetSize,
-              padding: conf.padding,
-              shadowColor: conf.shadowColor,
-              onDeleted: () {
-                widget.initialItems.remove(item);
-                setState(() {});
-                widget.onChanged?.call();
-              },
+            return Padding(
+              padding: conf.externalPadding,
+              child: Chip(
+                label: conf.label,
+                shape: conf.shape,
+                avatar: conf.avatar,
+                backgroundColor: conf.backgroundColor,
+                clipBehavior: conf.clipBehavior,
+                deleteButtonTooltipMessage: conf.deleteButtonTooltipMessage,
+                deleteIcon: conf.deleteIcon,
+                deleteIconColor: conf.deleteIconColor,
+                elevation: conf.elevation,
+                labelPadding: conf.labelPadding,
+                labelStyle: conf.labelStyle,
+                materialTapTargetSize: conf.materialTapTargetSize,
+                padding: conf.padding,
+                shadowColor: conf.shadowColor,
+                onDeleted: () {
+                  widget.initialItems.remove(item);
+                  setState(() {});
+                  widget.onChanged?.call();
+                },
+              ),
             );
           }).toList(),
         ),
