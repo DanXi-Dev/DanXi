@@ -67,21 +67,14 @@ class PlatformMasterDetailApp extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Container(
+          SizedBox(
               width: kTabletMasterContainerWidth,
               height: MediaQuery.of(context).size.height,
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                  border: Border(
-                      right: BorderSide(
-                          width: 1, color: Theme.of(context).dividerColor))),
               child: masterNavigatorWidget),
-          Container(
+          SizedBox(
             width:
                 MediaQuery.of(context).size.width - kTabletMasterContainerWidth,
             height: MediaQuery.of(context).size.height,
-            clipBehavior: Clip.hardEdge,
-            decoration: const BoxDecoration(),
             child: Navigator(
               key: detailNavigatorKey,
               onGenerateRoute: onGenerateRoute,

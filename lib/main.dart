@@ -143,7 +143,9 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) => const SizedBox(),
+    '/placeholder': (context, {arguments}) => PlatformX.isMaterial(context)
+        ? Container(color: Theme.of(context).scaffoldBackgroundColor)
+        : const SizedBox(),
     '/home': (context, {arguments}) => const HomePage(),
     '/diagnose': (context, {arguments}) =>
         DiagnosticConsole(arguments: arguments),
