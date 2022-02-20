@@ -395,5 +395,8 @@
   "unknown_start_date": "我们对该学期({semesterName})的开学日期尚不了解，请在右上角手动设置日期",
   "refresh_timetable_for_new_data": "刷新课程表获得更新数据",
   "fudan_daily_warning_notification": "你还没有填写今日的平安复旦",
-  "fudan_daily_warning_notification_action": "去填写"
+  "fudan_daily_warning_notification_action": "去填写",
+  "abnormal_entry_permission": "进校权限异常",
+  "everything_is_ok": "一切正常",
+  "entry_permission": "入校权限"
 }

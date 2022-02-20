@@ -402,5 +402,8 @@
   "unknown_start_date": "We know little for the semester ({semesterName}) you have selected. Please set the start date manually.",
   "refresh_timetable_for_new_data": "Refresh the timetable to fetch new data",
   "fudan_daily_warning_notification": "Safety Fudan Check-In has not been done today",
-  "fudan_daily_warning_notification_action": "Check In"
+  "fudan_daily_warning_notification_action": "Check In",
+  "abnormal_entry_permission": "No rights",
+  "everything_is_ok": "All Okay",
+  "entry_permission": "Entry permission"
 }

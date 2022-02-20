@@ -369,5 +369,8 @@
   "unknown_start_date": "学期({semesterName})の開始日はまだわかりませんので、手動で設定してください",
   "refresh_timetable_for_new_data": "新しいデータを取得するためにスケジュールを更新してください",
   "fudan_daily_warning_notification": "今日は平安復旦チェックインしません",
-  "fudan_daily_warning_notification_action": "チェックイン"
+  "fudan_daily_warning_notification_action": "チェックイン",
+  "abnormal_entry_permission": "校内へ立入禁止",
+  "everything_is_ok": "問題ない",
+  "entry_permission": "入校権限"
 }
