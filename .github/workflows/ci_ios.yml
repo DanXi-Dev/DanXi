@@ -1,9 +1,6 @@
-name: CI-iOS
+name: Automated-CI-iOS-Beta
 
 on:
-  push:
-    tags:        
-      - '*'
   workflow_dispatch:
 
 jobs:

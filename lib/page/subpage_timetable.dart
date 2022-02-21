@@ -49,6 +49,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -500,15 +501,17 @@ class StartDateSelectionButton extends StatelessWidget {
     });
     return PlatformIconButton(
       padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
-      icon: PlatformX.isCupertino(context)
-          ? AutoSizeText(S.of(context).semester_start_date, minFontSize: 10)
-          : const Icon(Icons.event),
+      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime), minFontSize: 10),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
+            cupertino: (context, __) => CupertinoDatePickerData(
+              doneLabel: S.of(context).ok,
+              cancelLabel: S.of(context).cancel
+            )
             material: (context, __) => MaterialDatePickerData(
                 helpText: S.of(context).semester_start_date,
-                confirmText: S.of(context).set_semester_start_date),
+                confirmText: S.of(context).ok),
             initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
