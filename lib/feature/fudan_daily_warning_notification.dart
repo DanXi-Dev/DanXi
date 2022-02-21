@@ -31,17 +31,22 @@ class FudanDailyWarningNotification extends Feature {
   bool get removable => true;
 
   @override
-  Widget get icon => PlatformX.isMaterial(context!)
-      ? const Icon(Icons.cloud_off)
-      : const Icon(CupertinoIcons.xmark_circle);
+  Widget get icon => Icon(
+        PlatformX.isMaterial(context!)
+            ? Icons.cloud_off
+            : CupertinoIcons.arrow_up_doc,
+        color: Theme.of(context!).errorColor,
+      );
 
   @override
-  Widget get trailing {
+  Widget get customSubtitle {
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       PlatformTextButton(
         padding: EdgeInsets.zero,
-        child: Text(S.of(context!).fudan_daily_warning_notification_action),
-        // User needs to download the vpn software. Open an external browser.
+        child: Text(
+          S.of(context!).fudan_daily_warning_notification_action,
+          style: TextStyle(color: Theme.of(context!).errorColor),
+        ),
         onPressed: () => FudanDailyFeature.pushFudanDailyWebPage(context!),
       ),
     ]);

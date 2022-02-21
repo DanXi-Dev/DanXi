@@ -27,6 +27,7 @@ import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -118,12 +119,22 @@ class WelcomeFeature extends Feature {
         _infoText = "";
         break;
       case ConnectionStatus.DONE:
-        if (_cardInfos?.any((element) => element.permission.contains("否")) ??
+        if (_cardInfos?.any((element) => !element.permission.contains("是")) ??
             false) {
-          status = const Icon(Icons.block);
+          status = Icon(
+            PlatformX.isMaterial(context!)
+                ? Icons.block
+                : CupertinoIcons.xmark_circle,
+            color: Theme.of(context!).errorColor,
+          );
           _infoText = S.of(context!).abnormal_entry_permission;
         } else {
-          status = const Icon(Icons.verified);
+          status = Icon(
+            PlatformX.isMaterial(context!)
+                ? Icons.verified
+                : CupertinoIcons.checkmark_alt_circle,
+            color: Colors.green,
+          );
           _infoText = S.of(context!).everything_is_ok;
         }
         break;
@@ -140,10 +151,12 @@ class WelcomeFeature extends Feature {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           status,
-          if (_infoText.isNotEmpty) ...[
+          /*if (_infoText.isNotEmpty) ...[
             const SizedBox(height: 2),
             Text(_infoText, textScaleFactor: 0.8)
-          ]
+          ]*/
+          const SizedBox(height: 2),
+          Text(S.of(context!).entry_permission, textScaleFactor: 0.8)
         ],
       ),
       onTap: () {
