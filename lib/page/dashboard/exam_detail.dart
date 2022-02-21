@@ -471,7 +471,9 @@ class _ExamListState extends State<ExamList> {
                     ),
                   )
                 ] else ...[
-                  Text(S.of(context).failed_exam_no_grade)
+                  Expanded(
+                      child: Text(S.of(context).failed_exam_no_grade,
+                          softWrap: true, textAlign: TextAlign.right))
                 ]
               ],
             )),
