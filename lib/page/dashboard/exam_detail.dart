@@ -38,7 +38,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:ical/serializer.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// A list page showing user's GPA scores and exam information.
 /// It will try to fetch [SemesterInfo] first.

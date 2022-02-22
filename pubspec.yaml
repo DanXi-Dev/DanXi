@@ -30,7 +30,7 @@ dependencies:
   catcher: ^0.6.9
   event_bus: ^2.0.0
   flutter_platform_widgets: ^1.20.0
-  share: ^2.0.4
+  share_plus: ^3.1.0
   path_provider: ^2.0.9
   screen_brightness: ^0.1.4
   flutter_email_sender: ^5.1.0
