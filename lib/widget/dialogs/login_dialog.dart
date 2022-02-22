@@ -36,7 +36,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT,
-  //UserGroup.VISITOR
+  UserGroup.VISITOR
 ];
 
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
@@ -211,7 +211,7 @@ class _LoginDialogState extends State<LoginDialog> {
                 S.of(context).login_uis_description,
                 style: Theme.of(context).textTheme.bodyText2,
               ),
-              if (_group == DEFAULT_USERGROUP)
+              if (_group == DEFAULT_USERGROUP) ...[
                 GestureDetector(
                   child: Text(
                     S.of(context).not_undergraduate,
@@ -219,6 +219,15 @@ class _LoginDialogState extends State<LoginDialog> {
                   ),
                   onTap: () => _showSwitchGroupModal(),
                 ),
+                GestureDetector(
+                  child: Text(
+                    S.of(context).try_visitor_mode,
+                    style: linkText,
+                  ),
+                  onTap: () => _showSwitchGroupModal(),
+                ),
+              ],
+
               Text(
                 _errorText,
                 textAlign: TextAlign.start,
