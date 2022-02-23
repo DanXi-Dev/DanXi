@@ -376,5 +376,7 @@
   "diagnostic_information": "診断情報",
   "failed_exam_no_grade": "追試験の成績はアカデミックサービスでご確認ください",
   "set_semester_start_date": "始業日を設定する",
-  "try_visitor_mode": "入力したくない？Visitorモードをご試します"
+  "try_visitor_mode": "入力したくない？Visitorモードをご試します",
+  "set_password": "パスワード設定",
+  "set_your_fduhole_password": "FDUHoleアカウントのパスワードを設定してください"
 }

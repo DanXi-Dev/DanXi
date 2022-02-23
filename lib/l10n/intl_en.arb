@@ -409,5 +409,7 @@
   "diagnostic_information": "Diagnostics",
   "failed_exam_no_grade": "Please check JWFW for make-up exam grades.",
   "set_semester_start_date": "Set Start Date",
-  "try_visitor_mode": "Don't want to login? Go as visitor"
+  "try_visitor_mode": "Don't want to login? Go as visitor",
+  "set_password": "Set A Password",
+  "set_your_fduhole_password": "Set a password for your FDUHole account"
 }
