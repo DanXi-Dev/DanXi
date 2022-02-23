@@ -1,0 +1,45 @@
+name: Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "2.10.1"
+          channel: "stable"
+
+      - name: Prepare Dependencies
+        run: |
+          flutter pub get
+          flutter pub global activate intl_utils
+          flutter pub global run intl_utils:generate
+
+      - name: Generate Models
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Import Secrets
+        uses: actions/checkout@v2
+        with:
+          repository: DanXi-Dev/DanXi-secrets
+          path: secrets
+          ssh-key: ${{ secrets.SECRETS_SSH_KEY }}
+
+      - name: Populate Secrets
+        run: |
+          mv -f secrets/Secret.dart lib/common/Secret.dart
+
+      - name: Build & Upload
+        run: |
+          flutter build web --release
+          cd build/web
+          git init -b gh-pages
+          git add -A
+          git commit -m 'gh-action deploy'
+          git push -f "git@github.com:DanXi-Dev/DanXi" gh-pages
