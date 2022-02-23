@@ -26,7 +26,7 @@ jobs:
 
       - name: Import Keys
         run: |
-          echo -n "${{ secrets.MATCH_SSH_KEY_BASE64 }}" | base64 -d -o $HOME/.ssh/id_rsa
+          echo -n "${{ secrets.DEPLOY_TO_GH_PAGES }}" | base64 -d -o $HOME/.ssh/id_rsa
           chmod 400 $HOME/.ssh/id_rsa
 
       - name: Configure Git
