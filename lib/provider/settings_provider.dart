@@ -62,6 +62,11 @@ class SettingsProvider with ChangeNotifier {
 
   SettingsProvider._();
 
+  /// Get a global instance of [SettingsProvider].
+  ///
+  /// Never use it anywhere expect [main.dart], where we put it into a [ChangeNotifierProvider] on the top
+  /// of widget tree.
+  /// If you need to get access to a [SettingsProvider], call [context.read<SettingsProvider>()] instead.
   factory SettingsProvider.getInstance() => _instance;
 
   List<String> get searchHistory {

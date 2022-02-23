@@ -82,8 +82,6 @@ class _LoginDialogState extends State<LoginDialog> {
   static const DEFAULT_USERGROUP = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
   UserGroup _group = DEFAULT_USERGROUP;
 
-  Future<bool> _deleteAllData() => widget.sharedPreferences!.clear();
-
   /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {
     if (id.length * password.length == 0) {
@@ -95,12 +93,10 @@ class _LoginDialogState extends State<LoginDialog> {
       case UserGroup.VISITOR:
         PersonInfo newInfo =
             PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
-        _deleteAllData().then((value) async {
-          await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
-          widget.personInfo.value = newInfo;
-          progressDialog.dismiss(showAnim: false);
-          Navigator.of(context).pop();
-        });
+        await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
+        widget.personInfo.value = newInfo;
+        progressDialog.dismiss(showAnim: false);
+        Navigator.of(context).pop();
         break;
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
@@ -109,7 +105,6 @@ class _LoginDialogState extends State<LoginDialog> {
           final stuInfo =
               await FudanEhallRepository.getInstance().getStudentInfo(newInfo);
           newInfo.name = stuInfo.name;
-          await _deleteAllData();
           await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
@@ -125,7 +120,6 @@ class _LoginDialogState extends State<LoginDialog> {
             if (newInfo.name?.isEmpty ?? true) {
               throw GeneralLoginFailedException();
             }
-            await _deleteAllData();
             await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
             widget.personInfo.value = newInfo;
             progressDialog.dismiss(showAnim: false);
