@@ -36,7 +36,7 @@ jobs:
 
       - name: Build & Upload
         run: |
-          flutter build web --release
+          flutter build web --release --web-renderer html
           cd build/web
           git init -b gh-pages
           git add -A
