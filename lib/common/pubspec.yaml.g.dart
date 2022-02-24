@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.5+151';
+const String version = r'1.3.6+156';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,22 +49,23 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 5;
+const int patch = 6;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'151'];
+const List<String> build = <String>[r'156'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1644578291;
+const int timestamp = 1645539285;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description = r'Maybe the best all-rounded service app for Fudan University students.';
+const String description =
+    r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -114,55 +115,56 @@ const Map<String, Object> dependencies = <String, Object>{
   'provider': r'^6.0.2',
   'catcher': r'^0.6.9',
   'event_bus': r'^2.0.0',
-  'flutter_platform_widgets': r'^1.12.1',
-  'share': r'^2.0.4',
-  'path_provider': r'^2.0.8',
-  'screen_brightness': r'^0.1.3',
-  'flutter_email_sender': r'^5.0.2',
-  'auto_size_text': r'^3.0.0-nullsafety.0',
+  'flutter_platform_widgets': r'^1.20.0',
+  'share_plus': r'^3.1.0',
+  'path_provider': r'^2.0.9',
+  'screen_brightness': r'^0.1.4',
+  'flutter_email_sender': r'^5.1.0',
+  'auto_size_text': r'^3.0.0',
   'ical': r'^0.2.2',
-  'url_launcher': r'^6.0.18',
+  'url_launcher': r'^6.0.20',
   'desktop_window': r'^0.4.0',
-  'intl': r'^0.17.0-nullsafety.2',
-  'http': r'^0.13.1',
+  'intl': r'^0.17.0',
+  'http': r'^0.13.4',
   'dio': r'^4.0.4',
-  'shared_preferences': r'^2.0.5',
+  'shared_preferences': r'^2.0.13',
   'flutter_phoenix': r'^1.0.0',
   'asn1lib': r'^1.0.0',
-  'image_picker': r'^0.8.1',
+  'image_picker': r'^0.8.4+9',
   'clipboard': r'^0.1.3',
   'flutter_inappwebview': r'^5.3.2',
   'permission_handler': r'^8.3.0',
-  'in_app_review': r'^2.0.2',
+  'in_app_review': r'^2.0.4',
   'flutter_linkify': r'^5.0.2',
   'linkify': r'^4.0.0',
   'open_file': r'^3.2.1',
-  'dio_log': r'^2.0.0',
-  'json_serializable': r'^6.1.3',
+  'dio_log': r'^2.0.2',
+  'json_serializable': r'^6.1.4',
   'photo_view': r'^0.13.0',
-  'gallery_saver': r'^2.1.2',
-  'flutter_markdown': r'^0.6.2',
-  'markdown': r'^4.0.0',
-  'system_tray': r'^0.0.7',
+  'gallery_saver': r'^2.3.2',
+  'flutter_markdown': r'^0.6.9',
+  'markdown': r'^4.0.1',
+  'system_tray': r'^0.1.0',
   'bitsdojo_window': r'^0.1.1+1',
-  'win32': r'^2.3.8',
+  'win32': r'^2.4.1',
   'file_picker': r'^4.0.0',
-  'cached_network_image': r'^3.1.0',
-  'google_mobile_ads': r'^1.0.1',
+  'cached_network_image': r'^3.2.0',
+  'google_mobile_ads': r'^1.1.0',
   'flutter_typeahead': r'>=3.1.0 <4.0.0',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
-  'flutter_js': r'^0.5.0+3',
-  'flutter_math_fork': r'^0.6.0',
+  'flutter_js': r'^0.5.0+6',
+  'flutter_math_fork': r'^0.6.1',
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.5',
   'screen_capture_event': r'^1.0.0+1',
-  'otp': r'^3.0.1',
-  'lunar': r'^1.2.15',
+  'otp': r'^3.0.2',
+  'lunar': r'^1.2.17',
   'animated_text_kit': r'^4.2.1',
   'flutter_fgbg': r'^0.1.0',
-  'lazy_load_indexed_stack': r'^0.1.2',
+  'lazy_load_indexed_stack': r'^0.1.3',
+  'js': r'^0.6.3',
 };
 
 /// Developer dependencies

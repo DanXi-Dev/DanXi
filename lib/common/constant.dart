@@ -60,7 +60,7 @@ class Constant {
       "https://www.fduhole.com/#/forgetpassword";
 
   // ignore: non_constant_identifier_names
-  static get DEFAULT_SEMESTER_START_TIME => DateTime(2021, 9, 13);
+  static get DEFAULT_SEMESTER_START_TIME => DateTime(2022, 2, 21);
 
   static EventBus eventBus = EventBus(sync: true);
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";

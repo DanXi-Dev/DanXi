@@ -121,7 +121,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
-      TimetableSubPage(key: timetablePageKey),
+      // Don't show Timetable in visitor mode
+      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+        TimetableSubPage(key: timetablePageKey),
       SettingsSubpage(key: settingsPageKey),
     ];
   }
@@ -555,12 +557,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         : const Icon(CupertinoIcons.text_bubble),
                     label: S.of(context).forum,
                   ),
-                BottomNavigationBarItem(
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.calendar_today)
-                      : const Icon(CupertinoIcons.calendar),
-                  label: S.of(context).timetable,
-                ),
+                // Don't show Timetable in visitor mode
+                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.calendar_today)
+                        : const Icon(CupertinoIcons.calendar),
+                    label: S.of(context).timetable,
+                  ),
                 BottomNavigationBarItem(
                   icon: PlatformX.isMaterial(context)
                       ? const Icon(Icons.settings)

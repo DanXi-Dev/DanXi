@@ -41,6 +41,7 @@ import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/opentreehole/text_selector.dart';
+import 'package:dan_xi/page/settings/diagnosic_console.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -139,8 +140,12 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) => const SizedBox(),
+    '/placeholder': (context, {arguments}) => PlatformX.isMaterial(context)
+        ? Container(color: Theme.of(context).scaffoldBackgroundColor)
+        : const SizedBox(),
     '/home': (context, {arguments}) => const HomePage(),
+    '/diagnose': (context, {arguments}) =>
+        DiagnosticConsole(arguments: arguments),
     '/bbs/reports': (context, {arguments}) =>
         BBSReportDetail(arguments: arguments),
     '/card/detail': (context, {arguments}) =>

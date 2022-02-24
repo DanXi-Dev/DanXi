@@ -124,7 +124,6 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   }
 
   TimeTable loadTimeTableLocally() {
-    // Use an ugly implementation here to avoid using async method [SharedPreferences.getInstance()].
     SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
     if (preferences.containsKey(TimeTableRepository.KEY_TIMETABLE_CACHE)) {
       return TimeTable.fromJson(jsonDecode(

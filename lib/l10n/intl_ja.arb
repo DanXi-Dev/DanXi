@@ -369,5 +369,14 @@
   "unknown_start_date": "学期({semesterName})の開始日はまだわかりませんので、手動で設定してください",
   "refresh_timetable_for_new_data": "新しいデータを取得するためにスケジュールを更新してください",
   "fudan_daily_warning_notification": "今日は平安復旦チェックインしません",
-  "fudan_daily_warning_notification_action": "チェックイン"
+  "fudan_daily_warning_notification_action": "チェックイン",
+  "abnormal_entry_permission": "校内へ立入禁止",
+  "everything_is_ok": "問題ない",
+  "entry_permission": "入校権限",
+  "diagnostic_information": "診断情報",
+  "failed_exam_no_grade": "追試験の成績はアカデミックサービスでご確認ください",
+  "set_semester_start_date": "始業日を設定する",
+  "try_visitor_mode": "入力したくない？Visitorモードをご試します",
+  "set_password": "パスワード設定",
+  "set_your_fduhole_password": "FDUHoleアカウントのパスワードを設定してください"
 }

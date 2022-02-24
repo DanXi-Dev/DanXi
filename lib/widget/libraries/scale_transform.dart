@@ -26,5 +26,7 @@ class ScaleTransform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Transform(
-      transform: Matrix4.identity()..scale(scale, scale, 1.0), child: child);
+      alignment: Alignment.center,
+      transform: Matrix4.identity()..scale(scale, scale, 1.0),
+      child: child);
 }

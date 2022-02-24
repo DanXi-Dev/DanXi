@@ -19,6 +19,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 GlobalKey<NavigatorState>? navigatorGlobalKey;
 
@@ -67,21 +68,30 @@ class PlatformMasterDetailApp extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Container(
-              width: kTabletMasterContainerWidth,
-              height: MediaQuery.of(context).size.height,
+          PlatformWidget(
+            material: (_, __) => SizedBox(
+                width: kTabletMasterContainerWidth,
+                height: MediaQuery.of(context).size.height,
+                child: masterNavigatorWidget),
+            // Dismiss the shadow border on Cupertino
+            cupertino: (_, __) => Container(
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                   border: Border(
                       right: BorderSide(
                           width: 1, color: Theme.of(context).dividerColor))),
-              child: masterNavigatorWidget),
+              width: kTabletMasterContainerWidth,
+              height: MediaQuery.of(context).size.height,
+              child: masterNavigatorWidget,
+            ),
+          ),
           Container(
+            // Set an empty BoxDecoration to dismiss the shadow border on Cupertino
+            decoration: const BoxDecoration(),
+            clipBehavior: Clip.hardEdge,
             width:
                 MediaQuery.of(context).size.width - kTabletMasterContainerWidth,
             height: MediaQuery.of(context).size.height,
-            clipBehavior: Clip.hardEdge,
-            decoration: const BoxDecoration(),
             child: Navigator(
               key: detailNavigatorKey,
               onGenerateRoute: onGenerateRoute,

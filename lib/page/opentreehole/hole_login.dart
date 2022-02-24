@@ -23,7 +23,6 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/animation.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/password_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -227,25 +226,19 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
   Future<void> checkEmailInfo(
       BuildContext context, String email, bool isRecommendedEmail) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
-    state.jumpTo(
-        OTLoadingWidget(
-          state: state,
-        ),
-        putInStack: false);
+    state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
     bool? registered =
         await OpenTreeHoleRepository.getInstance().checkRegisterStatus(email);
     if (registered!) {
-      state.jumpTo(OTEmailPasswordLoginWidget(
-        state: state,
-      ));
+      state.jumpTo(OTEmailPasswordLoginWidget(state: state));
     } else {
       if (isRecommendedEmail) {
         model.verifyCode =
             await OpenTreeHoleRepository.getInstance().getVerifyCode(email);
-        state.jumpTo(OTRegisterLicenseWidget(state: state));
+        state.jumpTo(OTSetPasswordWidget(state: state));
       } else {
         model.verifyCode = null;
-        state.jumpTo(OTRegisterLicenseWidget(state: state));
+        state.jumpTo(OTSetPasswordWidget(state: state));
       }
     }
   }
@@ -316,8 +309,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                     checkEmailInfo(context, email, email == recommendedEmail)
                         .catchError((e, st) {
                       state.jumpBackFromLoadingPage();
-                      Noticing.showNotice(state.context,
-                          S.of(state.context).unable_to_connect_to_server);
+                      Noticing.showModalError(state.context, e, trace: st);
                     });
                   }
                 }))
@@ -446,6 +438,56 @@ class OTLoadingWidget extends SubStatelessWidget {
   }
 }
 
+class OTSetPasswordWidget extends SubStatelessWidget {
+  final TextEditingController _passwordController = TextEditingController();
+
+  OTSetPasswordWidget({Key? key, required _HoleLoginPageState state})
+      : super(key: key, state: state);
+
+  @override
+  Widget buildContent(BuildContext context) {
+    final model = Provider.of<LoginInfoModel>(context, listen: false);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          S.of(context).set_password,
+          style: Theme.of(context).textTheme.headline6,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          S.of(context).set_your_fduhole_password,
+          style: Theme.of(context).textTheme.caption,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 32),
+        TextField(
+          controller: _passwordController,
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: S.of(context).password,
+            icon: PlatformX.isMaterial(context)
+                ? const Icon(Icons.lock_outline)
+                : const Icon(CupertinoIcons.lock_circle),
+          ),
+        ),
+        const SizedBox(height: 16),
+        PlatformElevatedButton(
+          child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(S.of(context).next)),
+          onPressed: () {
+            model.password = _passwordController.text;
+            if (_passwordController.text.isNotEmpty) {
+              state.jumpTo(OTRegisterLicenseWidget(state: state));
+            }
+          },
+        )
+      ],
+    );
+  }
+}
+
 class OTRegisterLicenseWidget extends SubStatelessWidget {
   const OTRegisterLicenseWidget({Key? key, required _HoleLoginPageState state})
       : super(key: key, state: state);
@@ -460,10 +502,8 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
       state.jumpTo(OTEmailVerifyCodeWidget(state: state));
       return;
     }
-    String generatedPassword = PasswordUtil.generateNormalPassword(8);
-    model.password = generatedPassword;
     await OpenTreeHoleRepository.getInstance()
-        .register(model.selectedEmail!, generatedPassword, model.verifyCode!);
+        .register(model.selectedEmail!, model.password!, model.verifyCode!);
     state.jumpTo(OTRegisterSuccessWidget(state: state));
   }
 
@@ -489,8 +529,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             registerCallback: () {
               executeRegister(context, state).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showNotice(state.context,
-                    S.of(state.context).unable_to_connect_to_server);
+                Noticing.showModalError(state.context, e, trace: st);
               });
             },
           )
@@ -589,8 +628,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
               OTRegisterLicenseWidget.executeRegister(context, state)
                   .catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showNotice(
-                    state.context, S.of(state.context).login_problem_occurred);
+                Noticing.showModalError(state.context, e, trace: st);
               });
             }
           },

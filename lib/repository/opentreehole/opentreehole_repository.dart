@@ -64,6 +64,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Push Notification Registration Cache
   PushNotificationRegData? _pushNotificationRegData;
 
+  String? lastUploadToken;
+
   Future<void> logout() async {
     if (!isUserInitialized) {
       if (SettingsProvider.getInstance().fduholeToken == null) {
@@ -619,10 +621,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminChangePassword(String email, String password) async {
+    return (await dio!.patch(_BASE_URL + "/register",
+            data: {"email": email, "password": password},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {
     if (isUserInitialized) {
+      lastUploadToken = token;
       await dio!.put(_BASE_URL + "/users/push-tokens",
           data: {
             "service": service.toStringRepresentation(),

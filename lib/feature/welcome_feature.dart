@@ -17,15 +17,32 @@
 
 import 'dart:math';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/fdu/data_center_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WelcomeFeature extends Feature {
   PersonInfo? _info;
+  ConnectionStatus _status = ConnectionStatus.NONE;
+  List<CardDetailInfo>? _cardInfos;
+
+  Future<void> _loadCardStatus() async {
+    _status = ConnectionStatus.CONNECTING;
+    _cardInfos =
+        await DataCenterRepository.getInstance().getCardDetailInfo(_info);
+    _status = ConnectionStatus.DONE;
+    notifyUpdate();
+  }
 
   /// A sentence to show welcome to users depending on the time.
   String _helloQuote = "";
@@ -60,6 +77,16 @@ class WelcomeFeature extends Feature {
     } else if (time >= 17 && time <= 22) {
       _helloQuote = S.of(context!).good_night;
     }
+
+    // Only load data once.
+    // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
+    // not just FeatureContainer. So the feature will be recreated then.
+    if (_status == ConnectionStatus.NONE) {
+      _loadCardStatus().catchError((error) {
+        _status = ConnectionStatus.FAILED;
+        notifyUpdate();
+      });
+    }
   }
 
   @override
@@ -77,5 +104,80 @@ class WelcomeFeature extends Feature {
       );
     }
     return null;
+  }
+
+  @override
+  Widget get trailing {
+    Widget status;
+    String _infoText;
+    switch (_status) {
+      case ConnectionStatus.NONE:
+      case ConnectionStatus.CONNECTING:
+        status = ScaleTransform(
+            scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
+            child: PlatformCircularProgressIndicator());
+        _infoText = "";
+        break;
+      case ConnectionStatus.DONE:
+        if (_cardInfos?.any((element) => !element.permission.contains("是")) ??
+            false) {
+          status = Icon(
+            PlatformX.isMaterial(context!)
+                ? Icons.block
+                : CupertinoIcons.xmark_circle,
+            color: Theme.of(context!).errorColor,
+          );
+          _infoText = S.of(context!).abnormal_entry_permission;
+        } else {
+          status = Icon(
+            PlatformX.isMaterial(context!)
+                ? Icons.verified
+                : CupertinoIcons.checkmark_alt_circle,
+            color: Colors.green,
+          );
+          _infoText = S.of(context!).everything_is_ok;
+        }
+        break;
+      case ConnectionStatus.FAILED:
+      case ConnectionStatus.FATAL_ERROR:
+        status = const Icon(Icons.error);
+        _infoText = S.of(context!).failed;
+        break;
+    }
+
+    return InkWell(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          status,
+          /*if (_infoText.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(_infoText, textScaleFactor: 0.8)
+          ]*/
+          const SizedBox(height: 2),
+          Text(S.of(context!).entry_permission, textScaleFactor: 0.8)
+        ],
+      ),
+      onTap: () {
+        switch (_status) {
+          case ConnectionStatus.NONE:
+          case ConnectionStatus.CONNECTING:
+            break;
+          case ConnectionStatus.DONE:
+            Noticing.showModalNotice(context!,
+                title: S.of(context!).entry_permission,
+                message: _cardInfos!.isEmpty
+                    ? S.of(context!).no_data
+                    : _cardInfos!.map((e) => e.permission).join("\n"));
+            break;
+          case ConnectionStatus.FAILED:
+          case ConnectionStatus.FATAL_ERROR:
+            _status = ConnectionStatus.NONE;
+            notifyUpdate();
+            break;
+        }
+      },
+    );
   }
 }

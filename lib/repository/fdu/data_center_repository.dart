@@ -34,6 +34,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       "https://my.fudan.edu.cn/simple_list/stqk";
   static const String SCORE_DETAIL_URL =
       "https://my.fudan.edu.cn/list/bks_xx_cj";
+  static const String CARD_DETAIL_URL = "https://my.fudan.edu.cn/list/ykt_xx";
 
   DataCenterRepository._();
 
@@ -128,11 +129,50 @@ class DataCenterRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
+  Future<List<CardDetailInfo>?> getCardDetailInfo(PersonInfo? info) =>
+      Retrier.tryAsyncWithFix(
+          () => _getCardDetailInfo(),
+          (exception) => UISLoginTool.fixByLoginUIS(
+              dio!, LOGIN_URL, cookieJar!, info, true));
+
+  Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
+    Response<String> r = await dio!.get(CARD_DETAIL_URL);
+    BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    dom.Element tableBody = soup.find("tbody")!.element!;
+    return tableBody
+        .getElementsByTagName("tr")
+        .map((e) => CardDetailInfo.fromDataCenterHtml(e))
+        .toList();
+  }
+
   @override
   String get linkHost => "my.fudan.edu.cn";
 }
 
 class UnsuitableTimeException implements Exception {}
+
+class CardDetailInfo {
+  String id;
+  String name;
+  String status;
+  String permission;
+  String expireDate;
+  String balance;
+
+  CardDetailInfo(this.id, this.name, this.status, this.permission,
+      this.expireDate, this.balance);
+
+  factory CardDetailInfo.fromDataCenterHtml(dom.Element html) {
+    List<dom.Element> elements = html.getElementsByTagName("td");
+    return CardDetailInfo(
+        elements[0].text.trim(),
+        elements[1].text.trim(),
+        elements[2].text.trim(),
+        elements[3].text.trim(),
+        elements[4].text.trim(),
+        elements[5].text.trim());
+  }
+}
 
 class TrafficInfo {
   int current;

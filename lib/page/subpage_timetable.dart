@@ -52,7 +52,7 @@ import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -77,11 +77,6 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
               : CupertinoIcons.square_arrow_up),
           () => ShareTimetableEvent().fire(),
         ),
-        AppBarButtonItem(
-            S.of(cxt).semester_start_date, // Timetable Start date
-            const StartDateSelectionButton(),
-            null,
-            useCustomWidget: true)
       ];
 
   @override
@@ -374,6 +369,11 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
               _showingTime!.week,
               tapCallback: _onTapCourse,
             ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(S.of(context).semester_start_date),
+              StartDateSelectionButton(
+                  onUpdate: (() => indicatorKey.currentState?.show())),
+            ]),
           ],
         ),
       ),
@@ -425,7 +425,8 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: AutoSizeText(
-                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}"),
+                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}",
+                minFontSize: 10),
             onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (menuContext) => PlatformContextMenu(
@@ -485,7 +486,9 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
 }
 
 class StartDateSelectionButton extends StatelessWidget {
-  const StartDateSelectionButton({Key? key}) : super(key: key);
+  const StartDateSelectionButton({Key? key, this.onUpdate}) : super(key: key);
+
+  final void Function()? onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -495,22 +498,26 @@ class StartDateSelectionButton extends StatelessWidget {
       if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
       return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
     });
-
     return PlatformIconButton(
-      padding: EdgeInsets.zero,
-      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime)),
+      padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
+      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime), minFontSize: 10),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
+            cupertino: (context, __) => CupertinoDatePickerData(
+              doneLabel: S.of(context).ok,
+              cancelLabel: S.of(context).cancel
+            )
+            material: (context, __) => MaterialDatePickerData(
+                helpText: S.of(context).semester_start_date,
+                confirmText: S.of(context).ok),
             initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
-        if (newDate != null) {
+        if (newDate != null && newDate != startTime) {
           SettingsProvider.getInstance().thisSemesterStartDate =
               newDate.toIso8601String();
-          Noticing.showMaterialNotice(
-              context, S.of(context).refresh_timetable_for_new_data,
-              useSnackBar: true);
+          onUpdate?.call();
         }
       },
     );

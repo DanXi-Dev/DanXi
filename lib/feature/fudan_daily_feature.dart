@@ -63,23 +63,6 @@ class FudanDailyFeature extends Feature {
     });
   }
 
-  @Deprecated("We do not use automatically ticking anymore.")
-  void _tickFudanDaily() {
-    if (!_hasTicked) {
-      FudanCOVID19Repository.getInstance().tick(_info).then((_) {
-        refreshData();
-      }, onError: (e) {
-        if (e is NotTickYesterdayException) {
-          _processForgetTickIssue();
-        } else {
-          _status = ConnectionStatus.FATAL_ERROR;
-          notifyUpdate();
-          Noticing.showNotice(context!, S.of(context!).tick_failed);
-        }
-      });
-    }
-  }
-
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
     _info = StateProvider.personInfo.value;
@@ -132,11 +115,6 @@ class FudanDailyFeature extends Feature {
   Widget get icon => PlatformX.isMaterial(context!)
       ? const Icon(Icons.cloud_upload)
       : const Icon(CupertinoIcons.arrow_up_doc);
-
-  void _processForgetTickIssue() {
-    Noticing.showNotice(context!, S.of(context!).tick_issue_1,
-        title: S.of(context!).fatal_error, useSnackBar: false);
-  }
 
   /// Restart the loading process
   void refreshData() {

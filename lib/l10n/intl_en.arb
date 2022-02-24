@@ -397,10 +397,19 @@
   "input_reason": "Input Content (leave empty to restore)",
   "operation_successful": "The operation completed successfully",
   "hole_hidden": "Hidden Hole",
-  "semester_start_date": "First day of the semester",
+  "semester_start_date": "Set semester start date: ",
   "delete_this_tag": "Delete this tag?",
-  "unknown_start_date": "We know little for the semester ({semesterName}) you have selected. Please set the start date manually.",
+  "unknown_start_date": "The start date for semester ({semesterName}) is unknown. Please set start date manually.",
   "refresh_timetable_for_new_data": "Refresh the timetable to fetch new data",
   "fudan_daily_warning_notification": "Safety Fudan Check-In has not been done today",
-  "fudan_daily_warning_notification_action": "Check In"
+  "fudan_daily_warning_notification_action": "Check In",
+  "abnormal_entry_permission": "No rights",
+  "everything_is_ok": "All Okay",
+  "entry_permission": "Entry Permission",
+  "diagnostic_information": "Diagnostics",
+  "failed_exam_no_grade": "Please check JWFW for make-up exam grades.",
+  "set_semester_start_date": "Set Start Date",
+  "try_visitor_mode": "Don't want to login? Go as visitor",
+  "set_password": "Set A Password",
+  "set_your_fduhole_password": "Set a password for your FDUHole account"
 }

@@ -25,7 +25,6 @@ import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/configur
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 /// A tag selector for [OTTag].
@@ -96,21 +95,23 @@ class _OTTagSelectorState extends State<OTTagSelector> {
           customChipBuilder: PlatformX.isCupertino(context)
               ? (tag, onDelete) {
                   return Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: RoundChip(
-                          label: tag.name,
-                          color: tag.color,
-                          onTap: () async {
-                            if (await Noticing.showConfirmationDialog(
-                                    context, tag.name ?? "",
-                                    title: S.of(context).delete_this_tag) ==
-                                true) {
-                              onDelete.call();
-                            }
-                          }));
+                    padding: const EdgeInsets.only(top: 8),
+                    child: RoundChip(
+                        label: tag.name,
+                        color: tag.color,
+                        onTap: () async {
+                          if (await Noticing.showConfirmationDialog(
+                                  context, tag.name ?? "",
+                                  title: S.of(context).delete_this_tag) ==
+                              true) {
+                            onDelete.call();
+                          }
+                        }),
+                  );
                 }
               : null,
           configureChip: (tag) => ChipConfiguration(
+              externalPadding: const EdgeInsets.only(top: 8),
               label: Text(tag.name!),
               backgroundColor: tag.color,
               labelStyle: TextStyle(

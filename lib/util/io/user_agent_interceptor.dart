@@ -17,6 +17,7 @@
 import 'dart:io';
 
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
 
 class UserAgentInterceptor extends Interceptor {
@@ -26,8 +27,10 @@ class UserAgentInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    userAgent ??= "DanXi/${pubspec.major}.${pubspec.minor}.${pubspec.patch}";
-    options.headers[HttpHeaders.userAgentHeader] = userAgent;
+    if (!PlatformX.isWeb) {
+      userAgent ??= "DanXi/${pubspec.major}.${pubspec.minor}.${pubspec.patch}";
+      options.headers[HttpHeaders.userAgentHeader] = userAgent;
+    }
     return handler.next(options);
   }
 }

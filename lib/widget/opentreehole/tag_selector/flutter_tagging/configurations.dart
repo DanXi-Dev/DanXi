@@ -169,6 +169,8 @@ class ChipConfiguration {
   /// The message to be used for the chip's delete button tooltip.
   final String? deleteButtonTooltipMessage;
 
+  final EdgeInsets externalPadding;
+
   ///
   const ChipConfiguration({
     required this.label,
@@ -185,6 +187,7 @@ class ChipConfiguration {
     this.materialTapTargetSize,
     this.elevation = 0,
     this.shadowColor = Colors.black,
+    this.externalPadding = EdgeInsets.zero,
   });
 }
 

@@ -1,7 +1,8 @@
 [中文版](README.md) English Version  
-[Official Website(Chinese Only)](https://danxi-dev.github.io)  
+[Official Website(Chinese Only)](https://danxi.fduhole.com)  
 # DanXi
-![Dart](https://github.com/w568w/DanXi/workflows/Dart/badge.svg)    
+[![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
+[![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)  
   
 > **CAUTION**   
 > The English version of README may not be synchronized with [the Chinese one](README.md).

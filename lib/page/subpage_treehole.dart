@@ -63,7 +63,8 @@ const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT,
   UserGroup.FUDAN_STAFF,
-  UserGroup.SJTU_STUDENT
+  UserGroup.SJTU_STUDENT,
+  UserGroup.VISITOR
 ];
 
 bool isHtml(String content) {
