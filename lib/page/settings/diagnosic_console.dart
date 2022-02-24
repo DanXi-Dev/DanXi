@@ -21,6 +21,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -121,6 +122,21 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
     bannerAd.load();
   }
 
+  Future<void> changePassword() async {
+    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    String? email = await Noticing.showInputDialog(context, "Input email");
+    String? password =
+        await Noticing.showInputDialog(context, "Input password");
+    if ((email ?? "").isEmpty || (password ?? "").isEmpty) return;
+
+    int? result = await OpenTreeHoleRepository.getInstance()
+        .adminChangePassword(email!, password!);
+    if (result != null && result < 300) {
+      Noticing.showModalNotice(context,
+          message: S.of(context).operation_successful);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => PlatformScaffold(
         iosContentBottomPadding: true,
@@ -132,11 +148,19 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(4),
             primary: true,
-            child: ChangeNotifierProvider.value(
-                value: _console,
-                child: Consumer<StringBufferNotifier>(
-                    builder: (context, value, child) =>
-                        Text(value.toString()))),
+            child: Column(
+              children: [
+                PlatformElevatedButton(
+                  child: const Text("Password Change [Only ADMIN]"),
+                  onPressed: changePassword,
+                ),
+                ChangeNotifierProvider.value(
+                    value: _console,
+                    child: Consumer<StringBufferNotifier>(
+                        builder: (context, value, child) =>
+                            Text(value.toString()))),
+              ],
+            ),
           ),
           controller: PrimaryScrollController.of(context),
         ),

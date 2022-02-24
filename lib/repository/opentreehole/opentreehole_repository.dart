@@ -621,6 +621,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminChangePassword(String email, String password) async {
+    return (await dio!.patch(_BASE_URL + "/register",
+            data: {"email": email, "password": password},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {
