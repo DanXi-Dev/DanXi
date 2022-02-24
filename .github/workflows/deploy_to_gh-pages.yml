@@ -1,6 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -12,7 +14,6 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "2.10.1"
           channel: "stable"
 
       - name: Prepare Dependencies
@@ -28,11 +29,6 @@ jobs:
         run: |
           echo -n "${{ secrets.DEPLOY_TO_GH_PAGES }}" | base64 -d -o $HOME/.ssh/id_rsa
           chmod 400 $HOME/.ssh/id_rsa
-
-      - name: Configure Git
-        run: |
-          git config --global user.email "1296845690@qq.com"
-          git config --global user.name "KYLN24"
 
       - name: Build & Upload
         run: |

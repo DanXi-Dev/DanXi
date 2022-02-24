@@ -1,8 +1,9 @@
 中文版 [English Version](README_EN.md)  
-[官方网站](https://danxi-dev.github.io)  
+[官方网站](https://danxi.fduhole.com)  
 
 # 旦夕
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
+[![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
   
 （原名旦兮）
 
