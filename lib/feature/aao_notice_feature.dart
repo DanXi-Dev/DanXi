@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/dashboard/aao_notices.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/aao_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -28,6 +29,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class FudanAAONoticesFeature extends Feature {
+  /// Stored notices on the first page of Fudan AAO notice webpage.
+  /// So we can pass it to [AAONoticesList] page.
   List<Notice>? _initialData;
   ConnectionStatus _status = ConnectionStatus.NONE;
 

@@ -22,7 +22,7 @@ import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+/// A notification to warn of inability to connect to Fudan LAN.
 class LanConnectionNotification extends Feature {
   @override
   String get mainTitle => S.of(context!).lan_connection_issue_1;

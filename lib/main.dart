@@ -82,6 +82,7 @@ void main() {
     LocalizationOptions.buildDefaultChineseOptions(),
   ]);
 
+  // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
 
   // Init Bmob database.
@@ -121,7 +122,7 @@ void main() {
 }
 
 class TouchMouseScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
+  // Override dragDevices to enable scrolling with mouse & stylus
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
@@ -135,7 +136,7 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
 /// ## Note: A Checklist After Creating a New Page
 ///
 /// [TextSelectorPage] is a simple example of what a typical page in DanXi looks like.
-/// Also have a look at [AAONoticesList] if you are looking for something a bit advanced.
+/// Also, you can have a look at [AAONoticesList] if looking for something a bit advanced.
 ///
 /// 1. Register it in [DanxiApp.routes] below, with the same syntax.
 /// 2. Call [smartNavigatorPush] to navigate to the page.
@@ -192,8 +193,10 @@ class DanxiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget mainApp = PlatformProvider(
-      // Uncomment this line below to force the app to use Cupertino UI
+      // Uncomment this line below to force the app to use Cupertino Widgets
       // initialPlatform: TargetPlatform.iOS,
+
+      // [DynamicThemeController] enables the app to change between dark/light theme without restart
       builder: (BuildContext context) => DynamicThemeController(
         lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
         darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
@@ -217,10 +220,8 @@ class DanxiApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate
           ],
           supportedLocales: S.delegate.supportedLocales,
-          onUnknownRoute: (settings) {
-            throw AssertionError(
-                "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code.");
-          },
+          onUnknownRoute: (settings) => throw AssertionError(
+              "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
           home: PlatformMasterDetailApp(
             // Configure the page route behaviour of the whole app
             onGenerateRoute: (settings) {

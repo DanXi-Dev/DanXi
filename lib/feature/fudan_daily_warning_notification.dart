@@ -23,6 +23,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+/// A notification to warn of not ticking Fudan Daily today.
 class FudanDailyWarningNotification extends Feature {
   @override
   String get mainTitle => S.of(context!).fudan_daily_warning_notification;

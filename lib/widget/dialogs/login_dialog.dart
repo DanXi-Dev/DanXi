@@ -93,7 +93,7 @@ class _LoginDialogState extends State<LoginDialog> {
       case UserGroup.VISITOR:
         PersonInfo newInfo =
             PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
-        await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
+        await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
         widget.personInfo.value = newInfo;
         progressDialog.dismiss(showAnim: false);
         Navigator.of(context).pop();
@@ -105,7 +105,7 @@ class _LoginDialogState extends State<LoginDialog> {
           final stuInfo =
               await FudanEhallRepository.getInstance().getStudentInfo(newInfo);
           newInfo.name = stuInfo.name;
-          await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
+          await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
@@ -120,7 +120,7 @@ class _LoginDialogState extends State<LoginDialog> {
             if (newInfo.name?.isEmpty ?? true) {
               throw GeneralLoginFailedException();
             }
-            await newInfo.saveAsSharedPreferences(widget.sharedPreferences!);
+            await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
             widget.personInfo.value = newInfo;
             progressDialog.dismiss(showAnim: false);
             Navigator.of(context).pop();

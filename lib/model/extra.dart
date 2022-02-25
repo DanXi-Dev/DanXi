@@ -19,6 +19,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'extra.g.dart';
 
+/// Extra is a data model represented extra data from the server.
+///
+/// It can contain different data. At the moment, we only stored semesters' start date.
 @JsonSerializable()
 class Extra {
   TimeTableExtra? timetable;
@@ -32,6 +35,7 @@ class Extra {
 
 @JsonSerializable()
 class TimeTableExtra {
+  /// The semester's start date of Fudan Undergraduates.
   List<TimeTableStartTimeItem>? fdu_ug;
 
   TimeTableExtra(this.fdu_ug);

@@ -21,7 +21,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/feature/fudan_daily_warning_notification.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/zlapp_repository.dart';
@@ -36,8 +35,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class FudanDailyFeature extends Feature {
-  PersonInfo? _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
+
+  /// Whether user has ticked today.
   bool _hasTicked = true;
 
   //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
@@ -46,7 +46,7 @@ class FudanDailyFeature extends Feature {
     _status = ConnectionStatus.CONNECTING;
     // Get the status of reporting
     await FudanCOVID19Repository.getInstance()
-        .hasTick(_info)
+        .hasTick(StateProvider.personInfo.value)
         .then((bool ticked) {
       _status = ConnectionStatus.DONE;
       _hasTicked = ticked;
@@ -65,8 +65,6 @@ class FudanDailyFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    _info = StateProvider.personInfo.value;
-
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.

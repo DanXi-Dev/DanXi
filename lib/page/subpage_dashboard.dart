@@ -138,8 +138,9 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   //   //_rebuildFeatures();
   // }
 
-  /// This function refreshes the content of Dashboard
-  /// Call this when new (online) data should be loaded.
+  /// This function refreshes the content of Dashboard.
+  ///
+  /// Only call this when new (online) data should be loaded.
   void rebuildFeatures() {
     checkConnection();
     widgetMap = {

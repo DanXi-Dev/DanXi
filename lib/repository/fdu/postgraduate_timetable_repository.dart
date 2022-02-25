@@ -93,7 +93,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     Response coursePage = await dio!.get(
         TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
         options: Options());
-    return TimeTable.fromUGjson(
+    return TimeTable.fromPGJson(
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??

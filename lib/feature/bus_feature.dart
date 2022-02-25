@@ -33,6 +33,8 @@ import 'package:intl/intl.dart';
 
 class BusFeature extends Feature {
   ConnectionStatus _status = ConnectionStatus.NONE;
+
+  /// The bus schedules retrieved.
   List<BusScheduleItem>? _busList;
 
   bool? isHoliday;

@@ -10,13 +10,14 @@ TimeTable _$TimeTableFromJson(Map<String, dynamic> json) => TimeTable()
   ..courses = (json['courses'] as List<dynamic>?)
       ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
       .toList()
-  ..startTime = json['startTime'] == null
+  ..startDate = json['startTime'] == null
       ? null
       : DateTime.parse(json['startTime'] as String);
 
-Map<String, dynamic> _$TimeTableToJson(TimeTable instance) => <String, dynamic>{
+Map<String, dynamic> _$TimeTableToJson(TimeTable instance) =>
+    <String, dynamic>{
       'courses': instance.courses,
-      'startTime': instance.startTime?.toIso8601String(),
+      'startTime': instance.startDate?.toIso8601String(),
     };
 
 Course _$CourseFromJson(Map<String, dynamic> json) => Course()

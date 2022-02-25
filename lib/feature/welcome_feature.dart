@@ -20,7 +20,6 @@ import 'dart:math';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
@@ -32,25 +31,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WelcomeFeature extends Feature {
-  PersonInfo? _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
+
+  /// A list of card details.
+  ///
+  /// We only use them to determine whether the user has entry permission to the campus.
   List<CardDetailInfo>? _cardInfos;
 
   Future<void> _loadCardStatus() async {
     _status = ConnectionStatus.CONNECTING;
-    _cardInfos =
-        await DataCenterRepository.getInstance().getCardDetailInfo(_info);
+    _cardInfos = await DataCenterRepository.getInstance()
+        .getCardDetailInfo(StateProvider.personInfo.value);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
 
-  /// A sentence to show welcome to users depending on the time.
+  /// A sentence to show welcome to user, depending on the time and date.
   String _helloQuote = "";
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    _info = StateProvider.personInfo.value;
-
     try {
       List<String> celebrationWords = [];
       for (var celebration in SettingsProvider.getInstance().celebrationWords) {
@@ -59,6 +59,7 @@ class WelcomeFeature extends Feature {
         }
       }
       if (celebrationWords.isNotEmpty) {
+        // Randomly choose a celebration sentence to show.
         _helloQuote =
             celebrationWords[Random().nextInt(celebrationWords.length)];
         return;
@@ -90,7 +91,8 @@ class WelcomeFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!).welcome(_info?.name ?? "?");
+  String get mainTitle =>
+      S.of(context!).welcome(StateProvider.personInfo.value?.name ?? "?");
 
   @override
   String get subTitle => _helloQuote;

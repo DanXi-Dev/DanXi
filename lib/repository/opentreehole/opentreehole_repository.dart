@@ -647,10 +647,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<void> deletePushNotificationToken(String deviceId) async {
     await dio!.delete(_BASE_URL + "/users/push-tokens",
-        data: {
-          "device_id": deviceId,
-        },
-        options: Options(headers: _tokenHeader));
+        data: {"device_id": deviceId}, options: Options(headers: _tokenHeader));
   }
 
   @override

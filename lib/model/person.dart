@@ -46,8 +46,14 @@ Map<UserGroup, Function> kUserGroupDescription = {
   UserGroup.SJTU_STUDENT: (BuildContext context) => S.of(context).sjtu_student,
 };
 
+/// PersonInfo is a model to store everything about the user (except data of FDUHole).
 class PersonInfo {
+  /// Which type the user is.
   UserGroup group;
+
+  /// [id] is user's student ID.
+  /// [password] is user's password to school platform.
+  /// [name] is user's real name.
   String? id, password, name;
 
   PersonInfo(this.id, this.password, this.name, this.group);
@@ -61,6 +67,7 @@ class PersonInfo {
     return 'PersonInfo{group: $group, id: $id, password: $password, name: $name}';
   }
 
+  /// Verify if we have valid [PersonInfo] data stored in the [preferences].
   static bool verifySharedPreferences(SharedPreferences preferences) {
     return preferences.containsKey("id") &&
         preferences.containsKey("password") &&
@@ -83,7 +90,7 @@ class PersonInfo {
             : UserGroup.FUDAN_UNDERGRADUATE_STUDENT);
   }
 
-  Future<void> saveAsSharedPreferences(SharedPreferences preferences) async {
+  Future<void> saveToSharedPreferences(SharedPreferences preferences) async {
     await preferences.setString("id", id!);
     await preferences.setString("password", password!);
     await preferences.setString("name", name!);

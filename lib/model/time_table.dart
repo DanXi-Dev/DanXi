@@ -27,6 +27,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'time_table.g.dart';
 
+/// A converter abstraction of converting a timetable to a file in [String] to be exported.
 abstract class TimetableConverter {
   String get fileName;
 
@@ -35,6 +36,17 @@ abstract class TimetableConverter {
   String convertTo(TimeTable table);
 }
 
+/// [Event] stands for a [course] with an exact [time].
+///
+/// It is used to represent the course taken *at* the [time], not the *whole* course.
+///
+/// For example, if you want to represent a Math lesson at the 1st slot of Monday,
+/// then you should use [Event].
+/// If you want to represent Math lessons of all weeks, use [Course] directly.
+///
+/// See Also:
+/// * [Course]
+/// * [DayEvents]
 class Event {
   Course course;
   CourseTime time;
@@ -55,6 +67,8 @@ class TimeTable {
   /// which was obtained from Bmob Database.
   /// If found, we set [defaultStartTime] to that date.
   /// Otherwise we do nothing and notify the user to set [TimeTable.defaultStartTime] manually.
+  ///
+  /// If you need to listen to the change of [defaultStartTime], see codes in
   static DateTime get defaultStartTime {
     var startDateStr = SettingsProvider.getInstance().thisSemesterStartDate;
     DateTime? startDate;
@@ -62,9 +76,14 @@ class TimeTable {
     return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
   }
 
+  /// A Monday.
+  ///
+  /// It is randomly selected, without special meaning. You can use any Monday to replace it.
   static final DateTime kMonday = DateTime(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
+
+  /// The start time of each slot in a day.
   static final List<VagueTime> kCourseSlotStartTime = [
     const VagueTime(hour: 8, minute: 0),
     const VagueTime(hour: 8, minute: 55),
@@ -82,15 +101,21 @@ class TimeTable {
     const VagueTime(hour: 21, minute: 15),
     const VagueTime(hour: 22, minute: 10),
   ];
+
+  /// All courses in the timetable.
   List<Course>? courses = [];
 
-  //First day of the term
-  DateTime? startTime;
+  /// First day of the semester.
+  DateTime? startDate;
 
   TimeTable();
 
+  /// Parse timetable from the HTML source codes of Fudan Undergraduate Edu Service.
+  ///
+  /// See:
+  /// * [TimeTableRepository]
   factory TimeTable.fromHtml(DateTime startTime, String tablePageSource) {
-    TimeTable newTable = TimeTable()..startTime = startTime;
+    TimeTable newTable = TimeTable()..startDate = startTime;
     RegExp courseMatcher =
         RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
     for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
@@ -99,10 +124,11 @@ class TimeTable {
     return newTable;
   }
 
-  factory TimeTable.fromUGjson(DateTime startTime, dynamic Coursejson) {
-    TimeTable newTable = TimeTable()..startTime = startTime;
+  /// Parse timetable from the json of Fudan Postgraduate Course Selection system.
+  factory TimeTable.fromPGJson(DateTime startTime, dynamic Coursejson) {
+    TimeTable newTable = TimeTable()..startDate = startTime;
     for (dynamic course in Coursejson["results"]) {
-      newTable.courses!.add(Course.fromUGPart(course));
+      newTable.courses!.add(Course.fromPGPart(course));
     }
     return newTable;
   }
@@ -112,9 +138,14 @@ class TimeTable {
 
   Map<String, dynamic> toJson() => _$TimeTableToJson(this);
 
+  /// Get the date representation in [TimeNow]
+  /// (i.e. the W-th lesson on the X-th day of week in the Y-th weeks of this semester) of the present time,
+  /// depending on [startDate].
+  ///
+  /// If the present time is out of the semester, it could return negative or big result.
   TimeNow now() {
     DateTime now = DateTime.now();
-    Duration diff = now.difference(startTime!);
+    Duration diff = now.difference(startDate!);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {
       if (now.isAfter(kCourseSlotStartTime[i].toExactTime())) {
@@ -128,14 +159,14 @@ class TimeTable {
       //      in fact we suppose the [days] to be `-1`.
       if (diff != Duration(days: days)) days--;
 
-      // Similarly, special rounding method should be used here to get correct result.
+      // Similarly, special rounding method should be used here to get the correct result.
       return TimeNow(days % 7 == 0 ? days ~/ 7 + 1 : days ~/ 7, days % 7, slot);
     } else {
       return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
     }
   }
 
-  /// See [now]() for details.
+  /// See [now] for details.
   static TimeNow defaultNow() {
     DateTime now = DateTime.now();
     Duration diff = now.difference(defaultStartTime);
@@ -154,6 +185,9 @@ class TimeTable {
     }
   }
 
+  /// Return the specific [week]'s course list.
+  ///
+  /// The key of map is the day of the week.
   Map<int, List<Event>> toWeekCourses(int week) {
     Map<int, List<Event>> table = {};
     for (int i = 0; i < 7; i++) {
@@ -199,7 +233,7 @@ class TimeTable {
   }
 }
 
-/// Control the result of [TimeTable.toDayEvents()].
+/// The result flavor of [TimeTable.toDayEvents].
 enum TableDisplayType {
   /// Add everyday in the result
   FULL,
@@ -267,14 +301,14 @@ class Course {
       ..times = _parseSlotFromStrings(timeMatcher.allMatches(htmlPart));
   }
 
-  factory Course.fromUGPart(dynamic UGPart) {
+  factory Course.fromPGPart(dynamic PGPart) {
     Course newCourse = Course();
     return newCourse
-      ..courseName = UGPart["KCMC"]
-      ..roomName = UGPart["JASMC"]
-      ..availableWeeks = _parseWeeksFromString(UGPart["ZCBH"])
-      ..times = [CourseTime(UGPart["XQ"] - 1, UGPart["KSJCDM"] - 1)]
-      ..teacherNames = [UGPart["JSXM"]];
+      ..courseName = PGPart["KCMC"]
+      ..roomName = PGPart["JASMC"]
+      ..availableWeeks = _parseWeeksFromString(PGPart["ZCBH"])
+      ..times = [CourseTime(PGPart["XQ"] - 1, PGPart["KSJCDM"] - 1)]
+      ..teacherNames = [PGPart["JSXM"]];
   }
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
@@ -295,6 +329,7 @@ class CourseTime {
   Map<String, dynamic> toJson() => _$CourseTimeToJson(this);
 }
 
+/// Representation of the [slot]-th lesson on the [weekday]-th day of week in the [week]-th weeks of this semester.
 class TimeNow {
   //First week is 1, Monday is 0
   int week, weekday, slot;

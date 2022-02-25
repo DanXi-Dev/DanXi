@@ -27,8 +27,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class FudanLibraryCrowdednessFeature extends Feature {
+  /// The numbers of each library visitors at the moment.
   List<int?>? _libraryCrowdedness;
 
+  /// The library literate names.
+  ///
+  /// Its order should correspond with the order of [_libraryCrowdedness].
   static const List<String> _LIBRARY_NAME = ["理图", "文图", "张江", "枫林", "江湾"];
 
   /// Status of the request.
