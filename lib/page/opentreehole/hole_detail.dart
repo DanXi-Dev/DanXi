@@ -33,8 +33,8 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
@@ -171,31 +171,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     StateProvider.needScreenshotWarning = true;
   }
 
-  Future<void> scrollDownToFloor(OTFloor floor) async {
-    try {
-      // Scroll to the corresponding post
-      while (!(await _listViewController.scrollToItem(floor))) {
-        // Prevent deadlock
-        if (hasPrefetchedAllData) {
-          if ((_listViewController
-                      .getScrollController()
-                      ?.position
-                      .extentAfter ??
-                  0) <
-              10) break;
-        } else {
-          if (_listViewController.isEnded) break;
-        }
-
-        // fixme: Will scrolling at height of viewportHeight bring problems?
-        await _listViewController.scrollDelta(
-            ViewportUtils.getViewportHeight(context),
-            const Duration(milliseconds: 1),
-            Curves.linear);
-      }
-    } catch (_) {}
-  }
-
   /// Refresh the list view.
   ///
   /// if [ignorePrefetch] and [hasPrefetchedAllData], it will discard the prefetched data first.
@@ -242,7 +217,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       if (locateFloor != null) {
         try {
           // Scroll to the specific floor
-          await scrollDownToFloor(locateFloor!);
+          await PagedListViewHelper.scrollToItem(
+              context, _listViewController, locateFloor, ScrollDirection.DOWN);
           locateFloor = null;
         } catch (_) {}
       }
