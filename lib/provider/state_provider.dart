@@ -15,11 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/util/opentreehole/editor_object.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 /// Manage global states of the app.
 ///
@@ -30,26 +29,16 @@ import 'package:flutter/cupertino.dart';
 class StateProvider {
   /// The user's basic information.
   static final ValueNotifier<PersonInfo?> personInfo = ValueNotifier(null);
-
-  /// Caches of [OTEditor].
-  static final Map<EditorObject?, PostEditorText> editorCache = {};
-
-  /// The current division.
-  static OTDivision? currentDivision;
-
-  /// Whether need to display screenshot warning
   static bool needScreenshotWarning = false;
-
-  /// Whether showing a warning
+  static bool isForeground = true;
   static bool showingScreenshotWarning = false;
 
-  static bool isForeground = true;
-
-  static void initialize() {
-    currentDivision = null;
+  static void initialize(BuildContext context) {
+    FDUHoleProvider provider = context.read<FDUHoleProvider>();
+    provider.currentDivision = null;
     personInfo.value = null;
     isForeground = true;
     needScreenshotWarning = showingScreenshotWarning = false;
-    editorCache.clear();
+    provider.editorCache.clear();
   }
 }

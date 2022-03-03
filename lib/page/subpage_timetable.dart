@@ -578,23 +578,23 @@ class StartDateSelectionButton extends StatelessWidget {
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
-            cupertino: (context, __) =>
+            cupertino: (cxt, __) =>
                 CupertinoDatePickerData(
                     doneLabel: S
-                        .of(context)
+                        .of(cxt)
                         .ok,
                     cancelLabel: S
-                        .of(context)
+                        .of(cxt)
                         .cancel
                 )
-            material: (context, __)
+            material: (cxt, __)
         =>
             MaterialDatePickerData(
                 helpText: S
-                    .of(context)
+                    .of(cxt)
                     .semester_start_date,
                 confirmText: S
-                    .of(context)
+                    .of(cxt)
                     .ok)
         ,
         initialDate: startTime,

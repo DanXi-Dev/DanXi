@@ -110,6 +110,9 @@ class TimeTable {
   List<Course>? courses = [];
 
   /// First day of the semester.
+  ///
+  /// Set the json key name to keep downward compatibility.
+  @JsonKey(name: "startTime")
   DateTime? startDate;
 
   TimeTable();

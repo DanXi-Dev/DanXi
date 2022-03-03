@@ -856,7 +856,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          '${S.of(context).version} ${pubspec.major}.${pubspec.minor}.${pubspec.patch} build ${pubspec.build.first}',
+                          '${S.of(context).version} ${FlutterApp.versionName} build ${pubspec.build.first}',
                           textScaleFactor: 0.7,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),

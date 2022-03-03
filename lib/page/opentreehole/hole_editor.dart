@@ -23,7 +23,7 @@ import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:provider/provider.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
@@ -62,7 +63,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    StateProvider.editorCache.remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -93,7 +94,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    StateProvider.editorCache.remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -122,7 +123,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    StateProvider.editorCache.remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -156,14 +157,16 @@ class OTEditor {
 
     switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:
-        if (!StateProvider.editorCache.containsKey(object)) {
-          StateProvider.editorCache[object] =
+        if (!context.read<FDUHoleProvider>().editorCache.containsKey(object)) {
+          context.read<FDUHoleProvider>().editorCache[object] =
               PostEditorText.newInstance(withText: placeholder);
         }
         final textController = TextEditingController(
-            text: StateProvider.editorCache[object]!.text);
-        textController.addListener(() =>
-            StateProvider.editorCache[object]!.text = textController.text);
+            text: context.read<FDUHoleProvider>().editorCache[object]!.text);
+        textController.addListener(() => context
+            .read<FDUHoleProvider>()
+            .editorCache[object]!
+            .text = textController.text);
         final value = await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
             context: context,
@@ -179,8 +182,10 @@ class OTEditor {
                     PlatformDialogAction(
                         child: Text(S.of(context).cancel),
                         onPressed: () {
-                          StateProvider.editorCache[object]!.text =
-                              textController.text;
+                          context
+                              .read<FDUHoleProvider>()
+                              .editorCache[object]!
+                              .text = textController.text;
                           Navigator.of(context).pop<PostEditorText>(null);
                         }),
                     /*PlatformDialogAction(
@@ -190,8 +195,12 @@ class OTEditor {
                         child: Text(S.of(context).submit),
                         onPressed: () async {
                           Navigator.of(context).pop<PostEditorText>(
-                              PostEditorText(textController.text,
-                                  StateProvider.editorCache[object]!.tags));
+                              PostEditorText(
+                                  textController.text,
+                                  context
+                                      .read<FDUHoleProvider>()
+                                      .editorCache[object]!
+                                      .tags));
                         }),
                   ],
                 ));
@@ -258,7 +267,6 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
-  List<OTTag>? _allTags;
 
   late ValueNotifier<String> previewText;
 
@@ -340,8 +348,10 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 padding: const EdgeInsets.only(bottom: 4),
                 child: ThemedMaterial(
                   child: OTTagSelector(
-                      initialTags:
-                          StateProvider.editorCache[widget.editorObject]!.tags),
+                      initialTags: context
+                          .read<FDUHoleProvider>()
+                          .editorCache[widget.editorObject]!
+                          .tags),
                 ),
               ),
             Row(
@@ -423,7 +433,8 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   void initState() {
     super.initState();
     _controller.addListener(() {
-      StateProvider.editorCache[_object]!.text = _controller.text;
+      context.read<FDUHoleProvider>().editorCache[_object]!.text =
+          _controller.text;
     });
   }
 
@@ -441,10 +452,11 @@ class BBSEditorPageState extends State<BBSEditorPage> {
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments!['object'];
     _placeholder = widget.arguments!['placeholder'];
-    if (StateProvider.editorCache.containsKey(_object)) {
-      _controller.text = StateProvider.editorCache[_object]!.text!;
+    if (context.read<FDUHoleProvider>().editorCache.containsKey(_object)) {
+      _controller.text =
+          context.read<FDUHoleProvider>().editorCache[_object]!.text!;
     } else {
-      StateProvider.editorCache[_object] =
+      context.read<FDUHoleProvider>().editorCache[_object] =
           PostEditorText.newInstance(withText: _placeholder);
       _controller.text = _placeholder;
     }
@@ -504,6 +516,8 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     String text = _controller.text;
     if (text.isEmpty) return;
     Navigator.pop<PostEditorText>(
-        context, PostEditorText(text, StateProvider.editorCache[object]!.tags));
+        context,
+        PostEditorText(
+            text, context.read<FDUHoleProvider>().editorCache[object]!.tags));
   }
 }

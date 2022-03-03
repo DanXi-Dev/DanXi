@@ -14,8 +14,7 @@ TimeTable _$TimeTableFromJson(Map<String, dynamic> json) => TimeTable()
       ? null
       : DateTime.parse(json['startTime'] as String);
 
-Map<String, dynamic> _$TimeTableToJson(TimeTable instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$TimeTableToJson(TimeTable instance) => <String, dynamic>{
       'courses': instance.courses,
       'startTime': instance.startDate?.toIso8601String(),
     };

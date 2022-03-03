@@ -31,6 +31,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -142,7 +143,7 @@ class _OTTitleState extends State<OTTitle> {
     super.initState();
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          StateProvider.currentDivision = event.newDivision;
+          context.read<FDUHoleProvider>().currentDivision = event.newDivision;
           refreshSelf();
         }),
         hashCode);
@@ -177,7 +178,8 @@ class _OTTitleState extends State<OTTitle> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(StateProvider.currentDivision?.name ?? S.of(context).forum),
+            Text(context.read<FDUHoleProvider>().currentDivision?.name ??
+                S.of(context).forum),
             const Icon(Icons.arrow_drop_down)
           ],
         ),
@@ -318,7 +320,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   /// Fields related to the display states.
-  static int get divisionId => StateProvider.currentDivision?.division_id ?? 1;
+  static int getDivisionId(BuildContext context) =>
+      context.read<FDUHoleProvider>().currentDivision?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
@@ -340,7 +343,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     // If no token, NotLoginError will be thrown.
     if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().initializeRepo();
-      StateProvider.currentDivision =
+      context.read<FDUHoleProvider>().currentDivision =
           OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
       settingsPageKey.currentState?.setState(() {});
     }
@@ -360,7 +363,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             time = DateTime.now();
           }
           return OpenTreeHoleRepository.getInstance()
-              .loadHoles(time, divisionId, tag: _tagFilter);
+              .loadHoles(time, getDivisionId(context), tag: _tagFilter);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.
@@ -398,7 +401,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _autoSilenceNotice() {
     final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
-        .getSilenceDateForDivision(divisionId)
+        .getSilenceDateForDivision(getDivisionId(context))
         ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
@@ -426,7 +429,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   Widget _autoPinnedPosts() {
     return Column(
       children: OpenTreeHoleRepository.getInstance()
-          .getPinned(divisionId)
+          .getPinned(getDivisionId(context))
           .map((e) => _buildListItem(context, null, null, e, isPinned: true))
           .toList(),
     );
@@ -458,7 +461,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
-              await OTEditor.createNewPost(context, divisionId);
+              await OTEditor.createNewPost(context, getDivisionId(context));
           if (success) refreshList();
         }),
         hashCode);
@@ -473,7 +476,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          StateProvider.currentDivision = event.newDivision;
+          context.read<FDUHoleProvider>().currentDivision = event.newDivision;
           indicatorKey.currentState?.show();
         }),
         hashCode);
@@ -637,7 +640,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
         (!isPinned &&
             OpenTreeHoleRepository.getInstance()
-                .getPinned(divisionId)
+                .getPinned(getDivisionId(context))
                 .contains(postElement))) return const SizedBox();
 
     Linkify postContentWidget = Linkify(

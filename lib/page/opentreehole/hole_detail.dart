@@ -28,6 +28,7 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -52,6 +53,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
+import 'package:provider/provider.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -228,7 +230,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (hasPrefetchedAllData) {
       allDataReceiver = Future.value(_hole.floors?.prefetch);
     }
-    print("build ${hasPrefetchedAllData}");
     final pagedListView = PagedListView<OTFloor>(
       initialData: _hole.floors?.prefetch,
       pagedController: _listViewController,
@@ -395,7 +396,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
             .adminAddPenalty(
-                e.floor_id, level, TreeHoleSubpageState.divisionId);
+                e.floor_id, level, TreeHoleSubpageState.getDivisionId(context));
         if (result != null && result < 300) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);
@@ -489,7 +490,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            var pinned = StateProvider.currentDivision!.pinned!
+            FDUHoleProvider provider = context.read<FDUHoleProvider>();
+
+            List<int> pinned = provider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
                 .toList();
             if (pinned.contains(e.hole_id!)) {
@@ -499,10 +502,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminModifyDivision(
-                    StateProvider.currentDivision!.division_id!,
-                    null,
-                    null,
-                    pinned);
+                    provider.currentDivision!.division_id!, null, null, pinned);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
