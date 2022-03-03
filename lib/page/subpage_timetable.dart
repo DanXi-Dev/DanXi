@@ -571,10 +571,10 @@ class StartDateSelectionButton extends StatelessWidget {
       if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
       return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
     });
-    return PlatformIconButton(
+    return PlatformTextButton(
       padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
-      icon: AutoSizeText(
-          DateFormat("yyyy-MM-dd").format(startTime), minFontSize: 10),
+      child: Text(
+          DateFormat("yyyy-MM-dd").format(startTime)),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
