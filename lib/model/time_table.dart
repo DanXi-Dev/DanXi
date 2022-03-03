@@ -19,6 +19,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
@@ -47,11 +48,14 @@ abstract class TimetableConverter {
 /// See Also:
 /// * [Course]
 /// * [DayEvents]
+/// * [TimeTable.toDayEvents]
 class Event {
   Course course;
   CourseTime time;
 
-  Event(this.course, this.time);
+  bool enabled = true;
+
+  Event(this.course, this.time, {this.enabled = true});
 }
 
 @JsonSerializable()
@@ -205,8 +209,12 @@ class TimeTable {
   }
 
   /// Convert the specific [week]'s timetable to [DayEvents], usually for a [ScheduleView].
+  ///
+  /// if [containCourseOtherWeeks], the result will contain other weeks' courses,
+  /// even if they do not take place in this [week].
   List<DayEvents> toDayEvents(int week,
-      {TableDisplayType compact = TableDisplayType.COMPAT}) {
+      {TableDisplayType compact = TableDisplayType.COMPAT,
+      bool containCourseOtherWeeks = false}) {
     Map<int, List<Event>> table = {};
     List<DayEvents> result = [];
     for (int i = 0; i < DateTime.daysPerWeek; i++) {
@@ -216,6 +224,11 @@ class TimeTable {
       if (course.availableWeeks!.contains(week)) {
         for (var courseTime in course.times!) {
           table[courseTime.weekDay]!.add(Event(course, courseTime));
+        }
+      } else if (containCourseOtherWeeks) {
+        for (var courseTime in course.times!) {
+          table[courseTime.weekDay]!
+              .add(Event(course, courseTime, enabled: false));
         }
       }
     }
