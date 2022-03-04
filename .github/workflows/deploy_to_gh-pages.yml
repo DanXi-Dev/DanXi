@@ -3,7 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   Deploy:
@@ -25,16 +24,12 @@ jobs:
       - name: Generate Models
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: Import Keys
-        run: |
-          echo -n "${{ secrets.DEPLOY_TO_GH_PAGES }}" | base64 -d -o $HOME/.ssh/id_rsa
-          chmod 400 $HOME/.ssh/id_rsa
-
-      - name: Build & Upload
+      - name: Build
         run: |
           flutter build web --release --web-renderer html
-          cd build/web
-          git init -b gh-pages
-          git add -A
-          git commit -m 'gh-action deploy'
-          git push -f "git@github.com:DanXi-Dev/DanXi" gh-pages
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          branch: gh-pages
+          folder: build/web
