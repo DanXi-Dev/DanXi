@@ -341,6 +341,18 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     if (_usernameController.text.isEmpty) {
       _usernameController.text = model.selectedEmail ?? "";
     }
+    void _doLogin() {
+      model.selectedEmail = _usernameController.text;
+      model.password = _passwordController.text;
+      if (_passwordController.text.isNotEmpty &&
+          _usernameController.text.isNotEmpty) {
+        executeLogin(context).catchError((e, st) {
+          state.jumpBackFromLoadingPage();
+          Noticing.showModalError(state.context, e, trace: st);
+        });
+      }
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -374,6 +386,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                 ? const Icon(Icons.lock_outline)
                 : const Icon(CupertinoIcons.lock_circle),
           ),
+          onSubmitted: (_) => _doLogin(),
         ),
         const SizedBox(
           height: 16,
@@ -392,17 +405,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
               child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(S.of(context).login)),
-              onPressed: () {
-                model.selectedEmail = _usernameController.text;
-                model.password = _passwordController.text;
-                if (_passwordController.text.isNotEmpty &&
-                    _usernameController.text.isNotEmpty) {
-                  executeLogin(context).catchError((e, st) {
-                    state.jumpBackFromLoadingPage();
-                    Noticing.showModalError(state.context, e, trace: st);
-                  });
-                }
-              },
+              onPressed: _doLogin,
             ),
           ],
         )
