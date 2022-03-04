@@ -97,7 +97,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
-            Constant.DEFAULT_SEMESTER_START_TIME,
+            Constant.DEFAULT_SEMESTER_START_DATE,
         coursePage.data is Map
             ? coursePage.data
             : jsonDecode(coursePage.data.toString()));

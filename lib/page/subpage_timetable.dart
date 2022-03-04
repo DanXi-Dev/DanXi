@@ -569,7 +569,7 @@ class StartDateSelectionButton extends StatelessWidget {
       var startDateStr = value.thisSemesterStartDate;
       DateTime? startDate;
       if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
-      return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
+      return startDate ?? Constant.DEFAULT_SEMESTER_START_DATE;
     });
     return PlatformTextButton(
       padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,

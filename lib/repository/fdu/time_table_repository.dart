@@ -98,7 +98,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
-            Constant.DEFAULT_SEMESTER_START_TIME,
+            Constant.DEFAULT_SEMESTER_START_DATE,
         tablePage.data.toString());
   }
 

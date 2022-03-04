@@ -127,32 +127,14 @@ Future<OTHole> prefetchAllFloors(OTHole hole) async {
 
 const String KEY_NO_TAG = "默认";
 
-class OTTitle extends StatefulWidget {
+class OTTitle extends StatelessWidget {
   const OTTitle({Key? key}) : super(key: key);
-
-  @override
-  _OTTitleState createState() => _OTTitleState();
-}
-
-class _OTTitleState extends State<OTTitle> {
-  final StateStreamListener<DivisionChangedEvent> _divisionChangedSubscription =
-      StateStreamListener();
-
-  @override
-  void initState() {
-    super.initState();
-    _divisionChangedSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          context.read<FDUHoleProvider>().currentDivision = event.newDivision;
-          refreshSelf();
-        }),
-        hashCode);
-  }
 
   List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
     List<Widget> list = [];
     onTapListener(OTDivision newDivision) {
       Navigator.of(cxt).pop();
+      cxt.read<FDUHoleProvider>().currentDivision = newDivision;
       DivisionChangedEvent(newDivision).fire();
     }
 
@@ -167,19 +149,14 @@ class _OTTitleState extends State<OTTitle> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _divisionChangedSubscription.cancel();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    OTDivision? division = context
+        .select<FDUHoleProvider, OTDivision?>((value) => value.currentDivision);
     return Listener(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(context.read<FDUHoleProvider>().currentDivision?.name ??
-                S.of(context).forum),
+            Text(division?.name ?? S.of(context).forum),
             const Icon(Icons.arrow_drop_down)
           ],
         ),
@@ -276,11 +253,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
 
 class AddNewPostEvent {}
 
-class RefreshBBSEvent {
-  final bool refreshAll;
-
-  RefreshBBSEvent({this.refreshAll = false});
-}
+class RefreshBBSEvent {}
 
 class DivisionChangedEvent {
   final OTDivision newDivision;
@@ -467,16 +440,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshBBSEvent>().listen((event) {
-          if (event.refreshAll) {
-            refreshSelf();
-          } else {
-            indicatorKey.currentState?.show();
-          }
+          indicatorKey.currentState?.show();
         }),
         hashCode);
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          context.read<FDUHoleProvider>().currentDivision = event.newDivision;
           indicatorKey.currentState?.show();
         }),
         hashCode);

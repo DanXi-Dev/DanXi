@@ -153,7 +153,7 @@ class OTEditor {
       required EditorObject object,
       String placeholder = "",
       bool hasTip = true}) async {
-    final String randomTip = await Constant.randomFduholeTip;
+    final String randomTip = await Constant.randomFDUHoleTip;
 
     switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:
