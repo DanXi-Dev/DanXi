@@ -30,6 +30,11 @@ class CourseGroup {
 
   CourseGroup(this.id, this.name, this.code, this.department, this.course_list);
 
+  @override
+  String toString() {
+    return 'CourseGroup{id: $id, name: $name, code: $code, department: $department, course_list: $course_list}';
+  }
+
   factory CourseGroup.fromJson(Map<String, dynamic> json) =>
       _$CourseGroupFromJson(json);
 

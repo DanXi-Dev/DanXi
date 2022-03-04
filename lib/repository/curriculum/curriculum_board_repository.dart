@@ -15,18 +15,81 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/model/curriculum/course.dart';
+import 'package:dan_xi/model/curriculum/course_group.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dio/dio.dart';
+import 'package:dio/src/response.dart';
+
+import '../../model/curriculum/review.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {
   static const String _BASE_URL = "http://127.0.0.1:8000";
 
-  CurriculumBoardRepository._() {
-    // Override the options set in parent class.
-  }
+  CurriculumBoardRepository._() {}
 
   static final _instance = CurriculumBoardRepository._();
 
   factory CurriculumBoardRepository.getInstance() => _instance;
+
+  Map<String, String> _tokenHeader(String fduHoleToken) {
+    return {"Authorization": "Token " + fduHoleToken};
+  }
+
+  Future<List<CourseGroup>?> getCourseGroups(String fduHoleToken) async {
+    Response<List> response = await dio!.get(_BASE_URL + "/courses",
+        options: Options(headers: _tokenHeader(fduHoleToken)));
+    return response.data?.map((e) => CourseGroup.fromJson(e)).toList();
+  }
+
+  Future<Course?> getCourse(String fduHoleToken, String courseId) async {
+    Response<Map<String, dynamic>> response = await dio!.get(
+        _BASE_URL + "/courses/$courseId",
+        options: Options(headers: _tokenHeader(fduHoleToken)));
+    return Course.fromJson(response.data!);
+  }
+
+  Future<Review?> addReview(
+      String fduHoleToken, String courseId, Review newReview) async {
+    Response<Map<String, dynamic>> response =
+        await dio!.post(_BASE_URL + "/courses/$courseId/reviews",
+            data: {
+              'title': newReview.title,
+              'content': newReview.content,
+              'rank': newReview.rank,
+              'remark': newReview.remark
+            },
+            options: Options(headers: _tokenHeader(fduHoleToken)));
+    return Review.fromJson(response.data!);
+  }
+
+  Future<int?> removeReview(
+      String fduHoleToken, String reviewId, Review newReview) async {
+    Response<String> response = await dio!.delete(
+        _BASE_URL + "/reviews/$reviewId",
+        options: Options(headers: _tokenHeader(fduHoleToken)));
+    return response.statusCode;
+  }
+
+  Future<int?> modifyReview(
+      String fduHoleToken, String reviewId, Review updatedReview) async {
+    Response<String> response = await dio!.put(_BASE_URL + "/reviews/$reviewId",
+        data: {
+          'title': updatedReview.title,
+          'content': updatedReview.content,
+          'rank': updatedReview.rank,
+          'remark': updatedReview.remark
+        },
+        options: Options(headers: _tokenHeader(fduHoleToken)));
+    return response.statusCode;
+  }
+
+  Future<List<Review>?> getReviews(String fduHoleToken, String courseId) async {
+    Response<List> response = await dio!.get(
+        _BASE_URL + "/courses/$courseId/reviews",
+        options: Options(headers: _tokenHeader(fduHoleToken)));
+    return response.data?.map((e) => Review.fromJson(e)).toList();
+  }
 
   @override
   String get linkHost => '127.0.0.1:8000';
