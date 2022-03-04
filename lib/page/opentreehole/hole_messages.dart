@@ -53,9 +53,8 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
   bool showUnreadOnly = false;
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<OTMessage>?> _loadContent(int page) async {
-    return await adaptLayer.generateReceiver(_listViewController,
-        (lastElement) {
+  Future<List<OTMessage>?> _loadContent(int page) {
+    return adaptLayer.generateReceiver(_listViewController, (lastElement) {
       DateTime? time;
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_created!);

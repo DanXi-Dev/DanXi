@@ -131,7 +131,7 @@ class _BusPageState extends State<BusPage> {
       _holidaySliding = 0;
     }
 
-    // Default to Handan
+    // Default to HanDan
     _startSelectItem = Campus.HANDAN_CAMPUS;
     _startSliding = _startSelectItem!.index;
     _onStartLocationChanged(_startSelectItem);

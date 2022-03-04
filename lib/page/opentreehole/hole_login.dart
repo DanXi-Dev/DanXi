@@ -388,9 +388,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           ),
           onSubmitted: (_) => _doLogin(),
         ),
-        const SizedBox(
-          height: 16,
-        ),
+        const SizedBox(height: 16),
         Wrap(
           alignment: WrapAlignment.spaceAround,
           children: [

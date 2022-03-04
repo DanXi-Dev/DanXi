@@ -33,18 +33,13 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 
 /// A list page showing the reports for administrators.
-class OTSearchPage extends StatefulWidget {
+class OTSearchPage extends StatelessWidget {
+  static final RegExp pidPattern = RegExp(r'#{1}([0-9]+)');
+  static final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
+
   final Map<String, dynamic>? arguments;
 
   const OTSearchPage({Key? key, this.arguments}) : super(key: key);
-
-  @override
-  _OTSearchPageState createState() => _OTSearchPageState();
-}
-
-class _OTSearchPageState extends State<OTSearchPage> {
-  final RegExp pidPattern = RegExp(r'#{1}([0-9]+)');
-  final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
 
   Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
     ProgressFuture progressDialog = showProgressDialog(
@@ -67,7 +62,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
     progressDialog.dismiss(showAnim: false);
   }
 
-  Future<void> submit(String value) async {
+  Future<void> submit(BuildContext context, String value) async {
     value = value.trim();
     if (value.isEmpty) return;
 
@@ -132,7 +127,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
                 child: CupertinoSearchTextField(
                   autofocus: true,
                   placeholder: S.of(context).search_hint,
-                  onSubmitted: submit,
+                  onSubmitted: (str) => submit(context, str),
                 ),
               ),
             ),
@@ -162,11 +157,11 @@ class _OTSearchPageState extends State<OTSearchPage> {
                             ScrollViewKeyboardDismissBehavior.onDrag,
                         children: value
                             .map((e) => PlatformTextButton(
-                                  padding: const EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                                       vertical: 0, horizontal: 16),
                                   alignment: Alignment.centerLeft,
                                   child: Text(e),
-                                  onPressed: () => submit(e),
+                                  onPressed: () => submit(context, e),
                                 ))
                             .toList(growable: false),
                       )),

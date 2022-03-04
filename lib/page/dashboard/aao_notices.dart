@@ -82,11 +82,9 @@ class _AAONoticesListState extends State<AAONoticesList> {
             ),
             endBuilder: (_) => Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
+              children: [
                 Text(S.of(context).end_reached),
-                const SizedBox(
-                  height: 16,
-                )
+                const SizedBox(height: 16)
               ],
             ),
             initialData: _data,

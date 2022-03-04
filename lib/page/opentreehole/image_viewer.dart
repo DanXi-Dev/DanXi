@@ -31,7 +31,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
-import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
@@ -135,18 +134,6 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     super.didUpdateWidget(oldWidget);
     originalLoading.clear();
     originalLoadFailError.clear();
-  }
-
-  static String getFileName(String url) {
-    try {
-      return RegExp(r'(.*)\..*')
-              .firstMatch(Uri.parse(url).pathSegments.last)!
-              .group(1)! +
-          '.png';
-    } catch (_) {
-      return "${DateFormat("yyyyMMddHHmmSSS").format(DateTime.now())}.png";
-    }
-    //return Uri.parse(url).pathSegments.last;
   }
 
   Future<void> shareImage() async {
