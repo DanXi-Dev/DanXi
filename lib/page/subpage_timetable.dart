@@ -200,7 +200,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           .fatal_error);
       return;
     }
-    String converted = converter.convertTo(_table!);
+    String? converted = converter.convertTo(_table!);
+    if (converted == null || converter.mimeType == null || converter.fileName == null) return; // If the converter does not export a file, return.
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
@@ -210,7 +211,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
     } else if (PlatformX.isAndroid) {
       Share.shareFiles([outputFile.absolute.path],
-          mimeTypes: [converter.mimeType]);
+          mimeTypes: [converter.mimeType!]);
     } else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
@@ -228,7 +229,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         material: (_, __) =>
             ListTile(
               title: Text(e.key),
-              subtitle: Text(e.value.fileName),
+              subtitle: Text(e.value.fileName ?? ""),
               onTap: () => _startShare(context, e.value),
             ),
       );
@@ -238,7 +239,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     super.initState();
-    converters = {S.current.share_as_ics: ICSConverter()};
+    converters = {//S.current.import_into_cal: CalendarImporter(), // Unfinished
+      S.current.share_as_ics: ICSConverter()}; 
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;

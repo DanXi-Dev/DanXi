@@ -404,5 +404,7 @@
   "set_semester_start_date": "设定开学日期",
   "try_visitor_mode": "不想输入账号？试试游客模式",
   "set_password": "设置密码",
-  "set_your_fduhole_password": "为 FDUHole 账户设置一个密码"
+  "set_your_fduhole_password": "为 FDUHole 账户设置一个密码",
+
+  "import_into_cal": "导入日历"
 }

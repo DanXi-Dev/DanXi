@@ -29,12 +29,13 @@ import 'package:json_annotation/json_annotation.dart';
 part 'time_table.g.dart';
 
 /// A converter abstraction of converting a timetable to a file in [String] to be exported.
+/// The parameters may be null if there aren't any files to export.
 abstract class TimetableConverter {
-  String get fileName;
+  String? get fileName;
 
-  String get mimeType;
+  String? get mimeType;
 
-  String convertTo(TimeTable table);
+  String? convertTo(TimeTable table);
 }
 
 /// [Event] stands for a [course] with an exact [time].

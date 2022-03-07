@@ -9,11 +9,20 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <permission
         android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE"
         android:protectionLevel="signature" />
     <uses-permission android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.INSERT" />
+            <data android:mimeType="vnd.android.cursor.item/event" />
+        </intent>
+    </queries>
 
     <application
         android:icon="@mipmap/ic_launcher"

@@ -1,7 +1,7 @@
 name: dan_xi
 description: Maybe the best all-rounded service app for Fudan University students.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.3.6+156
+version: 1.3.7+160
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -79,6 +79,10 @@ dependencies:
   flutter_fgbg: ^0.1.0
   lazy_load_indexed_stack: ^0.1.3
   js: ^0.6.3
+  add_2_calendar:
+    git:
+      url: git://github.com/singularity-s0/add_2_calendar.git
+      ref: master
 
 dependency_overrides:
   device_info_plus: ^3.2.1
