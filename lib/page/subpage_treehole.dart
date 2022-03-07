@@ -47,6 +47,7 @@ import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/fake_search_widget.dart';
+import 'package:dan_xi/widget/opentreehole/horizontal_selector.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -130,7 +131,7 @@ const String KEY_NO_TAG = "默认";
 class OTTitle extends StatelessWidget {
   const OTTitle({Key? key}) : super(key: key);
 
-  List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
+  /*List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
     List<Widget> list = [];
     onTapListener(OTDivision newDivision) {
       Navigator.of(cxt).pop();
@@ -146,13 +147,22 @@ class OTTitle extends StatelessWidget {
       ));
     });
     return list;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     OTDivision? division = context
         .select<FDUHoleProvider, OTDivision?>((value) => value.currentDivision);
-    return Listener(
+    return Center(
+      child: HorizontalSelector<OTDivision>(
+          options: OpenTreeHoleRepository.getInstance().getDivisions(),
+          onSelect: (division) {
+            context.read<FDUHoleProvider>().currentDivision = division;
+            DivisionChangedEvent(division).fire();
+          },
+          selectedOption: division),
+    );
+    /*return Listener(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -180,7 +190,7 @@ class OTTitle extends StatelessWidget {
                   }
                 });
           }
-        });
+        });*/
   }
 }
 
@@ -193,20 +203,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   const TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
 
   @override
-  Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(
-          S.of(cxt).messages,
-          Icon(PlatformX.isMaterial(cxt)
-              ? Icons.notifications
-              : CupertinoIcons.bell),
-          () {
-            if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-              smartNavigatorPush(cxt, '/bbs/messages',
-                  forcePushOnMainNavigator: true);
-            }
-          },
-        ),
-      ];
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [];
 
   @override
   Create<Widget> get title => (cxt) => const OTTitle();
@@ -222,6 +219,18 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
             smartNavigatorPush(cxt, "/bbs/reports");
           })
         ],
+        AppBarButtonItem(
+          S.of(cxt).messages,
+          Icon(PlatformX.isMaterial(cxt)
+              ? Icons.notifications
+              : CupertinoIcons.bell),
+          () {
+            if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
+              smartNavigatorPush(cxt, '/bbs/messages',
+                  forcePushOnMainNavigator: true);
+            }
+          },
+        ),
         AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
           if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/tags',
