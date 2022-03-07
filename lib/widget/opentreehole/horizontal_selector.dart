@@ -17,8 +17,8 @@
 
 import 'package:flutter/material.dart';
 
-const kDuration = Duration(milliseconds: 500);
-const kCurve = Curves.easeInOut;
+const kDuration = Duration(milliseconds: 300);
+const kCurve = Curves.fastLinearToSlowEaseIn;
 
 class HorizontalSelector<T> extends StatelessWidget {
   final List<T> options;
@@ -53,10 +53,10 @@ class HorizontalSelector<T> extends StatelessWidget {
             return GestureDetector(
               child: Padding(
                 // Note: place [Padding] inside [GestureDetector] to improve user's chance of hitting the option
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: Text(
                   e.toString(),
-                  textScaleFactor: selectedOption == e ? 1.1 : 0.8,
+                  textScaleFactor: selectedOption == e ? 1.25 : 1.0,
                   style: TextStyle(
                       color: selectedOption == e
                           ? null
