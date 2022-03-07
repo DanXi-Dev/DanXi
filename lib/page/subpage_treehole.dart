@@ -203,13 +203,10 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   const TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
 
   @override
-  Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(S.of(cxt).forum, const OTTitle(), null,
-            useCustomWidget: true)
-      ];
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [];
 
   @override
-  Create<Widget> get title => (cxt) => const SizedBox();
+  Create<Widget> get title => (cxt) => const OTTitle();
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
