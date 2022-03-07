@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.6+156';
+const String version = r'1.3.7+161';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,23 +49,22 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 6;
+const int patch = 7;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'156'];
+const List<String> build = <String>[r'161'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1645539285;
+const int timestamp = 1646654018;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -165,6 +164,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_fgbg': r'^0.1.0',
   'lazy_load_indexed_stack': r'^0.1.3',
   'js': r'^0.6.3',
+  'add_2_calendar': <String, Object>{
+    'git': <String, Object>{
+      'url': r'git://github.com/singularity-s0/add_2_calendar.git',
+      'ref': r'master',
+    },
+  },
 };
 
 /// Developer dependencies
