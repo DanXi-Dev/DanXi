@@ -49,7 +49,7 @@ class OTSearchPage extends StatelessWidget {
   ];
 
   /// The text user inputs.
-  final ValueNotifier<String> _inputText = ValueNotifier("");
+  final TextEditingController _searchFieldController = TextEditingController();
 
   Widget _buildSearchHistory(BuildContext context) => Column(
         mainAxisSize: MainAxisSize.min,
@@ -81,11 +81,12 @@ class OTSearchPage extends StatelessWidget {
                           ScrollViewKeyboardDismissBehavior.onDrag,
                       children: value
                           .map((e) => PlatformTextButton(
-                                padding: const EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                                     vertical: 0, horizontal: 16),
                                 alignment: Alignment.centerLeft,
                                 child: Text(e),
-                                onPressed: () => _inputText.value = e,
+                                onPressed: () =>
+                                    _searchFieldController.text = e,
                               ))
                           .toList(growable: false),
                     )),
@@ -94,22 +95,23 @@ class OTSearchPage extends StatelessWidget {
       );
 
   /// Build a list of search suggestion or search history if no input.
-  Widget buildSearchSuggestion(BuildContext context) => Consumer<String>(
-      builder: (context, value, child) => value.isEmpty
-          ? _buildSearchHistory(context)
-          : Expanded(
-              child: Material(
-                child: ListView(
-                  primary: false,
-                  shrinkWrap: true,
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  children: suggestionProviders
-                      .map((e) => e.call(context, value))
-                      .toList(),
-                ),
-              ),
-            ));
+  Widget buildSearchSuggestion(BuildContext context) =>
+      Consumer<TextEditingValue>(
+          builder: (context, value, child) => value.text.isEmpty
+              ? _buildSearchHistory(context)
+              : Expanded(
+                  child: Material(
+                    child: ListView(
+                      primary: false,
+                      shrinkWrap: true,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      children: suggestionProviders
+                          .map((e) => e.call(context, value.text))
+                          .toList(),
+                    ),
+                  ),
+                ));
 
   @override
   Widget build(BuildContext context) {
@@ -133,13 +135,14 @@ class OTSearchPage extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 child: PlatformTextField(
                   autofocus: true,
+                  controller: _searchFieldController,
                   hintText: S.of(context).search_hint,
-                  onChanged: (newText) => _inputText.value = newText,
                 ),
               ),
             ),
             ValueListenableProvider.value(
-                value: _inputText, child: buildSearchSuggestion(context)),
+                value: _searchFieldController,
+                child: buildSearchSuggestion(context)),
           ],
         ),
       ),
@@ -206,8 +209,8 @@ Widget searchByTag(BuildContext context, String searchKeyword) {
           mainAxisSize: MainAxisSize.min,
           children: suggestionList
               .map((e) => ListTile(
-                    leading: Icon(PlatformIcons(context).tag),
-                    title: Text("筛选含 Tag「${e.name}」的帖子"),
+            leading: Icon(PlatformIcons(context).tag),
+                    title: Text("查看本分区含 Tag「${e.name}」的帖子"),
                     onTap: () {
                       submit(context, searchKeyword);
                       smartNavigatorPush(context, '/bbs/discussions',

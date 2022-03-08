@@ -218,5 +218,6 @@ class StringBufferNotifier with ChangeNotifier {
   }
 
   /// Returns the contents of buffer as a single string.
+  @override
   String toString() => _buffer.toString();
 }

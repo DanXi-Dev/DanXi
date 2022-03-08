@@ -85,7 +85,7 @@ class AnnouncementRepository {
       _announcementCache.filter((element) => element.maxVersion! >= 0);
 
   @Deprecated(
-      "Never use single start date any more. Call getStartDates() instead")
+      "Never use single startDate any more. Call getStartDates() instead")
   DateTime getStartDate() => DateTime.parse(_announcementCache!
       .firstWhere((element) => element.maxVersion == _ID_START_DATE)
       .content!);
