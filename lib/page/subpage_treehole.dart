@@ -535,7 +535,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           },
           child: Column(
             children: [
-              if (_postsType == PostsType.NORMAL_POSTS) _autoTabWidget(),
               Expanded(
                 child: PagedListView<OTHole>(
                     noneItem: OTHole.DUMMY_POST,
@@ -548,6 +547,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                           children: [
                             AutoBannerAdWidget(bannerAd: bannerAd),
                             if (_postsType == PostsType.NORMAL_POSTS) ...[
+                              _autoTabWidget(),
                               _autoSilenceNotice(),
                               _autoPinnedPosts(),
                             ],

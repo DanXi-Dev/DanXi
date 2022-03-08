@@ -98,14 +98,16 @@ class OTSearchPage extends StatelessWidget {
       builder: (context, value, child) => value.isEmpty
           ? _buildSearchHistory(context)
           : Expanded(
-              child: ListView(
-                primary: false,
-                shrinkWrap: true,
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                children: suggestionProviders
-                    .map((e) => e.call(context, value))
-                    .toList(),
+              child: Material(
+                child: ListView(
+                  primary: false,
+                  shrinkWrap: true,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  children: suggestionProviders
+                      .map((e) => e.call(context, value))
+                      .toList(),
+                ),
               ),
             ));
 
