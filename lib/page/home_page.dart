@@ -30,6 +30,7 @@ import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
@@ -324,7 +325,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String? code,
     Map<String, dynamic>? data,
   ) async {
-    if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
       // Do a quick initialization and push
       OpenTreeHoleRepository.getInstance().initializeToken();
     }

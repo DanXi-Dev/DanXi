@@ -25,6 +25,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -454,13 +455,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
             leading: Icon(PlatformIcons(context).accountCircle),
             title: Text(S.of(context).forum),
             subtitle: Text(
-                OpenTreeHoleRepository.getInstance().isUserInitialized
-                    ? S.of(context).fduhole_user_id(
+                context.read<FDUHoleProvider>().isUserInitialized
+                ? S.of(context).fduhole_user_id(
                         (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
                             .toString())
                     : S.of(context).not_logged_in),
             children: [
-              if (OpenTreeHoleRepository.getInstance().isUserInitialized) ...[
+              if (context.read<FDUHoleProvider>().isUserInitialized) ...[
                 FutureWidget<OTUser?>(
                   future: OpenTreeHoleRepository.getInstance().getUserProfile(),
                   successBuilder:
@@ -589,7 +590,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               ],
               ListTile(
                 leading: const SizedBox(),
-                title: OpenTreeHoleRepository.getInstance().isUserInitialized
+                title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,
                         style: TextStyle(color: Theme.of(context).errorColor),
@@ -600,7 +601,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                 onTap: () async {
-                  if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+                  if (!context.read<FDUHoleProvider>().isUserInitialized) {
                     if (SettingsProvider.getInstance().fduholeToken == null) {
                       Noticing.showNotice(
                           context, S.of(context).login_from_treehole_page,
@@ -1029,7 +1030,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
           successBuilder:
               (BuildContext context, AsyncSnapshot<bool> permissionSnapshot) {
             if (permissionSnapshot.data == true) {
-              if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+              if (!context.read<FDUHoleProvider>().isUserInitialized) {
                 return ListTile(
                   title: Text(S.of(context).notification_settings),
                   leading: icon,

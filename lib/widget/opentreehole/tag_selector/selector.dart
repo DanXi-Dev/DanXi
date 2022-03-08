@@ -115,34 +115,42 @@ class _TagContainerState extends State<TagContainer> {
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplier(widget.fixedColor);
-    if (widget.wrapped) {
-      return ThemedMaterial(
-          child: Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-              child: Wrap(
-                spacing: 8,
-                children: tagList!.map((e) => _buildTag(e)).toList(),
-              )));
-    } else {
-      return ThemedMaterial(
-          child: Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: tagList!.map((e) => _buildTag(e)).toList(),
-                ),
-              )));
-    }
+    return ThemedMaterial(
+        child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: widget.wrapped
+                ? Wrap(
+                    spacing: 8,
+                    children: tagList!.map((e) => _buildTag(e)).toList(),
+                  )
+                : SingleChildScrollView(
+                    primary: false,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: tagList!
+                          .map((e) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: _buildTag(e)))
+                          .toList(),
+                    ),
+                  )));
   }
 
   Widget _buildTag(Tag data) {
+    Color? showingColor = data.isSelected ? data.tagColor : Colors.grey.shade50;
     return ChoiceChip(
-        label: Text(data.tagTitle!),
+        label: Text(
+          data.tagTitle!,
+          style: TextStyle(
+              color: (showingColor?.computeLuminance() ?? 0) >= 0.5
+                  ? Colors.black
+                  : Colors.white),
+        ),
         selected: data.isSelected,
-        avatar: Icon(data.icon),
+        selectedColor: data.tagColor,
+        // backgroundColor: data.tagColor?.withOpacity(0.5),
+        avatar: data.icon != null ? Icon(data.icon) : null,
         // When [widget.enabled] is false, set [onSelected] to null so that this chip will act as disabled.
         onSelected: widget.enabled
             ? (bool newValue) {
@@ -154,17 +162,17 @@ class _TagContainerState extends State<TagContainer> {
                     selectedCategories.clear();
                     for (var element in tagList!) {
                       element.isSelected = false;
-                    }
-                    data.isSelected = true;
-                  }
-                  data.isSelected
-                      ? selectedCategories.add(data.tagTitle)
-                      : selectedCategories.remove(data.tagTitle);
-                });
-                if (data.isSelected && widget.onChoice != null) {
-                  widget.onChoice!(data, selectedCategories);
-                }
               }
+              data.isSelected = true;
+            }
+            data.isSelected
+                ? selectedCategories.add(data.tagTitle)
+                : selectedCategories.remove(data.tagTitle);
+          });
+          if (data.isSelected && widget.onChoice != null) {
+            widget.onChoice!(data, selectedCategories);
+          }
+        }
             : null);
   }
 

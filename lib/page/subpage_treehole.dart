@@ -46,10 +46,10 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/fake_search_widget.dart';
 import 'package:dan_xi/widget/opentreehole/horizontal_selector.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +61,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../widget/opentreehole/tag_selector/tag.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -131,66 +133,43 @@ const String KEY_NO_TAG = "默认";
 class OTTitle extends StatelessWidget {
   const OTTitle({Key? key}) : super(key: key);
 
-  /*List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
-    List<Widget> list = [];
-    onTapListener(OTDivision newDivision) {
-      Navigator.of(cxt).pop();
-      cxt.read<FDUHoleProvider>().currentDivision = newDivision;
-      DivisionChangedEvent(newDivision).fire();
-    }
-
-    OpenTreeHoleRepository.getInstance().getDivisions().forEach((value) {
-      list.add(ListTile(
-        title: Text(value.name ?? "null"),
-        subtitle: Text(value.description ?? ""),
-        onTap: () => onTapListener(value),
-      ));
-    });
-    return list;
-  }*/
-
   @override
   Widget build(BuildContext context) {
+    List<OTDivision> divisions =
+        OpenTreeHoleRepository.getInstance().getDivisions();
     OTDivision? division = context
         .select<FDUHoleProvider, OTDivision?>((value) => value.currentDivision);
-    return Center(
-      child: HorizontalSelector<OTDivision>(
-          options: OpenTreeHoleRepository.getInstance().getDivisions(),
-          onSelect: (division) {
-            context.read<FDUHoleProvider>().currentDivision = division;
-            DivisionChangedEvent(division).fire();
+    int currentIndex;
+    if (division != null) {
+      currentIndex = divisions.indexOf(division);
+    } else {
+      currentIndex = 0;
+    }
+    return Expanded(
+      child: TagContainer(
+          fillRandomColor: false,
+          fixedColor: Theme.of(context).colorScheme.tertiary,
+          fontSize: 12,
+          enabled: true,
+          wrapped: false,
+          singleChoice: true,
+          defaultChoice: currentIndex,
+          onChoice: (Tag tag, list) {
+            division = context.read<FDUHoleProvider>().currentDivision =
+                divisions.firstWhere((element) => element.name == tag.tagTitle);
+            DivisionChangedEvent(division!).fire();
           },
-          selectedOption: division),
+          tagList: divisions
+              .map((e) => Tag(e.name, null, checkedIcon: null))
+              .toList()),
     );
-    /*return Listener(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(division?.name ?? S.of(context).forum),
-            const Icon(Icons.arrow_drop_down)
-          ],
-        ),
-        onPointerUp: (PointerUpEvent details) {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized &&
-              OpenTreeHoleRepository.getInstance().getDivisions().isNotEmpty) {
-            HapticFeedback.mediumImpact();
-            showPlatformModalSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  Widget content = Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ListView(
-                          shrinkWrap: true,
-                          primary: false,
-                          children: _buildDivisionOptionsList(context)));
-                  if (PlatformX.isCupertino(context)) {
-                    return SafeArea(child: Card(child: content));
-                  } else {
-                    return SafeArea(child: content);
-                  }
-                });
-          }
-        });*/
+    return HorizontalSelector<OTDivision>(
+        options: OpenTreeHoleRepository.getInstance().getDivisions(),
+        onSelect: (division) {
+          context.read<FDUHoleProvider>().currentDivision = division;
+          DivisionChangedEvent(division).fire();
+        },
+        selectedOption: division);
   }
 }
 
@@ -203,13 +182,27 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   const TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
 
   @override
-  Create<List<AppBarButtonItem>> get leading => (cxt) => [];
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+        AppBarButtonItem(
+          S.of(cxt).messages,
+          Icon(PlatformX.isMaterial(cxt)
+              ? Icons.notifications
+              : CupertinoIcons.bell),
+          () {
+            if (cxt.read<FDUHoleProvider>().isUserInitialized) {
+              smartNavigatorPush(cxt, '/bbs/messages',
+                  forcePushOnMainNavigator: true);
+            }
+          },
+        )
+      ];
 
   @override
-  Create<Widget> get title => (cxt) => const OTTitle();
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).forum);
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) =>
+  [
         if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
           AppBarButtonItem(
               S.of(cxt).reports,
@@ -219,30 +212,18 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
             smartNavigatorPush(cxt, "/bbs/reports");
           })
         ],
-        AppBarButtonItem(
-          S.of(cxt).messages,
-          Icon(PlatformX.isMaterial(cxt)
-              ? Icons.notifications
-              : CupertinoIcons.bell),
-          () {
-            if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-              smartNavigatorPush(cxt, '/bbs/messages',
-                  forcePushOnMainNavigator: true);
-            }
-          },
-        ),
-        AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-            smartNavigatorPush(cxt, '/bbs/tags',
-                forcePushOnMainNavigator: true);
-          }
-        }),
+        // AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
+        //   if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
+        //     smartNavigatorPush(cxt, '/bbs/tags',
+        //         forcePushOnMainNavigator: true);
+        //   }
+        // }),
         AppBarButtonItem(
             S.of(cxt).favorites,
             Icon(PlatformX.isMaterial(cxt)
                 ? Icons.star_outline
                 : CupertinoIcons.star), () {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
+          if (cxt.read<FDUHoleProvider>().isUserInitialized) {
             smartNavigatorPush(cxt, '/bbs/discussions',
                 arguments: {'showFavoredDiscussion': true},
                 forcePushOnMainNavigator: true);
@@ -250,7 +231,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
         }),
         AppBarButtonItem(
             S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
-          if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
+          if (cxt.read<FDUHoleProvider>().isUserInitialized) {
             AddNewPostEvent().fire();
           }
         }),
@@ -323,7 +304,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
-    if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().initializeRepo();
       context.read<FDUHoleProvider>().currentDivision =
           OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
@@ -369,7 +350,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await OpenTreeHoleRepository.getInstance()
             .getFavoriteHoleId(forceUpdate: true);
-      } else if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
+      } else if (context.read<FDUHoleProvider>().isUserInitialized) {
         OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false)
             .then((value) => setState(() {}))
@@ -409,6 +390,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   }
 
   Widget _autoPinnedPosts() {
+    print("Build pinned!");
     return Column(
       children: OpenTreeHoleRepository.getInstance()
           .getPinned(getDivisionId(context))
@@ -417,23 +399,31 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     );
   }
 
-  Widget _autoSearchWidget() {
-    return Hero(
-      transitionOnUserGestures: true,
-      tag: 'OTSearchWidget',
-      child: Padding(
-        padding: Theme.of(context).cardTheme.margin ??
-            const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        child: FakeCupertinoSearchTextField(
-          autofocus: false,
-          placeholder: S.of(context).search_hint,
-          onTap: () {
-            smartNavigatorPush(context, '/bbs/search',
-                forcePushOnMainNavigator: true);
-          },
-        ),
-      ),
-    );
+  Widget _autoTabWidget() {
+    return Selector<FDUHoleProvider, bool>(
+        selector: (_, model) => model.isUserInitialized,
+        builder: (context, value, _) {
+          if (value) {
+            return Row(
+              children: [
+                Padding(
+                  padding: Theme.of(context).cardTheme.margin ??
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  child: PlatformIconButton(
+                    icon: Icon(PlatformIcons(context).search),
+                    onPressed: () {
+                      smartNavigatorPush(context, '/bbs/search',
+                          forcePushOnMainNavigator: true);
+                    },
+                  ),
+                ),
+                const OTTitle()
+              ],
+            );
+          } else {
+            return Container();
+          }
+        });
   }
 
   @override
@@ -543,54 +533,63 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               // It is not important if [listViewController] is not attached to a ListView.
             } catch (_) {}
           },
-          child: PagedListView<OTHole>(
-              noneItem: OTHole.DUMMY_POST,
-              pagedController: listViewController,
-              withScrollbar: true,
-              scrollController: PrimaryScrollController.of(context),
-              startPage: 1,
-              builder: _buildListItem,
-              headBuilder: (context) => Column(
-                    children: [
-                      AutoBannerAdWidget(bannerAd: bannerAd),
-                      if (_postsType == PostsType.NORMAL_POSTS) ...[
-                        _autoSearchWidget(),
-                        _autoSilenceNotice(),
-                        _autoPinnedPosts(),
-                      ],
-                    ],
-                  ),
-              loadingBuilder: (BuildContext context) => Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
-                  ),
-              endBuilder: (context) => Center(
-                      child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(S.of(context).end_reached),
-                  )),
-              emptyBuilder: (_) {
-                if (_postsType == PostsType.FAVORED_DISCUSSION) {
-                  return _buildEmptyFavoritesPage();
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: Text(S.of(context).no_data)),
-                  );
-                }
-              },
-              fatalErrorBuilder: (_, e) {
-                if (e is NotLoginError) {
-                  return OTWelcomeWidget(loginCallback: () async {
-                    await smartNavigatorPush(context, "/bbs/login",
-                        arguments: {"info": StateProvider.personInfo.value!});
-                    refreshList();
-                  });
-                }
-                return ErrorPageWidget.buildWidget(context, e,
-                    onTap: () => refreshSelf());
-              },
-              dataReceiver: _loadContent),
+          child: Column(
+            children: [
+              if (_postsType == PostsType.NORMAL_POSTS) _autoTabWidget(),
+              Expanded(
+                child: PagedListView<OTHole>(
+                    noneItem: OTHole.DUMMY_POST,
+                    pagedController: listViewController,
+                    withScrollbar: true,
+                    scrollController: PrimaryScrollController.of(context),
+                    startPage: 1,
+                    builder: _buildListItem,
+                    headBuilder: (context) => Column(
+                          children: [
+                            AutoBannerAdWidget(bannerAd: bannerAd),
+                            if (_postsType == PostsType.NORMAL_POSTS) ...[
+                              _autoSilenceNotice(),
+                              _autoPinnedPosts(),
+                            ],
+                          ],
+                        ),
+                    loadingBuilder: (BuildContext context) => Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Center(
+                              child: PlatformCircularProgressIndicator()),
+                        ),
+                    endBuilder: (context) => Center(
+                            child: Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Text(S.of(context).end_reached),
+                        )),
+                    emptyBuilder: (_) {
+                      if (_postsType == PostsType.FAVORED_DISCUSSION) {
+                        return _buildEmptyFavoritesPage();
+                      } else {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Center(child: Text(S.of(context).no_data)),
+                        );
+                      }
+                    },
+                    fatalErrorBuilder: (_, e) {
+                      if (e is NotLoginError) {
+                        return OTWelcomeWidget(loginCallback: () async {
+                          await smartNavigatorPush(context, "/bbs/login",
+                              arguments: {
+                                "info": StateProvider.personInfo.value!
+                              });
+                          refreshList();
+                        });
+                      }
+                      return ErrorPageWidget.buildWidget(context, e,
+                          onTap: () => refreshSelf());
+                    },
+                    dataReceiver: _loadContent),
+              ),
+            ],
+          ),
         ),
       ),
     );

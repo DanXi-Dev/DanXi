@@ -49,6 +49,7 @@ import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -256,12 +257,13 @@ class DanxiApp extends StatelessWidget {
           },
           child: mainApp);
     }
-
+    var fduHoleProvider = FDUHoleProvider();
+    OpenTreeHoleRepository.init(fduHoleProvider);
     return Phoenix(
       child: MultiProvider(providers: [
         ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider(create: (_) => FDUHoleProvider())
+        ChangeNotifierProvider.value(value: fduHoleProvider)
       ], child: mainApp),
     );
   }

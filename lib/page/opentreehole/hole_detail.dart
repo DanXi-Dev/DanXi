@@ -564,8 +564,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ],
                     ),
                     onPointerUp: (PointerUpEvent details) async {
-                      if (OpenTreeHoleRepository.getInstance()
-                              .isUserInitialized &&
+                      if (context.read<FDUHoleProvider>().isUserInitialized &&
                           OpenTreeHoleRepository.getInstance()
                               .getDivisions()
                               .isNotEmpty) {

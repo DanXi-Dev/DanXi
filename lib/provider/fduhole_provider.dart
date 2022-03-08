@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/model/opentreehole/division.dart';
+import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
@@ -38,4 +39,26 @@ class FDUHoleProvider with ChangeNotifier {
     _currentDivision = currentDivision;
     notifyListeners();
   }
+
+  /// The token used for session authentication.
+  String? _token;
+
+  String? get token => _token;
+
+  set token(String? value) {
+    _token = value;
+    // notifyListeners();
+  }
+
+  /// Current user profile, stored as cache by the repository
+  OTUser? _userInfo;
+
+  OTUser? get userInfo => _userInfo;
+
+  set userInfo(OTUser? value) {
+    _userInfo = value;
+    notifyListeners();
+  }
+
+  bool get isUserInitialized => token != null && userInfo != null;
 }
