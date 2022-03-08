@@ -378,5 +378,9 @@
   "set_semester_start_date": "始業日を設定する",
   "try_visitor_mode": "入力したくない？Visitorモードをご試します",
   "set_password": "パスワード設定",
-  "set_your_fduhole_password": "FDUHoleアカウントのパスワードを設定してください"
+  "set_your_fduhole_password": "FDUHoleアカウントのパスワードを設定してください",
+  "search_by_text_tip": "本文中に「{searchKeyword}」を含むポストを検索する",
+  "search_by_pid_tip": "「{pid}」ポストへ",
+  "search_by_floor_tip": "「{floorId}」返信へ",
+  "search_by_tag_tip": "このスペースのタグ「{tag}」のポストを見る"
 }

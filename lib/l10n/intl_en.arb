@@ -412,6 +412,9 @@
   "try_visitor_mode": "Don't want to login? Go as visitor",
   "set_password": "Set A Password",
   "set_your_fduhole_password": "Set a password for your FDUHole account",
-
-  "import_into_cal": "Import to Calendar"
+  "import_into_cal": "Import to Calendar",
+  "search_by_text_tip": "Search \"{searchKeyword}\" in content",
+  "search_by_pid_tip": "Go to the post {pid}",
+  "search_by_floor_tip": "Go to the floor {floorId}",
+  "search_by_tag_tip": "See posts with tag \"{tag}\" in this division"
 }

@@ -81,7 +81,7 @@ class OTSearchPage extends StatelessWidget {
                           ScrollViewKeyboardDismissBehavior.onDrag,
                       children: value
                           .map((e) => PlatformTextButton(
-                        padding: const EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     vertical: 0, horizontal: 16),
                                 alignment: Alignment.centerLeft,
                                 child: Text(e),
@@ -156,7 +156,7 @@ final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
 
 Widget searchByText(BuildContext context, String searchKeyword) {
   return ListTile(
-    title: Text("搜索正文含「$searchKeyword」的帖子"),
+    title: Text(S.of(context).search_by_text_tip(searchKeyword)),
     leading: const Icon(Icons.text_fields),
     onTap: () {
       submit(context, searchKeyword);
@@ -171,7 +171,7 @@ Widget searchByPid(BuildContext context, String searchKeyword) {
   if (pidMatch != null) {
     return ListTile(
       leading: const Icon(Icons.message),
-      title: Text("跳转到帖子「${pidMatch.group(0)}」"),
+      title: Text(S.of(context).search_by_pid_tip(pidMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
         _goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
@@ -187,7 +187,7 @@ Widget searchByFloorId(BuildContext context, String searchKeyword) {
   if (floorMatch != null) {
     return ListTile(
       leading: const Icon(Icons.message),
-      title: Text("跳转到楼层「${floorMatch.group(0)}」"),
+      title: Text(S.of(context).search_by_floor_tip(floorMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
         _goToFloorIdResultPage(context, int.parse(floorMatch.group(1)!));
@@ -209,8 +209,8 @@ Widget searchByTag(BuildContext context, String searchKeyword) {
           mainAxisSize: MainAxisSize.min,
           children: suggestionList
               .map((e) => ListTile(
-            leading: Icon(PlatformIcons(context).tag),
-                    title: Text("查看本分区含 Tag「${e.name}」的帖子"),
+                    leading: Icon(PlatformIcons(context).tag),
+                    title: Text(S.of(context).search_by_tag_tip(e.name!)),
                     onTap: () {
                       submit(context, searchKeyword);
                       smartNavigatorPush(context, '/bbs/discussions',

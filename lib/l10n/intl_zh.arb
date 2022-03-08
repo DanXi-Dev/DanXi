@@ -405,6 +405,9 @@
   "try_visitor_mode": "不想输入账号？试试游客模式",
   "set_password": "设置密码",
   "set_your_fduhole_password": "为 FDUHole 账户设置一个密码",
-
-  "import_into_cal": "导入日历"
+  "import_into_cal": "导入日历",
+  "search_by_text_tip": "搜索正文含「{searchKeyword}」的帖子",
+  "search_by_pid_tip": "跳转到帖子「{pid}」",
+  "search_by_floor_tip": "跳转到楼层「{floorId}」",
+  "search_by_tag_tip": "查看本分区含 Tag「{tag}」的帖子"
 }
