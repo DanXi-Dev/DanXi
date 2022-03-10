@@ -19,8 +19,8 @@ import 'package:flutter/material.dart';
 /// SmallTag is a small tag, usually showing on the home page to visualize different data items.
 /// Such as "Next course", "Last transaction", etc.
 ///
-/// It defaultly uses [Theme.of(context).hintColor] as its background color, and
-/// self-adaptive text color.
+/// It uses [Theme.of(context).hintColor] as its background color, and
+/// self-adaptive text color by default.
 class SmallTag extends StatelessWidget {
   final String? label;
 

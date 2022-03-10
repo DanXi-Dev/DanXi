@@ -46,7 +46,6 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/horizontal_selector.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
@@ -163,13 +162,13 @@ class OTTitle extends StatelessWidget {
               .map((e) => Tag(e.name, null, checkedIcon: null))
               .toList()),
     );
-    return HorizontalSelector<OTDivision>(
-        options: OpenTreeHoleRepository.getInstance().getDivisions(),
-        onSelect: (division) {
-          context.read<FDUHoleProvider>().currentDivision = division;
-          DivisionChangedEvent(division).fire();
-        },
-        selectedOption: division);
+    // return HorizontalSelector<OTDivision>(
+    //     options: OpenTreeHoleRepository.getInstance().getDivisions(),
+    //     onSelect: (division) {
+    //       context.read<FDUHoleProvider>().currentDivision = division;
+    //       DivisionChangedEvent(division).fire();
+    //     },
+    //     selectedOption: division);
   }
 }
 

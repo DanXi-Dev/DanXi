@@ -137,15 +137,51 @@ class _TagContainerState extends State<TagContainer> {
                   )));
   }
 
+  /// Get the background color when [ChoiceChip] is selected.
+  ///
+  /// Most of this method come from Flutter Framework.
+  static Color parseSelectColor(BuildContext context, Tag tag) {
+    final ThemeData theme = Theme.of(context);
+    final ChipThemeData chipTheme = ChipTheme.of(context);
+    final Brightness brightness = chipTheme.brightness ?? theme.brightness;
+    Color secondaryColor = brightness == Brightness.dark
+        ? Colors.tealAccent[200]!
+        : theme.primaryColor;
+    return tag.tagColor ??
+        ChipTheme.of(context).secondarySelectedColor ??
+        secondaryColor.withAlpha(0x3d);
+  }
+
+  /// Get the background color according to [tag] is selected or not.
+  ///
+  /// Note: it does not return the exact color shown in the tag when not selected, since
+  /// the color has its opacity, which we cannot know until being built. See the method's comments for more details.
+  ///
+  /// Most of this method come from Flutter Framework.
+  static Color parseBackgroundColor(BuildContext context, Tag tag) {
+    final ThemeData theme = Theme.of(context);
+    final ChipThemeData chipTheme = ChipTheme.of(context);
+    final Brightness brightness = chipTheme.brightness ?? theme.brightness;
+
+    // The color has its opacity, which we cannot know until being built.
+    // So we have to hard-code a color code here which is similar to scaffold's background color.
+    // It is a bad practice, but works nice if the background *is* scaffold.
+    Color primaryColor =
+        brightness == Brightness.light ? Colors.grey.shade200 : Colors.grey;
+    final Color backgroundColor = primaryColor.withAlpha(0x1f);
+
+    return tag.isSelected ? parseSelectColor(context, tag) : backgroundColor;
+  }
+
   Widget _buildTag(Tag data) {
-    Color? showingColor = data.isSelected ? data.tagColor : Colors.grey.shade50;
     return ChoiceChip(
         label: Text(
           data.tagTitle!,
           style: TextStyle(
-              color: (showingColor?.computeLuminance() ?? 0) >= 0.5
-                  ? Colors.black
-                  : Colors.white),
+              color:
+                  parseBackgroundColor(context, data).computeLuminance() >= 0.5
+                      ? Colors.black
+                      : Colors.white),
         ),
         selected: data.isSelected,
         selectedColor: data.tagColor,
@@ -162,17 +198,17 @@ class _TagContainerState extends State<TagContainer> {
                     selectedCategories.clear();
                     for (var element in tagList!) {
                       element.isSelected = false;
+                    }
+                    data.isSelected = true;
+                  }
+                  data.isSelected
+                      ? selectedCategories.add(data.tagTitle)
+                      : selectedCategories.remove(data.tagTitle);
+                });
+                if (data.isSelected && widget.onChoice != null) {
+                  widget.onChoice!(data, selectedCategories);
+                }
               }
-              data.isSelected = true;
-            }
-            data.isSelected
-                ? selectedCategories.add(data.tagTitle)
-                : selectedCategories.remove(data.tagTitle);
-          });
-          if (data.isSelected && widget.onChoice != null) {
-            widget.onChoice!(data, selectedCategories);
-          }
-        }
             : null);
   }
 
