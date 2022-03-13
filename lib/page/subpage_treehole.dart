@@ -27,6 +27,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/curriculum/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -250,7 +251,12 @@ class DivisionChangedEvent {
   DivisionChangedEvent(this.newDivision);
 }
 
-enum PostsType { FAVORED_DISCUSSION, FILTER_BY_TAG, NORMAL_POSTS }
+enum PostsType {
+  FAVORED_DISCUSSION,
+  FILTER_BY_TAG,
+  NORMAL_POSTS,
+  EXTERNAL_VIEW
+}
 
 /// A list page showing bbs posts.
 ///
@@ -274,6 +280,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
+
+  ListDelegate? _delegate;
 
   final PagedListViewController<OTHole> listViewController =
       PagedListViewController();
@@ -341,6 +349,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         return loadedPost == null || loadedPost.isEmpty
             ? [OTHole.DUMMY_POST]
             : loadedPost;
+      case PostsType.EXTERNAL_VIEW:
+        // If we are showing a widget defined
+        return [];
     }
   }
 
@@ -356,8 +367,12 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             .catchError((error) {});
       }
     } finally {
-      await listViewController.notifyUpdate(
-          useInitialData: true, queueDataClear: true);
+      if (_postsType == PostsType.FAVORED_DISCUSSION) {
+        await _delegate?.triggerRefresh();
+      } else {
+        await listViewController.notifyUpdate(
+            useInitialData: true, queueDataClear: true);
+      }
     }
   }
 
@@ -411,9 +426,31 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           indicatorKey.currentState?.show();
         }),
         hashCode);
+
+    // @w568w (2022-3-13):
+    // Question: why not use [context.watch] to listen to change of division?
+    //
+    // Answer: We have to do some initial work before build (like the codes below),
+    // and some conclusive work after build (like showing the indicator).
+    // After some thought, I believe a subscription is still a better way, unless
+    // we refactor all logic fundamentally.
     _divisionChangedSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
-          indicatorKey.currentState?.show();
+          if (event.newDivision.name ==
+              Constant.SPECIAL_DIVISION_FOR_CURRICULUM) {
+            setState(() {
+              _delegate = CourseListDelegate();
+              _postsType = PostsType.EXTERNAL_VIEW;
+            });
+          } else {
+            setState(() {
+              _postsType = PostsType.NORMAL_POSTS;
+            });
+          }
+          // Schedule a reload after setState() is done.
+          WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+            indicatorKey.currentState?.show();
+          });
         }),
         hashCode);
 
@@ -476,6 +513,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           ),
         );
       case PostsType.NORMAL_POSTS:
+      case PostsType.EXTERNAL_VIEW:
         return _buildPageBody(context);
     }
   }
@@ -491,8 +529,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                     image: _backgroundImage!, fit: BoxFit.cover)),
         child: RefreshIndicator(
           // Make the indicator listen to [ScrollNotification] from deep located [PagedListView].
-          // If the structure of layout is changed, ensure that you modify the [depth] here too.
-          notificationPredicate: (notification) => notification.depth == 3,
+          notificationPredicate: (notification) => true,
           edgeOffset: MediaQuery.of(context).padding.top,
           key: indicatorKey,
           color: Theme.of(context).colorScheme.secondary,
@@ -511,56 +548,14 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             physics: const AlwaysScrollableScrollPhysics(),
             floatHeaderSlivers: true,
             // Use a [Builder] to force the [PagedListView] use the scrollController provided by [NestedScrollView].
-            body: Builder(
-                builder: (context) => PagedListView<OTHole>(
-                    noneItem: OTHole.DUMMY_POST,
-                    pagedController: listViewController,
-                    withScrollbar: true,
-                    scrollController: PrimaryScrollController.of(context),
-                    startPage: 1,
-                    builder: _buildListItem,
-                    headBuilder: (context) => Column(
-                          children: [
-                            AutoBannerAdWidget(bannerAd: bannerAd),
-                            if (_postsType == PostsType.NORMAL_POSTS) ...[
-                              _autoSilenceNotice(),
-                              _autoPinnedPosts(),
-                            ]
-                          ],
-                        ),
-                    loadingBuilder: (BuildContext context) => Container(
-                        padding: const EdgeInsets.all(8),
-                        child:
-                            Center(child: PlatformCircularProgressIndicator())),
-                    endBuilder: (context) => Center(
-                            child: Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(S.of(context).end_reached),
-                        )),
-                    emptyBuilder: (_) {
-                      if (_postsType == PostsType.FAVORED_DISCUSSION) {
-                        return _buildEmptyFavoritesPage();
-                      } else {
-                        return Container(
-                          padding: const EdgeInsets.all(8),
-                              child: Center(child: Text(S.of(context).no_data)),
-                            );
-                          }
-                        },
-                        fatalErrorBuilder: (_, e) {
-                          if (e is NotLoginError) {
-                            return OTWelcomeWidget(loginCallback: () async {
-                          await smartNavigatorPush(context, "/bbs/login",
-                              arguments: {
-                                "info": StateProvider.personInfo.value!
-                              });
-                          refreshList();
-                        });
-                      }
-                      return ErrorPageWidget.buildWidget(context, e,
-                          onTap: () => refreshSelf());
-                    },
-                    dataReceiver: _loadContent)),
+            body: Builder(builder: (context) {
+              //
+              if (_postsType == PostsType.EXTERNAL_VIEW) {
+                return _delegate!.build(context);
+              } else {
+                return _buildOTListView(context);
+              }
+            }),
             // Add a header for the scroll view
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) => <Widget>[
@@ -571,6 +566,55 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         ),
       ),
     );
+  }
+
+  Widget _buildOTListView(BuildContext context) {
+    return PagedListView<OTHole>(
+        noneItem: OTHole.DUMMY_POST,
+        pagedController: listViewController,
+        withScrollbar: true,
+        scrollController: PrimaryScrollController.of(context),
+        startPage: 1,
+        builder: _buildListItem,
+        headBuilder: (context) => Column(
+              children: [
+                AutoBannerAdWidget(bannerAd: bannerAd),
+                if (_postsType == PostsType.NORMAL_POSTS) ...[
+                  _autoSilenceNotice(),
+                  _autoPinnedPosts(),
+                ]
+              ],
+            ),
+        loadingBuilder: (BuildContext context) => Container(
+            padding: const EdgeInsets.all(8),
+            child: Center(child: PlatformCircularProgressIndicator())),
+        endBuilder: (context) => Center(
+                child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(S.of(context).end_reached),
+            )),
+        emptyBuilder: (_) {
+          if (_postsType == PostsType.FAVORED_DISCUSSION) {
+            return _buildEmptyFavoritesPage();
+          } else {
+            return Container(
+              padding: const EdgeInsets.all(8),
+              child: Center(child: Text(S.of(context).no_data)),
+            );
+          }
+        },
+        fatalErrorBuilder: (_, e) {
+          if (e is NotLoginError) {
+            return OTWelcomeWidget(loginCallback: () async {
+              await smartNavigatorPush(context, "/bbs/login",
+                  arguments: {"info": StateProvider.personInfo.value!});
+              refreshList();
+            });
+          }
+          return ErrorPageWidget.buildWidget(context, e,
+              onTap: () => refreshSelf());
+        },
+        dataReceiver: _loadContent);
   }
 
   Widget _buildEmptyFavoritesPage() => Container(
@@ -819,6 +863,7 @@ class TimeBasedLoadAdaptLayer<T> {
 
 typedef TimeBasedDataReceiver<T> = Future<List<T>?> Function(T? lastElement);
 
+/// The delegate to show the tab switch as a floating header.
 class ForumTabDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
@@ -858,5 +903,34 @@ class ForumTabDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
     return true;
+  }
+}
+
+/// A delegate class to control the body widget shown in the tab page.
+///
+/// When [TreeHoleSubpageState._postsType] is set to [PostsType.EXTERNAL_VIEW],
+/// the subpage will use the delegate as its content, rather than [PagedListView]
+/// built in the [TreeHoleSubpageState.build] method.
+///
+/// Also see:
+/// - [TreeHoleSubpageState]
+abstract class ListDelegate {
+  /// Same as a normal build() method. Return a widget to be shown in the page.
+  Widget build(BuildContext context);
+
+  /// Call when a refresh is triggered by user or by code.
+  /// You should do some time-consuming refresh work here.
+  Future<void> triggerRefresh();
+}
+
+class CourseListDelegate extends ListDelegate {
+  final GlobalKey<CourseListWidgetState> _key = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) => CourseListWidget(key: _key);
+
+  @override
+  Future<void> triggerRefresh() async {
+    await _key.currentState?.refresh();
   }
 }

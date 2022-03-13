@@ -33,6 +33,8 @@ class Constant {
   /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
 
+  static const SPECIAL_DIVISION_FOR_CURRICULUM = "评教";
+
   /// The Bmob verification keys.
   static const BMOB_APP_ID = "d651f7399053222e2b4d2575f7ca8ddb";
   static const BMOB_API_KEY = "bd9e3d90d593c053d4832c817b620890";

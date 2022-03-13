@@ -41,14 +41,9 @@ class FDUHoleProvider with ChangeNotifier {
   }
 
   /// The token used for session authentication.
-  String? _token;
-
-  String? get token => _token;
-
-  set token(String? value) {
-    _token = value;
-    // notifyListeners();
-  }
+  ///
+  /// Note: changing this will NOT trigger any notification.
+  String? token;
 
   /// Current user profile, stored as cache by the repository
   OTUser? _userInfo;
