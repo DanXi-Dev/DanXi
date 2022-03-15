@@ -409,5 +409,8 @@
   "search_by_text_tip": "搜索正文含「{searchKeyword}」的帖子",
   "search_by_pid_tip": "跳转到帖子「{pid}」",
   "search_by_floor_tip": "跳转到楼层「{floorId}」",
-  "search_by_tag_tip": "查看本分区含 Tag「{tag}」的帖子"
+  "search_by_tag_tip": "查看本分区含 Tag「{tag}」的帖子",
+  "tip_that_fduhole_is_not_fdu": "注意：FDUHole 账号并不是您的复旦邮箱或复旦 UIS 账号。\n如果您从「UIS 快捷注册/登录」来到这里，说明您已经注册过 FDUHole 了；\n如果您从「使用邮箱密码登录」来到这里，您可能还没有注册过，请从另一个选项注册账号。",
+  "our_email_is": "我们的邮箱是 {email} 。",
+  "send_email": "发送邮件"
 }

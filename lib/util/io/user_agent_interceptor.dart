@@ -16,10 +16,9 @@
  */
 import 'dart:io';
 
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
-
 class UserAgentInterceptor extends Interceptor {
   String? userAgent;
 
@@ -28,7 +27,7 @@ class UserAgentInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (!PlatformX.isWeb) {
-      userAgent ??= "DanXi/${pubspec.major}.${pubspec.minor}.${pubspec.patch}";
+      userAgent ??= "DanXi/${FlutterApp.versionName}";
       options.headers[HttpHeaders.userAgentHeader] = userAgent;
     }
     return handler.next(options);

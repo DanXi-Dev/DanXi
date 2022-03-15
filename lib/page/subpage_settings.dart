@@ -454,12 +454,11 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
           ExpansionTileX(
             leading: Icon(PlatformIcons(context).accountCircle),
             title: Text(S.of(context).forum),
-            subtitle: Text(
-                context.read<FDUHoleProvider>().isUserInitialized
+            subtitle: Text(context.read<FDUHoleProvider>().isUserInitialized
                 ? S.of(context).fduhole_user_id(
-                        (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
-                            .toString())
-                    : S.of(context).not_logged_in),
+                    (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
+                        .toString())
+                : S.of(context).not_logged_in),
             children: [
               if (context.read<FDUHoleProvider>().isUserInitialized) ...[
                 FutureWidget<OTUser?>(
@@ -902,13 +901,23 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     TextButton(
                       child: Text(S.of(context).contact_us),
                       onPressed: () async {
-                        final Email email = Email(
-                          body: '',
-                          subject: S.of(context).app_feedback,
-                          recipients: [S.of(context).feedback_email],
-                          isHTML: false,
-                        );
-                        await FlutterEmailSender.send(email);
+                        bool? sendEmail = await Noticing.showConfirmationDialog(
+                            context,
+                            S
+                                .of(context)
+                                .our_email_is(S.of(context).feedback_email),
+                            confirmText: S.of(context).send_email,
+                            cancelText: S.of(context).i_see,
+                            title: S.of(context).contact_us);
+                        if (sendEmail == true) {
+                          final Email email = Email(
+                            body: '',
+                            subject: S.of(context).app_feedback,
+                            recipients: [S.of(context).feedback_email],
+                            isHTML: false,
+                          );
+                          await FlutterEmailSender.send(email);
+                        }
                       },
                     ),
                     const SizedBox(width: 8),
