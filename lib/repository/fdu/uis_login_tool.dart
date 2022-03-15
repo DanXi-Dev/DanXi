@@ -18,6 +18,7 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
@@ -71,7 +72,8 @@ class UISLoginTool {
     //     sendTimeout: 5000);
     IndependentCookieJar workJar = IndependentCookieJar.createFrom(jar);
     workDio.interceptors.add(LimitedQueuedInterceptor.getInstance());
-    workDio.interceptors.add(UserAgentInterceptor());
+    workDio.interceptors.add(UserAgentInterceptor(
+        userAgent: SettingsProvider.getInstance().customUserAgent));
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
 

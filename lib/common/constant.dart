@@ -61,7 +61,7 @@ class Constant {
     "ca-app-pub-4420475240805528/4752425464",
   ];
 
-  /// A link to "forget password" page of FDUHole.
+  /// A link to the "forget password" page of FDUHole.
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://www.fduhole.com/#/forgetpassword";
 
