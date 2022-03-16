@@ -19,7 +19,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:catcher/catcher.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
@@ -72,18 +71,18 @@ import 'common/constant.dart';
 /// Do some initial work here.
 void main() {
   // Config [Catcher] to catch uncaught exceptions.
-  CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
-    ConsoleHandler()
-  ], localizationOptions: [
-    LocalizationOptions.buildDefaultEnglishOptions(),
-    LocalizationOptions.buildDefaultChineseOptions(),
-  ]);
-  CatcherOptions releaseOptions = CatcherOptions(SilentReportMode(), [
-    ConsoleHandler()
-  ], localizationOptions: [
-    LocalizationOptions.buildDefaultEnglishOptions(),
-    LocalizationOptions.buildDefaultChineseOptions(),
-  ]);
+  // CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
+  //   ConsoleHandler()
+  // ], localizationOptions: [
+  //   LocalizationOptions.buildDefaultEnglishOptions(),
+  //   LocalizationOptions.buildDefaultChineseOptions(),
+  // ]);
+  // CatcherOptions releaseOptions = CatcherOptions(SilentReportMode(), [
+  //   ConsoleHandler()
+  // ], localizationOptions: [
+  //   LocalizationOptions.buildDefaultEnglishOptions(),
+  //   LocalizationOptions.buildDefaultChineseOptions(),
+  // ]);
 
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();

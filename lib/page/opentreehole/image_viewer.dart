@@ -79,17 +79,14 @@ class ImageViewerPage extends StatefulWidget {
     return IMAGE_SUFFIX.any((element) => path.endsWith(element));
   }
 
-  static String getMineType(String? url) {
-    return 'image/png';
-
-    /*
-    if (!isImage(url)) return '';
+  static String getMineType(String url) {
+    if (!isImage(url)) return 'image/png';
     String path = Uri.parse(url).path.toLowerCase();
     return 'image/' +
         IMAGE_SUFFIX
             .firstWhere((element) => path.endsWith(element))
             .replaceFirst(RegExp(r"\\."), "")
-            .replaceFirst(RegExp("jpg"), "jpeg");*/
+            .replaceFirst(RegExp("jpg"), "jpeg");
   }
 }
 
@@ -136,7 +133,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     originalLoadFailError.clear();
   }
 
-  Future<void> shareImage() async {
+  Future<void> shareImage(BuildContext context) async {
     File image =
         await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isMobile) {
@@ -150,7 +147,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     }
   }
 
-  Future<void> saveImage() async {
+  static String? _guessExtensionNameFromUrl(String url) {
+    if (url.isEmpty || Uri.tryParse(url) == null) return null;
+    String? path = Uri.tryParse(url)?.path.toLowerCase();
+    if (path == null) return null;
+    return path.substring(path.lastIndexOf("."));
+  }
+
+  Future<void> saveImage(BuildContext context) async {
     File image =
         await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isAndroid) {
@@ -162,7 +166,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       }
     }
     if (PlatformX.isMobile) {
-      var result = await GallerySaver.saveImage(image.absolute.path);
+      // Attach an extension name for the picture file
+      File tempFileWithExtName = await image.copy(image.absolute.path +
+          (_guessExtensionNameFromUrl(_imageList[showIndex].hdUrl) ?? ""));
+      bool? result;
+      try {
+        result =
+            await GallerySaver.saveImage(tempFileWithExtName.absolute.path);
+      } catch (_) {}
       if (result != null && result) {
         Noticing.showNotice(context, S.of(context).image_save_success);
       } else {
@@ -220,14 +231,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                 icon: Icon(PlatformX.isMaterial(context)
                     ? Icons.share
                     : CupertinoIcons.square_arrow_up),
-                onPressed: shareImage,
+                onPressed: () => shareImage(context),
               ),
               // Not needed on iOS
               if (!PlatformX.isIOS)
                 PlatformIconButton(
                   padding: EdgeInsets.zero,
                   icon: const Icon(Icons.save),
-                  onPressed: saveImage,
+                  onPressed: () => saveImage(context),
                 )
             ]
           ],

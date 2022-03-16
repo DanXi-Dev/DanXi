@@ -27,7 +27,6 @@ dependencies:
   quick_actions: ^0.6.0+9
   qr_flutter: ^4.0.0
   provider: ^6.0.2
-  catcher: ^0.6.9
   event_bus: ^2.0.0
   flutter_platform_widgets: ^1.20.0
   share_plus: ^3.1.0

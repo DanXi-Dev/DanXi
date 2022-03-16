@@ -7,7 +7,6 @@
 #include "generated_plugin_registrant.h"
 
 #include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
-#include <catcher/catcher_plugin.h>
 #include <desktop_window/desktop_window_plugin.h>
 #include <flutter_js/flutter_js_plugin.h>
 #include <platform_device_id_windows/platform_device_id_windows_plugin.h>
@@ -17,8 +16,6 @@
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   BitsdojoWindowPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("BitsdojoWindowPlugin"));
-  CatcherPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("CatcherPlugin"));
   DesktopWindowPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DesktopWindowPlugin"));
   FlutterJsPluginRegisterWithRegistrar(
