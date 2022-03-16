@@ -273,7 +273,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                     _imageLoader != null &&
                     !nextPageLoading) {
                   _imageLoader?.call(context, ++lastIndex).then((value) {
-                    setState(() => _imageList.addAll(value!));
+                    if (value != null) setState(() => _imageList.addAll(value));
                   }, onError: (e, st) {}).whenComplete(() {
                     nextPageLoading = false;
                   });

@@ -40,7 +40,6 @@ class PlatformMasterDetailApp extends StatelessWidget {
       return WillPopScope(
           child: buildView(context),
           onWillPop: () async {
-            print("Will pop!");
             if (isTablet(context) &&
                 (detailNavigatorKey.currentState?.canPop() ?? false)) {
               detailNavigatorKey.currentState?.pop();
