@@ -440,7 +440,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               Constant.SPECIAL_DIVISION_FOR_CURRICULUM) {
             setState(() {
               _delegate = CourseListDelegate();
-              _postsType = PostsType.EXTERNAL_VIEW;
+              // _postsType = PostsType.EXTERNAL_VIEW;
             });
           } else {
             setState(() {
