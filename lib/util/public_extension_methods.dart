@@ -121,6 +121,11 @@ extension ListEx<T> on List<T>? {
     }
     return newList;
   }
+
+  T? get(int index, [T? defaultValue]) {
+    if (this != null && index >= 0 && index < this!.length) return this![index];
+    return defaultValue;
+  }
 }
 
 typedef FilterFunction<T> = bool Function(T element);
