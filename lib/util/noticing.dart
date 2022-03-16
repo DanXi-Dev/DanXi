@@ -201,16 +201,16 @@ class Noticing {
   }
 
   static showModalNotice(BuildContext context,
-      {String title = "", String message = ""}) async {
+      {String title = "", String message = "", bool selectable = false}) async {
     if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
     Widget content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
           child: ListTile(
               title: Text(title),
-              subtitle: Linkify(
-                text: message,
-              ))),
+              subtitle: selectable
+                  ? SelectableLinkify(text: message)
+                  : Linkify(text: message))),
     );
     Widget body;
     if (PlatformX.isCupertino(context)) {

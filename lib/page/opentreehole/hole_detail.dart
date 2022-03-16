@@ -663,7 +663,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               }
               Noticing.showModalNotice(context,
                   title: S.of(context).history_of(e.floor_id ?? "?"),
-                  message: content.toString());
+                  message: content.toString(),
+                  selectable: true);
             },
             child: Text(S.of(context).view_history),
             menuContext: menuContext,
