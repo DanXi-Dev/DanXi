@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.7+161';
+const String version = r'1.3.7+162';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,17 +55,16 @@ const int patch = 7;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'161'];
+const List<String> build = <String>[r'162'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1647694508;
+const int timestamp = 1647698919;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -99,13 +98,13 @@ const Map<String, Object> dependencies = <String, Object>{
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/singularity-s0/flutter_progress_dialog.git',
+      'url': r'https://github.com/singularity-s0/flutter_progress_dialog.git',
       'ref': r'master',
     },
   },
   'xiao_mi_push_plugin': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/w568w/FlutterXiaoMiPushPlugin.git',
+      'url': r'https://github.com/w568w/FlutterXiaoMiPushPlugin.git',
       'ref': r'master',
     },
   },
@@ -166,7 +165,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'js': r'^0.6.3',
   'add_2_calendar': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/singularity-s0/add_2_calendar.git',
+      'url': r'https://github.com/singularity-s0/add_2_calendar.git',
       'ref': r'master',
     },
   },
@@ -187,13 +186,13 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
   'device_info_plus': r'^3.2.1',
   'fluttertoast': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/ponnamkarthik/FlutterToast.git',
+      'url': r'https://github.com/ponnamkarthik/FlutterToast.git',
       'ref': r'master',
     },
   },
   'linkify': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/singularity-s0/linkify.git',
+      'url': r'https://github.com/singularity-s0/linkify.git',
       'ref': r'master',
     },
   },
