@@ -91,6 +91,9 @@ class WelcomeFeature extends Feature {
   }
 
   @override
+  bool get loadOnTap => false;
+
+  @override
   String get mainTitle =>
       S.of(context!).welcome(StateProvider.personInfo.value?.name ?? "?");
 

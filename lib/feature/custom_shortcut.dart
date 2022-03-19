@@ -32,6 +32,9 @@ class CustomShortcutFeature extends Feature {
   String? get mainTitle => title;
 
   @override
+  bool get loadOnTap => false;
+
+  @override
   String? get subTitle => link;
 
   @override

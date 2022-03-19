@@ -30,6 +30,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NextCourseFeature extends Feature {
+  @override
+  bool get loadOnTap => false;
+
   LiveCourseModel? _data;
   ConnectionStatus _status = ConnectionStatus.NONE;
 

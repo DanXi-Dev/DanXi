@@ -78,6 +78,9 @@ class FudanAAONoticesFeature extends Feature {
     }
   }
 
+  @override
+  bool get loadOnTap => false;
+
   void refreshData() {
     _status = ConnectionStatus.NONE;
     notifyUpdate();

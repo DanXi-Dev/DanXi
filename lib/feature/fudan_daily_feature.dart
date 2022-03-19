@@ -35,6 +35,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class FudanDailyFeature extends Feature {
+  @override
+  bool get loadOnTap => false;
+
   ConnectionStatus _status = ConnectionStatus.NONE;
 
   /// Whether user has ticked today.

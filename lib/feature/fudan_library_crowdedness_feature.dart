@@ -27,6 +27,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class FudanLibraryCrowdednessFeature extends Feature {
+  @override
+  bool get loadOnTap => false;
+
   /// The numbers of each library visitors at the moment.
   List<int?>? _libraryCrowdedness;
 
