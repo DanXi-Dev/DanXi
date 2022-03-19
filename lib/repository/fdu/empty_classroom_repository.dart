@@ -20,7 +20,6 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomRepository extends BaseRepositoryWithDio {
@@ -42,14 +41,9 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   ///
   /// Request [PersonInfo] for logging in, if necessary.
   Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
-      String? buildingName, DateTime? date) async {
-    // To accelerate the retrieval of RoomInfo,
-    // only execute logging in when necessary.
-    return Retrier.tryAsyncWithFix(
-        () => _getBuildingRoomInfo(areaName, buildingName, date!),
-        (exception) => UISLoginTool.fixByLoginUIS(
-            dio!, LOGIN_URL, cookieJar!, info, true));
-  }
+          String? buildingName, DateTime? date) =>
+      UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
+          () => _getBuildingRoomInfo(areaName, buildingName, date!));
 
   Future<List<RoomInfo>?> _getBuildingRoomInfo(
       String areaName, String? buildingName, DateTime date) async {

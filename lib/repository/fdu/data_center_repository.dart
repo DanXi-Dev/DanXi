@@ -114,10 +114,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
   Future<List<ExamScore>?> loadAllExamScore(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadAllExamScore(),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, LOGIN_URL, cookieJar!, info, () => _loadAllExamScore());
 
   Future<List<ExamScore>?> _loadAllExamScore() async {
     Response r = await dio!.get(SCORE_DETAIL_URL);
@@ -130,10 +128,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<CardDetailInfo>?> getCardDetailInfo(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(
-          () => _getCardDetailInfo(),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
 
   Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
     Response<String> r = await dio!.get(CARD_DETAIL_URL);

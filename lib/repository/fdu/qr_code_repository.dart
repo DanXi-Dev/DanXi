@@ -19,7 +19,6 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retrier.dart';
 
 class QRCodeRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
@@ -33,10 +32,8 @@ class QRCodeRepository extends BaseRepositoryWithDio {
 
   factory QRCodeRepository.getInstance() => _instance;
 
-  Future<String?> getQRCode(PersonInfo? info) async => Retrier.tryAsyncWithFix(
-      () => _getQRCode(),
-      (exception) =>
-          UISLoginTool.fixByLoginUIS(dio!, LOGIN_URL, cookieJar!, info, true));
+  Future<String?> getQRCode(PersonInfo? info) => UISLoginTool.tryAsyncWithAuth(
+      dio!, LOGIN_URL, cookieJar!, info, () => _getQRCode());
 
   Future<String?> _getQRCode() async {
     final res = await dio!.get(QR_URL);

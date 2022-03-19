@@ -20,7 +20,6 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 
 class FudanDormRepository extends BaseRepositoryWithDio {
@@ -37,10 +36,8 @@ class FudanDormRepository extends BaseRepositoryWithDio {
   factory FudanDormRepository.getInstance() => _instance;
 
   Future<ElectricityItem> loadElectricityInfo(PersonInfo? info) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadElectricityInfo(),
-        (exception) => UISLoginTool.fixByLoginUIS(
-            dio!, _LOGIN_URL, cookieJar!, info, true));
+    return UISLoginTool.tryAsyncWithAuth(
+        dio!, _LOGIN_URL, cookieJar!, info, () => _loadElectricityInfo());
   }
 
   Future<ElectricityItem> _loadElectricityInfo() async {

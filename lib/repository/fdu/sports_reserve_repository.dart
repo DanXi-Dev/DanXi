@@ -21,7 +21,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as DOM;
 import 'package:intl/intl.dart';
@@ -46,12 +45,14 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   factory SportsReserveRepository.getInstance() => _instance;
 
   Future<List<StadiumData>?> getStadiumFullList(PersonInfo info,
-          {DateTime? queryDate, SportsType? type, Campus? campus}) async =>
-      Retrier.tryAsyncWithFix(
+          {DateTime? queryDate, SportsType? type, Campus? campus}) =>
+      UISLoginTool.tryAsyncWithAuth(
+          dio!,
+          LOGIN_URL,
+          cookieJar!,
+          info,
           () => _getStadiumFullList(
-              queryDate: queryDate, type: type, campus: campus),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+              queryDate: queryDate, type: type, campus: campus));
 
   Future<int> _getStadiumPageNumber() async {
     Response rep = await dio!.get(STADIUM_LIST_NUMBER_URL);
@@ -95,11 +96,9 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   }
 
   Future<StadiumScheduleData?> getScheduleData(
-          PersonInfo info, StadiumData stadium, DateTime date) async =>
-      Retrier.tryAsyncWithFix(
-          () => _getScheduleData(stadium, date),
-              (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+          PersonInfo info, StadiumData stadium, DateTime date) =>
+      UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
+          () => _getScheduleData(stadium, date));
 
   Future<StadiumScheduleData?> _getScheduleData(
       StadiumData stadium, DateTime date) async {

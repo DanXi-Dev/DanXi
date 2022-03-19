@@ -23,7 +23,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -67,10 +66,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<Exam>?> loadExamListRemotely(PersonInfo? info,
           {String? semesterId}) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadExamList(semesterId: semesterId),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(dio!, EXAM_TABLE_LOGIN_URL, cookieJar!,
+          info, () => _loadExamList(semesterId: semesterId));
 
   Future<String?> get semesterIdFromCookie async =>
       (await cookieJar!.loadForRequest(Uri.parse(HOST)))
@@ -103,10 +100,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<ExamScore>?> loadExamScoreRemotely(PersonInfo? info,
           {String? semesterId}) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadExamScore(semesterId),
-              (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(dio!, EXAM_TABLE_LOGIN_URL, cookieJar!,
+          info, () => _loadExamScore(semesterId));
 
   Future<List<ExamScore>?> _loadExamScore([String? semesterId]) async {
     final Response r = await dio!.get(
@@ -121,10 +116,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<GPAListItem>?> loadGPARemotely(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadGPA(),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadGPA());
 
   Future<List<GPAListItem>?> _loadGPA() async {
     final Response r = await dio!
@@ -141,10 +134,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   ///
   /// Returns an unpacked list of [SemesterInfo].
   Future<List<SemesterInfo>?> loadSemesters(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadSemesters(),
-              (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters());
 
   Future<List<SemesterInfo>?> _loadSemesters() async {
     await dio!

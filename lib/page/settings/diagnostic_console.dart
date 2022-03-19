@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -194,6 +195,12 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
                   onPressed: () async {
                     await FlutterClipboard.copy(_console.toString());
                     Noticing.showMaterialNotice(context, "Copied.");
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Clear Cookies"),
+                  onPressed: () async {
+                    await BaseRepositoryWithDio.clearAllCookies();
                   },
                 ),
                 ChangeNotifierProvider.value(

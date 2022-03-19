@@ -20,10 +20,12 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/dio_log.dart';
@@ -34,13 +36,33 @@ class UISLoginTool {
   static const String WEAK_PASSWORD = "弱密码提示";
   static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
 
+  static Future<E> tryAsyncWithAuth<E>(
+          Dio dio,
+          String serviceUrl,
+          IndependentCookieJar jar,
+          PersonInfo? info,
+          Future<E> Function() function,
+          {int retryTimes = 1}) =>
+      Retrier.tryAsyncWithFix(() async {
+        await throwIfNotLogin(serviceUrl, jar);
+        return function();
+      }, (_) => UISLoginTool.fixByLoginUIS(dio, serviceUrl, jar, info, true),
+          retryTimes: retryTimes);
+
+  static Future<void> throwIfNotLogin(
+      String serviceUrl, IndependentCookieJar jar) async {
+    if ((await jar.loadForRequest(Uri.tryParse(serviceUrl)!)).isEmpty) {
+      throw NotLoginError("You have not logged in your UIS.");
+    }
+  }
+
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if having logged in, return null.
   static Future<void> fixByLoginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
-      [bool forceRelogin = false]) async {
-    await loginUIS(dio, serviceUrl, jar, info, forceRelogin);
+      [bool forceReLogin = false]) async {
+    await loginUIS(dio, serviceUrl, jar, info, forceReLogin);
   }
 
   /// Log in Fudan UIS system and return the response.
