@@ -58,13 +58,14 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'161'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1646654018;
+const int timestamp = 1647590596;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description = r'Maybe the best all-rounded service app for Fudan University students.';
+const String description =
+    r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -112,7 +113,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'quick_actions': r'^0.6.0+9',
   'qr_flutter': r'^4.0.0',
   'provider': r'^6.0.2',
-  'catcher': r'^0.6.9',
   'event_bus': r'^2.0.0',
   'flutter_platform_widgets': r'^1.20.0',
   'share_plus': r'^3.1.0',
@@ -170,6 +170,8 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'master',
     },
   },
+  'source_gen': r'^1.2.1',
+  'code_builder': r'^4.1.0',
 };
 
 /// Developer dependencies

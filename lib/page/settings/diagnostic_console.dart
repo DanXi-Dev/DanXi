@@ -18,12 +18,12 @@
 import 'dart:async';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -127,7 +127,7 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> diagnoseDanXi() async {
     _console.writeln(
-        "User Agent used by DanXi: ${context.read<SettingsProvider>().customUserAgent ?? "DanXi/${FlutterApp.versionName}"}");
+        "User Agent used by DanXi: ${context.read<SettingsProvider>().customUserAgent ?? Constant.DEFAULT_USER_AGENT}");
 
     _console.writeln("Everything we stored in the local device:");
     var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
