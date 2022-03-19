@@ -26,7 +26,9 @@ part 'extra.g.dart';
 class Extra {
   TimeTableExtra? timetable;
 
-  Extra(this.timetable);
+  String? userAgent;
+
+  Extra(this.timetable, this.userAgent);
 
   factory Extra.fromJson(Map<String, dynamic> json) => _$ExtraFromJson(json);
 

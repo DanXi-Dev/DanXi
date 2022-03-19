@@ -33,6 +33,8 @@ class StateProvider {
   static bool isForeground = true;
   static bool showingScreenshotWarning = false;
 
+  static String? onlineUserAgent;
+
   static void initialize(BuildContext context) {
     FDUHoleProvider provider = context.read<FDUHoleProvider>();
     provider.currentDivision = null;

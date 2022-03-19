@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'161'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1647590596;
+const int timestamp = 1647694508;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -170,8 +170,6 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'master',
     },
   },
-  'source_gen': r'^1.2.1',
-  'code_builder': r'^4.1.0',
 };
 
 /// Developer dependencies

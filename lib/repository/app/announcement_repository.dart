@@ -91,10 +91,17 @@ class AnnouncementRepository {
       .content!);
 
   TimeTableExtra? getStartDates() {
+    return getExtra()?.timetable;
+  }
+
+  String? getUserAgent() {
+    return getExtra()?.userAgent;
+  }
+
+  Extra? getExtra() {
     return Extra.fromJson(jsonDecode(_announcementCache!
-            .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
-            .content!))
-        .timetable;
+        .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
+        .content!));
   }
 
   UpdateInfo checkVersion() => UpdateInfo(

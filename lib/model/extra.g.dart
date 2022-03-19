@@ -10,10 +10,13 @@ Extra _$ExtraFromJson(Map<String, dynamic> json) => Extra(
       json['timetable'] == null
           ? null
           : TimeTableExtra.fromJson(json['timetable'] as Map<String, dynamic>),
+      json['userAgent'] as String?,
     );
 
-Map<String, dynamic> _$ExtraToJson(Extra instance) => <String, dynamic>{
+Map<String, dynamic> _$ExtraToJson(Extra instance) =>
+    <String, dynamic>{
       'timetable': instance.timetable,
+      'userAgent': instance.userAgent,
     };
 
 TimeTableExtra _$TimeTableExtraFromJson(Map<String, dynamic> json) =>

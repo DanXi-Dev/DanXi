@@ -227,6 +227,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _loadUpdate().then(
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
+      _loadUserAgent().catchError((ignored) {});
       _loadStartDate().catchError((ignored) {});
       _loadCelebration().catchError((ignored, st) {});
     }, onError: (e) {
@@ -678,6 +679,17 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       onPressed: () => Navigator.pop(context)),
                 ],
               ));
+    }
+  }
+
+  Future<void> _loadUserAgent() async {
+    String? userAgent;
+    try {
+      userAgent = AnnouncementRepository.getInstance().getUserAgent();
+    } catch (_) {}
+    if (userAgent != null) {
+      SettingsProvider.getInstance().customUserAgent =
+          StateProvider.onlineUserAgent = userAgent;
     }
   }
 
