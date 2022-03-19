@@ -37,6 +37,8 @@ abstract class Feature {
 
   bool get clickable => false;
 
+  bool get loadOnTap => true;
+
   Widget? get icon => null;
 
   String? get mainTitle;
