@@ -417,7 +417,18 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
-              await OTEditor.createNewPost(context, getDivisionId(context));
+              await OTEditor.createNewPost(context, getDivisionId(context),
+                  interceptor: (PostEditorText? text) async {
+            if (text?.tags.isEmpty ?? true) {
+              return await Noticing.showConfirmationDialog(
+                      context, S.of(context).post_has_no_tags,
+                      title: S.of(context).post_has_no_tags_title,
+                      confirmText: S.of(context).continue_sending,
+                      isConfirmDestructive: true) ??
+                  false;
+            }
+            return true;
+          });
           if (success) refreshList();
         }),
         hashCode);

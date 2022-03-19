@@ -44,14 +44,21 @@ import 'package:provider/provider.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
+typedef PostInterceptor = Future<bool> Function(PostEditorText? text);
+
 class OTEditor {
   static Future<bool> createNewPost(BuildContext context, int divisionId,
-      {OTEditorType? editorType}) async {
+      {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText? content = await _showEditor(
         context, S.of(context).new_post,
-        allowTags: true, editorType: editorType, object: object);
+        allowTags: true,
+        editorType: editorType,
+        object: object,
+        interceptor: interceptor);
+
     if (content?.text == null) return false;
+
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
@@ -152,7 +159,8 @@ class OTEditor {
       required OTEditorType? editorType,
       required EditorObject object,
       String placeholder = "",
-      bool hasTip = true}) async {
+      bool hasTip = true,
+      PostInterceptor? interceptor}) async {
     final String randomTip = await Constant.randomFDUHoleTip;
 
     switch (editorType ?? OTEditorType.PAGE) {
@@ -215,7 +223,8 @@ class OTEditor {
               "tags": allowTags,
               'object': object,
               'placeholder': placeholder,
-              'tip': randomTip
+              'tip': randomTip,
+              'interceptor': interceptor
             });
         return result;
     }
@@ -267,7 +276,6 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
-
   late ValueNotifier<String> previewText;
 
   @override
@@ -429,9 +437,12 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   late String _title;
   late String _placeholder;
 
+  PostInterceptor? _interceptor;
+
   @override
   void initState() {
     super.initState();
+
     _controller.addListener(() {
       context.read<FDUHoleProvider>().editorCache[_object]!.text =
           _controller.text;
@@ -446,6 +457,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   void didChangeDependencies() {
+    _interceptor = widget.arguments?['interceptor'];
     _tip = widget.arguments!['tip'];
     _supportTags = widget.arguments!['tags'] ?? false;
     _title =
@@ -515,9 +527,11 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   Future<void> _sendDocument(EditorObject? object) async {
     String text = _controller.text;
     if (text.isEmpty) return;
-    Navigator.pop<PostEditorText>(
-        context,
-        PostEditorText(
-            text, context.read<FDUHoleProvider>().editorCache[object]!.tags));
+    final editorText = PostEditorText(
+        text, context.read<FDUHoleProvider>().editorCache[object]!.tags);
+
+    if ((await _interceptor?.call(editorText)) ?? true) {
+      Navigator.pop<PostEditorText>(context, editorText);
+    }
   }
 }
