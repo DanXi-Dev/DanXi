@@ -17,11 +17,11 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
     git:
-      url: git://github.com/singularity-s0/flutter_progress_dialog.git
+      url: https://github.com/singularity-s0/flutter_progress_dialog.git
       ref: master
   xiao_mi_push_plugin:
     git:
-      url: git://github.com/w568w/FlutterXiaoMiPushPlugin.git
+      url: https://github.com/w568w/FlutterXiaoMiPushPlugin.git
       ref: master
   beautiful_soup_dart: ^0.2.0
   quick_actions: ^0.6.0+9
@@ -80,18 +80,18 @@ dependencies:
   js: ^0.6.3
   add_2_calendar:
     git:
-      url: git://github.com/singularity-s0/add_2_calendar.git
+      url: https://github.com/singularity-s0/add_2_calendar.git
       ref: master
 
 dependency_overrides:
   device_info_plus: ^3.2.1
   fluttertoast:
     git:
-      url: git://github.com/ponnamkarthik/FlutterToast.git
+      url: https://github.com/ponnamkarthik/FlutterToast.git
       ref: master
   linkify:
     git:
-      url: git://github.com/singularity-s0/linkify.git
+      url: https://github.com/singularity-s0/linkify.git
       ref: master
 
 dev_dependencies:

@@ -14,7 +14,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: e1c391b25e6a465690f1400cc656e2f5b5634589
-      url: "git://github.com/singularity-s0/add_2_calendar.git"
+      url: "https://github.com/singularity-s0/add_2_calendar.git"
     source: git
     version: "2.1.3"
   analyzer:
@@ -149,7 +149,7 @@ packages:
       name: build_runner
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.7"
+    version: "2.1.8"
   build_runner_core:
     dependency: transitive
     description:
@@ -408,7 +408,7 @@ packages:
       name: file_picker
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.5.0"
+    version: "4.5.1"
   fixnum:
     dependency: transitive
     description:
@@ -551,7 +551,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: b083aa29dec19a3b6c9efe318d145dede57d1705
-      url: "git://github.com/singularity-s0/flutter_progress_dialog.git"
+      url: "https://github.com/singularity-s0/flutter_progress_dialog.git"
     source: git
     version: "0.1.1"
   flutter_svg:
@@ -584,7 +584,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: "08fd963f495463ee19e4fd8de383ff1c52b9a019"
-      url: "git://github.com/ponnamkarthik/FlutterToast.git"
+      url: "https://github.com/ponnamkarthik/FlutterToast.git"
     source: git
     version: "8.0.9"
   frontend_server_client:
@@ -663,7 +663,7 @@ packages:
       name: image_picker
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.8.4+10"
+    version: "0.8.4+11"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -740,7 +740,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: ada15684ac89603681cec54bb07b05b191a05a1a
-      url: "git://github.com/singularity-s0/linkify.git"
+      url: "https://github.com/singularity-s0/linkify.git"
     source: git
     version: "4.0.0"
   lints:
@@ -763,7 +763,7 @@ packages:
       name: lunar
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.2.18"
+    version: "1.2.19"
   markdown:
     dependency: "direct main"
     description:
@@ -1155,14 +1155,14 @@ packages:
       name: share_plus_macos
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   share_plus_platform_interface:
     dependency: transitive
     description:
       name: share_plus_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.0"
   share_plus_web:
     dependency: transitive
     description:
@@ -1286,7 +1286,7 @@ packages:
       name: sqflite_common
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.2.0"
+    version: "2.2.1"
   stack_trace:
     dependency: transitive
     description:
@@ -1475,7 +1475,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: "6f3ab002930444e2f4a79ba6907f862c35d6f9ef"
-      url: "git://github.com/w568w/FlutterXiaoMiPushPlugin.git"
+      url: "https://github.com/w568w/FlutterXiaoMiPushPlugin.git"
     source: git
     version: "2.0.0"
   xml:
@@ -1493,5 +1493,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.15.0 <3.0.0"
+  dart: ">=2.16.0 <3.0.0"
   flutter: ">=2.10.0"
