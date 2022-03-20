@@ -119,8 +119,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/mzdm/beautiful_soup"),
     LicenseItem("build_runner", LICENSE_BSD,
         "https://github.com/dart-lang/build/tree/master/build_runner"),
-    LicenseItem(
-        "catcher", LICENSE_APACHE_2_0, "https://github.com/jhomlala/catcher"),
     LicenseItem("clipboard", LICENSE_BSD,
         "https://github.com/samuelezedi/flutter_clipboard"),
     LicenseItem("cupertino_icons", LICENSE_MIT,
@@ -205,7 +203,22 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("screen_brightness", LICENSE_MIT,
         "https://github.com/aaassseee/screen_brightness"),
     LicenseItem("uuid", LICENSE_MIT, "https://github.com/Daegalus/dart-uuid"),
-    LicenseItem("lunar", LICENSE_MIT, "https://github.com/6tail/lunar-flutter")
+    LicenseItem("lunar", LICENSE_MIT, "https://github.com/6tail/lunar-flutter"),
+    LicenseItem("animated_text_kit", LICENSE_MIT,
+        "https://github.com/aagarwal1012/Animated-Text-Kit"),
+    LicenseItem("flutter_fgbg", LICENSE_MIT,
+        "https://github.com/ajinasokan/flutter_fgbg"),
+    LicenseItem("lazy_load_indexed_stack", LICENSE_MIT,
+        "https://github.com/okaryo/lazy_load_indexed_stack"),
+    LicenseItem("screen_capture_event", LICENSE_MIT,
+        "https://github.com/nizwar/screen_capture_event"),
+    LicenseItem("otp", LICENSE_MIT, "https://github.com/Daegalus/dart-otp"),
+    LicenseItem(
+        "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
+    LicenseItem("add_2_calendar", LICENSE_MIT,
+        "https://github.com/singularity-s0/add_2_calendar"),
+    LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
   ];
   BannerAd? myBanner;
 
