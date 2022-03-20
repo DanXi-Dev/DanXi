@@ -507,7 +507,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildPageBody(context),
+            builder: (context) => _buildPageBody(context, false),
           ),
         );
       case PostsType.FILTER_BY_TAG:
@@ -520,16 +520,16 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildPageBody(context),
+            builder: (context) => _buildPageBody(context, false),
           ),
         );
       case PostsType.NORMAL_POSTS:
       case PostsType.EXTERNAL_VIEW:
-        return _buildPageBody(context);
+      return _buildPageBody(context, true);
     }
   }
 
-  Widget _buildPageBody(BuildContext context) {
+  Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Material(
       child: Container(
@@ -563,19 +563,22 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               if (_postsType == PostsType.EXTERNAL_VIEW) {
                 return _delegate!.build(context);
               } else {
-                return _buildOTListView(context);
+                return _buildOTListView(context,
+                    padding: buildTabBar ? EdgeInsets.zero : null);
               }
             }),
             // Add a header for the scroll view
             headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) => <Widget>[
-              SliverSafeArea(
-                bottom: false,
-                sliver: SliverPersistentHeader(
-                    delegate: ForumTabDelegate(),
-                    pinned: false,
-                    floating: false),
-              )
+                (BuildContext context, bool innerBoxIsScrolled) =>
+                <Widget>[
+              if (buildTabBar)
+                SliverSafeArea(
+                  bottom: false,
+                  sliver: SliverPersistentHeader(
+                      delegate: ForumTabDelegate(),
+                      pinned: false,
+                      floating: true),
+                )
             ],
           ),
         ),
@@ -583,7 +586,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     );
   }
 
-  Widget _buildOTListView(BuildContext context) {
+  Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) {
     return PagedListView<OTHole>(
         noneItem: OTHole.DUMMY_POST,
         pagedController: listViewController,
@@ -591,7 +594,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         scrollController: PrimaryScrollController.of(context),
         startPage: 1,
         // Avoiding extra padding from ListView. We have added it in [SliverSafeArea].
-        padding: EdgeInsets.zero,
+        padding: padding,
         builder: _buildListItem,
         headBuilder: (context) => Column(
               children: [
@@ -891,14 +894,17 @@ class ForumTabDelegate extends SliverPersistentHeaderDelegate {
           if (value) {
             return Row(
               children: [
-                PlatformIconButton(
-                  padding: Theme.of(context).cardTheme.margin?.resolve(null) ??
-                      const EdgeInsets.all(8.0),
-                  icon: Icon(PlatformIcons(context).search),
-                  onPressed: () {
-                    smartNavigatorPush(context, '/bbs/search',
-                        forcePushOnMainNavigator: true);
-                  },
+                Padding(
+                  padding: PlatformX.isMaterial(context)
+                      ? const EdgeInsets.all(8.0)
+                      : EdgeInsets.zero,
+                  child: PlatformIconButton(
+                    icon: Icon(PlatformIcons(context).search),
+                    onPressed: () {
+                      smartNavigatorPush(context, '/bbs/search',
+                          forcePushOnMainNavigator: true);
+                    },
+                  ),
                 ),
                 const OTTitle()
               ],
