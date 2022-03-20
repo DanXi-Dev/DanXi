@@ -196,6 +196,7 @@ class Constant {
       return ThemeData(
         brightness: Brightness.light,
         colorScheme: const ColorScheme.light().copyWith(
+            tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF)),
         toggleableActiveColor: const Color(0xFF007AFF),
@@ -232,6 +233,7 @@ class Constant {
       return ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark().copyWith(
+            tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF)),
         indicatorColor: const Color(0xFF007AFF),
