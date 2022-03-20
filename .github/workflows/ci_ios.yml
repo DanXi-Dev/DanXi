@@ -51,6 +51,9 @@ jobs:
         run: |
           git add .
           git commit -m "[GitHub Action] Bump Build Number"
+      
+      - name: Push Build Number Update
+        run: git push origin main
 
       - name: Import Keys
         run: |
@@ -84,7 +87,3 @@ jobs:
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
-          
-        
-      - name: Push Build Number Update
-        run: git push origin main
