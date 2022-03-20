@@ -560,7 +560,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             floatHeaderSlivers: true,
             // Use a [Builder] to force the [PagedListView] use the scrollController provided by [NestedScrollView].
             body: Builder(builder: (context) {
-              //
               if (_postsType == PostsType.EXTERNAL_VIEW) {
                 return _delegate!.build(context);
               } else {
@@ -570,8 +569,13 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             // Add a header for the scroll view
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) => <Widget>[
-              SliverPersistentHeader(
-                  delegate: ForumTabDelegate(), pinned: false, floating: true)
+              SliverSafeArea(
+                bottom: false,
+                sliver: SliverPersistentHeader(
+                    delegate: ForumTabDelegate(),
+                    pinned: false,
+                    floating: false),
+              )
             ],
           ),
         ),
@@ -586,6 +590,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         withScrollbar: true,
         scrollController: PrimaryScrollController.of(context),
         startPage: 1,
+        // Avoiding extra padding from ListView. We have added it in [SliverSafeArea].
+        padding: EdgeInsets.zero,
         builder: _buildListItem,
         headBuilder: (context) => Column(
               children: [
@@ -885,16 +891,14 @@ class ForumTabDelegate extends SliverPersistentHeaderDelegate {
           if (value) {
             return Row(
               children: [
-                Padding(
-                  padding: Theme.of(context).cardTheme.margin ??
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                  child: PlatformIconButton(
-                    icon: Icon(PlatformIcons(context).search),
-                    onPressed: () {
-                      smartNavigatorPush(context, '/bbs/search',
-                          forcePushOnMainNavigator: true);
-                    },
-                  ),
+                PlatformIconButton(
+                  padding: Theme.of(context).cardTheme.margin?.resolve(null) ??
+                      const EdgeInsets.all(8.0),
+                  icon: Icon(PlatformIcons(context).search),
+                  onPressed: () {
+                    smartNavigatorPush(context, '/bbs/search',
+                        forcePushOnMainNavigator: true);
+                  },
                 ),
                 const OTTitle()
               ],

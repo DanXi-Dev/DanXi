@@ -91,6 +91,8 @@ class PagedListView<T> extends StatefulWidget {
   /// Will be executed only once
   final bool? shouldScrollToEnd;
 
+  final EdgeInsets? padding;
+
   const PagedListView(
       {Key? key,
       this.pagedController,
@@ -107,7 +109,8 @@ class PagedListView<T> extends StatefulWidget {
       this.allDataReceiver,
       this.shouldScrollToEnd,
       this.noneItem,
-      this.fatalErrorBuilder})
+      this.fatalErrorBuilder,
+      this.padding})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         assert(dataReceiver != null || allDataReceiver != null),
         super(key: key);
@@ -280,6 +283,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       _shouldLoad = false;
       return ListView(
         //clipBehavior: Clip.none,
+        padding: widget.padding,
         key: _scrollKey,
         controller: widget.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
@@ -299,6 +303,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         (_hasHeadWidget ? 1 : 0);
     return ListView.builder(
       key: _scrollKey,
+      padding: widget.padding,
       controller: widget.scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
