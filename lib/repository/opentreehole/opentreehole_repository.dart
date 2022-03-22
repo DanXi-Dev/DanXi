@@ -367,8 +367,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<String?> uploadImage(File file) async {
-    final RegExp tokenReg =
-        RegExp(r'PF\.obj\.config\.authprovider.token = "(\w+)"');
+    final RegExp tokenReg = RegExp(r'PF\.obj\.config\.auth_token = "(\w+)"');
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
     Response<String> r = await dio!.get(_IMAGE_BASE_URL + "/upload");
@@ -378,7 +377,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             data: FormData.fromMap({
               "type": "file",
               "action": "upload",
-              "authprovider.token": token!,
+              "auth_token": token!,
               "source": await MultipartFile.fromFile(path, filename: fileName)
             }),
             options: Options(headers: _tokenHeader))
