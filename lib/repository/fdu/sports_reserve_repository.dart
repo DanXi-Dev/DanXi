@@ -22,7 +22,7 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as DOM;
+import 'package:html/dom.dart' as dom;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +36,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
 
   static sStadiumDetailUrl(String? contentId, DateTime queryDate) =>
       "https://elife.fudan.edu.cn/public/front/getResource2.htm?contentId=$contentId&ordersId=&"
-      "currentDate=${DateFormat('yyyy-MM-dd').format(queryDate)}";
+          "currentDate=${DateFormat('yyyy-MM-dd').format(queryDate)}";
 
   SportsReserveRepository._();
 
@@ -45,23 +45,22 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   factory SportsReserveRepository.getInstance() => _instance;
 
   Future<List<StadiumData>?> getStadiumFullList(PersonInfo info,
-          {DateTime? queryDate, SportsType? type, Campus? campus}) =>
+      {DateTime? queryDate, SportsType? type, Campus? campus}) =>
       UISLoginTool.tryAsyncWithAuth(
           dio!,
           LOGIN_URL,
           cookieJar!,
           info,
-          () => _getStadiumFullList(
+              () => _getStadiumFullList(
               queryDate: queryDate, type: type, campus: campus));
 
   Future<int> _getStadiumPageNumber() async {
-    Response rep = await dio!.get(STADIUM_LIST_NUMBER_URL);
-    String pageNumber = rep.data.toString().between('页次:1/', '页')!;
+    Response<String> rep = await dio!.get(STADIUM_LIST_NUMBER_URL);
+    String pageNumber = rep.data!.between('页次:1/', '页')!;
     return int.parse(pageNumber);
   }
 
-  Future<List<StadiumData>?> _getStadiumFullList(
-      {DateTime? queryDate, SportsType? type, Campus? campus}) async {
+  Future<List<StadiumData>?> _getStadiumFullList({DateTime? queryDate, SportsType? type, Campus? campus}) async {
     var result = <StadiumData>[];
     int pages = await _getStadiumPageNumber();
     for (int i = 1; i <= pages; i++) {
@@ -71,11 +70,10 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
     return result;
   }
 
-  Future<List<StadiumData>?> _getStadiumList(
-      {DateTime? queryDate,
-      SportsType? type,
-      Campus? campus,
-      int page = 1}) async {
+  Future<List<StadiumData>?> _getStadiumList({DateTime? queryDate,
+    SportsType? type,
+    Campus? campus,
+    int page = 1}) async {
     String body = "id=2c9c486e4f821a19014f82381feb0001&"
         "resourceDate=${queryDate == null ? '' : DateFormat('yyyy-MM-dd').format(queryDate)}&"
         "beginTime=&"
@@ -85,25 +83,24 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
         "fieldID=2c9c486e4f821a19014f824535480007&"
         "dicID=${type?.id ?? ''}&"
         "pageBean.pageNo=$page";
-    Response res = await dio!.post(STADIUM_LIST_URL,
+    Response<String> res = await dio!.post(STADIUM_LIST_URL,
         data: body,
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    BeautifulSoup soup = BeautifulSoup(res.data.toString());
-    Iterable<DOM.Element> elements =
+    BeautifulSoup soup = BeautifulSoup(res.data!);
+    Iterable<dom.Element> elements =
         soup.findAll('.order_list > table').map((e) => e.element!);
 
     return elements.map((e) => StadiumData.fromHtml(e)).toList();
   }
 
-  Future<StadiumScheduleData?> getScheduleData(
-          PersonInfo info, StadiumData stadium, DateTime date) =>
+  Future<StadiumScheduleData?> getScheduleData(PersonInfo info, StadiumData stadium, DateTime date) =>
       UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
-          () => _getScheduleData(stadium, date));
+              () => _getScheduleData(stadium, date));
 
-  Future<StadiumScheduleData?> _getScheduleData(
-      StadiumData stadium, DateTime date) async {
-    Response res = await dio!.get(sStadiumDetailUrl(stadium.contentId, date));
-    BeautifulSoup soup = BeautifulSoup(res.data.toString());
+  Future<StadiumScheduleData?> _getScheduleData(StadiumData stadium, DateTime date) async {
+    Response<String> res =
+        await dio!.get(sStadiumDetailUrl(stadium.contentId, date));
+    BeautifulSoup soup = BeautifulSoup(res.data!);
     List<Bs4Element> listOfSchedule = soup
         .findAll("table", class_: "site_table")
         .first
@@ -130,7 +127,7 @@ class StadiumData {
     return 'StadiumData{name: $name, area: $area, type: $type, info: $info, contentId: $contentId}';
   }
 
-  factory StadiumData.fromHtml(DOM.Element element) {
+  factory StadiumData.fromHtml(dom.Element element) {
     var tableItems = element
         .querySelector('td[valign=top]:not([align])')!
         .querySelectorAll('tr');
@@ -177,7 +174,7 @@ class StadiumScheduleData {
   }
 
   factory StadiumScheduleData.fromHtmlPart(
-          StadiumData stadium, DateTime date, List<DOM.Element> elements) =>
+          StadiumData stadium, DateTime date, List<dom.Element> elements) =>
       StadiumScheduleData(
           stadium,
           elements.map((e) {
@@ -206,28 +203,28 @@ class StadiumScheduleItem {
 
   StadiumScheduleItem(this.startTime, this.endTime, this.reserved, this.total);
 }
-
+// ignore_for_file: non_constant_identifier_names
 class SportsType {
   final String id;
   final Create<String?> name;
   static final SportsType BADMINTON =
-      SportsType._('2c9c486e4f821a19014f824823c5000c', (context) => null);
+  SportsType._('2c9c486e4f821a19014f824823c5000c', (context) => null);
   static final SportsType TENNIS =
-      SportsType._('2c9c486e4f821a19014f824823c5000d', (context) => null);
+  SportsType._('2c9c486e4f821a19014f824823c5000d', (context) => null);
   static final SportsType SOCCER =
-      SportsType._('2c9c486e4f821a19014f824823c5000e', (context) => null);
+  SportsType._('2c9c486e4f821a19014f824823c5000e', (context) => null);
   static final SportsType BASKETBALL =
-      SportsType._('2c9c486e4f821a19014f824823c5000f', (context) => null);
+  SportsType._('2c9c486e4f821a19014f824823c5000f', (context) => null);
   static final SportsType VOLLEYBALL =
-      SportsType._('2c9c486e4f821a19014f824823c50010', (context) => null);
+  SportsType._('2c9c486e4f821a19014f824823c50010', (context) => null);
   static final SportsType BALLROOM =
-      SportsType._('2c9c486e4f821a19014f824823c50011', (context) => null);
+  SportsType._('2c9c486e4f821a19014f824823c50011', (context) => null);
   static final SportsType GYM =
-      SportsType._('8aecc6ce66851ffa0166d77ef48a60e6', (context) => null);
+  SportsType._('8aecc6ce66851ffa0166d77ef48a60e6', (context) => null);
   static final SportsType BATHROOM =
-      SportsType._('8aecc6ce7176eb1801719b4ab80c4d73', (context) => null);
+  SportsType._('8aecc6ce7176eb1801719b4ab80c4d73', (context) => null);
   static final SportsType PLAYGROUND =
-      SportsType._('8aecc6ce7176eb18017207d74e1a4ef5', (context) => null);
+  SportsType._('8aecc6ce7176eb18017207d74e1a4ef5', (context) => null);
 
   static SportsType? fromLiterateName(String name) {
     switch (name) {

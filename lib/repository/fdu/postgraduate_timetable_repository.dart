@@ -77,7 +77,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   Future<void> _login(PersonInfo ug, OnCaptchaCallback callback) async {
     String yzmToken = await _loadToken();
     String yzm = await callback(GET_CAPTCHA_URL + yzmToken);
-    await _requestLogin(ug.id!, await encryptDES(ug.password!), yzm, yzmToken);
+    await _requestLogin(ug.id!, encryptDES(ug.password!), yzm, yzmToken);
   }
 
   Future<TimeTable?> loadTimeTableRemotely(

@@ -49,10 +49,10 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
   Future<List<BusScheduleItem>?> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];
-    Response r = await dio!.post(_INFO_URL,
+    Response<String> r = await dio!.post(_INFO_URL,
         data: FormData.fromMap(
             {"holiday": holiday.toRequestParamStringRepresentation()}));
-    Map json = r.data is Map ? r.data : jsonDecode(r.data.toString());
+    Map<String, dynamic> json = jsonDecode(r.data!);
     json['d']['data'].forEach((route) {
       if (route['lists'] is List) {
         items.addAll((route['lists'] as List)
@@ -80,18 +80,20 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
   BusScheduleItem(this.id, this.start, this.end, this.startTime, this.endTime,
       this.direction, this.holidayRun);
 
-  factory BusScheduleItem.fromRawJson(Map json) => BusScheduleItem(
-      json['id'],
-      CampusEx.fromChineseName(json['start']),
-      CampusEx.fromChineseName(json['end']),
-      (json['stime'] as String).isNotEmpty
-          ? VagueTime.onlyMMSS(json['stime'])
-          : null,
-      (json['etime'] as String).isNotEmpty
-          ? VagueTime.onlyMMSS(json['etime'])
-          : null,
-      BusDirection.values[int.parse(json['arrow'])],
-      int.parse(json['holiday']) != 0);
+  factory BusScheduleItem.fromRawJson(
+          Map<String, dynamic> json) =>
+      BusScheduleItem(
+          json['id'],
+          CampusEx.fromChineseName(json['start']),
+          CampusEx.fromChineseName(json['end']),
+          (json['stime'] as String).isNotEmpty
+              ? VagueTime.onlyMMSS(json['stime'])
+              : null,
+          (json['etime'] as String).isNotEmpty
+              ? VagueTime.onlyMMSS(json['etime'])
+              : null,
+          BusDirection.values[int.parse(json['arrow'])],
+          int.parse(json['holiday']) != 0);
 
   @override
   int compareTo(BusScheduleItem other) =>
@@ -136,7 +138,6 @@ extension BusDirectionExtension on BusDirection {
 extension VagueTimeExtension on VagueTime {
   String toDisplayFormat() {
     final format = NumberFormat("00");
-    //if (this == null) return ""; Can't be null
     return "${format.format(hour)}:${format.format(minute)}";
   }
 }

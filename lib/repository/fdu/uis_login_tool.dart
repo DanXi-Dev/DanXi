@@ -68,13 +68,14 @@ class UISLoginTool {
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if it has logged in or it's logging in, return null.
-  static Future<Response?> loginUIS(
+  static Future<Response<dynamic>?> loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     if (dio.interceptors.requestLock.locked) return null;
     dio.interceptors.requestLock.lock();
-    Response? result = await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
-        .whenComplete(() {
+    Response<dynamic>? result =
+        await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
+            .whenComplete(() {
       if (dio.interceptors.requestLock.locked) {
         dio.interceptors.requestLock.unlock();
       }
@@ -82,7 +83,7 @@ class UISLoginTool {
     return result;
   }
 
-  static Future<Response?> _loginUIS(
+  static Future<Response<dynamic>?> _loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
@@ -102,7 +103,7 @@ class UISLoginTool {
     // If we has logged in, return null.
     if (!forceRelogin &&
         (await workJar.loadForRequest(Uri.tryParse(serviceUrl)!)).isNotEmpty) {
-      Response res = await workDio.head(serviceUrl,
+      Response<dynamic> res = await workDio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
       if (res.statusCode == 302 &&
           !res.headers.map.containsKey('set-cookie') &&
@@ -114,8 +115,8 @@ class UISLoginTool {
     // Remove old cookies.
     workJar.deleteAll();
     Map<String?, String?> data = {};
-    Response res = await workDio.get(serviceUrl);
-    BeautifulSoup(res.data.toString()).findAll("input").forEach((element) {
+    Response<String> res = await workDio.get(serviceUrl);
+    BeautifulSoup(res.data!).findAll("input").forEach((element) {
       if (element.attributes['type'] != "button") {
         data[element.attributes['name']] = element.attributes['value'];
       }
@@ -125,7 +126,8 @@ class UISLoginTool {
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    final Response response = await DioUtils.processRedirect(workDio, res);
+    final Response<dynamic> response =
+        await DioUtils.processRedirect(workDio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       CredentialsInvalidException().fire();
       throw CredentialsInvalidException();

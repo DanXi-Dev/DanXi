@@ -43,8 +43,8 @@ class FudanAAORepository extends BaseRepositoryWithDio {
 
   Future<List<Notice>?> _getNotices(String type, int page) async {
     List<Notice> notices = [];
-    Response response = await dio!.get(_listUrl(type, page));
-    if (response.data.toString().contains("Under Maintenance")) {
+    Response<String> response = await dio!.get(_listUrl(type, page));
+    if (response.data?.contains("Under Maintenance") ?? false) {
       throw NotConnectedToLANError();
     }
     BeautifulSoup soup = BeautifulSoup(response.data.toString());

@@ -48,8 +48,8 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
     });
     final List<ExerciseItem> items = [];
-    final Response r = await dio!.get(_INFO_URL + "?token=" + token);
-    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final Response<String> r = await dio!.get(_INFO_URL + "?token=" + token);
+    final BeautifulSoup soup = BeautifulSoup(r.data!);
     final Iterable<dom.Element> tableLines = soup
         .findAll(
             "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")

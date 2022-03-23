@@ -156,10 +156,6 @@ class WelcomeFeature extends Feature {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           status,
-          /*if (_infoText.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(_infoText, textScaleFactor: 0.8)
-          ]*/
           const SizedBox(height: 2),
           Text(S.of(context!).entry_permission, textScaleFactor: 0.8)
         ],

@@ -97,10 +97,12 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   bool isRefreshQueued = false;
 
   BannerAd? bannerAd;
+  late NotificationProvider _notificationProvider;
 
   @override
   void initState() {
     super.initState();
+    _notificationProvider = context.read<NotificationProvider>();
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshHomepageEvent>().listen((event) {
           if (event.queueRefresh) {
@@ -121,22 +123,12 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   void checkConnection() {
     FudanLibraryRepository.getInstance().checkConnection().then((connected) {
       if (connected) {
-        context
-            .read<NotificationProvider>()
-            .removeNotification(LanConnectionNotification());
+        _notificationProvider.removeNotification(LanConnectionNotification());
       } else {
-        context
-            .read<NotificationProvider>()
-            .addNotification(LanConnectionNotification());
+        _notificationProvider.addNotification(LanConnectionNotification());
       }
     });
   }
-
-  // @override
-  // void didUpdateWidget(HomeSubpage oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   //_rebuildFeatures();
-  // }
 
   /// This function refreshes the content of Dashboard.
   ///

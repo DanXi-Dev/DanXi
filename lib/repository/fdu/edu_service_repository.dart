@@ -82,7 +82,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       cookieJar?.saveFromResponse(
           Uri.parse(HOST), [Cookie("semester.id", semesterId)]);
     }
-    final Response r = await dio!
+    final Response<String> r = await dio!
         .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
 
     // Restore old semester id
@@ -90,7 +90,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       cookieJar?.saveFromResponse(
           Uri.parse(HOST), [Cookie("semester.id", oldSemesterId)]);
     }
-    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final BeautifulSoup soup = BeautifulSoup(r.data!);
     final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
@@ -104,10 +104,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           info, () => _loadExamScore(semesterId));
 
   Future<List<ExamScore>?> _loadExamScore([String? semesterId]) async {
-    final Response r = await dio!.get(
+    final Response<String> r = await dio!.get(
         kExamScoreUrl(semesterId ?? await semesterIdFromCookie),
         options: Options(headers: Map.of(_JWFW_HEADER)));
-    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final BeautifulSoup soup = BeautifulSoup(r.data!);
     final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
@@ -120,9 +120,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           dio!, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadGPA());
 
   Future<List<GPAListItem>?> _loadGPA() async {
-    final Response r = await dio!
+    final Response<String> r = await dio!
         .get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
-    final BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    final BeautifulSoup soup = BeautifulSoup(r.data!);
     final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
@@ -140,14 +140,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<SemesterInfo>?> _loadSemesters() async {
     await dio!
         .get(EXAM_TABLE_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Response semesterResponse = await dio!.post(SEMESTER_DATA_URL,
+    final Response<String> semesterResponse = await dio!.post(SEMESTER_DATA_URL,
         data: "dataType=semesterCalendar&empty=false",
         options: Options(contentType: 'application/x-www-form-urlencoded'));
-    final BeautifulSoup soup = BeautifulSoup(semesterResponse.data.toString());
+    final BeautifulSoup soup = BeautifulSoup(semesterResponse.data!);
 
     final jsonText = _normalizeJson(soup.getText().trim());
     final json = jsonDecode(jsonText);
-    final Map semesters = json['semesters'];
+    final Map<String, dynamic> semesters = json['semesters'];
     List<SemesterInfo> sems = [];
     for (var element in semesters.values) {
       if (element is List && element.isNotEmpty) {
@@ -203,7 +203,7 @@ class SemesterInfo {
   // 			"schoolYear": "1994-1995",
   // 			"name": "1"
   // 		}
-  factory SemesterInfo.fromJson(Map json) {
+  factory SemesterInfo.fromJson(Map<String, dynamic> json) {
     return SemesterInfo(json['id'], json['schoolYear'], json['name']);
   }
 }

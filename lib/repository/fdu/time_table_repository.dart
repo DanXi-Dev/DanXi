@@ -81,9 +81,9 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       }
     }
 
-    Response idPage = await dio!.get(ID_URL);
-    String? termId = _getIds(idPage.data.toString());
-    Response tablePage = await dio!.post(TIME_TABLE_URL,
+    Response<String> idPage = await dio!.get(ID_URL);
+    String? termId = _getIds(idPage.data!);
+    Response<String> tablePage = await dio!.post(TIME_TABLE_URL,
         data: {
           "ignoreHead": "1",
           "setting.kind": "std",
@@ -97,7 +97,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
             Constant.DEFAULT_SEMESTER_START_DATE,
-        tablePage.data.toString());
+        tablePage.data!);
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo? info,
