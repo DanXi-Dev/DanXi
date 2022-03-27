@@ -114,14 +114,12 @@ class WelcomeFeature extends Feature {
   @override
   Widget get trailing {
     Widget status;
-    String _infoText;
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
         status = ScaleTransform(
             scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
             child: PlatformCircularProgressIndicator());
-        _infoText = "";
         break;
       case ConnectionStatus.DONE:
         if (_cardInfos?.any((element) => !element.permission.contains("是")) ??
@@ -132,7 +130,6 @@ class WelcomeFeature extends Feature {
                 : CupertinoIcons.xmark_circle,
             color: Theme.of(context!).errorColor,
           );
-          _infoText = S.of(context!).abnormal_entry_permission;
         } else {
           status = Icon(
             PlatformX.isMaterial(context!)
@@ -140,13 +137,11 @@ class WelcomeFeature extends Feature {
                 : CupertinoIcons.checkmark_alt_circle,
             color: Colors.green,
           );
-          _infoText = S.of(context!).everything_is_ok;
         }
         break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         status = const Icon(Icons.error);
-        _infoText = S.of(context!).failed;
         break;
     }
 
