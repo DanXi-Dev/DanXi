@@ -67,34 +67,22 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   const TimetableSubPage({Key? key}) : super(key: key);
 
   @override
-  Create<Widget> get title =>
-          (cxt) =>
-          Text(S
-              .of(cxt)
-              .timetable);
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).timetable);
 
   @override
-  Create<List<AppBarButtonItem>> get trailing =>
-          (cxt) =>
-      [
+  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
-          S
-              .of(cxt)
-              .share,
+          S.of(cxt).share,
           Icon(PlatformX.isMaterial(cxt)
               ? Icons.share
               : CupertinoIcons.square_arrow_up),
-              () => ShareTimetableEvent().fire(),
+          () => ShareTimetableEvent().fire(),
         ),
       ];
 
   @override
-  Create<List<AppBarButtonItem>> get leading =>
-          (cxt) =>
-      [
-        AppBarButtonItem(S
-            .of(cxt)
-            .select_semester, SemesterSelectionButton(
+  Create<List<AppBarButtonItem>> get leading => (cxt) => [
+        AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
           onSelectionUpdate: () {
             timetablePageKey.currentState?.indicatorKey.currentState?.show();
           },
@@ -106,7 +94,7 @@ class ShareTimetableEvent {}
 
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
-  StateStreamListener();
+      StateStreamListener();
 
   /// A map of all converters.
   ///
@@ -126,7 +114,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   BannerAd? bannerAd;
 
   final GlobalKey<RefreshIndicatorState> indicatorKey =
-  GlobalKey<RefreshIndicatorState>();
+      GlobalKey<RefreshIndicatorState>();
 
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup)) {
@@ -140,34 +128,29 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value!, (imageUrl) async {
-              TextEditingController controller = TextEditingController();
-              // TODO: dispose
-              await showPlatformDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (cxt) =>
-                      PlatformAlertDialog(
-                        title: Text(S
-                            .of(context)
-                            .enter_captcha),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.network(imageUrl),
-                            TextField(controller: controller)
-                          ],
-                        ),
-                        actions: [
-                          PlatformDialogAction(
-                            child: Text(S
-                                .of(context)
-                                .ok),
-                            onPressed: () => Navigator.of(cxt).pop(),
-                          )
-                        ],
-                      ));
-              return controller.text;
-            }, forceLoadFromRemote: forceLoadFromRemote));
+          TextEditingController controller = TextEditingController();
+          // TODO: dispose
+          await showPlatformDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (cxt) => PlatformAlertDialog(
+                    title: Text(S.of(context).enter_captcha),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.network(imageUrl),
+                        TextField(controller: controller)
+                      ],
+                    ),
+                    actions: [
+                      PlatformDialogAction(
+                        child: Text(S.of(context).ok),
+                        onPressed: () => Navigator.of(cxt).pop(),
+                      )
+                    ],
+                  ));
+          return controller.text;
+        }, forceLoadFromRemote: forceLoadFromRemote));
       } else {
         try {
           _contentFuture = Future.value(
@@ -176,32 +159,27 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           // If throw an error, it means we don't have a valid timetable.
         } catch (_) {
           _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-              NotLoginError(S
-                  .of(context)
-                  .postgraduates_need_login)));
+              NotLoginError(S.of(context).postgraduates_need_login)));
         }
       }
       forceLoadFromRemote = false;
     } else {
       _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-          NotLoginError(S
-              .of(context)
-              .not_fudan_student)));
+          NotLoginError(S.of(context).not_fudan_student)));
     }
   }
 
-  void _startShare(BuildContext menuContext,
-      TimetableConverter converter) async {
+  void _startShare(
+      BuildContext menuContext, TimetableConverter converter) async {
     // Close the dialog first
     Navigator.of(menuContext).pop();
     if (_table == null) {
-      Noticing.showNotice(context, S
-          .of(context)
-          .fatal_error);
+      Noticing.showNotice(context, S.of(context).fatal_error);
       return;
     }
     String? converted = converter.convertTo(_table!);
-    if (converted == null || converter.mimeType == null ||
+    if (converted == null ||
+        converter.mimeType == null ||
         converter.fileName == null)
       return; // If the converter does not export a file, return.
     Directory documentDir = await getApplicationDocumentsDirectory();
@@ -223,17 +201,15 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     return converters.entries
         .map<Widget>((MapEntry<String, TimetableConverter> e) {
       return PlatformWidget(
-        cupertino: (_, __) =>
-            CupertinoActionSheetAction(
-              onPressed: () => _startShare(context, e.value),
-              child: Text(e.key),
-            ),
-        material: (_, __) =>
-            ListTile(
-              title: Text(e.key),
-              subtitle: Text(e.value.fileName ?? ""),
-              onTap: () => _startShare(context, e.value),
-            ),
+        cupertino: (_, __) => CupertinoActionSheetAction(
+          onPressed: () => _startShare(context, e.value),
+          child: Text(e.key),
+        ),
+        material: (_, __) => ListTile(
+          title: Text(e.key),
+          subtitle: Text(e.value.fileName ?? ""),
+          onTap: () => _startShare(context, e.value),
+        ),
       );
     }).toList();
   }
@@ -241,24 +217,22 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     super.initState();
-    converters =
-    { //S.current.import_into_cal: CalendarImporter(), // Unfinished
-      S.current.share_as_ics: ICSConverter()};
+    converters = {
+      //S.current.import_into_cal: CalendarImporter(), // Unfinished
+      S.current.share_as_ics: ICSConverter()
+    };
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
           showPlatformModalSheet(
             context: context,
-            builder: (BuildContext context) =>
-                PlatformContextMenu(
-                  actions: _buildShareList(context),
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(S
-                        .of(context)
-                        .cancel),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
+            builder: (BuildContext context) => PlatformContextMenu(
+              actions: _buildShareList(context),
+              cancelButton: CupertinoActionSheetAction(
+                child: Text(S.of(context).cancel),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
           );
         }),
         hashCode);
@@ -266,8 +240,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
-  Future<void> refresh({bool reloadWhenEmptyData = false,
-    bool forceReloadFromRemote = false}) async {
+  Future<void> refresh(
+      {bool reloadWhenEmptyData = false,
+      bool forceReloadFromRemote = false}) async {
     if (forceReloadFromRemote) forceLoadFromRemote = true;
     _setContent();
 
@@ -289,22 +264,18 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     return FutureWidget<TimeTable?>(
       successBuilder:
           (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
-          _buildPage(snapshot.data!),
+              _buildPage(snapshot.data!),
       future: _contentFuture,
       errorBuilder: (BuildContext context,
-          AsyncSnapshot<TimeTable?> snapshot) =>
+              AsyncSnapshot<TimeTable?> snapshot) =>
           ErrorPageWidget.buildWidget(context, snapshot.error,
               stackTrace: snapshot.stackTrace, onTap: () {
-                forceLoadFromRemote = true;
-                refresh(reloadWhenEmptyData: true);
-              },
+        forceLoadFromRemote = true;
+        refresh(reloadWhenEmptyData: true);
+      },
               buttonText:
-              snapshot.error is NotLoginError ? S
-                  .of(context)
-                  .login : null),
-      loadingBuilder: Center(
-          child: PlatformCircularProgressIndicator()
-      ),
+                  snapshot.error is NotLoginError ? S.of(context).login : null),
+      loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
     );
   }
 
@@ -320,8 +291,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     });
   }
 
-  Widget _buildCourseItem(Event event) =>
-      Card(
+  Widget _buildCourseItem(Event event) => Card(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -329,10 +299,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             children: [
               Text(
                 event.course.courseName!,
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headline6,
+                style: Theme.of(context).textTheme.headline6,
               ),
               Text((event.course.teacherNames ?? []).join(",")),
               Text(event.course.roomName!),
@@ -345,14 +312,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   void _onTapCourse(ScheduleBlock block) {
     showPlatformModalSheet(
       context: context,
-      builder: (BuildContext context) =>
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: block.event.map((e) => _buildCourseItem(e)).toList(),
-            ),
-          ),
+      builder: (BuildContext context) => SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: block.event.map((e) => _buildCourseItem(e)).toList(),
+        ),
+      ),
     );
   }
 
@@ -369,23 +335,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (_showingTime!.weekday < 0) _showingTime!.weekday = 0;
     if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
 
-    final List<DayEvents> scheduleData = _table!
-        .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD,
-        containCourseOtherWeeks: false);
+    final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
+        compact: TableDisplayType.STANDARD, containCourseOtherWeeks: false);
     return Material(
       child: RefreshIndicator(
         key: indicatorKey,
-        edgeOffset: MediaQuery
-            .of(context)
-            .padding
-            .top,
-        color: Theme
-            .of(context)
-            .colorScheme
-            .secondary,
-        backgroundColor: Theme
-            .of(context)
-            .dialogBackgroundColor,
+        edgeOffset: MediaQuery.of(context).padding.top,
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           forceLoadFromRemote = true;
           HapticFeedback.mediumImpact();
@@ -407,7 +364,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 PlatformIconButton(
                   icon: const Icon(Icons.chevron_right),
                   onPressed:
-                  _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
+                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
                 )
               ],
             ),
@@ -419,9 +376,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
               tapCallback: _onTapCourse,
             ),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(S
-                  .of(context)
-                  .semester_start_date),
+              Text(S.of(context).semester_start_date),
               StartDateSelectionButton(
                   onUpdate: (() => indicatorKey.currentState?.show())),
             ]),
@@ -459,9 +414,7 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
         .loadSemesters(StateProvider.personInfo.value);
     // Reverse the order to make the newest item at top
     _semesterInfo = _semesterInfo?.reversed.toList();
-    String? chosenSemester = SettingsProvider
-        .getInstance()
-        .timetableSemester;
+    String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
       chosenSemester = await TimeTableRepository.getInstance()
           .getDefaultSemesterId(StateProvider.personInfo.value);
@@ -471,96 +424,71 @@ class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      FutureWidget<void>(
-          future: _future,
-          nullable: true,
-          successBuilder: (BuildContext context,
-              AsyncSnapshot<void> snapshot) =>
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: AutoSizeText(
-                    "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}",
-                    minFontSize: 10),
-                onPressed: () =>
-                    showPlatformModalSheet(
-                      context: context,
-                      builder: (menuContext) =>
-                          PlatformContextMenu(
-                            cancelButton: CupertinoActionSheetAction(
-                                child: Text(S
-                                    .of(menuContext)
-                                    .cancel),
-                                onPressed: () =>
-                                    Navigator.of(menuContext).pop()),
-                            actions: _semesterInfo!
-                                .map((e) =>
-                                PlatformContextMenuItem(
-                                    menuContext: menuContext,
-                                    onPressed: () {
-                                      SettingsProvider
-                                          .getInstance()
-                                          .timetableSemester =
-                                          e.semesterId;
-                                      setState(() => _selectionInfo = e);
+  Widget build(BuildContext context) => FutureWidget<void>(
+      future: _future,
+      nullable: true,
+      successBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: AutoSizeText(
+                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}",
+                minFontSize: 10),
+            onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (menuContext) => PlatformContextMenu(
+                cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(menuContext).cancel),
+                    onPressed: () => Navigator.of(menuContext).pop()),
+                actions: _semesterInfo!
+                    .map((e) => PlatformContextMenuItem(
+                        menuContext: menuContext,
+                        onPressed: () {
+                          SettingsProvider.getInstance().timetableSemester =
+                              e.semesterId;
+                          setState(() => _selectionInfo = e);
 
-                                      // Try to parse the start date
-                                      String? parsedStartDate =
-                                      SettingsProvider
-                                          .getInstance()
-                                          .semesterStartDates
-                                          ?.parseStartDate(
-                                          StateProvider.personInfo.value!.group,
-                                          e.semesterId!);
-                                      if (parsedStartDate != null) {
-                                        SettingsProvider
-                                            .getInstance()
-                                            .thisSemesterStartDate =
-                                            parsedStartDate;
-                                      } else {
-                                        Noticing.showNotice(
-                                            this.context,
-                                            S.of(context).unknown_start_date(
-                                                "${e.schoolYear} ${e.name!}"));
-                                      }
-                                      widget.onSelectionUpdate?.call();
-                                    },
-                                    child: Text(
-                                      "${e.schoolYear} ${e.name!}",
-                                      // Highlight the selected item
-                                      style: TextStyle(
-                                          color: PlatformX.isMaterial(
-                                              context) &&
-                                              e.semesterId ==
-                                                  _selectionInfo?.semesterId
-                                              ? Theme
-                                              .of(context)
-                                              .colorScheme
-                                              .secondary
-                                              : null),
-                                    )))
-                                .toList(),
-                          ),
-                    ),
+                          // Try to parse the start date
+                          String? parsedStartDate =
+                              SettingsProvider.getInstance()
+                                  .semesterStartDates
+                                  ?.parseStartDate(
+                                      StateProvider.personInfo.value!.group,
+                                      e.semesterId!);
+                          if (parsedStartDate != null) {
+                            SettingsProvider.getInstance()
+                                .thisSemesterStartDate = parsedStartDate;
+                          } else {
+                            Noticing.showNotice(
+                                this.context,
+                                S.of(context).unknown_start_date(
+                                    "${e.schoolYear} ${e.name!}"));
+                          }
+                          widget.onSelectionUpdate?.call();
+                        },
+                        child: Text(
+                          "${e.schoolYear} ${e.name!}",
+                          // Highlight the selected item
+                          style: TextStyle(
+                              color: PlatformX.isMaterial(context) &&
+                                      e.semesterId == _selectionInfo?.semesterId
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : null),
+                        )))
+                    .toList(),
               ),
-          errorBuilder: () =>
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: Text(S
-                    .of(context)
-                    .failed),
-                onPressed: () =>
-                    setState(() {
-                      _future = LazyFuture.pack(loadSemesterInfo());
-                    }),
-              ),
-          loadingBuilder: () =>
-              PlatformIconButton(
-                padding: EdgeInsets.zero,
-                icon: Text(S
-                    .of(context)
-                    .loading),
-              ));
+            ),
+          ),
+      errorBuilder: () => PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(S.of(context).failed),
+            onPressed: () => setState(() {
+              _future = LazyFuture.pack(loadSemesterInfo());
+            }),
+          ),
+      loadingBuilder: () => PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Text(S.of(context).loading),
+          ));
 }
 
 class StartDateSelectionButton extends StatelessWidget {
@@ -578,37 +506,22 @@ class StartDateSelectionButton extends StatelessWidget {
     });
     return PlatformTextButton(
       padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
-      child: Text(
-          DateFormat("yyyy-MM-dd").format(startTime)),
+      child: Text(DateFormat("yyyy-MM-dd").format(startTime)),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
-            cupertino: (cxt, __) =>
-                CupertinoDatePickerData(
-                    doneLabel: S
-                        .of(cxt)
-                        .ok,
-                    cancelLabel: S
-                        .of(cxt)
-                        .cancel
-                )
-            material: (cxt, __)
-        =>
-            MaterialDatePickerData(
-                helpText: S
-                    .of(cxt)
-                    .semester_start_date,
-                confirmText: S
-                    .of(cxt)
-                    .ok)
-        ,
-        initialDate: startTime,
-        firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-        lastDate: startTime.add(const Duration(days: 365 * 100)));
+            cupertino: (cxt, __) => CupertinoDatePickerData(
+                doneLabel: S.of(cxt).ok, cancelLabel: S.of(cxt).cancel),
+            material: (cxt, __) => MaterialDatePickerData(
+                helpText: S.of(cxt).semester_start_date,
+                confirmText: S.of(cxt).ok),
+            initialDate: startTime,
+            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+            lastDate: startTime.add(const Duration(days: 365 * 100)));
         if (newDate != null && newDate != startTime) {
-        SettingsProvider.getInstance().thisSemesterStartDate =
-        newDate.toIso8601String();
-        onUpdate?.call();
+          SettingsProvider.getInstance().thisSemesterStartDate =
+              newDate.toIso8601String();
+          onUpdate?.call();
         }
       },
     );

@@ -97,10 +97,6 @@ void main() {
     }
 
     runApp(const DanxiApp());
-    // Catcher(
-    //     rootWidget: ,
-    //     debugConfig: debugOptions,
-    //     releaseConfig: releaseOptions);
   });
 
   // Init DesktopWindow on desktop environment.
