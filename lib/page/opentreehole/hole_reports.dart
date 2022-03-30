@@ -28,6 +28,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -109,25 +110,21 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     );
   }
 
-  List<Widget> _buildContextMenu(BuildContext context, OTReport e) => [
-        /*PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              OpenTreeHoleRepository.getInstance()
-                  .adminSetReportDealt(e.report_id);
-            },
-            child: Text("Mark as dealt"),
-          ),
-          material: (_, __) => ListTile(
-            title: Text("Mark as dealt"),
-            onTap: () {
-              Navigator.of(context).pop();
-              OpenTreeHoleRepository.getInstance()
-                  .adminSetReportDealt(e.report_id);
-            },
-          ),
-        ),*/
+  List<Widget> _buildContextMenu(
+          BuildContext pageContext, BuildContext menuContext, OTReport e) =>
+      [
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: const Text("Mark as dealt"),
+          onPressed: () async {
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminSetReportDealt(e.report_id!);
+            if (result != null && result < 300) {
+              Noticing.showModalNotice(pageContext,
+                  message: S.of(pageContext).operation_successful);
+            }
+          },
+        )
       ];
 
   Widget _getListItems(BuildContext context,
@@ -146,17 +143,17 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     }
 
     return GestureDetector(
-      // onLongPress: () {
-      //   showPlatformModalSheet(
-      //       context: context,
-      //       builder: (BuildContext context) => PlatformContextMenu(
-      //             actions: _buildContextMenu(context, e),
-      //             cancelButton: CupertinoActionSheetAction(
-      //               child: Text(S.of(context).cancel),
-      //               onPressed: () => Navigator.of(context).pop(),
-      //             ),
-      //           ));
-      // },
+      onLongPress: () {
+        showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext cxt) => PlatformContextMenu(
+                  actions: _buildContextMenu(context, cxt, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(cxt).cancel),
+                    onPressed: () => Navigator.of(cxt).pop(),
+                  ),
+                ));
+      },
       child: Card(
         child: ListTile(
             dense: true,

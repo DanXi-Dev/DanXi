@@ -633,6 +633,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminSetReportDealt(int reportId) async {
+    return (await dio!.delete(_BASE_URL + "/reports/$reportId",
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {

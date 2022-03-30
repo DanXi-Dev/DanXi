@@ -58,11 +58,13 @@ dependencies:
   flutter_markdown: ^0.6.9
   markdown: ^4.0.1
   system_tray: ^0.1.0
-  bitsdojo_window:
-    git:
-      url: git@github.com:XuTuKe/bitsdojo_window.git
-      path: bitsdojo_window
-      ref: master
+  bitsdojo_window: ^0.1.1+1
+  # Change the line above to these lines when updating to Flutter 2.13+
+  #  bitsdojo_window:
+  #    git:
+  #      url: git@github.com:XuTuKe/bitsdojo_window.git
+  #      path: bitsdojo_window
+  #      ref: master
   win32: ^2.4.1
   file_picker: ^4.0.0
   cached_network_image: ^3.2.0
