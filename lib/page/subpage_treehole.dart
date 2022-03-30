@@ -203,7 +203,8 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-        if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+        if (cxt.select<FDUHoleProvider, bool>(
+            (value) => value.userInfo?.is_admin ?? false)) ...[
           AppBarButtonItem(
               S.of(cxt).reports,
               Icon(PlatformX.isMaterial(cxt)
@@ -569,8 +570,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             }),
             // Add a header for the scroll view
             headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) =>
-                <Widget>[
+                (BuildContext context, bool innerBoxIsScrolled) => <Widget>[
               if (buildTabBar)
                 SliverSafeArea(
                   bottom: false,
