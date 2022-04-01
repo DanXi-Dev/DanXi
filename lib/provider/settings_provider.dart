@@ -425,9 +425,9 @@ extension SortOrderEx on SortOrder? {
   String? getInternalString() {
     switch (this) {
       case SortOrder.LAST_REPLIED:
-        return "last_updated";
+        return "time_updated";
       case SortOrder.LAST_CREATED:
-        return "last_created";
+        return "time_created";
       case null:
         return null;
     }

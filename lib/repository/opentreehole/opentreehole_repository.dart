@@ -271,7 +271,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
       {int length = Constant.POST_COUNT_PER_PAGE,
       int prefetchLength = Constant.POST_COUNT_PER_PAGE,
-      String? tag}) async {
+      String? tag,
+      SortOrder? sortOrder}) async {
+    sortOrder ??= SortOrder.LAST_REPLIED;
     final Response<List<dynamic>> response =
         await dio!.get(_BASE_URL + "/holes",
             queryParameters: {
@@ -280,6 +282,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "length": length,
               "prefetch_length": prefetchLength,
               "tag": tag,
+              "order": sortOrder.getInternalString()
             },
             options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHole.fromJson(e)).toList();

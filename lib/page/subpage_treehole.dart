@@ -47,6 +47,7 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
@@ -202,41 +203,64 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).forum);
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-        if (cxt.select<FDUHoleProvider, bool>(
-            (value) => value.userInfo?.is_admin ?? false)) ...[
+  Create<List<AppBarButtonItem>> get trailing => (cxt) {
+        void onChangeSortOrder(BuildContext context, SortOrder newSortOrder) {
+          context.read<SettingsProvider>().fduholeSortOrder = newSortOrder;
+          RefreshBBSEvent().fire();
+        }
+
+        return [
+          if (cxt.select<FDUHoleProvider, bool>(
+              (value) => value.userInfo?.is_admin ?? false)) ...[
+            AppBarButtonItem(
+                S.of(cxt).reports,
+                Icon(PlatformX.isMaterial(cxt)
+                    ? Icons.report_outlined
+                    : CupertinoIcons.exclamationmark_octagon), () {
+              smartNavigatorPush(cxt, "/bbs/reports");
+            })
+          ],
           AppBarButtonItem(
-              S.of(cxt).reports,
+              S.of(cxt).sort_order,
+              PlatformPopupMenuX(
+                options: [
+                  PopupMenuOption(
+                      label: S.of(cxt).last_replied,
+                      onTap: (_) =>
+                          onChangeSortOrder(cxt, SortOrder.LAST_REPLIED)),
+                  PopupMenuOption(
+                      label: S.of(cxt).last_created,
+                      onTap: (_) =>
+                          onChangeSortOrder(cxt, SortOrder.LAST_CREATED))
+                ],
+                cupertino: (context, platform) => CupertinoPopupMenuData(
+                    cancelButtonData: CupertinoPopupMenuCancelButtonData(
+                        child: Text(S.of(context).cancel))),
+                icon: Icon(PlatformX.isMaterial(cxt)
+                    ? Icons.filter_list
+                    : CupertinoIcons.sort_down),
+              ),
+              null,
+              useCustomWidget: true),
+          AppBarButtonItem(
+              S.of(cxt).favorites,
               Icon(PlatformX.isMaterial(cxt)
-                  ? Icons.report_outlined
-                  : CupertinoIcons.exclamationmark_octagon), () {
-            smartNavigatorPush(cxt, "/bbs/reports");
-          })
-        ],
-        // AppBarButtonItem(S.of(cxt).all_tags, Icon(PlatformIcons(cxt).tag), () {
-        //   if (OpenTreeHoleRepository.getInstance().isUserInitialized) {
-        //     smartNavigatorPush(cxt, '/bbs/tags',
-        //         forcePushOnMainNavigator: true);
-        //   }
-        // }),
-        AppBarButtonItem(
-            S.of(cxt).favorites,
-            Icon(PlatformX.isMaterial(cxt)
-                ? Icons.star_outline
-                : CupertinoIcons.star), () {
-          if (cxt.read<FDUHoleProvider>().isUserInitialized) {
-            smartNavigatorPush(cxt, '/bbs/discussions',
-                arguments: {'showFavoredDiscussion': true},
-                forcePushOnMainNavigator: true);
-          }
-        }),
-        AppBarButtonItem(
-            S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
-          if (cxt.read<FDUHoleProvider>().isUserInitialized) {
-            AddNewPostEvent().fire();
-          }
-        }),
-      ];
+                  ? Icons.star_outline
+                  : CupertinoIcons.star), () {
+            if (cxt.read<FDUHoleProvider>().isUserInitialized) {
+              smartNavigatorPush(cxt, '/bbs/discussions',
+                  arguments: {'showFavoredDiscussion': true},
+                  forcePushOnMainNavigator: true);
+            }
+          }),
+          AppBarButtonItem(
+              S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
+            if (cxt.read<FDUHoleProvider>().isUserInitialized) {
+              AddNewPostEvent().fire();
+            }
+          }),
+        ];
+      };
 
   @override
   void onDoubleTapOnTab() => RefreshBBSEvent().fire();
@@ -309,7 +333,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     if (!checkGroup(kCompatibleUserGroup)) {
       throw NotLoginError("Logged in as a visitor.");
     }
-
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
@@ -333,8 +356,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           } else {
             time = DateTime.now();
           }
-          return OpenTreeHoleRepository.getInstance()
-              .loadHoles(time, getDivisionId(context), tag: _tagFilter);
+          return OpenTreeHoleRepository.getInstance().loadHoles(
+              time, getDivisionId(context),
+              tag: _tagFilter,
+              sortOrder: context.read<SettingsProvider>().fduholeSortOrder);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.
