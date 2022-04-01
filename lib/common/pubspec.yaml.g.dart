@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.7+163';
+const String version = r'1.3.8+165';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,16 +49,16 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 7;
+const int patch = 8;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'163'];
+const List<String> build = <String>[r'165'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1647747519;
+const int timestamp = 1648779022;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -148,7 +148,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'file_picker': r'^4.0.0',
   'cached_network_image': r'^3.2.0',
   'google_mobile_ads': r'^1.1.0',
-  'flutter_typeahead': r'>=3.1.0 <4.0.0',
+  'flutter_typeahead': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/selvam920/flutter_typeahead',
+      'ref': r'master',
+    },
+  },
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
