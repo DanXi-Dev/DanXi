@@ -32,6 +32,7 @@ import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/opentreehole/fduhole_platform_bridge.dart';
+import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
@@ -106,13 +107,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     dio!.options = BaseOptions(
       receiveDataWhenStatusError: true,
       validateStatus: (int? status) {
-        if (status == 401) {
-          // If token is invalid, clear the token.
-          SettingsProvider.getInstance().fduholeToken = null;
-        }
         return status != null && status >= 200 && status < 300;
       },
     );
+    dio!.interceptors.add(JWTInterceptor(refreshUrl, () => provider.token));
   }
 
   void initializeToken() {
@@ -221,7 +219,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Map<String, String> get _tokenHeader {
     if (provider.token == null) throw NotLoginError("Null Token");
-    return {"Authorization": "Token " + provider.token!};
+    return {"Authorization": "Bearer " + provider.token!.access!};
   }
 
   Future<List<OTDivision>?> loadDivisions({bool useCache = true}) async {

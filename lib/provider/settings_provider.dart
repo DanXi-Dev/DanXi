@@ -24,6 +24,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/extra.dart';
+import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:flutter/widgets.dart';
@@ -42,7 +43,7 @@ class SettingsProvider with ChangeNotifier {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v2";
+  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v3";
   static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
       "ec_last_choice";
@@ -252,16 +253,19 @@ class SettingsProvider with ChangeNotifier {
       preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);*/
 
   //Token
-  String? get fduholeToken {
+  JWToken? get fduholeToken {
     if (preferences!.containsKey(KEY_FDUHOLE_TOKEN)) {
-      return preferences!.getString(KEY_FDUHOLE_TOKEN)!;
+      try {
+        return JWToken.fromJson(
+            jsonDecode(preferences!.getString(KEY_FDUHOLE_TOKEN)!));
+      } catch (_) {}
     }
     return null;
   }
 
-  set fduholeToken(String? value) {
+  set fduholeToken(JWToken? value) {
     if (value != null) {
-      preferences!.setString(KEY_FDUHOLE_TOKEN, value);
+      preferences!.setString(KEY_FDUHOLE_TOKEN, jsonEncode(value));
     } else {
       preferences!.remove(KEY_FDUHOLE_TOKEN);
     }
