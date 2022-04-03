@@ -36,9 +36,9 @@ class JWTInterceptor extends QueuedInterceptor {
 
   static _rewriteRequestOptionsWithToken(
       RequestOptions options, JWToken token) {
-    Map<String, dynamic> newHeader = options.headers.map((key, value) =>
-        MapEntry(
-            key, key.toLowerCase() == "authorization" ? token.access : value));
+    Map<String, dynamic> newHeader =
+        options.headers.map((key, value) => MapEntry(key, value));
+    newHeader['Authorization'] = token.access;
     return options.copyWith(headers: newHeader);
   }
 
@@ -50,7 +50,7 @@ class JWTInterceptor extends QueuedInterceptor {
         RequestOptions options = RequestOptions(
             path: refreshUrl,
             method: "POST",
-            data: {"token": currentToken.refresh}); //TODO
+            headers: {"Authorization": "Bearer " + currentToken.refresh!});
         try {
           Response<Map<String, dynamic>> response = await _dio.fetch(options);
           JWToken newToken = JWToken.fromJson(response.data!);
