@@ -36,15 +36,12 @@ import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -54,15 +51,11 @@ import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../widget/opentreehole/tag_selector/tag.dart';
 
@@ -99,8 +92,9 @@ String renderText(
   }
   // Deal with LaTeX
   content = content.replaceAll(latexRegExp, formulaPlaceholder);
-  // Deal with Mention
+  // Deal with Mentions
   if (removeMentions) content = content.replaceAll(mentionRegExp, "");
+  // Deal with images
   BeautifulSoup soup = BeautifulSoup(content);
   List<Bs4Element> images = soup.findAll("img");
   if (images.isNotEmpty) {
@@ -126,12 +120,13 @@ Future<OTHole> prefetchAllFloors(OTHole hole) async {
   List<OTFloor>? floors = await OpenTreeHoleRepository.getInstance()
       .loadFloors(hole, startFloor: 0, length: 0);
 
-  var holeCopy = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
-  return holeCopy..floors?.prefetch = floors;
+  OTHole holeClone = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
+  return holeClone..floors?.prefetch = floors;
 }
 
 const String KEY_NO_TAG = "默认";
 
+/// The tab bar for switching divisions.
 class OTTitle extends StatelessWidget {
   const OTTitle({Key? key}) : super(key: key);
 
@@ -141,11 +136,9 @@ class OTTitle extends StatelessWidget {
         OpenTreeHoleRepository.getInstance().getDivisions();
     OTDivision? division = context
         .select<FDUHoleProvider, OTDivision?>((value) => value.currentDivision);
-    int currentIndex;
+    int currentIndex = 0;
     if (division != null) {
       currentIndex = divisions.indexOf(division);
-    } else {
-      currentIndex = 0;
     }
     return Expanded(
       child: TagContainer(
@@ -159,19 +152,12 @@ class OTTitle extends StatelessWidget {
           onChoice: (Tag tag, list) {
             division = context.read<FDUHoleProvider>().currentDivision =
                 divisions.firstWhere((element) => element.name == tag.tagTitle);
-            DivisionChangedEvent(division!).fire();
+            ChangeDivisionEvent(division!).fire();
           },
           tagList: divisions
               .map((e) => Tag(e.name, null, checkedIcon: null))
               .toList()),
     );
-    // return HorizontalSelector<OTDivision>(
-    //     options: OpenTreeHoleRepository.getInstance().getDivisions(),
-    //     onSelect: (division) {
-    //       context.read<FDUHoleProvider>().currentDivision = division;
-    //       DivisionChangedEvent(division).fire();
-    //     },
-    //     selectedOption: division);
   }
 }
 
@@ -206,7 +192,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) {
         void onChangeSortOrder(BuildContext context, SortOrder newSortOrder) {
           context.read<SettingsProvider>().fduholeSortOrder = newSortOrder;
-          RefreshBBSEvent().fire();
+          RefreshListEvent().fire();
         }
 
         return [
@@ -256,24 +242,24 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
           AppBarButtonItem(
               S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
             if (cxt.read<FDUHoleProvider>().isUserInitialized) {
-              AddNewPostEvent().fire();
+              CreateNewPostEvent().fire();
             }
           }),
         ];
       };
 
   @override
-  void onDoubleTapOnTab() => RefreshBBSEvent().fire();
+  void onDoubleTapOnTab() => RefreshListEvent().fire();
 }
 
-class AddNewPostEvent {}
+class CreateNewPostEvent {}
 
-class RefreshBBSEvent {}
+class RefreshListEvent {}
 
-class DivisionChangedEvent {
+class ChangeDivisionEvent {
   final OTDivision newDivision;
 
-  DivisionChangedEvent(this.newDivision);
+  ChangeDivisionEvent(this.newDivision);
 }
 
 enum PostsType {
@@ -294,11 +280,11 @@ enum PostsType {
 class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
-  final StateStreamListener<AddNewPostEvent> _postSubscription =
+  final StateStreamListener<CreateNewPostEvent> _postSubscription =
       StateStreamListener();
-  final StateStreamListener<RefreshBBSEvent> _refreshSubscription =
+  final StateStreamListener<RefreshListEvent> _refreshSubscription =
       StateStreamListener();
-  final StateStreamListener<DivisionChangedEvent> _divisionChangedSubscription =
+  final StateStreamListener<ChangeDivisionEvent> _divisionChangedSubscription =
       StateStreamListener();
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
@@ -344,17 +330,16 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
     switch (_postsType) {
       case PostsType.FAVORED_DISCUSSION:
-        if (page > 1) return Future.value([]);
+        // Favored discussion has only one page.
+        if (page > 1) return [];
         return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
-          DateTime time;
+          DateTime time = DateTime.now();
           if (lastElement != null) {
             time = DateTime.parse(lastElement.time_updated!);
-          } else {
-            time = DateTime.now();
           }
           return OpenTreeHoleRepository.getInstance().loadHoles(
               time, getDivisionId(context),
@@ -376,24 +361,24 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             ? [OTHole.DUMMY_POST]
             : loadedPost;
       case PostsType.EXTERNAL_VIEW:
-        // If we are showing a widget defined
+      // If we are showing a widget predefined
         return [];
     }
   }
 
+  /// Refresh the whole list.
   Future<void> refreshList() async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await OpenTreeHoleRepository.getInstance()
             .getFavoriteHoleId(forceUpdate: true);
       } else if (context.read<FDUHoleProvider>().isUserInitialized) {
-        OpenTreeHoleRepository.getInstance()
-            .loadDivisions(useCache: false)
-            .then((value) => setState(() {}))
-            .catchError((error) {});
+        await OpenTreeHoleRepository.getInstance()
+            .loadDivisions(useCache: false);
+        await refreshSelf();
       }
     } finally {
-      if (_postsType == PostsType.FAVORED_DISCUSSION) {
+      if (_postsType == PostsType.EXTERNAL_VIEW) {
         await _delegate?.triggerRefresh();
       } else {
         await listViewController.notifyUpdate(
@@ -421,10 +406,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           S.of(context).ban_post_until(
               "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),
         ),
-        onTap: () {
-          Noticing.showNotice(context, S.of(context).silence_detail,
-              title: S.of(context).silence_notice, useSnackBar: false);
-        },
+        onTap: () => Noticing.showNotice(context, S.of(context).silence_detail,
+            title: S.of(context).silence_notice, useSnackBar: false),
       ),
     );
   }
@@ -441,7 +424,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     super.initState();
     _fieldInitComplete = false;
     _postSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
+        Constant.eventBus.on<CreateNewPostEvent>().listen((_) async {
           final bool success =
               await OTEditor.createNewPost(context, getDivisionId(context),
                   interceptor: (_, PostEditorText? text) async {
@@ -459,7 +442,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         }),
         hashCode);
     _refreshSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<RefreshBBSEvent>().listen((event) {
+        Constant.eventBus.on<RefreshListEvent>().listen((event) {
           indicatorKey.currentState?.show();
         }),
         hashCode);
@@ -472,7 +455,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     // After some thought, I believe a subscription is still a better way, unless
     // we refactor all logic fundamentally.
     _divisionChangedSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<DivisionChangedEvent>().listen((event) {
+        Constant.eventBus.on<ChangeDivisionEvent>().listen((event) {
           if (event.newDivision.name ==
               Constant.SPECIAL_DIVISION_FOR_CURRICULUM) {
             setState(() {
@@ -513,7 +496,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   @override
   void dispose() {
-    //screenListener.dispose();
     super.dispose();
     _postSubscription.cancel();
     _refreshSubscription.cancel();
@@ -565,7 +547,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                 image: DecorationImage(
                     image: _backgroundImage!, fit: BoxFit.cover)),
         child: RefreshIndicator(
-          // Make the indicator listen to [ScrollNotification] from deep located [PagedListView].
+          // Make the indicator listen to [ScrollNotification] from deeper located [PagedListView].
           notificationPredicate: (notification) => true,
           edgeOffset: MediaQuery.of(context).padding.top,
           key: indicatorKey,
@@ -573,7 +555,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           backgroundColor: Theme.of(context).dialogBackgroundColor,
           onRefresh: () async {
             HapticFeedback.mediumImpact();
+            // Refresh the list...
             await refreshList();
+            // ... and scroll it to the top.
             try {
               await PrimaryScrollController.of(context)?.animateTo(0,
                   duration: const Duration(milliseconds: 200),
@@ -611,69 +595,52 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     );
   }
 
-  Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) {
-    return PagedListView<OTHole>(
-        noneItem: OTHole.DUMMY_POST,
-        pagedController: listViewController,
-        withScrollbar: true,
-        scrollController: PrimaryScrollController.of(context),
-        startPage: 1,
-        // Avoiding extra padding from ListView. We have added it in [SliverSafeArea].
-        padding: padding,
-        builder: _buildListItem,
-        headBuilder: (context) => Column(
-              children: [
-                AutoBannerAdWidget(bannerAd: bannerAd),
-                if (_postsType == PostsType.NORMAL_POSTS) ...[
-                  _autoSilenceNotice(),
-                  _autoPinnedPosts(),
-                ]
-              ],
-            ),
-        loadingBuilder: (BuildContext context) => Container(
-            padding: const EdgeInsets.all(8),
-            child: Center(child: PlatformCircularProgressIndicator())),
-        endBuilder: (context) => Center(
-                child: Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(S.of(context).end_reached),
-            )),
-        emptyBuilder: (_) {
-          if (_postsType == PostsType.FAVORED_DISCUSSION) {
-            return _buildEmptyFavoritesPage();
-          } else {
-            return Container(
+  Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>
+      PagedListView<OTHole>(
+          noneItem: OTHole.DUMMY_POST,
+          pagedController: listViewController,
+          withScrollbar: true,
+          scrollController: PrimaryScrollController.of(context),
+          startPage: 1,
+          // Avoiding extra padding from ListView. We have added it in [SliverSafeArea].
+          padding: padding,
+          builder: _buildListItem,
+          headBuilder: (context) => Column(
+                children: [
+                  AutoBannerAdWidget(bannerAd: bannerAd),
+                  if (_postsType == PostsType.NORMAL_POSTS) ...[
+                    _autoSilenceNotice(),
+                    _autoPinnedPosts(),
+                  ]
+                ],
+              ),
+          loadingBuilder: (BuildContext context) => Container(
               padding: const EdgeInsets.all(8),
-              child: Center(child: Text(S.of(context).no_data)),
-            );
-          }
-        },
-        fatalErrorBuilder: (_, e) {
-          if (e is NotLoginError) {
-            return OTWelcomeWidget(loginCallback: () async {
-              await smartNavigatorPush(context, "/bbs/login",
-                  arguments: {"info": StateProvider.personInfo.value!});
-              refreshList();
-            });
-          }
-          return ErrorPageWidget.buildWidget(context, e,
-              onTap: () => refreshSelf());
-        },
-        dataReceiver: _loadContent);
-  }
-
-  Widget _buildEmptyFavoritesPage() => Container(
-        padding: const EdgeInsets.all(8),
-        child: Center(child: Text(S.of(context).no_favorites)),
-      );
-
-  _launchUrlWithNotice(LinkableElement link) async {
-    if (await canLaunch(link.url)) {
-      BrowserUtil.openUrl(link.url, context);
-    } else {
-      Noticing.showNotice(context, S.of(context).cannot_launch_url);
-    }
-  }
+              child: Center(child: PlatformCircularProgressIndicator())),
+          endBuilder: (context) => Center(
+                  child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(S.of(context).end_reached),
+              )),
+          emptyBuilder: (context) => Container(
+                padding: const EdgeInsets.all(8),
+                child: Center(
+                    child: Text(_postsType == PostsType.FAVORED_DISCUSSION
+                        ? S.of(context).no_favorites
+                        : S.of(context).no_data)),
+              ),
+          fatalErrorBuilder: (_, error) {
+            if (error is NotLoginError) {
+              return OTWelcomeWidget(loginCallback: () async {
+                await smartNavigatorPush(context, "/bbs/login",
+                    arguments: {"info": StateProvider.personInfo.value!});
+                refreshList();
+              });
+            }
+            return ErrorPageWidget.buildWidget(context, error,
+                onTap: refreshSelf);
+          },
+          dataReceiver: _loadContent);
 
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement,
@@ -685,196 +652,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             OpenTreeHoleRepository.getInstance()
                 .getPinned(getDivisionId(context))
                 .contains(postElement))) return const SizedBox();
-
-    Linkify postContentWidget = Linkify(
-      text: renderText(postElement.floors!.first_floor!.filteredContent!,
-          S.of(context).image_tag, S.of(context).formula),
-      style: const TextStyle(fontSize: 16),
-      maxLines: 6,
-      overflow: TextOverflow.ellipsis,
-      onOpen: _launchUrlWithNotice,
-    );
-    final TextStyle infoStyle =
-        TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
-
-    return Card(
-      color: _backgroundImage != null
-          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
-          : null,
-      child: Column(
-        children: [
-          ListTile(
-              contentPadding: const EdgeInsets.fromLTRB(16, 4, 10, 0),
-              dense: false,
-              title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        alignment: WrapAlignment.spaceBetween,
-                        runSpacing: 4,
-                        children: [
-                          generateTagWidgets(context, postElement,
-                              (String? tagName) {
-                            smartNavigatorPush(context, '/bbs/discussions',
-                                arguments: {"tagFilter": tagName},
-                                forcePushOnMainNavigator: true);
-                          },
-                              SettingsProvider.getInstance()
-                                  .useAccessibilityColoring),
-                          Row(
-                            //mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (isPinned)
-                                OTLeadingTag(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  text: S.of(context).pinned,
-                                ),
-                              if (postElement.floors?.first_floor?.special_tag
-                                      ?.isNotEmpty ==
-                                  true) ...[
-                                const SizedBox(width: 4),
-                                OTLeadingTag(
-                                  color: Colors.red,
-                                  text: postElement
-                                      .floors!.first_floor!.special_tag!,
-                                ),
-                              ],
-                              if (postElement.hidden == true) ...[
-                                const SizedBox(width: 4),
-                                OTLeadingTag(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  text: S.of(context).hole_hidden,
-                                ),
-                              ]
-                            ],
-                          ),
-                        ]),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    (postElement.is_folded && foldBehavior == FoldBehavior.FOLD)
-                        ? ExpansionTileX(
-                            expandedCrossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            expandedAlignment: Alignment.topLeft,
-                            childrenPadding:
-                                const EdgeInsets.symmetric(vertical: 4),
-                            tilePadding: EdgeInsets.zero,
-                            title: Text(
-                              S.of(context).folded,
-                              style: infoStyle,
-                            ),
-                            children: [
-                                postContentWidget,
-                              ])
-                        : postContentWidget,
-                  ]),
-              subtitle:
-                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                const SizedBox(height: 12),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("#${postElement.id}", style: infoStyle),
-                      Text(
-                          HumanDuration.tryFormat(
-                              context,
-                              DateTime.parse(postElement.time_created!)
-                                  .toLocal()),
-                          style: infoStyle),
-                      Row(children: [
-                        Text("${postElement.reply} ", style: infoStyle),
-                        Icon(
-                            PlatformX.isMaterial(context)
-                                ? Icons.sms_outlined
-                                : CupertinoIcons.ellipses_bubble,
-                            size: infoStyle.fontSize,
-                            color: infoStyle.color),
-                      ]),
-                    ]),
-              ]),
-              onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
-                  arguments: {"post": postElement})),
-          if (!(postElement.is_folded && foldBehavior == FoldBehavior.FOLD) &&
-              postElement.floors?.last_floor !=
-                  postElement.floors?.first_floor) ...[
-            const Divider(height: 4),
-            _buildCommentView(postElement)
-          ]
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCommentView(OTHole postElement, {bool useLeading = true}) {
-    final String lastReplyContent = renderText(
-        postElement.floors!.last_floor!.filteredContent!,
-        S.of(context).image_tag,
-        S.of(context).formula);
-    return ListTile(
-        dense: true,
-        minLeadingWidth: 16,
-        leading: useLeading
-            ? Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Icon(
-                  PlatformX.isMaterial(context)
-                      ? Icons.sms_outlined
-                      : CupertinoIcons.quote_bubble,
-                  color: Theme.of(context).hintColor,
-                ),
-              )
-            : null,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      S.of(context).latest_reply(
-                          postElement.floors!.last_floor!.anonyname ?? "?",
-                          HumanDuration.tryFormat(
-                              context,
-                              DateTime.parse(postElement
-                                      .floors!.last_floor!.time_created!)
-                                  .toLocal())),
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
-                    Icon(CupertinoIcons.search,
-                        size: 14,
-                        color: Theme.of(context).hintColor.withOpacity(0.2)),
-                  ]),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Linkify(
-                    text: lastReplyContent,
-                    style: const TextStyle(fontSize: 14),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    onOpen: _launchUrlWithNotice)),
-          ],
-        ),
-        onTap: () async {
-          ProgressFuture dialog = showProgressDialog(
-              loadingText: S.of(context).loading, context: context);
-          try {
-            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": await prefetchAllFloors(postElement),
-              "scroll_to_end": true
-            });
-          } catch (error, st) {
-            Noticing.showModalError(context, error, trace: st);
-          } finally {
-            dialog.dismiss(showAnim: false);
-          }
-        });
+    return OTHoleWidget(
+        postElement: postElement,
+        translucent: _backgroundImage != null,
+        isPinned: isPinned,
+        isFolded: postElement.is_folded && foldBehavior == FoldBehavior.FOLD);
   }
 }
 
@@ -912,33 +694,27 @@ typedef TimeBasedDataReceiver<T> = Future<List<T>?> Function(T? lastElement);
 class ForumTabDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Selector<FDUHoleProvider, bool>(
-        selector: (_, model) => model.isUserInitialized,
-        builder: (context, value, _) {
-          if (value) {
-            return Row(
-              children: [
-                Padding(
-                  padding: PlatformX.isMaterial(context)
-                      ? const EdgeInsets.all(8.0)
-                      : EdgeInsets.zero,
-                  child: PlatformIconButton(
-                    icon: Icon(PlatformIcons(context).search),
-                    onPressed: () {
-                      smartNavigatorPush(context, '/bbs/search',
-                          forcePushOnMainNavigator: true);
-                    },
-                  ),
-                ),
-                const OTTitle()
-              ],
-            );
-          } else {
-            return Container();
-          }
-        });
-  }
+          BuildContext context, double shrinkOffset, bool overlapsContent) =>
+      Selector<FDUHoleProvider, bool>(
+          selector: (_, model) => model.isUserInitialized,
+          builder: (context, userInitialized, _) => userInitialized
+              ? Row(
+                  children: [
+                    Padding(
+                      padding: PlatformX.isMaterial(context)
+                          ? const EdgeInsets.all(8.0)
+                          : EdgeInsets.zero,
+                      child: PlatformIconButton(
+                        icon: Icon(PlatformIcons(context).search),
+                        onPressed: () => smartNavigatorPush(
+                            context, '/bbs/search',
+                            forcePushOnMainNavigator: true),
+                      ),
+                    ),
+                    const OTTitle()
+                  ],
+                )
+              : Container());
 
   @override
   double get maxExtent => 64;
@@ -947,9 +723,7 @@ class ForumTabDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => 64;
 
   @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
-  }
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }
 
 /// A delegate class to control the body widget shown in the tab page.
