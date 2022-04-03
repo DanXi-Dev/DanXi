@@ -7,7 +7,7 @@ part of 'floor.dart';
 // **************************************************************************
 
 OTFloor _$OTFloorFromJson(Map<String, dynamic> json) => OTFloor(
-      json['floor_id'] as int?,
+      json['id'] as int?,
       json['hole_id'] as int?,
       json['content'] as String?,
       json['anonyname'] as String?,
@@ -27,8 +27,9 @@ OTFloor _$OTFloorFromJson(Map<String, dynamic> json) => OTFloor(
           ?.map((e) => OTHistory.fromJson(e as Map<String, dynamic>))
           .toList();
 
-Map<String, dynamic> _$OTFloorToJson(OTFloor instance) => <String, dynamic>{
-      'floor_id': instance.floor_id,
+Map<String, dynamic> _$OTFloorToJson(OTFloor instance) =>
+    <String, dynamic>{
+      'id': instance.id,
       'hole_id': instance.hole_id,
       'content': instance.content,
       'anonyname': instance.anonyname,

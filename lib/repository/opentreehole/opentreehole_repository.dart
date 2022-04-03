@@ -45,8 +45,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static const String _BASE_URL = "https://test.fduhole.com";
-  static const String _BASE_AUTH_URL = "https://testauth.fduhole.com";
+  static const String _BASE_URL = "https://test.fduhole.com/api";
+  static const String _BASE_AUTH_URL = "https://testauth.fduhole.com/api";
   static const String _IMAGE_BASE_URL = "https://pic.hath.top";
 
   late FDUHoleProvider provider;
@@ -166,18 +166,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           (X509Certificate certificate, String host, int port) {
             return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
-            final ASN1Parser p = ASN1Parser(certificate.der);
-            final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
-            final ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
-            final ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
-            final ASN1BitString pubKeyBits =
+        final ASN1Parser p = ASN1Parser(certificate.der);
+        final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
+        final ASN1Sequence cert = signedCert.elements[0] as ASN1Sequence;
+        final ASN1Sequence pubKeyElement = cert.elements[6] as ASN1Sequence;
+        final ASN1BitString pubKeyBits =
             pubKeyElement.elements[1] as ASN1BitString;
-            if (listEquals(
-                pubKeyBits.stringValue, SecureConstant.PINNED_CERTIFICATE)) {
-              return true;
-            }
-            // Allow connection when public key matches
-            throw NotLoginError("Invalid HTTPS Certificate");
+        if (listEquals(
+            pubKeyBits.stringValue, SecureConstant.PINNED_CERTIFICATE)) {
+          return true;
+        }
+        // Allow connection when public key matches
+        throw NotLoginError("Invalid HTTPS Certificate");
       };
       return httpClient;
     };
@@ -308,7 +308,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTFloor?> loadSpecificFloor(int floorId) async {
     try {
-      return _floorCache.lastWhere((element) => element.floor_id == floorId);
+      return _floorCache.lastWhere((element) => element.id == floorId);
     } catch (ignored) {
       final Response<Map<String, dynamic>> response = await dio!.get(
           _BASE_URL + "/floors/$floorId",
@@ -325,7 +325,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         _BASE_URL + "/floors",
         queryParameters: {
           "start_floor": startFloor,
-          "hole_id": post.hole_id,
+          "hole_id": post.id,
           "length": length
         },
         options: Options(headers: _tokenHeader));
@@ -450,8 +450,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (provider.userInfo == null || forceUpdate) {
-      final Response<Map<String, dynamic>> response = await dio!
-          .get(_BASE_URL + "/users", options: Options(headers: _tokenHeader));
+      final Response<Map<String, dynamic>> response = await dio!.get(
+          _BASE_AUTH_URL + "/users/me",
+          options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
     }
     return provider.userInfo;
@@ -459,7 +460,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTUser?> updateUserProfile() async {
     final Response<Map<String, dynamic>> response = await dio!.put(
-        _BASE_URL + "/users",
+        _BASE_AUTH_URL + "/users/" + provider.userInfo!.user_id.toString(),
         data: provider.userInfo!.toJson(),
         options: Options(headers: _tokenHeader));
     return provider.userInfo = OTUser.fromJson(response.data!);

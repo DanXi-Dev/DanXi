@@ -27,7 +27,7 @@ part 'floor.g.dart';
 
 @JsonSerializable()
 class OTFloor {
-  int? floor_id;
+  int? id;
   int? hole_id;
   String? content;
   String? anonyname;
@@ -59,11 +59,10 @@ class OTFloor {
   factory OTFloor.onlyId(int floorId) => OTFloor.special('', '', null, floorId);
 
   @override
-  bool operator ==(Object other) =>
-      (other is OTFloor) && floor_id == other.floor_id;
+  bool operator ==(Object other) => (other is OTFloor) && id == other.id;
 
   OTFloor(
-      this.floor_id,
+      this.id,
       this.hole_id,
       this.content,
       this.anonyname,
@@ -86,9 +85,9 @@ class OTFloor {
 
   @override
   String toString() {
-    return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, like: $like, mention: $mention}';
+    return 'OTFloor{floor_id: $id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, like: $like, mention: $mention}';
   }
 
   @override
-  int get hashCode => floor_id!;
+  int get hashCode => id!;
 }

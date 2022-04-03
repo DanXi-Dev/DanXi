@@ -778,7 +778,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("#${postElement.hole_id}", style: infoStyle),
+                      Text("#${postElement.id}", style: infoStyle),
                       Text(
                           HumanDuration.tryFormat(
                               context,
