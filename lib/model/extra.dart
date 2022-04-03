@@ -28,7 +28,9 @@ class Extra {
 
   String? userAgent;
 
-  Extra(this.timetable, this.userAgent);
+  List<String?>? stopWords;
+
+  Extra(this.timetable, this.userAgent, this.stopWords);
 
   factory Extra.fromJson(Map<String, dynamic> json) => _$ExtraFromJson(json);
 

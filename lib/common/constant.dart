@@ -24,6 +24,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -80,8 +81,42 @@ class Constant {
 
   /// Load in the tips to be shown in the [BBSEditorWidget].
   static Future<List<String>> _loadTips() async {
-    String tipsJson = await rootBundle.loadString("assets/texts/tips.dat");
-    return tipsJson.split("\n");
+    String tipLines = await rootBundle.loadString("assets/texts/tips.dat");
+    return tipLines.split("\n");
+  }
+
+  static List<String> _stopWords = [];
+
+  /// Load in the stop words to be shown in the [BBSEditorWidget].
+  static Future<List<String>> _loadStopWords() async {
+    String wordLines =
+        await rootBundle.loadString("assets/texts/stop_words.dat");
+    return wordLines.split("\n");
+  }
+
+  /// Get stop word list from [_loadStopWords].
+  ///
+  /// If failed to get, return an empty string.
+  static Future<List<String>> get stopWords async {
+    List<String?>? list;
+
+    // Try to fetch a stop word list online
+    try {
+      list = AnnouncementRepository.getInstance().getStopWords();
+    } catch (_) {}
+    if (list != null) {
+      List<String> filterList = list
+          .filter((e) => e != null && e.trim().isNotEmpty)
+          .map((e) => e!)
+          .toList();
+      if (filterList.isNotEmpty) {
+        return filterList;
+      }
+    }
+
+    // Fall back to local copy
+    if (_stopWords.isEmpty) _stopWords = await _loadStopWords();
+    return _stopWords;
   }
 
   /// Get a random tip from [_loadTips].

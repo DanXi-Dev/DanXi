@@ -98,6 +98,10 @@ class AnnouncementRepository {
     return getExtra()?.userAgent;
   }
 
+  List<String?>? getStopWords() {
+    return getExtra()?.stopWords;
+  }
+
   Extra? getExtra() {
     return Extra.fromJson(jsonDecode(_announcementCache!
         .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)

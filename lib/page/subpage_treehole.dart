@@ -444,7 +444,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         Constant.eventBus.on<AddNewPostEvent>().listen((_) async {
           final bool success =
               await OTEditor.createNewPost(context, getDivisionId(context),
-                  interceptor: (PostEditorText? text) async {
+                  interceptor: (_, PostEditorText? text) async {
             if (text?.tags.isEmpty ?? true) {
               return await Noticing.showConfirmationDialog(
                       context, S.of(context).post_has_no_tags,

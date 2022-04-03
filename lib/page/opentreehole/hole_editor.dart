@@ -44,7 +44,38 @@ import 'package:provider/provider.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
-typedef PostInterceptor = Future<bool> Function(PostEditorText? text);
+typedef PostInterceptor = Future<bool> Function(
+    BuildContext context, PostEditorText? text);
+
+extension PostInterceptorEx on PostInterceptor {
+  PostInterceptor mergeWith(PostInterceptor? interceptor) {
+    if (interceptor == null) return this;
+    return (context, text) async {
+      if (await this.call(context, text)) {
+        return interceptor.call(context, text);
+      } else {
+        return false;
+      }
+    };
+  }
+}
+
+final PostInterceptor _kStopWordInterceptor = (context, text) async {
+  final regularText = text?.text?.toLowerCase();
+  var stopWordList = await Constant.stopWords;
+  stopWordList = stopWordList.map((e) => e.trim().toLowerCase()).toList();
+  try {
+    var checkedStopWord = stopWordList.firstWhere((element) =>
+        element.isNotEmpty && (regularText?.contains(element) ?? false));
+    return await Noticing.showConfirmationDialog(
+            context, S.of(context).post_has_stop_words(checkedStopWord.trim()),
+            title: S.of(context).post_has_stop_words_title,
+            confirmText: S.of(context).continue_sending,
+            isConfirmDestructive: true) ??
+        false;
+  } catch (_) {}
+  return true;
+};
 
 class OTEditor {
   static Future<bool> createNewPost(BuildContext context, int divisionId,
@@ -55,7 +86,7 @@ class OTEditor {
         allowTags: true,
         editorType: editorType,
         object: object,
-        interceptor: interceptor);
+        interceptor: _kStopWordInterceptor.mergeWith(interceptor));
 
     if (content?.text == null) return false;
 
@@ -76,7 +107,7 @@ class OTEditor {
 
   static Future<bool> createNewReply(
       BuildContext context, int? discussionId, int? floorId,
-      {OTEditorType? editorType}) async {
+      {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = (floorId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_HOLE)
         : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
@@ -87,7 +118,8 @@ class OTEditor {
                 : S.of(context).reply_to_floor(floorId),
             editorType: editorType,
             object: object,
-            placeholder: floorId == null ? "" : "##$floorId\n"))
+            placeholder: floorId == null ? "" : "##$floorId\n",
+            interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
         ?.text;
     if (content == null || content.trim() == "") return false;
     ProgressFuture progressDialog = showProgressDialog(
@@ -107,7 +139,7 @@ class OTEditor {
 
   static Future<bool> modifyReply(BuildContext context, int? discussionId,
       int? floorId, String? originalContent,
-      {OTEditorType? editorType}) async {
+      {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = EditorObject(floorId, EditorObjectType.MODIFY_FLOOR);
     final String? content = (await _showEditor(
             context,
@@ -116,7 +148,8 @@ class OTEditor {
                 : S.of(context).modify_to_floor(floorId),
             editorType: editorType,
             object: object,
-            placeholder: originalContent ?? ""))
+            placeholder: originalContent ?? "",
+            interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
         ?.text;
     if (content == null || content.trim().isEmpty) return false;
     ProgressFuture progressDialog = showProgressDialog(
@@ -530,7 +563,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     final editorText = PostEditorText(
         text, context.read<FDUHoleProvider>().editorCache[object]!.tags);
 
-    if ((await _interceptor?.call(editorText)) ?? true) {
+    if ((await _interceptor?.call(context, editorText)) ?? true) {
       Navigator.pop<PostEditorText>(context, editorText);
     }
   }
