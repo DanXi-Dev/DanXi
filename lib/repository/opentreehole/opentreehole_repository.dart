@@ -242,7 +242,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   List<OTHole> getPinned(int divisionId) {
     try {
       return _divisionCache
-              .firstWhere((element) => element.division_id == divisionId)
+              .firstWhere((element) => element.id == divisionId)
               .pinned ??
           List<OTHole>.empty();
     } catch (ignored) {
@@ -259,7 +259,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     if (useCache) {
       try {
         final OTDivision cached =
-            _divisionCache.firstWhere((e) => e.division_id == divisionId);
+            _divisionCache.firstWhere((e) => e.id == divisionId);
         return cached;
       } catch (_) {}
     }
@@ -267,7 +267,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         _BASE_URL + "/divisions/$divisionId",
         options: Options(headers: _tokenHeader));
     final newDivision = OTDivision.fromJson(response.data!);
-    _divisionCache.removeWhere((element) => element.division_id == divisionId);
+    _divisionCache.removeWhere((element) => element.id == divisionId);
     _divisionCache.add(newDivision);
     return newDivision;
   }

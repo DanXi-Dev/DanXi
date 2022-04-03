@@ -21,8 +21,7 @@ OTHole _$OTHoleFromJson(Map<String, dynamic> json) => OTHole(
           : OTFloors.fromJson(json['floors'] as Map<String, dynamic>),
     )..hidden = json['hidden'] as bool?;
 
-Map<String, dynamic> _$OTHoleToJson(OTHole instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$OTHoleToJson(OTHole instance) => <String, dynamic>{
       'id': instance.id,
       'division_id': instance.division_id,
       'time_updated': instance.time_updated,

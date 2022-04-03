@@ -501,7 +501,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminModifyDivision(
-                    provider.currentDivision!.division_id!, null, null, pinned);
+                    provider.currentDivision!.id!, null, null, pinned);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
@@ -532,7 +532,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             OTDivision selectedDivision = OpenTreeHoleRepository.getInstance()
                 .getDivisions()
                 .firstWhere(
-                    (element) => element.division_id == _hole.division_id,
+                    (element) => element.id == _hole.division_id,
                     orElse: () => OTDivision(_hole.division_id, '', '', null));
 
             List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
@@ -617,7 +617,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             if (comfirmChanged ?? false) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
-                      newTagsList, _hole.id, selectedDivision.division_id);
+                      newTagsList, _hole.id, selectedDivision.id);
               if (result != null && result < 300) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);

@@ -27,8 +27,7 @@ OTFloor _$OTFloorFromJson(Map<String, dynamic> json) => OTFloor(
           ?.map((e) => OTHistory.fromJson(e as Map<String, dynamic>))
           .toList();
 
-Map<String, dynamic> _$OTFloorToJson(OTFloor instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$OTFloorToJson(OTFloor instance) => <String, dynamic>{
       'id': instance.id,
       'hole_id': instance.hole_id,
       'content': instance.content,

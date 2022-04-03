@@ -24,7 +24,7 @@ part 'division.g.dart';
 
 @JsonSerializable()
 class OTDivision {
-  int? division_id;
+  int? id;
   String? name;
   String? description;
   List<OTHole>? pinned;
@@ -35,14 +35,13 @@ class OTDivision {
   Map<String, dynamic> toJson() => _$OTDivisionToJson(this);
 
   @override
-  bool operator ==(Object other) =>
-      (other is OTDivision) && division_id == other.division_id;
+  bool operator ==(Object other) => (other is OTDivision) && id == other.id;
 
-  OTDivision(this.division_id, this.name, this.description, this.pinned);
+  OTDivision(this.id, this.name, this.description, this.pinned);
 
   @override
   String toString() => name ?? "null";
 
   @override
-  int get hashCode => division_id!;
+  int get hashCode => id!;
 }

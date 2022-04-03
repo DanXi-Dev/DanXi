@@ -7,7 +7,7 @@ part of 'division.dart';
 // **************************************************************************
 
 OTDivision _$OTDivisionFromJson(Map<String, dynamic> json) => OTDivision(
-      json['division_id'] as int?,
+      json['id'] as int?,
       json['name'] as String?,
       json['description'] as String?,
       (json['pinned'] as List<dynamic>?)
@@ -17,7 +17,7 @@ OTDivision _$OTDivisionFromJson(Map<String, dynamic> json) => OTDivision(
 
 Map<String, dynamic> _$OTDivisionToJson(OTDivision instance) =>
     <String, dynamic>{
-      'division_id': instance.division_id,
+      'id': instance.id,
       'name': instance.name,
       'description': instance.description,
       'pinned': instance.pinned,
