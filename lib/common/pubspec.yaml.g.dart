@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.6+156';
+const String version = r'1.3.8+166';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,16 +49,16 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 6;
+const int patch = 8;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'156'];
+const List<String> build = <String>[r'166'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1645539285;
+const int timestamp = 1648955431;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -99,13 +99,13 @@ const Map<String, Object> dependencies = <String, Object>{
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/singularity-s0/flutter_progress_dialog.git',
+      'url': r'https://github.com/singularity-s0/flutter_progress_dialog.git',
       'ref': r'master',
     },
   },
   'xiao_mi_push_plugin': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/w568w/FlutterXiaoMiPushPlugin.git',
+      'url': r'https://github.com/w568w/FlutterXiaoMiPushPlugin.git',
       'ref': r'master',
     },
   },
@@ -113,7 +113,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'quick_actions': r'^0.6.0+9',
   'qr_flutter': r'^4.0.0',
   'provider': r'^6.0.2',
-  'catcher': r'^0.6.9',
   'event_bus': r'^2.0.0',
   'flutter_platform_widgets': r'^1.20.0',
   'share_plus': r'^3.1.0',
@@ -150,7 +149,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'file_picker': r'^4.0.0',
   'cached_network_image': r'^3.2.0',
   'google_mobile_ads': r'^1.1.0',
-  'flutter_typeahead': r'>=3.1.0 <4.0.0',
+  'flutter_typeahead': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/selvam920/flutter_typeahead',
+      'ref': r'master',
+    },
+  },
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^1.0.3',
@@ -165,6 +169,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_fgbg': r'^0.1.0',
   'lazy_load_indexed_stack': r'^0.1.3',
   'js': r'^0.6.3',
+  'add_2_calendar': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/singularity-s0/add_2_calendar.git',
+      'ref': r'master',
+    },
+  },
 };
 
 /// Developer dependencies
@@ -182,13 +192,13 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
   'device_info_plus': r'^3.2.1',
   'fluttertoast': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/ponnamkarthik/FlutterToast.git',
+      'url': r'https://github.com/ponnamkarthik/FlutterToast.git',
       'ref': r'master',
     },
   },
   'linkify': <String, Object>{
     'git': <String, Object>{
-      'url': r'git://github.com/singularity-s0/linkify.git',
+      'url': r'https://github.com/singularity-s0/linkify.git',
       'ref': r'master',
     },
   },

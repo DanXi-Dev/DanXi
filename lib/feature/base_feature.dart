@@ -26,8 +26,8 @@ import 'package:flutter/widgets.dart';
 /// ## Note: A Checklist After Creating a New [Feature] (For a Notification, you don't need to do these!)
 ///
 /// 1. Register it in [FeatureMap].
-/// 2. Add it to [_HomeSubpageState.widgetMap] in [HomeSubpage],
-///   whose initialization you will find at [_HomeSubpageState._rebuild].
+/// 2. Add it to [HomeSubpageState.widgetMap] in [HomeSubpage],
+///   whose initialization you will find at [HomeSubpageState.rebuildFeatures].
 /// 3. Insert it at a appropriate position to [Constant.defaultDashboardCardList].
 /// 4. Also add it to [Constant.getFeatureName].
 abstract class Feature {
@@ -36,6 +36,8 @@ abstract class Feature {
   notifyUpdate() => container.doUpdate();
 
   bool get clickable => false;
+
+  bool get loadOnTap => true;
 
   Widget? get icon => null;
 

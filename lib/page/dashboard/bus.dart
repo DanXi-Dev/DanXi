@@ -50,18 +50,23 @@ class _BusPageState extends State<BusPage> {
   List<BusScheduleItem>? _busListWeekdayLoaded;
   List<BusScheduleItem>? _busListHolidayLoaded;
 
+  /// The slide bar's position of holiday/workday.
   int? _holidaySliding;
 
-  // Start Location
+  /// Start location.
   Campus? _startSelectItem = Campus.NONE;
+
+  /// The slide bar's position of start location.
   int? _startSliding;
 
-  // End Location
+  /// End location.
   Campus? _endSelectItem = Campus.NONE;
+
+  /// The slide bar's position of end location.
   int? _endSliding;
 
-  // By default, only buses after DateTime.now() is displayed
-  // Set this to true to display all buses
+  /// By default, only buses after DateTime.now() is displayed.
+  /// Set this to true to display all buses.
   bool _showAll = false;
 
   Future<List<BusScheduleItem>?> _setContent() async {
@@ -126,7 +131,7 @@ class _BusPageState extends State<BusPage> {
       _holidaySliding = 0;
     }
 
-    // Default to Handan
+    // Default to HanDan
     _startSelectItem = Campus.HANDAN_CAMPUS;
     _startSliding = _startSelectItem!.index;
     _onStartLocationChanged(_startSelectItem);

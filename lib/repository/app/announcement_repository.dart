@@ -85,16 +85,27 @@ class AnnouncementRepository {
       _announcementCache.filter((element) => element.maxVersion! >= 0);
 
   @Deprecated(
-      "Never use single start date any more. Call getStartDates() instead")
+      "Never use single startDate any more. Call getStartDates() instead")
   DateTime getStartDate() => DateTime.parse(_announcementCache!
       .firstWhere((element) => element.maxVersion == _ID_START_DATE)
       .content!);
 
   TimeTableExtra? getStartDates() {
+    return getExtra()?.timetable;
+  }
+
+  String? getUserAgent() {
+    return getExtra()?.userAgent;
+  }
+
+  List<String?>? getStopWords() {
+    return getExtra()?.stopWords;
+  }
+
+  Extra? getExtra() {
     return Extra.fromJson(jsonDecode(_announcementCache!
-            .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
-            .content!))
-        .timetable;
+        .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
+        .content!));
   }
 
   UpdateInfo checkVersion() => UpdateInfo(

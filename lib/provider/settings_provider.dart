@@ -25,6 +25,7 @@ import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,6 +60,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_BACKGROUND_IMAGE_PATH = "background";
   static const String KEY_SEARCH_HISTORY = "search_history";
   static const String KEY_TIMETABLE_SEMESTER = "timetable_semester";
+  static const String KEY_CUSTOM_USER_AGENT = "custom_user_agent";
 
   SettingsProvider._();
 
@@ -383,6 +385,27 @@ class SettingsProvider with ChangeNotifier {
     preferences!.setString(KEY_CELEBRATION, jsonEncode(lists));
     notifyListeners();
   }
+
+  /// Custom User Agent
+  ///
+  /// See:
+  /// - [UserAgentInterceptor]
+  /// - [BaseRepositoryWithDio]
+  String? get customUserAgent {
+    if (preferences!.containsKey(KEY_CUSTOM_USER_AGENT)) {
+      return preferences!.getString(KEY_CUSTOM_USER_AGENT)!;
+    }
+    return null;
+  }
+
+  set customUserAgent(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_CUSTOM_USER_AGENT, value);
+    } else {
+      preferences!.remove(KEY_CUSTOM_USER_AGENT);
+    }
+    notifyListeners();
+  }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }
@@ -402,9 +425,9 @@ extension SortOrderEx on SortOrder? {
   String? getInternalString() {
     switch (this) {
       case SortOrder.LAST_REPLIED:
-        return "last_updated";
+        return "time_updated";
       case SortOrder.LAST_CREATED:
-        return "last_created";
+        return "time_created";
       case null:
         return null;
     }

@@ -19,7 +19,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:catcher/catcher.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
@@ -41,19 +40,24 @@ import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/opentreehole/text_selector.dart';
-import 'package:dan_xi/page/settings/diagnosic_console.dart';
+import 'package:dan_xi/page/settings/diagnostic_console.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/bmob/bmob/bmob.dart';
+import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -65,20 +69,7 @@ import 'common/constant.dart';
 /// The main entry of the whole app.
 /// Do some initial work here.
 void main() {
-  // Config [Catcher] to catch uncaught exceptions.
-  CatcherOptions debugOptions = CatcherOptions(SilentReportMode(), [
-    ConsoleHandler()
-  ], localizationOptions: [
-    LocalizationOptions.buildDefaultEnglishOptions(),
-    LocalizationOptions.buildDefaultChineseOptions(),
-  ]);
-  CatcherOptions releaseOptions = CatcherOptions(SilentReportMode(), [
-    ConsoleHandler()
-  ], localizationOptions: [
-    LocalizationOptions.buildDefaultEnglishOptions(),
-    LocalizationOptions.buildDefaultChineseOptions(),
-  ]);
-
+  // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
 
   // Init Bmob database.
@@ -93,7 +84,7 @@ void main() {
 
   // Init Feature registration.
   FeatureMap.registerAllFeatures();
-  unawaited(ScreenProxy.init());
+  unawaited(LazyFuture.pack(ScreenProxy.init()));
   SettingsProvider.getInstance().init().then((_) {
     // Initialize Ad only if user has opted-in to save resources
     // If user decides to opt-in after the app has started,
@@ -102,10 +93,7 @@ void main() {
     //   MobileAds.instance.initialize();
     // }
 
-    Catcher(
-        rootWidget: const DanxiApp(),
-        debugConfig: debugOptions,
-        releaseConfig: releaseOptions);
+    runApp(const DanxiApp());
   });
 
   // Init DesktopWindow on desktop environment.
@@ -118,7 +106,7 @@ void main() {
 }
 
 class TouchMouseScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
+  // Override dragDevices to enable scrolling with mouse & stylus
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
@@ -132,7 +120,7 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
 /// ## Note: A Checklist After Creating a New Page
 ///
 /// [TextSelectorPage] is a simple example of what a typical page in DanXi looks like.
-/// Also have a look at [AAONoticesList] if you are looking for something a bit advanced.
+/// Also, you can have a look at [AAONoticesList] if looking for something a bit advanced.
 ///
 /// 1. Register it in [DanxiApp.routes] below, with the same syntax.
 /// 2. Call [smartNavigatorPush] to navigate to the page.
@@ -186,11 +174,22 @@ class DanxiApp extends StatelessWidget {
 
   const DanxiApp({Key? key}) : super(key: key);
 
+  Widget errorBuilder(FlutterErrorDetails details) => Builder(
+      builder: (context) =>
+          ErrorPageWidget.buildWidget(context, details.exception));
+
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+    // Replace the global error widget with a simple Text
+    if (!kDebugMode) ErrorWidget.builder = errorBuilder;
+
     Widget mainApp = PlatformProvider(
-      // Uncomment this line below to force the app to use Cupertino UI
+      // Uncomment this line below to force the app to use Cupertino Widgets
       // initialPlatform: TargetPlatform.iOS,
+
+      // [DynamicThemeController] enables the app to change between dark/light theme without restart
       builder: (BuildContext context) => DynamicThemeController(
         lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
         darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
@@ -214,10 +213,8 @@ class DanxiApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate
           ],
           supportedLocales: S.delegate.supportedLocales,
-          onUnknownRoute: (settings) {
-            throw AssertionError(
-                "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code.");
-          },
+          onUnknownRoute: (settings) => throw AssertionError(
+              "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
           home: PlatformMasterDetailApp(
             // Configure the page route behaviour of the whole app
             onGenerateRoute: (settings) {
@@ -231,7 +228,7 @@ class DanxiApp extends StatelessWidget {
               }
               return null;
             },
-            navigatorKey: Catcher.navigatorKey,
+            navigatorKey: _navigatorKey,
           ),
         ),
       ),
@@ -251,11 +248,13 @@ class DanxiApp extends StatelessWidget {
           },
           child: mainApp);
     }
-
+    var fduHoleProvider = FDUHoleProvider();
+    OpenTreeHoleRepository.init(fduHoleProvider);
     return Phoenix(
       child: MultiProvider(providers: [
         ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider())
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider.value(value: fduHoleProvider)
       ], child: mainApp),
     );
   }

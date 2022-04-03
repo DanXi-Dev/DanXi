@@ -50,52 +50,52 @@ class Noticing {
       // Override Linkify's default text style.
       final bool isThemeDark = Theme.of(context).brightness == Brightness.dark;
       final Brightness invertBrightness =
-      isThemeDark ? Brightness.light : Brightness.dark;
+          isThemeDark ? Brightness.light : Brightness.dark;
       final TextStyle? contentTextStyle =
           Theme.of(context).snackBarTheme.contentTextStyle ??
               ThemeData(brightness: invertBrightness).textTheme.subtitle1;
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Linkify(
-            style: contentTextStyle,
-            text: message,
-            onOpen: (element) => BrowserUtil.openUrl(element.url, context),
-          )));
+        style: contentTextStyle,
+        text: message,
+        onOpen: (element) => BrowserUtil.openUrl(element.url, context),
+      )));
     } else {
       await showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
-            title: title == null ? null : Text(title),
-            content: centerContent!
-                ? Center(
-                child: Linkify(
-                  textAlign:
-                  centerContent ? TextAlign.center : TextAlign.start,
-                  text: message,
-                  onOpen: (element) =>
-                      BrowserUtil.openUrl(element.url, context),
-                ))
-                : Linkify(
-              textAlign:
-              centerContent ? TextAlign.center : TextAlign.start,
-              text: message,
-              onOpen: (element) =>
-                  BrowserUtil.openUrl(element.url, context),
-            ),
-            actions: <Widget>[
-              PlatformDialogAction(
-                  child: PlatformText(confirmText ?? S.of(context).i_see),
-                  onPressed: () => Navigator.pop(context)),
-            ],
-          ));
+                title: title == null ? null : Text(title),
+                content: centerContent!
+                    ? Center(
+                        child: Linkify(
+                        textAlign:
+                            centerContent ? TextAlign.center : TextAlign.start,
+                        text: message,
+                        onOpen: (element) =>
+                            BrowserUtil.openUrl(element.url, context),
+                      ))
+                    : Linkify(
+                        textAlign:
+                            centerContent ? TextAlign.center : TextAlign.start,
+                        text: message,
+                        onOpen: (element) =>
+                            BrowserUtil.openUrl(element.url, context),
+                      ),
+                actions: <Widget>[
+                  PlatformDialogAction(
+                      child: PlatformText(confirmText ?? S.of(context).i_see),
+                      onPressed: () => Navigator.pop(context)),
+                ],
+              ));
     }
   }
 
   static showModalError(BuildContext context, dynamic error,
       {StackTrace? trace,
-        String? title,
-        bool useSnackBar = false,
-        bool? centerContent}) {
+      String? title,
+      bool useSnackBar = false,
+      bool? centerContent}) {
     title ??= S.of(context).fatal_error;
     return Noticing.showNotice(
         context,
@@ -108,9 +108,9 @@ class Noticing {
 
   static Future<String?> showInputDialog(BuildContext context, String title,
       {String? confirmText,
-        bool isConfirmDestructive = false,
-        int? maxLines,
-        String? hintText}) async {
+      bool isConfirmDestructive = false,
+      int? maxLines,
+      String? hintText}) async {
     TextEditingController controller = TextEditingController();
     String? value = await showPlatformDialog<String?>(
       context: context,
@@ -135,8 +135,8 @@ class Noticing {
               material: (context, platform) => MaterialDialogActionData(
                   style: isConfirmDestructive
                       ? ButtonStyle(
-                      foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.red))
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red))
                       : null),
               child: PlatformText(confirmText ?? S.of(context).i_see),
               onPressed: () => Navigator.pop(context, controller.text)),
@@ -150,40 +150,42 @@ class Noticing {
     return value;
   }
 
-  static Future<bool?> showConfirmationDialog(BuildContext context, String message,
+  static Future<bool?> showConfirmationDialog(
+      BuildContext context, String message,
       {String? confirmText,
-        String? title,
-        bool isConfirmDestructive = false,
-        bool? centerContent}) async {
+      String? cancelText,
+      String? title,
+      bool isConfirmDestructive = false,
+      bool? centerContent}) async {
     centerContent ??= !PlatformX.isMaterial(context);
     return await showPlatformDialog<bool>(
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
-          title: title == null ? null : Text(title),
-          content: centerContent!
-              ? Center(
-              child: Linkify(
-                textAlign:
-                centerContent ? TextAlign.center : TextAlign.start,
-                text: message,
-                onOpen: (element) =>
-                    BrowserUtil.openUrl(element.url, context),
-              ))
-              : Linkify(
-            textAlign:
-            centerContent ? TextAlign.center : TextAlign.start,
-            text: message,
-            onOpen: (element) =>
-                BrowserUtil.openUrl(element.url, context),
-          ),
-          actions: <Widget>[
-            PlatformDialogAction(
-                cupertino: (context, platform) =>
-                    CupertinoDialogActionData(isDefaultAction: true),
-                child: PlatformText(S.of(context).cancel),
-                onPressed: () => Navigator.pop(context, false)),
-            PlatformDialogAction(
-                cupertino: (context, platform) => CupertinoDialogActionData(
+              title: title == null ? null : Text(title),
+              content: centerContent!
+                  ? Center(
+                      child: Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ))
+                  : Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    cupertino: (context, platform) =>
+                        CupertinoDialogActionData(isDefaultAction: true),
+                    child: PlatformText(cancelText ?? S.of(context).cancel),
+                    onPressed: () => Navigator.pop(context, false)),
+                PlatformDialogAction(
+                    cupertino: (context, platform) => CupertinoDialogActionData(
                         isDestructiveAction: isConfirmDestructive),
                     material: (context, platform) => MaterialDialogActionData(
                         style: isConfirmDestructive
@@ -194,21 +196,21 @@ class Noticing {
                             : null),
                     child: PlatformText(confirmText ?? S.of(context).i_see),
                     onPressed: () => Navigator.pop(context, true)),
-          ],
-        ));
+              ],
+            ));
   }
 
   static showModalNotice(BuildContext context,
-      {String title = "", String message = ""}) async {
+      {String title = "", String message = "", bool selectable = false}) async {
     if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
     Widget content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
           child: ListTile(
               title: Text(title),
-              subtitle: Linkify(
-                text: message,
-              ))),
+              subtitle: selectable
+                  ? SelectableLinkify(text: message)
+                  : Linkify(text: message))),
     );
     Widget body;
     if (PlatformX.isCupertino(context)) {

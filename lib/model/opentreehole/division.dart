@@ -41,5 +41,8 @@ class OTDivision {
   OTDivision(this.division_id, this.name, this.description, this.pinned);
 
   @override
+  String toString() => name ?? "null";
+
+  @override
   int get hashCode => division_id!;
 }

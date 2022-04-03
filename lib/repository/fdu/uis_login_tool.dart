@@ -18,11 +18,14 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/dio_log.dart';
@@ -33,25 +36,46 @@ class UISLoginTool {
   static const String WEAK_PASSWORD = "弱密码提示";
   static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
 
+  static Future<E> tryAsyncWithAuth<E>(
+          Dio dio,
+          String serviceUrl,
+          IndependentCookieJar jar,
+          PersonInfo? info,
+          Future<E> Function() function,
+          {int retryTimes = 1}) =>
+      Retrier.tryAsyncWithFix(() async {
+        await throwIfNotLogin(serviceUrl, jar);
+        return function();
+      }, (_) => UISLoginTool.fixByLoginUIS(dio, serviceUrl, jar, info, true),
+          retryTimes: retryTimes);
+
+  static Future<void> throwIfNotLogin(
+      String serviceUrl, IndependentCookieJar jar) async {
+    if ((await jar.loadForRequest(Uri.tryParse(serviceUrl)!)).isEmpty) {
+      throw NotLoginError("You have not logged in your UIS.");
+    }
+  }
+
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if having logged in, return null.
   static Future<void> fixByLoginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
-      [bool forceRelogin = false]) async {
-    await loginUIS(dio, serviceUrl, jar, info, forceRelogin);
+      [bool forceReLogin = false]) async {
+    await loginUIS(dio, serviceUrl, jar, info, forceReLogin);
   }
 
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if it has logged in or it's logging in, return null.
-  static Future<Response?> loginUIS(
+  static Future<Response<dynamic>?> loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     if (dio.interceptors.requestLock.locked) return null;
     dio.interceptors.requestLock.lock();
-    Response? result = await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
-        .whenComplete(() {
+    Response<dynamic>? result =
+        await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
+            .whenComplete(() {
       if (dio.interceptors.requestLock.locked) {
         dio.interceptors.requestLock.unlock();
       }
@@ -59,7 +83,7 @@ class UISLoginTool {
     return result;
   }
 
-  static Future<Response?> _loginUIS(
+  static Future<Response<dynamic>?> _loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
@@ -71,14 +95,15 @@ class UISLoginTool {
     //     sendTimeout: 5000);
     IndependentCookieJar workJar = IndependentCookieJar.createFrom(jar);
     workDio.interceptors.add(LimitedQueuedInterceptor.getInstance());
-    workDio.interceptors.add(UserAgentInterceptor());
+    workDio.interceptors.add(UserAgentInterceptor(
+        userAgent: SettingsProvider.getInstance().customUserAgent));
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
 
     // If we has logged in, return null.
     if (!forceRelogin &&
         (await workJar.loadForRequest(Uri.tryParse(serviceUrl)!)).isNotEmpty) {
-      Response res = await workDio.head(serviceUrl,
+      Response<dynamic> res = await workDio.head(serviceUrl,
           options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
       if (res.statusCode == 302 &&
           !res.headers.map.containsKey('set-cookie') &&
@@ -90,8 +115,8 @@ class UISLoginTool {
     // Remove old cookies.
     workJar.deleteAll();
     Map<String?, String?> data = {};
-    Response res = await workDio.get(serviceUrl);
-    BeautifulSoup(res.data.toString()).findAll("input").forEach((element) {
+    Response<String> res = await workDio.get(serviceUrl);
+    BeautifulSoup(res.data!).findAll("input").forEach((element) {
       if (element.attributes['type'] != "button") {
         data[element.attributes['name']] = element.attributes['value'];
       }
@@ -101,7 +126,8 @@ class UISLoginTool {
     res = await workDio.post(serviceUrl,
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    final Response response = await DioUtils.processRedirect(workDio, res);
+    final Response<dynamic> response =
+        await DioUtils.processRedirect(workDio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       CredentialsInvalidException().fire();
       throw CredentialsInvalidException();

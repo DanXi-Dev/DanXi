@@ -27,8 +27,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class FudanLibraryCrowdednessFeature extends Feature {
+  @override
+  bool get loadOnTap => false;
+
+  /// The numbers of each library visitors at the moment.
   List<int?>? _libraryCrowdedness;
 
+  /// The library literate names.
+  ///
+  /// Its order should correspond with the order of [_libraryCrowdedness].
   static const List<String> _LIBRARY_NAME = ["理图", "文图", "张江", "枫林", "江湾"];
 
   /// Status of the request.
@@ -60,6 +67,16 @@ class FudanLibraryCrowdednessFeature extends Feature {
   @override
   String get mainTitle => S.of(context!).fudan_library_crowdedness;
 
+  List<String> get _resultText {
+    List<String> result = [];
+    for (int i = 0;
+        i < _libraryCrowdedness!.length && i < _LIBRARY_NAME.length;
+        i++) {
+      result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
+    }
+    return result;
+  }
+
   @override
   String get subTitle {
     switch (_status) {
@@ -70,11 +87,7 @@ class FudanLibraryCrowdednessFeature extends Feature {
         if (_libraryCrowdedness!.isEmpty) {
           return S.of(context!).no_data;
         } else {
-          List<String> result = [];
-          for (int i = 0; i < _libraryCrowdedness!.length; i++) {
-            result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
-          }
-          return result.join(" ");
+          return _resultText.join(" ");
         }
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
@@ -106,12 +119,8 @@ class FudanLibraryCrowdednessFeature extends Feature {
   @override
   void onTap() {
     if (_libraryCrowdedness != null && _libraryCrowdedness!.isNotEmpty) {
-      List<String> result = [];
-      for (int i = 0; i < _libraryCrowdedness!.length; i++) {
-        result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
-      }
       Noticing.showModalNotice(context!,
-          message: result.join("\n"),
+          message: _resultText.join("\n"),
           title: S.of(context!).fudan_library_crowdedness);
     } else {
       refreshData();

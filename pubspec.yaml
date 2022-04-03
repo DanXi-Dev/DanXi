@@ -1,7 +1,7 @@
 name: dan_xi
 description: Maybe the best all-rounded service app for Fudan University students.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.3.6+156
+version: 1.3.8+166
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -17,7 +17,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
     git:
-      url: git://github.com/singularity-s0/flutter_progress_dialog.git
+      url: https://github.com/singularity-s0/flutter_progress_dialog.git
       ref: master
   #  xiao_mi_push_plugin:
   #    git:
@@ -27,7 +27,6 @@ dependencies:
   quick_actions: ^0.6.0+9
   qr_flutter: ^4.0.0
   provider: ^6.0.2
-  catcher: ^0.6.9
   event_bus: ^2.0.0
   flutter_platform_widgets: ^1.20.0
   share_plus: ^3.1.0
@@ -60,11 +59,20 @@ dependencies:
   markdown: ^4.0.1
   system_tray: ^0.1.0
   bitsdojo_window: ^0.1.1+1
+  # Change the line above to these lines when updating to Flutter 2.13+
+  #  bitsdojo_window:
+  #    git:
+  #      url: git@github.com:XuTuKe/bitsdojo_window.git
+  #      path: bitsdojo_window
+  #      ref: master
   win32: ^2.4.1
   file_picker: ^4.0.0
   cached_network_image: ^3.2.0
-  # google_mobile_ads: ^1.0.1
-  flutter_typeahead: '>=3.1.0 <4.0.0'
+#  google_mobile_ads: ^1.1.0
+  flutter_typeahead:
+    git:
+      url: https://github.com/selvam920/flutter_typeahead
+      ref: master
   collection: '>=1.15.0 <2.0.0'
   meta: '>=1.3.0 <2.0.0'
   flutter_layout_grid: ^1.0.3
@@ -79,16 +87,20 @@ dependencies:
   flutter_fgbg: ^0.1.0
   lazy_load_indexed_stack: ^0.1.3
   js: ^0.6.3
+  add_2_calendar:
+    git:
+      url: https://github.com/singularity-s0/add_2_calendar.git
+      ref: master
 
 dependency_overrides:
   device_info_plus: ^3.2.1
   fluttertoast:
     git:
-      url: git://github.com/ponnamkarthik/FlutterToast.git
+      url: https://github.com/ponnamkarthik/FlutterToast.git
       ref: master
   linkify:
     git:
-      url: git://github.com/singularity-s0/linkify.git
+      url: https://github.com/singularity-s0/linkify.git
       ref: master
 
 dev_dependencies:

@@ -19,7 +19,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '2.10.1'
+          # flutter-version: '2.10.1'
           channel: 'stable'
           
       - name: Prepare Flutter Dependencies
@@ -51,6 +51,9 @@ jobs:
         run: |
           git add .
           git commit -m "[GitHub Action] Bump Build Number"
+      
+      - name: Push Build Number Update
+        run: git push origin main
 
       - name: Import Keys
         run: |
@@ -71,7 +74,7 @@ jobs:
           mv -f secrets/sksl_default.json CI/sksl_default.json
 
       - name: Configure Xcode
-        run: flutter build ios --release --config-only --bundle-sksl-path CI/sksl_default.json
+        run: flutter build ios --release --config-only # --bundle-sksl-path CI/sksl_default.json
 
       - name: Build and Upload via Fastlane
         uses: maierj/fastlane-action@v2.1.0
@@ -84,7 +87,3 @@ jobs:
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
-          
-        
-      - name: Push Build Number Update
-        run: git push origin main

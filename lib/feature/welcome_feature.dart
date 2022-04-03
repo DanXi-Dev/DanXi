@@ -20,7 +20,6 @@ import 'dart:math';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
@@ -32,25 +31,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WelcomeFeature extends Feature {
-  PersonInfo? _info;
   ConnectionStatus _status = ConnectionStatus.NONE;
+
+  /// A list of card details.
+  ///
+  /// We only use them to determine whether the user has entry permission to the campus.
   List<CardDetailInfo>? _cardInfos;
 
   Future<void> _loadCardStatus() async {
     _status = ConnectionStatus.CONNECTING;
-    _cardInfos =
-        await DataCenterRepository.getInstance().getCardDetailInfo(_info);
+    _cardInfos = await DataCenterRepository.getInstance()
+        .getCardDetailInfo(StateProvider.personInfo.value);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
 
-  /// A sentence to show welcome to users depending on the time.
+  /// A sentence to show welcome to user, depending on the time and date.
   String _helloQuote = "";
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    _info = StateProvider.personInfo.value;
-
     try {
       List<String> celebrationWords = [];
       for (var celebration in SettingsProvider.getInstance().celebrationWords) {
@@ -59,6 +59,7 @@ class WelcomeFeature extends Feature {
         }
       }
       if (celebrationWords.isNotEmpty) {
+        // Randomly choose a celebration sentence to show.
         _helloQuote =
             celebrationWords[Random().nextInt(celebrationWords.length)];
         return;
@@ -90,7 +91,11 @@ class WelcomeFeature extends Feature {
   }
 
   @override
-  String get mainTitle => S.of(context!).welcome(_info?.name ?? "?");
+  bool get loadOnTap => false;
+
+  @override
+  String get mainTitle =>
+      S.of(context!).welcome(StateProvider.personInfo.value?.name ?? "?");
 
   @override
   String get subTitle => _helloQuote;
@@ -109,14 +114,12 @@ class WelcomeFeature extends Feature {
   @override
   Widget get trailing {
     Widget status;
-    String _infoText;
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
         status = ScaleTransform(
             scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
             child: PlatformCircularProgressIndicator());
-        _infoText = "";
         break;
       case ConnectionStatus.DONE:
         if (_cardInfos?.any((element) => !element.permission.contains("是")) ??
@@ -127,7 +130,6 @@ class WelcomeFeature extends Feature {
                 : CupertinoIcons.xmark_circle,
             color: Theme.of(context!).errorColor,
           );
-          _infoText = S.of(context!).abnormal_entry_permission;
         } else {
           status = Icon(
             PlatformX.isMaterial(context!)
@@ -135,13 +137,11 @@ class WelcomeFeature extends Feature {
                 : CupertinoIcons.checkmark_alt_circle,
             color: Colors.green,
           );
-          _infoText = S.of(context!).everything_is_ok;
         }
         break;
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         status = const Icon(Icons.error);
-        _infoText = S.of(context!).failed;
         break;
     }
 
@@ -151,10 +151,6 @@ class WelcomeFeature extends Feature {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           status,
-          /*if (_infoText.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(_infoText, textScaleFactor: 0.8)
-          ]*/
           const SizedBox(height: 2),
           Text(S.of(context!).entry_permission, textScaleFactor: 0.8)
         ],

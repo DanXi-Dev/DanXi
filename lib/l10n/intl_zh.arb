@@ -404,5 +404,18 @@
   "set_semester_start_date": "设定开学日期",
   "try_visitor_mode": "不想输入账号？试试游客模式",
   "set_password": "设置密码",
-  "set_your_fduhole_password": "为 FDUHole 账户设置一个密码"
+  "set_your_fduhole_password": "为 FDUHole 账户设置一个密码",
+  "import_into_cal": "导入日历",
+  "search_by_text_tip": "搜索正文含「{searchKeyword}」的帖子",
+  "search_by_pid_tip": "跳转到帖子「{pid}」",
+  "search_by_floor_tip": "跳转到楼层「{floorId}」",
+  "search_by_tag_tip": "查看本分区含 Tag「{tag}」的帖子",
+  "tip_that_fduhole_is_not_fdu": "注意：FDUHole 账号并不是您的复旦邮箱或复旦 UIS 账号。\n如果您从「UIS 快捷注册/登录」来到这里，说明您已经注册过 FDUHole 了；\n如果您从「使用邮箱密码登录」来到这里，您可能还没有注册过，请从另一个选项注册账号。",
+  "our_email_is": "我们的邮箱是 {email} 。",
+  "send_email": "发送邮件",
+  "post_has_no_tags": "我们不建议发布无标签的帖子，一定要继续发送吗？",
+  "post_has_no_tags_title": "没有标签",
+  "continue_sending": "继续发送",
+  "post_has_stop_words_title": "含有不适当的词语",
+  "post_has_stop_words": "内容中含有不适宜使用的词汇：{stopWord}。\n我们不建议发送此类词语，因为它不适用于理性讨论的环境，因而更有可能招致攻击和不恰当言论，一定要继续发送吗？"
 }

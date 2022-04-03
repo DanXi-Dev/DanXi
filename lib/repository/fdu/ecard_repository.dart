@@ -70,11 +70,11 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String?> requestData, int pageNum) async {
     requestData['pageNo'] = pageNum.toString();
-    Response detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
+    Response<String> detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
         options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
-    BeautifulSoup soup = BeautifulSoup(
-        detailResponse.data.toString().between("<![CDATA[", "]]>")!);
+    BeautifulSoup soup =
+        BeautifulSoup(detailResponse.data!.between("<![CDATA[", "]]>")!);
     List<Element> elements =
         soup.find("tbody")!.element!.querySelectorAll("tr");
     Iterable<CardRecord> records = elements.map((e) {
@@ -97,9 +97,10 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<List<CardRecord>?> loadCardRecord(int logDays) async {
     if (logDays < 0) return null;
     //Get csrf id.
-    Response consumeCsrfPageResponse = await dio!.get(_CONSUME_DETAIL_CSRF_URL);
+    Response<String> consumeCsrfPageResponse =
+        await dio!.get(_CONSUME_DETAIL_CSRF_URL);
     BeautifulSoup consumeCsrfPageSoup =
-        BeautifulSoup(consumeCsrfPageResponse.data.toString());
+        BeautifulSoup(consumeCsrfPageResponse.data!);
     Iterable<Element> metas =
         consumeCsrfPageSoup.findAll("meta").map((e) => e.element!);
     Element element = metas
@@ -126,12 +127,11 @@ class CardRepository extends BaseRepositoryWithDio {
     // Get the number of pages, only when logDays > 0.
     int totalPages = 1;
     if (logDays > 0) {
-      Response detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
+      Response<String> detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
           data: data.encodeMap(),
           options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
 
-      totalPages =
-          int.parse(detailResponse.data.toString().between('</b>/', '页')!);
+      totalPages = int.parse(detailResponse.data?.between('</b>/', '页') ?? '');
     }
     // Get pages.
     List<CardRecord> list = [];

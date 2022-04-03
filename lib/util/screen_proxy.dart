@@ -15,27 +15,31 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class ScreenProxy {
   static Future<void> init() async {
-    await ScreenBrightness().setAutoReset(false);
+    if (PlatformX.isMobile) await ScreenBrightness().setAutoReset(false);
   }
 
   static Future<double?> get brightness async {
-    return await ScreenBrightness().current;
+    if (PlatformX.isMobile) {
+      return await ScreenBrightness().current;
+    } else {
+      return 0;
+    }
   }
 
   static setBrightness(double brightness) async {
-    await ScreenBrightness().setScreenBrightness(brightness);
+    if (PlatformX.isMobile) {
+      await ScreenBrightness().setScreenBrightness(brightness);
+    }
   }
 
   static resetBrightness() async {
-    await ScreenBrightness().resetScreenBrightness();
-  }
-
-  static keepOn(bool on) async {
-    // TODO: Use wakelock to keep screen on
-    throw UnimplementedError();
+    if (PlatformX.isMobile) {
+      await ScreenBrightness().resetScreenBrightness();
+    }
   }
 }

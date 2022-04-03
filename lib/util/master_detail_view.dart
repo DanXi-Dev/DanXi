@@ -115,7 +115,7 @@ Future<T?> smartNavigatorPush<T extends Object>(
     return navigatorGlobalKey!.currentState!
         .pushNamed<T?>(routeName, arguments: arguments);
   } else {
-    return Navigator.of(context).pushNamed(routeName, arguments: arguments);
+    return Navigator.of(context).pushNamed<T?>(routeName, arguments: arguments);
   }
 }
 

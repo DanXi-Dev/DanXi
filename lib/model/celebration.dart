@@ -25,15 +25,16 @@ part 'celebration.g.dart';
 class Celebration {
   /// Type of celebration [date].
   ///
-  /// 1: Chinese lunar festival(e.g. 春节)
-  /// 2: Chinese lunar date(e.g. 01-01)
-  /// 3: Standard date(e.g. 01-01)
+  /// 1: Chinese lunar festival(e.g. date = 春节)
+  /// 2: Chinese lunar date(e.g. date = 01-01)
+  /// 3: Standard date(e.g. date = 01-01)
   final int type;
 
   final String date;
 
   final List<String> celebrationWords;
 
+  /// Return whether the [date] corresponds with [dateTime].
   bool match(DateTime dateTime) {
     switch (type) {
       case 1:

@@ -19,18 +19,27 @@ import 'dart:math';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Store some important constants, like app id, default color styles, etc.
 class Constant {
+  /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
-  static const bool IS_PRODUCTION_ENVIRONMENT =
-      bool.fromEnvironment('dart.vm.product');
 
+  static const SPECIAL_DIVISION_FOR_CURRICULUM = "评教";
+
+  static String get DEFAULT_USER_AGENT =>
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
+
+  /// The Bmob verification keys.
   static const BMOB_APP_ID = "d651f7399053222e2b4d2575f7ca8ddb";
   static const BMOB_API_KEY = "bd9e3d90d593c053d4832c817b620890";
 
@@ -56,25 +65,64 @@ class Constant {
     "ca-app-pub-4420475240805528/4752425464",
   ];
 
+  /// A link to the "forget password" page of FDUHole.
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://www.fduhole.com/#/forgetpassword";
 
+  /// The default start date of a semester.
   // ignore: non_constant_identifier_names
-  static get DEFAULT_SEMESTER_START_TIME => DateTime(2022, 2, 21);
+  static final DEFAULT_SEMESTER_START_DATE = DateTime(2022, 2, 21);
 
   static EventBus eventBus = EventBus(sync: true);
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
-  static const FUDAN_DAILY_COUNTDOWN_SECONDS = 5;
 
   static List<String> fduHoleTips = [];
 
+  /// Load in the tips to be shown in the [BBSEditorWidget].
   static Future<List<String>> _loadTips() async {
-    String tipsJson = await rootBundle.loadString("assets/texts/tips.dat");
-    return tipsJson.split("\n");
+    String tipLines = await rootBundle.loadString("assets/texts/tips.dat");
+    return tipLines.split("\n");
   }
 
-  static Future<String> get randomFduholeTip async {
+  static List<String> _stopWords = [];
+
+  /// Load in the stop words to be shown in the [BBSEditorWidget].
+  static Future<List<String>> _loadStopWords() async {
+    String wordLines =
+        await rootBundle.loadString("assets/texts/stop_words.dat");
+    return wordLines.split("\n");
+  }
+
+  /// Get stop word list from [_loadStopWords].
+  ///
+  /// If failed to get, return an empty string.
+  static Future<List<String>> get stopWords async {
+    List<String?>? list;
+
+    // Try to fetch a stop word list online
+    try {
+      list = AnnouncementRepository.getInstance().getStopWords();
+    } catch (_) {}
+    if (list != null) {
+      List<String> filterList = list
+          .filter((e) => e != null && e.trim().isNotEmpty)
+          .map((e) => e!)
+          .toList();
+      if (filterList.isNotEmpty) {
+        return filterList;
+      }
+    }
+
+    // Fall back to local copy
+    if (_stopWords.isEmpty) _stopWords = await _loadStopWords();
+    return _stopWords;
+  }
+
+  /// Get a random tip from [_loadTips].
+  ///
+  /// If failed to get, return an empty string.
+  static Future<String> get randomFDUHoleTip async {
     if (fduHoleTips.isEmpty) fduHoleTips = await _loadTips();
 
     if (fduHoleTips.isEmpty) {
@@ -84,6 +132,9 @@ class Constant {
     }
   }
 
+  /// Get i18n names of all features.
+  ///
+  /// For any feature newly added, its representation name should be added here.
   static Map<String, String> getFeatureName(BuildContext context) => {
         'welcome_feature': S.of(context).welcome_feature,
         'next_course_feature': S.of(context).today_course,
@@ -103,6 +154,9 @@ class Constant {
         'dorm_electricity_feature': S.of(context).dorm_electricity,
       };
 
+  /// A default dashboard card list to be shown on the initial startup.
+  ///
+  /// It will be overwritten by data stored with key [SettingsProvider.KEY_DASHBOARD_WIDGETS]
   static List<DashboardCard> defaultDashboardCardList = [
     DashboardCard("new_card", null, null, true),
     DashboardCard("welcome_feature", null, null, true),
@@ -122,6 +176,9 @@ class Constant {
     DashboardCard("qr_feature", null, null, true),
   ];
 
+  /// Information about developers.
+  ///
+  /// The field "description" is not used at the moment.
   static List<Developer> getDevelopers(BuildContext context) => [
         Developer("w568w", "assets/graphics/w568w.jpeg",
             "https://github.com/w568w", S.of(context).w568w_description),
@@ -145,11 +202,15 @@ class Constant {
             "https://github.com/ivanfei-1", S.of(context).ivanfei_description),
       ];
 
+  /// Add a Chinese symbol(￥) at the end of [num].
+  ///
+  /// If [num] is empty, return an empty string.
   static String yuanSymbol(String? num) {
     if (num == null || num.trim().isEmpty) return "";
     return '\u00A5' + num;
   }
 
+  /// Get the link to update the application.
   static String updateUrl() {
     // Don't use GitHub URL, since access is not guaranteed
     if (PlatformX.isIOS) {
@@ -158,11 +219,19 @@ class Constant {
     return "https://danxi.fduhole.com";
   }
 
+  /// The light theme used by Material widgets in the app.
+  ///
+  /// It returns nearly default theme on Material environment, but do some special
+  /// configurations on Cupertino environment used by iOS.
+  ///
+  /// Also see:
+  /// * [darkTheme]
   static ThemeData lightTheme(bool isCupertino) {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.light,
         colorScheme: const ColorScheme.light().copyWith(
+            tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF)),
         toggleableActiveColor: const Color(0xFF007AFF),
@@ -193,11 +262,13 @@ class Constant {
     );
   }
 
+  /// See [lightTheme] for more details.
   static ThemeData darkTheme(bool isCupertino) {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark().copyWith(
+            tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF)),
         indicatorColor: const Color(0xFF007AFF),
@@ -230,6 +301,7 @@ class Constant {
     );
   }
 
+  /// A list of tag colors used by FDUHole.
   static const List<String> TAG_COLOR_LIST = [
     'red',
     'pink',
@@ -252,10 +324,11 @@ class Constant {
     'grey'
   ];
 
+  /// Get a random color string from [TAG_COLOR_LIST].
   static String get randomColor =>
       TAG_COLOR_LIST[Random().nextInt(TAG_COLOR_LIST.length)];
 
-  /// Get the [Color] from a color string.
+  /// Get the corresponding [Color] from a color string.
   static MaterialColor getColorFromString(String? color) {
     switch (color) {
       case 'red':
@@ -300,7 +373,9 @@ class Constant {
     return Colors.red;
   }
 
-  /// A copy of [Campus.values], omitting [Campus.NONE].
+  /// A list of Fudan campus.
+  ///
+  /// It is a copy of [Campus.values] expect [Campus.NONE].
   static const CAMPUS_VALUES = [
     Campus.HANDAN_CAMPUS,
     Campus.FENGLIN_CAMPUS,
@@ -308,7 +383,11 @@ class Constant {
     Campus.ZHANGJIANG_CAMPUS
   ];
 
-  /// Special days to celebrate in lunar calendar.
+  /// A default configuration JSON string for setting special days to celebrate
+  /// in lunar calendar.
+  ///
+  /// It is only used as a fallback when [AnnouncementRepository] cannot obtain the config from
+  /// server.
   static const String SPECIAL_DAYS = '''
   [
     {
@@ -334,6 +413,7 @@ class Constant {
   ''';
 }
 
+/// A list of Fudan campus.
 enum Campus {
   HANDAN_CAMPUS,
   FENGLIN_CAMPUS,
@@ -345,6 +425,7 @@ enum Campus {
 extension CampusEx on Campus? {
   static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
 
+  /// Find the corresponding [Campus] from its Chinese name in [_CAMPUS_NAME].
   static Campus fromChineseName(String? name) {
     for (int i = 0; i < _CAMPUS_NAME.length; i++) {
       if (name!.contains(_CAMPUS_NAME[i])) {
@@ -354,6 +435,7 @@ extension CampusEx on Campus? {
     return Campus.NONE;
   }
 
+  /// Get the teaching buildings of this campus.
   List<String>? getTeachingBuildings() {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
@@ -371,6 +453,7 @@ extension CampusEx on Campus? {
     }
   }
 
+  /// Get the i18n name of this campus for display.
   String? displayTitle(BuildContext? context) {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
@@ -390,8 +473,10 @@ extension CampusEx on Campus? {
   }
 }
 
+/// Define a set of possible connection status.
 enum ConnectionStatus { NONE, CONNECTING, DONE, FAILED, FATAL_ERROR }
 
+/// Some constants for secure connection.
 class SecureConstant {
   static const List<int> PINNED_CERTIFICATE = [
     48,

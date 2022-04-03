@@ -16,7 +16,9 @@
  */
 import 'dart:io';
 
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
 
@@ -25,10 +27,15 @@ class UserAgentInterceptor extends Interceptor {
 
   UserAgentInterceptor({this.userAgent});
 
+  static String? get defaultUsedUserAgent =>
+      StateProvider.onlineUserAgent ??
+      SettingsProvider.getInstance().customUserAgent ??
+      Constant.DEFAULT_USER_AGENT;
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (!PlatformX.isWeb) {
-      userAgent ??= "DanXi/${pubspec.major}.${pubspec.minor}.${pubspec.patch}";
+      userAgent ??= defaultUsedUserAgent;
       options.headers[HttpHeaders.userAgentHeader] = userAgent;
     }
     return handler.next(options);

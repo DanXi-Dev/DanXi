@@ -29,6 +29,7 @@ import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
@@ -221,6 +222,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _loadUpdate().then(
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
+      _loadUserAgent().catchError((ignored) {});
       _loadStartDate().catchError((ignored) {});
       _loadCelebration().catchError((ignored, st) {});
     }, onError: (e) {
@@ -319,7 +321,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String? code,
     Map<String, dynamic>? data,
   ) async {
-    if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
       // Do a quick initialization and push
       OpenTreeHoleRepository.getInstance().initializeToken();
     }
@@ -660,17 +662,29 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       .of(context)
                       .developer_announcement(announcement.createdAt ?? "?"),
                 ),
-                content: Linkify(
+                content: SingleChildScrollView(
+                    child: Linkify(
                   text: announcement.content!,
                   onOpen: (element) =>
                       BrowserUtil.openUrl(element.url, context),
-                ),
+                )),
                 actions: <Widget>[
                   PlatformDialogAction(
                       child: PlatformText(S.of(context).i_see),
                       onPressed: () => Navigator.pop(context)),
                 ],
               ));
+    }
+  }
+
+  Future<void> _loadUserAgent() async {
+    String? userAgent;
+    try {
+      userAgent = AnnouncementRepository.getInstance().getUserAgent();
+    } catch (_) {}
+    if (userAgent != null) {
+      SettingsProvider.getInstance().customUserAgent =
+          StateProvider.onlineUserAgent = userAgent;
     }
   }
 

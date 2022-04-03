@@ -68,11 +68,10 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   double _selectDate = 0;
 
-  _loadDefaultRoom() async {
+  _loadDefaultRoom() {
     _selectCampusIndex = SettingsProvider.getInstance().campus.index;
     _selectBuildingIndex =
         SettingsProvider.getInstance().lastECBuildingChoiceRepresentation;
-    refreshSelf();
   }
 
   @override

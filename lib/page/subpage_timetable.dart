@@ -176,7 +176,11 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       Noticing.showNotice(context, S.of(context).fatal_error);
       return;
     }
-    String converted = converter.convertTo(_table!);
+    String? converted = converter.convertTo(_table!);
+    if (converted == null ||
+        converter.mimeType == null ||
+        converter.fileName == null)
+      return; // If the converter does not export a file, return.
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");
@@ -186,7 +190,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
     } else if (PlatformX.isAndroid) {
       Share.shareFiles([outputFile.absolute.path],
-          mimeTypes: [converter.mimeType]);
+          mimeTypes: [converter.mimeType!]);
     } else {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
@@ -202,7 +206,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         ),
         material: (_, __) => ListTile(
           title: Text(e.key),
-          subtitle: Text(e.value.fileName),
+          subtitle: Text(e.value.fileName ?? ""),
           onTap: () => _startShare(context, e.value),
         ),
       );
@@ -212,7 +216,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     super.initState();
-    converters = {S.current.share_as_ics: ICSConverter()};
+    converters = {
+      //S.current.import_into_cal: CalendarImporter(), // Unfinished
+      S.current.share_as_ics: ICSConverter()
+    };
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
@@ -267,9 +274,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       },
               buttonText:
                   snapshot.error is NotLoginError ? S.of(context).login : null),
-      loadingBuilder: Center(
-        child: PlatformCircularProgressIndicator(),
-      ),
+      loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
     );
   }
 
@@ -329,8 +334,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (_showingTime!.weekday < 0) _showingTime!.weekday = 0;
     if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
 
-    final List<DayEvents> scheduleData = _table!
-        .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
+    final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
+        compact: TableDisplayType.STANDARD, containCourseOtherWeeks: false);
     return Material(
       child: RefreshIndicator(
         key: indicatorKey,
@@ -496,21 +501,19 @@ class StartDateSelectionButton extends StatelessWidget {
       var startDateStr = value.thisSemesterStartDate;
       DateTime? startDate;
       if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
-      return startDate ?? Constant.DEFAULT_SEMESTER_START_TIME;
+      return startDate ?? Constant.DEFAULT_SEMESTER_START_DATE;
     });
-    return PlatformIconButton(
+    return PlatformTextButton(
       padding: PlatformX.isCupertino(context) ? EdgeInsets.zero : null,
-      icon: AutoSizeText(DateFormat("yyyy-MM-dd").format(startTime), minFontSize: 10),
+      child: Text(DateFormat("yyyy-MM-dd").format(startTime)),
       onPressed: () async {
         DateTime? newDate = await showPlatformDatePicker(
             context: context,
-            cupertino: (context, __) => CupertinoDatePickerData(
-              doneLabel: S.of(context).ok,
-              cancelLabel: S.of(context).cancel
-            )
-            material: (context, __) => MaterialDatePickerData(
-                helpText: S.of(context).semester_start_date,
-                confirmText: S.of(context).ok),
+            cupertino: (cxt, __) => CupertinoDatePickerData(
+                doneLabel: S.of(cxt).ok, cancelLabel: S.of(cxt).cancel),
+            material: (cxt, __) => MaterialDatePickerData(
+                helpText: S.of(cxt).semester_start_date,
+                confirmText: S.of(cxt).ok),
             initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));

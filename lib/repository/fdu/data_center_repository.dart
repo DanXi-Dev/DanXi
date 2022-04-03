@@ -69,7 +69,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     return zoneTraffic;
   }
 
-  Future<Map<String, TrafficInfo>> getCrowdednessInfo(
+  Future<Map<String, TrafficInfo>?> getCrowdednessInfo(
           PersonInfo? info, int areaCode) async =>
       Retrier.tryAsyncWithFix(() => _getCrowdednessInfo(areaCode),
           (exception) async {
@@ -78,24 +78,24 @@ class DataCenterRepository extends BaseRepositoryWithDio {
         }
       });
 
-  Future<Map<String, TrafficInfo>> _getCrowdednessInfo(int areaCode) async {
+  Future<Map<String, TrafficInfo>?> _getCrowdednessInfo(int areaCode) async {
     var result = <String, TrafficInfo>{};
-    var response = await dio!.get(DINING_DETAIL_URL);
+    Response<String> response = await dio!.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
     if (response.data.toString().contains("仅")) {
       throw UnsuitableTimeException();
     }
     var dataString =
-        response.data.toString().between("}", "</script>", headGreedy: false)!;
+        response.data!.between("}", "</script>", headGreedy: false)!;
     var jsonExtraction = RegExp(r'\[.+\]').allMatches(dataString);
-    List names = jsonDecode(
+    List<dynamic> names = jsonDecode(
         jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("'", "\""));
-    List? cur = jsonDecode(jsonExtraction
+    List<dynamic>? cur = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 1)
         .group(0)!
         .replaceAll("'", "\""));
-    List? max = jsonDecode(jsonExtraction
+    List<dynamic>? max = jsonDecode(jsonExtraction
         .elementAt(areaCode * 3 + 2)
         .group(0)!
         .replaceAll("'", "\""));
@@ -114,14 +114,12 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
   Future<List<ExamScore>?> loadAllExamScore(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadAllExamScore(),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, LOGIN_URL, cookieJar!, info, () => _loadAllExamScore());
 
   Future<List<ExamScore>?> _loadAllExamScore() async {
-    Response r = await dio!.get(SCORE_DETAIL_URL);
-    BeautifulSoup soup = BeautifulSoup(r.data.toString());
+    Response<String> r = await dio!.get(SCORE_DETAIL_URL);
+    BeautifulSoup soup = BeautifulSoup(r.data!);
     dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
         .getElementsByTagName("tr")
@@ -130,10 +128,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<CardDetailInfo>?> getCardDetailInfo(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(
-          () => _getCardDetailInfo(),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
 
   Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
     Response<String> r = await dio!.get(CARD_DETAIL_URL);

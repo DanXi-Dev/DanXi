@@ -22,6 +22,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// A feature providing a shortcut a custom link.
 class CustomShortcutFeature extends Feature {
   final String? title;
   final String? link;
@@ -29,6 +30,9 @@ class CustomShortcutFeature extends Feature {
 
   @override
   String? get mainTitle => title;
+
+  @override
+  bool get loadOnTap => false;
 
   @override
   String? get subTitle => link;

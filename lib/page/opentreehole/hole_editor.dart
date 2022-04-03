@@ -23,7 +23,7 @@ import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -40,17 +40,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:provider/provider.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
+typedef PostInterceptor = Future<bool> Function(
+    BuildContext context, PostEditorText? text);
+
+extension PostInterceptorEx on PostInterceptor {
+  PostInterceptor mergeWith(PostInterceptor? interceptor) {
+    if (interceptor == null) return this;
+    return (context, text) async {
+      if (await this.call(context, text)) {
+        return interceptor.call(context, text);
+      } else {
+        return false;
+      }
+    };
+  }
+}
+
+final PostInterceptor _kStopWordInterceptor = (context, text) async {
+  final regularText = text?.text?.toLowerCase();
+  var stopWordList = await Constant.stopWords;
+  stopWordList = stopWordList.map((e) => e.trim().toLowerCase()).toList();
+  try {
+    var checkedStopWord = stopWordList.firstWhere((element) =>
+        element.isNotEmpty && (regularText?.contains(element) ?? false));
+    return await Noticing.showConfirmationDialog(
+            context, S.of(context).post_has_stop_words(checkedStopWord.trim()),
+            title: S.of(context).post_has_stop_words_title,
+            confirmText: S.of(context).continue_sending,
+            isConfirmDestructive: true) ??
+        false;
+  } catch (_) {}
+  return true;
+};
+
 class OTEditor {
   static Future<bool> createNewPost(BuildContext context, int divisionId,
-      {OTEditorType? editorType}) async {
+      {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText? content = await _showEditor(
         context, S.of(context).new_post,
-        allowTags: true, editorType: editorType, object: object);
+        allowTags: true,
+        editorType: editorType,
+        object: object,
+        interceptor: _kStopWordInterceptor.mergeWith(interceptor));
+
     if (content?.text == null) return false;
+
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
@@ -62,13 +101,13 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    StateProvider.editorCache.remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
   static Future<bool> createNewReply(
       BuildContext context, int? discussionId, int? floorId,
-      {OTEditorType? editorType}) async {
+      {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = (floorId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_HOLE)
         : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
@@ -79,7 +118,8 @@ class OTEditor {
                 : S.of(context).reply_to_floor(floorId),
             editorType: editorType,
             object: object,
-            placeholder: floorId == null ? "" : "##$floorId\n"))
+            placeholder: floorId == null ? "" : "##$floorId\n",
+            interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
         ?.text;
     if (content == null || content.trim() == "") return false;
     ProgressFuture progressDialog = showProgressDialog(
@@ -93,13 +133,13 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    StateProvider.editorCache.remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
   static Future<bool> modifyReply(BuildContext context, int? discussionId,
       int? floorId, String? originalContent,
-      {OTEditorType? editorType}) async {
+      {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = EditorObject(floorId, EditorObjectType.MODIFY_FLOOR);
     final String? content = (await _showEditor(
             context,
@@ -108,7 +148,8 @@ class OTEditor {
                 : S.of(context).modify_to_floor(floorId),
             editorType: editorType,
             object: object,
-            placeholder: originalContent ?? ""))
+            placeholder: originalContent ?? "",
+            interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
         ?.text;
     if (content == null || content.trim().isEmpty) return false;
     ProgressFuture progressDialog = showProgressDialog(
@@ -122,7 +163,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    StateProvider.editorCache.remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -151,19 +192,22 @@ class OTEditor {
       required OTEditorType? editorType,
       required EditorObject object,
       String placeholder = "",
-      bool hasTip = true}) async {
-    final String randomTip = await Constant.randomFduholeTip;
+      bool hasTip = true,
+      PostInterceptor? interceptor}) async {
+    final String randomTip = await Constant.randomFDUHoleTip;
 
     switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:
-        if (!StateProvider.editorCache.containsKey(object)) {
-          StateProvider.editorCache[object] =
+        if (!context.read<FDUHoleProvider>().editorCache.containsKey(object)) {
+          context.read<FDUHoleProvider>().editorCache[object] =
               PostEditorText.newInstance(withText: placeholder);
         }
         final textController = TextEditingController(
-            text: StateProvider.editorCache[object]!.text);
-        textController.addListener(() =>
-            StateProvider.editorCache[object]!.text = textController.text);
+            text: context.read<FDUHoleProvider>().editorCache[object]!.text);
+        textController.addListener(() => context
+            .read<FDUHoleProvider>()
+            .editorCache[object]!
+            .text = textController.text);
         final value = await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
             context: context,
@@ -179,8 +223,10 @@ class OTEditor {
                     PlatformDialogAction(
                         child: Text(S.of(context).cancel),
                         onPressed: () {
-                          StateProvider.editorCache[object]!.text =
-                              textController.text;
+                          context
+                              .read<FDUHoleProvider>()
+                              .editorCache[object]!
+                              .text = textController.text;
                           Navigator.of(context).pop<PostEditorText>(null);
                         }),
                     /*PlatformDialogAction(
@@ -190,8 +236,12 @@ class OTEditor {
                         child: Text(S.of(context).submit),
                         onPressed: () async {
                           Navigator.of(context).pop<PostEditorText>(
-                              PostEditorText(textController.text,
-                                  StateProvider.editorCache[object]!.tags));
+                              PostEditorText(
+                                  textController.text,
+                                  context
+                                      .read<FDUHoleProvider>()
+                                      .editorCache[object]!
+                                      .tags));
                         }),
                   ],
                 ));
@@ -206,7 +256,8 @@ class OTEditor {
               "tags": allowTags,
               'object': object,
               'placeholder': placeholder,
-              'tip': randomTip
+              'tip': randomTip,
+              'interceptor': interceptor
             });
         return result;
     }
@@ -258,8 +309,6 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
-  List<OTTag>? _allTags;
-
   late ValueNotifier<String> previewText;
 
   @override
@@ -340,8 +389,10 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 padding: const EdgeInsets.only(bottom: 4),
                 child: ThemedMaterial(
                   child: OTTagSelector(
-                      initialTags:
-                          StateProvider.editorCache[widget.editorObject]!.tags),
+                      initialTags: context
+                          .read<FDUHoleProvider>()
+                          .editorCache[widget.editorObject]!
+                          .tags),
                 ),
               ),
             Row(
@@ -419,11 +470,15 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   late String _title;
   late String _placeholder;
 
+  PostInterceptor? _interceptor;
+
   @override
   void initState() {
     super.initState();
+
     _controller.addListener(() {
-      StateProvider.editorCache[_object]!.text = _controller.text;
+      context.read<FDUHoleProvider>().editorCache[_object]!.text =
+          _controller.text;
     });
   }
 
@@ -435,16 +490,18 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   @override
   void didChangeDependencies() {
+    _interceptor = widget.arguments?['interceptor'];
     _tip = widget.arguments!['tip'];
     _supportTags = widget.arguments!['tags'] ?? false;
     _title =
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments!['object'];
     _placeholder = widget.arguments!['placeholder'];
-    if (StateProvider.editorCache.containsKey(_object)) {
-      _controller.text = StateProvider.editorCache[_object]!.text!;
+    if (context.read<FDUHoleProvider>().editorCache.containsKey(_object)) {
+      _controller.text =
+          context.read<FDUHoleProvider>().editorCache[_object]!.text!;
     } else {
-      StateProvider.editorCache[_object] =
+      context.read<FDUHoleProvider>().editorCache[_object] =
           PostEditorText.newInstance(withText: _placeholder);
       _controller.text = _placeholder;
     }
@@ -503,7 +560,11 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   Future<void> _sendDocument(EditorObject? object) async {
     String text = _controller.text;
     if (text.isEmpty) return;
-    Navigator.pop<PostEditorText>(
-        context, PostEditorText(text, StateProvider.editorCache[object]!.tags));
+    final editorText = PostEditorText(
+        text, context.read<FDUHoleProvider>().editorCache[object]!.tags);
+
+    if ((await _interceptor?.call(context, editorText)) ?? true) {
+      Navigator.pop<PostEditorText>(context, editorText);
+    }
   }
 }

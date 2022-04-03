@@ -143,6 +143,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           ],
         ),
       ).withRatio(kRatio).withGridPlacement(columnStart: day + 1, rowStart: 0);
+
       convertToBlock(widget.laneEventsList[day].events).forEach((element) {
         result[1 + day + cols * (element.firstSlot + 1)] =
             _buildScheduleBlock(element)
@@ -205,6 +206,19 @@ class _ScheduleViewState extends State<ScheduleView> {
         }
       }
     }
+
+    // Change the order of courses at the same time to ensure that the first course should be
+    // enabled if possible.
+    for (ScheduleBlock block in result) {
+      // Skip blocks that needn't be reordered
+      if (block.event.first.enabled ||
+          block.event.every((element) => !element.enabled)) continue;
+
+      Event firstEnabledCourse =
+          block.event.firstWhere((element) => element.enabled);
+      block.event.remove(firstEnabledCourse);
+      block.event.insert(0, firstEnabledCourse);
+    }
     return result;
   }
 
@@ -214,9 +228,10 @@ class _ScheduleViewState extends State<ScheduleView> {
       Course copiedCourse =
           Course.fromJson(jsonDecode(jsonEncode(block.event.first.course)));
       copiedCourse.courseName = copiedCourse.courseName! + S.current.and_more;
-      body = _buildCourseBody(copiedCourse);
+      body = _buildCourseBody(copiedCourse, enabled: block.event.first.enabled);
     } else {
-      body = _buildCourseBody(block.event.first.course);
+      body = _buildCourseBody(block.event.first.course,
+          enabled: block.event.first.enabled);
     }
     return InkWell(
       onTap: () => widget.tapCallback?.call(block),
@@ -224,7 +239,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     );
   }
 
-  Widget _buildCourseBody(Course course) {
+  Widget _buildCourseBody(Course course, {bool enabled = true}) {
     final TextStyle? textStyle = Theme.of(context).textTheme.overline?.copyWith(
         color: Theme.of(context).colorScheme.secondary.computeLuminance() >= 0.5
             ? Colors.black
@@ -233,7 +248,9 @@ class _ScheduleViewState extends State<ScheduleView> {
       margin: const EdgeInsets.all(2),
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary,
+          color: enabled
+              ? Theme.of(context).colorScheme.secondary
+              : Theme.of(context).hintColor,
           borderRadius: BorderRadius.circular(2)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

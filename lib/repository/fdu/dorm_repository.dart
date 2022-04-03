@@ -15,12 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 
 class FudanDormRepository extends BaseRepositoryWithDio {
@@ -36,16 +33,14 @@ class FudanDormRepository extends BaseRepositoryWithDio {
 
   factory FudanDormRepository.getInstance() => _instance;
 
-  Future<ElectricityItem> loadElectricityInfo(PersonInfo? info) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadElectricityInfo(),
-        (exception) => UISLoginTool.fixByLoginUIS(
-            dio!, _LOGIN_URL, cookieJar!, info, true));
+  Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
+    return UISLoginTool.tryAsyncWithAuth(
+        dio!, _LOGIN_URL, cookieJar!, info, () => _loadElectricityInfo());
   }
 
-  Future<ElectricityItem> _loadElectricityInfo() async {
-    final Response r = await dio!.get(electricityUrl);
-    final Map json = r.data is Map ? r.data : jsonDecode(r.data.toString());
+  Future<ElectricityItem?> _loadElectricityInfo() async {
+    final Response<Map<String, dynamic>> r = await dio!.get(electricityUrl);
+    final Map<String, dynamic> json = r.data!;
 
     final data = json['d'];
     // An example of data:

@@ -28,13 +28,14 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
@@ -52,6 +53,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
+import 'package:provider/provider.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -171,31 +173,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     StateProvider.needScreenshotWarning = true;
   }
 
-  Future<void> scrollDownToFloor(OTFloor floor) async {
-    try {
-      // Scroll to the corresponding post
-      while (!(await _listViewController.scrollToItem(floor))) {
-        // Prevent deadlock
-        if (hasPrefetchedAllData) {
-          if ((_listViewController
-                      .getScrollController()
-                      ?.position
-                      .extentAfter ??
-                  0) <
-              10) break;
-        } else {
-          if (_listViewController.isEnded) break;
-        }
-
-        // fixme: Will scrolling at height of viewportHeight bring problems?
-        await _listViewController.scrollDelta(
-            ViewportUtils.getViewportHeight(context),
-            const Duration(milliseconds: 1),
-            Curves.linear);
-      }
-    } catch (_) {}
-  }
-
   /// Refresh the list view.
   ///
   /// if [ignorePrefetch] and [hasPrefetchedAllData], it will discard the prefetched data first.
@@ -242,7 +219,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       if (locateFloor != null) {
         try {
           // Scroll to the specific floor
-          await scrollDownToFloor(locateFloor!);
+          await PagedListViewHelper.scrollToItem(
+              context, _listViewController, locateFloor, ScrollDirection.DOWN);
           locateFloor = null;
         } catch (_) {}
       }
@@ -252,7 +230,6 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (hasPrefetchedAllData) {
       allDataReceiver = Future.value(_hole.floors?.prefetch);
     }
-    print("build ${hasPrefetchedAllData}");
     final pagedListView = PagedListView<OTFloor>(
       initialData: _hole.floors?.prefetch,
       pagedController: _listViewController,
@@ -419,7 +396,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
             .adminAddPenalty(
-                e.floor_id, level, TreeHoleSubpageState.divisionId);
+                e.floor_id, level, TreeHoleSubpageState.getDivisionId(context));
         if (result != null && result < 300) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);
@@ -513,7 +490,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            var pinned = StateProvider.currentDivision!.pinned!
+            FDUHoleProvider provider = context.read<FDUHoleProvider>();
+
+            List<int> pinned = provider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
                 .toList();
             if (pinned.contains(e.hole_id!)) {
@@ -523,10 +502,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminModifyDivision(
-                    StateProvider.currentDivision!.division_id!,
-                    null,
-                    null,
-                    pinned);
+                    provider.currentDivision!.division_id!, null, null, pinned);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
@@ -588,8 +564,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                       ],
                     ),
                     onPointerUp: (PointerUpEvent details) async {
-                      if (OpenTreeHoleRepository.getInstance()
-                              .isUserInitialized &&
+                      if (context.read<FDUHoleProvider>().isUserInitialized &&
                           OpenTreeHoleRepository.getInstance()
                               .getDivisions()
                               .isNotEmpty) {
@@ -688,7 +663,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               }
               Noticing.showModalNotice(context,
                   title: S.of(context).history_of(e.floor_id ?? "?"),
-                  message: content.toString());
+                  message: content.toString(),
+                  selectable: true);
             },
             child: Text(S.of(context).view_history),
             menuContext: menuContext,

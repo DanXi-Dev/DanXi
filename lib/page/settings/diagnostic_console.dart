@@ -17,9 +17,13 @@
 
 import 'dart:async';
 
+import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -46,7 +50,7 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
   @override
   void initState() {
     super.initState();
-    diagnoses = [diagnoseFDUHole];
+    diagnoses = [diagnoseFDUHole, diagnoseDanXi];
     unawaited(diagnose());
   }
 
@@ -65,7 +69,7 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> diagnoseFDUHole() async {
     _console.writeln(
-        "FDUHole is user initialized: ${OpenTreeHoleRepository.getInstance().isUserInitialized}");
+        "FDUHole is user initialized: ${context.read<FDUHoleProvider>().isUserInitialized}");
     _console.writeln(
         "FDUHole is user admin: ${OpenTreeHoleRepository.getInstance().isAdmin}");
     _console.writeln(
@@ -119,6 +123,23 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
   //   bannerAd.load();
   // }
 
+  Future<void> diagnoseDanXi() async {
+    _console.writeln(
+        "User Agent used by DanXi: ${UserAgentInterceptor.defaultUsedUserAgent}");
+
+    _console.writeln("Everything we stored in the local device:");
+    var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
+    if (allKeys != null) {
+      for (var key in allKeys) {
+        _console.writeln("Key: $key");
+        _console.writeln(
+            "Value: ${context.read<SettingsProvider>().preferences?.get(key)}");
+      }
+    } else {
+      _console.writeln("Nothing!");
+    }
+  }
+
   Future<void> changePassword() async {
     if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
     String? email = await Noticing.showInputDialog(context, "Input email");
@@ -132,6 +153,17 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
       Noticing.showModalNotice(context,
           message: S.of(context).operation_successful);
     }
+  }
+
+  Future<void> setUserAgent() async {
+    String? ua = await Noticing.showInputDialog(context, "Input user agent");
+    if (ua == null) return;
+    if (ua.isEmpty) {
+      context.read<SettingsProvider>().customUserAgent = null;
+    } else {
+      context.read<SettingsProvider>().customUserAgent = ua;
+    }
+    Noticing.showNotice(context, "Restart app to take effects");
   }
 
   @override
@@ -151,11 +183,28 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Password Change [Only ADMIN]"),
                   onPressed: changePassword,
                 ),
+                PlatformElevatedButton(
+                  child: const Text("Set User Agent"),
+                  onPressed: setUserAgent,
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Copy Everything"),
+                  onPressed: () async {
+                    await FlutterClipboard.copy(_console.toString());
+                    Noticing.showMaterialNotice(context, "Copied.");
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Clear Cookies"),
+                  onPressed: () async {
+                    await BaseRepositoryWithDio.clearAllCookies();
+                  },
+                ),
                 ChangeNotifierProvider.value(
                     value: _console,
                     child: Consumer<StringBufferNotifier>(
                         builder: (context, value, child) =>
-                            Text(value.toString()))),
+                            SelectableText(value.toString()))),
               ],
             ),
           ),
@@ -214,5 +263,6 @@ class StringBufferNotifier with ChangeNotifier {
   }
 
   /// Returns the contents of buffer as a single string.
+  @override
   String toString() => _buffer.toString();
 }

@@ -20,7 +20,7 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retrier.dart';
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomRepository extends BaseRepositoryWithDio {
@@ -42,23 +42,17 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   ///
   /// Request [PersonInfo] for logging in, if necessary.
   Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
-      String? buildingName, DateTime? date) async {
-    // To accelerate the retrieval of RoomInfo,
-    // only execute logging in when necessary.
-    return Retrier.tryAsyncWithFix(
-        () => _getBuildingRoomInfo(areaName, buildingName, date!),
-        (exception) => UISLoginTool.fixByLoginUIS(
-            dio!, LOGIN_URL, cookieJar!, info, true));
-  }
+          String? buildingName, DateTime? date) =>
+      UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
+          () => _getBuildingRoomInfo(areaName, buildingName, date!));
 
   Future<List<RoomInfo>?> _getBuildingRoomInfo(
       String areaName, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
-    final response = await dio!.get(detailUrl(areaName, buildingName, date));
-    final Map json = response.data is Map
-        ? response.data
-        : jsonDecode(response.data.toString());
-    final Map buildingInfo = json['d']['list'];
+    final Response<String> response =
+        await dio!.get(detailUrl(areaName, buildingName, date));
+    final Map<String, dynamic> json = jsonDecode(response.data!);
+    final Map<String, dynamic> buildingInfo = json['d']['list'];
     for (var element in buildingInfo.values) {
       if (element is List) {
         for (var element in element) {

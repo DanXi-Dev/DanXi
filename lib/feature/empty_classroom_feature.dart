@@ -39,4 +39,7 @@ class EmptyClassroomFeature extends Feature {
 
   @override
   bool get clickable => true;
+
+  @override
+  bool get loadOnTap => false;
 }

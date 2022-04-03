@@ -122,10 +122,12 @@ class _AnnouncementListState extends State<AnnouncementList> {
                   title: Text(S
                       .of(context)
                       .developer_announcement(value.createdAt ?? "")),
-                  content: Linkify(
-                      text: value.content!,
-                      onOpen: (element) =>
-                          BrowserUtil.openUrl(element.url, context)),
+                  content: SingleChildScrollView(
+                    child: Linkify(
+                        text: value.content!,
+                        onOpen: (element) =>
+                            BrowserUtil.openUrl(element.url, context)),
+                  ),
                   actions: <Widget>[
                     PlatformDialogAction(
                         child: PlatformText(S.of(context).i_see),

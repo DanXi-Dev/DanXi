@@ -28,6 +28,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,16 +49,11 @@ class BBSReportDetail extends StatefulWidget {
 class _BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController<OTReport> _listViewController =
       PagedListViewController();
+  Future<List<OTReport>?>? _contentFuture;
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<OTReport>?> _loadContent() async {
-    return await OpenTreeHoleRepository.getInstance().adminGetReports();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  Future<List<OTReport>?> _loadContent() =>
+      OpenTreeHoleRepository.getInstance().adminGetReports();
 
   @override
   Widget build(BuildContext context) {
@@ -74,60 +70,64 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
         controller: PrimaryScrollController.of(context),
         child: Text(S.of(context).reports),
       )),
-      body: Builder(
+      body: StatefulBuilder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-        builder: (context) => RefreshIndicator(
-          edgeOffset: MediaQuery.of(context).padding.top,
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            setState(() {});
-            await _listViewController.notifyUpdate(useInitialData: false);
-          },
-          child: Material(
-              child: PagedListView<OTReport>(
-            startPage: 1,
-            pagedController: _listViewController,
-            withScrollbar: true,
-            scrollController: PrimaryScrollController.of(context),
-            allDataReceiver: _loadContent(),
-            builder: _getListItems,
-            loadingBuilder: (BuildContext context) => Container(
-              padding: const EdgeInsets.all(8),
-              child: Center(child: PlatformCircularProgressIndicator()),
-            ),
-            endBuilder: (context) => Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context).end_reached),
+        builder: (context, setState) {
+          _contentFuture ??= _loadContent();
+          return RefreshIndicator(
+            edgeOffset: MediaQuery.of(context).padding.top,
+            color: Theme.of(context).colorScheme.secondary,
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              _contentFuture = _loadContent();
+              await _contentFuture;
+              setState(() {});
+              WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+                _listViewController.notifyUpdate(
+                    useInitialData: false, queueDataClear: false);
+              });
+            },
+            child: Material(
+                child: PagedListView<OTReport>(
+              startPage: 1,
+              pagedController: _listViewController,
+              withScrollbar: true,
+              scrollController: PrimaryScrollController.of(context),
+              allDataReceiver: _contentFuture,
+              builder: _getListItems,
+              loadingBuilder: (BuildContext context) => Container(
+                padding: const EdgeInsets.all(8),
+                child: Center(child: PlatformCircularProgressIndicator()),
               ),
-            ),
-          )),
-        ),
+              endBuilder: (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(S.of(context).end_reached),
+                ),
+              ),
+            )),
+          );
+        },
       ),
     );
   }
 
-  List<Widget> _buildContextMenu(BuildContext context, OTReport e) => [
-        /*PlatformWidget(
-          cupertino: (_, __) => CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              OpenTreeHoleRepository.getInstance()
-                  .adminSetReportDealt(e.report_id);
-            },
-            child: Text("Mark as dealt"),
-          ),
-          material: (_, __) => ListTile(
-            title: Text("Mark as dealt"),
-            onTap: () {
-              Navigator.of(context).pop();
-              OpenTreeHoleRepository.getInstance()
-                  .adminSetReportDealt(e.report_id);
-            },
-          ),
-        ),*/
+  List<Widget> _buildContextMenu(
+          BuildContext pageContext, BuildContext menuContext, OTReport e) =>
+      [
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: const Text("Mark as dealt"),
+          onPressed: () async {
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminSetReportDealt(e.report_id!);
+            if (result != null && result < 300) {
+              Noticing.showModalNotice(pageContext,
+                  message: S.of(pageContext).operation_successful);
+            }
+          },
+        )
       ];
 
   Widget _getListItems(BuildContext context,
@@ -146,17 +146,17 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
     }
 
     return GestureDetector(
-      // onLongPress: () {
-      //   showPlatformModalSheet(
-      //       context: context,
-      //       builder: (BuildContext context) => PlatformContextMenu(
-      //             actions: _buildContextMenu(context, e),
-      //             cancelButton: CupertinoActionSheetAction(
-      //               child: Text(S.of(context).cancel),
-      //               onPressed: () => Navigator.of(context).pop(),
-      //             ),
-      //           ));
-      // },
+      onLongPress: () {
+        showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext cxt) => PlatformContextMenu(
+                  actions: _buildContextMenu(context, cxt, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(cxt).cancel),
+                    onPressed: () => Navigator.of(cxt).pop(),
+                  ),
+                ));
+      },
       child: Card(
         child: ListTile(
             dense: true,
@@ -189,15 +189,19 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
-                /*GestureDetector(
+                GestureDetector(
                   child: Text("Mark as dealt",
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12)),
-                  onTap: () {
-                    OpenTreeHoleRepository.getInstance()
-                        .adminSetReportDealt(e.report_id);
+                  onTap: () async {
+                    int? result = await OpenTreeHoleRepository.getInstance()
+                        .adminSetReportDealt(e.report_id!);
+                    if (result != null && result < 300) {
+                      Noticing.showModalNotice(context,
+                          message: S.of(context).operation_successful);
+                    }
                   },
-                ),*/
+                ),
               ]),
             ]),
             onTap: () async {

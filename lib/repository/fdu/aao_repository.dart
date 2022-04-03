@@ -18,8 +18,6 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 
@@ -37,30 +35,16 @@ class FudanAAORepository extends BaseRepositoryWithDio {
   static const String TYPE_NOTICE_ANNOUNCEMENT = "9397";
   static final _instance = FudanAAORepository._();
 
-  PersonInfo? _info;
-
   factory FudanAAORepository.getInstance() => _instance;
 
-  Future<IndependentCookieJar?> get thisCookies async {
-    // Log in before getting cookies.
-    await Retrier.runAsyncWithRetry(() =>
-        UISLoginTool.fixByLoginUIS(dio!, _LOGIN_URL, cookieJar!, _info, true));
-    return cookieJar;
-  }
+  Future<List<Notice>?> getNotices(String type, int page, PersonInfo? info) =>
+      UISLoginTool.tryAsyncWithAuth(
+          dio!, _LOGIN_URL, cookieJar!, info, () => _getNotices(type, page));
 
-  Future<List<Notice>> getNotices(
-      String type, int page, PersonInfo? info) async {
-    _info = info;
-    return Retrier.tryAsyncWithFix(
-        () => _getNotices(type, page),
-        (exception) => UISLoginTool.fixByLoginUIS(
-            dio!, _LOGIN_URL, cookieJar!, info, true));
-  }
-
-  Future<List<Notice>> _getNotices(String type, int page) async {
+  Future<List<Notice>?> _getNotices(String type, int page) async {
     List<Notice> notices = [];
-    Response response = await dio!.get(_listUrl(type, page));
-    if (response.data.toString().contains("Under Maintenance")) {
+    Response<String> response = await dio!.get(_listUrl(type, page));
+    if (response.data?.contains("Under Maintenance") ?? false) {
       throw NotConnectedToLANError();
     }
     BeautifulSoup soup = BeautifulSoup(response.data.toString());

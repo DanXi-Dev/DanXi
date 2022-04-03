@@ -25,6 +25,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -116,8 +117,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/mzdm/beautiful_soup"),
     LicenseItem("build_runner", LICENSE_BSD,
         "https://github.com/dart-lang/build/tree/master/build_runner"),
-    LicenseItem(
-        "catcher", LICENSE_APACHE_2_0, "https://github.com/jhomlala/catcher"),
     LicenseItem("clipboard", LICENSE_BSD,
         "https://github.com/samuelezedi/flutter_clipboard"),
     LicenseItem("cupertino_icons", LICENSE_MIT,
@@ -202,7 +201,22 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("screen_brightness", LICENSE_MIT,
         "https://github.com/aaassseee/screen_brightness"),
     LicenseItem("uuid", LICENSE_MIT, "https://github.com/Daegalus/dart-uuid"),
-    LicenseItem("lunar", LICENSE_MIT, "https://github.com/6tail/lunar-flutter")
+    LicenseItem("lunar", LICENSE_MIT, "https://github.com/6tail/lunar-flutter"),
+    LicenseItem("animated_text_kit", LICENSE_MIT,
+        "https://github.com/aagarwal1012/Animated-Text-Kit"),
+    LicenseItem("flutter_fgbg", LICENSE_MIT,
+        "https://github.com/ajinasokan/flutter_fgbg"),
+    LicenseItem("lazy_load_indexed_stack", LICENSE_MIT,
+        "https://github.com/okaryo/lazy_load_indexed_stack"),
+    LicenseItem("screen_capture_event", LICENSE_MIT,
+        "https://github.com/nizwar/screen_capture_event"),
+    LicenseItem("otp", LICENSE_MIT, "https://github.com/Daegalus/dart-otp"),
+    LicenseItem(
+        "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
+    LicenseItem("add_2_calendar", LICENSE_MIT,
+        "https://github.com/singularity-s0/add_2_calendar"),
+    LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
   ];
   BannerAd? myBanner;
 
@@ -451,14 +465,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
           ExpansionTileX(
             leading: Icon(PlatformIcons(context).accountCircle),
             title: Text(S.of(context).forum),
-            subtitle: Text(
-                OpenTreeHoleRepository.getInstance().isUserInitialized
-                    ? S.of(context).fduhole_user_id(
-                        (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
-                            .toString())
-                    : S.of(context).not_logged_in),
+            subtitle: Text(context.read<FDUHoleProvider>().isUserInitialized
+                ? S.of(context).fduhole_user_id(
+                    (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
+                        .toString())
+                : S.of(context).not_logged_in),
             children: [
-              if (OpenTreeHoleRepository.getInstance().isUserInitialized) ...[
+              if (context.read<FDUHoleProvider>().isUserInitialized) ...[
                 FutureWidget<OTUser?>(
                   future: OpenTreeHoleRepository.getInstance().getUserProfile(),
                   successBuilder:
@@ -587,7 +600,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               ],
               ListTile(
                 leading: const SizedBox(),
-                title: OpenTreeHoleRepository.getInstance().isUserInitialized
+                title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,
                         style: TextStyle(color: Theme.of(context).errorColor),
@@ -598,7 +611,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                 onTap: () async {
-                  if (!OpenTreeHoleRepository.getInstance().isUserInitialized) {
+                  if (!context.read<FDUHoleProvider>().isUserInitialized) {
                     if (SettingsProvider.getInstance().fduholeToken == null) {
                       Noticing.showNotice(
                           context, S.of(context).login_from_treehole_page,
@@ -854,7 +867,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'FOSS ${S.of(context).version} ${pubspec.major}.${pubspec.minor}.${pubspec.patch} build ${pubspec.build.first}',
+                          'FOSS ${S.of(context).version} ${FlutterApp.versionName} build ${pubspec.build.first}',
                           textScaleFactor: 0.7,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -899,13 +912,23 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     TextButton(
                       child: Text(S.of(context).contact_us),
                       onPressed: () async {
-                        final Email email = Email(
-                          body: '',
-                          subject: S.of(context).app_feedback,
-                          recipients: [S.of(context).feedback_email],
-                          isHTML: false,
-                        );
-                        await FlutterEmailSender.send(email);
+                        bool? sendEmail = await Noticing.showConfirmationDialog(
+                            context,
+                            S
+                                .of(context)
+                                .our_email_is(S.of(context).feedback_email),
+                            confirmText: S.of(context).send_email,
+                            cancelText: S.of(context).i_see,
+                            title: S.of(context).contact_us);
+                        if (sendEmail == true) {
+                          final Email email = Email(
+                            body: '',
+                            subject: S.of(context).app_feedback,
+                            recipients: [S.of(context).feedback_email],
+                            isHTML: false,
+                          );
+                          await FlutterEmailSender.send(email);
+                        }
                       },
                     ),
                     const SizedBox(width: 8),

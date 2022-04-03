@@ -75,11 +75,12 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
   /// Build a payload from [_historyData].
   ///
   /// If failed, return null.
-  Map? _buildPayloadFromHistory() {
-    if (_historyData == null || _historyData['oldInfo'] is! Map) {
+  Map<String, dynamic>? _buildPayloadFromHistory() {
+    if (_historyData == null ||
+        _historyData['oldInfo'] is! Map<String, dynamic>) {
       return null;
     }
-    Map payload = _historyData['info'];
+    Map<String, dynamic> payload = _historyData['info'];
     payload['ismoved'] = 0;
     payload['number'] = _historyData['uinfo']['role']['number'];
     payload['realname'] = _historyData['uinfo']['realname'];
@@ -113,11 +114,12 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };
-    Map? payload = await Cache.getRemotely<Map?>(
-        _KEY_PREF,
-        () async => _buildPayloadFromHistory(),
-        (cachedValue) => jsonDecode(cachedValue!),
-        (object) => jsonEncode(object));
+    Map<String, dynamic>? payload =
+        await Cache.getRemotely<Map<String, dynamic>?>(
+            _KEY_PREF,
+            () async => _buildPayloadFromHistory(),
+            (cachedValue) => jsonDecode(cachedValue!),
+            (object) => jsonEncode(object));
     if (payload == null) {
       throw NotTickYesterdayException();
     }

@@ -56,10 +56,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   Future<TimeTable?> loadTimeTableRemotely(PersonInfo? info,
           {DateTime? startTime}) =>
-      Retrier.tryAsyncWithFix(
-          () => _loadTimeTableRemotely(startTime: startTime),
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio!, LOGIN_URL, cookieJar!, info, true));
+      UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
+          () => _loadTimeTableRemotely(startTime: startTime));
 
   Future<String?> getDefaultSemesterId(PersonInfo? info) =>
       Retrier.tryAsyncWithFix(() async {
@@ -83,9 +81,9 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       }
     }
 
-    Response idPage = await dio!.get(ID_URL);
-    String? termId = _getIds(idPage.data.toString());
-    Response tablePage = await dio!.post(TIME_TABLE_URL,
+    Response<String> idPage = await dio!.get(ID_URL);
+    String? termId = _getIds(idPage.data!);
+    Response<String> tablePage = await dio!.post(TIME_TABLE_URL,
         data: {
           "ignoreHead": "1",
           "setting.kind": "std",
@@ -98,8 +96,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
-            Constant.DEFAULT_SEMESTER_START_TIME,
-        tablePage.data.toString());
+            Constant.DEFAULT_SEMESTER_START_DATE,
+        tablePage.data!);
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo? info,

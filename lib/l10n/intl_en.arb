@@ -370,7 +370,7 @@
   "ivanfei_description": "FDUHole Frontend Developer",
   "acknowledgement_name_1": "Ivan Fei",
   "acknowledgement_link_1": "https://github.com/ivanfei-1",
-  "feedback_email": "danxi_dev@protonmail.com",
+  "feedback_email": "danxi_dev@pm.me",
   "privacy_policy_url": "https://danxi.fduhole.com/privacy",
   "moment_ago": "A moment ago",
   "second_ago": "{num} sec ago",
@@ -411,5 +411,18 @@
   "set_semester_start_date": "Set Start Date",
   "try_visitor_mode": "Don't want to login? Go as visitor",
   "set_password": "Set A Password",
-  "set_your_fduhole_password": "Set a password for your FDUHole account"
+  "set_your_fduhole_password": "Set a password for your FDUHole account",
+  "import_into_cal": "Import to Calendar",
+  "search_by_text_tip": "Search \"{searchKeyword}\" in content",
+  "search_by_pid_tip": "Go to the post {pid}",
+  "search_by_floor_tip": "Go to the floor {floorId}",
+  "search_by_tag_tip": "See posts with tag \"{tag}\" in this division",
+  "tip_that_fduhole_is_not_fdu": "Note: your FDUHole account is not your FDU account.\nComing from \"Fudan UIS Quick Login\", you should already have a FDUHole account;\ncoming from \"Log in by email and password\", you may not have registered and please sign up in another option.",
+  "our_email_is": "Our email is {email} .",
+  "send_email": "Send Email",
+  "post_has_no_tags": "We do not recommend sending a post with no tags. Do you really want to send?",
+  "post_has_no_tags_title": "No tags",
+  "continue_sending": "Still send",
+  "post_has_stop_words_title": "Inappropriate words",
+  "post_has_stop_words": "You are using some inappropriate words: {stopWord}.\nWe do not recommend sending such words as they are not suitable for a rational discussion and are therefore more likely to attract unfriendly comments. Do you really want to send?"
 }

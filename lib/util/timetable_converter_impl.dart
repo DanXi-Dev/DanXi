@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:add_2_calendar/add_2_calendar.dart' as Add2Calendar;
 import 'package:dan_xi/model/time_table.dart';
 import 'package:ical/serializer.dart';
 
@@ -31,14 +32,14 @@ class ICSConverter extends TimetableConverter {
               status: IEventStatus.CONFIRMED,
               classification: IClass.PUBLIC,
               description: event.course.teacherNames!.join(","),
-              location: event.course.roomName!,
-              summary: event.course.courseName!,
-              start: table.startTime!.add(Duration(
+              location: event.course.roomName ?? "",
+              summary: event.course.courseName ?? "",
+              start: table.startDate!.add(Duration(
                   days: 7 * (weekNum - 1) + day,
                   hours: TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
                   minutes:
                       TimeTable.kCourseSlotStartTime[event.time.slot].minute!)),
-              end: table.startTime!
+              end: table.startDate!
                   .add(Duration(
                       days: 7 * (weekNum - 1) + day,
                       hours:
@@ -57,4 +58,44 @@ class ICSConverter extends TimetableConverter {
 
   @override
   String get mimeType => "text/calendar";
+}
+
+class CalendarImporter extends TimetableConverter {
+  /// Import [table] directly into system calendar without exporting any files.
+  @override
+  String? convertTo(TimeTable? table) {
+    for (int weekNum = 0; weekNum <= 24; weekNum++) {
+      Map<int, List<Event>> weekTable = table!.toWeekCourses(weekNum);
+      for (int day = 0; day < 7; day++) {
+        for (var event in weekTable[day]!) {
+          final Add2Calendar.Event e = Add2Calendar.Event(
+              title: event.course.courseName ?? "",
+              description: event.course.teacherNames!.join(","),
+              location: event.course.roomName ?? "",
+              startDate: table.startDate!.add(Duration(
+                  days: 7 * (weekNum - 1) + day,
+                  hours: TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
+                  minutes:
+                      TimeTable.kCourseSlotStartTime[event.time.slot].minute!)),
+              endDate: table.startDate!
+                  .add(Duration(
+                      days: 7 * (weekNum - 1) + day,
+                      hours:
+                          TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
+                      minutes: TimeTable
+                          .kCourseSlotStartTime[event.time.slot].minute!))
+                  .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
+          Add2Calendar.Add2Calendar.addEvent2Cal(e);
+        }
+      }
+    }
+    Add2Calendar.Add2Calendar.commit();
+    return null;
+  }
+
+  @override
+  String? get fileName => null;
+
+  @override
+  String? get mimeType => null;
 }

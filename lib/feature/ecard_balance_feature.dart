@@ -30,9 +30,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class EcardBalanceFeature extends Feature {
-  PersonInfo? _info;
+  @override
+  bool get loadOnTap => false;
+
+  /// The card balance. (e.g. "12.31")
   String? _balance;
+
+  /// User's card information.
   CardInfo? _cardInfo;
+
+  /// The last transaction information to show in the [subTitle].
   CardRecord? _lastTransaction;
 
   /// Status of the request.
@@ -59,14 +66,12 @@ class EcardBalanceFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    _info = StateProvider.personInfo.value;
-
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
       _balance = "";
-      _loadCard(_info).catchError((error) {
+      _loadCard(StateProvider.personInfo.value).catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });

@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -40,8 +39,8 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   }
 
   Future<StudentInfo> _getStudentInfo() async {
-    Response rep = await dio!.get(_INFO_URL);
-    Map rawJson = rep.data is Map ? rep.data : jsonDecode(rep.data.toString());
+    Response<Map<String, dynamic>> rep = await dio!.get(_INFO_URL);
+    Map<String, dynamic> rawJson = rep.data!;
     if (rawJson['data']['userName'] == null) {
       throw GeneralLoginFailedException();
     }

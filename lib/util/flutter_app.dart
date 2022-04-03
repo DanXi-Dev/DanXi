@@ -42,7 +42,7 @@ class FlutterApp {
   static Future<void> restartApp(BuildContext context) async {
     await BaseRepositoryWithDio.clearAllCookies();
     OpenTreeHoleRepository.getInstance().clearCache();
-    StateProvider.initialize();
+    StateProvider.initialize(context);
     while (auxiliaryNavigatorState?.canPop() == true) {
       auxiliaryNavigatorState?.pop();
     }

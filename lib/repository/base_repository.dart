@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
@@ -39,7 +40,8 @@ abstract class BaseRepositoryWithDio {
           receiveTimeout: 10000,
           sendTimeout: 10000);
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
-      _dios[linkHost]!.interceptors.add(UserAgentInterceptor());
+      _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
+          userAgent: SettingsProvider.getInstance().customUserAgent));
       _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }

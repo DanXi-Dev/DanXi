@@ -115,34 +115,78 @@ class _TagContainerState extends State<TagContainer> {
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplier(widget.fixedColor);
-    if (widget.wrapped) {
-      return ThemedMaterial(
-          child: Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-              child: Wrap(
-                spacing: 8,
-                children: tagList!.map((e) => _buildTag(e)).toList(),
-              )));
-    } else {
-      return ThemedMaterial(
-          child: Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: tagList!.map((e) => _buildTag(e)).toList(),
-                ),
-              )));
-    }
+    return ThemedMaterial(
+        child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: widget.wrapped
+                ? Wrap(
+                    spacing: 8,
+                    children: tagList!.map((e) => _buildTag(e)).toList(),
+                  )
+                : SingleChildScrollView(
+                    primary: false,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: tagList!
+                          .map((e) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: _buildTag(e)))
+                          .toList(),
+                    ),
+                  )));
+  }
+
+  /// Get the background color when [ChoiceChip] is selected.
+  ///
+  /// Most of this method come from Flutter Framework.
+  static Color parseSelectColor(BuildContext context, Tag tag) {
+    final ThemeData theme = Theme.of(context);
+    final ChipThemeData chipTheme = ChipTheme.of(context);
+    final Brightness brightness = chipTheme.brightness ?? theme.brightness;
+    Color secondaryColor = brightness == Brightness.dark
+        ? Colors.tealAccent[200]!
+        : theme.primaryColor;
+    return tag.tagColor ??
+        ChipTheme.of(context).secondarySelectedColor ??
+        secondaryColor.withAlpha(0x3d);
+  }
+
+  /// Get the background color according to [tag] is selected or not.
+  ///
+  /// Note: it does not return the exact color shown in the tag when not selected, since
+  /// the color has its opacity, which we cannot know until being built. See the method's comments for more details.
+  ///
+  /// Most of this method come from Flutter Framework.
+  static Color parseBackgroundColor(BuildContext context, Tag tag) {
+    final ThemeData theme = Theme.of(context);
+    final ChipThemeData chipTheme = ChipTheme.of(context);
+    final Brightness brightness = chipTheme.brightness ?? theme.brightness;
+
+    // The color has its opacity, which we cannot know until being built.
+    // So we have to hard-code a color code here which is similar to scaffold's background color.
+    // It is a bad practice, but works nice if the background *is* scaffold.
+    Color primaryColor =
+        brightness == Brightness.light ? Colors.grey.shade200 : Colors.grey;
+    final Color backgroundColor = primaryColor.withAlpha(0x1f);
+
+    return tag.isSelected ? parseSelectColor(context, tag) : backgroundColor;
   }
 
   Widget _buildTag(Tag data) {
     return ChoiceChip(
-        label: Text(data.tagTitle!),
+        label: Text(
+          data.tagTitle!,
+          style: TextStyle(
+              color:
+                  parseBackgroundColor(context, data).computeLuminance() >= 0.5
+                      ? Colors.black
+                      : Colors.white),
+        ),
         selected: data.isSelected,
-        avatar: Icon(data.icon),
+        selectedColor: data.tagColor,
+        // backgroundColor: data.tagColor?.withOpacity(0.5),
+        avatar: data.icon != null ? Icon(data.icon) : null,
         // When [widget.enabled] is false, set [onSelected] to null so that this chip will act as disabled.
         onSelected: widget.enabled
             ? (bool newValue) {

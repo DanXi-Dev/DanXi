@@ -77,7 +77,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   Future<void> _login(PersonInfo ug, OnCaptchaCallback callback) async {
     String yzmToken = await _loadToken();
     String yzm = await callback(GET_CAPTCHA_URL + yzmToken);
-    await _requestLogin(ug.id!, await encryptDES(ug.password!), yzm, yzmToken);
+    await _requestLogin(ug.id!, encryptDES(ug.password!), yzm, yzmToken);
   }
 
   Future<TimeTable?> loadTimeTableRemotely(
@@ -93,11 +93,11 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     Response coursePage = await dio!.get(
         TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
         options: Options());
-    return TimeTable.fromUGjson(
+    return TimeTable.fromPGJson(
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
-            Constant.DEFAULT_SEMESTER_START_TIME,
+            Constant.DEFAULT_SEMESTER_START_DATE,
         coursePage.data is Map
             ? coursePage.data
             : jsonDecode(coursePage.data.toString()));
