@@ -79,22 +79,21 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
             S.of(cxt).dashboard_layout,
             Text(S.of(cxt).edit, textScaleFactor: 1.2),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
-                (value) => RefreshHomepageEvent(onlyIfQueued: true).fire()))
+                (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire()))
       ];
 }
 
 class RefreshHomepageEvent {
-  final bool queueRefresh;
-  final bool onlyIfQueued;
+  /// Tell the page not to rebuild all features, just update the order or visibility of them.
+  final bool onlyRefreshOrder;
 
-  RefreshHomepageEvent({this.queueRefresh = false, this.onlyIfQueued = false});
+  RefreshHomepageEvent({this.onlyRefreshOrder = false});
 }
 
 class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   static final StateStreamListener<RefreshHomepageEvent> _refreshSubscription =
       StateStreamListener();
   late Map<String, Widget> widgetMap;
-  bool isRefreshQueued = false;
 
   BannerAd? bannerAd;
   late NotificationProvider _notificationProvider;
@@ -105,19 +104,15 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     _notificationProvider = context.read<NotificationProvider>();
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshHomepageEvent>().listen((event) {
-          if (event.queueRefresh) {
-            isRefreshQueued = true;
-          } else if (event.onlyIfQueued) {
-            isRefreshQueued = false;
+          if (event.onlyRefreshOrder) {
             refreshSelf();
           } else {
-            rebuildFeatures();
-            refreshSelf();
+            triggerRebuildFeatures();
           }
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(0); // 0 for main page
-    rebuildFeatures();
+    _rebuildFeatures();
   }
 
   void checkConnection() {
@@ -130,50 +125,30 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     });
   }
 
-  /// This function refreshes the content of Dashboard.
+  /// This function rebuilds the content of Dashboard.
   ///
   /// Only call this when new (online) data should be loaded.
-  void rebuildFeatures() {
+  void _rebuildFeatures() {
     checkConnection();
     widgetMap = {
-      'welcome_feature': FeatureListItem(
-        feature: WelcomeFeature(),
-      ),
-      'next_course_feature': FeatureListItem(
-        feature: NextCourseFeature(),
-      ),
+      'welcome_feature': FeatureListItem(feature: WelcomeFeature()),
+      'next_course_feature': FeatureListItem(feature: NextCourseFeature()),
       'divider': const Divider(),
-      'ecard_balance_feature': FeatureListItem(
-        feature: EcardBalanceFeature(),
-      ),
-      'dining_hall_crowdedness_feature': FeatureListItem(
-        feature: DiningHallCrowdednessFeature(),
-      ),
-      'fudan_library_crowdedness_feature': FeatureListItem(
-        feature: FudanLibraryCrowdednessFeature(),
-      ),
-      'aao_notice_feature': FeatureListItem(
-        feature: FudanAAONoticesFeature(),
-      ),
-      'empty_classroom_feature': FeatureListItem(
-        feature: EmptyClassroomFeature(),
-      ),
-      'fudan_daily_feature': FeatureListItem(
-        feature: FudanDailyFeature(),
-      ),
+      'ecard_balance_feature': FeatureListItem(feature: EcardBalanceFeature()),
+      'dining_hall_crowdedness_feature':
+          FeatureListItem(feature: DiningHallCrowdednessFeature()),
+      'fudan_library_crowdedness_feature':
+          FeatureListItem(feature: FudanLibraryCrowdednessFeature()),
+      'aao_notice_feature': FeatureListItem(feature: FudanAAONoticesFeature()),
+      'empty_classroom_feature':
+          FeatureListItem(feature: EmptyClassroomFeature()),
+      'fudan_daily_feature': FeatureListItem(feature: FudanDailyFeature()),
       'new_card': const SizedBox(),
-      'qr_feature': FeatureListItem(
-        feature: QRFeature(),
-      ),
-      'pe_feature': FeatureListItem(
-        feature: PEFeature(),
-      ),
-      'bus_feature': FeatureListItem(
-        feature: BusFeature(),
-      ),
-      'dorm_electricity_feature': FeatureListItem(
-        feature: DormElectricityFeature(),
-      ),
+      'qr_feature': FeatureListItem(feature: QRFeature()),
+      'pe_feature': FeatureListItem(feature: PEFeature()),
+      'bus_feature': FeatureListItem(feature: BusFeature()),
+      'dorm_electricity_feature':
+          FeatureListItem(feature: DormElectricityFeature()),
     };
   }
 
@@ -233,6 +208,12 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     return _widgets;
   }
 
+  /// Tell the page to refresh all shown features and rebuild itself.
+  void triggerRebuildFeatures() {
+    _rebuildFeatures();
+    refreshSelf();
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     List<DashboardCard> widgetList =
@@ -246,8 +227,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
             onRefresh: () async {
               HapticFeedback.mediumImpact();
               LimitedQueuedInterceptor.getInstance().dropAllRequest();
-              rebuildFeatures();
-              refreshSelf();
+              triggerRebuildFeatures();
             },
             child: Material(
                 child: ListView(

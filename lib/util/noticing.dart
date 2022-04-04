@@ -229,8 +229,4 @@ class Noticing {
       builder: (BuildContext context) => body,
     );
   }
-
-  static showScreenshotWarning(BuildContext context) =>
-      Noticing.showNotice(context, S.of(context).screenshot_warning,
-          title: S.of(context).screenshot_warning_title, useSnackBar: false);
 }
