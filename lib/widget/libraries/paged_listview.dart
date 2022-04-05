@@ -353,7 +353,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       }
     } else {
       _shouldLoad = false;
-      _isRefreshing = false;
+      _isRefreshing = true;
       _isEnded = true;
       return widget.allDataReceiver!;
     }
