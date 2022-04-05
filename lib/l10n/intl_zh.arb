@@ -417,5 +417,6 @@
   "post_has_no_tags_title": "没有标签",
   "continue_sending": "继续发送",
   "post_has_stop_words_title": "含有不适当的词语",
-  "post_has_stop_words": "内容中含有不适宜使用的词汇：{stopWord}。\n我们不建议发送此类词语，因为它不适用于理性讨论的环境，因而更有可能招致攻击和不恰当言论，一定要继续发送吗？"
+  "post_has_stop_words": "内容中含有不适宜使用的词汇：{stopWord}。\n我们不建议发送此类词语，因为它不适用于理性讨论的环境，因而更有可能招致攻击和不恰当言论，一定要继续发送吗？",
+  "community_convention": "社区公约"
 }
