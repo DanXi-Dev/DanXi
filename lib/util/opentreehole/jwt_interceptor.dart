@@ -44,6 +44,8 @@ class JWTInterceptor extends QueuedInterceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) async {
+    print("Huston, we have troubles: $err");
+    print(err.requestOptions.headers);
     if (err.response?.statusCode == HttpStatus.unauthorized) {
       JWToken? currentToken = tokenGetter.call();
       if (currentToken != null && currentToken.refresh != null) {
