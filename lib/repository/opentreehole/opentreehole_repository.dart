@@ -186,7 +186,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<String?> getVerifyCode(String email) async {
     Response<Map<String, dynamic>> response =
-    await secureDio.get(_BASE_AUTH_URL + "/verify/apikey",
+        await secureDio.get(_BASE_AUTH_URL + "/verify/apikey",
             queryParameters: {
               "apikey": Secret.generateOneTimeAPIKey(),
               "email": email,
@@ -209,7 +209,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       "verification": int.parse(verifyCode),
     });
     return SettingsProvider.getInstance().fduholeToken =
-        JWToken.fromJson(response.data!);
+        JWToken.fromJsonWithVerification(response.data!);
   }
 
   Future<JWToken?> loginWithUsernamePassword(
@@ -220,11 +220,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       'password': password,
     });
     return SettingsProvider.getInstance().fduholeToken =
-        JWToken.fromJson(response.data!);
+        JWToken.fromJsonWithVerification(response.data!);
   }
 
   Map<String, String> get _tokenHeader {
-    if (provider.token == null) throw NotLoginError("Null Token");
+    if (provider.token == null || !provider.token!.isValid) {
+      throw NotLoginError("Null Token");
+    }
     return {"Authorization": "Bearer " + provider.token!.access!};
   }
 

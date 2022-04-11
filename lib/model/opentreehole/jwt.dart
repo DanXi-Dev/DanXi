@@ -26,6 +26,16 @@ class JWToken {
   factory JWToken.fromJson(Map<String, dynamic> json) =>
       _$JWTokenFromJson(json);
 
+  bool get isValid => access != null && refresh != null;
+
+  factory JWToken.fromJsonWithVerification(Map<String, dynamic> json) {
+    JWToken token = JWToken.fromJson(json);
+    if (!token.isValid) {
+      throw BadTokenException();
+    }
+    return token;
+  }
+
   Map<String, dynamic> toJson() => _$JWTokenToJson(this);
 
   @override
@@ -41,3 +51,5 @@ class JWToken {
 
   JWToken(this.access, this.refresh);
 }
+
+class BadTokenException implements Exception {}

@@ -252,11 +252,11 @@ class SettingsProvider with ChangeNotifier {
   set lastPushToken(String? value) =>
       preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);*/
 
-  //Token
+  // Token. If token is invalid, return null.
   JWToken? get fduholeToken {
     if (preferences!.containsKey(KEY_FDUHOLE_TOKEN)) {
       try {
-        return JWToken.fromJson(
+        return JWToken.fromJsonWithVerification(
             jsonDecode(preferences!.getString(KEY_FDUHOLE_TOKEN)!));
       } catch (_) {}
     }

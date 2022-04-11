@@ -42,29 +42,48 @@ class JWTInterceptor extends QueuedInterceptor {
     return options.copyWith(headers: newHeader);
   }
 
+  void _throwOrBuildDioError(
+      ErrorInterceptorHandler handler, RequestOptions options, dynamic error) {
+    if (error is DioError) {
+      handler.reject(error);
+    } else {
+      handler.reject(DioError(requestOptions: options, error: error));
+    }
+  }
+
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) async {
     print("Huston, we have troubles: $err");
-    print(err.requestOptions.headers);
+
     if (err.response?.statusCode == HttpStatus.unauthorized) {
       JWToken? currentToken = tokenGetter.call();
-      if (currentToken != null && currentToken.refresh != null) {
+      if (currentToken != null && currentToken.isValid) {
         RequestOptions options = RequestOptions(
             path: refreshUrl,
             method: "POST",
             headers: {"Authorization": "Bearer " + currentToken.refresh!});
+        Response<Map<String, dynamic>> response;
         try {
-          Response<Map<String, dynamic>> response = await _dio.fetch(options);
-          JWToken newToken = JWToken.fromJson(response.data!);
+          response = await _dio.fetch(options);
+        } catch (e) {
+          if (e is DioError &&
+              e.response?.statusCode == HttpStatus.unauthorized) {
+            // Oh, we cannot get a token here! Maybe the refresh token we hold has gone invalid.
+            // Clear old token, so the next request will definitely generate a [NotLoginError].
+            tokenSetter?.call(null);
+            handler.reject(e);
+            return;
+          }
+          _throwOrBuildDioError(handler, options, e);
+          return;
+        }
+        try {
+          JWToken newToken = JWToken.fromJsonWithVerification(response.data!);
           tokenSetter?.call(newToken);
           handler.resolve(await _dio.fetch(
               _rewriteRequestOptionsWithToken(err.requestOptions, newToken)));
         } catch (e) {
-          if (e is DioError) {
-            handler.reject(e);
-          } else {
-            handler.reject(DioError(requestOptions: options, error: e));
-          }
+          _throwOrBuildDioError(handler, options, e);
         }
         return;
       }
