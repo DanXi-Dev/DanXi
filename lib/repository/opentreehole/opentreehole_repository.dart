@@ -164,7 +164,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
-            return true;
+        return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
         final ASN1Parser p = ASN1Parser(certificate.der);
         final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
@@ -450,9 +450,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (provider.userInfo == null || forceUpdate) {
-      final Response<Map<String, dynamic>> response = await dio!.get(
-          _BASE_AUTH_URL + "/users/me",
-          options: Options(headers: _tokenHeader));
+      final Response<Map<String, dynamic>> response = await dio!
+          .get(_BASE_URL + "/users", options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
     }
     return provider.userInfo;
