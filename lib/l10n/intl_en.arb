@@ -385,7 +385,7 @@
   "hide_hole": "Hide Hole",
   "add_penalty": "Penalize User",
   "level": "Level {level}",
-  "add_special_tag": "Add Special Tag",
+  "add_special_tag": "Add Special Flag",
   "pin_unpin_hole": "Pin/Unpin Hole",
   "modify_tag_division": "Change Tags/Division",
   "fold_floor": "Fold Floor",
