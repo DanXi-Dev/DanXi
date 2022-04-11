@@ -302,7 +302,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   /// Fields related to the display states.
   static int getDivisionId(BuildContext context) =>
-      context.read<FDUHoleProvider>().currentDivision?.id ?? 1;
+      context.read<FDUHoleProvider>().currentDivision?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);

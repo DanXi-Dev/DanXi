@@ -45,7 +45,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static const String _BASE_URL = "https://test.fduhole.com/api";
+  static const String _BASE_URL = "https://hole.hath.top/api";
   static const String _BASE_AUTH_URL = "https://testauth.fduhole.com/api";
   static const String _IMAGE_BASE_URL = "https://pic.hath.top";
 
@@ -242,7 +242,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   List<OTHole> getPinned(int divisionId) {
     try {
       return _divisionCache
-              .firstWhere((element) => element.id == divisionId)
+              .firstWhere((element) => element.division_id == divisionId)
               .pinned ??
           List<OTHole>.empty();
     } catch (ignored) {
@@ -259,7 +259,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     if (useCache) {
       try {
         final OTDivision cached =
-            _divisionCache.firstWhere((e) => e.id == divisionId);
+            _divisionCache.firstWhere((e) => e.division_id == divisionId);
         return cached;
       } catch (_) {}
     }
@@ -267,7 +267,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         _BASE_URL + "/divisions/$divisionId",
         options: Options(headers: _tokenHeader));
     final newDivision = OTDivision.fromJson(response.data!);
-    _divisionCache.removeWhere((element) => element.id == divisionId);
+    _divisionCache.removeWhere((element) => element.division_id == divisionId);
     _divisionCache.add(newDivision);
     return newDivision;
   }
@@ -308,7 +308,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTFloor?> loadSpecificFloor(int floorId) async {
     try {
-      return _floorCache.lastWhere((element) => element.id == floorId);
+      return _floorCache.lastWhere((element) => element.floor_id == floorId);
     } catch (ignored) {
       final Response<Map<String, dynamic>> response = await dio!.get(
           _BASE_URL + "/floors/$floorId",
@@ -325,7 +325,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         _BASE_URL + "/floors",
         queryParameters: {
           "start_floor": startFloor,
-          "hole_id": post.id,
+          "hole_id": post.hole_id,
           "length": length
         },
         options: Options(headers: _tokenHeader));

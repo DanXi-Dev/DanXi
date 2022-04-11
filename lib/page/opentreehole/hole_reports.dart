@@ -178,7 +178,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               ),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
-                  "#${e.hole_id} (##${e.floor?.id})",
+                  "#${e.hole_id} (##${e.floor?.floor_id})",
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),

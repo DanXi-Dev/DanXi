@@ -25,7 +25,7 @@ part 'hole.g.dart';
 
 @JsonSerializable()
 class OTHole {
-  int? id;
+  int? hole_id;
   int? division_id;
   String? time_updated;
   String? time_created;
@@ -40,9 +40,10 @@ class OTHole {
   Map<String, dynamic> toJson() => _$OTHoleToJson(this);
 
   @override
-  bool operator ==(Object other) => (other is OTHole) && id == other.id;
+  bool operator ==(Object other) =>
+      (other is OTHole) && hole_id == other.hole_id;
 
-  OTHole(this.id, this.division_id, this.time_created, this.time_updated,
+  OTHole(this.hole_id, this.division_id, this.time_created, this.time_updated,
       this.tags, this.view, this.reply, this.floors);
 
   /// Generate an empty BBSPost for special sakes.
@@ -50,7 +51,7 @@ class OTHole {
 
   @override
   String toString() {
-    return 'OTHole{id: $id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden}';
+    return 'OTHole{id: $hole_id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden}';
   }
 
   bool get is_folded =>
@@ -59,5 +60,5 @@ class OTHole {
   static final DUMMY_POST = OTHole.dummy();
 
   @override
-  int get hashCode => id!;
+  int get hashCode => hole_id!;
 }

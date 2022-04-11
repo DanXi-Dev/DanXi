@@ -223,7 +223,7 @@ class OTHoleWidget extends StatelessWidget {
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("#${postElement.id}", style: infoStyle),
+                      Text("#${postElement.hole_id}", style: infoStyle),
                       Text(
                           HumanDuration.tryFormat(
                               context,
@@ -464,7 +464,7 @@ class OTFloorWidget extends StatelessWidget {
         ],
       ),
       subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
-        if ((floor.hole_id ?? 0) > 0 || (floor.id ?? 0) > 0) ...[
+        if ((floor.hole_id ?? 0) > 0 || (floor.floor_id ?? 0) > 0) ...[
           const SizedBox(
             height: 8,
           ),
@@ -480,7 +480,7 @@ class OTFloorWidget extends StatelessWidget {
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Text(
-                      "  (##${floor.id})",
+                      "  (##${floor.floor_id})",
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 10),
                     ),
@@ -498,7 +498,7 @@ class OTFloorWidget extends StatelessWidget {
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      "  (##${floor.id})",
+                      "  (##${floor.floor_id})",
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 10),
                     ),
@@ -799,7 +799,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       floor.liked = !floor.liked!;
                     });
                     floor = (await OpenTreeHoleRepository.getInstance()
-                        .likeFloor(floor.id!, floor.liked!))!;
+                        .likeFloor(floor.floor_id!, floor.liked!))!;
                     setState(() {});
                   } catch (e, st) {
                     Noticing.showModalError(context, e, trace: st);
@@ -829,7 +829,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     ),
                   ),
                   onTap: () async {
-                    if (await OTEditor.reportPost(context, floor.id)) {
+                    if (await OTEditor.reportPost(context, floor.floor_id)) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).report_success);
                     }
@@ -858,8 +858,8 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     ),
                   ),
                   onTap: () async {
-                    if (await OTEditor.modifyReply(
-                        context, floor.hole_id, floor.id, floor.content)) {
+                    if (await OTEditor.modifyReply(context, floor.hole_id,
+                        floor.floor_id, floor.content)) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).request_success);
                     }
@@ -889,15 +889,14 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   onTap: () async {
                     if (await Noticing.showConfirmationDialog(
                         context,
-                            S
-                                .of(context)
-                                .about_to_delete_floor(floor.id ?? "null"),
+                            S.of(context).about_to_delete_floor(
+                                floor.floor_id ?? "null"),
                             title: S.of(context).are_you_sure,
                             isConfirmDestructive: true) ==
                         true) {
                       try {
                         await OpenTreeHoleRepository.getInstance()
-                            .deleteFloor(floor.id!);
+                            .deleteFloor(floor.floor_id!);
                       } catch (e, st) {
                         Noticing.showModalError(context, e, trace: st);
                       }
@@ -934,7 +933,7 @@ class OTMessageItem extends StatefulWidget {
         case 'modify':
           // data should be [OTFloor]
           final floor = OTFloor.fromJson(data!);
-          if (floor.id == null) return;
+          if (floor.floor_id == null) return;
           if (await OTFloorMentionWidget.showFloorDetail(context, floor) ==
                   true &&
               id != null) {

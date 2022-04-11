@@ -142,7 +142,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (_isFavored != null) return _isFavored;
     final List<int>? favorites =
         await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
-    return favorites!.any((elementId) => elementId == _hole.id);
+    return favorites!.any((elementId) => elementId == _hole.hole_id);
   }
 
   @override
@@ -156,9 +156,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         OpenTreeHoleRepository.getInstance().cacheFloor(floor);
       }
       // Update hole view count
-      if (_hole.id != null) {
+      if (_hole.hole_id != null) {
         unawaited(OpenTreeHoleRepository.getInstance()
-            .updateHoleViewCount(_hole.id!));
+            .updateHoleViewCount(_hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
       _searchKeyword = widget.arguments!['searchKeyword'];
@@ -264,7 +264,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? "#${_hole.id}"
+              ? "#${_hole.hole_id}"
               : S.of(context).search_result),
         ),
         trailingActions: [
@@ -276,7 +276,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
-                if (await OTEditor.createNewReply(context, _hole.id, null)) {
+                if (await OTEditor.createNewReply(
+                    context, _hole.hole_id, null)) {
                   refreshListView(scrollToEnd: true);
                 }
               },
@@ -377,7 +378,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           await OpenTreeHoleRepository.getInstance()
               .setFavorite(
                   _isFavored! ? SetFavoriteMode.ADD : SetFavoriteMode.DELETE,
-                  _hole.id)
+                  _hole.hole_id)
               .onError((dynamic error, stackTrace) {
             Noticing.showNotice(context, error.toString(),
                 title: S.of(context).operation_failed, useSnackBar: false);
@@ -395,7 +396,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
             .adminAddPenalty(
-                e.id, level, TreeHoleSubpageState.getDivisionId(context));
+                e.floor_id, level, TreeHoleSubpageState.getDivisionId(context));
         if (result != null && result < 300) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);
@@ -427,7 +428,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         PlatformContextMenuItem(
           onPressed: () async {
             if (await OTEditor.modifyReply(
-                context, e.hole_id, e.id, e.content)) {
+                context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
             }
@@ -445,7 +446,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               final reason = await Noticing.showInputDialog(
                   context, S.of(context).input_reason);
               int? result = await OpenTreeHoleRepository.getInstance()
-                  .adminDeleteFloor(e.id, reason);
+                  .adminDeleteFloor(e.floor_id, reason);
               if (result != null && result < 300) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
@@ -492,7 +493,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             FDUHoleProvider provider = context.read<FDUHoleProvider>();
 
             List<int> pinned = provider.currentDivision!.pinned!
-                .map((hole) => hole.id!)
+                .map((hole) => hole.hole_id!)
                 .toList();
             if (pinned.contains(e.hole_id!)) {
               pinned.remove(e.hole_id!);
@@ -501,7 +502,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminModifyDivision(
-                    provider.currentDivision!.id!, null, null, pinned);
+                    provider.currentDivision!.division_id!, null, null, pinned);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
@@ -518,7 +519,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
             int? result = await OpenTreeHoleRepository.getInstance()
-                .adminAddSpecialTag(tag, e.id);
+                .adminAddSpecialTag(tag, e.floor_id);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
@@ -532,7 +533,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             OTDivision selectedDivision = OpenTreeHoleRepository.getInstance()
                 .getDivisions()
                 .firstWhere(
-                    (element) => element.id == _hole.division_id,
+                    (element) => element.division_id == _hole.division_id,
                     orElse: () => OTDivision(_hole.division_id, '', '', null));
 
             List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
@@ -617,7 +618,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             if (comfirmChanged ?? false) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
-                      newTagsList, _hole.id, selectedDivision.id);
+                      newTagsList, _hole.hole_id, selectedDivision.division_id);
               if (result != null && result < 300) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
@@ -635,7 +636,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
             int? result = await OpenTreeHoleRepository.getInstance()
-                .adminFoldFloor(reason.isEmpty ? [] : [reason], e.id);
+                .adminFoldFloor(reason.isEmpty ? [] : [reason], e.floor_id);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
@@ -661,7 +662,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 }
               }
               Noticing.showModalNotice(context,
-                  title: S.of(context).history_of(e.id ?? "?"),
+                  title: S.of(context).history_of(e.floor_id ?? "?"),
                   message: content.toString(),
                   selectable: true);
             },
@@ -677,7 +678,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           onPressed: () async {
             if (await OTEditor.modifyReply(
-                context, e.hole_id, e.id, e.content)) {
+                context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
             }
@@ -708,7 +709,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         menuContext: menuContext,
         isDestructive: true,
         onPressed: () async {
-          if (await OTEditor.reportPost(context, e.id)) {
+          if (await OTEditor.reportPost(context, e.floor_id)) {
             Noticing.showMaterialNotice(context, S.of(context).report_success);
           }
         },
@@ -785,11 +786,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
         if (_searchKeyword == null) {
           int? replyId;
           // Set the replyId to null when tapping on the first reply.
-          if (_hole.floors!.first_floor!.id != floor.id) {
-            replyId = floor.id;
+          if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
+            replyId = floor.floor_id;
             OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
-          if (await OTEditor.createNewReply(context, _hole.id, replyId)) {
+          if (await OTEditor.createNewReply(context, _hole.hole_id, replyId)) {
             await refreshListView(scrollToEnd: true);
           }
         } else {
