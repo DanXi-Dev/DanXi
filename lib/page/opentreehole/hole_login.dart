@@ -309,7 +309,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                     checkEmailInfo(context, email, email == recommendedEmail)
                         .catchError((e, st) {
                       state.jumpBackFromLoadingPage();
-                      Noticing.showModalError(state.context, e, trace: st);
+                      Noticing.showErrorDialog(state.context, e, trace: st);
                     });
                   }
                 }))
@@ -348,7 +348,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           _usernameController.text.isNotEmpty) {
         executeLogin(context).catchError((e, st) {
           state.jumpBackFromLoadingPage();
-          Noticing.showModalError(state.context, e, trace: st);
+          Noticing.showErrorDialog(state.context, e, trace: st);
         });
       }
     }
@@ -535,7 +535,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             registerCallback: () {
               executeRegister(context, state).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showModalError(state.context, e, trace: st);
+                Noticing.showErrorDialog(state.context, e, trace: st);
               });
             },
           )
@@ -634,7 +634,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
               OTRegisterLicenseWidget.executeRegister(context, state)
                   .catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showModalError(state.context, e, trace: st);
+                Noticing.showErrorDialog(state.context, e, trace: st);
               });
             }
           },

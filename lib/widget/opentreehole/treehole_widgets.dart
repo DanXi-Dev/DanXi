@@ -313,7 +313,7 @@ class OTHoleWidget extends StatelessWidget {
               "scroll_to_end": true
             });
           } catch (error, st) {
-            Noticing.showModalError(context, error, trace: st);
+            Noticing.showErrorDialog(context, error, trace: st);
           } finally {
             dialog.dismiss(showAnim: false);
           }
@@ -673,7 +673,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                                 "locate": floor,
                               });
                         } catch (e, st) {
-                          Noticing.showModalError(context, e, trace: st);
+                          Noticing.showErrorDialog(context, e, trace: st);
                         } finally {
                           progressDialog.dismiss(showAnim: false);
                         }
@@ -802,7 +802,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         .likeFloor(floor.floor_id!, floor.liked!))!;
                     setState(() {});
                   } catch (e, st) {
-                    Noticing.showModalError(context, e, trace: st);
+                    Noticing.showErrorDialog(context, e, trace: st);
                   }
                 },
               ),
@@ -888,7 +888,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   ),
                   onTap: () async {
                     if (await Noticing.showConfirmationDialog(
-                        context,
+                            context,
                             S.of(context).about_to_delete_floor(
                                 floor.floor_id ?? "null"),
                             title: S.of(context).are_you_sure,
@@ -898,7 +898,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         await OpenTreeHoleRepository.getInstance()
                             .deleteFloor(floor.floor_id!);
                       } catch (e, st) {
-                        Noticing.showModalError(context, e, trace: st);
+                        Noticing.showErrorDialog(context, e, trace: st);
                       }
                     }
                   },

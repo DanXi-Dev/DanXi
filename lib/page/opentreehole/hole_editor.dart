@@ -96,7 +96,7 @@ class OTEditor {
       await OpenTreeHoleRepository.getInstance()
           .newHole(divisionId, content!.text, tags: content.tags);
     } catch (e, st) {
-      Noticing.showModalError(context, e, trace: st);
+      Noticing.showErrorDialog(context, e, trace: st);
       return false;
     } finally {
       progressDialog.dismiss(showAnim: false);
@@ -128,7 +128,7 @@ class OTEditor {
       await OpenTreeHoleRepository.getInstance()
           .newFloor(discussionId, content);
     } catch (e, st) {
-      Noticing.showModalError(context, e, trace: st);
+      Noticing.showErrorDialog(context, e, trace: st);
       return false;
     } finally {
       progressDialog.dismiss(showAnim: false);
@@ -157,7 +157,7 @@ class OTEditor {
     try {
       await OpenTreeHoleRepository.getInstance().modifyFloor(content, floorId);
     } catch (e, st) {
-      Noticing.showModalError(context, e,
+      Noticing.showErrorDialog(context, e,
           trace: st, title: S.of(context).reply_failed);
       return false;
     } finally {
@@ -178,7 +178,7 @@ class OTEditor {
     try {
       await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
     } catch (error, st) {
-      Noticing.showModalError(context, error,
+      Noticing.showErrorDialog(context, error,
           trace: st, title: S.of(context).report_failed);
       return false;
     } finally {

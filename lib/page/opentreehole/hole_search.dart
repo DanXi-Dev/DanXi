@@ -56,47 +56,47 @@ class _OTSearchPageState extends State<OTSearchPage> {
   final TextEditingController _searchFieldController = TextEditingController();
 
   Widget _buildSearchHistory(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(S.of(context).history),
-            PlatformTextButton(
-                alignment: Alignment.centerLeft,
-                child: Text(S.of(context).clear),
-                onPressed: () =>
-                SettingsProvider.getInstance().searchHistory = null),
-          ],
-        ),
-      ),
-      Flexible(
-        fit: FlexFit.loose,
-        child: Selector<SettingsProvider, List<String>>(
-            selector: (_, model) => model.searchHistory,
-            builder: (_, value, __) => ListView(
-              primary: false,
-              shrinkWrap: true,
-              //reverse: true,
-              keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior.onDrag,
-              children: value
-                  .map((e) => PlatformTextButton(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 0, horizontal: 16),
-                alignment: Alignment.centerLeft,
-                child: Text(e),
-                onPressed: () =>
-                _searchFieldController.text = e,
-              ))
-                  .toList(growable: false),
-            )),
-      ),
-    ],
-  );
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(S.of(context).history),
+                PlatformTextButton(
+                    alignment: Alignment.centerLeft,
+                    child: Text(S.of(context).clear),
+                    onPressed: () =>
+                        SettingsProvider.getInstance().searchHistory = null),
+              ],
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.loose,
+            child: Selector<SettingsProvider, List<String>>(
+                selector: (_, model) => model.searchHistory,
+                builder: (_, value, __) => ListView(
+                      primary: false,
+                      shrinkWrap: true,
+                      //reverse: true,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      children: value
+                          .map((e) => PlatformTextButton(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 16),
+                                alignment: Alignment.centerLeft,
+                                child: Text(e),
+                                onPressed: () =>
+                                    _searchFieldController.text = e,
+                              ))
+                          .toList(growable: false),
+                    )),
+          ),
+        ],
+      );
 
   /// Build a list of search suggestion or search history if no input.
   Widget buildSearchSuggestion(BuildContext context) =>
@@ -104,18 +104,18 @@ class _OTSearchPageState extends State<OTSearchPage> {
           builder: (context, value, child) => value.text.isEmpty
               ? _buildSearchHistory(context)
               : Expanded(
-            child: Material(
-              child: ListView(
-                primary: false,
-                shrinkWrap: true,
-                keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior.onDrag,
-                children: suggestionProviders
-                    .map((e) => e.call(context, value.text))
-                    .toList(),
-              ),
-            ),
-          ));
+                  child: Material(
+                    child: ListView(
+                      primary: false,
+                      shrinkWrap: true,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      children: suggestionProviders
+                          .map((e) => e.call(context, value.text))
+                          .toList(),
+                    ),
+                  ),
+                ));
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +245,7 @@ Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
       Noticing.showNotice(context, S.of(context).post_does_not_exist,
           title: S.of(context).fatal_error, useSnackBar: false);
     } else {
-      Noticing.showModalError(context, error, trace: st);
+      Noticing.showErrorDialog(context, error, trace: st);
     }
   } finally {
     progressDialog.dismiss(showAnim: false);
@@ -265,7 +265,7 @@ Future<void> _goToFloorIdResultPage(BuildContext context, int floorId) async {
       Noticing.showNotice(context, S.of(context).post_does_not_exist,
           title: S.of(context).fatal_error, useSnackBar: false);
     } else {
-      Noticing.showModalError(context, error, trace: st);
+      Noticing.showErrorDialog(context, error, trace: st);
     }
   } finally {
     progressDialog.dismiss(showAnim: false);

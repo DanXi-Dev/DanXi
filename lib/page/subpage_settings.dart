@@ -65,7 +65,7 @@ Future<void> updateOTUserProfile(BuildContext context) async {
   try {
     await OpenTreeHoleRepository.getInstance().updateUserProfile();
   } catch (e, st) {
-    Noticing.showModalError(context, e, trace: st);
+    Noticing.showErrorDialog(context, e, trace: st);
   }
 }
 

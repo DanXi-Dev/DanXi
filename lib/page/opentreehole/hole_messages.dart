@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-/// A list page showing the reports for administrators.
+/// A list page showing notifications.
 class OTMessagesPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 

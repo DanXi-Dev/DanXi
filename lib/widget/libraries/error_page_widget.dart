@@ -105,6 +105,15 @@ class ErrorPageWidget extends StatelessWidget {
         onTap: onTap);
   }
 
+  static String generateErrorDetails(dynamic error, StackTrace? trace) {
+    String errorInfo = error.toString();
+    // DioError will insert its stack trace in the result of [toString] method.
+    if (trace != null && error is! DioError) {
+      errorInfo += ("\n$trace");
+    }
+    return errorInfo;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -125,13 +134,9 @@ class ErrorPageWidget extends StatelessWidget {
               PlatformTextButton(
                 child: Text(S.of(context).error_detail),
                 onPressed: () {
-                  String errorInfo = error.toString();
-                  // DioError will insert its stack trace in the result of [toString] method.
-                  if (trace != null && error is! DioError) {
-                    errorInfo += ("\n$trace");
-                  }
                   Noticing.showModalNotice(context,
-                      title: S.of(context).error_detail, message: errorInfo);
+                      title: S.of(context).error_detail,
+                      message: generateErrorDetails(error, trace));
                 },
               )
             ],

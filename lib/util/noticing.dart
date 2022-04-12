@@ -91,19 +91,51 @@ class Noticing {
     }
   }
 
-  static showModalError(BuildContext context, dynamic error,
+  static showErrorDialog(BuildContext context, dynamic error,
       {StackTrace? trace,
       String? title,
       bool useSnackBar = false,
-      bool? centerContent}) {
+      bool? centerContent}) async {
     title ??= S.of(context).fatal_error;
-    return Noticing.showNotice(
-        context,
-        ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error,
-            stackTrace: trace),
-        title: title,
-        useSnackBar: useSnackBar,
-        centerContent: centerContent);
+    centerContent ??= !PlatformX.isMaterial(context);
+    final message = ErrorPageWidget.generateUserFriendlyDescription(
+        S.of(context), error,
+        stackTrace: trace);
+    return await showPlatformDialog(
+        context: context,
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: title == null ? null : Text(title),
+              content: centerContent!
+                  ? Center(
+                      child: Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ))
+                  : Linkify(
+                      textAlign:
+                          centerContent ? TextAlign.center : TextAlign.start,
+                      text: message,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).error_detail),
+                    onPressed: () {
+                      Noticing.showModalNotice(context,
+                          message: ErrorPageWidget.generateErrorDetails(
+                              error, trace),
+                          title: S.of(context).error_detail,
+                          selectable: true);
+                    }),
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).i_see),
+                    onPressed: () => Navigator.pop(context)),
+              ],
+            ));
   }
 
   static Future<String?> showInputDialog(BuildContext context, String title,

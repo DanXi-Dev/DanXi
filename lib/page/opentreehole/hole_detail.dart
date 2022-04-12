@@ -345,7 +345,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       setState(() {});
       shouldScrollToEnd = true;
     } catch (error, st) {
-      Noticing.showModalError(context, error, trace: st);
+      Noticing.showErrorDialog(context, error, trace: st);
     } finally {
       dialog.dismiss(showAnim: false);
     }

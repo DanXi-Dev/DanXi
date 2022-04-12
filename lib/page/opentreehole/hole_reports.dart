@@ -212,7 +212,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                 smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"post": post!, "locate": e.floor});
               } catch (error, st) {
-                Noticing.showModalError(context, error, trace: st);
+                Noticing.showErrorDialog(context, error, trace: st);
               } finally {
                 progressDialog.dismiss(showAnim: false);
               }
