@@ -61,7 +61,7 @@ class DioUtils {
   static String? guessErrorMessageFromResponse(Response<dynamic>? response) {
     if (response?.data is Map<String, dynamic>) {
       if (response?.data['message'] != null) {
-        return response?.data['message'];
+        return response?.data['message'].toString();
       }
     }
     return response?.data.toString();

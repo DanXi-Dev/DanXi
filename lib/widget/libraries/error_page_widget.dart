@@ -60,8 +60,12 @@ class ErrorPageWidget extends StatelessWidget {
           errorType = locale.response_error +
               (error.response?.statusCode?.toString() ?? locale.unknown_error);
           try {
-            errorType +=
-                "\n${DioUtils.guessErrorMessageFromResponse(error.response)}";
+            String? message =
+                DioUtils.guessErrorMessageFromResponse(error.response);
+            if ((message?.length ?? 0) > 100) {
+              message = "${message?.substring(0, 100)}...";
+            }
+            errorType += "\n$message";
           } catch (_) {}
           break;
         case DioErrorType.cancel:
