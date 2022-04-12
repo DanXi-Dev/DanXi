@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,8 @@ class ErrorPageWidget extends StatelessWidget {
           errorType = locale.response_error +
               (error.response?.statusCode?.toString() ?? locale.unknown_error);
           try {
-            errorType += "\n${error.response?.data['message']}";
+            errorType +=
+                "\n${DioUtils.guessErrorMessageFromResponse(error.response)}";
           } catch (_) {}
           break;
         case DioErrorType.cancel:

@@ -52,7 +52,7 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
       Constant.eventBus.fire(_ViewStateChangedNotification<T>(state));
 }
 
-/// Flag that the page has some [PlatformSubpage] subwidgets.
+/// Mark that the page has some [PlatformSubpage] subwidgets.
 class PageWithTab extends StatelessWidget {
   final Widget child;
 

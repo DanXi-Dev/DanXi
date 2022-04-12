@@ -116,7 +116,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.
-  List<PlatformSubpage> _subpage = [];
+  List<PlatformSubpage<dynamic>> _subpage = [];
 
   /// Force app to rebuild all of subpages.
   ///
@@ -146,6 +146,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Deal with login issue described at [CaptchaNeededException].
   _dealWithCaptchaNeededException() {
+    // If we have shown a dialog, do not pop up another.
     if (_isErrorDialogShown) {
       return;
     }
@@ -195,8 +196,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Deal with login issue described at [CredentialsInvalidException].
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
-      // TODO: Can [_preferences] be null when this is called?
-      PersonInfo.removeFromSharedPreferences(_preferences!);
+      // In case that [_preferences] is still not initialized.
+      if (_preferences != null) {
+        PersonInfo.removeFromSharedPreferences(_preferences!);
+      } else {
+        PersonInfo.removeFromSharedPreferences(
+            await SharedPreferences.getInstance());
+      }
       FlutterApp.restartApp(context);
     }
   }
@@ -248,27 +254,21 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
-        // After the app returns from the background
-        // Refresh the homepage if it hasn't been refreshed for 30 minutes
-        // To keep the data up-to-date.
+        // After the app returns from the background,
+        // refresh the homepage if it hasn't been refreshed for 30 minutes
+        // to keep the data up-to-date.
         if (_lastRefreshTime != null &&
             DateTime.now()
                     .difference(_lastRefreshTime!)
                     .compareTo(const Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
-          dashboardPageKey.currentState?.rebuildFeatures();
-          dashboardPageKey.currentState?.setState(() {});
+          dashboardPageKey.currentState?.triggerRebuildFeatures();
         }
         break;
       case AppLifecycleState.inactive:
-        // Ignored
-        break;
       case AppLifecycleState.paused:
-        // Ignored
-        break;
       case AppLifecycleState.detached:
-        // Ignored
         break;
     }
   }
@@ -441,9 +441,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             }
             break;
           case XiaoMiPushListenerTypeEnum.RequirePermissions:
-            break;
           case XiaoMiPushListenerTypeEnum.ReceivePassThroughMessage:
-            break;
           case XiaoMiPushListenerTypeEnum.CommandResult:
             break;
           case XiaoMiPushListenerTypeEnum.ReceiveRegisterResult:
@@ -478,7 +476,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
         StateProvider.showingScreenshotWarning = true;
-        await Noticing.showScreenshotWarning(context);
+        await showScreenshotWarning(context);
         StateProvider.showingScreenshotWarning = false;
       }
     });
@@ -487,12 +485,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
         StateProvider.showingScreenshotWarning = true;
-        await Noticing.showScreenshotWarning(context);
+        await showScreenshotWarning(context);
         StateProvider.showingScreenshotWarning = false;
       }
     });
     screenListener?.watch();
   }
+
+  static showScreenshotWarning(BuildContext context) =>
+      Noticing.showNotice(context, S.of(context).screenshot_warning,
+          title: S.of(context).screenshot_warning_title, useSnackBar: false);
 
   @override
   void didChangeDependencies() {
@@ -522,12 +524,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Show an empty container, if no person info is set.
   Widget _buildDummyBody(Widget title) => PlatformScaffold(
-        iosContentBottomPadding: false,
+    iosContentBottomPadding: false,
         iosContentPadding: true,
-        // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: PlatformAppBar(
-          title: title,
-        ),
+        appBar: PlatformAppBar(title: title),
         body: const SizedBox(),
       );
 

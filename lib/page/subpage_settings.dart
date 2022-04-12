@@ -246,8 +246,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     List<Widget> list = [];
     onTapListener(Campus campus) {
       SettingsProvider.getInstance().campus = campus;
-      dashboardPageKey.currentState?.rebuildFeatures();
-      dashboardPageKey.currentState?.setState(() {});
+      dashboardPageKey.currentState?.triggerRebuildFeatures();
       refreshSelf();
     }
 

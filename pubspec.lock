@@ -672,6 +672,13 @@ packages:
       name: image_picker_android
       url: "https://pub.dartlang.org"
     source: hosted
+    version: "0.8.5"
+  image_picker_android:
+    dependency: transitive
+    description:
+      name: image_picker_android
+      url: "https://pub.flutter-io.cn"
+    source: hosted
     version: "0.8.4+11"
   image_picker_for_web:
     dependency: transitive

@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
-import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -59,7 +58,6 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
         DashboardCard("custom_card", _nameTextFieldController.text,
             _linkTextFieldController.text, true)
       ]).toList();
-      RefreshHomepageEvent(queueRefresh: true).fire();
       Navigator.of(context).pop();
     } catch (e) {
       _errorText = S.of(context).unable_to_access_url;

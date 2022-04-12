@@ -49,6 +49,11 @@ class OTHole {
   /// Generate an empty BBSPost for special sakes.
   factory OTHole.dummy() => OTHole(-1, -1, "", "", [], -1, -1, null);
 
+  @override
+  String toString() {
+    return 'OTHole{id: $hole_id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden}';
+  }
+
   bool get is_folded =>
       tags?.any((element) => element.name?.startsWith("*") ?? false) ?? false;
 

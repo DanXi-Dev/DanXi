@@ -27,7 +27,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// 1. Register it in [FeatureMap].
 /// 2. Add it to [HomeSubpageState.widgetMap] in [HomeSubpage],
-///   whose initialization you will find at [HomeSubpageState.rebuildFeatures].
+///   whose initialization you will find at [HomeSubpageState._rebuildFeatures].
 /// 3. Insert it at a appropriate position to [Constant.defaultDashboardCardList].
 /// 4. Also add it to [Constant.getFeatureName].
 abstract class Feature {

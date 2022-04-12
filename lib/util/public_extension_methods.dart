@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
@@ -71,11 +72,17 @@ extension ObjectEx on dynamic {
 
 extension StateEx on State {
   /// Call [setState] to perform a global redrawing of the widget.
-  void refreshSelf() {
+  Future<void> refreshSelf() {
+    Completer<void> _completer = Completer();
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {});
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        _completer.complete();
+      });
+      return _completer.future;
     }
+    return Future.value();
   }
 }
 

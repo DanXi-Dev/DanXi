@@ -309,24 +309,16 @@ class BBSEditorWidget extends StatefulWidget {
 }
 
 class _BBSEditorWidgetState extends State<BBSEditorWidget> {
-  late ValueNotifier<String> previewText;
-
   @override
   void initState() {
     super.initState();
-    // TODO: We don't need [TextEditingController] if we use [ValueNotifier]
-    previewText = ValueNotifier(widget.controller.text);
-    widget.controller.addListener(() {
-      previewText.value = widget.controller.text;
-    });
   }
 
   Widget _buildIntroButton(BuildContext context, IconData iconData,
-      String title, String description) {
-    return PlatformIconButton(
-        icon: Icon(iconData, color: Theme.of(context).colorScheme.secondary),
-        onPressed: () {
-          showPlatformModalSheet(
+          String title, String description) =>
+      PlatformIconButton(
+          icon: Icon(iconData, color: Theme.of(context).colorScheme.secondary),
+          onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (BuildContext context) {
                 final Widget body = SafeArea(
@@ -336,10 +328,7 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ListTile(
-                            leading: Icon(iconData),
-                            title: Text(title),
-                          ),
+                          ListTile(leading: Icon(iconData), title: Text(title)),
                           const Divider(),
                           Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -351,14 +340,10 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         ]),
                   ),
                 );
-                if (PlatformX.isCupertino(context)) {
-                  return Card(child: body);
-                } else {
-                  return body;
-                }
-              });
-        });
-  }
+                return PlatformX.isCupertino(context)
+                    ? Card(child: body)
+                    : body;
+              }));
 
   @override
   Widget build(BuildContext context) {
@@ -408,6 +393,11 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                     IconFont.tex,
                     S.of(context).latex_enabled,
                     S.of(context).latex_description),
+                PlatformTextButton(
+                  child: Text(S.of(context).community_convention),
+                  onPressed: () => BrowserUtil.openUrl(
+                      "https://www.fduhole.com/#/licence", context),
+                )
               ],
             ),
             textField,
@@ -416,11 +406,11 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: ValueListenableBuilder<String>(
+              child: ValueListenableBuilder<TextEditingValue>(
                 builder: (context, value, child) => smartRender(
-                    context, value, null, null, false,
+                    context, value.text, null, null, false,
                     preview: true),
-                valueListenable: previewText,
+                valueListenable: widget.controller,
               ),
             ),
           ]),

@@ -24,6 +24,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
@@ -32,6 +33,7 @@ import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/opentreehole/fduhole_platform_bridge.dart';
+import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/adapter.dart';
@@ -43,8 +45,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static const String _BASE_URL = "https://api.fduhole.com";
-
+  static const String _BASE_URL = "https://hole.hath.top/api";
+  static const String _BASE_AUTH_URL = "https://testauth.fduhole.com/api";
   static const String _IMAGE_BASE_URL = "https://pic.hath.top";
 
   late FDUHoleProvider provider;
@@ -106,13 +108,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     dio!.options = BaseOptions(
       receiveDataWhenStatusError: true,
       validateStatus: (int? status) {
-        if (status == 401) {
-          // If token is invalid, clear the token.
-          SettingsProvider.getInstance().fduholeToken = null;
-        }
         return status != null && status >= 200 && status < 300;
       },
     );
+    dio!.interceptors.add(JWTInterceptor(
+        _BASE_AUTH_URL + "/refresh",
+        () => provider.token,
+        (token) => provider.token =
+            SettingsProvider.getInstance().fduholeToken = token));
   }
 
   void initializeToken() {
@@ -142,7 +145,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    final response = await secureDio.get(_BASE_URL + "/verify/apikey",
+    final response = await secureDio.get(_BASE_AUTH_URL + "/verify/apikey",
         queryParameters: {
           "apikey": Secret.generateOneTimeAPIKey(),
           "email": email,
@@ -161,6 +164,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       HttpClient httpClient = HttpClient(context: sc);
       httpClient.badCertificateCallback =
           (X509Certificate certificate, String host, int port) {
+        return true;
         // This badCertificateCallback will always be called since we have no trusted certificate.
         final ASN1Parser p = ASN1Parser(certificate.der);
         final ASN1Sequence signedCert = p.nextObject() as ASN1Sequence;
@@ -182,7 +186,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<String?> getVerifyCode(String email) async {
     Response<Map<String, dynamic>> response =
-        await secureDio.get(_BASE_URL + "/verify/apikey",
+        await secureDio.get(_BASE_AUTH_URL + "/verify/apikey",
             queryParameters: {
               "apikey": Secret.generateOneTimeAPIKey(),
               "email": email,
@@ -192,36 +196,38 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> requestEmailVerifyCode(String email) async {
-    await dio!
-        .get(_BASE_URL + "/verify/email", queryParameters: {"email": email});
+    await dio!.get(_BASE_AUTH_URL + "/verify/email",
+        queryParameters: {"email": email});
   }
 
-  Future<String?> register(
+  Future<JWToken?> register(
       String email, String password, String verifyCode) async {
     final Response<Map<String, dynamic>> response =
-        await dio!.post(_BASE_URL + "/register", data: {
+        await dio!.post(_BASE_AUTH_URL + "/register", data: {
       "password": password,
       "email": email,
       "verification": int.parse(verifyCode),
     });
     return SettingsProvider.getInstance().fduholeToken =
-        response.data!["token"];
+        JWToken.fromJsonWithVerification(response.data!);
   }
 
-  Future<String?> loginWithUsernamePassword(
+  Future<JWToken?> loginWithUsernamePassword(
       String username, String password) async {
     final Response<Map<String, dynamic>> response =
-        await dio!.post(_BASE_URL + "/login", data: {
+        await dio!.post(_BASE_AUTH_URL + "/login", data: {
       'email': username,
       'password': password,
     });
     return SettingsProvider.getInstance().fduholeToken =
-        response.data!["token"];
+        JWToken.fromJsonWithVerification(response.data!);
   }
 
   Map<String, String> get _tokenHeader {
-    if (provider.token == null) throw NotLoginError("Null Token");
-    return {"Authorization": "Token " + provider.token!};
+    if (provider.token == null || !provider.token!.isValid) {
+      throw NotLoginError("Null Token");
+    }
+    return {"Authorization": "Bearer " + provider.token!.access!};
   }
 
   Future<List<OTDivision>?> loadDivisions({bool useCache = true}) async {
@@ -455,7 +461,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTUser?> updateUserProfile() async {
     final Response<Map<String, dynamic>> response = await dio!.put(
-        _BASE_URL + "/users",
+        _BASE_AUTH_URL + "/users/" + provider.userInfo!.user_id.toString(),
         data: provider.userInfo!.toJson(),
         options: Options(headers: _tokenHeader));
     return provider.userInfo = OTUser.fromJson(response.data!);

@@ -41,7 +41,7 @@ class DioUtils {
           });
 
   static Future<Response<dynamic>> processRedirect(
-      Dio dio, Response response) async {
+      Dio dio, Response<dynamic> response) async {
     // Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&
@@ -56,5 +56,14 @@ class DioUtils {
     } else {
       return response;
     }
+  }
+
+  static String? guessErrorMessageFromResponse(Response<dynamic>? response) {
+    if (response?.data is Map<String, dynamic>) {
+      if (response?.data['message'] != null) {
+        return response?.data['message'];
+      }
+    }
+    return response?.data.toString();
   }
 }
