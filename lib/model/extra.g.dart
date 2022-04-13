@@ -19,8 +19,7 @@ Extra _$ExtraFromJson(Map<String, dynamic> json) => Extra(
           .toList(),
     );
 
-Map<String, dynamic> _$ExtraToJson(Extra instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ExtraToJson(Extra instance) => <String, dynamic>{
       'timetable': instance.timetable,
       'userAgent': instance.userAgent,
       'stopWords': instance.stopWords,

@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.8+167';
+const String version = r'1.3.8+168';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,17 +55,16 @@ const int patch = 8;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'167'];
+const List<String> build = <String>[r'168'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1649828574;
+const int timestamp = 1649836052;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -125,11 +124,11 @@ const Map<String, Object> dependencies = <String, Object>{
   'desktop_window': r'^0.4.0',
   'intl': r'^0.17.0',
   'http': r'^0.13.4',
-  'dio': r'^4.0.4',
+  'dio': r'^4.0.6',
   'shared_preferences': r'^2.0.13',
   'flutter_phoenix': r'^1.0.0',
-  'asn1lib': r'^1.0.0',
-  'image_picker': r'^0.8.4+9',
+  'asn1lib': r'^1.1.0',
+  'image_picker': r'^0.8.5',
   'clipboard': r'^0.1.3',
   'flutter_inappwebview': r'^5.3.2',
   'permission_handler': r'^8.3.0',
@@ -141,14 +140,14 @@ const Map<String, Object> dependencies = <String, Object>{
   'json_serializable': r'^6.1.4',
   'photo_view': r'^0.13.0',
   'gallery_saver': r'^2.3.2',
-  'flutter_markdown': r'^0.6.9',
+  'flutter_markdown': r'^0.6.9+1',
   'markdown': r'^4.0.1',
   'system_tray': r'^0.1.0',
   'bitsdojo_window': r'^0.1.1+1',
-  'win32': r'^2.4.1',
-  'file_picker': r'^4.0.0',
+  'win32': r'^2.5.1',
+  'file_picker': r'^4.5.1',
   'cached_network_image': r'^3.2.0',
-  'google_mobile_ads': r'^1.1.0',
+  'google_mobile_ads': r'^1.2.0',
   'flutter_typeahead': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/selvam920/flutter_typeahead',
@@ -157,16 +156,16 @@ const Map<String, Object> dependencies = <String, Object>{
   },
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
-  'flutter_layout_grid': r'^1.0.3',
+  'flutter_layout_grid': r'^1.0.6',
   'flutter_js': r'^0.5.0+6',
   'flutter_math_fork': r'^0.6.1',
   'platform_device_id': r'^1.0.1',
-  'uuid': r'^3.0.5',
+  'uuid': r'^3.0.6',
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.2',
-  'lunar': r'^1.2.17',
+  'lunar': r'^1.2.19',
   'animated_text_kit': r'^4.2.1',
-  'flutter_fgbg': r'^0.1.0',
+  'flutter_fgbg': r'^0.2.0',
   'lazy_load_indexed_stack': r'^0.1.3',
   'js': r'^0.6.3',
   'add_2_calendar': <String, Object>{
