@@ -461,7 +461,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTUser?> updateUserProfile() async {
     final Response<Map<String, dynamic>> response = await dio!.put(
-        _BASE_AUTH_URL + "/users/" + provider.userInfo!.user_id.toString(),
+        _BASE_URL + "/users/" + provider.userInfo!.user_id.toString(),
         data: provider.userInfo!.toJson(),
         options: Options(headers: _tokenHeader));
     return provider.userInfo = OTUser.fromJson(response.data!);
