@@ -12,12 +12,19 @@ Extra _$ExtraFromJson(Map<String, dynamic> json) => Extra(
           : TimeTableExtra.fromJson(json['timetable'] as Map<String, dynamic>),
       json['userAgent'] as String?,
       (json['stopWords'] as List<dynamic>?)?.map((e) => e as String?).toList(),
+      (json['banners'] as List<dynamic>?)
+          ?.map((e) => e == null
+              ? null
+              : BannerExtra.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
-Map<String, dynamic> _$ExtraToJson(Extra instance) => <String, dynamic>{
+Map<String, dynamic> _$ExtraToJson(Extra instance) =>
+    <String, dynamic>{
       'timetable': instance.timetable,
       'userAgent': instance.userAgent,
       'stopWords': instance.stopWords,
+      'banners': instance.banners,
     };
 
 TimeTableExtra _$TimeTableExtraFromJson(Map<String, dynamic> json) =>
@@ -45,4 +52,17 @@ Map<String, dynamic> _$TimeTableStartTimeItemToJson(
     <String, dynamic>{
       'id': instance.id,
       'startDate': instance.startDate,
+    };
+
+BannerExtra _$BannerExtraFromJson(Map<String, dynamic> json) => BannerExtra(
+      json['title'] as String,
+      json['actionName'] as String,
+      json['action'] as String,
+    );
+
+Map<String, dynamic> _$BannerExtraToJson(BannerExtra instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'actionName': instance.actionName,
+      'action': instance.action,
     };

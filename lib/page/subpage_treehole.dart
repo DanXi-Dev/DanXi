@@ -17,11 +17,13 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -30,18 +32,22 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/curriculum/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/material_banner.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -288,6 +294,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       StateStreamListener();
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
+  final GlobalKey bannerKey = GlobalKey();
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
@@ -418,6 +425,44 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             .map((e) => _buildListItem(context, null, null, e, isPinned: true))
             .toList(),
       );
+
+  Widget _autoBanner() {
+    void onTapAction(String action) {
+      try {
+        if (action.startsWith("##")) {
+          final floorMatch = floorPattern.firstMatch(action);
+          int floorId = int.parse(floorMatch!.group(1)!);
+          goToFloorIdResultPage(context, floorId);
+        } else if (action.startsWith("#")) {
+          final pidMatch = pidPattern.firstMatch(action);
+          int pid = int.parse(pidMatch!.group(1)!);
+          goToPIDResultPage(context, pid);
+        } else {
+          BrowserUtil.openUrl(action, context);
+        }
+      } catch (e) {
+        Noticing.showErrorDialog(context, e);
+      }
+    }
+
+    return Selector<SettingsProvider, bool>(
+        builder: (BuildContext context, bool bannerEnabled, Widget? child) {
+          List<BannerExtra?>? list =
+              AnnouncementRepository.getInstance().getBannerExtras();
+          if (bannerEnabled && list != null && list.isNotEmpty) {
+            BannerExtra? randomBannerItem = list[Random().nextInt(list.length)];
+            if (randomBannerItem != null) {
+              return SlimMaterialBanner(
+                  icon: const Icon(Icons.campaign),
+                  title: randomBannerItem.title,
+                  actionName: randomBannerItem.actionName,
+                  onTapAction: () => onTapAction(randomBannerItem.action));
+            }
+          }
+          return Container();
+        },
+        selector: (_, model) => model.isBannerEnabled);
+  }
 
   @override
   void initState() {
@@ -610,6 +655,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                   AutoBannerAdWidget(bannerAd: bannerAd),
                   if (_postsType == PostsType.NORMAL_POSTS) ...[
                     _autoSilenceNotice(),
+                    _autoBanner(),
                     _autoPinnedPosts(),
                   ]
                 ],

@@ -178,7 +178,7 @@ Widget searchByPid(BuildContext context, String searchKeyword) {
       title: Text(S.of(context).search_by_pid_tip(pidMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
-        _goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
+        goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
       },
     );
   } else {
@@ -194,7 +194,7 @@ Widget searchByFloorId(BuildContext context, String searchKeyword) {
       title: Text(S.of(context).search_by_floor_tip(floorMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
-        _goToFloorIdResultPage(context, int.parse(floorMatch.group(1)!));
+        goToFloorIdResultPage(context, int.parse(floorMatch.group(1)!));
       },
     );
   } else {
@@ -230,7 +230,7 @@ Widget searchByTag(BuildContext context, String searchKeyword) {
 }
 
 /// Go to the post page with specific pid.
-Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
+Future<void> goToPIDResultPage(BuildContext context, int pid) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
@@ -252,7 +252,7 @@ Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
   }
 }
 
-Future<void> _goToFloorIdResultPage(BuildContext context, int floorId) async {
+Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {

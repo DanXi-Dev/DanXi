@@ -515,9 +515,19 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     onTap: () => refreshSelf(),
                   ),
                 ),
-                OTNotificationSettingsTile(
-                  onSettingsUpdate: refreshSelf,
-                ),
+                OTNotificationSettingsTile(onSettingsUpdate: refreshSelf),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).fduhole_show_banner),
+                          secondary: const Icon(Icons.campaign),
+                          subtitle: Text(
+                              S.of(context).fduhole_show_banner_description),
+                          value: value,
+                          onChanged: (bool value) =>
+                              SettingsProvider.getInstance().isBannerEnabled =
+                                  value,
+                        ),
+                    selector: (_, model) => model.isBannerEnabled),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).fduhole_clean_mode),

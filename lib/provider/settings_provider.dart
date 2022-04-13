@@ -62,6 +62,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_SEARCH_HISTORY = "search_history";
   static const String KEY_TIMETABLE_SEMESTER = "timetable_semester";
   static const String KEY_CUSTOM_USER_AGENT = "custom_user_agent";
+  static const String KEY_BANNER_ENABLED = "banner_enabled";
 
   SettingsProvider._();
 
@@ -408,6 +409,19 @@ class SettingsProvider with ChangeNotifier {
     } else {
       preferences!.remove(KEY_CUSTOM_USER_AGENT);
     }
+    notifyListeners();
+  }
+
+  /// Whether user has opted-in to banners
+  bool get isBannerEnabled {
+    if (preferences!.containsKey(KEY_BANNER_ENABLED)) {
+      return preferences!.getBool(KEY_BANNER_ENABLED)!;
+    }
+    return true;
+  }
+
+  set isBannerEnabled(bool value) {
+    preferences!.setBool(KEY_BANNER_ENABLED, value);
     notifyListeners();
   }
 }

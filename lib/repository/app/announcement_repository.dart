@@ -102,6 +102,10 @@ class AnnouncementRepository {
     return getExtra()?.stopWords;
   }
 
+  List<BannerExtra?>? getBannerExtras() {
+    return getExtra()?.banners;
+  }
+
   Extra? getExtra() {
     return Extra.fromJson(jsonDecode(_announcementCache!
         .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
