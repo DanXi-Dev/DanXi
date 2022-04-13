@@ -43,7 +43,7 @@ class SlimMaterialBanner extends StatelessWidget {
     Widget body = Container(
       color: Theme.of(context).colorScheme.surface,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 10, 8, 8),
+        padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
         child: Row(
           children: [
             if (icon != null)
