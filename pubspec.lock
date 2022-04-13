@@ -448,7 +448,7 @@ packages:
       name: flutter_fgbg
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.0"
+    version: "0.2.0"
   flutter_inappwebview:
     dependency: "direct main"
     description:
