@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.8+169';
+const String version = r'1.3.8+170';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,10 +55,10 @@ const int patch = 8;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'169'];
+const List<String> build = <String>[r'170'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1649914131;
+const int timestamp = 1649923384;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -164,16 +164,9 @@ const Map<String, Object> dependencies = <String, Object>{
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.2',
   'lunar': r'^1.2.19',
-  'animated_text_kit': r'^4.2.1',
   'flutter_fgbg': r'^0.2.0',
   'lazy_load_indexed_stack': r'^0.1.3',
   'js': r'^0.6.3',
-  'add_2_calendar': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/singularity-s0/add_2_calendar.git',
-      'ref': r'master',
-    },
-  },
 };
 
 /// Developer dependencies
