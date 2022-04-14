@@ -453,7 +453,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             BannerExtra? randomBannerItem = list[Random().nextInt(list.length)];
             if (randomBannerItem != null) {
               return SlimMaterialBanner(
-                  icon: const Icon(Icons.campaign),
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.campaign)
+                      : const Icon(CupertinoIcons.bell_circle),
                   title: randomBannerItem.title,
                   actionName: randomBannerItem.actionName,
                   onTapAction: () => onTapAction(randomBannerItem.action));
@@ -578,7 +580,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         );
       case PostsType.NORMAL_POSTS:
       case PostsType.EXTERNAL_VIEW:
-        return _buildPageBody(context, true);
+        return _buildPageBody(context, PlatformX.isMaterial(context));
     }
   }
 
@@ -654,6 +656,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                 children: [
                   AutoBannerAdWidget(bannerAd: bannerAd),
                   if (_postsType == PostsType.NORMAL_POSTS) ...[
+                    if (PlatformX.isCupertino(context)) buildForumTopBar(),
                     _autoSilenceNotice(),
                     _autoBanner(),
                     _autoPinnedPosts(),
@@ -736,31 +739,32 @@ class TimeBasedLoadAdaptLayer<T> {
 
 typedef TimeBasedDataReceiver<T> = Future<List<T>?> Function(T? lastElement);
 
+Widget buildForumTopBar() => Selector<FDUHoleProvider, bool>(
+    selector: (_, model) => model.isUserInitialized,
+    builder: (context, userInitialized, _) => userInitialized
+        ? Row(
+            children: [
+              Padding(
+                padding: PlatformX.isMaterial(context)
+                    ? const EdgeInsets.all(8.0)
+                    : EdgeInsets.zero,
+                child: PlatformIconButton(
+                  icon: Icon(PlatformIcons(context).search),
+                  onPressed: () => smartNavigatorPush(context, '/bbs/search',
+                      forcePushOnMainNavigator: true),
+                ),
+              ),
+              const OTTitle()
+            ],
+          )
+        : const SizedBox());
+
 /// The delegate to show the tab switch as a floating header.
 class ForumTabDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
           BuildContext context, double shrinkOffset, bool overlapsContent) =>
-      Selector<FDUHoleProvider, bool>(
-          selector: (_, model) => model.isUserInitialized,
-          builder: (context, userInitialized, _) => userInitialized
-              ? Row(
-                  children: [
-                    Padding(
-                      padding: PlatformX.isMaterial(context)
-                          ? const EdgeInsets.all(8.0)
-                          : EdgeInsets.zero,
-                      child: PlatformIconButton(
-                        icon: Icon(PlatformIcons(context).search),
-                        onPressed: () => smartNavigatorPush(
-                            context, '/bbs/search',
-                            forcePushOnMainNavigator: true),
-                      ),
-                    ),
-                    const OTTitle()
-                  ],
-                )
-              : Container());
+      buildForumTopBar();
 
   @override
   double get maxExtent => 64;

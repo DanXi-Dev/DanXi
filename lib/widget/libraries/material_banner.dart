@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -40,26 +41,32 @@ class SlimMaterialBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget body = Container(
-      color: Theme.of(context).colorScheme.surface,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
-        child: Row(
-          children: [
-            if (icon != null)
-              Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: SizedBox(width: 32, height: 32, child: icon)),
-            Expanded(child: Text(title)),
-            if (actionName != null)
-              Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: PlatformTextButton(
-                      child: Text(actionName!), onPressed: onTapAction))
-          ],
-        ),
+    Widget body = Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null)
+            Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: SizedBox(width: 32, height: 32, child: icon)),
+          Expanded(child: Text(title)),
+          if (actionName != null)
+            Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: PlatformTextButton(
+                    child: Text(actionName!), onPressed: onTapAction))
+        ],
       ),
     );
+    if (PlatformX.isCupertino(context)) {
+      body = Card(child: body);
+    } else {
+      body = Container(
+        color: Theme.of(context).colorScheme.surface,
+        child: body,
+      );
+    }
     if (dismissible) {
       return Dismissible(
         key: key ?? UniqueKey(),
