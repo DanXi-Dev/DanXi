@@ -230,7 +230,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
                         child: Text(S.of(context).cancel))),
                 icon: Icon(PlatformX.isMaterial(cxt)
                     ? Icons.filter_list
-                    : CupertinoIcons.sort_down),
+                    : CupertinoIcons.sort_down_circle),
               ),
               null,
               useCustomWidget: true),
@@ -368,7 +368,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             ? [OTHole.DUMMY_POST]
             : loadedPost;
       case PostsType.EXTERNAL_VIEW:
-      // If we are showing a widget predefined
+        // If we are showing a widget predefined
         return [];
     }
   }
@@ -578,7 +578,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         );
       case PostsType.NORMAL_POSTS:
       case PostsType.EXTERNAL_VIEW:
-      return _buildPageBody(context, true);
+        return _buildPageBody(context, true);
     }
   }
 

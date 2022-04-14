@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:add_2_calendar/add_2_calendar.dart' as Add2Calendar;
 import 'package:dan_xi/model/time_table.dart';
 import 'package:ical/serializer.dart';
 
@@ -60,6 +59,7 @@ class ICSConverter extends TimetableConverter {
   String get mimeType => "text/calendar";
 }
 
+/*
 class CalendarImporter extends TimetableConverter {
   /// Import [table] directly into system calendar without exporting any files.
   @override
@@ -98,4 +98,4 @@ class CalendarImporter extends TimetableConverter {
 
   @override
   String? get mimeType => null;
-}
+}*/

@@ -8,15 +8,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "38.0.0"
-  add_2_calendar:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: e1c391b25e6a465690f1400cc656e2f5b5634589
-      url: "https://github.com/singularity-s0/add_2_calendar.git"
-    source: git
-    version: "2.1.3"
   analyzer:
     dependency: transitive
     description:
@@ -24,13 +15,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.4.1"
-  animated_text_kit:
-    dependency: "direct main"
-    description:
-      name: animated_text_kit
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.2.1"
   args:
     dependency: transitive
     description:
@@ -142,7 +126,7 @@ packages:
       name: build_resolvers
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.6"
+    version: "2.0.7"
   build_runner:
     dependency: "direct dev"
     description:
@@ -523,7 +507,7 @@ packages:
       name: flutter_math_fork
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1"
+    version: "0.6.2"
   flutter_phoenix:
     dependency: "direct main"
     description:

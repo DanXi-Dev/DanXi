@@ -356,6 +356,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        Image.asset("assets/graphics/ot_logo.png"),
+        const SizedBox(height: 8),
         Text(
           S.of(context).login_by_email_password,
           style: Theme.of(context).textTheme.headline6,

@@ -25,6 +25,7 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -161,7 +162,9 @@ final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
 Widget searchByText(BuildContext context, String searchKeyword) {
   return ListTile(
     title: Text(S.of(context).search_by_text_tip(searchKeyword)),
-    leading: const Icon(Icons.text_fields),
+    leading: PlatformX.isMaterial(context)
+        ? const Icon(Icons.text_fields)
+        : const Icon(CupertinoIcons.search),
     onTap: () {
       submit(context, searchKeyword);
       smartNavigatorPush(context, "/bbs/postDetail",
@@ -174,7 +177,9 @@ Widget searchByPid(BuildContext context, String searchKeyword) {
   final pidMatch = pidPattern.firstMatch(searchKeyword);
   if (pidMatch != null) {
     return ListTile(
-      leading: const Icon(Icons.message),
+      leading: PlatformX.isMaterial(context)
+          ? const Icon(Icons.message)
+          : const Icon(CupertinoIcons.arrow_right_square),
       title: Text(S.of(context).search_by_pid_tip(pidMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
@@ -190,7 +195,9 @@ Widget searchByFloorId(BuildContext context, String searchKeyword) {
   final floorMatch = floorPattern.firstMatch(searchKeyword);
   if (floorMatch != null) {
     return ListTile(
-      leading: const Icon(Icons.message),
+      leading: PlatformX.isMaterial(context)
+          ? const Icon(Icons.message)
+          : const Icon(CupertinoIcons.arrow_right_square),
       title: Text(S.of(context).search_by_floor_tip(floorMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
