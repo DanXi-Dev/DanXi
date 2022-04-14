@@ -12,7 +12,7 @@ struct THPostDetailView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("[\(reply.anonyname)]")
+            Text("\(reply.anonyname)")
             Text(preprocessTextForHtmlAndImage(text:reply.content))
         }
         .padding()
