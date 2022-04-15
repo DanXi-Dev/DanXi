@@ -89,9 +89,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
             ]),
             if (widget.feature.customSubtitle != null ||
                 summary.isNotEmpty) ...[
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
               widget.feature.customSubtitle ??
                   Text(
                     summary.join("\n"),

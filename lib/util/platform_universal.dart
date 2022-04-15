@@ -59,10 +59,12 @@ class PlatformX {
     }
   }
 
-  static ThemeData getTheme(BuildContext context) {
+  static ThemeData getTheme(BuildContext context,
+      [MaterialColor? primarySwatch]) {
+    primarySwatch ??= Colors.blue;
     return PlatformX.isDarkMode
-        ? Constant.darkTheme(PlatformX.isCupertino(context))
-        : Constant.lightTheme(PlatformX.isCupertino(context));
+        ? Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch)
+        : Constant.lightTheme(PlatformX.isCupertino(context), primarySwatch);
   }
 
   static Color? backgroundColor(BuildContext context) {

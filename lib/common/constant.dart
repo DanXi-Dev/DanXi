@@ -226,7 +226,7 @@ class Constant {
   ///
   /// Also see:
   /// * [darkTheme]
-  static ThemeData lightTheme(bool isCupertino) {
+  static ThemeData lightTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.light,
@@ -254,7 +254,7 @@ class Constant {
     }
     return ThemeData(
       brightness: Brightness.light,
-      primarySwatch: Colors.blue,
+      primarySwatch: color,
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
@@ -263,7 +263,7 @@ class Constant {
   }
 
   /// See [lightTheme] for more details.
-  static ThemeData darkTheme(bool isCupertino) {
+  static ThemeData darkTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
       return ThemeData(
         brightness: Brightness.dark,
@@ -294,6 +294,7 @@ class Constant {
     }
     return ThemeData(
       brightness: Brightness.dark,
+      primarySwatch: color,
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.dark().cardColor,

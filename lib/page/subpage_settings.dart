@@ -39,6 +39,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart'
     if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
+import 'package:dan_xi/widget/dialogs/swatch_picker_dialog.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -367,21 +368,50 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
                     // Accessibility
                     Card(
-                      child: Selector<SettingsProvider, bool>(
-                        selector: (_, model) => model.useAccessibilityColoring,
-                        builder: (_, bool value, __) => SwitchListTile.adaptive(
-                          title: Text(S.of(context).accessibility_coloring),
-                          subtitle: Text(
-                              S.of(context).high_contrast_color_description),
-                          secondary:
-                              const Icon(Icons.accessibility_new_rounded),
-                          value: value,
-                          onChanged: (bool value) {
-                            SettingsProvider.getInstance()
-                                .useAccessibilityColoring = value;
-                            treeholePageKey.currentState?.setState(() {});
-                          },
-                        ),
+                      child: Column(
+                        children: [
+                          Selector<SettingsProvider, bool>(
+                            selector: (_, model) =>
+                                model.useAccessibilityColoring,
+                            builder: (_, bool value, __) =>
+                                SwitchListTile.adaptive(
+                              title: Text(S.of(context).accessibility_coloring),
+                              subtitle: Text(S
+                                  .of(context)
+                                  .high_contrast_color_description),
+                              secondary:
+                                  const Icon(Icons.accessibility_new_rounded),
+                              value: value,
+                              onChanged: (bool value) {
+                                SettingsProvider.getInstance()
+                                    .useAccessibilityColoring = value;
+                                treeholePageKey.currentState?.setState(() {});
+                              },
+                            ),
+                          ),
+                          ListTile(
+                            title: Text(S.of(context).theme_color),
+                            subtitle:
+                                Text(S.of(context).theme_color_description),
+                            leading: const Icon(Icons.color_lens),
+                            onTap: () async {
+                              String? result =
+                                  await showPlatformDialog<String?>(
+                                context: context,
+                                builder: (_) => SwatchPickerDialog(
+                                  initialSelectedColor: context
+                                      .read<SettingsProvider>()
+                                      .primarySwatch,
+                                ),
+                              );
+                              if (result != null) {
+                                context
+                                    .read<SettingsProvider>()
+                                    .setPrimarySwatch(result);
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
                     if (PlatformX.isWindows)

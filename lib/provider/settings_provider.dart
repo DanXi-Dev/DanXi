@@ -27,6 +27,7 @@ import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -63,6 +64,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_TIMETABLE_SEMESTER = "timetable_semester";
   static const String KEY_CUSTOM_USER_AGENT = "custom_user_agent";
   static const String KEY_BANNER_ENABLED = "banner_enabled";
+  static const String KEY_PRIMARY_SWATCH = "primary_swatch";
 
   SettingsProvider._();
 
@@ -422,6 +424,23 @@ class SettingsProvider with ChangeNotifier {
 
   set isBannerEnabled(bool value) {
     preferences!.setBool(KEY_BANNER_ENABLED, value);
+    notifyListeners();
+  }
+
+  /// Primary color used by the app.
+  String get primarySwatch {
+    if (preferences!.containsKey(KEY_PRIMARY_SWATCH)) {
+      String color = preferences!.getString(KEY_PRIMARY_SWATCH)!;
+      if (color.trim().isNotEmpty) {
+        return color;
+      }
+    }
+    return 'blue';
+  }
+
+  /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
+  void setPrimarySwatch(String value) {
+    preferences!.setString(KEY_PRIMARY_SWATCH, value);
     notifyListeners();
   }
 }

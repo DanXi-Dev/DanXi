@@ -419,5 +419,7 @@
   "post_has_stop_words": "内容中含有不适宜使用的词汇：{stopWord}。\n我们不建议发送此类词语，因为它不适用于理性讨论的环境，因而更有可能招致攻击和不恰当言论，一定要继续发送吗？",
   "community_convention": "社区公约",
   "fduhole_show_banner": "显示一些活动",
-  "fduhole_show_banner_description": "[实验性] 将在树洞页面顶部显示一些不干扰浏览的校园活动公告"
+  "fduhole_show_banner_description": "[实验性] 将在树洞页面顶部显示一些不干扰浏览的校园活动公告",
+  "theme_color": "主题色",
+  "theme_color_description": "切换旦夕的主题配色"
 }

@@ -427,5 +427,7 @@
   "post_has_stop_words": "You are using some inappropriate words: {stopWord}.\nWe do not recommend sending such words as they are not suitable for a rational discussion and are therefore more likely to attract unfriendly comments. Do you really want to send?",
   "community_convention": "Community Convention",
   "fduhole_show_banner": "Show campaigns",
-  "fduhole_show_banner_description": "[Experimental] Show some non-invasive campaigns and announcements"
+  "fduhole_show_banner_description": "[Experimental] Show some non-invasive campaigns and announcements",
+  "theme_color": "Theming",
+  "theme_color_description": "Customize theme color"
 }
