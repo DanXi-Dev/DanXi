@@ -126,6 +126,8 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
     bannerAd.load();
   }
 
+  static const _IGNORE_KEYS = ["password"];
+
   Future<void> diagnoseDanXi() async {
     _console.writeln(
         "User Agent used by DanXi: ${UserAgentInterceptor.defaultUsedUserAgent}");
@@ -134,6 +136,9 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
     var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
     if (allKeys != null) {
       for (var key in allKeys) {
+        // Skip some keys
+        if (_IGNORE_KEYS.contains(key)) continue;
+
         _console.writeln("Key: $key");
         _console.writeln(
             "Value: ${context.read<SettingsProvider>().preferences?.get(key)}");
