@@ -4,9 +4,9 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "cd55dc746cea4557664f855189bee7da",
-"index.html": "15b14dce95c58e2a14850129379fc78c",
-"/": "15b14dce95c58e2a14850129379fc78c",
-"main.dart.js": "19903cd15bd3308a492e7dc66041f3d0",
+"index.html": "ca0731b3db60d4a539ba11e05ce56a6f",
+"/": "ca0731b3db60d4a539ba11e05ce56a6f",
+"main.dart.js": "cccedc0202c1d853018d54d98bc37a7f",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
 "assets/AssetManifest.json": "65447a81fedac3a248175db4a979c617",
@@ -40,7 +40,7 @@ const RESOURCES = {
 "assets/packages/flutter_js/assets/js/fetch.js": "277e0c5ec36810cbe57371a4b7e26be0",
 "assets/fonts/MaterialIcons-Regular.otf": "7e7a6cccddf6d7b20012a548461d5d81",
 "assets/assets/texts/stop_words.dat": "654361d38d55c99cbac298d4566ac719",
-"assets/assets/texts/tips.dat": "31433307867405485cd3b175d21b43a9",
+"assets/assets/texts/tips.dat": "7f20ac68bbe7f73708ed69813eb02672",
 "assets/assets/graphics/kavinzhao.jpeg": "c8bc3cc6c213b56d2103bf806ab62fbf",
 "assets/assets/graphics/ivanfei.jpg": "04ecf0883297db553b0b494b4ddb0f30",
 "assets/assets/graphics/w568w.jpeg": "52a688cf3c32b58e04f9f3e101fba056",
