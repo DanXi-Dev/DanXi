@@ -389,28 +389,29 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               },
                             ),
                           ),
-                          ListTile(
-                            title: Text(S.of(context).theme_color),
-                            subtitle:
-                                Text(S.of(context).theme_color_description),
-                            leading: const Icon(Icons.color_lens),
-                            onTap: () async {
-                              String? result =
-                                  await showPlatformDialog<String?>(
-                                context: context,
-                                builder: (_) => SwatchPickerDialog(
-                                  initialSelectedColor: context
+                          if (PlatformX.isMaterial(context))
+                            ListTile(
+                              title: Text(S.of(context).theme_color),
+                              subtitle:
+                                  Text(S.of(context).theme_color_description),
+                              leading: const Icon(Icons.color_lens),
+                              onTap: () async {
+                                String? result =
+                                    await showPlatformDialog<String?>(
+                                  context: context,
+                                  builder: (_) => SwatchPickerDialog(
+                                    initialSelectedColor: context
+                                        .read<SettingsProvider>()
+                                        .primarySwatch,
+                                  ),
+                                );
+                                if (result != null) {
+                                  context
                                       .read<SettingsProvider>()
-                                      .primarySwatch,
-                                ),
-                              );
-                              if (result != null) {
-                                context
-                                    .read<SettingsProvider>()
-                                    .setPrimarySwatch(result);
-                              }
-                            },
-                          ),
+                                      .setPrimarySwatch(result);
+                                }
+                              },
+                            ),
                         ],
                       ),
                     ),
