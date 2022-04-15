@@ -21,7 +21,6 @@ import 'dart:math';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 extension StringEx on String {
   /// Get the substring of [this] between [a] and [b].

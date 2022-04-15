@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 
 class PagedListViewHelper {

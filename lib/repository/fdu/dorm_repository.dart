@@ -35,11 +35,11 @@ class FudanDormRepository extends BaseRepositoryWithDio {
 
   Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
     return UISLoginTool.tryAsyncWithAuth(
-        dio!, _LOGIN_URL, cookieJar!, info, () => _loadElectricityInfo());
+        dio, _LOGIN_URL, cookieJar!, info, () => _loadElectricityInfo());
   }
 
   Future<ElectricityItem?> _loadElectricityInfo() async {
-    final Response<Map<String, dynamic>> r = await dio!.get(electricityUrl);
+    final Response<Map<String, dynamic>> r = await dio.get(electricityUrl);
     final Map<String, dynamic> json = r.data!;
 
     final data = json['d'];

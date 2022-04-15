@@ -34,12 +34,12 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   factory FudanEhallRepository.getInstance() => _instance;
 
   Future<StudentInfo> getStudentInfo(PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true);
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info, true);
     return _getStudentInfo();
   }
 
   Future<StudentInfo> _getStudentInfo() async {
-    Response<Map<String, dynamic>> rep = await dio!.get(_INFO_URL);
+    Response<Map<String, dynamic>> rep = await dio.get(_INFO_URL);
     Map<String, dynamic> rawJson = rep.data!;
     if (rawJson['data']['userName'] == null) {
       throw GeneralLoginFailedException();

@@ -47,15 +47,15 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   Future<List<StadiumData>?> getStadiumFullList(PersonInfo info,
       {DateTime? queryDate, SportsType? type, Campus? campus}) =>
       UISLoginTool.tryAsyncWithAuth(
-          dio!,
+          dio,
           LOGIN_URL,
           cookieJar!,
           info,
-              () => _getStadiumFullList(
+          () => _getStadiumFullList(
               queryDate: queryDate, type: type, campus: campus));
 
   Future<int> _getStadiumPageNumber() async {
-    Response<String> rep = await dio!.get(STADIUM_LIST_NUMBER_URL);
+    Response<String> rep = await dio.get(STADIUM_LIST_NUMBER_URL);
     String pageNumber = rep.data!.between('页次:1/', '页')!;
     return int.parse(pageNumber);
   }
@@ -83,7 +83,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
         "fieldID=2c9c486e4f821a19014f824535480007&"
         "dicID=${type?.id ?? ''}&"
         "pageBean.pageNo=$page";
-    Response<String> res = await dio!.post(STADIUM_LIST_URL,
+    Response<String> res = await dio.post(STADIUM_LIST_URL,
         data: body,
         options: Options(contentType: 'application/x-www-form-urlencoded'));
     BeautifulSoup soup = BeautifulSoup(res.data!);
@@ -94,12 +94,12 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   }
 
   Future<StadiumScheduleData?> getScheduleData(PersonInfo info, StadiumData stadium, DateTime date) =>
-      UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
-              () => _getScheduleData(stadium, date));
+      UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
+          () => _getScheduleData(stadium, date));
 
   Future<StadiumScheduleData?> _getScheduleData(StadiumData stadium, DateTime date) async {
     Response<String> res =
-        await dio!.get(sStadiumDetailUrl(stadium.contentId, date));
+        await dio.get(sStadiumDetailUrl(stadium.contentId, date));
     BeautifulSoup soup = BeautifulSoup(res.data!);
     List<Bs4Element> listOfSchedule = soup
         .findAll("table", class_: "site_table")

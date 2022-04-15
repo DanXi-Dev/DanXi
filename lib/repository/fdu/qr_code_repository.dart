@@ -33,10 +33,10 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   factory QRCodeRepository.getInstance() => _instance;
 
   Future<String?> getQRCode(PersonInfo? info) => UISLoginTool.tryAsyncWithAuth(
-      dio!, LOGIN_URL, cookieJar!, info, () => _getQRCode());
+      dio, LOGIN_URL, cookieJar!, info, () => _getQRCode());
 
   Future<String?> _getQRCode() async {
-    final res = await dio!.get(QR_URL);
+    final res = await dio.get(QR_URL);
     BeautifulSoup soup = BeautifulSoup(res.data.toString());
     return soup.find("#myText")!.attributes['value'];
   }

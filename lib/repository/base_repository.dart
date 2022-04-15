@@ -31,7 +31,7 @@ abstract class BaseRepositoryWithDio {
   String get linkHost;
 
   @protected
-  Dio? get dio {
+  Dio get dio {
     if (!_dios.containsKey(linkHost)) {
       _dios[linkHost] = Dio();
       _dios[linkHost]!.options = BaseOptions(
@@ -45,7 +45,7 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }
-    return _dios[linkHost];
+    return _dios[linkHost]!;
   }
 
   @protected

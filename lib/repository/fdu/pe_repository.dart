@@ -40,7 +40,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   Future<List<ExerciseItem>?> _loadExerciseRecords(PersonInfo? info) async {
     // PE system request a token from UIS to log in.
     String token = "";
-    await UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, info, true)
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info, true)
         .catchError((e) {
       if (e is DioError && e.type == DioErrorType.response) {
         String url = e.response!.requestOptions.path;
@@ -48,7 +48,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
     });
     final List<ExerciseItem> items = [];
-    final Response<String> r = await dio!.get(_INFO_URL + "?token=" + token);
+    final Response<String> r = await dio.get(_INFO_URL + "?token=" + token);
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final Iterable<dom.Element> tableLines = soup
         .findAll(
