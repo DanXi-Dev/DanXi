@@ -71,4 +71,4 @@ Tools • Dart 2.16.2 • DevTools 2.9.2
 ## 赞助
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
 
-我们的邮箱：[danxi_dev@protonmail.com](mailto:danxi_dev@protonmail.com)
+我们的邮箱：[dev@fduhole.com](mailto:dev@fduhole.com)
