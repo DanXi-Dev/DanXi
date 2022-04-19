@@ -124,7 +124,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _rebuildPage() {
     _lastRefreshTime = DateTime.now();
     _subpage = [
-      HomeSubpage(key: dashboardPageKey),
+      // Don't show Dashboard in visitor mode
+      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+        HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
@@ -524,10 +526,19 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Show an empty container, if no person info is set.
   Widget _buildDummyBody(Widget title) => PlatformScaffold(
-    iosContentBottomPadding: false,
+        iosContentBottomPadding: false,
         iosContentPadding: true,
         appBar: PlatformAppBar(title: title),
-        body: const SizedBox(),
+        body: Column(children: [
+          Card(
+            child: ListTile(
+              leading: Icon(PlatformIcons(context).accountCircle),
+              title: Text(S.of(context).login),
+              onTap: () => LoginDialog.showLoginDialog(
+                  context, _preferences, StateProvider.personInfo, false),
+            ),
+          )
+        ]),
       );
 
   Widget _buildBody(Widget title) {
@@ -550,12 +561,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             cupertinoTabChildBuilder: (_, index) => _subpage[index],
             bottomNavBar: PlatformNavBar(
               items: [
-                BottomNavigationBarItem(
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.dashboard)
-                      : const Icon(CupertinoIcons.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
-                ),
+                // Don't show Dashboard in visitor mode
+                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.dashboard)
+                        : const Icon(CupertinoIcons.square_stack_3d_up_fill),
+                    label: S.of(context).dashboard,
+                  ),
                 if (!SettingsProvider.getInstance().hideHole)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
