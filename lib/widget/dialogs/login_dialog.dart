@@ -96,7 +96,7 @@ class _LoginDialogState extends State<LoginDialog> {
     switch (_group) {
       case UserGroup.VISITOR:
         PersonInfo newInfo =
-            PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
+            PersonInfo(id, password, "No User Account", UserGroup.VISITOR);
         await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
         widget.personInfo.value = newInfo;
         progressDialog.dismiss(showAnim: false);
@@ -339,7 +339,7 @@ class _LoginDialogState extends State<LoginDialog> {
   /// Change the login group and rebuild the dialog.
   _switchLoginGroup(UserGroup e) {
     if (e == UserGroup.VISITOR) {
-      _nameController.text = _pwdController.text = "visitor";
+      _nameController.text = _pwdController.text = "[ FDUHole Only ]";
     } else {
       _nameController.text = _pwdController.text = "";
     }
