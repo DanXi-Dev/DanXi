@@ -423,7 +423,7 @@
   "theme_color": "主题色",
   "theme_color_description": "切换旦夕的主题配色",
   "cant_login": "无法登录？",
-  "login_problem": "如果您登录时遇到问题，请联系 dev@fduhole.com 或加入QQ群 {QQ}.\n\n与此同时，建议您阅读开发组公告，您遇到的问题可能已经在其中被提及。",
-  "copy_qq_group_id": "复制QQ群号",
+  "login_problem": "如果您登录时遇到问题，请联系 dev@fduhole.com 或加入 QQ 群 {QQ}.\n\n与此同时，建议您阅读开发组公告，您遇到的问题可能已经在其中被提及。",
+  "copy_qq_group_id": "复制 QQ 群号",
   "read_announcements": "查看开发组公告"
 }

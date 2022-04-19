@@ -383,7 +383,7 @@
   "search_by_pid_tip": "「{pid}」ポストへ",
   "search_by_floor_tip": "「{floorId}」返信へ",
   "search_by_tag_tip": "このスペースのタグ「{tag}」のポストを見る",
-  "tip_that_fduhole_is_not_fdu": "注意：FDUHoleのアカウントは、復旦大学メールやUISアカウントではありません。\n「UIS クイックログイン/登録」からのは、すでにFDUHoleに登録されています；\n「メールアドレスとパスワードでログイン」からのは、まだ登録されていない可能性があるので、他のオプションからアカウントを登録してください。",
+  "tip_that_fduhole_is_not_fdu": "注意：FDUHoleのアカウントは、復旦大学メールやUISアカウントではありません。",
   "send_email": "送信する",
   "post_has_no_tags": "タグなしでのポストは推奨していませんが、送り続けなければならないのでしょうか？",
   "post_has_no_tags_title": "タグなし",
@@ -394,5 +394,9 @@
   "fduhole_show_banner": "活動を表示する",
   "fduhole_show_banner_description": "[実験的] 閲覧に支障のない範囲で、学内活動のお知らせをFDUHoleのページ上部に表示します",
   "theme_color": "テーマ色",
-  "theme_color_description": "旦夕のテーマ色を設定する"
+  "theme_color_description": "旦夕のテーマ色を設定する",
+  "cant_login": "ログインできない？",
+  "login_problem": "ログインできない場合は、dev@fduhole.comまでご連絡ください、またはQQグループ（番号：{QQ}）にご参加ください。 .\n\nその間に、「開発チームのお知らせ」を読んでくださいと、こんな問題が言及されている可能性があります。",
+  "copy_qq_group_id": "番号をコピーする",
+  "read_announcements": "お知らせを読む"
 }
