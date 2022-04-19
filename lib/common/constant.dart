@@ -34,6 +34,8 @@ class Constant {
   /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
 
+  static const SUPPORT_QQ_GROUP = "941342818";
+
   static const SPECIAL_DIVISION_FOR_CURRICULUM = "评教";
 
   static String get DEFAULT_USER_AGENT =>

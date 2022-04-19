@@ -29,6 +29,7 @@ import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -394,22 +395,38 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
         ),
         const SizedBox(height: 16),
-        Wrap(
-          alignment: WrapAlignment.spaceAround,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            PlatformTextButton(
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(S.of(context).forgot_password)),
-              onPressed: () => BrowserUtil.openUrl(
-                  Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
-            ),
             PlatformElevatedButton(
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(S.of(context).login)),
+              child: Text(S.of(context).login),
               onPressed: _doLogin,
             ),
+            const SizedBox(height: 16),
+            Wrap(
+              children: [
+                PlatformTextButton(
+                  child: Text(S.of(context).forgot_password),
+                  onPressed: () => BrowserUtil.openUrl(
+                      Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
+                ),
+                PlatformTextButton(
+                    child: Text(S.of(context).cant_login),
+                    onPressed: () => Noticing.showNotice(
+                            context,
+                            S
+                                .of(context)
+                                .login_problem(Constant.SUPPORT_QQ_GROUP),
+                            title: S.of(context).cant_login,
+                            useSnackBar: false,
+                            customActions: [
+                              CustomDialogActionItem(
+                                  S.of(context).copy_qq_group_id,
+                                  () => Clipboard.setData(const ClipboardData(
+                                      text: Constant.SUPPORT_QQ_GROUP)))
+                            ])),
+              ],
+            )
           ],
         )
       ],

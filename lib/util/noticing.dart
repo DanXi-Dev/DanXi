@@ -44,7 +44,8 @@ class Noticing {
       {String? confirmText,
       String? title,
       bool useSnackBar = true,
-      bool? centerContent}) async {
+      bool? centerContent,
+      List<CustomDialogActionItem> customActions = const []}) async {
     centerContent ??= !PlatformX.isMaterial(context);
     if (PlatformX.isMaterial(context) && useSnackBar) {
       // Override Linkify's default text style.
@@ -82,11 +83,17 @@ class Noticing {
                         onOpen: (element) =>
                             BrowserUtil.openUrl(element.url, context),
                       ),
-                actions: <Widget>[
-                  PlatformDialogAction(
-                      child: PlatformText(confirmText ?? S.of(context).i_see),
-                      onPressed: () => Navigator.pop(context)),
-                ],
+                actions: customActions
+                        .map((e) => PlatformDialogAction(
+                            child: PlatformText(e.text),
+                            onPressed: e.onPressed))
+                        .toList() +
+                    [
+                      PlatformDialogAction(
+                          child:
+                              PlatformText(confirmText ?? S.of(context).i_see),
+                          onPressed: () => Navigator.pop(context)),
+                    ],
               ));
     }
   }
@@ -261,4 +268,11 @@ class Noticing {
       builder: (BuildContext context) => body,
     );
   }
+}
+
+class CustomDialogActionItem {
+  final String text;
+  final VoidCallback onPressed;
+
+  CustomDialogActionItem(this.text, this.onPressed);
 }
