@@ -22,6 +22,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/animation.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -420,6 +421,11 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                             title: S.of(context).cant_login,
                             useSnackBar: false,
                             customActions: [
+                              CustomDialogActionItem(
+                                  S.of(context).read_announcements, () {
+                                smartNavigatorPush(
+                                    context, '/announcement/list');
+                              }),
                               CustomDialogActionItem(
                                   S.of(context).copy_qq_group_id,
                                   () => Clipboard.setData(const ClipboardData(
