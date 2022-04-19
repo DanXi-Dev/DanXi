@@ -107,18 +107,20 @@ class AnnouncementRepository {
   }
 
   Extra? getExtra() {
-    return Extra.fromJson(jsonDecode(_announcementCache!
+    return _announcementCache.apply((p0) => Extra.fromJson(jsonDecode(p0
         .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
-        .content!));
+        .content!)));
   }
 
-  UpdateInfo checkVersion() => UpdateInfo(
-      _announcementCache!
-          .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
-          .content,
-      _announcementCache!
-          .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
-          .content);
+  UpdateInfo checkVersion() {
+    return UpdateInfo(
+        _announcementCache!
+            .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
+            .content,
+        _announcementCache!
+            .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
+            .content);
+  }
 
   List<Celebration> getCelebrations() {
     List celebrationJson = jsonDecode(_announcementCache!

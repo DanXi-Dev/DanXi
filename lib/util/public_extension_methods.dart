@@ -69,6 +69,16 @@ extension ObjectEx on dynamic {
   }
 }
 
+extension ObjectNullSafetyEx<T> on T? {
+  V? apply<V>(V Function(T) applier) {
+    if (this != null) {
+      return applier.call(this!);
+    } else {
+      return null;
+    }
+  }
+}
+
 extension StateEx on State {
   /// Call [setState] to perform a global redrawing of the widget.
   Future<void> refreshSelf() {
