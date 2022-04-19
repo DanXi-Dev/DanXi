@@ -238,9 +238,9 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
       await OpenTreeHoleRepository.getInstance().logout();
     } finally {
       progressDialog.dismiss(showAnim: false);
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      _preferences.clear().then((value) => FlutterApp.restartApp(context));
     }
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
 
   List<Widget> _buildCampusAreaList(BuildContext menuContext) {
