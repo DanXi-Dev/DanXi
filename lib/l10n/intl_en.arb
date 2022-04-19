@@ -417,7 +417,7 @@
   "search_by_pid_tip": "Go to the post {pid}",
   "search_by_floor_tip": "Go to the floor {floorId}",
   "search_by_tag_tip": "See posts with tag \"{tag}\" in this division",
-  "tip_that_fduhole_is_not_fdu": "Note: your FDUHole account is not your FDU account.\nComing from \"Fudan UIS Quick Login\", you should already have a FDUHole account;\ncoming from \"Log in by email and password\", you may not have registered and please sign up in another option.",
+  "tip_that_fduhole_is_not_fdu": "Note: Your FDUHole account is not your UIS account.",
   "our_email_is": "Our email is {email} .",
   "send_email": "Send Email",
   "post_has_no_tags": "We do not recommend sending a post with no tags. Do you really want to send?",

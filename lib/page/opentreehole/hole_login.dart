@@ -153,8 +153,10 @@ abstract class SubStatelessWidget extends StatelessWidget {
     return Align(
       alignment: Alignment.topCenter,
       child: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: size.width * 0.1, vertical: size.height * 0.1),
+        padding: EdgeInsets.only(
+            left: size.width * 0.1,
+            right: size.width * 0.1,
+            top: size.height * 0.1),
         child: Container(
           decoration: ShapeDecoration(
               color: Colors.transparent,
@@ -162,7 +164,7 @@ abstract class SubStatelessWidget extends StatelessWidget {
                   side: const BorderSide(color: Colors.grey, width: 0.5),
                   borderRadius: BorderRadius.circular(4))),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,19 +360,17 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text(
-          S.of(context).login_by_email_password,
-          style: Theme.of(context).textTheme.headline6,
-          textAlign: TextAlign.center,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 48.0),
+          child: Image.asset("assets/graphics/ot_logo.png"),
         ),
+        const SizedBox(height: 4),
         Text(
           S.of(context).input_your_email_password,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(
-          height: 32,
-        ),
+        const SizedBox(height: 24),
         TextField(
           controller: _usernameController,
           decoration: InputDecoration(
@@ -407,11 +407,13 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
             Wrap(
               children: [
                 PlatformTextButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(S.of(context).forgot_password),
                   onPressed: () => BrowserUtil.openUrl(
                       Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
                 ),
                 PlatformTextButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Text(S.of(context).cant_login),
                     onPressed: () => Noticing.showNotice(
                             context,
@@ -623,6 +625,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
   Widget buildContent(BuildContext context) {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Text(
           S.of(context).secure_verification,
