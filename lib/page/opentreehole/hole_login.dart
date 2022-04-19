@@ -360,8 +360,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 48.0),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 166),
           child: Image.asset("assets/graphics/ot_logo.png"),
         ),
         const SizedBox(height: 4),

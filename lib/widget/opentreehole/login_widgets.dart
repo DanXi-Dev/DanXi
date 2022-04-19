@@ -38,7 +38,10 @@ class OTWelcomeWidget extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: Image.asset("assets/graphics/ot_logo.png"),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 256),
+                child: Image.asset("assets/graphics/ot_logo.png"),
+              ),
             ),
             Column(
               children: [
