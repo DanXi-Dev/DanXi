@@ -612,31 +612,14 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               // It is not important if [listViewController] is not attached to a ListView.
             } catch (_) {}
           },
-          child: NestedScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            floatHeaderSlivers: true,
-            // Use a [Builder] to force the [PagedListView] use the scrollController provided by [NestedScrollView].
-            body: Builder(builder: (context) {
-              if (_postsType == PostsType.EXTERNAL_VIEW) {
-                return _delegate!.build(context);
-              } else {
-                return _buildOTListView(context,
-                    padding: buildTabBar ? EdgeInsets.zero : null);
-              }
-            }),
-            // Add a header for the scroll view
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) => <Widget>[
-              if (buildTabBar)
-                SliverSafeArea(
-                  bottom: false,
-                  sliver: SliverPersistentHeader(
-                      delegate: ForumTabDelegate(),
-                      pinned: false,
-                      floating: true),
-                )
-            ],
-          ),
+          child: Builder(builder: (context) {
+            if (_postsType == PostsType.EXTERNAL_VIEW) {
+              return _delegate!.build(context);
+            } else {
+              return _buildOTListView(context,
+                  padding: buildTabBar ? EdgeInsets.zero : null);
+            }
+          }),
         ),
       ),
     );
@@ -656,7 +639,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                 children: [
                   AutoBannerAdWidget(bannerAd: bannerAd),
                   if (_postsType == PostsType.NORMAL_POSTS) ...[
-                    if (PlatformX.isCupertino(context)) buildForumTopBar(),
+                    buildForumTopBar(),
                     _autoSilenceNotice(),
                     _autoBanner(),
                     _autoPinnedPosts(),
