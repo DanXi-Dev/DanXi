@@ -158,7 +158,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Dio get secureDio {
     Dio secureDio = Dio();
     //Pin HTTPS cert
-    (secureDio.httpClientAdapter as DefaultHttpClientAdapter)
+    /*(secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
       final SecurityContext sc = SecurityContext(withTrustedRoots: false);
       HttpClient httpClient = HttpClient(context: sc);
@@ -180,7 +180,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         throw NotLoginError("Invalid HTTPS Certificate");
       };
       return httpClient;
-    };
+    };*/
     return secureDio;
   }
 
@@ -203,7 +203,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<JWToken?> register(
       String email, String password, String verifyCode) async {
     final Response<Map<String, dynamic>> response =
-    await dio.post(_BASE_AUTH_URL + "/register", data: {
+        await dio.post(_BASE_AUTH_URL + "/register", data: {
       "password": password,
       "email": email,
       "verification": int.parse(verifyCode),
@@ -215,7 +215,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<JWToken?> loginWithUsernamePassword(
       String username, String password) async {
     final Response<Map<String, dynamic>> response =
-    await dio.post(_BASE_AUTH_URL + "/login", data: {
+        await dio.post(_BASE_AUTH_URL + "/login", data: {
       'email': username,
       'password': password,
     });
@@ -280,8 +280,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
-    final Response<List<dynamic>> response =
-    await dio.get(_BASE_URL + "/holes",
+    final Response<List<dynamic>> response = await dio.get(_BASE_URL + "/holes",
         queryParameters: {
           "start_time": startTime.toIso8601String(),
           "division_id": divisionId,
@@ -427,7 +426,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTFloor?> likeFloor(int floorId, bool like) async {
     final Response<Map<String, dynamic>> response =
-    await dio.put(_BASE_URL + "/floors/$floorId",
+        await dio.put(_BASE_URL + "/floors/$floorId",
             data: {
               "like": like ? "add" : "cancel",
             },
@@ -475,7 +474,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<List<OTMessage>?> loadMessages(
       {bool unreadOnly = false, DateTime? startTime}) async {
     final Response<List<dynamic>> response =
-    await dio.get(_BASE_URL + "/messages",
+        await dio.get(_BASE_URL + "/messages",
             queryParameters: {
               "not_read": unreadOnly,
               "start_time": startTime?.toIso8601String(),
