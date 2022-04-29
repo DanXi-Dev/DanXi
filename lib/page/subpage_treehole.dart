@@ -627,52 +627,65 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>
       PagedListView<OTHole>(
-          noneItem: OTHole.DUMMY_POST,
-          pagedController: listViewController,
-          withScrollbar: true,
-          scrollController: PrimaryScrollController.of(context),
-          startPage: 1,
-          // Avoiding extra padding from ListView. We have added it in [SliverSafeArea].
-          padding: padding,
-          builder: _buildListItem,
-          headBuilder: (context) => Column(
-                children: [
-                  AutoBannerAdWidget(bannerAd: bannerAd),
-                  if (_postsType == PostsType.NORMAL_POSTS) ...[
-                    buildForumTopBar(),
-                    _autoSilenceNotice(),
-                    _autoBanner(),
-                    _autoPinnedPosts(),
-                  ]
-                ],
-              ),
-          loadingBuilder: (BuildContext context) => Container(
-              padding: const EdgeInsets.all(8),
-              child: Center(child: PlatformCircularProgressIndicator())),
-          endBuilder: (context) => Center(
-                  child: Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(S.of(context).end_reached),
-              )),
-          emptyBuilder: (context) => Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(
-                    child: Text(_postsType == PostsType.FAVORED_DISCUSSION
-                        ? S.of(context).no_favorites
-                        : S.of(context).no_data)),
-              ),
-          fatalErrorBuilder: (_, error) {
-            if (error is NotLoginError) {
-              return OTWelcomeWidget(loginCallback: () async {
-                await smartNavigatorPush(context, "/bbs/login",
-                    arguments: {"info": StateProvider.personInfo.value!});
-                refreshList();
-              });
-            }
-            return ErrorPageWidget.buildWidget(context, error,
-                onTap: refreshSelf);
-          },
-          dataReceiver: _loadContent);
+        noneItem: OTHole.DUMMY_POST,
+        pagedController: listViewController,
+        withScrollbar: true,
+        scrollController: PrimaryScrollController.of(context),
+        startPage: 1,
+        // Avoiding extra padding from ListView. We have added it in [SliverSafeArea].
+        padding: padding,
+        builder: _buildListItem,
+        headBuilder: (context) => Column(
+          children: [
+            AutoBannerAdWidget(bannerAd: bannerAd),
+            if (_postsType == PostsType.NORMAL_POSTS) ...[
+              buildForumTopBar(),
+              _autoSilenceNotice(),
+              _autoBanner(),
+              _autoPinnedPosts(),
+            ]
+          ],
+        ),
+        loadingBuilder: (BuildContext context) => Container(
+            padding: const EdgeInsets.all(8),
+            child: Center(child: PlatformCircularProgressIndicator())),
+        endBuilder: (context) => Center(
+            child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Text(S.of(context).end_reached),
+        )),
+        emptyBuilder: (context) => Container(
+          padding: const EdgeInsets.all(8),
+          child: Center(
+              child: Text(_postsType == PostsType.FAVORED_DISCUSSION
+                  ? S.of(context).no_favorites
+                  : S.of(context).no_data)),
+        ),
+        fatalErrorBuilder: (_, error) {
+          if (error is NotLoginError) {
+            return OTWelcomeWidget(loginCallback: () async {
+              await smartNavigatorPush(context, "/bbs/login",
+                  arguments: {"info": StateProvider.personInfo.value!});
+              refreshList();
+            });
+          }
+          return ErrorPageWidget.buildWidget(context, error,
+              onTap: refreshSelf);
+        },
+        dataReceiver: _loadContent,
+        onDismissItem: _postsType == PostsType.FAVORED_DISCUSSION
+            ? (context, index, item) async {
+                await OpenTreeHoleRepository.getInstance()
+                    .setFavorite(SetFavoriteMode.DELETE, item.hole_id)
+                    .onError((dynamic error, stackTrace) {
+                  Noticing.showNotice(context, error.toString(),
+                      title: S.of(context).operation_failed,
+                      useSnackBar: false);
+                  return null;
+                });
+              }
+            : null,
+      );
 
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement,

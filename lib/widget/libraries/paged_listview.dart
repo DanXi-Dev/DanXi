@@ -93,6 +93,10 @@ class PagedListView<T> extends StatefulWidget {
 
   final EdgeInsets? padding;
 
+  /// If non-null, items will be slidable.
+  /// Sliding an item away will cause this function to be called.
+  final void Function(BuildContext, int, T)? onDismissItem;
+
   const PagedListView(
       {Key? key,
       this.pagedController,
@@ -110,7 +114,8 @@ class PagedListView<T> extends StatefulWidget {
       this.shouldScrollToEnd,
       this.noneItem,
       this.fatalErrorBuilder,
-      this.padding})
+      this.padding,
+      this.onDismissItem})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         assert(dataReceiver != null || allDataReceiver != null),
         super(key: key);
@@ -319,10 +324,23 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       index--;
     }
     if (index < _data.length) {
-      return WithStateKey(
+      Widget item = WithStateKey(
         childKey: valueKeys[index],
         child: widget.builder(context, this, index, _data[index]),
       );
+      if (widget.onDismissItem != null) {
+        item = Dismissible(
+          key: valueKeys[index],
+          background: ColoredBox(color: Theme.of(context).errorColor),
+          onDismissed: (direction) {
+            _data.removeAt(index);
+            valueKeys.removeAt(index);
+            widget.onDismissItem!(context, index, _data[index]);
+          },
+          child: item,
+        );
+      }
+      return item;
     } else if (index == _data.length) {
       if (_hasError) {
         return _defaultErrorBuilder(snapshot);
