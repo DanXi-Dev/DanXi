@@ -333,9 +333,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           key: valueKeys[index],
           background: ColoredBox(color: Theme.of(context).errorColor),
           onDismissed: (direction) {
+            widget.onDismissItem!.call(context, index, _data[index]);
             _data.removeAt(index);
             valueKeys.removeAt(index);
-            widget.onDismissItem!(context, index, _data[index]);
           },
           child: item,
         );
