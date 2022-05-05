@@ -12,9 +12,6 @@ Announcement _$AnnouncementFromJson(Map<String, dynamic> json) => Announcement(
       ..createdAt = json['createdAt'] as String?
       ..updatedAt = json['updatedAt'] as String?
       ..objectId = json['objectId'] as String?
-      ..ACL = (json['ACL'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as Object),
-      )
       ..maxVersion = json['maxVersion'] as int?;
 
 Map<String, dynamic> _$AnnouncementToJson(Announcement instance) =>
@@ -22,7 +19,6 @@ Map<String, dynamic> _$AnnouncementToJson(Announcement instance) =>
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
       'objectId': instance.objectId,
-      'ACL': instance.ACL,
       'content': instance.content,
       'maxVersion': instance.maxVersion,
     };

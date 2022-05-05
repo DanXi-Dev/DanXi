@@ -231,7 +231,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _loadDataFromBmob() {
-    AnnouncementRepository.getInstance().loadData().then((value) {
+    AnnouncementRepository.getInstance().loadAnnouncements().then((value) {
       _loadUpdate().then(
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});

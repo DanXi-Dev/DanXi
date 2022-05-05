@@ -49,7 +49,6 @@ import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -74,10 +73,6 @@ import 'common/constant.dart';
 void main() {
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Init Bmob database.
-  Bmob.init(
-      "https://api2.bmob.cn", Constant.BMOB_APP_ID, Constant.BMOB_API_KEY);
 
   // Init Mi push Service.
   if (PlatformX.isAndroid) {
