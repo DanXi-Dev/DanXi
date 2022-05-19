@@ -577,7 +577,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),
-                  subtitle: Text(S.of(context).fduhole_hidden_tags_description),
+                  subtitle: Text(OpenTreeHoleRepository.getInstance().isAdmin
+                      ? S.of(context).admin_no_hide_tag
+                      : S.of(context).fduhole_hidden_tags_description),
+                  enabled: !OpenTreeHoleRepository.getInstance().isAdmin,
                   onTap: () async {
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
                     treeholePageKey.currentState?.setState(() {});
