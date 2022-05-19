@@ -60,7 +60,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:system_tray/system_tray.dart';
+import 'package:system_tray/system_tray.dart' as tray;
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -136,7 +136,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     ];
   }
 
-  final SystemTray _systemTray = SystemTray();
+  final tray.SystemTray _systemTray = tray.SystemTray();
 
   @override
   void dispose() {
@@ -285,17 +285,17 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     "/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
         toolTip: "DanXi is here~");
-    late List<MenuItemBase> showingMenu, hidingMenu;
+    late List<tray.MenuItemBase> showingMenu, hidingMenu;
     showingMenu = [
-      MenuItem(
+      tray.MenuItem(
         label: 'Hide',
         onClicked: () {
           appWindow.hide();
           _systemTray.setContextMenu(hidingMenu);
         },
       ),
-      MenuSeparator(),
-      MenuItem(
+      tray.MenuSeparator(),
+      tray.MenuItem(
         label: 'Exit',
         onClicked: () {
           appWindow.close();
@@ -304,15 +304,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     ];
     hidingMenu = [
-      MenuItem(
+      tray.MenuItem(
         label: 'Show',
         onClicked: () {
           appWindow.show();
           _systemTray.setContextMenu(showingMenu);
         },
       ),
-      MenuSeparator(),
-      MenuItem(
+      tray.MenuSeparator(),
+      tray.MenuItem(
         label: 'Exit',
         onClicked: () {
           appWindow.close();
