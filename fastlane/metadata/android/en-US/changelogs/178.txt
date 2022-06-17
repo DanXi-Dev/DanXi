@@ -1,0 +1,2 @@
+A lot of updates! See https://github.com/DanXi-Dev/DanXi/releases for more details.
+To Chinese users: you may meet with some font issues. Watch https://github.com/flutter/flutter/issues/103811 for the fixing progress.

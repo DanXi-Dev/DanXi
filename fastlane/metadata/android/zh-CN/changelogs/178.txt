@@ -1,0 +1,2 @@
+大量更新！更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。
+该版本你可能遇到一些字体问题，如日语字体、粗细不均等。关注 https://github.com/flutter/flutter/issues/103811 获得最新解决进展。
