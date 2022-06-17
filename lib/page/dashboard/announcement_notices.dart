@@ -51,7 +51,8 @@ class _AnnouncementListState extends State<AnnouncementList> {
   @override
   void initState() {
     super.initState();
-    _future = LazyFuture.pack(AnnouncementRepository.getInstance().loadData());
+    _future = LazyFuture.pack(
+        AnnouncementRepository.getInstance().loadAnnouncements());
   }
 
   @override

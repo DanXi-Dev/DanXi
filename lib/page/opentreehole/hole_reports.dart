@@ -26,6 +26,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -82,11 +83,9 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               HapticFeedback.mediumImpact();
               _contentFuture = _loadContent();
               await _contentFuture;
-              setState(() {});
-              WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-                _listViewController.notifyUpdate(
-                    useInitialData: false, queueDataClear: false);
-              });
+              await refreshSelf();
+              _listViewController.notifyUpdate(
+                  useInitialData: false, queueDataClear: false);
             },
             child: Material(
                 child: PagedListView<OTReport>(
@@ -213,7 +212,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                 smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"post": post!, "locate": e.floor});
               } catch (error, st) {
-                Noticing.showModalError(context, error, trace: st);
+                Noticing.showErrorDialog(context, error, trace: st);
               } finally {
                 progressDialog.dismiss(showAnim: false);
               }

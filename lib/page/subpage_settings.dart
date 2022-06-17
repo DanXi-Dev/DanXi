@@ -39,6 +39,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart'
     if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
+import 'package:dan_xi/widget/dialogs/swatch_picker_dialog.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
@@ -63,7 +64,7 @@ Future<void> updateOTUserProfile(BuildContext context) async {
   try {
     await OpenTreeHoleRepository.getInstance().updateUserProfile();
   } catch (e, st) {
-    Noticing.showModalError(context, e, trace: st);
+    Noticing.showErrorDialog(context, e, trace: st);
   }
 }
 
@@ -235,17 +236,16 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
       await OpenTreeHoleRepository.getInstance().logout();
     } finally {
       progressDialog.dismiss(showAnim: false);
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      _preferences.clear().then((value) => FlutterApp.restartApp(context));
     }
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    _preferences.clear().then((value) => FlutterApp.restartApp(context));
   }
 
   List<Widget> _buildCampusAreaList(BuildContext menuContext) {
     List<Widget> list = [];
     onTapListener(Campus campus) {
       SettingsProvider.getInstance().campus = campus;
-      dashboardPageKey.currentState?.rebuildFeatures();
-      dashboardPageKey.currentState?.setState(() {});
+      dashboardPageKey.currentState?.triggerRebuildFeatures();
       refreshSelf();
     }
 
@@ -366,21 +366,51 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
                     // Accessibility
                     Card(
-                      child: Selector<SettingsProvider, bool>(
-                        selector: (_, model) => model.useAccessibilityColoring,
-                        builder: (_, bool value, __) => SwitchListTile.adaptive(
-                          title: Text(S.of(context).accessibility_coloring),
-                          subtitle: Text(
-                              S.of(context).high_contrast_color_description),
-                          secondary:
-                              const Icon(Icons.accessibility_new_rounded),
-                          value: value,
-                          onChanged: (bool value) {
-                            SettingsProvider.getInstance()
-                                .useAccessibilityColoring = value;
-                            treeholePageKey.currentState?.setState(() {});
-                          },
-                        ),
+                      child: Column(
+                        children: [
+                          Selector<SettingsProvider, bool>(
+                            selector: (_, model) =>
+                                model.useAccessibilityColoring,
+                            builder: (_, bool value, __) =>
+                                SwitchListTile.adaptive(
+                              title: Text(S.of(context).accessibility_coloring),
+                              subtitle: Text(S
+                                  .of(context)
+                                  .high_contrast_color_description),
+                              secondary:
+                                  const Icon(Icons.accessibility_new_rounded),
+                              value: value,
+                              onChanged: (bool value) {
+                                SettingsProvider.getInstance()
+                                    .useAccessibilityColoring = value;
+                                treeholePageKey.currentState?.setState(() {});
+                              },
+                            ),
+                          ),
+                          if (PlatformX.isMaterial(context))
+                            ListTile(
+                              title: Text(S.of(context).theme_color),
+                              subtitle:
+                                  Text(S.of(context).theme_color_description),
+                              leading: const Icon(Icons.color_lens),
+                              onTap: () async {
+                                String? result =
+                                    await showPlatformDialog<String?>(
+                                  context: context,
+                                  builder: (_) => SwatchPickerDialog(
+                                    initialSelectedColor: context
+                                        .read<SettingsProvider>()
+                                        .primarySwatch,
+                                  ),
+                                );
+                                if (result != null) {
+                                  context
+                                      .read<SettingsProvider>()
+                                      .setPrimarySwatch(result);
+                                }
+                              },
+                            ),
+                        ],
                       ),
                     ),
                     if (PlatformX.isWindows)
@@ -514,9 +544,19 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     onTap: () => refreshSelf(),
                   ),
                 ),
-                OTNotificationSettingsTile(
-                  onSettingsUpdate: refreshSelf,
-                ),
+                OTNotificationSettingsTile(onSettingsUpdate: refreshSelf),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).fduhole_show_banner),
+                          secondary: const Icon(Icons.campaign),
+                          subtitle: Text(
+                              S.of(context).fduhole_show_banner_description),
+                          value: value,
+                          onChanged: (bool value) =>
+                              SettingsProvider.getInstance().isBannerEnabled =
+                                  value,
+                        ),
+                    selector: (_, model) => model.isBannerEnabled),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).fduhole_clean_mode),
@@ -535,7 +575,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),
-                  subtitle: Text(S.of(context).fduhole_hidden_tags_description),
+                  subtitle: Text(OpenTreeHoleRepository.getInstance().isAdmin
+                      ? S.of(context).admin_no_hide_tag
+                      : S.of(context).fduhole_hidden_tags_description),
+                  enabled: !OpenTreeHoleRepository.getInstance().isAdmin,
                   onTap: () async {
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
                     treeholePageKey.currentState?.setState(() {});

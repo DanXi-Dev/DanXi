@@ -82,11 +82,7 @@ class ImageViewerPage extends StatefulWidget {
   static String getMineType(String url) {
     if (!isImage(url)) return 'image/png';
     String path = Uri.parse(url).path.toLowerCase();
-    return 'image/' +
-        IMAGE_SUFFIX
-            .firstWhere((element) => path.endsWith(element))
-            .replaceFirst(RegExp(r"\\."), "")
-            .replaceFirst(RegExp("jpg"), "jpeg");
+    return 'image/${IMAGE_SUFFIX.firstWhere((element) => path.endsWith(element)).replaceFirst(RegExp(r"\\."), "").replaceFirst(RegExp("jpg"), "jpeg")}';
   }
 }
 
@@ -326,7 +322,7 @@ class _ImageViewerBodyViewState extends State<ImageViewerBodyView> {
   void initState() {
     super.initState();
     safeShowingUrl = widget.imageInfo.thumbUrl ?? widget.imageInfo.hdUrl;
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       unawaited(cacheOriginalImage());
     });
   }

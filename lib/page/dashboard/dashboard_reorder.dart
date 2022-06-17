@@ -18,7 +18,6 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
-import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -75,7 +74,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                               .add(DashboardCard("new_card", null, null, true));
                           SettingsProvider.getInstance()
                               .dashboardWidgetsSequence = sequence;
-                          RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
                         },
                       ),
@@ -93,7 +91,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           );
                           SettingsProvider.getInstance()
                               .dashboardWidgetsSequence = sequence;
-                          RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
                         },
                       ),
@@ -129,7 +126,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                           await SettingsProvider.getInstance()
                               .preferences!
                               .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
-                          RefreshHomepageEvent(queueRefresh: true).fire();
                           refreshSelf();
                         },
                       ),
@@ -146,7 +142,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                 sequence!.insert(newIndex, tmp);
                 SettingsProvider.getInstance().dashboardWidgetsSequence =
                     sequence;
-                RefreshHomepageEvent(queueRefresh: true).fire();
                 refreshSelf();
               },
             ),
@@ -179,7 +174,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
           onDismissed: (direction) {
             sequence!.removeAt(index);
             SettingsProvider.getInstance().dashboardWidgetsSequence = sequence;
-            RefreshHomepageEvent(queueRefresh: true).fire();
             refreshSelf();
           },
         ));
@@ -205,7 +199,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                   sequence![index].enabled = value;
                   SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
-                  RefreshHomepageEvent(queueRefresh: true).fire();
                   refreshSelf();
                 },
                 value: sequence![index].enabled,
@@ -215,8 +208,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
               sequence!.removeAt(index);
               SettingsProvider.getInstance().dashboardWidgetsSequence =
                   sequence;
-              RefreshHomepageEvent(queueRefresh: true).fire();
-              setState(() {});
+              refreshSelf();
             },
           ),
         );
@@ -239,7 +231,6 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
                   sequence![index].enabled = value;
                   SettingsProvider.getInstance().dashboardWidgetsSequence =
                       sequence;
-                  RefreshHomepageEvent(queueRefresh: true).fire();
                   refreshSelf();
                 },
                 value: sequence![index].enabled,

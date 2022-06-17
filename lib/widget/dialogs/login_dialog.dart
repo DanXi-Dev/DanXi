@@ -15,12 +15,15 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -29,6 +32,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -92,7 +96,7 @@ class _LoginDialogState extends State<LoginDialog> {
     switch (_group) {
       case UserGroup.VISITOR:
         PersonInfo newInfo =
-            PersonInfo(id, password, "Visitor", UserGroup.VISITOR);
+            PersonInfo(id, password, "No User Account", UserGroup.VISITOR);
         await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
         widget.personInfo.value = newInfo;
         progressDialog.dismiss(showAnim: false);
@@ -251,9 +255,32 @@ class _LoginDialogState extends State<LoginDialog> {
                 obscureText: true,
                 onSubmitted: (_) => _executeLogin(),
               ),
-              const SizedBox(
-                height: 24,
+              const SizedBox(height: 24),
+              GestureDetector(
+                child: Text(
+                  S.of(context).cant_login,
+                  style: linkText,
+                ),
+                onTap: () => Noticing.showNotice(context,
+                    S.of(context).login_problem(Constant.SUPPORT_QQ_GROUP),
+                    title: S.of(context).cant_login,
+                    useSnackBar: false,
+                    customActions: [
+                      CustomDialogActionItem(S.of(context).read_announcements,
+                          () {
+                        while (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        }
+                        smartNavigatorPush(context, '/announcement/list',
+                            forcePushOnMainNavigator: true);
+                      }),
+                      CustomDialogActionItem(
+                          S.of(context).copy_qq_group_id,
+                          () => Clipboard.setData(const ClipboardData(
+                              text: Constant.SUPPORT_QQ_GROUP))),
+                    ]),
               ),
+              const SizedBox(height: 12),
               //Legal
               RichText(
                   text: TextSpan(children: [
@@ -312,7 +339,7 @@ class _LoginDialogState extends State<LoginDialog> {
   /// Change the login group and rebuild the dialog.
   _switchLoginGroup(UserGroup e) {
     if (e == UserGroup.VISITOR) {
-      _nameController.text = _pwdController.text = "visitor";
+      _nameController.text = _pwdController.text = "[ FDUHole Only ]";
     } else {
       _nameController.text = _pwdController.text = "";
     }

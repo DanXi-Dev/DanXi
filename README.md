@@ -57,10 +57,10 @@
 
 ```shell script
 $ flutter --version
-Flutter 2.10.2 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 097d3313d8 (8 hours ago) • 2022-02-18 19:33:08 -0600
-Engine • revision a83ed0e5e3
-Tools • Dart 2.16.1 • DevTools 2.9.2
+Flutter 2.10.4 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision c860cba910 (3 weeks ago) • 2022-03-25 00:23:12 -0500
+Engine • revision 57d3bac3dd
+Tools • Dart 2.16.2 • DevTools 2.9.2
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
@@ -78,4 +78,4 @@ Tools • Dart 2.16.1 • DevTools 2.9.2
 ## 赞助
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
 
-我们的邮箱：[danxi_dev@protonmail.com](mailto:danxi_dev@protonmail.com)
+我们的邮箱：[dev@fduhole.com](mailto:dev@fduhole.com)

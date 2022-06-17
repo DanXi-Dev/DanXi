@@ -44,12 +44,12 @@ class FudanBusRepository extends BaseRepositoryWithDio {
     return Retrier.tryAsyncWithFix(
         () => _loadBusList(holiday: holiday!),
         (exception) => UISLoginTool.fixByLoginUIS(
-            dio!, _LOGIN_URL, cookieJar!, info, true));
+            dio, _LOGIN_URL, cookieJar!, info, true));
   }
 
   Future<List<BusScheduleItem>?> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];
-    Response<String> r = await dio!.post(_INFO_URL,
+    Response<String> r = await dio.post(_INFO_URL,
         data: FormData.fromMap(
             {"holiday": holiday.toRequestParamStringRepresentation()}));
     Map<String, dynamic> json = jsonDecode(r.data!);

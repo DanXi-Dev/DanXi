@@ -107,6 +107,220 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
   );
 }
 
+class OTHoleWidget extends StatelessWidget {
+  final OTHole postElement;
+  final bool translucent;
+  final bool isPinned;
+  final bool isFolded;
+
+  const OTHoleWidget(
+      {Key? key,
+      required this.postElement,
+      this.translucent = false,
+      this.isPinned = false,
+      this.isFolded = false})
+      : super(key: key);
+
+  _launchUrlWithNotice(BuildContext context, LinkableElement link) async {
+    if (await canLaunch(link.url)) {
+      BrowserUtil.openUrl(link.url, context);
+    } else {
+      Noticing.showNotice(context, S.of(context).cannot_launch_url);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Linkify postContentWidget = Linkify(
+      text: renderText(postElement.floors!.first_floor!.filteredContent!,
+          S.of(context).image_tag, S.of(context).formula),
+      style: const TextStyle(fontSize: 16),
+      maxLines: 6,
+      overflow: TextOverflow.ellipsis,
+      onOpen: (link) => _launchUrlWithNotice(context, link),
+    );
+    final TextStyle infoStyle =
+        TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
+
+    return Card(
+      color: translucent
+          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+          : null,
+      child: Column(
+        children: [
+          ListTile(
+              contentPadding: const EdgeInsets.fromLTRB(16, 4, 10, 0),
+              dense: false,
+              title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        alignment: WrapAlignment.spaceBetween,
+                        runSpacing: 4,
+                        children: [
+                          generateTagWidgets(context, postElement,
+                              (String? tagName) {
+                            smartNavigatorPush(context, '/bbs/discussions',
+                                arguments: {"tagFilter": tagName},
+                                forcePushOnMainNavigator: true);
+                          },
+                              SettingsProvider.getInstance()
+                                  .useAccessibilityColoring),
+                          Row(
+                            //mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (isPinned)
+                                OTLeadingTag(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  text: S.of(context).pinned,
+                                ),
+                              if (postElement.floors?.first_floor?.special_tag
+                                      ?.isNotEmpty ==
+                                  true) ...[
+                                const SizedBox(width: 4),
+                                OTLeadingTag(
+                                  color: Colors.red,
+                                  text: postElement
+                                      .floors!.first_floor!.special_tag!,
+                                ),
+                              ],
+                              if (postElement.hidden == true) ...[
+                                const SizedBox(width: 4),
+                                OTLeadingTag(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  text: S.of(context).hole_hidden,
+                                ),
+                              ]
+                            ],
+                          ),
+                        ]),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    isFolded
+                        ? ExpansionTileX(
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            expandedAlignment: Alignment.topLeft,
+                            childrenPadding:
+                                const EdgeInsets.symmetric(vertical: 4),
+                            tilePadding: EdgeInsets.zero,
+                            title: Text(
+                              S.of(context).folded,
+                              style: infoStyle,
+                            ),
+                            children: [
+                                postContentWidget,
+                              ])
+                        : postContentWidget,
+                  ]),
+              subtitle:
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                const SizedBox(height: 12),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("#${postElement.hole_id}", style: infoStyle),
+                      Text(
+                          HumanDuration.tryFormat(
+                              context,
+                              DateTime.parse(postElement.time_created!)
+                                  .toLocal()),
+                          style: infoStyle),
+                      Row(children: [
+                        Text("${postElement.reply} ", style: infoStyle),
+                        Icon(
+                            PlatformX.isMaterial(context)
+                                ? Icons.sms_outlined
+                                : CupertinoIcons.ellipses_bubble,
+                            size: infoStyle.fontSize,
+                            color: infoStyle.color),
+                      ]),
+                    ]),
+              ]),
+              onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
+                  arguments: {"post": postElement})),
+          if (!isFolded &&
+              postElement.floors?.last_floor !=
+                  postElement.floors?.first_floor) ...[
+            const Divider(height: 4),
+            _buildCommentView(context, postElement)
+          ]
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommentView(BuildContext context, OTHole postElement) {
+    final String lastReplyContent = renderText(
+        postElement.floors!.last_floor!.filteredContent!,
+        S.of(context).image_tag,
+        S.of(context).formula);
+    return ListTile(
+        dense: true,
+        minLeadingWidth: 16,
+        leading: Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Icon(
+            PlatformX.isMaterial(context)
+                ? Icons.sms_outlined
+                : CupertinoIcons.quote_bubble,
+            color: Theme.of(context).hintColor,
+          ),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      S.of(context).latest_reply(
+                          postElement.floors!.last_floor!.anonyname ?? "?",
+                          HumanDuration.tryFormat(
+                              context,
+                              DateTime.parse(postElement
+                                      .floors!.last_floor!.time_created!)
+                                  .toLocal())),
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                    ),
+                    Icon(CupertinoIcons.search,
+                        size: 14,
+                        color: Theme.of(context).hintColor.withOpacity(0.2)),
+                  ]),
+            ),
+            Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Linkify(
+                    text: lastReplyContent,
+                    style: const TextStyle(fontSize: 14),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    onOpen: (link) => _launchUrlWithNotice(context, link))),
+          ],
+        ),
+        onTap: () async {
+          ProgressFuture dialog = showProgressDialog(
+              loadingText: S.of(context).loading, context: context);
+          try {
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+              "post": await prefetchAllFloors(postElement),
+              "scroll_to_end": true
+            });
+          } catch (error, st) {
+            Noticing.showErrorDialog(context, error, trace: st);
+          } finally {
+            dialog.dismiss(showAnim: false);
+          }
+        });
+  }
+}
+
 class OTFloorWidget extends StatelessWidget {
   final OTFloor floor;
 
@@ -459,7 +673,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                                 "locate": floor,
                               });
                         } catch (e, st) {
-                          Noticing.showModalError(context, e, trace: st);
+                          Noticing.showErrorDialog(context, e, trace: st);
                         } finally {
                           progressDialog.dismiss(showAnim: false);
                         }
@@ -588,7 +802,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         .likeFloor(floor.floor_id!, floor.liked!))!;
                     setState(() {});
                   } catch (e, st) {
-                    Noticing.showModalError(context, e, trace: st);
+                    Noticing.showErrorDialog(context, e, trace: st);
                   }
                 },
               ),
@@ -684,7 +898,7 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         await OpenTreeHoleRepository.getInstance()
                             .deleteFloor(floor.floor_id!);
                       } catch (e, st) {
-                        Noticing.showModalError(context, e, trace: st);
+                        Noticing.showErrorDialog(context, e, trace: st);
                       }
                     }
                   },

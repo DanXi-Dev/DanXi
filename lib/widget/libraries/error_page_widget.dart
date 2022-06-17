@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,12 @@ class ErrorPageWidget extends StatelessWidget {
           errorType = locale.response_error +
               (error.response?.statusCode?.toString() ?? locale.unknown_error);
           try {
-            errorType += "\n${error.response?.data['message']}";
+            String? message =
+                DioUtils.guessErrorMessageFromResponse(error.response);
+            if ((message?.length ?? 0) > 100) {
+              message = "${message?.substring(0, 100)}...";
+            }
+            errorType += "\n$message";
           } catch (_) {}
           break;
         case DioErrorType.cancel:
@@ -99,6 +105,15 @@ class ErrorPageWidget extends StatelessWidget {
         onTap: onTap);
   }
 
+  static String generateErrorDetails(dynamic error, StackTrace? trace) {
+    String errorInfo = error.toString();
+    // DioError will insert its stack trace in the result of [toString] method.
+    if (trace != null && error is! DioError) {
+      errorInfo += ("\n$trace");
+    }
+    return errorInfo;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -119,13 +134,9 @@ class ErrorPageWidget extends StatelessWidget {
               PlatformTextButton(
                 child: Text(S.of(context).error_detail),
                 onPressed: () {
-                  String errorInfo = error.toString();
-                  // DioError will insert its stack trace in the result of [toString] method.
-                  if (trace != null && error is! DioError) {
-                    errorInfo += ("\n$trace");
-                  }
                   Noticing.showModalNotice(context,
-                      title: S.of(context).error_detail, message: errorInfo);
+                      title: S.of(context).error_detail,
+                      message: generateErrorDetails(error, trace));
                 },
               )
             ],

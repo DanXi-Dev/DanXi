@@ -30,7 +30,9 @@ class Extra {
 
   List<String?>? stopWords;
 
-  Extra(this.timetable, this.userAgent, this.stopWords);
+  List<BannerExtra?>? banners;
+
+  Extra(this.timetable, this.userAgent, this.stopWords, this.banners);
 
   factory Extra.fromJson(Map<String, dynamic> json) => _$ExtraFromJson(json);
 
@@ -78,4 +80,18 @@ class TimeTableStartTimeItem {
       _$TimeTableStartTimeItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$TimeTableStartTimeItemToJson(this);
+}
+
+@JsonSerializable()
+class BannerExtra {
+  final String title;
+  final String actionName;
+  final String action;
+
+  BannerExtra(this.title, this.actionName, this.action);
+
+  factory BannerExtra.fromJson(Map<String, dynamic> json) =>
+      _$BannerExtraFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BannerExtraToJson(this);
 }

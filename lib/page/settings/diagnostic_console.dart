@@ -123,6 +123,8 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
   //   bannerAd.load();
   // }
 
+  static const _IGNORE_KEYS = ["password"];
+
   Future<void> diagnoseDanXi() async {
     _console.writeln(
         "User Agent used by DanXi: ${UserAgentInterceptor.defaultUsedUserAgent}");
@@ -131,6 +133,9 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
     var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
     if (allKeys != null) {
       for (var key in allKeys) {
+        // Skip some keys
+        if (_IGNORE_KEYS.contains(key)) continue;
+
         _console.writeln("Key: $key");
         _console.writeln(
             "Value: ${context.read<SettingsProvider>().preferences?.get(key)}");
@@ -174,18 +179,19 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
         appBar:
             PlatformAppBarX(title: Text(S.of(context).diagnostic_information)),
         body: WithScrollbar(
+          controller: PrimaryScrollController.of(context),
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(4),
             primary: true,
             child: Column(
               children: [
                 PlatformElevatedButton(
-                  child: const Text("Password Change [Only ADMIN]"),
                   onPressed: changePassword,
+                  child: const Text("Password Change [Only ADMIN]"),
                 ),
                 PlatformElevatedButton(
-                  child: const Text("Set User Agent"),
                   onPressed: setUserAgent,
+                  child: const Text("Set User Agent"),
                 ),
                 PlatformElevatedButton(
                   child: const Text("Copy Everything"),
@@ -208,7 +214,6 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
               ],
             ),
           ),
-          controller: PrimaryScrollController.of(context),
         ),
       );
 }

@@ -59,7 +59,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:system_tray/system_tray.dart';
+import 'package:system_tray/system_tray.dart' as tray;
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -111,7 +111,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
   /// List of all of the subpages. They will be displayed as tab pages.
-  List<PlatformSubpage> _subpage = [];
+  List<PlatformSubpage<dynamic>> _subpage = [];
 
   /// Force app to rebuild all of subpages.
   ///
@@ -119,7 +119,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _rebuildPage() {
     _lastRefreshTime = DateTime.now();
     _subpage = [
-      HomeSubpage(key: dashboardPageKey),
+      // Don't show Dashboard in visitor mode
+      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+        HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
@@ -129,11 +131,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     ];
   }
 
-  final SystemTray _systemTray = SystemTray();
+  final tray.SystemTray _systemTray = tray.SystemTray();
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _captchaSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
@@ -141,6 +143,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Deal with login issue described at [CaptchaNeededException].
   _dealWithCaptchaNeededException() {
+    // If we have shown a dialog, do not pop up another.
     if (_isErrorDialogShown) {
       return;
     }
@@ -190,8 +193,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Deal with login issue described at [CredentialsInvalidException].
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
-      // TODO: Can [_preferences] be null when this is called?
-      PersonInfo.removeFromSharedPreferences(_preferences!);
+      // In case that [_preferences] is still not initialized.
+      if (_preferences != null) {
+        PersonInfo.removeFromSharedPreferences(_preferences!);
+      } else {
+        PersonInfo.removeFromSharedPreferences(
+            await SharedPreferences.getInstance());
+      }
       FlutterApp.restartApp(context);
     }
   }
@@ -218,7 +226,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _loadDataFromBmob() {
-    AnnouncementRepository.getInstance().loadData().then((value) {
+    AnnouncementRepository.getInstance().loadAnnouncements().then((value) {
       _loadUpdate().then(
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
@@ -243,27 +251,21 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
-        // After the app returns from the background
-        // Refresh the homepage if it hasn't been refreshed for 30 minutes
-        // To keep the data up-to-date.
+        // After the app returns from the background,
+        // refresh the homepage if it hasn't been refreshed for 30 minutes
+        // to keep the data up-to-date.
         if (_lastRefreshTime != null &&
             DateTime.now()
                     .difference(_lastRefreshTime!)
                     .compareTo(const Duration(minutes: 30)) >
                 0) {
           _lastRefreshTime = DateTime.now();
-          dashboardPageKey.currentState?.rebuildFeatures();
-          dashboardPageKey.currentState?.setState(() {});
+          dashboardPageKey.currentState?.triggerRebuildFeatures();
         }
         break;
       case AppLifecycleState.inactive:
-        // Ignored
-        break;
       case AppLifecycleState.paused:
-        // Ignored
-        break;
       case AppLifecycleState.detached:
-        // Ignored
         break;
     }
   }
@@ -274,21 +276,20 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     await _systemTray.initSystemTray(
         title: 'DanXi',
         iconPath: PlatformX.createPlatformFile(
-                PlatformX.getPathFromFile(Platform.resolvedExecutable) +
-                    "/data/flutter_assets/assets/graphics/app_icon.ico")
+                "${PlatformX.getPathFromFile(Platform.resolvedExecutable)}/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
         toolTip: "DanXi is here~");
-    late List<MenuItemBase> showingMenu, hidingMenu;
+    late List<tray.MenuItemBase> showingMenu, hidingMenu;
     showingMenu = [
-      MenuItem(
+      tray.MenuItem(
         label: 'Hide',
         onClicked: () {
           appWindow.hide();
           _systemTray.setContextMenu(hidingMenu);
         },
       ),
-      MenuSeparator(),
-      MenuItem(
+      tray.MenuSeparator(),
+      tray.MenuItem(
         label: 'Exit',
         onClicked: () {
           appWindow.close();
@@ -297,15 +298,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     ];
     hidingMenu = [
-      MenuItem(
+      tray.MenuItem(
         label: 'Show',
         onClicked: () {
           appWindow.show();
           _systemTray.setContextMenu(showingMenu);
         },
       ),
-      MenuSeparator(),
-      MenuItem(
+      tray.MenuSeparator(),
+      tray.MenuItem(
         label: 'Exit',
         onClicked: () {
           appWindow.close();
@@ -341,7 +342,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
     initSystemTray().catchError((ignored) {});
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     _captchaSubscription.bindOnlyInvalid(
         Constant.eventBus
@@ -473,7 +474,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
         StateProvider.showingScreenshotWarning = true;
-        await Noticing.showScreenshotWarning(context);
+        await showScreenshotWarning(context);
         StateProvider.showingScreenshotWarning = false;
       }
     });
@@ -482,12 +483,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           StateProvider.isForeground &&
           !StateProvider.showingScreenshotWarning) {
         StateProvider.showingScreenshotWarning = true;
-        await Noticing.showScreenshotWarning(context);
+        await showScreenshotWarning(context);
         StateProvider.showingScreenshotWarning = false;
       }
     });
     screenListener?.watch();
   }
+
+  static showScreenshotWarning(BuildContext context) =>
+      Noticing.showNotice(context, S.of(context).screenshot_warning,
+          title: S.of(context).screenshot_warning_title, useSnackBar: false);
 
   @override
   void didChangeDependencies() {
@@ -495,7 +500,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // We have to load personInfo after [initState] and [build], since it may pop up a dialog,
     // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
     // Also, otherwise it will call [setState] before the frame is completed.
-    WidgetsBinding.instance!
+    WidgetsBinding.instance
         .addPostFrameCallback((_) => _loadPersonInfoOrLogin());
   }
 
@@ -519,11 +524,17 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _buildDummyBody(Widget title) => PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: true,
-        // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: PlatformAppBar(
-          title: title,
-        ),
-        body: const SizedBox(),
+        appBar: PlatformAppBar(title: title),
+        body: Column(children: [
+          Card(
+            child: ListTile(
+              leading: Icon(PlatformIcons(context).accountCircle),
+              title: Text(S.of(context).login),
+              onTap: () => LoginDialog.showLoginDialog(
+                  context, _preferences, StateProvider.personInfo, false),
+            ),
+          )
+        ]),
       );
 
   Widget _buildBody(Widget title) {
@@ -546,12 +557,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             cupertinoTabChildBuilder: (_, index) => _subpage[index],
             bottomNavBar: PlatformNavBar(
               items: [
-                BottomNavigationBarItem(
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.dashboard)
-                      : const Icon(CupertinoIcons.square_stack_3d_up_fill),
-                  label: S.of(context).dashboard,
-                ),
+                // Don't show Dashboard in visitor mode
+                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.dashboard)
+                        : const Icon(CupertinoIcons.square_stack_3d_up_fill),
+                    label: S.of(context).dashboard,
+                  ),
                 if (!SettingsProvider.getInstance().hideHole)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)

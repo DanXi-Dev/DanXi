@@ -25,6 +25,7 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -56,47 +57,47 @@ class _OTSearchPageState extends State<OTSearchPage> {
   final TextEditingController _searchFieldController = TextEditingController();
 
   Widget _buildSearchHistory(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(S.of(context).history),
-            PlatformTextButton(
-                alignment: Alignment.centerLeft,
-                child: Text(S.of(context).clear),
-                onPressed: () =>
-                SettingsProvider.getInstance().searchHistory = null),
-          ],
-        ),
-      ),
-      Flexible(
-        fit: FlexFit.loose,
-        child: Selector<SettingsProvider, List<String>>(
-            selector: (_, model) => model.searchHistory,
-            builder: (_, value, __) => ListView(
-              primary: false,
-              shrinkWrap: true,
-              //reverse: true,
-              keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior.onDrag,
-              children: value
-                  .map((e) => PlatformTextButton(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 0, horizontal: 16),
-                alignment: Alignment.centerLeft,
-                child: Text(e),
-                onPressed: () =>
-                _searchFieldController.text = e,
-              ))
-                  .toList(growable: false),
-            )),
-      ),
-    ],
-  );
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(S.of(context).history),
+                PlatformTextButton(
+                    alignment: Alignment.centerLeft,
+                    child: Text(S.of(context).clear),
+                    onPressed: () =>
+                        SettingsProvider.getInstance().searchHistory = null),
+              ],
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.loose,
+            child: Selector<SettingsProvider, List<String>>(
+                selector: (_, model) => model.searchHistory,
+                builder: (_, value, __) => ListView(
+                      primary: false,
+                      shrinkWrap: true,
+                      //reverse: true,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      children: value
+                          .map((e) => PlatformTextButton(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 16),
+                                alignment: Alignment.centerLeft,
+                                child: Text(e),
+                                onPressed: () =>
+                                    _searchFieldController.text = e,
+                              ))
+                          .toList(growable: false),
+                    )),
+          ),
+        ],
+      );
 
   /// Build a list of search suggestion or search history if no input.
   Widget buildSearchSuggestion(BuildContext context) =>
@@ -104,18 +105,18 @@ class _OTSearchPageState extends State<OTSearchPage> {
           builder: (context, value, child) => value.text.isEmpty
               ? _buildSearchHistory(context)
               : Expanded(
-            child: Material(
-              child: ListView(
-                primary: false,
-                shrinkWrap: true,
-                keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior.onDrag,
-                children: suggestionProviders
-                    .map((e) => e.call(context, value.text))
-                    .toList(),
-              ),
-            ),
-          ));
+                  child: Material(
+                    child: ListView(
+                      primary: false,
+                      shrinkWrap: true,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      children: suggestionProviders
+                          .map((e) => e.call(context, value.text))
+                          .toList(),
+                    ),
+                  ),
+                ));
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +162,9 @@ final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
 Widget searchByText(BuildContext context, String searchKeyword) {
   return ListTile(
     title: Text(S.of(context).search_by_text_tip(searchKeyword)),
-    leading: const Icon(Icons.text_fields),
+    leading: PlatformX.isMaterial(context)
+        ? const Icon(Icons.text_fields)
+        : const Icon(CupertinoIcons.search),
     onTap: () {
       submit(context, searchKeyword);
       smartNavigatorPush(context, "/bbs/postDetail",
@@ -174,11 +177,13 @@ Widget searchByPid(BuildContext context, String searchKeyword) {
   final pidMatch = pidPattern.firstMatch(searchKeyword);
   if (pidMatch != null) {
     return ListTile(
-      leading: const Icon(Icons.message),
+      leading: PlatformX.isMaterial(context)
+          ? const Icon(Icons.message)
+          : const Icon(CupertinoIcons.arrow_right_square),
       title: Text(S.of(context).search_by_pid_tip(pidMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
-        _goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
+        goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
       },
     );
   } else {
@@ -190,11 +195,13 @@ Widget searchByFloorId(BuildContext context, String searchKeyword) {
   final floorMatch = floorPattern.firstMatch(searchKeyword);
   if (floorMatch != null) {
     return ListTile(
-      leading: const Icon(Icons.message),
+      leading: PlatformX.isMaterial(context)
+          ? const Icon(Icons.message)
+          : const Icon(CupertinoIcons.arrow_right_square),
       title: Text(S.of(context).search_by_floor_tip(floorMatch.group(0)!)),
       onTap: () {
         submit(context, searchKeyword);
-        _goToFloorIdResultPage(context, int.parse(floorMatch.group(1)!));
+        goToFloorIdResultPage(context, int.parse(floorMatch.group(1)!));
       },
     );
   } else {
@@ -230,7 +237,7 @@ Widget searchByTag(BuildContext context, String searchKeyword) {
 }
 
 /// Go to the post page with specific pid.
-Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
+Future<void> goToPIDResultPage(BuildContext context, int pid) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
@@ -245,14 +252,14 @@ Future<void> _goToPIDResultPage(BuildContext context, int pid) async {
       Noticing.showNotice(context, S.of(context).post_does_not_exist,
           title: S.of(context).fatal_error, useSnackBar: false);
     } else {
-      Noticing.showModalError(context, error, trace: st);
+      Noticing.showErrorDialog(context, error, trace: st);
     }
   } finally {
     progressDialog.dismiss(showAnim: false);
   }
 }
 
-Future<void> _goToFloorIdResultPage(BuildContext context, int floorId) async {
+Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
@@ -265,7 +272,7 @@ Future<void> _goToFloorIdResultPage(BuildContext context, int floorId) async {
       Noticing.showNotice(context, S.of(context).post_does_not_exist,
           title: S.of(context).fatal_error, useSnackBar: false);
     } else {
-      Noticing.showModalError(context, error, trace: st);
+      Noticing.showErrorDialog(context, error, trace: st);
     }
   } finally {
     progressDialog.dismiss(showAnim: false);

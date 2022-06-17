@@ -15,15 +15,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/util/bmob/bmob/table/bmob_object.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'announcement.g.dart';
 
 @JsonSerializable()
-class Announcement extends BmobObject {
+class Announcement {
   // ignore: unused_field
   final String __type = "Announcement";
+
+  String? createdAt;
+  String? updatedAt;
+  String? objectId;
 
   String? content;
   int? maxVersion;

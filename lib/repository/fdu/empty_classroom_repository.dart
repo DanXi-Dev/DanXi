@@ -43,14 +43,14 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   /// Request [PersonInfo] for logging in, if necessary.
   Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
           String? buildingName, DateTime? date) =>
-      UISLoginTool.tryAsyncWithAuth(dio!, LOGIN_URL, cookieJar!, info,
+      UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
           () => _getBuildingRoomInfo(areaName, buildingName, date!));
 
   Future<List<RoomInfo>?> _getBuildingRoomInfo(
       String areaName, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final Response<String> response =
-        await dio!.get(detailUrl(areaName, buildingName, date));
+        await dio.get(detailUrl(areaName, buildingName, date));
     final Map<String, dynamic> json = jsonDecode(response.data!);
     final Map<String, dynamic> buildingInfo = json['d']['list'];
     for (var element in buildingInfo.values) {

@@ -39,11 +39,11 @@ class FudanAAORepository extends BaseRepositoryWithDio {
 
   Future<List<Notice>?> getNotices(String type, int page, PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
-          dio!, _LOGIN_URL, cookieJar!, info, () => _getNotices(type, page));
+          dio, _LOGIN_URL, cookieJar!, info, () => _getNotices(type, page));
 
   Future<List<Notice>?> _getNotices(String type, int page) async {
     List<Notice> notices = [];
-    Response<String> response = await dio!.get(_listUrl(type, page));
+    Response<String> response = await dio.get(_listUrl(type, page));
     if (response.data?.contains("Under Maintenance") ?? false) {
       throw NotConnectedToLANError();
     }

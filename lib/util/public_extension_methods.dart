@@ -15,12 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 extension StringEx on String {
   /// Get the substring of [this] between [a] and [b].
@@ -69,13 +69,29 @@ extension ObjectEx on dynamic {
   }
 }
 
+extension ObjectNullSafetyEx<T> on T? {
+  V? apply<V>(V Function(T) applier) {
+    if (this != null) {
+      return applier.call(this!);
+    } else {
+      return null;
+    }
+  }
+}
+
 extension StateEx on State {
   /// Call [setState] to perform a global redrawing of the widget.
-  void refreshSelf() {
+  Future<void> refreshSelf() {
+    Completer<void> _completer = Completer();
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {});
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        _completer.complete();
+      });
+      return _completer.future;
     }
+    return Future.value();
   }
 }
 

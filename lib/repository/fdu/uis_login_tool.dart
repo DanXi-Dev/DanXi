@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 /*
  *     Copyright (C) 2021  DanXi-Dev
  *
@@ -36,21 +38,19 @@ class UISLoginTool {
   static const String WEAK_PASSWORD = "弱密码提示";
   static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
 
-  static Future<E> tryAsyncWithAuth<E>(
-          Dio dio,
-          String serviceUrl,
-          IndependentCookieJar jar,
-          PersonInfo? info,
-          Future<E> Function() function,
-          {int retryTimes = 1}) =>
+  static Future<E> tryAsyncWithAuth<E>(Dio dio,
+      String serviceUrl,
+      IndependentCookieJar jar,
+      PersonInfo? info,
+      Future<E> Function() function,
+      {int retryTimes = 1}) =>
       Retrier.tryAsyncWithFix(() async {
         await throwIfNotLogin(serviceUrl, jar);
         return function();
       }, (_) => UISLoginTool.fixByLoginUIS(dio, serviceUrl, jar, info, true),
           retryTimes: retryTimes);
 
-  static Future<void> throwIfNotLogin(
-      String serviceUrl, IndependentCookieJar jar) async {
+  static Future<void> throwIfNotLogin(String serviceUrl, IndependentCookieJar jar) async {
     if ((await jar.loadForRequest(Uri.tryParse(serviceUrl)!)).isEmpty) {
       throw NotLoginError("You have not logged in your UIS.");
     }
@@ -59,8 +59,7 @@ class UISLoginTool {
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if having logged in, return null.
-  static Future<void> fixByLoginUIS(
-      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
+  static Future<void> fixByLoginUIS(Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceReLogin = false]) async {
     await loginUIS(dio, serviceUrl, jar, info, forceReLogin);
   }
@@ -68,14 +67,13 @@ class UISLoginTool {
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if it has logged in or it's logging in, return null.
-  static Future<Response<dynamic>?> loginUIS(
-      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
+  static Future<Response<dynamic>?> loginUIS(Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     if (dio.interceptors.requestLock.locked) return null;
     dio.interceptors.requestLock.lock();
     Response<dynamic>? result =
-        await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
-            .whenComplete(() {
+    await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
+        .whenComplete(() {
       if (dio.interceptors.requestLock.locked) {
         dio.interceptors.requestLock.unlock();
       }
@@ -83,8 +81,7 @@ class UISLoginTool {
     return result;
   }
 
-  static Future<Response<dynamic>?> _loginUIS(
-      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
+  static Future<Response<dynamic>?> _loginUIS(Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
     Dio workDio = Dio();
@@ -127,7 +124,7 @@ class UISLoginTool {
         data: data.encodeMap(),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
     final Response<dynamic> response =
-        await DioUtils.processRedirect(workDio, res);
+    await DioUtils.processRedirect(workDio, res);
     if (response.data.toString().contains(CREDENTIALS_INVALID)) {
       CredentialsInvalidException().fire();
       throw CredentialsInvalidException();

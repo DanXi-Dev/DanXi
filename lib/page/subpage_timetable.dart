@@ -179,8 +179,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     String? converted = converter.convertTo(_table!);
     if (converted == null ||
         converter.mimeType == null ||
-        converter.fileName == null)
-      return; // If the converter does not export a file, return.
+        converter.fileName == null) {
+      return;
+    } // If the converter does not export a file, return.
     Directory documentDir = await getApplicationDocumentsDirectory();
     File outputFile = PlatformX.createPlatformFile(
         "${documentDir.absolute.path}/output_timetable/${converter.fileName}");

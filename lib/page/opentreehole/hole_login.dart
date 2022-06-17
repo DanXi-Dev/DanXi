@@ -22,6 +22,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/animation.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -29,6 +30,7 @@ import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -151,8 +153,10 @@ abstract class SubStatelessWidget extends StatelessWidget {
     return Align(
       alignment: Alignment.topCenter,
       child: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: size.width * 0.1, vertical: size.height * 0.1),
+        padding: EdgeInsets.only(
+            left: size.width * 0.1,
+            right: size.width * 0.1,
+            top: size.height * 0.1),
         child: Container(
           decoration: ShapeDecoration(
               color: Colors.transparent,
@@ -160,7 +164,7 @@ abstract class SubStatelessWidget extends StatelessWidget {
                   side: const BorderSide(color: Colors.grey, width: 0.5),
                   borderRadius: BorderRadius.circular(4))),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,7 +313,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                     checkEmailInfo(context, email, email == recommendedEmail)
                         .catchError((e, st) {
                       state.jumpBackFromLoadingPage();
-                      Noticing.showModalError(state.context, e, trace: st);
+                      Noticing.showErrorDialog(state.context, e, trace: st);
                     });
                   }
                 }))
@@ -348,7 +352,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           _usernameController.text.isNotEmpty) {
         executeLogin(context).catchError((e, st) {
           state.jumpBackFromLoadingPage();
-          Noticing.showModalError(state.context, e, trace: st);
+          Noticing.showErrorDialog(state.context, e, trace: st);
         });
       }
     }
@@ -356,19 +360,17 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text(
-          S.of(context).login_by_email_password,
-          style: Theme.of(context).textTheme.headline6,
-          textAlign: TextAlign.center,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 166),
+          child: Image.asset("assets/graphics/ot_logo.png"),
         ),
+        const SizedBox(height: 4),
         Text(
           S.of(context).input_your_email_password,
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(
-          height: 32,
-        ),
+        const SizedBox(height: 24),
         TextField(
           controller: _usernameController,
           decoration: InputDecoration(
@@ -394,22 +396,45 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           style: Theme.of(context).textTheme.caption,
         ),
         const SizedBox(height: 16),
-        Wrap(
-          alignment: WrapAlignment.spaceAround,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            PlatformTextButton(
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(S.of(context).forgot_password)),
-              onPressed: () => BrowserUtil.openUrl(
-                  Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
-            ),
             PlatformElevatedButton(
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(S.of(context).login)),
               onPressed: _doLogin,
+              child: Text(S.of(context).login),
             ),
+            const SizedBox(height: 16),
+            Wrap(
+              children: [
+                PlatformTextButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(S.of(context).forgot_password),
+                  onPressed: () => BrowserUtil.openUrl(
+                      Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
+                ),
+                PlatformTextButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(S.of(context).cant_login),
+                    onPressed: () => Noticing.showNotice(
+                            context,
+                            S
+                                .of(context)
+                                .login_problem(Constant.SUPPORT_QQ_GROUP),
+                            title: S.of(context).cant_login,
+                            useSnackBar: false,
+                            customActions: [
+                              CustomDialogActionItem(
+                                  S.of(context).read_announcements, () {
+                                smartNavigatorPush(
+                                    context, '/announcement/list');
+                              }),
+                              CustomDialogActionItem(
+                                  S.of(context).copy_qq_group_id,
+                                  () => Clipboard.setData(const ClipboardData(
+                                      text: Constant.SUPPORT_QQ_GROUP)))
+                            ])),
+              ],
+            )
           ],
         )
       ],
@@ -535,7 +560,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
             registerCallback: () {
               executeRegister(context, state).catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showModalError(state.context, e, trace: st);
+                Noticing.showErrorDialog(state.context, e, trace: st);
               });
             },
           )
@@ -582,8 +607,8 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
         PlatformElevatedButton(
           material: (_, __) => MaterialElevatedButtonData(
               icon: const Icon(Icons.app_registration)),
-          child: Text(S.of(context).next),
           onPressed: _agreed ? widget.registerCallback : null,
+          child: Text(S.of(context).next),
         )
       ],
     );
@@ -600,6 +625,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
   Widget buildContent(BuildContext context) {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Text(
           S.of(context).secure_verification,
@@ -634,7 +660,7 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
               OTRegisterLicenseWidget.executeRegister(context, state)
                   .catchError((e, st) {
                 state.jumpBackFromLoadingPage();
-                Noticing.showModalError(state.context, e, trace: st);
+                Noticing.showErrorDialog(state.context, e, trace: st);
               });
             }
           },
@@ -763,9 +789,9 @@ class EmailProviderImpl extends EmailProvider {
         if (info.id!.length >= 2) {
           int year = int.tryParse(info.id!.substring(0, 2)) ?? 0;
           if (year >= 21) {
-            emailList.add(info.id! + "@fudan.edu.cn");
+            emailList.add("${info.id!}@fudan.edu.cn");
           } else {
-            emailList.add(info.id! + "@m.fudan.edu.cn");
+            emailList.add("${info.id!}@m.fudan.edu.cn");
           }
         }
         break;
@@ -785,9 +811,9 @@ class EmailProviderImpl extends EmailProvider {
         if (info.id!.length >= 2) {
           int year = int.tryParse(info.id!.substring(0, 2)) ?? 0;
           if (year >= 21) {
-            return info.id! + "@m.fudan.edu.cn";
+            return "${info.id!}@m.fudan.edu.cn";
           } else {
-            return info.id! + "@fudan.edu.cn";
+            return "${info.id!}@fudan.edu.cn";
           }
         }
         break;

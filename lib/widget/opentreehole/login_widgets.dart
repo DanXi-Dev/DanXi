@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -33,24 +32,15 @@ class OTWelcomeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  TypewriterAnimatedText(
-                    S.of(context).welcome_title,
-                    textStyle: const TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    speed: const Duration(milliseconds: 150),
-                  ),
-                ],
-                isRepeatingAnimation: false,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 256),
+                child: Image.asset("assets/graphics/ot_logo.png"),
               ),
             ),
             Column(

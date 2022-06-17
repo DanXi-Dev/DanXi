@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/model/opentreehole/division.dart';
+import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -43,7 +44,7 @@ class FDUHoleProvider with ChangeNotifier {
   /// The token used for session authentication.
   ///
   /// Note: changing this will NOT trigger any notification.
-  String? token;
+  JWToken? token;
 
   /// Current user profile, stored as cache by the repository
   OTUser? _userInfo;

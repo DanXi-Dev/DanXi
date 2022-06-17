@@ -117,9 +117,13 @@ class WelcomeFeature extends Feature {
     switch (_status) {
       case ConnectionStatus.NONE:
       case ConnectionStatus.CONNECTING:
-        status = ScaleTransform(
-            scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
-            child: PlatformCircularProgressIndicator());
+        status = PlatformCircularProgressIndicator();
+        if (PlatformX.isMaterial(context!)) {
+          status = SizedBox(
+              width: 24,
+              height: 24,
+              child: ScaleTransform(scale: 0.5, child: status));
+        }
         break;
       case ConnectionStatus.DONE:
         if (_cardInfos?.any((element) => !element.permission.contains("是")) ??

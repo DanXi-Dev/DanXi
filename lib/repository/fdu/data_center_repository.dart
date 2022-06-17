@@ -74,13 +74,13 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       Retrier.tryAsyncWithFix(() => _getCrowdednessInfo(areaCode),
           (exception) async {
         if (exception is! UnsuitableTimeException) {
-          await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, info, true);
+          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, info, true);
         }
       });
 
   Future<Map<String, TrafficInfo>?> _getCrowdednessInfo(int areaCode) async {
     var result = <String, TrafficInfo>{};
-    Response<String> response = await dio!.get(DINING_DETAIL_URL);
+    Response<String> response = await dio.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
     if (response.data.toString().contains("仅")) {
@@ -115,10 +115,10 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   /// and [id] doesn't contain the last 2 digits.
   Future<List<ExamScore>?> loadAllExamScore(PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
-          dio!, LOGIN_URL, cookieJar!, info, () => _loadAllExamScore());
+          dio, LOGIN_URL, cookieJar!, info, () => _loadAllExamScore());
 
   Future<List<ExamScore>?> _loadAllExamScore() async {
-    Response<String> r = await dio!.get(SCORE_DETAIL_URL);
+    Response<String> r = await dio.get(SCORE_DETAIL_URL);
     BeautifulSoup soup = BeautifulSoup(r.data!);
     dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
@@ -129,10 +129,10 @@ class DataCenterRepository extends BaseRepositoryWithDio {
 
   Future<List<CardDetailInfo>?> getCardDetailInfo(PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
-          dio!, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
+          dio, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
 
   Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
-    Response<String> r = await dio!.get(CARD_DETAIL_URL);
+    Response<String> r = await dio.get(CARD_DETAIL_URL);
     BeautifulSoup soup = BeautifulSoup(r.data.toString());
     dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody

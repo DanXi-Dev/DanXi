@@ -22,8 +22,8 @@ import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/extra.dart';
-import 'package:dan_xi/util/bmob/bmob/bmob_query.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementRepository {
@@ -36,17 +36,18 @@ class AnnouncementRepository {
 
   AnnouncementRepository._();
 
+  static const _URL = "https://danxi-static.fduhole.com/all.json";
+
   static final _instance = AnnouncementRepository._();
 
   factory AnnouncementRepository.getInstance() => _instance;
   List<Announcement>? _announcementCache;
 
-  Future<bool?> loadData() async {
-    BmobQuery query = BmobQuery<Announcement>().setOrder("-createdAt");
-    _announcementCache = (await query.queryObjects())!
-        .map<Announcement>((e) => Announcement.fromJson(e))
-        .toList();
-    return true;
+  Future<bool?> loadAnnouncements() async {
+    final Response<List<dynamic>> response = await Dio().get(_URL);
+    _announcementCache =
+        response.data?.map((e) => Announcement.fromJson(e)).toList() ?? [];
+    return _announcementCache?.isNotEmpty ?? false;
   }
 
   Future<Announcement?> getLastNewAnnouncement() async {
@@ -102,19 +103,25 @@ class AnnouncementRepository {
     return getExtra()?.stopWords;
   }
 
-  Extra? getExtra() {
-    return Extra.fromJson(jsonDecode(_announcementCache!
-        .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
-        .content!));
+  List<BannerExtra?>? getBannerExtras() {
+    return getExtra()?.banners;
   }
 
-  UpdateInfo checkVersion() => UpdateInfo(
-      _announcementCache!
-          .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
-          .content,
-      _announcementCache!
-          .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
-          .content);
+  Extra? getExtra() {
+    return _announcementCache.apply((p0) => Extra.fromJson(jsonDecode(p0
+        .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
+        .content!)));
+  }
+
+  UpdateInfo checkVersion() {
+    return UpdateInfo(
+        _announcementCache!
+            .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
+            .content,
+        _announcementCache!
+            .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
+            .content);
+  }
 
   List<Celebration> getCelebrations() {
     List celebrationJson = jsonDecode(_announcementCache!

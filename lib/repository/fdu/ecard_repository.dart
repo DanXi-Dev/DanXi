@@ -60,7 +60,7 @@ class CardRepository extends BaseRepositoryWithDio {
   /// Log in before calling any method in this repository.
   Future<void> init(PersonInfo? info) async {
     _info = info;
-    await UISLoginTool.loginUIS(dio!, _LOGIN_URL, cookieJar!, _info, true);
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, _info, true);
   }
 
   Future<String?> getName() async {
@@ -70,7 +70,7 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String?> requestData, int pageNum) async {
     requestData['pageNo'] = pageNum.toString();
-    Response<String> detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
+    Response<String> detailResponse = await dio.post(_CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
         options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
     BeautifulSoup soup =
@@ -98,7 +98,7 @@ class CardRepository extends BaseRepositoryWithDio {
     if (logDays < 0) return null;
     //Get csrf id.
     Response<String> consumeCsrfPageResponse =
-        await dio!.get(_CONSUME_DETAIL_CSRF_URL);
+        await dio.get(_CONSUME_DETAIL_CSRF_URL);
     BeautifulSoup consumeCsrfPageSoup =
         BeautifulSoup(consumeCsrfPageResponse.data!);
     Iterable<Element> metas =
@@ -127,7 +127,7 @@ class CardRepository extends BaseRepositoryWithDio {
     // Get the number of pages, only when logDays > 0.
     int totalPages = 1;
     if (logDays > 0) {
-      Response<String> detailResponse = await dio!.post(_CONSUME_DETAIL_URL,
+      Response<String> detailResponse = await dio.post(_CONSUME_DETAIL_URL,
           data: data.encodeMap(),
           options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
 
@@ -145,7 +145,7 @@ class CardRepository extends BaseRepositoryWithDio {
     var cardInfo = CardInfo();
 
     //获取用户页面信息
-    var userPageResponse = await dio!.get(_USER_DETAIL_URL);
+    var userPageResponse = await dio.get(_USER_DETAIL_URL);
     cardInfo.cash =
         userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
     cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");

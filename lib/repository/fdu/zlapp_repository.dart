@@ -53,8 +53,8 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
 
   Future<dynamic> _getHistoryInfo(PersonInfo? info) async {
     _info = info;
-    await UISLoginTool.loginUIS(dio!, LOGIN_URL, cookieJar!, _info, true);
-    var res = await dio!.get(GET_INFO_URL);
+    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, _info, true);
+    var res = await dio.get(GET_INFO_URL);
     try {
       return res.data is Map
           ? res.data['d']
@@ -123,7 +123,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
     if (payload == null) {
       throw NotTickYesterdayException();
     }
-    await dio!.post(SAVE_URL,
+    await dio.post(SAVE_URL,
         data: payload.encodeMap(),
         options:
             DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));

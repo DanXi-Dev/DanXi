@@ -49,7 +49,6 @@ import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/bmob/bmob/bmob.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -71,10 +70,6 @@ import 'common/constant.dart';
 void main() {
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Init Bmob database.
-  Bmob.init(
-      "https://api2.bmob.cn", Constant.BMOB_APP_ID, Constant.BMOB_API_KEY);
 
   // Init Mi push Service.
   // if (PlatformX.isAndroid) {
@@ -110,7 +105,7 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
+        if (PlatformX.isWindows) PointerDeviceKind.mouse,
         PointerDeviceKind.stylus,
         PointerDeviceKind.invertedStylus
         // etc.
@@ -190,48 +185,55 @@ class DanxiApp extends StatelessWidget {
       // initialPlatform: TargetPlatform.iOS,
 
       // [DynamicThemeController] enables the app to change between dark/light theme without restart
-      builder: (BuildContext context) => DynamicThemeController(
-        lightTheme: Constant.lightTheme(PlatformX.isCupertino(context)),
-        darkTheme: Constant.darkTheme(PlatformX.isCupertino(context)),
-        child: PlatformApp(
-          scrollBehavior: TouchMouseScrollBehavior(),
-          debugShowCheckedModeBanner: false,
-          // Fix cupertino UI text color issue by override text color
-          cupertino: (context, __) => CupertinoAppData(
-              theme: CupertinoThemeData(
-                  textTheme: CupertinoTextThemeData(
-                      textStyle: TextStyle(
-                          color: PlatformX.getTheme(context)
-                              .textTheme
-                              .bodyText1!
-                              .color)))),
-          // Configure i18n delegates
-          localizationsDelegates: const [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate
-          ],
-          supportedLocales: S.delegate.supportedLocales,
-          onUnknownRoute: (settings) => throw AssertionError(
-              "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
-          home: PlatformMasterDetailApp(
-            // Configure the page route behaviour of the whole app
-            onGenerateRoute: (settings) {
-              final Function? pageContentBuilder =
-                  DanxiApp.routes[settings.name!];
-              if (pageContentBuilder != null) {
-                return platformPageRoute(
-                    context: context,
-                    builder: (context) => pageContentBuilder(context,
-                        arguments: settings.arguments));
-              }
-              return null;
-            },
-            navigatorKey: _navigatorKey,
+      builder: (BuildContext context) {
+        MaterialColor primarySwatch =
+            context.select<SettingsProvider, MaterialColor>(
+                (value) => Constant.getColorFromString(value.primarySwatch));
+        return DynamicThemeController(
+          lightTheme: Constant.lightTheme(
+              PlatformX.isCupertino(context), primarySwatch),
+          darkTheme:
+              Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch),
+          child: PlatformApp(
+            scrollBehavior: TouchMouseScrollBehavior(),
+            debugShowCheckedModeBanner: false,
+            // Fix cupertino UI text color issue by override text color
+            cupertino: (context, __) => CupertinoAppData(
+                theme: CupertinoThemeData(
+                    textTheme: CupertinoTextThemeData(
+                        textStyle: TextStyle(
+                            color: PlatformX.getTheme(context, primarySwatch)
+                                .textTheme
+                                .bodyText1!
+                                .color)))),
+            // Configure i18n delegates
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            onUnknownRoute: (settings) => throw AssertionError(
+                "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
+            home: PlatformMasterDetailApp(
+              // Configure the page route behaviour of the whole app
+              onGenerateRoute: (settings) {
+                final Function? pageContentBuilder =
+                    DanxiApp.routes[settings.name!];
+                if (pageContentBuilder != null) {
+                  return platformPageRoute(
+                      context: context,
+                      builder: (context) => pageContentBuilder(context,
+                          arguments: settings.arguments));
+                }
+                return null;
+              },
+              navigatorKey: _navigatorKey,
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
     if (PlatformX.isAndroid || PlatformX.isIOS) {
       // Listen to Foreground / Background Event with [FGBGNotifier].

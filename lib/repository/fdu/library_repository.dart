@@ -36,7 +36,7 @@ class FudanLibraryRepository extends BaseRepositoryWithDio {
   /// but I do not know the order.
   Future<List<int?>> getLibraryRawData() async {
     RegExp dataMatcher = RegExp(r'(?<=当前在馆人数：)[0-9]+');
-    Response<String> r = await dio!.get(_INFO_URL);
+    Response<String> r = await dio.get(_INFO_URL);
     return dataMatcher
         .allMatches(r.data!)
         .map((e) => int.tryParse(e.group(0)!))
