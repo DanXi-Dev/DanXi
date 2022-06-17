@@ -48,7 +48,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
     });
     final List<ExerciseItem> items = [];
-    final Response<String> r = await dio.get(_INFO_URL + "?token=" + token);
+    final Response<String> r = await dio.get("$_INFO_URL?token=$token");
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final Iterable<dom.Element> tableLines = soup
         .findAll(

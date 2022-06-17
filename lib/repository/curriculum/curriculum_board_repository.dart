@@ -32,18 +32,18 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   factory CurriculumBoardRepository.getInstance() => _instance;
 
   Map<String, String> _tokenHeader(JWToken fduHoleToken) {
-    return {"Authorization": "Bearer " + fduHoleToken.access!};
+    return {"Authorization": "Bearer ${fduHoleToken.access!}"};
   }
 
   Future<List<CourseGroup>?> getCourseGroups(JWToken fduHoleToken) async {
-    Response<List<dynamic>> response = await dio.get(_BASE_URL + "/courses",
+    Response<List<dynamic>> response = await dio.get("$_BASE_URL/courses",
         options: Options(headers: _tokenHeader(fduHoleToken)));
     return response.data?.map((e) => CourseGroup.fromJson(e)).toList();
   }
 
   Future<Course?> getCourse(JWToken fduHoleToken, String courseId) async {
     Response<Map<String, dynamic>> response = await dio.get(
-        _BASE_URL + "/courses/$courseId",
+        "$_BASE_URL/courses/$courseId",
         options: Options(headers: _tokenHeader(fduHoleToken)));
     return Course.fromJson(response.data!);
   }
@@ -51,7 +51,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   Future<Review?> addReview(
       JWToken fduHoleToken, String courseId, Review newReview) async {
     Response<Map<String, dynamic>> response =
-    await dio.post(_BASE_URL + "/courses/$courseId/reviews",
+    await dio.post("$_BASE_URL/courses/$courseId/reviews",
             data: {
               'title': newReview.title,
               'content': newReview.content,
@@ -65,14 +65,14 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   Future<int?> removeReview(
       JWToken fduHoleToken, String reviewId, Review newReview) async {
     Response<String> response = await dio.delete(
-        _BASE_URL + "/reviews/$reviewId",
+        "$_BASE_URL/reviews/$reviewId",
         options: Options(headers: _tokenHeader(fduHoleToken)));
     return response.statusCode;
   }
 
   Future<int?> modifyReview(
       JWToken fduHoleToken, String reviewId, Review updatedReview) async {
-    Response<String> response = await dio.put(_BASE_URL + "/reviews/$reviewId",
+    Response<String> response = await dio.put("$_BASE_URL/reviews/$reviewId",
         data: {
           'title': updatedReview.title,
           'content': updatedReview.content,
@@ -86,7 +86,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   Future<List<Review>?> getReviews(
       JWToken fduHoleToken, String courseId) async {
     Response<List<dynamic>> response = await dio.get(
-        _BASE_URL + "/courses/$courseId/reviews",
+        "$_BASE_URL/courses/$courseId/reviews",
         options: Options(headers: _tokenHeader(fduHoleToken)));
     return response.data?.map((e) => Review.fromJson(e)).toList();
   }

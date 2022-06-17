@@ -400,8 +400,8 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             PlatformElevatedButton(
-              child: Text(S.of(context).login),
               onPressed: _doLogin,
+              child: Text(S.of(context).login),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -607,8 +607,8 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
         PlatformElevatedButton(
           material: (_, __) => MaterialElevatedButtonData(
               icon: const Icon(Icons.app_registration)),
-          child: Text(S.of(context).next),
           onPressed: _agreed ? widget.registerCallback : null,
+          child: Text(S.of(context).next),
         )
       ],
     );
@@ -789,9 +789,9 @@ class EmailProviderImpl extends EmailProvider {
         if (info.id!.length >= 2) {
           int year = int.tryParse(info.id!.substring(0, 2)) ?? 0;
           if (year >= 21) {
-            emailList.add(info.id! + "@fudan.edu.cn");
+            emailList.add("${info.id!}@fudan.edu.cn");
           } else {
-            emailList.add(info.id! + "@m.fudan.edu.cn");
+            emailList.add("${info.id!}@m.fudan.edu.cn");
           }
         }
         break;
@@ -811,9 +811,9 @@ class EmailProviderImpl extends EmailProvider {
         if (info.id!.length >= 2) {
           int year = int.tryParse(info.id!.substring(0, 2)) ?? 0;
           if (year >= 21) {
-            return info.id! + "@m.fudan.edu.cn";
+            return "${info.id!}@m.fudan.edu.cn";
           } else {
-            return info.id! + "@fudan.edu.cn";
+            return "${info.id!}@fudan.edu.cn";
           }
         }
         break;

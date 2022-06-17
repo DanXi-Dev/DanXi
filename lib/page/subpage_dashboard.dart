@@ -159,29 +159,29 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   }
 
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
-    List<Widget> _widgets = [
+    List<Widget> widgets = [
       AutoBannerAdWidget(
         bannerAd: bannerAd,
       )
     ];
     NotificationProvider provider = context.watch<NotificationProvider>();
-    _widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
+    widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
           feature: e,
           onDismissed: () => provider.removeNotification(e),
         )));
-    List<Widget> _currentCardChildren = [];
+    List<Widget> currentCardChildren = [];
     for (var element in widgetSequence) {
       if (!element.enabled!) continue;
       if (element.internalString == 'new_card') {
-        if (_currentCardChildren.isEmpty) continue;
-        _widgets.add(Card(
+        if (currentCardChildren.isEmpty) continue;
+        widgets.add(Card(
           child: Column(
-            children: _currentCardChildren,
+            children: currentCardChildren,
           ),
         ));
-        _currentCardChildren = [];
+        currentCardChildren = [];
       } else if (element.internalString == 'custom_card') {
-        _currentCardChildren.add(FeatureListItem(
+        currentCardChildren.add(FeatureListItem(
           feature:
               CustomShortcutFeature(title: element.title, link: element.link),
         ));
@@ -195,17 +195,17 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
             continue;
           }
         }
-        _currentCardChildren.add(widgetMap[element.internalString!]!);
+        currentCardChildren.add(widgetMap[element.internalString!]!);
       }
     }
-    if (_currentCardChildren.isNotEmpty) {
-      _widgets.add(Card(
+    if (currentCardChildren.isNotEmpty) {
+      widgets.add(Card(
         child: Column(
-          children: _currentCardChildren,
+          children: currentCardChildren,
         ),
       ));
     }
-    return _widgets;
+    return widgets;
   }
 
   /// Tell the page to refresh all shown features and rebuild itself.

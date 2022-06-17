@@ -194,10 +194,10 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
       // Wait build() complete (so `allDataReceiver` has been set to `null`), then trigger a refresh in
       // the list view.
-      Completer<void> _completer = Completer();
-      WidgetsBinding.instance?.addPostFrameCallback((_) => _realRefresh()
-          .then(_completer.complete, onError: _completer.completeError));
-      return _completer.future;
+      Completer<void> completer = Completer();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _realRefresh()
+          .then(completer.complete, onError: completer.completeError));
+      return completer.future;
     }
     return _realRefresh();
   }
@@ -210,7 +210,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         // Replaced precached data with updated ones
         _listViewController.replaceInitialData(
@@ -406,19 +406,19 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       return [
         PlatformContextMenuItem(
           onPressed: () => onExecutePenalty(1),
-          child: Text(S.of(context).level(1)),
           menuContext: menuContext,
+          child: Text(S.of(context).level(1)),
         ),
         PlatformContextMenuItem(
           onPressed: () => onExecutePenalty(2),
-          child: Text(S.of(context).level(2)),
           menuContext: menuContext,
+          child: Text(S.of(context).level(2)),
         ),
         PlatformContextMenuItem(
           onPressed: () => onExecutePenalty(3),
-          child: Text(S.of(context).level(3)),
           menuContext: menuContext,
           isDestructive: true,
+          child: Text(S.of(context).level(3)),
         )
       ];
     }
@@ -433,9 +433,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).operation_successful);
             }
           },
-          child: Text(S.of(context).modify_floor),
           isDestructive: true,
           menuContext: menuContext,
+          child: Text(S.of(context).modify_floor),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -453,9 +453,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               }
             }
           },
-          child: Text(S.of(context).delete_floor),
           isDestructive: true,
           menuContext: menuContext,
+          child: Text(S.of(context).delete_floor),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -471,9 +471,9 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               }
             }
           },
-          child: Text(S.of(context).hide_hole),
           isDestructive: true,
           menuContext: menuContext,
+          child: Text(S.of(context).hide_hole),
         ),
         PlatformContextMenuItem(
           onPressed: () => showPlatformModalSheet(
@@ -485,8 +485,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     onPressed: () => Navigator.of(subMenuContext).pop(),
                   ))),
           isDestructive: true,
-          child: Text(S.of(context).add_penalty),
           menuContext: menuContext,
+          child: Text(S.of(context).add_penalty),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -508,8 +508,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).operation_successful);
             }
           },
-          child: Text(S.of(context).pin_unpin_hole),
           menuContext: menuContext,
+          child: Text(S.of(context).pin_unpin_hole),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -525,8 +525,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).operation_successful);
             }
           },
-          child: Text(S.of(context).add_special_tag),
           menuContext: menuContext,
+          child: Text(S.of(context).add_special_tag),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -625,8 +625,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               }
             }
           },
-          child: Text(S.of(context).modify_tag_division),
           menuContext: menuContext,
+          child: Text(S.of(context).modify_tag_division),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -642,8 +642,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).operation_successful);
             }
           },
-          child: Text(S.of(context).fold_floor),
           menuContext: menuContext,
+          child: Text(S.of(context).fold_floor),
         ),
         if (e.history != null && e.history!.isNotEmpty)
           PlatformContextMenuItem(
@@ -666,8 +666,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   message: content.toString(),
                   selectable: true);
             },
-            child: Text(S.of(context).view_history),
             menuContext: menuContext,
+            child: Text(S.of(context).view_history),
           ),
       ];
     }
@@ -726,8 +726,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     onPressed: () => Navigator.of(subMenuContext).pop(),
                   ))),
           isDestructive: true,
-          child: Text(S.of(context).admin_options),
           menuContext: menuContext,
+          child: Text(S.of(context).admin_options),
         ),
       ]
     ];

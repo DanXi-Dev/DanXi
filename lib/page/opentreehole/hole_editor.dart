@@ -265,17 +265,17 @@ class OTEditor {
 
   @protected
   static Future<void> uploadImage(
-      BuildContext context, TextEditingController _controller) async {
-    final ImagePickerProxy _picker = ImagePickerProxy.createPicker();
-    final String? _file = await _picker.pickImage();
-    if (_file == null) return;
+      BuildContext context, TextEditingController controller) async {
+    final ImagePickerProxy picker = ImagePickerProxy.createPicker();
+    final String? file = await picker.pickImage();
+    if (file == null) return;
 
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
     try {
       String? url =
-          await OpenTreeHoleRepository.getInstance().uploadImage(File(_file));
-      if (url != null) _controller.text += "![]($url)";
+          await OpenTreeHoleRepository.getInstance().uploadImage(File(file));
+      if (url != null) controller.text += "![]($url)";
       // "showAnim: true" makes it crash. Don't know the reason.
       progressDialog.dismiss(showAnim: false);
     } catch (error) {

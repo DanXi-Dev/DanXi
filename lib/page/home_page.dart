@@ -140,7 +140,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _captchaSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
@@ -281,8 +281,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     await _systemTray.initSystemTray(
         title: 'DanXi',
         iconPath: PlatformX.createPlatformFile(
-                PlatformX.getPathFromFile(Platform.resolvedExecutable) +
-                    "/data/flutter_assets/assets/graphics/app_icon.ico")
+                "${PlatformX.getPathFromFile(Platform.resolvedExecutable)}/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
         toolTip: "DanXi is here~");
     late List<tray.MenuItemBase> showingMenu, hidingMenu;
@@ -348,7 +347,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
     initSystemTray().catchError((ignored) {});
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     _captchaSubscription.bindOnlyInvalid(
         Constant.eventBus
@@ -504,7 +503,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // We have to load personInfo after [initState] and [build], since it may pop up a dialog,
     // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
     // Also, otherwise it will call [setState] before the frame is completed.
-    WidgetsBinding.instance!
+    WidgetsBinding.instance
         .addPostFrameCallback((_) => _loadPersonInfoOrLogin());
   }
 

@@ -93,9 +93,9 @@ class AutoBannerAdWidget extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.only(bottom: padding),
           alignment: Alignment.center,
-          child: AdWidget(ad: bannerAd!),
           width: bannerAd!.size.width.toDouble(),
           height: bannerAd!.size.height.toDouble() + padding,
+          child: AdWidget(ad: bannerAd!),
         ),
       );
     }

@@ -163,6 +163,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
             onPressed: e.onPressed);
       }).toList();
     }
+
     return PrimaryScrollController(
       controller: _buildPrimaryScrollController(context),
       child: PlatformScaffold(

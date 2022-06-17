@@ -516,7 +516,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             });
           }
           // Schedule a reload after setState() is done.
-          WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
             indicatorKey.currentState?.show();
           });
         }),

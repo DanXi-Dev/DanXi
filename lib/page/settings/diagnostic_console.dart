@@ -182,18 +182,19 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
         appBar:
             PlatformAppBarX(title: Text(S.of(context).diagnostic_information)),
         body: WithScrollbar(
+          controller: PrimaryScrollController.of(context),
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(4),
             primary: true,
             child: Column(
               children: [
                 PlatformElevatedButton(
-                  child: const Text("Password Change [Only ADMIN]"),
                   onPressed: changePassword,
+                  child: const Text("Password Change [Only ADMIN]"),
                 ),
                 PlatformElevatedButton(
-                  child: const Text("Set User Agent"),
                   onPressed: setUserAgent,
+                  child: const Text("Set User Agent"),
                 ),
                 PlatformElevatedButton(
                   child: const Text("Copy Everything"),
@@ -216,7 +217,6 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
               ],
             ),
           ),
-          controller: PrimaryScrollController.of(context),
         ),
       );
 }

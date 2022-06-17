@@ -276,7 +276,7 @@ class ExamScore {
     return ExamScore(
         elements[0].text.trim(),
         elements[3].text.trim(),
-        elements[1].text.trim() + ' ' + elements[2].text.trim(),
+        '${elements[1].text.trim()} ${elements[2].text.trim()}',
         elements[4].text.trim(),
         elements[5].text.trim(),
         MAP_LEVEL_SCORE[elements[5].text.trim()]);
