@@ -977,12 +977,12 @@ class _OTMessageItemState extends State<OTMessageItem> {
               ? const Icon(Icons.developer_board)
               : const Icon(CupertinoIcons.info_circle),
           title: Text(message.message ?? "null",
-              style: (message.has_read == true)
-                  ? TextStyle(color: Theme.of(context).hintColor)
+              style: (message.has_read == false)
+                  ? TextStyle(color: Theme.of(context).colorScheme.primary)
                   : null),
           subtitle: Text(HumanDuration.tryFormat(
               context, DateTime.tryParse(message.time_created ?? ""))),
-          onTap: () async {
+          onTap: () {
             OTMessageItem.markMessageAsRead(message)
                 .then((value) => setState(() {}));
             OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
