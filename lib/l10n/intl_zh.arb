@@ -426,5 +426,6 @@
   "login_problem": "如果您登录时遇到问题，请联系 dev@fduhole.com 或加入 QQ 群 {QQ}.\n\n与此同时，建议您阅读开发组公告，您遇到的问题可能已经在其中被提及。",
   "copy_qq_group_id": "复制 QQ 群号",
   "read_announcements": "查看开发组公告",
-  "admin_no_hide_tag": "管理员不可以屏蔽标签"
+  "admin_no_hide_tag": "管理员不可以屏蔽标签",
+  "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？"
 }

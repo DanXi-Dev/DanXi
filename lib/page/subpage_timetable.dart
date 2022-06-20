@@ -520,6 +520,14 @@ class StartDateSelectionButton extends StatelessWidget {
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
         if (newDate != null && newDate != startTime) {
+          // Notice user that newDate is not a Monday.
+          if (newDate.weekday != DateTime.monday) {
+            bool? confirmed = await Noticing.showConfirmationDialog(
+                context, S.of(context).semester_start_at_monday);
+            if (confirmed != true) {
+              return;
+            }
+          }
           SettingsProvider.getInstance().thisSemesterStartDate =
               newDate.toIso8601String();
           onUpdate?.call();
