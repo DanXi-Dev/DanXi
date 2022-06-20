@@ -296,198 +296,193 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               HapticFeedback.mediumImpact();
               refreshSelf();
             },
-            child: Material(
-              child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    AutoBannerAdWidget(bannerAd: myBanner),
-                    //Account Selection
-                    Card(
-                      child: Column(children: [
-                        ListTile(
-                          title: Text(S.of(context).account),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.account_circle)
-                              : const Icon(CupertinoIcons.person_circle),
-                          subtitle: Text(
-                              "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
-                          onTap: () {
-                            showPlatformDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) =>
-                                  PlatformAlertDialog(
-                                title: Text(
-                                    S.of(context).logout_question_prompt_title),
-                                content:
-                                    Text(S.of(context).logout_question_prompt),
-                                actions: [
-                                  PlatformDialogAction(
-                                    child: Text(S.of(context).cancel),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                  ),
-                                  PlatformDialogAction(
-                                      child: Text(
-                                        S.of(context).i_see,
-                                        style: TextStyle(
-                                            color:
-                                                Theme.of(context).errorColor),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        _deleteAllDataAndExit();
-                                      })
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-
-                        // Campus
-                        ListTile(
-                          title: Text(S.of(context).default_campus),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.location_on)
-                              : const Icon(CupertinoIcons.location_fill),
-                          subtitle: Text(SettingsProvider.getInstance()
-                              .campus
-                              .displayTitle(context)!),
-                          onTap: () => showPlatformModalSheet(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  PlatformContextMenu(
-                                      actions: _buildCampusAreaList(context),
-                                      cancelButton: CupertinoActionSheetAction(
-                                          child: Text(S.of(context).cancel),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop()))),
-                        ),
-                      ]),
-                    ),
-
-                    // Accessibility
-                    Card(
-                      child: Column(
-                        children: [
-                          Selector<SettingsProvider, bool>(
-                            selector: (_, model) =>
-                                model.useAccessibilityColoring,
-                            builder: (_, bool value, __) =>
-                                SwitchListTile.adaptive(
-                              title: Text(S.of(context).accessibility_coloring),
-                              subtitle: Text(S
-                                  .of(context)
-                                  .high_contrast_color_description),
-                              secondary:
-                                  const Icon(Icons.accessibility_new_rounded),
-                              value: value,
-                              onChanged: (bool value) {
-                                SettingsProvider.getInstance()
-                                    .useAccessibilityColoring = value;
-                                treeholePageKey.currentState?.setState(() {});
-                              },
+            child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  AutoBannerAdWidget(bannerAd: myBanner),
+                  //Account Selection
+                  Card(
+                    child: Column(children: [
+                      ListTile(
+                        title: Text(S.of(context).account),
+                        leading: PlatformX.isMaterial(context)
+                            ? const Icon(Icons.account_circle)
+                            : const Icon(CupertinoIcons.person_circle),
+                        subtitle: Text(
+                            "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
+                        onTap: () {
+                          showPlatformDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) =>
+                                PlatformAlertDialog(
+                              title: Text(
+                                  S.of(context).logout_question_prompt_title),
+                              content:
+                                  Text(S.of(context).logout_question_prompt),
+                              actions: [
+                                PlatformDialogAction(
+                                  child: Text(S.of(context).cancel),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                                PlatformDialogAction(
+                                    child: Text(
+                                      S.of(context).i_see,
+                                      style: TextStyle(
+                                          color: Theme.of(context).errorColor),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      _deleteAllDataAndExit();
+                                    })
+                              ],
                             ),
-                          ),
-                          if (PlatformX.isMaterial(context))
-                            ListTile(
-                              title: Text(S.of(context).theme_color),
-                              subtitle:
-                                  Text(S.of(context).theme_color_description),
-                              leading: const Icon(Icons.color_lens),
-                              onTap: () async {
-                                String? result =
-                                    await showPlatformDialog<String?>(
-                                  context: context,
-                                  builder: (_) => SwatchPickerDialog(
-                                    initialSelectedColor: context
-                                        .read<SettingsProvider>()
-                                        .primarySwatch,
-                                  ),
-                                );
-                                if (result != null) {
-                                  context
-                                      .read<SettingsProvider>()
-                                      .setPrimarySwatch(result);
-                                }
-                              },
-                            ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                    if (PlatformX.isWindows)
-                      Card(
-                        child: SwitchListTile.adaptive(
-                            title: Text(S.of(context).windows_auto_start_title),
-                            secondary: const Icon(Icons.settings_power),
+
+                      // Campus
+                      ListTile(
+                        title: Text(S.of(context).default_campus),
+                        leading: PlatformX.isMaterial(context)
+                            ? const Icon(Icons.location_on)
+                            : const Icon(CupertinoIcons.location_fill),
+                        subtitle: Text(SettingsProvider.getInstance()
+                            .campus
+                            .displayTitle(context)!),
+                        onTap: () => showPlatformModalSheet(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                PlatformContextMenu(
+                                    actions: _buildCampusAreaList(context),
+                                    cancelButton: CupertinoActionSheetAction(
+                                        child: Text(S.of(context).cancel),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop()))),
+                      ),
+                    ]),
+                  ),
+
+                  // Accessibility
+                  Card(
+                    child: Column(
+                      children: [
+                        Selector<SettingsProvider, bool>(
+                          selector: (_, model) =>
+                              model.useAccessibilityColoring,
+                          builder: (_, bool value, __) =>
+                              SwitchListTile.adaptive(
+                            title: Text(S.of(context).accessibility_coloring),
                             subtitle: Text(
-                                S.of(context).windows_auto_start_description),
-                            value: WindowsAutoStart.autoStart,
-                            onChanged: (bool value) async {
-                              WindowsAutoStart.autoStart = value;
-                              await Noticing.showNotice(
-                                  context,
-                                  S
-                                      .of(context)
-                                      .windows_auto_start_wait_dialog_message,
-                                  title: S
-                                      .of(context)
-                                      .windows_auto_start_wait_dialog_title,
-                                  useSnackBar: false);
-                              refreshSelf();
-                            }),
-                      ),
-
-                    // FDUHOLE
-                    _buildFDUHoleSettingsCard(context),
-                    if (SettingsProvider.getInstance().debugMode)
-                      //Theme Selection
-                      Card(
-                        child: ListTile(
-                          title: Text(S.of(context).theme),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.color_lens)
-                              : const Icon(CupertinoIcons.color_filter),
-                          subtitle: Text(PlatformX.isMaterial(context)
-                              ? S.of(context).material
-                              : S.of(context).cupertino),
-                          onTap: () => PlatformX.isMaterial(context)
-                              ? PlatformProvider.of(context)!
-                                  .changeToCupertinoPlatform()
-                              : PlatformProvider.of(context)!
-                                  .changeToMaterialPlatform(),
-                        ),
-                      ),
-
-                    // Sponsor Option
-                    if (PlatformX.isMobile)
-                      Card(
-                        child: ListTile(
-                          isThreeLine:
-                              !SettingsProvider.getInstance().isAdEnabled,
-                          leading: Icon(
-                            PlatformIcons(context).heartSolid,
+                                S.of(context).high_contrast_color_description),
+                            secondary:
+                                const Icon(Icons.accessibility_new_rounded),
+                            value: value,
+                            onChanged: (bool value) {
+                              SettingsProvider.getInstance()
+                                  .useAccessibilityColoring = value;
+                              treeholePageKey.currentState?.setState(() {});
+                            },
                           ),
-                          title: Text(S.of(context).sponsor_us),
-                          subtitle: Text(
-                              SettingsProvider.getInstance().isAdEnabled
-                                  ? S.of(context).sponsor_us_enabled
-                                  : S.of(context).sponsor_us_disabled),
-                          onTap: () async {
-                            if (SettingsProvider.getInstance().isAdEnabled) {
-                              _toggleAdDisplay();
-                            } else {
-                              _toggleAdDisplay();
-                              await _showAdsThankDialog();
-                            }
-                          },
                         ),
-                      ),
+                        if (PlatformX.isMaterial(context))
+                          ListTile(
+                            title: Text(S.of(context).theme_color),
+                            subtitle:
+                                Text(S.of(context).theme_color_description),
+                            leading: const Icon(Icons.color_lens),
+                            onTap: () async {
+                              String? result =
+                                  await showPlatformDialog<String?>(
+                                context: context,
+                                builder: (_) => SwatchPickerDialog(
+                                  initialSelectedColor: context
+                                      .read<SettingsProvider>()
+                                      .primarySwatch,
+                                ),
+                              );
+                              if (result != null) {
+                                context
+                                    .read<SettingsProvider>()
+                                    .setPrimarySwatch(result);
+                              }
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (PlatformX.isWindows)
+                    Card(
+                      child: SwitchListTile.adaptive(
+                          title: Text(S.of(context).windows_auto_start_title),
+                          secondary: const Icon(Icons.settings_power),
+                          subtitle: Text(
+                              S.of(context).windows_auto_start_description),
+                          value: WindowsAutoStart.autoStart,
+                          onChanged: (bool value) async {
+                            WindowsAutoStart.autoStart = value;
+                            await Noticing.showNotice(
+                                context,
+                                S
+                                    .of(context)
+                                    .windows_auto_start_wait_dialog_message,
+                                title: S
+                                    .of(context)
+                                    .windows_auto_start_wait_dialog_title,
+                                useSnackBar: false);
+                            refreshSelf();
+                          }),
+                    ),
 
-                    // About
-                    _buildAboutCard(context)
-                  ]),
-            )));
+                  // FDUHOLE
+                  _buildFDUHoleSettingsCard(context),
+                  if (SettingsProvider.getInstance().debugMode)
+                    //Theme Selection
+                    Card(
+                      child: ListTile(
+                        title: Text(S.of(context).theme),
+                        leading: PlatformX.isMaterial(context)
+                            ? const Icon(Icons.color_lens)
+                            : const Icon(CupertinoIcons.color_filter),
+                        subtitle: Text(PlatformX.isMaterial(context)
+                            ? S.of(context).material
+                            : S.of(context).cupertino),
+                        onTap: () => PlatformX.isMaterial(context)
+                            ? PlatformProvider.of(context)!
+                                .changeToCupertinoPlatform()
+                            : PlatformProvider.of(context)!
+                                .changeToMaterialPlatform(),
+                      ),
+                    ),
+
+                  // Sponsor Option
+                  if (PlatformX.isMobile)
+                    Card(
+                      child: ListTile(
+                        isThreeLine:
+                            !SettingsProvider.getInstance().isAdEnabled,
+                        leading: Icon(
+                          PlatformIcons(context).heartSolid,
+                        ),
+                        title: Text(S.of(context).sponsor_us),
+                        subtitle: Text(
+                            SettingsProvider.getInstance().isAdEnabled
+                                ? S.of(context).sponsor_us_enabled
+                                : S.of(context).sponsor_us_disabled),
+                        onTap: () async {
+                          if (SettingsProvider.getInstance().isAdEnabled) {
+                            _toggleAdDisplay();
+                          } else {
+                            _toggleAdDisplay();
+                            await _showAdsThankDialog();
+                          }
+                        },
+                      ),
+                    ),
+
+                  // About
+                  _buildAboutCard(context)
+                ])));
   }
 
   Widget _buildFDUHoleSettingsCard(BuildContext context) {

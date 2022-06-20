@@ -25,7 +25,6 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -105,8 +104,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
   List<Widget> _getListWidgets() {
     List<Widget> widgets = [];
     for (var value in _data) {
-      widgets.add(ThemedMaterial(
-          child: ListTile(
+      widgets.add(ListTile(
         leading: PlatformX.isMaterial(context)
             ? const Icon(Icons.info)
             : const Icon(CupertinoIcons.info_circle_fill),
@@ -135,7 +133,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
                         onPressed: () => Navigator.pop(context)),
                   ],
                 )),
-      )));
+      ));
     }
 
     return widgets;

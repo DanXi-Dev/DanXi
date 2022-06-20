@@ -17,23 +17,6 @@
 
 import 'package:flutter/material.dart';
 
-/// A container of [Material] that applies the app's theme settings on it.
-///
-/// Use it anywhere you need a [Material].
-class ThemedMaterial extends StatelessWidget {
-  final Widget? child;
-
-  const ThemedMaterial({Key? key, this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: child,
-    );
-  }
-}
-
 class ExpansionTileX extends StatefulWidget {
   /// Creates a single-line [ListTile] with an expansion arrow icon that expands or collapses
   /// the tile to reveal or hide the [children]. The [initiallyExpanded] property must

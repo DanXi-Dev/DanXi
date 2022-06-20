@@ -54,98 +54,96 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
       appBar: PlatformAppBarX(title: Text(S.of(context).dashboard_layout)),
       body: SafeArea(
         bottom: false,
-        child: Material(
-          child: WithScrollbar(
-            child: ReorderableListView(
-              clipBehavior: Clip.none,
-              buildDefaultDragHandles: true,
-              primary: true,
-              children: _getListWidgets() +
-                  [
-                    Padding(
-                      key: UniqueKey(),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 2, horizontal: 16),
-                      child: ListTile(
-                        leading: Icon(PlatformIcons(context).addCircled),
-                        title: Text(S.of(context).add_new_card),
-                        onTap: () {
-                          sequence!
-                              .add(DashboardCard("new_card", null, null, true));
-                          SettingsProvider.getInstance()
-                              .dashboardWidgetsSequence = sequence;
-                          refreshSelf();
-                        },
-                      ),
+        child: WithScrollbar(
+          controller: PrimaryScrollController.of(context),
+          child: ReorderableListView(
+            clipBehavior: Clip.none,
+            buildDefaultDragHandles: true,
+            primary: true,
+            children: _getListWidgets() +
+                [
+                  Padding(
+                    key: UniqueKey(),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: ListTile(
+                      leading: Icon(PlatformIcons(context).addCircled),
+                      title: Text(S.of(context).add_new_card),
+                      onTap: () {
+                        sequence!
+                            .add(DashboardCard("new_card", null, null, true));
+                        SettingsProvider.getInstance()
+                            .dashboardWidgetsSequence = sequence;
+                        refreshSelf();
+                      },
                     ),
-                    Padding(
-                      key: UniqueKey(),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 2, horizontal: 16),
-                      child: ListTile(
-                        leading: Icon(PlatformIcons(context).addCircled),
-                        title: Text(S.of(context).add_new_divider),
-                        onTap: () {
-                          sequence!.add(
-                            DashboardCard("divider", null, null, true),
-                          );
-                          SettingsProvider.getInstance()
-                              .dashboardWidgetsSequence = sequence;
-                          refreshSelf();
-                        },
-                      ),
+                  ),
+                  Padding(
+                    key: UniqueKey(),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: ListTile(
+                      leading: Icon(PlatformIcons(context).addCircled),
+                      title: Text(S.of(context).add_new_divider),
+                      onTap: () {
+                        sequence!.add(
+                          DashboardCard("divider", null, null, true),
+                        );
+                        SettingsProvider.getInstance()
+                            .dashboardWidgetsSequence = sequence;
+                        refreshSelf();
+                      },
                     ),
-                    Padding(
-                      key: UniqueKey(),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 2, horizontal: 16),
-                      child: ListTile(
-                        leading: Icon(PlatformIcons(context).addCircled),
-                        title: Text(S.of(context).new_shortcut_card),
-                        onTap: () {
-                          showPlatformDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (BuildContext context) =>
-                                  NewShortcutDialog(
-                                    sharedPreferences:
-                                        SettingsProvider.getInstance()
-                                            .preferences,
-                                  )).then((value) => refreshSelf());
-                        },
-                      ),
+                  ),
+                  Padding(
+                    key: UniqueKey(),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: ListTile(
+                      leading: Icon(PlatformIcons(context).addCircled),
+                      title: Text(S.of(context).new_shortcut_card),
+                      onTap: () {
+                        showPlatformDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            builder: (BuildContext context) =>
+                                NewShortcutDialog(
+                                  sharedPreferences:
+                                      SettingsProvider.getInstance()
+                                          .preferences,
+                                )).then((value) => refreshSelf());
+                      },
                     ),
-                    Padding(
-                      key: UniqueKey(),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 2, horizontal: 16),
-                      child: ListTile(
-                        leading: Icon(PlatformIcons(context).removeCircled),
-                        title: Text(S.of(context).reset_layout),
-                        onTap: () async {
-                          await SettingsProvider.getInstance()
-                              .preferences!
-                              .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
-                          refreshSelf();
-                        },
-                      ),
+                  ),
+                  Padding(
+                    key: UniqueKey(),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: ListTile(
+                      leading: Icon(PlatformIcons(context).removeCircled),
+                      title: Text(S.of(context).reset_layout),
+                      onTap: () async {
+                        await SettingsProvider.getInstance()
+                            .preferences!
+                            .remove(SettingsProvider.KEY_DASHBOARD_WIDGETS);
+                        refreshSelf();
+                      },
                     ),
-                  ],
-              onReorder: (oldIndex, newIndex) {
-                if (oldIndex >= sequence!.length) {
-                  Noticing.showNotice(context, S.of(context).unmovable_widget);
-                  return;
-                }
-                if (newIndex > oldIndex) --newIndex;
-                DashboardCard tmp = sequence![oldIndex];
-                sequence!.removeAt(oldIndex);
-                sequence!.insert(newIndex, tmp);
-                SettingsProvider.getInstance().dashboardWidgetsSequence =
-                    sequence;
-                refreshSelf();
-              },
-            ),
-            controller: PrimaryScrollController.of(context),
+                  ),
+                ],
+            onReorder: (oldIndex, newIndex) {
+              if (oldIndex >= sequence!.length) {
+                Noticing.showNotice(context, S.of(context).unmovable_widget);
+                return;
+              }
+              if (newIndex > oldIndex) --newIndex;
+              DashboardCard tmp = sequence![oldIndex];
+              sequence!.removeAt(oldIndex);
+              sequence!.insert(newIndex, tmp);
+              SettingsProvider.getInstance().dashboardWidgetsSequence =
+                  sequence;
+              refreshSelf();
+            },
           ),
         ),
       ),

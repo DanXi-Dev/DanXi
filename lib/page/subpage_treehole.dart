@@ -587,41 +587,39 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    return Material(
-      child: Container(
-        decoration: _backgroundImage == null
-            ? null
-            : BoxDecoration(
-                image: DecorationImage(
-                    image: _backgroundImage!, fit: BoxFit.cover)),
-        child: RefreshIndicator(
-          // Make the indicator listen to [ScrollNotification] from deeper located [PagedListView].
-          notificationPredicate: (notification) => true,
-          edgeOffset: MediaQuery.of(context).padding.top,
-          key: indicatorKey,
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            // Refresh the list...
-            await refreshList();
-            // ... and scroll it to the top.
-            try {
-              await PrimaryScrollController.of(context)?.animateTo(0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.ease);
-              // It is not important if [listViewController] is not attached to a ListView.
-            } catch (_) {}
-          },
-          child: Builder(builder: (context) {
-            if (_postsType == PostsType.EXTERNAL_VIEW) {
-              return _delegate!.build(context);
-            } else {
-              return _buildOTListView(context,
-                  padding: buildTabBar ? EdgeInsets.zero : null);
-            }
-          }),
-        ),
+    return Container(
+      decoration: _backgroundImage == null
+          ? null
+          : BoxDecoration(
+              image:
+                  DecorationImage(image: _backgroundImage!, fit: BoxFit.cover)),
+      child: RefreshIndicator(
+        // Make the indicator listen to [ScrollNotification] from deeper located [PagedListView].
+        notificationPredicate: (notification) => true,
+        edgeOffset: MediaQuery.of(context).padding.top,
+        key: indicatorKey,
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          // Refresh the list...
+          await refreshList();
+          // ... and scroll it to the top.
+          try {
+            await PrimaryScrollController.of(context)?.animateTo(0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.ease);
+            // It is not important if [listViewController] is not attached to a ListView.
+          } catch (_) {}
+        },
+        child: Builder(builder: (context) {
+          if (_postsType == PostsType.EXTERNAL_VIEW) {
+            return _delegate!.build(context);
+          } else {
+            return _buildOTListView(context,
+                padding: buildTabBar ? EdgeInsets.zero : null);
+          }
+        }),
       ),
     );
   }

@@ -37,7 +37,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -308,26 +307,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       ),
       body: Builder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-        builder: (context) => Material(
-          child: Container(
-            decoration: _backgroundImage == null
-                ? null
-                : BoxDecoration(
-                    image: DecorationImage(
-                        image: _backgroundImage!, fit: BoxFit.cover)),
-            child: _searchKeyword == null
-                ? RefreshIndicator(
-                    edgeOffset: MediaQuery.of(context).padding.top,
-                    color: Theme.of(context).colorScheme.secondary,
-                    backgroundColor: Theme.of(context).dialogBackgroundColor,
-                    onRefresh: () async {
-                      HapticFeedback.mediumImpact();
-                      await refreshListView();
-                    },
-                    child: pagedListView,
-                  )
-                : pagedListView,
-          ),
+        builder: (context) => Container(
+          decoration: _backgroundImage == null
+              ? null
+              : BoxDecoration(
+                  image: DecorationImage(
+                      image: _backgroundImage!, fit: BoxFit.cover)),
+          child: _searchKeyword == null
+              ? RefreshIndicator(
+                  edgeOffset: MediaQuery.of(context).padding.top,
+                  color: Theme.of(context).colorScheme.secondary,
+                  backgroundColor: Theme.of(context).dialogBackgroundColor,
+                  onRefresh: () async {
+                    HapticFeedback.mediumImpact();
+                    await refreshListView();
+                  },
+                  child: pagedListView,
+                )
+              : pagedListView,
         ),
       ),
     );
@@ -595,13 +592,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
               context: context,
               builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(S.of(context).modify_tag_division),
-                content: ThemedMaterial(
-                  child: Column(
-                    children: [
-                      divisionOptionsView,
-                      OTTagSelector(initialTags: newTagsList),
-                    ],
-                  ),
+                content: Column(
+                  children: [
+                    divisionOptionsView,
+                    OTTagSelector(initialTags: newTagsList),
+                  ],
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(

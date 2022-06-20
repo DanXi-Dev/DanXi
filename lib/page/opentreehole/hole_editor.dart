@@ -32,7 +32,6 @@ import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
@@ -372,13 +371,11 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
             if (widget.allowTags!)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: ThemedMaterial(
-                  child: OTTagSelector(
-                      initialTags: context
-                          .read<FDUHoleProvider>()
-                          .editorCache[widget.editorObject]!
-                          .tags),
-                ),
+                child: OTTagSelector(
+                    initialTags: context
+                        .read<FDUHoleProvider>()
+                        .editorCache[widget.editorObject]!
+                        .tags),
               ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -534,16 +531,15 @@ class BBSEditorPageState extends State<BBSEditorPage> {
       ),
       body: SafeArea(
           bottom: false,
-          child: Material(
-              child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: BBSEditorWidget(
-                    controller: _controller,
-                    allowTags: _supportTags,
-                    editorObject: _object,
-                    fullscreen: _isFullscreen,
-                    tip: _tip,
-                  )))),
+          child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: BBSEditorWidget(
+                controller: _controller,
+                allowTags: _supportTags,
+                editorObject: _object,
+                fullscreen: _isFullscreen,
+                tip: _tip,
+              ))),
     );
   }
 
