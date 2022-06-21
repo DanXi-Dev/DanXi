@@ -25,6 +25,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 const kDuration = Duration(milliseconds: 500);
 const kCurve = Curves.easeInOut;
@@ -146,6 +147,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   List<StateKey<T>> valueKeys = [];
   Future<List<T>?>? _futureData;
 
+  // Item scroll controller used by the list view.
+  final ItemScrollController itemScrollController = ItemScrollController();
+
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
 
@@ -168,11 +172,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
     if (widget.withScrollbar) {
       return NotificationListener<ScrollNotification>(
+        onNotification: scrollToEnd,
         child: WithScrollbar(
           child: _buildListBody(),
           controller: widget.scrollController,
         ),
-        onNotification: scrollToEnd,
       );
     } else {
       return NotificationListener<ScrollNotification>(
@@ -190,14 +194,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           // Handle Scroll To End Requests
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
-              while (currentController!.position.pixels <
-                  currentController!.position.maxScrollExtent) {
-                currentController!
-                    .jumpTo(currentController!.position.maxScrollExtent);
-
-                // TODO: Evil hack to wait for new contents to load
-                await Future.delayed(const Duration(milliseconds: 100));
-              }
+              // Any big enough index number is workable here.
+              itemScrollController.jumpTo(index: _data.length * 2 + 999);
               if (_isEnded) _scrollToEndQueued = false;
             }
           });
@@ -306,10 +304,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         (_isEnded ? 1 : 0) +
         (_hasError ? 1 : 0) +
         (_hasHeadWidget ? 1 : 0);
-    return ListView.builder(
+    return ScrollablePositionedList.builder(
       key: _scrollKey,
       padding: widget.padding,
-      controller: widget.scrollController,
+      itemScrollController: itemScrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
       itemBuilder: (context, index) => _getListItemAt(index, snapshot),
@@ -450,20 +448,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           duration, curve);
 
   scrollToIndex(int index,
-      [Duration duration = kDuration, Curve curve = kCurve]) async {
-    final double itemTop =
-        valueKeys.getRange(0, index).fold<double>(0.0, (value, element) {
-      final RenderBox box =
-          element.currentContext.findRenderObject() as RenderBox;
-      return value + box.size.height;
-    });
-    if (kDuration.inMicroseconds == 0) {
-      currentController!.jumpTo(itemTop);
-    } else {
-      await currentController!
-          .animateTo(itemTop, duration: duration, curve: curve);
-    }
-  }
+          [Duration duration = kDuration, Curve curve = kCurve]) =>
+      itemScrollController.scrollTo(
+          index: index, duration: duration, curve: curve);
 
   Future<void> scrollDelta(double pixels,
           [Duration duration = kDuration, Curve curve = kCurve]) =>
@@ -534,6 +521,7 @@ class PagedListViewController<T> implements ListProvider<T> {
     await _state.scrollToIndex(index, duration, curve);
   }
 
+  @Deprecated("Unable to function after using scrollable_positioned_list.")
   Future<void> scrollDelta(double pixels,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     await _state.scrollDelta(pixels, duration, curve);

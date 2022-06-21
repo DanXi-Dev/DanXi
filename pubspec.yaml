@@ -94,6 +94,7 @@ dependencies:
       url: https://github.com/w568w/keframe
       ref: master
   nil: ^1.1.1
+  scrollable_positioned_list: ^0.3.2
 
 dependency_overrides:
   device_info_plus: ^3.2.1
