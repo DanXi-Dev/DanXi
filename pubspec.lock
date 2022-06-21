@@ -730,9 +730,11 @@ packages:
   keframe:
     dependency: "direct main"
     description:
-      name: keframe
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "8f4934ef56de7928adb64f21cb9def5327cfbb5d"
+      url: "https://github.com/w568w/keframe"
+    source: git
     version: "3.0.0"
   lazy_load_indexed_stack:
     dependency: "direct main"

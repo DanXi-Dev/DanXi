@@ -51,6 +51,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:keframe/keframe.dart';
 import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
@@ -762,58 +763,61 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       }
     }
 
-    return OTFloorWidget(
-      hasBackgroundImage: _backgroundImage != null,
-      floor: floor,
-      index: _searchKeyword == null ? index : null,
-      isInMention: isNested,
-      parentHole: _hole,
-      onLongPress: () {
-        showPlatformModalSheet(
-            context: context,
-            builder: (BuildContext context) => PlatformContextMenu(
-                actions: _buildContextMenu(context, floor),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () => Navigator.of(context).pop(),
-                )));
-      },
-      onTap: () async {
-        if (_searchKeyword == null) {
-          int? replyId;
-          // Set the replyId to null when tapping on the first reply.
-          if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
-            replyId = floor.floor_id;
-            OpenTreeHoleRepository.getInstance().cacheFloor(floor);
+    return FrameSeparateWidget(
+      child: OTFloorWidget(
+        hasBackgroundImage: _backgroundImage != null,
+        floor: floor,
+        index: _searchKeyword == null ? index : null,
+        isInMention: isNested,
+        parentHole: _hole,
+        onLongPress: () {
+          showPlatformModalSheet(
+              context: context,
+              builder: (BuildContext context) => PlatformContextMenu(
+                  actions: _buildContextMenu(context, floor),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(context).cancel),
+                    onPressed: () => Navigator.of(context).pop(),
+                  )));
+        },
+        onTap: () async {
+          if (_searchKeyword == null) {
+            int? replyId;
+            // Set the replyId to null when tapping on the first reply.
+            if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
+              replyId = floor.floor_id;
+              OpenTreeHoleRepository.getInstance().cacheFloor(floor);
+            }
+            if (await OTEditor.createNewReply(
+                context, _hole.hole_id, replyId)) {
+              await refreshListView(scrollToEnd: true);
+            }
+          } else {
+            ProgressFuture progressDialog = showProgressDialog(
+                loadingText: S.of(context).loading, context: context);
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+              "post": await OpenTreeHoleRepository.getInstance()
+                  .loadSpecificHole(floor.hole_id!),
+              "locate": floor
+            });
+            progressDialog.dismiss(showAnim: false);
           }
-          if (await OTEditor.createNewReply(context, _hole.hole_id, replyId)) {
-            await refreshListView(scrollToEnd: true);
-          }
-        } else {
-          ProgressFuture progressDialog = showProgressDialog(
-              loadingText: S.of(context).loading, context: context);
-          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-            "post": await OpenTreeHoleRepository.getInstance()
-                .loadSpecificHole(floor.hole_id!),
-            "locate": floor
+        },
+        onTapImage: (String? url, Object heroTag) {
+          final int length = _listViewController.length();
+          smartNavigatorPush(context, '/image/detail', arguments: {
+            'preview_url': url,
+            'hd_url': OpenTreeHoleRepository.getInstance()
+                .extractHighDefinitionImageUrl(url!),
+            'hero_tag': heroTag,
+            'image_list': extractAllImages(),
+            'loader': loadPageImage,
+            'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
+                ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
+                : length ~/ Constant.POST_COUNT_PER_PAGE
           });
-          progressDialog.dismiss(showAnim: false);
-        }
-      },
-      onTapImage: (String? url, Object heroTag) {
-        final int length = _listViewController.length();
-        smartNavigatorPush(context, '/image/detail', arguments: {
-          'preview_url': url,
-          'hd_url': OpenTreeHoleRepository.getInstance()
-              .extractHighDefinitionImageUrl(url!),
-          'hero_tag': heroTag,
-          'image_list': extractAllImages(),
-          'loader': loadPageImage,
-          'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
-              ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
-              : length ~/ Constant.POST_COUNT_PER_PAGE
-        });
-      },
+        },
+      ),
     );
   }
 
