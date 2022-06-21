@@ -52,6 +52,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
+import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
@@ -735,7 +736,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       {bool isNested = false}) {
     if (_onlyShowDZ &&
         _hole.floors?.first_floor?.anonyname != floor.anonyname) {
-      return const SizedBox();
+      return nil;
     }
 
     Future<List<ImageUrlInfo>?> loadPageImage(
@@ -843,7 +844,6 @@ StatelessWidget smartRender(
     ImageTapCallback? onTapImage,
     bool translucentCard,
     {bool preview = false}) {
-  try {
     return PostRenderWidget(
       render: kMarkdownRender,
       content: preprocessContentForDisplay(content),
@@ -852,7 +852,4 @@ StatelessWidget smartRender(
       hasBackgroundImage: translucentCard,
       isPreviewWidget: preview,
     );
-  } catch (e) {
-    return Text(S.of(context).parse_fatal_error);
-  }
 }

@@ -35,6 +35,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:ical/serializer.dart';
+import 'package:nil/nil.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -314,7 +315,7 @@ class _ExamListState extends State<ExamList> {
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              return const SizedBox();
+              return nil;
             },
             loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
           ),
@@ -436,7 +437,7 @@ class _ExamListState extends State<ExamList> {
                                       _unpackedSemester![semester!].semesterId)
                           : Future.value(_cachedScoreData),
                       loadingBuilder: PlatformCircularProgressIndicator(),
-                      errorBuilder: const SizedBox(),
+                      errorBuilder: nil,
                       successBuilder: (context, snapshot) {
                         if (snapshot.hasData) {
                           _cachedScoreData = snapshot.data;
@@ -462,7 +463,7 @@ class _ExamListState extends State<ExamList> {
                             // If we cannot find such an element, we will build an empty SizedBox.
                           } catch (_) {}
                         }
-                        return const SizedBox();
+                        return nil;
                       },
                     ),
                   )

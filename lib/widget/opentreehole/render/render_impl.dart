@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:nil/nil.dart';
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
@@ -83,7 +84,6 @@ final BaseRender kMarkdownRender = (BuildContext context,
 
   return MarkdownBody(
     softLineBreak: true,
-    //selectable: true,
     data: content!,
     styleSheet: _fontSizeOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
@@ -114,8 +114,8 @@ class MarkdownLatexSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) =>
       SingleChildScrollView(
-          child: Math.tex(element.textContent),
-          scrollDirection: Axis.horizontal);
+          scrollDirection: Axis.horizontal,
+          child: Math.tex(element.textContent));
 }
 
 class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
@@ -194,7 +194,7 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
         _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    imageBuilder: (Uri uri, String? title, String? alt) => const SizedBox(),
+    imageBuilder: (Uri uri, String? title, String? alt) => nil,
   );
 };
 

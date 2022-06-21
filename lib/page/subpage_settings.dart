@@ -57,6 +57,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -632,14 +633,14 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   },
                 ),
                 ListTile(
-                  leading: const SizedBox(),
+                  leading: nil,
                   title: Text(S.of(context).modify_password),
                   onTap: () => BrowserUtil.openUrl(
                       Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
                 ),
               ],
               ListTile(
-                leading: const SizedBox(),
+                leading: nil,
                 title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,
@@ -935,7 +936,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       builder:
                           (BuildContext context, AsyncSnapshot<bool> snapshot) {
                         if (snapshot.hasError || snapshot.data == false) {
-                          return const SizedBox();
+                          return nil;
                         }
                         return TextButton(
                           child: Text(S.of(context).rate),
