@@ -550,6 +550,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     _divisionChangedSubscription.cancel();
   }
 
+  void pageRefresh() {
+    refreshSelf();
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     switch (_postsType) {
