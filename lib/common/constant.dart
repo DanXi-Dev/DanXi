@@ -378,7 +378,7 @@ class Constant {
 
   /// A list of Fudan campus.
   ///
-  /// It is a copy of [Campus.values] excect [Campus.NONE].
+  /// It is a copy of [Campus.values] except [Campus.NONE].
   static const CAMPUS_VALUES = [
     Campus.HANDAN_CAMPUS,
     Campus.FENGLIN_CAMPUS,
