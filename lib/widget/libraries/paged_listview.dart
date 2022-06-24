@@ -306,7 +306,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         (_hasHeadWidget ? 1 : 0);
     return ScrollablePositionedList.builder(
       key: _scrollKey,
-      padding: widget.padding,
+      padding: widget.padding ?? MediaQuery.of(context).padding,
       itemScrollController: itemScrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
