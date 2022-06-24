@@ -18,6 +18,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -65,6 +66,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_CUSTOM_USER_AGENT = "custom_user_agent";
   static const String KEY_BANNER_ENABLED = "banner_enabled";
   static const String KEY_PRIMARY_SWATCH = "primary_swatch";
+  static const String KEY_PREFERRED_LANGUAGE = "language";
 
   SettingsProvider._();
 
@@ -244,6 +246,36 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Language get defaultLanguage{
+    Locale locale = PlatformDispatcher.instance.locale;
+    if(locale.languageCode == 'en') {
+      return Language.ENGLISH;
+    } else if(locale.languageCode == 'ja') {
+      return Language.JAPANESE;
+    } else if(locale.languageCode == 'zh'){
+      return Language.SCHINESE;
+    } else{
+      return Language.NONE;
+    }
+  }
+
+  Language get language{
+    if (preferences!.containsKey(KEY_PREFERRED_LANGUAGE)) {
+      String? value = preferences!.getString(KEY_PREFERRED_LANGUAGE);
+      return Constant.LANGUAGE_VALUES
+          .firstWhere((element) => element.toString() == value, orElse: () {
+        language = defaultLanguage;
+        return defaultLanguage;
+      });
+    }
+    language = defaultLanguage;
+    return defaultLanguage;
+  }
+
+  set language(Language language) {
+    preferences!.setString(KEY_PREFERRED_LANGUAGE, language.toString());
+    notifyListeners();
+  }
   /*Push Token
   String? get lastPushToken {
     if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {

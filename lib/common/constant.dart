@@ -378,12 +378,21 @@ class Constant {
 
   /// A list of Fudan campus.
   ///
-  /// It is a copy of [Campus.values] expect [Campus.NONE].
+  /// It is a copy of [Campus.values] except [Campus.NONE].
   static const CAMPUS_VALUES = [
     Campus.HANDAN_CAMPUS,
     Campus.FENGLIN_CAMPUS,
     Campus.JIANGWAN_CAMPUS,
     Campus.ZHANGJIANG_CAMPUS
+  ];
+
+  ///A list of provided languages
+  ///
+  /// It is a copy of [Language.values] except [Language.NONE].
+  static const LANGUAGE_VALUES = [
+    Language.SCHINESE,
+    Language.ENGLISH,
+    Language.JAPANESE
   ];
 
   /// A default configuration JSON string for setting special days to celebrate
@@ -422,6 +431,13 @@ enum Campus {
   FENGLIN_CAMPUS,
   JIANGWAN_CAMPUS,
   ZHANGJIANG_CAMPUS,
+  NONE
+}
+
+enum Language{
+  SCHINESE,
+  ENGLISH,
+  JAPANESE,
   NONE
 }
 
@@ -470,6 +486,36 @@ extension CampusEx on Campus? {
       // Select area when it's none
       case Campus.NONE:
         return S.of(context!).choose_area;
+      case null:
+        return "?";
+    }
+  }
+}
+
+extension LanguageEx on Language? {
+  static const _LANGUAGE = ["简体中文", "英文", "日语"];
+
+  /// Find the corresponding [Language] from its Chinese name in [_LANGUAGE].
+  static Language fromChineseName(String? name) {
+    for (int i = 0; i < _LANGUAGE.length; i++) {
+      if (name!.contains(_LANGUAGE[i])) {
+        return Constant.LANGUAGE_VALUES[i];
+      }
+    }
+    return Language.NONE;
+  }
+
+  /// Get the i18n name of this language for display.
+  String? displayTitle(BuildContext? context) {
+    switch (this) {
+      case Language.SCHINESE:
+        return S.of(context!).simplified_chinese_languae;
+      case Language.ENGLISH:
+        return S.of(context!).english_languae;
+      case Language.JAPANESE:
+        return S.of(context!).japanese_languae;
+      case Language.NONE:
+        return "?";
       case null:
         return "?";
     }

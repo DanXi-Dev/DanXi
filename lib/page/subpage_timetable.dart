@@ -116,6 +116,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  void pageRefresh() {
+    refreshSelf();
+  }
+
   void _setContent() {
     if (checkGroup(kCompatibleUserGroup)) {
       if (StateProvider.personInfo.value!.group ==

@@ -16,6 +16,7 @@
  */
 
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
@@ -62,6 +63,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../provider/language_manager.dart';
 
 Future<void> updateOTUserProfile(BuildContext context) async {
   try {
@@ -284,6 +287,24 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     return list;
   }
 
+  List<Widget> _buildLanguageList(BuildContext menuContext) {
+    List<Widget> list = [];
+    onTapListener(Language language) {
+      SettingsProvider.getInstance().language = language;
+      LanguageManager(SettingsProvider.getInstance().language).setLanguage();
+      refreshSelf();
+    }
+
+    for (var value in Constant.LANGUAGE_VALUES) {
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(value.displayTitle(menuContext)!),
+        onPressed: () => onTapListener(value),
+      ));
+    }
+    return list;
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     // Load preference fields
@@ -363,7 +384,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ),
                     ]),
                   ),
-
                   // Accessibility
                   Card(
                     child: Column(
