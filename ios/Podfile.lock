@@ -1,6 +1,4 @@
 PODS:
-  - add_2_calendar (0.0.1):
-    - Flutter
   - device_info (0.0.1):
     - Flutter
   - device_info_plus (0.0.1):
@@ -107,7 +105,7 @@ PODS:
   - "GoogleUtilities/NSData+zlib (7.7.0)"
   - GoogleUtilities/Reachability (7.7.0):
     - GoogleUtilities/Logger
-  - image_picker (0.0.1):
+  - image_picker_ios (0.0.1):
     - Flutter
   - in_app_review (0.2.0):
     - Flutter
@@ -128,7 +126,7 @@ PODS:
   - PromisesObjC (2.0.0)
   - quick_actions_ios (0.0.1):
     - Flutter
-  - screen_brightness_ios (0.0.5):
+  - screen_brightness_ios (0.1.0):
     - Flutter
   - screen_capture_event (0.0.1):
     - Flutter
@@ -148,7 +146,6 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - add_2_calendar (from `.symlinks/plugins/add_2_calendar/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -161,7 +158,7 @@ DEPENDENCIES:
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
   - google_mobile_ads (from `.symlinks/plugins/google_mobile_ads/ios`)
-  - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - open_file (from `.symlinks/plugins/open_file/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
@@ -192,8 +189,6 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
-  add_2_calendar:
-    :path: ".symlinks/plugins/add_2_calendar/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
   device_info_plus:
@@ -218,8 +213,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/gallery_saver/ios"
   google_mobile_ads:
     :path: ".symlinks/plugins/google_mobile_ads/ios"
-  image_picker:
-    :path: ".symlinks/plugins/image_picker/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
   in_app_review:
     :path: ".symlinks/plugins/in_app_review/ios"
   open_file:
@@ -246,12 +241,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  add_2_calendar: e9d68636aed37fb18e12f5a3d74c2e0589487af0
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   DKImagePickerController: 72fd378f244cef3d27288e0aebf217a4467e4012
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
-  file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
+  file_picker: 817ab1d8cd2da9d2da412a417162deee3500fc95
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_email_sender: 02d7443217d8c41483223627972bfdc09f74276b
   flutter_fgbg: 31c0d1140a131daea2d342121808f6aa0dcd879d
@@ -266,7 +260,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 71156240babd3cc6ced03e0d54816f01a880c730
   GoogleUserMessagingPlatform: ab890ce5f6620f293a21b6bdd82e416a2c73aeca
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
-  image_picker: 541dcbb3b9cf32d87eacbd957845d8651d6c62c3
+  image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
   in_app_review: 4a97249f7a2f539a0f294c2d9196b7fe35e49541
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
@@ -276,7 +270,7 @@ SPEC CHECKSUMS:
   platform_device_id: 81b3e2993881f87d0c82ef151dc274df4869aef5
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   quick_actions_ios: 622e9076602c57f1f937f1c13e5c59c3379347e9
-  screen_brightness_ios: dd110ebfe9602013ea863d59770a9192ebbb7ac7
+  screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
   screen_capture_event: bcf965bb31968a51c08ad3698725c5ad8c597124
   SDWebImage: 0905f1b7760fc8ac4198cae0036600d67478751e
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
@@ -288,4 +282,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 402ca1dbc65ab091f9caa450e4fdf6d5665fc06e
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
