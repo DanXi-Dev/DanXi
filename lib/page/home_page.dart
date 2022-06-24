@@ -375,7 +375,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (_needSendToWatch &&
         _preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
       sendFduholeTokenToWatch(
-          _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          SettingsProvider.getInstance().fduholeToken!.access!);
       // Only send once.
       _needSendToWatch = false;
     }
@@ -423,7 +423,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           // If we haven't loaded [StateProvider.personInfo]
           if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
             sendFduholeTokenToWatch(
-                _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+                SettingsProvider.getInstance().fduholeToken!.access!);
           } else {
             // Notify that we should send the token to watch later
             _needSendToWatch = true;

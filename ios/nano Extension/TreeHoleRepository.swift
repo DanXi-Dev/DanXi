@@ -18,7 +18,7 @@ func loadHoles<T: Decodable>(token: String, startTime: String?, divisionId: Int?
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
     request.httpMethod = "GET"
-    request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
     URLSession.shared.dataTask(with: request) { data, response, error in
         if (error == nil) {
@@ -41,7 +41,7 @@ func loadDivisions<T: Decodable>(token: String, completion: @escaping (T?, _ err
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
     request.httpMethod = "GET"
-    request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
     URLSession.shared.dataTask(with: request) { data, response, error in
         if (error == nil) {
@@ -67,7 +67,7 @@ func loadFloors<T: Decodable>(token: String, page: Int, discussionId: Int, compl
     components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
     var request = URLRequest(url: components.url!)
     request.httpMethod = "GET"
-    request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
     URLSession.shared.dataTask(with: request) {
         data, response, error in
