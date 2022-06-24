@@ -167,6 +167,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
     return PrimaryScrollController(
       controller: _buildPrimaryScrollController(context),
       child: PlatformScaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           iosContentBottomPadding: widget.needBottomPadding,
           iosContentPadding: widget.needPadding,
           appBar: PlatformAppBar(
