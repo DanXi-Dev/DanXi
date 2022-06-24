@@ -281,7 +281,7 @@ class _BusPageState extends State<BusPage> {
         ));
   }
 
-  List<Widget> _getListWidgets(List<BusScheduleItem>? _filteredBusList) {
+  List<Widget> _getListWidgets(List<BusScheduleItem>? filteredBusList) {
     final currentTime = DateTime.now();
     final format = NumberFormat("00");
     List<Widget> widgets = [
@@ -304,8 +304,8 @@ class _BusPageState extends State<BusPage> {
         ),
       )
     ];
-    if (_filteredBusList == null) return [const SizedBox()];
-    for (var value in _filteredBusList) {
+    if (filteredBusList == null) return [const SizedBox()];
+    for (var value in filteredBusList) {
       if (_showAll ||
           value.realStartTime == null ||
           value.realStartTime!.toExactTime().isAfter(currentTime)) {

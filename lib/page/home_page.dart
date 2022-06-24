@@ -221,7 +221,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     child: PlatformText(S.of(context).retry),
                     onPressed: () {
                       Navigator.pop(context);
-                      _loadDataFromBmob();
+                      _loadDataFromGithubRepo();
                     }),
                 PlatformDialogAction(
                     child: PlatformText(S.of(context).skip),
@@ -230,7 +230,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ));
   }
 
-  void _loadDataFromBmob() {
+  void _loadDataFromGithubRepo() {
     AnnouncementRepository.getInstance().loadAnnouncements().then((value) {
       _loadUpdate().then(
           (value) => _loadAnnouncement().catchError((ignored) {}),
@@ -361,7 +361,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         hashCode);
 
     // Load the latest version, announcement & the start date of the following term.
-    _loadDataFromBmob();
+    _loadDataFromGithubRepo();
     // Configure shortcut listeners on Android & iOS.
     if (PlatformX.isMobile) {
       quickActions.initialize((shortcutType) {

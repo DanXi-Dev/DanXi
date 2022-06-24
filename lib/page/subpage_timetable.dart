@@ -342,51 +342,49 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
     final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
         compact: TableDisplayType.STANDARD, containCourseOtherWeeks: false);
-    return Material(
-      child: RefreshIndicator(
-        key: indicatorKey,
-        edgeOffset: MediaQuery.of(context).padding.top,
-        color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          forceLoadFromRemote = true;
-          HapticFeedback.mediumImpact();
-          await refresh();
-        },
-        child: ListView(
-          // This ListView is a workaround, so that we can apply a custom scroll physics to it.
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            AutoBannerAdWidget(bannerAd: bannerAd),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PlatformIconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: _showingTime!.week > 0 ? goToPrev : null,
-                ),
-                Text(S.of(context).week(_showingTime!.week)),
-                PlatformIconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed:
-                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
-                )
-              ],
-            ),
-            ScheduleView(
-              scheduleData,
-              style,
-              _table!.now(),
-              _showingTime!.week,
-              tapCallback: _onTapCourse,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(S.of(context).semester_start_date),
-              StartDateSelectionButton(
-                  onUpdate: (() => indicatorKey.currentState?.show())),
-            ]),
-          ],
-        ),
+    return RefreshIndicator(
+      key: indicatorKey,
+      edgeOffset: MediaQuery.of(context).padding.top,
+      color: Theme.of(context).colorScheme.secondary,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      onRefresh: () async {
+        forceLoadFromRemote = true;
+        HapticFeedback.mediumImpact();
+        await refresh();
+      },
+      child: ListView(
+        // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          AutoBannerAdWidget(bannerAd: bannerAd),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PlatformIconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: _showingTime!.week > 0 ? goToPrev : null,
+              ),
+              Text(S.of(context).week(_showingTime!.week)),
+              PlatformIconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed:
+                    _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
+              )
+            ],
+          ),
+          ScheduleView(
+            scheduleData,
+            style,
+            _table!.now(),
+            _showingTime!.week,
+            tapCallback: _onTapCourse,
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(S.of(context).semester_start_date),
+            StartDateSelectionButton(
+                onUpdate: (() => indicatorKey.currentState?.show())),
+          ]),
+        ],
       ),
     );
   }
@@ -524,6 +522,14 @@ class StartDateSelectionButton extends StatelessWidget {
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
         if (newDate != null && newDate != startTime) {
+          // Notice user that newDate is not a Monday.
+          if (newDate.weekday != DateTime.monday) {
+            bool? confirmed = await Noticing.showConfirmationDialog(
+                context, S.of(context).semester_start_at_monday);
+            if (confirmed != true) {
+              return;
+            }
+          }
           SettingsProvider.getInstance().thisSemesterStartDate =
               newDate.toIso8601String();
           onUpdate?.call();

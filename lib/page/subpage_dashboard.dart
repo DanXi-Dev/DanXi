@@ -229,10 +229,9 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
               LimitedQueuedInterceptor.getInstance().dropAllRequest();
               triggerRebuildFeatures();
             },
-            child: Material(
-                child: ListView(
+            child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: _buildCards(widgetList),
-            ))));
+            )));
   }
 }

@@ -82,12 +82,11 @@ class _OpenSourceListState extends State<OpenSourceLicenseList> {
     List<Widget> widgets = [];
     if (_items != null) {
       for (var element in _items!) {
-        widgets.add(Material(
-            child: ListTile(
+        widgets.add(ListTile(
           title: Text(element.name),
           subtitle: Text(element.license.licenseName),
           onTap: () => BrowserUtil.openUrl(element.url, context),
-        )));
+        ));
       }
     }
     return widgets;

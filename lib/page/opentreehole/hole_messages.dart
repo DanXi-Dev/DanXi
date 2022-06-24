@@ -119,8 +119,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
             HapticFeedback.mediumImpact();
             await refreshSelf();
           },
-          child: Material(
-              child: PagedListView<OTMessage>(
+          child: PagedListView<OTMessage>(
             startPage: 1,
             pagedController: _listViewController,
             withScrollbar: true,
@@ -143,7 +142,7 @@ class _OTMessagesPageState extends State<OTMessagesPage> {
                 child: Text(S.of(context).no_data),
               ),
             ),
-          )),
+          ),
         ),
       ),
     );

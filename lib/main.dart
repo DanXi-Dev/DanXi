@@ -179,7 +179,7 @@ class DanxiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
     // Replace the global error widget with a simple Text
     if (!kDebugMode) ErrorWidget.builder = errorBuilder;
@@ -187,7 +187,6 @@ class DanxiApp extends StatelessWidget {
     Widget mainApp = PlatformProvider(
       // Uncomment this line below to force the app to use Cupertino Widgets
       // initialPlatform: TargetPlatform.iOS,
-
       // [DynamicThemeController] enables the app to change between dark/light theme without restart
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
@@ -198,43 +197,44 @@ class DanxiApp extends StatelessWidget {
               PlatformX.isCupertino(context), primarySwatch),
           darkTheme:
               Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch),
-          child: PlatformApp(
-            scrollBehavior: TouchMouseScrollBehavior(),
-            debugShowCheckedModeBanner: false,
-            // Fix cupertino UI text color issue by override text color
-            cupertino: (context, __) => CupertinoAppData(
-                theme: CupertinoThemeData(
-                    textTheme: CupertinoTextThemeData(
-                        textStyle: TextStyle(
-                            color: PlatformX.getTheme(context, primarySwatch)
-                                .textTheme
-                                .bodyText1!
-                                .color)))),
-            // Configure i18n delegates
-            localizationsDelegates: const [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            onUnknownRoute: (settings) => throw AssertionError(
-                "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
-            home: PlatformMasterDetailApp(
-              // Configure the page route behaviour of the whole app
-              onGenerateRoute: (settings) {
-                LanguageManager(SettingsProvider.getInstance().language).setLanguage();
-                final Function? pageContentBuilder =
-                    DanxiApp.routes[settings.name!];
-                if (pageContentBuilder != null) {
-                  return platformPageRoute(
-                      context: context,
-                      builder: (context) => pageContentBuilder(context,
-                          arguments: settings.arguments));
-                }
-                return null;
-              },
-              navigatorKey: _navigatorKey,
+          child: Material(
+            child: PlatformApp(
+              scrollBehavior: TouchMouseScrollBehavior(),
+              debugShowCheckedModeBanner: false,
+              // Fix cupertino UI text color issue by override text color
+              cupertino: (context, __) => CupertinoAppData(
+                  theme: CupertinoThemeData(
+                      textTheme: CupertinoTextThemeData(
+                          textStyle: TextStyle(
+                              color: PlatformX.getTheme(context, primarySwatch)
+                                  .textTheme
+                                  .bodyText1!
+                                  .color)))),
+              // Configure i18n delegates
+              localizationsDelegates: const [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              onUnknownRoute: (settings) => throw AssertionError(
+                  "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
+              home: PlatformMasterDetailApp(
+                // Configure the page route behaviour of the whole app
+                onGenerateRoute: (settings) {
+                  final Function? pageContentBuilder =
+                      DanxiApp.routes[settings.name!];
+                  if (pageContentBuilder != null) {
+                    return platformPageRoute(
+                        context: context,
+                        builder: (context) => pageContentBuilder(context,
+                            arguments: settings.arguments));
+                  }
+                  return null;
+                },
+                navigatorKey: navigatorKey,
+              ),
             ),
           ),
         );

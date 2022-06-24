@@ -17,7 +17,6 @@
 
 import 'dart:math';
 
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
 import 'package:flutter/material.dart';
 
@@ -115,26 +114,24 @@ class _TagContainerState extends State<TagContainer> {
     fillRandomColor
         ? randomColorApplier()
         : fixedColorApplier(widget.fixedColor);
-    return ThemedMaterial(
-        child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-            child: widget.wrapped
-                ? Wrap(
-                    spacing: 8,
-                    children: tagList!.map((e) => _buildTag(e)).toList(),
-                  )
-                : SingleChildScrollView(
-                    primary: false,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: tagList!
-                          .map((e) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4),
-                              child: _buildTag(e)))
-                          .toList(),
-                    ),
-                  )));
+    return Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: widget.wrapped
+            ? Wrap(
+                spacing: 8,
+                children: tagList!.map((e) => _buildTag(e)).toList(),
+              )
+            : SingleChildScrollView(
+                primary: false,
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: tagList!
+                      .map((e) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: _buildTag(e)))
+                      .toList(),
+                ),
+              ));
   }
 
   /// Get the background color when [ChoiceChip] is selected.

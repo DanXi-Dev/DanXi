@@ -17,6 +17,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:nil/nil.dart';
 
 /// A helper class to convert [String],[WidgetBuilder],[List<Widget>] or something similar into [Widget].
 class SmartWidget {
@@ -27,7 +28,7 @@ class SmartWidget {
       Widget? child,
       VoidCallback? onStepContinue,
       VoidCallback? onStepCancel}) {
-    fallback ??= const SizedBox();
+    fallback ??= nil;
     if (object == null) return fallback;
 
     if (object is String) {

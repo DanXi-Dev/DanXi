@@ -89,6 +89,8 @@ dependencies:
   flutter_fgbg: ^0.2.0
   lazy_load_indexed_stack: ^0.1.3
   js: ^0.6.4
+  keframe: ^3.0.0
+  nil: ^1.1.1
 
 dependency_overrides:
   device_info_plus: ^3.2.1

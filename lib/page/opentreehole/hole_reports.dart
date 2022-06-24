@@ -87,8 +87,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               _listViewController.notifyUpdate(
                   useInitialData: false, queueDataClear: false);
             },
-            child: Material(
-                child: PagedListView<OTReport>(
+            child: PagedListView<OTReport>(
               startPage: 1,
               pagedController: _listViewController,
               withScrollbar: true,
@@ -105,7 +104,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   child: Text(S.of(context).end_reached),
                 ),
               ),
-            )),
+            ),
           );
         },
       ),

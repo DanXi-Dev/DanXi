@@ -131,8 +131,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
     List<Widget> widgets = [];
     if (_cardInfo!.records != null) {
       for (var element in _cardInfo!.records!) {
-        widgets.add(Material(
-            child: ListTile(
+        widgets.add(ListTile(
           // leading: PlatformX.isMaterial(context)
           //     ? Icon(Icons.monetization_on)
           //     : Icon(CupertinoIcons.money_dollar_circle_fill),
@@ -140,7 +139,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
           trailing: Text(Constant.yuanSymbol(element.payment)),
           subtitle:
               Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
-        )));
+        ));
       }
     }
 

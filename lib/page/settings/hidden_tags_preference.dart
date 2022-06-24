@@ -18,7 +18,6 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
@@ -56,12 +55,9 @@ class _BBSHiddenTagsPreferencePageState
         title: Text(S.of(context).fduhole_hidden_tags_title),
       ),
       body: SafeArea(
-        child:
-            ThemedMaterial(
-          child: OTTagSelector(
-            initialTags: tags,
-            onChanged: () => SettingsProvider.getInstance().hiddenTags = tags,
-          ),
+        child: OTTagSelector(
+          initialTags: tags,
+          onChanged: () => SettingsProvider.getInstance().hiddenTags = tags,
         ),
       ),
     );

@@ -53,7 +53,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     _personInfo = StateProvider.personInfo.value;
     _selectItem = SettingsProvider.getInstance().campus;
     _sliding = _selectItem!.index;
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _onSelectedItemChanged(_selectItem);
     });
   }
