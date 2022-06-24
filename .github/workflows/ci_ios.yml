@@ -53,7 +53,7 @@ jobs:
           git commit -m "[GitHub Action] Bump Build Number"
       
       - name: Push Build Number Update
-        run: git push origin main
+        run: git push origin
 
       - name: Import Keys
         run: |
