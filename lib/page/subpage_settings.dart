@@ -292,7 +292,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     onTapListener(Language language) {
       SettingsProvider.getInstance().language = language;
       LanguageManager(SettingsProvider.getInstance().language).setLanguage();
-      refreshSelf();
       FlutterApp.restartApp(context);
     }
 
