@@ -71,6 +71,11 @@ import WatchConnectivity
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        if #available(iOS 15.0, *) {
+              let displayLink = CADisplayLink(target: self, selector: #selector(step))
+              displayLink.preferredFrameRateRange = CAFrameRateRange(minimum:80, maximum:120, preferred:120)
+              displayLink.add(to: .current, forMode: .default)
+            }
         /* Flutter */
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "fduhole", binaryMessenger: controller.binaryMessenger)
@@ -119,6 +124,10 @@ import WatchConnectivity
         let channel = FlutterMethodChannel(name: "plugins.flutter.io/quick_actions", binaryMessenger: controller! as! FlutterBinaryMessenger)
         channel.invokeMethod("launch", arguments: shortcutItem.type)
     }
+
+    @objc func step(displaylink: CADisplayLink) {
+          // Will be called once a frame has been built while matching desired frame rate
+        }
 }
 
 extension AppDelegate {

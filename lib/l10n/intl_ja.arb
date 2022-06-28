@@ -93,7 +93,7 @@
   "settings": "設定",
   "default_campus": "現在のキャンパス",
   "select_campus": "キャンパス選択",
-  "default_language": "既定の言語",
+  "default_language": "言語",
   "select_language": "言語を選択してください",
   "simplified_chinese_languae": "簡体字中国語",
   "english_languae": "英語",

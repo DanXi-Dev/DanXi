@@ -5,7 +5,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import '../page/home_page.dart';
 import '/common/constant.dart';
 
 class LanguageManager{
@@ -27,10 +26,6 @@ class LanguageManager{
     GlobalMaterialLocalizations.delegate.load(Locale(languageCodeGenerator(SettingsProvider.getInstance().language)));
     GlobalWidgetsLocalizations.delegate.load(Locale(languageCodeGenerator(SettingsProvider.getInstance().language)));
     GlobalCupertinoLocalizations.delegate.load(Locale(languageCodeGenerator(SettingsProvider.getInstance().language)));
-    //Refresh the pages
-    dashboardPageKey.currentState?.triggerRebuildFeatures();
-    timetablePageKey.currentState?.pageRefresh();
-    treeholePageKey.currentState?.pageRefresh();
   }
 
 }

@@ -292,7 +292,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     onTapListener(Language language) {
       SettingsProvider.getInstance().language = language;
       LanguageManager(SettingsProvider.getInstance().language).setLanguage();
-      refreshSelf();
+      FlutterApp.restartApp(context);
     }
 
     for (var value in Constant.LANGUAGE_VALUES) {
@@ -388,6 +388,24 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   Card(
                     child: Column(
                       children: [
+                        ListTile(
+                        title: Text(S.of(context).default_language),
+                        leading: PlatformX.isMaterial(context)
+                            ? const Icon(Icons.language)
+                            : const Icon(CupertinoIcons.globe),
+                        subtitle: Text(SettingsProvider.getInstance()
+                            .language
+                            .displayTitle(context)!),
+                        onTap: () => showPlatformModalSheet(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                PlatformContextMenu(
+                                    actions: _buildLanguageList(context),
+                                    cancelButton: CupertinoActionSheetAction(
+                                        child: Text(S.of(context).cancel),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop()))),
+                      ),
                         Selector<SettingsProvider, bool>(
                           selector: (_, model) =>
                               model.useAccessibilityColoring,
