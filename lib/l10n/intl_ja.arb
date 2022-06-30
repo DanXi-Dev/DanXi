@@ -400,6 +400,7 @@
   "fduhole_show_banner_description": "[実験的] 閲覧に支障のない範囲で、学内活動のお知らせをFDUHoleのページ上部に表示します",
   "theme_color": "テーマ色",
   "theme_color_description": "旦夕のテーマ色を設定する",
+  "theme_color_description_detail": "テーマカラーを切り替えるには、プリセットカラーまたはカスタムカラーを選択します",
   "cant_login": "ログインできない？",
   "login_problem": "ログインできない場合は、dev@fduhole.comまでご連絡ください、またはQQグループ（番号：{QQ}）にご参加ください。 .\n\nその間に、「開発チームのお知らせ」を読んでくださいと、こんな問題が言及されている可能性があります。",
   "copy_qq_group_id": "番号をコピーする",

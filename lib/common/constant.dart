@@ -376,6 +376,24 @@ class Constant {
     return Colors.red;
   }
 
+  static MaterialColor getMaterialColorFromInt(int color){
+    return MaterialColor(
+      int.parse(color.toString()),
+      <int, Color>{
+        50:  Color(int.parse(color.toString())),
+        100: Color(int.parse(color.toString())),
+        200: Color(int.parse(color.toString())),
+        300: Color(int.parse(color.toString())),
+        400: Color(int.parse(color.toString())),
+        500: Color(int.parse(color.toString())),
+        600: Color(int.parse(color.toString())),
+        700: Color(int.parse(color.toString())),
+        800: Color(int.parse(color.toString())),
+        900: Color(int.parse(color.toString())),
+      },
+    );
+  }
+
   /// A list of Fudan campus.
   ///
   /// It is a copy of [Campus.values] except [Campus.NONE].

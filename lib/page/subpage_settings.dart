@@ -431,8 +431,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                 Text(S.of(context).theme_color_description),
                             leading: const Icon(Icons.color_lens),
                             onTap: () async {
-                              String? result =
-                                  await showPlatformDialog<String?>(
+                              MaterialColor? result =
+                                  await showPlatformDialog<MaterialColor?>(
                                 context: context,
                                 builder: (_) => SwatchPickerDialog(
                                   initialSelectedColor: context
@@ -443,8 +443,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               if (result != null) {
                                 context
                                     .read<SettingsProvider>()
-                                    .setPrimarySwatch(result);
+                                    .setPrimarySwatch(int.parse(result.value.toString()));
+                                FlutterApp.restartApp(context);
                               }
+
                             },
                           ),
                       ],

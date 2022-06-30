@@ -435,6 +435,7 @@
   "fduhole_show_banner_description": "[Experimental] Show some non-invasive campaigns and announcements",
   "theme_color": "Theming",
   "theme_color_description": "Customize theme color",
+  "theme_color_description_detail": "Choose a preset color or custom color to switch the theme color",
   "cant_login": "Unable to Login?",
   "login_problem": "If you encounter problems while logging in, please contact us at dev@fduhole.com or QQ group {QQ}.\n\nYou may also want to read Dev Team Announcements in case your problem is a known issue.",
   "copy_qq_group_id": "Copy QQ Group ID",
