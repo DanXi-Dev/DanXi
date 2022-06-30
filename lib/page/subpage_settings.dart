@@ -61,7 +61,6 @@ import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> updateOTUserProfile(BuildContext context) async {
   try {
@@ -239,8 +238,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
       await OpenTreeHoleRepository.getInstance().logout();
     } finally {
       progressDialog.dismiss(showAnim: false);
-      SharedPreferences _preferences = await SharedPreferences.getInstance();
-      _preferences.clear().then((value) => FlutterApp.restartApp(context));
+      SettingsProvider.getInstance()
+          .preferences
+          ?.clear()
+          .then((value) => FlutterApp.restartApp(context));
     }
   }
 
