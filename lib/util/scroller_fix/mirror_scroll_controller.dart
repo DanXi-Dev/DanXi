@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 ///   * [PrimaryScrollController]
 ///   * [PlatformSubpage]
 ///   * [PageWithPrimaryScrollController]
+@Deprecated("You should not use this controller at the moment.")
 class MirrorScrollController extends ScrollController {
   final ScrollController? originController;
   ScrollPosition? _oldPosition;

@@ -46,12 +46,12 @@ import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:dan_xi/widget/scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:keframe/keframe.dart';
 import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
@@ -102,10 +102,10 @@ class BBSPostDetail extends StatefulWidget {
   const BBSPostDetail({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _BBSPostDetailState createState() => _BBSPostDetailState();
+  BBSPostDetailState createState() => BBSPostDetailState();
 }
 
-class _BBSPostDetailState extends State<BBSPostDetail> {
+class BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   late OTHole _hole;
@@ -121,6 +121,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
+
+  late ItemScrollController _itemScrollController;
 
   bool get hasPrefetchedAllData =>
       shouldScrollToEnd ||
@@ -171,7 +173,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (widget.arguments!.containsKey('locate')) {
       locateFloor = widget.arguments!["locate"];
     }
+
     StateProvider.needScreenshotWarning = true;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _itemScrollController = ItemScrollController(
+        scrollController: PrimaryScrollController.of(context));
   }
 
   /// Refresh the list view.
@@ -236,7 +246,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       pagedController: _listViewController,
       noneItem: OTFloor.dummy(),
       withScrollbar: true,
-      scrollController: PrimaryScrollController.of(context),
+      itemScrollController: _itemScrollController,
       dataReceiver: _loadContent,
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
@@ -262,8 +272,8 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: TopController(
-          controller: PrimaryScrollController.of(context),
+        title: TopPositionedController(
+          controller: _itemScrollController,
           child: Text(_searchKeyword == null
               ? "#${_hole.hole_id}"
               : S.of(context).search_result),
@@ -763,68 +773,65 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       }
     }
 
-    return FrameSeparateWidget(
-      child: OTFloorWidget(
-        hasBackgroundImage: _backgroundImage != null,
-        floor: floor,
-        index: _searchKeyword == null ? index : null,
-        isInMention: isNested,
-        parentHole: _hole,
-        onLongPress: () {
-          showPlatformModalSheet(
-              context: context,
-              builder: (BuildContext context) => PlatformContextMenu(
-                  actions: _buildContextMenu(context, floor),
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(S.of(context).cancel),
-                    onPressed: () => Navigator.of(context).pop(),
-                  )));
-        },
-        onTap: () async {
-          if (_searchKeyword == null) {
-            int? replyId;
-            // Set the replyId to null when tapping on the first reply.
-            if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
-              replyId = floor.floor_id;
-              OpenTreeHoleRepository.getInstance().cacheFloor(floor);
-            }
-            if (await OTEditor.createNewReply(
-                context, _hole.hole_id, replyId)) {
-              await refreshListView(scrollToEnd: true);
-            }
-          } else {
-            // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
-            ProgressFuture progressDialog = showProgressDialog(
-                loadingText: S.of(context).loading, context: context);
-            try {
-              OTHole? hole = await OpenTreeHoleRepository.getInstance()
-                  .loadSpecificHole(floor.hole_id!);
-              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                "post": await prefetchAllFloors(hole!),
-                "locate": floor
-              });
-            } catch (e, st) {
-              Noticing.showErrorDialog(context, e, trace: st);
-            } finally {
-              progressDialog.dismiss(showAnim: false);
-            }
+    return OTFloorWidget(
+      hasBackgroundImage: _backgroundImage != null,
+      floor: floor,
+      index: _searchKeyword == null ? index : null,
+      isInMention: isNested,
+      parentHole: _hole,
+      onLongPress: () {
+        showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext context) => PlatformContextMenu(
+                actions: _buildContextMenu(context, floor),
+                cancelButton: CupertinoActionSheetAction(
+                  child: Text(S.of(context).cancel),
+                  onPressed: () => Navigator.of(context).pop(),
+                )));
+      },
+      onTap: () async {
+        if (_searchKeyword == null) {
+          int? replyId;
+          // Set the replyId to null when tapping on the first reply.
+          if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
+            replyId = floor.floor_id;
+            OpenTreeHoleRepository.getInstance().cacheFloor(floor);
           }
-        },
-        onTapImage: (String? url, Object heroTag) {
-          final int length = _listViewController.length();
-          smartNavigatorPush(context, '/image/detail', arguments: {
-            'preview_url': url,
-            'hd_url': OpenTreeHoleRepository.getInstance()
-                .extractHighDefinitionImageUrl(url!),
-            'hero_tag': heroTag,
-            'image_list': extractAllImages(),
-            'loader': loadPageImage,
-            'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
-                ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
-                : length ~/ Constant.POST_COUNT_PER_PAGE
-          });
-        },
-      ),
+          if (await OTEditor.createNewReply(context, _hole.hole_id, replyId)) {
+            await refreshListView(scrollToEnd: true);
+          }
+        } else {
+          // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
+          ProgressFuture progressDialog = showProgressDialog(
+              loadingText: S.of(context).loading, context: context);
+          try {
+            OTHole? hole = await OpenTreeHoleRepository.getInstance()
+                .loadSpecificHole(floor.hole_id!);
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+              "post": await prefetchAllFloors(hole!),
+              "locate": floor
+            });
+          } catch (e, st) {
+            Noticing.showErrorDialog(context, e, trace: st);
+          } finally {
+            progressDialog.dismiss(showAnim: false);
+          }
+        }
+      },
+      onTapImage: (String? url, Object heroTag) {
+        final int length = _listViewController.length();
+        smartNavigatorPush(context, '/image/detail', arguments: {
+          'preview_url': url,
+          'hd_url': OpenTreeHoleRepository.getInstance()
+              .extractHighDefinitionImageUrl(url!),
+          'hero_tag': heroTag,
+          'image_list': extractAllImages(),
+          'loader': loadPageImage,
+          'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
+              ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
+              : length ~/ Constant.POST_COUNT_PER_PAGE
+        });
+      },
     );
   }
 

@@ -58,8 +58,8 @@ class _AAONoticesListState extends State<AAONoticesList> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
-        child: Text(S.of(context).fudan_aao_notices),
         controller: _controller,
+        child: Text(S.of(context).fudan_aao_notices),
       )),
       body: Column(
         children: [

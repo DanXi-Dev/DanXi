@@ -18,6 +18,8 @@
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/widgets.dart';
 
+import '../scrollable_positioned_list/scrollable_positioned_list.dart';
+
 /// A widget that listens to the double tap on its child,
 /// controlling a [ScrollController] or calling [onDoubleTap] method to scroll to the top.
 ///
@@ -30,8 +32,9 @@ class TopController extends StatelessWidget {
   const TopController({Key? key, this.controller, this.onDoubleTap, this.child})
       : super(key: key);
 
-  static scrollToTop(ScrollController? controller) => controller?.animateTo(0,
-      duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  static scrollToTop(ScrollController? controller) =>
+      controller?.animateTo(-controller.initialScrollOffset,
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
 
   @override
   Widget build(BuildContext context) {
@@ -49,5 +52,26 @@ class TopController extends StatelessWidget {
   }
 }
 
-/// An event to notify the sub page to scroll its listview.
-class ScrollToTopEvent {}
+class TopPositionedController extends StatelessWidget {
+  final Widget? child;
+  final ItemScrollController controller;
+  final Function? onDoubleTap;
+
+  const TopPositionedController(
+      {Key? key, required this.controller, this.onDoubleTap, this.child})
+      : super(key: key);
+
+  static scrollToTop(ItemScrollController? controller) =>
+      controller?.jumpTo(index: 0);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onDoubleTap: () {
+        TopPositionedController.scrollToTop(controller);
+        onDoubleTap?.call();
+      },
+      child: child,
+    );
+  }
+}

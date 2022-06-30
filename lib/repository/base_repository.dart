@@ -43,6 +43,7 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
       _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }
     return _dios[linkHost]!;
