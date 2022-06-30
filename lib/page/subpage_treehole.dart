@@ -314,7 +314,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
 
-  BannerAd? bannerAd;
+  Future<BannerAd?>? bannerAd;
 
   FileImage? _backgroundImage;
 
