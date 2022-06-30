@@ -225,12 +225,12 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
   ];
-  BannerAd? myBanner;
+  Future<BannerAd?>? bannerAd;
 
   @override
   void initState() {
     super.initState();
-    myBanner = AdManager.loadBannerAd(3); // 3 for settings page
+    bannerAd = AdManager.loadBannerAd(3); // 3 for settings page
   }
 
   String? _clearCacheSubtitle;
@@ -321,7 +321,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
             child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  AutoBannerAdWidget(bannerAd: myBanner),
+                  AutoBannerAdWidget(bannerAd: bannerAd),
                   //Account Selection
                   Card(
                     child: Column(children: [
@@ -389,23 +389,23 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     child: Column(
                       children: [
                         ListTile(
-                        title: Text(S.of(context).default_language),
-                        leading: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.language)
-                            : const Icon(CupertinoIcons.globe),
-                        subtitle: Text(SettingsProvider.getInstance()
-                            .language
-                            .displayTitle(context)!),
-                        onTap: () => showPlatformModalSheet(
-                            context: context,
-                            builder: (BuildContext context) =>
-                                PlatformContextMenu(
-                                    actions: _buildLanguageList(context),
-                                    cancelButton: CupertinoActionSheetAction(
-                                        child: Text(S.of(context).cancel),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop()))),
-                      ),
+                          title: Text(S.of(context).default_language),
+                          leading: PlatformX.isMaterial(context)
+                              ? const Icon(Icons.language)
+                              : const Icon(CupertinoIcons.globe),
+                          subtitle: Text(SettingsProvider.getInstance()
+                              .language
+                              .displayTitle(context)!),
+                          onTap: () => showPlatformModalSheet(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  PlatformContextMenu(
+                                      actions: _buildLanguageList(context),
+                                      cancelButton: CupertinoActionSheetAction(
+                                          child: Text(S.of(context).cancel),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop()))),
+                        ),
                         Selector<SettingsProvider, bool>(
                           selector: (_, model) =>
                               model.useAccessibilityColoring,

@@ -15,9 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -45,7 +48,7 @@ class AdManager {
   /// ... and later in UI, use
   /// AdWidget(ad: bannerAd)
   ///
-  static BannerAd? loadBannerAd(int index) {
+  static Future<BannerAd?> loadBannerAd(int index) async {
     if (!PlatformX.isMobile) return null;
 
     BannerAd bannerAd;
@@ -70,7 +73,7 @@ class AdManager {
       request: const AdRequest(),
       listener: listener,
     );
-    bannerAd.load();
+    await bannerAd.load();
     return bannerAd;
   }
 }
@@ -78,27 +81,37 @@ class AdManager {
 /// A widget that automatically returns a AdWidget placed in a container
 /// or nothing if user has not opted-in to Ads or [bannerAd] is [null]
 class AutoBannerAdWidget extends StatelessWidget {
-  final BannerAd? bannerAd;
+  final FutureOr<BannerAd?>? bannerAd;
 
   const AutoBannerAdWidget({Key? key, required this.bannerAd})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (SettingsProvider.getInstance().isAdEnabled &&
-        bannerAd != null &&
-        bannerAd!.responseInfo?.responseId != null) {
+    const nullWidget = SizedBox();
+    if (SettingsProvider.getInstance().isAdEnabled && bannerAd != null) {
       const double padding = 8.0;
-      return Center(
-        child: Container(
-          padding: const EdgeInsets.only(bottom: padding),
-          alignment: Alignment.center,
-          width: bannerAd!.size.width.toDouble(),
-          height: bannerAd!.size.height.toDouble() + padding,
-          child: AdWidget(ad: bannerAd!),
-        ),
-      );
+
+      return FutureWidget(
+          future: Future.value(bannerAd),
+          successBuilder:
+              (BuildContext context, AsyncSnapshot<BannerAd?> snapshot) {
+            BannerAd? ad = snapshot.data;
+            return ad != null && ad.responseInfo?.responseId != null
+                ? Center(
+                    child: Container(
+                      padding: const EdgeInsets.only(bottom: padding),
+                      alignment: Alignment.center,
+                      width: ad.size.width.toDouble(),
+                      height: ad.size.height.toDouble() + padding,
+                      child: AdWidget(ad: ad),
+                    ),
+                  )
+                : nullWidget;
+          },
+          errorBuilder: nullWidget,
+          loadingBuilder: nullWidget);
     }
-    return const SizedBox();
+    return nullWidget;
   }
 }

@@ -95,7 +95,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
       StateStreamListener();
   late Map<String, Widget> widgetMap;
 
-  BannerAd? bannerAd;
+  Future<BannerAd?>? bannerAd;
   late NotificationProvider _notificationProvider;
 
   @override
