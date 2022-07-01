@@ -111,7 +111,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   bool forceLoadFromRemote = false;
 
-  BannerAd? bannerAd;
+  Future<BannerAd?>? bannerAd;
 
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
