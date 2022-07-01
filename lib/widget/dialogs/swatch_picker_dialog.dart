@@ -20,6 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:material_color_generator/material_color_generator.dart';
 
 /// A dialog allowing user to choose a swatch color from the list [Constant.TAG_COLOR_LIST].
 class SwatchPickerDialog extends StatefulWidget {
@@ -40,49 +41,16 @@ class _SwatchPickerDialogState extends State<SwatchPickerDialog> {
   @override
   void initState() {
     super.initState();
-    _currentSelected = _intToMaterialColor(widget.initialSelectedColor);
+    _currentSelected =
+        generateMaterialColor(color: Color(widget.initialSelectedColor));
     _finalSelected = _currentSelected;
   }
 
-  //shared_preferences cannot store [Color] or [MaterialColor], so we have to do a
-  //transformation here.
-  MaterialColor _intToMaterialColor(int color) {
-    return MaterialColor(
-      color,
-      <int, Color>{
-        50: Color(color),
-        100: Color(color),
-        200: Color(color),
-        300: Color(color),
-        400: Color(color),
-        500: Color(color),
-        600: Color(color),
-        700: Color(color),
-        800: Color(color),
-        900: Color(color),
-      },
-    );
-  }
-
   void materialColorGenerator(Color color) {
-    _currentSelected = MaterialColor(
-      color.value,
-      <int, Color>{
-        50: Color(color.value),
-        100: Color(color.value),
-        200: Color(color.value),
-        300: Color(color.value),
-        400: Color(color.value),
-        500: Color(color.value),
-        600: Color(color.value),
-        700: Color(color.value),
-        800: Color(color.value),
-        900: Color(color.value),
-      },
-    );
+    _currentSelected = generateMaterialColor(color: color);
   }
 
-  void onWheel(bool oprated) {
+  void onWheel(_) {
     _finalSelected = _currentSelected;
     setState(() => {});
   }
@@ -106,35 +74,34 @@ class _SwatchPickerDialogState extends State<SwatchPickerDialog> {
         children: [
           Expanded(
             flex: 1,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  children: Constant.TAG_COLOR_LIST
-                      .map((e) => GestureDetector(
-                            onTap: () => setState(() =>
-                                _finalSelected = Constant.getColorFromString(e)),
-                            child: CircleAvatar(
-                              backgroundColor: Constant.getColorFromString(e),
-                              child:
-                                  _finalSelected == Constant.getColorFromString(e)
-                                      ? const Icon(Icons.done)
-                                      : null,
-                            ),
-                          ))
-                      .toList(),
-                ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: Constant.TAG_COLOR_LIST
+                    .map((e) => GestureDetector(
+                          onTap: () => setState(() =>
+                              _finalSelected = Constant.getColorFromString(e)),
+                          child: CircleAvatar(
+                            backgroundColor: Constant.getColorFromString(e),
+                            child:
+                                _finalSelected == Constant.getColorFromString(e)
+                                    ? const Icon(Icons.done)
+                                    : null,
+                          ),
+                        ))
+                    .toList(),
               ),
             ),
           ),
           Expanded(
-            flex: 1,
             child: ColorWheelPicker(
-              color: _currentSelected,
+              color: _finalSelected,
               onChanged: materialColorGenerator,
               onWheel: onWheel,
+              shouldUpdate: true,
+              wheelSquarePadding: 8.0,
             ),
           )
         ],
