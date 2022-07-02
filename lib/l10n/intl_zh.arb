@@ -427,6 +427,7 @@
   "fduhole_show_banner_description": "[实验性] 将在树洞页面顶部显示一些不干扰浏览的校园活动公告",
   "theme_color": "主题色",
   "theme_color_description": "切换旦夕的主题配色",
+  "theme_color_description_detail": "选择预设颜色或自定义颜色以切换旦夕主题配色",
   "cant_login": "无法登录？",
   "login_problem": "如果您登录时遇到问题，请联系 dev@fduhole.com 或加入 QQ 群 {QQ}.\n\n与此同时，建议您阅读开发组公告，您遇到的问题可能已经在其中被提及。",
   "copy_qq_group_id": "复制 QQ 群号",

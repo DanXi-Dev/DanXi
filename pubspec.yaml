@@ -91,6 +91,8 @@ dependencies:
   js: ^0.6.4
   keframe: ^3.0.0
   nil: ^1.1.1
+  flex_color_picker: ^2.4.0
+  material_color_generator: ^1.1.0
 
 dependency_overrides:
   device_info_plus: ^3.2.1
