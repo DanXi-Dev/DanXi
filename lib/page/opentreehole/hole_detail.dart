@@ -46,7 +46,6 @@ import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
-import 'package:dan_xi/widget/scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -122,8 +121,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
 
-  late ItemScrollController _itemScrollController;
-
   bool get hasPrefetchedAllData =>
       shouldScrollToEnd ||
       (_hole.floors?.prefetch?.length ?? -1) > Constant.POST_COUNT_PER_PAGE;
@@ -175,13 +172,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
 
     StateProvider.needScreenshotWarning = true;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _itemScrollController = ItemScrollController(
-        scrollController: PrimaryScrollController.of(context));
   }
 
   /// Refresh the list view.
@@ -246,7 +236,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       pagedController: _listViewController,
       noneItem: OTFloor.dummy(),
       withScrollbar: true,
-      itemScrollController: _itemScrollController,
+      scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
@@ -272,8 +262,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        title: TopPositionedController(
-          controller: _itemScrollController,
+        title: TopController(
+          controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
               ? "#${_hole.hole_id}"
               : S.of(context).search_result),

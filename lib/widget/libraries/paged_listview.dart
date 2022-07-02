@@ -26,8 +26,6 @@ import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/material.dart';
 
-import '../scrollable_positioned_list/scrollable_positioned_list.dart';
-
 const kDuration = Duration(milliseconds: 500);
 const kCurve = Curves.easeInOut;
 
@@ -83,8 +81,6 @@ class PagedListView<T> extends StatefulWidget {
   /// The scrollController of the ListView. If not set, it will be PrimaryScrollController.
   final ScrollController? scrollController;
 
-  final ItemScrollController? itemScrollController;
-
   /// Should add a scrollbar or not. If true, [scrollController] may not be null.
   final bool withScrollbar;
 
@@ -119,11 +115,9 @@ class PagedListView<T> extends StatefulWidget {
       this.noneItem,
       this.fatalErrorBuilder,
       this.padding,
-      this.onDismissItem,
-      this.itemScrollController})
-      : assert((!withScrollbar) ||
-            (withScrollbar &&
-                (scrollController != null || itemScrollController != null))),
+      this.onDismissItem})
+      : assert(
+            (!withScrollbar) || (withScrollbar && (scrollController != null))),
         assert(dataReceiver != null || allDataReceiver != null),
         super(key: key);
 
@@ -153,15 +147,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   List<StateKey<T>> valueKeys = [];
   Future<List<T>?>? _futureData;
 
-  // Item scroll controller used by the list view.
-  late ItemScrollController itemScrollController =
-      widget.itemScrollController ??
-          ItemScrollController(scrollController: currentController);
-
   ScrollController? get currentController =>
-      widget.scrollController ??
-      widget.itemScrollController?.scrollController ??
-      PrimaryScrollController.of(context);
+      widget.scrollController ?? PrimaryScrollController.of(context);
 
   @override
   Widget build(BuildContext context) {
@@ -204,9 +191,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           // Handle Scroll To End Requests
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
-              // Any big enough index number is workable here.
-              print("Scroll to the end!");
-              itemScrollController.jumpTo(index: realWidgetCount - 1);
+              currentController
+                  ?.jumpTo(currentController!.position.maxScrollExtent);
               if (_isEnded) _scrollToEndQueued = false;
             }
           });
@@ -306,7 +292,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         //clipBehavior: Clip.none,
         padding: widget.padding,
         key: _scrollKey,
-        controller: widget.scrollController,
+        controller: currentController,
         physics: const AlwaysScrollableScrollPhysics(),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
@@ -317,10 +303,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       );
     }
 
-    return ScrollablePositionedList.builder(
+    return ListView.builder(
       key: _scrollKey,
       padding: widget.padding ?? MediaQuery.of(context).padding,
-      itemScrollController: itemScrollController,
+      controller: currentController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
       itemBuilder: (context, index) => _getListItemAt(index, snapshot),
@@ -500,9 +486,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   int indexOf(T element, [int start = 0]) => _data.indexOf(element, start);
 
   @override
-  int length() {
-    return _data.length;
-  }
+  int length() => _data.length;
 }
 
 class PagedListViewController<T> implements ListProvider<T> {
@@ -528,7 +512,6 @@ class PagedListViewController<T> implements ListProvider<T> {
     try {
       await _state.scrollToItem(item, duration, curve);
     } catch (ignored) {
-      print(ignored);
       return false;
     }
     return true;
@@ -539,7 +522,6 @@ class PagedListViewController<T> implements ListProvider<T> {
     await _state.scrollToIndex(index, duration, curve);
   }
 
-  @Deprecated("Unable to function after using scrollable_positioned_list.")
   Future<void> scrollDelta(double pixels,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     await _state.scrollDelta(pixels, duration, curve);
