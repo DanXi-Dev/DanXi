@@ -462,8 +462,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) {
-    return itemScrollController.scrollTo(
-        index: index, duration: duration, curve: curve);
+    return Scrollable.ensureVisible(valueKeys[index].currentContext,
+        curve: curve,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
+    //return itemScrollController.scrollTo(index: index, duration: duration, curve: curve);
   }
 
   Future<void> scrollDelta(double pixels,
