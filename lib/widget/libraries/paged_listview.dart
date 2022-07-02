@@ -461,10 +461,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           duration, curve);
 
   scrollToIndex(int index,
-      [Duration duration = kDuration, Curve curve = kCurve]) {
-    return Scrollable.ensureVisible(valueKeys[index].currentContext,
-        curve: curve,
-        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
+      [Duration duration = kDuration, Curve curve = kCurve]) async {
+    // Alignment = 1.0 makes the target appear at the bottom
+    // on iOS, the default alignment (top) will make the target obstructed by the App Bar
+    return await Scrollable.ensureVisible(valueKeys[index].currentContext,
+        curve: curve, alignment: 1.0);
     //return itemScrollController.scrollTo(index: index, duration: duration, curve: curve);
   }
 
