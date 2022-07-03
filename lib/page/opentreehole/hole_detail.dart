@@ -101,10 +101,10 @@ class BBSPostDetail extends StatefulWidget {
   const BBSPostDetail({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _BBSPostDetailState createState() => _BBSPostDetailState();
+  BBSPostDetailState createState() => BBSPostDetailState();
 }
 
-class _BBSPostDetailState extends State<BBSPostDetail> {
+class BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   late OTHole _hole;
@@ -170,6 +170,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (widget.arguments!.containsKey('locate')) {
       locateFloor = widget.arguments!["locate"];
     }
+
     StateProvider.needScreenshotWarning = true;
   }
 
@@ -790,14 +791,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             await refreshListView(scrollToEnd: true);
           }
         } else {
+          // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
           ProgressFuture progressDialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
-          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-            "post": await OpenTreeHoleRepository.getInstance()
-                .loadSpecificHole(floor.hole_id!),
-            "locate": floor
-          });
-          progressDialog.dismiss(showAnim: false);
+          try {
+            OTHole? hole = await OpenTreeHoleRepository.getInstance()
+                .loadSpecificHole(floor.hole_id!);
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+              "post": await prefetchAllFloors(hole!),
+              "locate": floor
+            });
+          } catch (e, st) {
+            Noticing.showErrorDialog(context, e, trace: st);
+          } finally {
+            progressDialog.dismiss(showAnim: false);
+          }
         }
       },
       onTapImage: (String? url, Object heroTag) {
@@ -844,12 +852,12 @@ StatelessWidget smartRender(
     ImageTapCallback? onTapImage,
     bool translucentCard,
     {bool preview = false}) {
-    return PostRenderWidget(
-      render: kMarkdownRender,
-      content: preprocessContentForDisplay(content),
-      onTapImage: onTapImage,
-      onTapLink: onTapLink,
-      hasBackgroundImage: translucentCard,
-      isPreviewWidget: preview,
-    );
+  return PostRenderWidget(
+    render: kMarkdownRender,
+    content: preprocessContentForDisplay(content),
+    onTapImage: onTapImage,
+    onTapLink: onTapLink,
+    hasBackgroundImage: translucentCard,
+    isPreviewWidget: preview,
+  );
 }

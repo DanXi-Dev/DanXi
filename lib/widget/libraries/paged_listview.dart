@@ -65,8 +65,8 @@ class PagedListView<T> extends StatefulWidget {
 
   /// The builder to build full-screen error widget.
   /// It will be called only when a [FatalException] is thrown.
-  /// [PagedListView] will simply clear all the data, reset the state,
-  /// and show the widget returned by [fatalErrorBuilder].
+  /// And at that moment, [PagedListView] will simply clear all the data, reset the state,
+  /// and show the widget built by [fatalErrorBuilder].
   final PureValueWidgetBuilder<dynamic>? fatalErrorBuilder;
 
   /// The start number of page index, usually zero to say that the first page is Page 0.
@@ -87,8 +87,8 @@ class PagedListView<T> extends StatefulWidget {
   /// If not null, will use this data source instead. Using this will turn PagedListView into a regular ListView with customizations.
   final Future<List<T>?>? allDataReceiver;
 
-  /// Whether this should scroll to end upon loading complete
-  /// Will be executed only once
+  /// Whether the list view should scroll to end as soon as loading is completed.
+  /// The scroll action will be executed only once.
   final bool? shouldScrollToEnd;
 
   final EdgeInsets? padding;
@@ -116,7 +116,8 @@ class PagedListView<T> extends StatefulWidget {
       this.fatalErrorBuilder,
       this.padding,
       this.onDismissItem})
-      : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
+      : assert(
+            (!withScrollbar) || (withScrollbar && (scrollController != null))),
         assert(dataReceiver != null || allDataReceiver != null),
         super(key: key);
 
@@ -168,11 +169,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
     if (widget.withScrollbar) {
       return NotificationListener<ScrollNotification>(
+        onNotification: scrollToEnd,
         child: WithScrollbar(
           child: _buildListBody(),
-          controller: widget.scrollController,
+          controller: currentController,
         ),
-        onNotification: scrollToEnd,
       );
     } else {
       return NotificationListener<ScrollNotification>(
@@ -190,14 +191,8 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           // Handle Scroll To End Requests
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
-              while (currentController!.position.pixels <
-                  currentController!.position.maxScrollExtent) {
-                currentController!
-                    .jumpTo(currentController!.position.maxScrollExtent);
-
-                // TODO: Evil hack to wait for new contents to load
-                await Future.delayed(const Duration(milliseconds: 100));
-              }
+              currentController
+                  ?.jumpTo(currentController!.position.maxScrollExtent);
               if (_isEnded) _scrollToEndQueued = false;
             }
           });
@@ -281,6 +276,13 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
+  int get realWidgetCount =>
+      _data.length +
+      (_isRefreshing ? 1 : 0) +
+      (_isEnded ? 1 : 0) +
+      (_hasError ? 1 : 0) +
+      (_hasHeadWidget ? 1 : 0);
+
   Widget _buildListView({AsyncSnapshot<List<T>?>? snapshot}) {
     // Show an empty indicator if there's no data at all.
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
@@ -290,7 +292,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         //clipBehavior: Clip.none,
         padding: widget.padding,
         key: _scrollKey,
-        controller: widget.scrollController,
+        controller: currentController,
         physics: const AlwaysScrollableScrollPhysics(),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
@@ -301,15 +303,10 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       );
     }
 
-    final realWidgetCount = _data.length +
-        (_isRefreshing ? 1 : 0) +
-        (_isEnded ? 1 : 0) +
-        (_hasError ? 1 : 0) +
-        (_hasHeadWidget ? 1 : 0);
     return ListView.builder(
       key: _scrollKey,
-      padding: widget.padding,
-      controller: widget.scrollController,
+      padding: widget.padding ?? MediaQuery.of(context).padding,
+      controller: currentController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
       itemBuilder: (context, index) => _getListItemAt(index, snapshot),
@@ -451,18 +448,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    final double itemTop =
-        valueKeys.getRange(0, index).fold<double>(0.0, (value, element) {
-      final RenderBox box =
-          element.currentContext.findRenderObject() as RenderBox;
-      return value + box.size.height;
-    });
-    if (kDuration.inMicroseconds == 0) {
-      currentController!.jumpTo(itemTop);
-    } else {
-      await currentController!
-          .animateTo(itemTop, duration: duration, curve: curve);
-    }
+    // Alignment = 1.0 makes the target appear at the bottom
+    // on iOS, the default alignment (top) will make the target obstructed by the App Bar
+    return await Scrollable.ensureVisible(valueKeys[index].currentContext,
+        curve: curve, alignment: 1.0);
+    //return itemScrollController.scrollTo(index: index, duration: duration, curve: curve);
   }
 
   Future<void> scrollDelta(double pixels,
@@ -496,9 +486,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   int indexOf(T element, [int start = 0]) => _data.indexOf(element, start);
 
   @override
-  int length() {
-    return _data.length;
-  }
+  int length() => _data.length;
 }
 
 class PagedListViewController<T> implements ListProvider<T> {

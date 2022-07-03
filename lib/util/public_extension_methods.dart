@@ -72,7 +72,7 @@ extension ObjectEx on dynamic {
 extension ObjectNullSafetyEx<T> on T? {
   V? apply<V>(V Function(T) applier) {
     if (this != null) {
-      return applier.call(this!);
+      return applier.call(this as T);
     } else {
       return null;
     }
@@ -86,7 +86,7 @@ extension StateEx on State {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {});
-      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         _completer.complete();
       });
       return _completer.future;

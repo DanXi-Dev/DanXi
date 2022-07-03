@@ -59,7 +59,6 @@ import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart' as tray;
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
@@ -91,8 +90,6 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  SharedPreferences? _preferences;
-
   final ScreenCaptureEvent? screenListener =
       PlatformX.isWeb ? null : ScreenCaptureEvent();
 
@@ -201,12 +198,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
       // In case that [_preferences] is still not initialized.
-      if (_preferences != null) {
-        PersonInfo.removeFromSharedPreferences(_preferences!);
-      } else {
-        PersonInfo.removeFromSharedPreferences(
-            await SharedPreferences.getInstance());
-      }
+      PersonInfo.removeFromSharedPreferences(
+          SettingsProvider.getInstance().preferences!);
       FlutterApp.restartApp(context);
     }
   }
@@ -376,9 +369,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     // Configure watch listeners on iOS.
     if (_needSendToWatch &&
-        _preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+        SettingsProvider.getInstance().fduholeToken != null) {
       sendFduholeTokenToWatch(
-          _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          SettingsProvider.getInstance().fduholeToken!.access!);
       // Only send once.
       _needSendToWatch = false;
     }
@@ -423,10 +416,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
           break;
         case 'get_token':
-          // If we haven't loaded [StateProvider.personInfo]
-          if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+          if (SettingsProvider.getInstance().fduholeToken != null) {
             sendFduholeTokenToWatch(
-                _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+                SettingsProvider.getInstance().fduholeToken!.access!);
           } else {
             // Notify that we should send the token to watch later
             _needSendToWatch = true;
@@ -514,15 +506,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ///
   /// If user hasn't logged in before, request him to do so.
   void _loadPersonInfoOrLogin() {
-    _preferences = SettingsProvider.getInstance().preferences;
+    var preferences = SettingsProvider.getInstance().preferences;
 
-    if (PersonInfo.verifySharedPreferences(_preferences!)) {
+    if (PersonInfo.verifySharedPreferences(preferences!)) {
       StateProvider.personInfo.value =
-          PersonInfo.fromSharedPreferences(_preferences!);
+          PersonInfo.fromSharedPreferences(preferences);
       TestLifeCycle.onStart(context);
     } else {
       LoginDialog.showLoginDialog(
-          context, _preferences, StateProvider.personInfo, false);
+          context, preferences, StateProvider.personInfo, false);
     }
   }
 
@@ -537,7 +529,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               leading: Icon(PlatformIcons(context).accountCircle),
               title: Text(S.of(context).login),
               onTap: () => LoginDialog.showLoginDialog(
-                  context, _preferences, StateProvider.personInfo, false),
+                  context,
+                  SettingsProvider.getInstance().preferences,
+                  StateProvider.personInfo,
+                  false),
             ),
           )
         ]),
@@ -545,7 +540,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
-    if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
+    if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences))
+      showDebugBtn(context);
 
     return MultiProvider(
       providers: [ValueListenableProvider.value(value: _pageIndex)],

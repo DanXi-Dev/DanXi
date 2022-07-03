@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.10+178';
+const String version = r'1.3.11+183';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,16 +49,16 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 10;
+const int patch = 11;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'178'];
+const List<String> build = <String>[r'183'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1652963939;
+const int timestamp = 1656574304;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -114,9 +114,9 @@ const Map<String, Object> dependencies = <String, Object>{
   'provider': r'^6.0.2',
   'event_bus': r'^2.0.0',
   'flutter_platform_widgets': r'^1.20.0',
-  'share_plus': r'^3.1.0',
+  'share_plus': r'^4.0.4',
   'path_provider': r'^2.0.9',
-  'screen_brightness': r'^0.1.4',
+  'screen_brightness': r'^0.2.1',
   'flutter_email_sender': r'^5.1.0',
   'auto_size_text': r'^3.0.0',
   'ical': r'^0.2.2',
@@ -137,16 +137,21 @@ const Map<String, Object> dependencies = <String, Object>{
   'linkify': r'^4.0.0',
   'open_file': r'^3.2.1',
   'dio_log': r'^2.0.2',
-  'json_serializable': r'^6.1.4',
+  'json_serializable': r'^6.2.0',
   'photo_view': r'^0.13.0',
   'gallery_saver': r'^2.3.2',
-  'flutter_markdown': r'^0.6.9+1',
-  'markdown': r'^4.0.1',
-  'system_tray': r'^0.1.0',
-  'bitsdojo_window': r'^0.1.1+1',
-  'win32': r'^2.5.1',
+  'flutter_markdown': r'^0.6.10',
+  'markdown': r'^5.0.0',
+  'system_tray': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/antler119/system_tray.git',
+      'ref': r'main',
+    },
+  },
+  'bitsdojo_window': r'^0.1.2',
+  'win32': r'^2.6.1',
   'file_picker': r'^4.5.1',
-  'cached_network_image': r'^3.2.0',
+  'cached_network_image': r'^3.2.1',
   'google_mobile_ads': r'^1.2.0',
   'flutter_typeahead': <String, Object>{
     'git': <String, Object>{
@@ -156,17 +161,24 @@ const Map<String, Object> dependencies = <String, Object>{
   },
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
-  'flutter_layout_grid': r'^1.0.6',
+  'flutter_layout_grid': r'^2.0.1',
   'flutter_js': r'^0.5.0+6',
-  'flutter_math_fork': r'^0.6.1',
+  'flutter_math_fork': r'^0.6.2',
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.6',
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.2',
-  'lunar': r'^1.2.19',
+  'lunar': r'^1.2.20',
   'flutter_fgbg': r'^0.2.0',
   'lazy_load_indexed_stack': r'^0.1.3',
-  'js': r'^0.6.3',
+  'js': r'^0.6.4',
+  'keframe': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/w568w/keframe',
+      'ref': r'master',
+    },
+  },
+  'nil': r'^1.1.1',
 };
 
 /// Developer dependencies
@@ -176,7 +188,7 @@ const Map<String, Object> devDependencies = <String, Object>{
   'flutter_test': <String, Object>{
     'sdk': r'flutter',
   },
-  'flutter_lints': r'^1.0.4',
+  'flutter_lints': r'^2.0.1',
 };
 
 /// Dependency overrides

@@ -30,8 +30,9 @@ class TopController extends StatelessWidget {
   const TopController({Key? key, this.controller, this.onDoubleTap, this.child})
       : super(key: key);
 
-  static scrollToTop(ScrollController? controller) => controller?.animateTo(0,
-      duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  static scrollToTop(ScrollController? controller) =>
+      controller?.animateTo(-controller.initialScrollOffset,
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,3 @@ class TopController extends StatelessWidget {
     );
   }
 }
-
-/// An event to notify the sub page to scroll its listview.
-class ScrollToTopEvent {}
