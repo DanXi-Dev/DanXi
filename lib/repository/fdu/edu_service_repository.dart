@@ -135,7 +135,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Returns an unpacked list of [SemesterInfo].
   Future<List<SemesterInfo>?> loadSemesters(PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
-          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters());
+          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters(),
+          retryTimes: 2);
 
   Future<List<SemesterInfo>?> _loadSemesters() async {
     await dio.get(EXAM_TABLE_URL,
