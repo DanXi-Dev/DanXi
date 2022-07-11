@@ -191,8 +191,14 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           // Handle Scroll To End Requests
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
-              currentController
-                  ?.jumpTo(currentController!.position.maxScrollExtent);
+              while (currentController!.position.pixels <
+                  currentController!.position.maxScrollExtent) {
+                currentController!
+                    .jumpTo(currentController!.position.maxScrollExtent);
+
+                // TODO: Evil hack to wait for new contents to load
+                await Future.delayed(const Duration(milliseconds: 100));
+              }
               if (_isEnded) _scrollToEndQueued = false;
             }
           });

@@ -164,6 +164,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Real JSON Text: {"aaaa":"asdasd"}
   ///
   /// Add a pair of quote on the both sides of every key.
+  /// This requires that no quote is included in the key or value.
   String _normalizeJson(String jsonLikeText) {
     var result = "";
     bool inQuote = false;
