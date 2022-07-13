@@ -259,7 +259,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     for (var value in Constant.CAMPUS_VALUES) {
       list.add(PlatformContextMenuItem(
         menuContext: menuContext,
-        child: Text(value.displayTitle(menuContext)!),
+        child: Text(value.displayTitle(menuContext)),
         onPressed: () => onTapListener(value),
       ));
     }
@@ -299,7 +299,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     for (var value in Constant.LANGUAGE_VALUES) {
       list.add(PlatformContextMenuItem(
         menuContext: menuContext,
-        child: Text(value.displayTitle(menuContext)!),
+        child: Text(value.displayTitle(menuContext)),
         onPressed: () => onTapListener(value),
       ));
     }
@@ -372,7 +372,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             : const Icon(CupertinoIcons.location_fill),
                         subtitle: Text(SettingsProvider.getInstance()
                             .campus
-                            .displayTitle(context)!),
+                            .displayTitle(context)),
                         onTap: () => showPlatformModalSheet(
                             context: context,
                             builder: (BuildContext context) =>
@@ -396,7 +396,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               : const Icon(CupertinoIcons.globe),
                           subtitle: Text(SettingsProvider.getInstance()
                               .language
-                              .displayTitle(context)!),
+                              .displayTitle(context)),
                           onTap: () => showPlatformModalSheet(
                               context: context,
                               builder: (BuildContext context) =>

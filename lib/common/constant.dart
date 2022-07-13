@@ -209,7 +209,7 @@ class Constant {
   /// If [num] is empty, return an empty string.
   static String yuanSymbol(String? num) {
     if (num == null || num.trim().isEmpty) return "";
-    return '\u00A5' + num;
+    return '\u00A5$num';
   }
 
   /// Get the link to update the application.
@@ -390,7 +390,7 @@ class Constant {
   ///
   /// It is a copy of [Language.values] except [Language.NONE].
   static const LANGUAGE_VALUES = [
-    Language.SCHINESE,
+    Language.SIMPLE_CHINESE,
     Language.ENGLISH,
     Language.JAPANESE
   ];
@@ -434,21 +434,18 @@ enum Campus {
   NONE
 }
 
-enum Language{
-  SCHINESE,
-  ENGLISH,
-  JAPANESE,
-  NONE
-}
+enum Language { SIMPLE_CHINESE, ENGLISH, JAPANESE, NONE }
 
 extension CampusEx on Campus? {
   static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
 
   /// Find the corresponding [Campus] from its Chinese name in [_CAMPUS_NAME].
   static Campus fromChineseName(String? name) {
-    for (int i = 0; i < _CAMPUS_NAME.length; i++) {
-      if (name!.contains(_CAMPUS_NAME[i])) {
-        return Constant.CAMPUS_VALUES[i];
+    if (name != null) {
+      for (int i = 0; i < _CAMPUS_NAME.length; i++) {
+        if (name.contains(_CAMPUS_NAME[i])) {
+          return Constant.CAMPUS_VALUES[i];
+        }
       }
     }
     return Campus.NONE;
@@ -473,7 +470,7 @@ extension CampusEx on Campus? {
   }
 
   /// Get the i18n name of this campus for display.
-  String? displayTitle(BuildContext? context) {
+  String displayTitle(BuildContext? context) {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
         return S.of(context!).handan_campus;
@@ -493,12 +490,12 @@ extension CampusEx on Campus? {
 }
 
 extension LanguageEx on Language? {
-  static const _LANGUAGE = ["简体中文", "英文", "日语"];
+  static const _LANGUAGE = ["简体中文", "English", "日本語"];
 
   /// Find the corresponding [Language] from its Chinese name in [_LANGUAGE].
-  static Language fromChineseName(String? name) {
+  static Language fromChineseName(String name) {
     for (int i = 0; i < _LANGUAGE.length; i++) {
-      if (name!.contains(_LANGUAGE[i])) {
+      if (name.contains(_LANGUAGE[i])) {
         return Constant.LANGUAGE_VALUES[i];
       }
     }
@@ -506,9 +503,9 @@ extension LanguageEx on Language? {
   }
 
   /// Get the i18n name of this language for display.
-  String? displayTitle(BuildContext? context) {
+  String displayTitle(BuildContext? context) {
     switch (this) {
-      case Language.SCHINESE:
+      case Language.SIMPLE_CHINESE:
         return S.of(context!).simplified_chinese_languae;
       case Language.ENGLISH:
         return S.of(context!).english_languae;

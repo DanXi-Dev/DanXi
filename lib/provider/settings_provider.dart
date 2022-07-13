@@ -254,7 +254,7 @@ class SettingsProvider with ChangeNotifier {
     } else if(locale.languageCode == 'ja') {
       return Language.JAPANESE;
     } else if(locale.languageCode == 'zh'){
-      return Language.SCHINESE;
+      return Language.SIMPLE_CHINESE;
     } else{
       return Language.NONE;
     }
