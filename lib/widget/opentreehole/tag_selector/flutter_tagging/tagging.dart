@@ -258,8 +258,8 @@ class _FlutterTaggingState<T extends Taggable>
                 borderRadius: conf.splashRadius,
                 onTap: () async {
                   if (widget.onAdded != null) {
-                    final _item = await widget.onAdded!(item);
-                    widget.initialItems.add(_item);
+                    final item = await widget.onAdded!(item);
+                    widget.initialItems.add(item);
                   } else {
                     widget.initialItems.add(item);
                   }

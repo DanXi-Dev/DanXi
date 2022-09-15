@@ -54,7 +54,7 @@ class LoginDialog extends StatefulWidget {
 
   static bool get dialogShown => _isShown;
 
-  static showLoginDialog(BuildContext context, SharedPreferences? _preferences,
+  static showLoginDialog(BuildContext context, SharedPreferences? preferences,
       ValueNotifier<PersonInfo?> personInfo, bool dismissible) async {
     if (_isShown) return;
     _isShown = true;
@@ -62,7 +62,7 @@ class LoginDialog extends StatefulWidget {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => LoginDialog(
-            sharedPreferences: _preferences,
+            sharedPreferences: preferences,
             personInfo: personInfo,
             dismissible: dismissible));
     _isShown = false;
@@ -313,8 +313,8 @@ class _LoginDialogState extends State<LoginDialog> {
                 Navigator.of(context).pop();
               }),
         TextButton(
-          child: Text(S.of(context).login),
           onPressed: _executeLogin,
+          child: Text(S.of(context).login),
         ),
         TextButton(
             onPressed: () {

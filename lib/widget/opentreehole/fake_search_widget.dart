@@ -163,10 +163,10 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String _placeholder = placeholder ??
+    final String placeholder = placeholder ??
         CupertinoLocalizations.of(context).searchTextFieldPlaceholderLabel;
 
-    final TextStyle _placeholderStyle =
+    final TextStyle placeholderStyle =
         placeholderStyle ?? const TextStyle(color: CupertinoColors.systemGrey);
 
     // The icon size will be scaled by a factor of the accessibility text scale,
@@ -176,7 +176,7 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
 
     // If decoration was not provided, create a decoration with the provided
     // background color and border radius.
-    final BoxDecoration _decoration = decoration ??
+    final BoxDecoration decoration = decoration ??
         BoxDecoration(
           color: backgroundColor ?? CupertinoColors.tertiarySystemFill,
           borderRadius: borderRadius ?? _kDefaultBorderRadius,
@@ -209,15 +209,15 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
     );
 
     return CupertinoTextField(
-      decoration: _decoration,
+      decoration: decoration,
       style: style,
       prefix: prefix,
       suffix: suffix,
       onTap: onTap,
       enabled: enabled,
       suffixMode: suffixMode,
-      placeholder: _placeholder,
-      placeholderStyle: _placeholderStyle,
+      placeholder: placeholder,
+      placeholderStyle: placeholderStyle,
       padding: padding,
       onChanged: onChanged,
       onSubmitted: onSubmitted,

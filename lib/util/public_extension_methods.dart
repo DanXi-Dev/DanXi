@@ -82,14 +82,14 @@ extension ObjectNullSafetyEx<T> on T? {
 extension StateEx on State {
   /// Call [setState] to perform a global redrawing of the widget.
   Future<void> refreshSelf() {
-    Completer<void> _completer = Completer();
+    Completer<void> completer = Completer();
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {});
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        _completer.complete();
+        completer.complete();
       });
-      return _completer.future;
+      return completer.future;
     }
     return Future.value();
   }

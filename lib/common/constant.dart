@@ -250,7 +250,7 @@ class Constant {
           color: ThemeData.light().cardColor,
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
       );
     }
@@ -288,7 +288,7 @@ class Constant {
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
         dialogBackgroundColor: const Color.fromRGBO(28, 28, 30, 1.0),
         textTheme: Typography.whiteCupertino,
