@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class FakeCupertinoSearchTextField extends StatelessWidget {
-  const FakeCupertinoSearchTextField({
+  FakeCupertinoSearchTextField({
     Key? key,
     this.controller,
     this.onChanged,
@@ -50,12 +50,12 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
   /// A hint placeholder text that appears when the text entry is empty.
   ///
   /// Defaults to 'Search' localized in each supported language.
-  final String? placeholder;
+  String? placeholder;
 
   /// Sets the style of the placeholder of the text field.
   ///
   /// Defaults to the gray [CupertinoColors.secondaryLabel] iOS color.
-  final TextStyle? placeholderStyle;
+  TextStyle? placeholderStyle;
 
   /// Sets the decoration for the text field.
   ///
@@ -63,7 +63,7 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
   /// [borderRadius] properties, which both have default values. Therefore,
   /// [decoration] has a default value upon building the  It is designed
   /// to mimic the look of a `UISearchTextField`.
-  final BoxDecoration? decoration;
+  BoxDecoration? decoration;
 
   /// Set the [decoration] property's background color.
   ///
@@ -163,11 +163,10 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String placeholder = placeholder ??
+    placeholder ??=
         CupertinoLocalizations.of(context).searchTextFieldPlaceholderLabel;
 
-    final TextStyle placeholderStyle =
-        placeholderStyle ?? const TextStyle(color: CupertinoColors.systemGrey);
+    placeholderStyle ??= const TextStyle(color: CupertinoColors.systemGrey);
 
     // The icon size will be scaled by a factor of the accessibility text scale,
     // to follow the behavior of `UISearchTextField`.
@@ -176,11 +175,10 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
 
     // If decoration was not provided, create a decoration with the provided
     // background color and border radius.
-    final BoxDecoration decoration = decoration ??
-        BoxDecoration(
-          color: backgroundColor ?? CupertinoColors.tertiarySystemFill,
-          borderRadius: borderRadius ?? _kDefaultBorderRadius,
-        );
+    decoration ??= BoxDecoration(
+      color: backgroundColor ?? CupertinoColors.tertiarySystemFill,
+      borderRadius: borderRadius ?? _kDefaultBorderRadius,
+    );
 
     final IconThemeData iconThemeData = IconThemeData(
       color: CupertinoDynamicColor.resolve(itemColor, context),

@@ -630,11 +630,11 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         null) {
                       final ImagePickerProxy picker =
                           ImagePickerProxy.createPicker();
-                      final String? file = await picker.pickImage();
-                      if (file == null) return;
+                      final String? image = await picker.pickImage();
+                      if (image == null) return;
                       final String path =
                           (await getApplicationDocumentsDirectory()).path;
-                      final File file = File(file);
+                      final File file = File(image);
                       final imagePath = '$path/background';
                       await file.copy(imagePath);
                       SettingsProvider.getInstance().backgroundImagePath =

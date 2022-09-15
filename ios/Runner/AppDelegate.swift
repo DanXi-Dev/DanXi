@@ -95,8 +95,12 @@ import WatchConnectivity
                 }
                 // This gets called regardless of whether user grants permission or not.
                 application.registerForRemoteNotifications()
+                result()
             case "send_token":
                 self.sendString(text: call.arguments as! String)
+                result()
+            case "get_tag_suggestions":
+                result()
             default:
                 break
             }
