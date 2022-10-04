@@ -49,7 +49,7 @@ class DioUtils {
       String location = response.headers['location']![0];
       if (location.isEmpty) return response;
       if (!Uri.parse(location).isAbsolute) {
-        location = response.requestOptions.uri.origin + '/' + location;
+        location = '${response.requestOptions.uri.origin}/$location';
       }
       return processRedirect(dio,
           await dio.get(location, options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));

@@ -152,12 +152,12 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
 
   List<Widget> _getListWidgets() {
     Map<String, String> widgetName = Constant.getFeatureName(context);
-    List<Widget> _widgets = [];
+    List<Widget> widgets = [];
 
     for (int index = 0; index < sequence!.length; ++index) {
       // Nonfunctional Widgets
       if (NONFUNCTIONAL_WIDGET_LIST.contains(sequence![index].internalString)) {
-        _widgets.add(Dismissible(
+        widgets.add(Dismissible(
           key: UniqueKey(),
           // Show a red background as the item is swiped away.
           background: Container(color: Colors.red),
@@ -179,7 +179,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
 
       // Custom Widgets
       else if (sequence![index].internalString == 'custom_card') {
-        _widgets.add(
+        widgets.add(
           Dismissible(
             key: UniqueKey(),
             // Show a red background as the item is swiped away.
@@ -214,7 +214,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
 
       // Default widgets
       else {
-        _widgets.add(
+        widgets.add(
           Dismissible(
             key: UniqueKey(),
             confirmDismiss: (_) => Future.value(false),
@@ -238,7 +238,7 @@ class _DashboardReorderPage extends State<DashboardReorderPage> {
         );
       }
     }
-    return _widgets;
+    return widgets;
   }
 
   @override

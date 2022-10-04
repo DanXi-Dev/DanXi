@@ -126,8 +126,8 @@ class ErrorPageWidget extends StatelessWidget {
             Text(errorMessage),
             const SizedBox(height: 8),
             PlatformElevatedButton(
-              child: Text(buttonText),
               onPressed: onTap,
+              child: Text(buttonText),
             ),
             if (error != null) ...[
               const SizedBox(height: 8),

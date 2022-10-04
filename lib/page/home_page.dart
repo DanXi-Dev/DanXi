@@ -540,8 +540,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
-    if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences))
+    if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
       showDebugBtn(context);
+    }
 
     return MultiProvider(
       providers: [ValueListenableProvider.value(value: _pageIndex)],

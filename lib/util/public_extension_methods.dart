@@ -82,20 +82,20 @@ extension ObjectNullSafetyEx<T> on T? {
 extension StateEx on State {
   /// Call [setState] to perform a global redrawing of the widget.
   Future<void> refreshSelf() {
-    Completer<void> _completer = Completer();
+    Completer<void> completer = Completer();
     if (mounted) {
       // ignore: invalid_use_of_protected_member
       setState(() {});
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        _completer.complete();
+        completer.complete();
       });
-      return _completer.future;
+      return completer.future;
     }
     return Future.value();
   }
 }
 
-extension MapEx on Map {
+extension MapEx<K, V> on Map<K, V> {
   /// Encode a map as a url query string.
   String encodeMap() {
     return keys.map((key) {
@@ -104,6 +104,8 @@ extension MapEx on Map {
       return '$k=$v';
     }).join('&');
   }
+
+  V opt(K key, V defaultValue) => containsKey(key) ? this[key]! : defaultValue;
 }
 
 extension ToStr on bool {
