@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -54,6 +55,11 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../util/io/cache.dart';
+import '../widget/dialogs/delete_course_dialog.dart';
+import '../widget/dialogs/manually_add_course_dialog.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -71,6 +77,18 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+        AppBarButtonItem(
+          S.of(cxt).add_courses,
+          Icon(PlatformX.isMaterial(cxt) ? Icons.edit : CupertinoIcons.pen),
+          () => DeleteCourseEvent().fire(),
+        ),
+        AppBarButtonItem(
+          S.of(cxt).add_courses,
+          Icon(PlatformX.isMaterial(cxt)
+              ? Icons.add
+              : CupertinoIcons.add_circled),
+          () => ManuallyAddCourseEvent().fire(),
+        ),
         AppBarButtonItem(
           S.of(cxt).share,
           Icon(PlatformX.isMaterial(cxt)
@@ -92,9 +110,19 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
 class ShareTimetableEvent {}
 
+class ManuallyAddCourseEvent {}
+
+class DeleteCourseEvent {}
+
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
+  final StateStreamListener<ManuallyAddCourseEvent> _addCourseSubscription =
+      StateStreamListener();
+  final StateStreamListener<DeleteCourseEvent> _deleteCourseSubscription =
+      StateStreamListener();
+
+  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
 
   /// A map of all converters.
   ///
@@ -113,6 +141,11 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   Future<BannerAd?>? bannerAd;
 
+  List<Course> newCourses = [];
+
+  List<int> courseAvailableList = <int>[];
+
+  TimeTable? temp;
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
@@ -120,14 +153,33 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     refreshSelf();
   }
 
+  List<Course> getNewCourseList() {
+    SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
+    if (!preferences.containsKey(Constant.KEY_MANUALLY_ADDED_COURSE)) {
+      preferences.setString(Constant.KEY_MANUALLY_ADDED_COURSE, "[]");
+    }
+    String courseList =
+        preferences.getString(Constant.KEY_MANUALLY_ADDED_COURSE)!;
+    print(courseList);
+    List<String>? courseListString = courseList.length <= 2
+        ? []
+        : courseList.substring(0, courseList.length - 2).split(", ");
+    newCourses =
+        courseListString.map((e) => Course.fromJson(jsonDecode("$e"))).toList();
+    return newCourses;
+  }
+
   void _setContent() {
+    newCourses = getNewCourseList();
     if (checkGroup(kCompatibleUserGroup)) {
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value,
-                forceLoadFromRemote: forceLoadFromRemote)));
+                forceLoadFromRemote: forceLoadFromRemote)))
+          ..then((value) =>
+              TimeTable.mergeManuallyAddedCourses(value, newCourses));
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
@@ -154,22 +206,34 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     ],
                   ));
           return controller.text;
-        }, forceLoadFromRemote: forceLoadFromRemote));
+        }, forceLoadFromRemote: forceLoadFromRemote))
+          ..then(
+              (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses))
+          ..then((value) => temp = value);
       } else {
         try {
           _contentFuture = Future.value(
               PostgraduateTimetableRepository.getInstance()
-                  .loadTimeTableLocally());
+                  .loadTimeTableLocally())
+            ..then((value) =>
+                TimeTable.mergeManuallyAddedCourses(value, newCourses))
+            ..then((value) => temp = value);
           // If throw an error, it means we don't have a valid timetable.
         } catch (_) {
           _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-              NotLoginError(S.of(context).postgraduates_need_login)));
+              NotLoginError(S.of(context).postgraduates_need_login)))
+            ..then((value) =>
+                TimeTable.mergeManuallyAddedCourses(value, newCourses))
+            ..then((value) => temp = value);
         }
       }
       forceLoadFromRemote = false;
     } else {
       _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-          NotLoginError(S.of(context).not_fudan_student)));
+          NotLoginError(S.of(context).not_fudan_student)))
+        ..then(
+            (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses))
+        ..then((value) => temp = value);
     }
   }
 
@@ -222,6 +286,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     super.initState();
+    _setContent();
     converters = {
       //S.current.import_into_cal: CalendarImporter(), // Unfinished
       S.current.share_as_ics: ICSConverter()
@@ -241,7 +306,68 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           );
         }),
         hashCode);
-    _setContent();
+    _addCourseSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<ManuallyAddCourseEvent>().listen((_) async {
+          //if (_table == null) return;
+          newCourses = (await Cache.getNew<List<Course>?>(
+              KEY_MANUALLY_ADDED_COURSE,
+              () async => (await showPlatformDialog<Course?>(
+                    context: context,
+                    builder: (_) => ManuallyAddCourseDialog(
+                      courseAvailableList,
+                    ),
+                  )?.then<List<Course>>((course) {
+                    List<Course> oldCourseList = getNewCourseList();
+                    oldCourseList.add(course!);
+                    return oldCourseList;
+                  }))!, (cachedValue) {
+            List<String>? courseListString =
+                cachedValue?.substring(1, cachedValue.length - 1).split(", ");
+            return courseListString
+                ?.map((e) => Course.fromJson(jsonDecode(e)))
+                .toList();
+          }, (object) {
+            String encodedCourseList = "";
+            for (var course in object!) {
+              encodedCourseList =
+                  "$encodedCourseList${jsonEncode(course.toJson())}, ";
+            }
+            return encodedCourseList;
+          }, validate: (_) => false))!;
+        }),
+        hashCode);
+    _deleteCourseSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<DeleteCourseEvent>().listen((_) async {
+          //if (_table == null) return;
+          newCourses = (await Cache.getNew<List<Course>?>(
+              KEY_MANUALLY_ADDED_COURSE,
+              () async => (await showPlatformDialog(
+                    context: context,
+                    builder: (_) => DeleteCourseDialog(newCourses),
+                  )?.then<List<Course>>((course) {
+                    return course;
+                  }))!, (cachedValue) {
+            List<String>? courseListString =
+                cachedValue?.substring(1, cachedValue.length - 1).split(", ");
+            return courseListString
+                ?.map((e) => Course.fromJson(jsonDecode(e)))
+                .toList();
+          }, (object) {
+            String encodedCourseList = "";
+            if (object == null) return "[]";
+            for (var course in object!) {
+              encodedCourseList =
+                  "$encodedCourseList${jsonEncode(course.toJson())}, ";
+            }
+            return encodedCourseList;
+          }, validate: (_) => false))!;
+
+          newCourses = await showPlatformDialog(
+            context: context,
+            builder: (_) => DeleteCourseDialog(newCourses),
+          );
+        }),
+        hashCode);
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
@@ -250,10 +376,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       bool forceReloadFromRemote = false}) async {
     if (forceReloadFromRemote) forceLoadFromRemote = true;
     _setContent();
-
     // If there is no data before, we call setState once to show a ProgressIndicator.
     if (reloadWhenEmptyData) setState(() {});
-
     await _contentFuture;
     setState(() {});
   }
@@ -262,14 +386,21 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   void dispose() {
     super.dispose();
     _shareSubscription.cancel();
+    _addCourseSubscription.cancel();
+    _deleteCourseSubscription.cancel();
   }
 
   @override
   Widget buildPage(BuildContext context) {
     return FutureWidget<TimeTable?>(
       successBuilder:
-          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
-              _buildPage(snapshot.data!),
+          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
+        if (snapshot.hasData) {
+          return _buildPage(snapshot.data!);
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
       future: _contentFuture,
       errorBuilder: (BuildContext context,
               AsyncSnapshot<TimeTable?> snapshot) =>
@@ -393,8 +524,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
 
-  const SemesterSelectionButton({Key? key, this.onSelectionUpdate})
-      : super(key: key);
+  SemesterSelectionButton({Key? key, this.onSelectionUpdate}) : super(key: key);
 
   @override
   _SemesterSelectionButtonState createState() =>

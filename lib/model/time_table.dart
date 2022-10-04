@@ -144,6 +144,20 @@ class TimeTable {
   factory TimeTable.fromJson(Map<String, dynamic> json) =>
       _$TimeTableFromJson(json);
 
+  factory TimeTable.mergeManuallyAddedCourses(
+      TimeTable? formerTimeTable, List<Course?> newCourses) {
+    if(formerTimeTable == null){
+      return TimeTable();
+    }
+    if (newCourses.isEmpty) {
+      return formerTimeTable;
+    }
+    for (var newCourse in newCourses) {
+      formerTimeTable.courses!.add(newCourse!);
+    }
+    return formerTimeTable;
+  }
+
   Map<String, dynamic> toJson() => _$TimeTableToJson(this);
 
   /// Get the date representation in [TimeNow]

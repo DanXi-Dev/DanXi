@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A helper class to cache data locally and load it remotely if necessary.
@@ -65,6 +66,29 @@ class Cache {
       // Fall back to local cache.
       return get(key, fetch, decode, encode,
           validate: (v) => validate!(decode(v)));
+    }
+  }
+
+  static Future<T?> getNew<T>(String key, Future<T> Function() fetch,
+      T Function(String? cachedValue) decode, String Function(T object) encode,
+      {bool Function(String cachedValue)? validate}) async {
+    SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
+    validate ??= (v) => true;
+    if (!preferences.containsKey(key)) {
+      // Reload the cache
+      T newValue = await fetch();
+      if (validate(encode(newValue))) {
+        preferences.setString(key, encode(newValue));
+      }
+      return newValue;
+    }
+    String? result = preferences.getString(key);
+    if (validate(result!)) {
+      return decode(result);
+    } else {
+      T newValue = await fetch();
+      preferences.setString(key, encode(newValue));
+      return newValue;
     }
   }
 }
