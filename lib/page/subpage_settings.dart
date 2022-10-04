@@ -438,13 +438,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                 builder: (_) => SwatchPickerDialog(
                                   initialSelectedColor: context
                                       .read<SettingsProvider>()
-                                      .primarySwatch_V2,
+                                      .primarySwatch,
                                 ),
                               );
                               if (result != null) {
                                 context
                                     .read<SettingsProvider>()
-                                    .setPrimarySwatch_V2(result.value);
+                                    .setPrimarySwatch(result.value);
                                 FlutterApp.restartApp(context);
                               }
                             },
@@ -549,9 +549,9 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     leading: PlatformX.isMaterial(context)
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
-                    subtitle: Text(foldBehaviorFromInternalString(
-                            snapshot.data!.config!.show_folded!)
-                        .displayTitle(context)!),
+                            subtitle: Text(foldBehaviorFromInternalString(
+                                snapshot.data!.config!.show_folded!)
+                                .displayTitle(context)!),
                     onTap: () {
                       showPlatformModalSheet(
                           context: context,

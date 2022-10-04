@@ -461,7 +461,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Primary color used by the app.
-  int get primarySwatch_V2 {
+  int get primarySwatch{
     if (preferences!.containsKey(KEY_PRIMARY_SWATCH_V2)) {
       int? color = preferences!.getInt(KEY_PRIMARY_SWATCH_V2);
       return Color(color!).value;
@@ -470,7 +470,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
-  void setPrimarySwatch_V2(int value) {
+  void setPrimarySwatch(int value) {
     preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
     notifyListeners();
   }
