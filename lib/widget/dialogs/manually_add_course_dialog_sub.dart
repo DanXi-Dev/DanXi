@@ -28,7 +28,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
     int index = 0;
     for (var element in selectedSlots) {
       if (element == true) {
-        newCourseTime?.add(CourseTime(selectedWeekDay, index));
+        newCourseTime.add(CourseTime(selectedWeekDay, index));
       }
       index++;
     }
@@ -53,7 +53,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         child: CircleAvatar(
                           radius: 24.0,
                           backgroundColor: Color(
-                              context.read<SettingsProvider>().primarySwatch),
+                              context.read<SettingsProvider>().primarySwatch_V2),
                           child: e == widget.selectedWeekDay
                               ? const Icon(Icons.done)
                               : Text(
@@ -78,7 +78,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         child: CircleAvatar(
                           radius: 24.0,
                           backgroundColor: Color(
-                              context.read<SettingsProvider>().primarySwatch),
+                              context.read<SettingsProvider>().primarySwatch_V2),
                           child: widget.selectedSlots[e] == true
                               ? const Icon(Icons.done)
                               : Text(

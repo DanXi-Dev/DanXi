@@ -48,7 +48,7 @@ class _DeleteCourseDialogState extends State<DeleteCourseDialog> {
   Widget build(BuildContext context) {
     generateCourseList();
     return PlatformAlertDialog(
-      title: Text(S.of(context).edit),
+      title: Text(S.of(context).delete),
       content: SingleChildScrollView(
           child: Column(
         children: generateCourseList(),
@@ -58,7 +58,7 @@ class _DeleteCourseDialogState extends State<DeleteCourseDialog> {
             child: Text(S.of(context).cancel),
             onPressed: () => {Navigator.pop(context)}),
         PlatformDialogAction(
-            child: Text(S.of(context).delete),
+            child: Text(S.of(context).confirm),
             onPressed: () {
               widget.manuallyAddedCourseList.removeWhere(
                   (element) => toBeDeleted.contains(element.courseName));

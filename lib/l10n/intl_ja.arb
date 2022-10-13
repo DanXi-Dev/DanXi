@@ -332,6 +332,7 @@
   "clear_cache_description": "次回表示時に写真が再ロードされます",
   "cache_cleared": "キャッシュを削除した",
   "delete": "削除",
+  "confirm": "確認",
   "are_you_sure": "削除は大丈夫ですか？",
   "about_to_delete_floor": "#{floor}を削除しようとしている",
   "formula": "[フォーミュラ]",

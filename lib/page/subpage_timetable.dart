@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -55,9 +54,6 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../util/io/cache.dart';
 import '../widget/dialogs/delete_course_dialog.dart';
 import '../widget/dialogs/manually_add_course_dialog.dart';
 
@@ -79,7 +75,7 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
           S.of(cxt).add_courses,
-          Icon(PlatformX.isMaterial(cxt) ? Icons.edit : CupertinoIcons.pen),
+          Icon(PlatformX.isMaterial(cxt) ? Icons.delete : CupertinoIcons.delete),
           () => DeleteCourseEvent().fire(),
         ),
         AppBarButtonItem(
@@ -145,7 +141,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   List<int> courseAvailableList = <int>[];
 
-  TimeTable? temp;
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
@@ -153,33 +148,19 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     refreshSelf();
   }
 
-  List<Course> getNewCourseList() {
-    SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
-    if (!preferences.containsKey(Constant.KEY_MANUALLY_ADDED_COURSE)) {
-      preferences.setString(Constant.KEY_MANUALLY_ADDED_COURSE, "[]");
-    }
-    String courseList =
-        preferences.getString(Constant.KEY_MANUALLY_ADDED_COURSE)!;
-    print(courseList);
-    List<String>? courseListString = courseList.length <= 2
-        ? []
-        : courseList.substring(0, courseList.length - 2).split(", ");
-    newCourses =
-        courseListString.map((e) => Course.fromJson(jsonDecode("$e"))).toList();
-    return newCourses;
+  List<Course> getCourseList() {
+    return SettingsProvider.getInstance().manualAddedCourses;
   }
 
   void _setContent() {
-    newCourses = getNewCourseList();
+    newCourses = getCourseList();
     if (checkGroup(kCompatibleUserGroup)) {
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTable(
                 StateProvider.personInfo.value,
-                forceLoadFromRemote: forceLoadFromRemote)))
-          ..then((value) =>
-              TimeTable.mergeManuallyAddedCourses(value, newCourses));
+                forceLoadFromRemote: forceLoadFromRemote)));
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
@@ -206,35 +187,24 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     ],
                   ));
           return controller.text;
-        }, forceLoadFromRemote: forceLoadFromRemote))
-          ..then(
-              (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses))
-          ..then((value) => temp = value);
+        }, forceLoadFromRemote: forceLoadFromRemote));
       } else {
         try {
           _contentFuture = Future.value(
               PostgraduateTimetableRepository.getInstance()
-                  .loadTimeTableLocally())
-            ..then((value) =>
-                TimeTable.mergeManuallyAddedCourses(value, newCourses))
-            ..then((value) => temp = value);
+                  .loadTimeTableLocally());
           // If throw an error, it means we don't have a valid timetable.
         } catch (_) {
           _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-              NotLoginError(S.of(context).postgraduates_need_login)))
-            ..then((value) =>
-                TimeTable.mergeManuallyAddedCourses(value, newCourses))
-            ..then((value) => temp = value);
+              NotLoginError(S.of(context).postgraduates_need_login)));
         }
       }
       forceLoadFromRemote = false;
     } else {
       _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-          NotLoginError(S.of(context).not_fudan_student)))
-        ..then(
-            (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses))
-        ..then((value) => temp = value);
+          NotLoginError(S.of(context).not_fudan_student)));
     }
+    _contentFuture?.then((value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
   }
 
   void _startShare(
@@ -309,63 +279,29 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     _addCourseSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ManuallyAddCourseEvent>().listen((_) async {
           //if (_table == null) return;
-          newCourses = (await Cache.getNew<List<Course>?>(
-              KEY_MANUALLY_ADDED_COURSE,
-              () async => (await showPlatformDialog<Course?>(
-                    context: context,
-                    builder: (_) => ManuallyAddCourseDialog(
-                      courseAvailableList,
-                    ),
-                  )?.then<List<Course>>((course) {
-                    List<Course> oldCourseList = getNewCourseList();
-                    oldCourseList.add(course!);
-                    return oldCourseList;
-                  }))!, (cachedValue) {
-            List<String>? courseListString =
-                cachedValue?.substring(1, cachedValue.length - 1).split(", ");
-            return courseListString
-                ?.map((e) => Course.fromJson(jsonDecode(e)))
-                .toList();
-          }, (object) {
-            String encodedCourseList = "";
-            for (var course in object!) {
-              encodedCourseList =
-                  "$encodedCourseList${jsonEncode(course.toJson())}, ";
+          newCourses = (await showPlatformDialog<Course?>(
+            context: context,
+            builder: (_) => ManuallyAddCourseDialog(
+              courseAvailableList
+            ),
+          ).then<List<Course>>((course) {
+            List<Course> courseList = getCourseList();
+            if(course == null) {
+              return courseList;
             }
-            return encodedCourseList;
-          }, validate: (_) => false))!;
+            List<Course> newCourseList = courseList + [course];
+            SettingsProvider.getInstance().manualAddedCourses = newCourseList;
+            return newCourseList;
+          }))!;
         }),
         hashCode);
     _deleteCourseSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DeleteCourseEvent>().listen((_) async {
-          //if (_table == null) return;
-          newCourses = (await Cache.getNew<List<Course>?>(
-              KEY_MANUALLY_ADDED_COURSE,
-              () async => (await showPlatformDialog(
-                    context: context,
-                    builder: (_) => DeleteCourseDialog(newCourses),
-                  )?.then<List<Course>>((course) {
-                    return course;
-                  }))!, (cachedValue) {
-            List<String>? courseListString =
-                cachedValue?.substring(1, cachedValue.length - 1).split(", ");
-            return courseListString
-                ?.map((e) => Course.fromJson(jsonDecode(e)))
-                .toList();
-          }, (object) {
-            String encodedCourseList = "";
-            if (object == null) return "[]";
-            for (var course in object!) {
-              encodedCourseList =
-                  "$encodedCourseList${jsonEncode(course.toJson())}, ";
-            }
-            return encodedCourseList;
-          }, validate: (_) => false))!;
-
           newCourses = await showPlatformDialog(
             context: context,
             builder: (_) => DeleteCourseDialog(newCourses),
           );
+          SettingsProvider.getInstance().manualAddedCourses = newCourses;
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page

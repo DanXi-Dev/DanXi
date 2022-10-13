@@ -298,6 +298,7 @@
   "cache_cleared": "Cached cleared",
   "exam_unavailable": "Exam Data Unavailable",
   "delete": "Delete",
+  "confirm": "Confirm",
   "are_you_sure": "Are you sure?",
   "about_to_delete_floor": "You are about to delete floor #{floor}",
   "search": "Search",

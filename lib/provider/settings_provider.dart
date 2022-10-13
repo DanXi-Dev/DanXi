@@ -27,6 +27,7 @@ import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -68,6 +69,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_PRIMARY_SWATCH = "primary_swatch";
   static const String KEY_PRIMARY_SWATCH_V2 = "primary_swatch_v2";
   static const String KEY_PREFERRED_LANGUAGE = "language";
+  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
 
   SettingsProvider._();
 
@@ -226,6 +228,26 @@ class SettingsProvider with ChangeNotifier {
 
   set dashboardWidgetsSequence(List<DashboardCard>? value) {
     preferences!.setString(KEY_DASHBOARD_WIDGETS, jsonEncode(value));
+    notifyListeners();
+  }
+
+  List<Course> get manualAddedCourses {
+    if (preferences!.containsKey(KEY_MANUALLY_ADDED_COURSE)) {
+      var courseList = (json.decode(preferences!.getString(KEY_MANUALLY_ADDED_COURSE)!) as List)
+          .map((i) => Course.fromJson(i))
+          .toList();
+
+      return courseList;
+    }
+    return List<Course>.empty();
+  }
+
+  set manualAddedCourses(List<Course>? value) {
+    if (value != null) {
+      preferences!.setString(KEY_MANUALLY_ADDED_COURSE, jsonEncode(value));
+    } else if (preferences!.containsKey(KEY_MANUALLY_ADDED_COURSE)) {
+      preferences!.remove(KEY_MANUALLY_ADDED_COURSE);
+    }
     notifyListeners();
   }
 
