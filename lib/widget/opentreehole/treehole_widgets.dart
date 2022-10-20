@@ -84,10 +84,10 @@ class OTLeadingTag extends StatelessWidget {
 Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
   if (e == null || e.tags == null) return nil;
-  List<Widget> _tags = [];
+  List<Widget> tags = [];
   for (var element in e.tags!) {
     if (element.name == KEY_NO_TAG) continue;
-    _tags.add(Flex(
+    tags.add(Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -104,7 +104,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
     direction: Axis.horizontal,
     spacing: 4,
     runSpacing: 4,
-    children: _tags,
+    children: tags,
   );
 }
 

@@ -98,9 +98,9 @@ class _ExamListState extends State<ExamList> {
             description:
                 "${element.testCategory} ${element.type}\n${element.note}",
             start:
-                DateTime.parse(element.date + ' ' + element.time.split('~')[0]),
+                DateTime.parse('${element.date} ${element.time.split('~')[0]}'),
             end:
-                DateTime.parse(element.date + ' ' + element.time.split('~')[1]),
+                DateTime.parse('${element.date} ${element.time.split('~')[1]}'),
           ));
         } catch (ignored) {
           Noticing.showNotice(
@@ -221,10 +221,10 @@ class _ExamListState extends State<ExamList> {
               (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
             if (snapshot.error is RangeError) {
               return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Center(
                     child: Text(S.of(context).no_data),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32));
+                  ));
             }
             return _loadGradeViewFromDataCenter();
           });
@@ -253,17 +253,23 @@ class _ExamListState extends State<ExamList> {
   Widget _buildErrorPage(
           BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
       ErrorPageWidget(
-        errorMessage: S.of(context).failed +
-            '\n${S.of(context).need_campus_network}\n\nError:\n' +
-            ErrorPageWidget.generateUserFriendlyDescription(
-                S.of(context), snapshot.error),
+        errorMessage: '${S
+            .of(context)
+            .failed}\n${S
+            .of(context)
+            .need_campus_network}\n\nError:\n${ErrorPageWidget
+            .generateUserFriendlyDescription(
+            S.of(context), snapshot.error)}',
         error: snapshot.error,
         trace: snapshot.stackTrace,
-        onTap: () => setState(() {
-          _semesterFuture = LazyFuture.pack(
-              EduServiceRepository.getInstance().loadSemesters(_info));
-        }),
-        buttonText: S.of(context).retry,
+        onTap: () =>
+            setState(() {
+              _semesterFuture = LazyFuture.pack(
+                  EduServiceRepository.getInstance().loadSemesters(_info));
+            }),
+        buttonText: S
+            .of(context)
+            .retry,
       );
 
   List<Widget> _getListWidgetsGrade(List<ExamScore> scores,

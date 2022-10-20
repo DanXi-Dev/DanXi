@@ -55,7 +55,8 @@ class SlimMaterialBanner extends StatelessWidget {
             Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: PlatformTextButton(
-                    child: Text(actionName!), onPressed: onTapAction))
+                    onPressed: onTapAction,
+                    child: Text(actionName!)))
         ],
       ),
     );

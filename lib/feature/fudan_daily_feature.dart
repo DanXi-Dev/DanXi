@@ -45,10 +45,10 @@ class FudanDailyFeature extends Feature {
 
   //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
 
-  Future<void> _loadTickStatus() async {
+  Future<void> _loadTickStatus() {
     _status = ConnectionStatus.CONNECTING;
     // Get the status of reporting
-    await FudanCOVID19Repository.getInstance()
+    return FudanCOVID19Repository.getInstance()
         .hasTick(StateProvider.personInfo.value)
         .then((bool ticked) {
       _status = ConnectionStatus.DONE;

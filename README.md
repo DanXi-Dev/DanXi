@@ -1,14 +1,23 @@
 中文版 [English Version](README_EN.md)  
-[官方网站](https://danxi.fduhole.com)  
+[官方网站](https://danxi.fduhole.com)
+
+# 暂停开发公告
+
+由于 Flutter 框架在开发中表现出越来越不适应我们需求的兼容性、稳定性和流畅性，旦夕开发组于 2022 年 7 月 20 日 正式决定弃用 Flutter 框架，转向 Android 和 iOS
+原生开发。
+
+现有仓库仅进行维护性更新。新的仓库可在 [这里（Android 端）](https://github.com/DanXi-Dev/DanXi-NG)
+和 [这里（iOS 端，由于含有测试私钥，仓库尚未公开）](https://github.com/DanXi-Dev/DanXi-Swift) 查看。
 
 # 旦夕
+
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
 [![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
-  
+
 （原名旦兮）
 
 日月光华，旦复旦兮.
-  
+
 可能是为 FDUer 准备的,最好的一站式服务 APP!  
 
 - 校园卡余额和消费记录

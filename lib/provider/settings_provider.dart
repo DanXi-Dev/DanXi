@@ -30,7 +30,6 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A class to manage [SharedPreferences] Settings
@@ -276,7 +275,7 @@ class SettingsProvider with ChangeNotifier {
     } else if(locale.languageCode == 'ja') {
       return Language.JAPANESE;
     } else if(locale.languageCode == 'zh'){
-      return Language.SCHINESE;
+      return Language.SIMPLE_CHINESE;
     } else{
       return Language.NONE;
     }
@@ -483,7 +482,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Primary color used by the app.
-  int get primarySwatch_V2 {
+  int get primarySwatch{
     if (preferences!.containsKey(KEY_PRIMARY_SWATCH_V2)) {
       int? color = preferences!.getInt(KEY_PRIMARY_SWATCH_V2);
       return Color(color!).value;
@@ -492,7 +491,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
-  void setPrimarySwatch_V2(int value) {
+  void setPrimarySwatch(int value) {
     preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
     notifyListeners();
   }

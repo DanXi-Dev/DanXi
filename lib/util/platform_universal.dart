@@ -112,7 +112,7 @@ class PlatformX {
       platformImpl.isCupertino(context);
 
   static bool get isDarkMode =>
-      WidgetsBinding.instance!.window.platformBrightness == Brightness.dark;
+      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
 
   static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode;
 }
