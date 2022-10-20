@@ -293,6 +293,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             SettingsProvider.getInstance().manualAddedCourses = newCourseList;
             return newCourseList;
           }))!;
+          refresh();
         }),
         hashCode);
     _deleteCourseSubscription.bindOnlyInvalid(
@@ -302,6 +303,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             builder: (_) => DeleteCourseDialog(newCourses),
           );
           SettingsProvider.getInstance().manualAddedCourses = newCourses;
+          refresh();
         }),
         hashCode);
     bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page

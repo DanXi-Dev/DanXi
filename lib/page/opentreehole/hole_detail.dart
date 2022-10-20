@@ -55,6 +55,8 @@ import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
+import '../../model/opentreehole/history.dart';
+
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
 /// (2) Markdown Images are converted to HTML images.
@@ -390,7 +392,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   List<OTTag> deepCopyTagList(List<OTTag> list) =>
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
+  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e, List<OTHistory>? history) {
     List<Widget> _buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
@@ -642,19 +644,19 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
         ),
-        if (e.history != null && e.history!.isNotEmpty)
+        if (history != null && history!.isNotEmpty)
           PlatformContextMenuItem(
             onPressed: () async {
               StringBuffer content = StringBuffer();
-              for (int i = 0; i < e.history!.length; i++) {
-                var record = e.history![i];
+              for (int i = 0; i < history!.length; i++) {
+                var record = history![i];
                 content.writeln(
-                    S.of(context).history_time(record.altered_time ?? "?"));
+                    S.of(context).history_time(record.time_updated ?? "?"));
                 content.writeln(
-                    S.of(context).history_altered_by(record.altered_by ?? "?"));
+                    S.of(context).history_altered_by(record.user_id ?? "?"));
                 content.writeln(S.of(context).original_content);
                 content.writeln(record.content);
-                if (i < e.history!.length - 1) {
+                if (i < history!.length - 1) {
                   content.writeln("================");
                 }
               }
@@ -769,11 +771,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       index: _searchKeyword == null ? index : null,
       isInMention: isNested,
       parentHole: _hole,
-      onLongPress: () {
+      onLongPress: () async {
+        List<OTHistory>? history = await OpenTreeHoleRepository.getInstance().getHistory(floor.floor_id);
         showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
-                actions: _buildContextMenu(context, floor),
+                actions: _buildContextMenu(context, floor, history),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () => Navigator.of(context).pop(),
