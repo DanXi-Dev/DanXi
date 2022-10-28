@@ -21,13 +21,13 @@ part 'history.g.dart';
 @JsonSerializable()
 class OTHistory {
   String? content;
-  int? altered_by;
-  String? altered_time;
+  int? user_id;
+  String? time_updated;
 
   factory OTHistory.fromJson(Map<String, dynamic> json) =>
       _$OTHistoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$OTHistoryToJson(this);
 
-  OTHistory(this.content, this.altered_by, this.altered_time);
+  OTHistory(this.content, this.user_id, this.time_updated);
 }

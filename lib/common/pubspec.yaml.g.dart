@@ -125,7 +125,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'intl': r'^0.17.0',
   'http': r'^0.13.4',
   'dio': r'^4.0.6',
-  'shared_preferences': r'^2.0.13',
+  'shared_preferences': r'^2.0.15',
   'flutter_phoenix': r'^1.0.0',
   'asn1lib': r'^1.1.0',
   'image_picker': r'^0.8.5',

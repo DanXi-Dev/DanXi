@@ -42,7 +42,7 @@ class HorizontalSelector<T> extends StatelessWidget {
         children: options.map((e) {
           return Builder(builder: (context) {
             if (selectedOption == e) {
-              WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                 Scrollable.ensureVisible(context,
                     duration: kDuration,
                     curve: kCurve,

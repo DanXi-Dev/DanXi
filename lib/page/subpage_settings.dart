@@ -16,7 +16,6 @@
  */
 
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
@@ -629,13 +628,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   onTap: () async {
                     if (SettingsProvider.getInstance().backgroundImagePath ==
                         null) {
-                      final ImagePickerProxy _picker =
+                      final ImagePickerProxy picker =
                           ImagePickerProxy.createPicker();
-                      final String? _file = await _picker.pickImage();
-                      if (_file == null) return;
+                      final String? image = await picker.pickImage();
+                      if (image == null) return;
                       final String path =
                           (await getApplicationDocumentsDirectory()).path;
-                      final File file = File(_file);
+                      final File file = File(image);
                       final imagePath = '$path/background';
                       await file.copy(imagePath);
                       SettingsProvider.getInstance().backgroundImagePath =
@@ -803,8 +802,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
   Card _buildAboutCard(BuildContext context) {
     final inAppReview = InAppReview.instance;
-    final Color _originalDividerColor = Theme.of(context).dividerColor;
-    final double _avatarSize =
+    final Color originalDividerColor = Theme.of(context).dividerColor;
+    final double avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 8;
     final TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
     final TextStyle linkText = Theme.of(context)
@@ -817,8 +816,8 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               minLeadingWidth: 0,
               contentPadding: EdgeInsets.zero,
               leading: Container(
-                  width: _avatarSize,
-                  height: _avatarSize,
+                  width: avatarSize,
+                  height: avatarSize,
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
@@ -851,7 +850,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         textScaleFactor: 1.1,
                       ),
                       Divider(
-                        color: _originalDividerColor,
+                        color: originalDividerColor,
                       ),
                       Text(S.of(context).app_description),
                       const SizedBox(height: 16),
@@ -861,7 +860,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         textScaleFactor: 1.1,
                       ),
                       Divider(
-                        color: _originalDividerColor,
+                        color: originalDividerColor,
                       ),
                       RichText(
                           text: TextSpan(children: [
@@ -897,7 +896,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         S.of(context).acknowledgements,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(color: _originalDividerColor),
+                      Divider(color: originalDividerColor),
                       RichText(
                           text: TextSpan(children: [
                         TextSpan(
@@ -924,7 +923,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         S.of(context).authors,
                         textScaleFactor: 1.1,
                       ),
-                      Divider(color: _originalDividerColor),
+                      Divider(color: originalDividerColor),
                       const SizedBox(height: 4),
                       Row(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,12 +8,12 @@ part of 'history.dart';
 
 OTHistory _$OTHistoryFromJson(Map<String, dynamic> json) => OTHistory(
       json['content'] as String?,
-      json['altered_by'] as int?,
-      json['altered_time'] as String?,
+      json['user_id'] as int?,
+      json['time_updated'] as String?,
     );
 
 Map<String, dynamic> _$OTHistoryToJson(OTHistory instance) => <String, dynamic>{
       'content': instance.content,
-      'altered_by': instance.altered_by,
-      'altered_time': instance.altered_time,
+      'user_id': instance.user_id,
+      'time_updated': instance.time_updated,
     };

@@ -12,44 +12,10 @@
 		3C777C4E7FAED9219A010D6D /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721FF0A0A9F39DC812E3EF3C /* Pods_Runner.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7713EA8F27194CA300219A65 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7713EA8927194C0A00219A65 /* InfoPlist.strings */; };
-		7713EA9027194CA400219A65 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7713EA8927194C0A00219A65 /* InfoPlist.strings */; };
-		8A3542FD269035EF00A6B16E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A3542FC269035EF00A6B16E /* Assets.xcassets */; };
-		8A354304269035EF00A6B16E /* nano Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 8A354303269035EF00A6B16E /* nano Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		8A35430D269035EF00A6B16E /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A35430C269035EF00A6B16E /* ComplicationController.swift */; };
-		8A35430F269035F000A6B16E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A35430E269035F000A6B16E /* Assets.xcassets */; };
-		8A354312269035F000A6B16E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A354311269035F000A6B16E /* Preview Assets.xcassets */; };
-		8A354316269035F000A6B16E /* nano.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8A3542FA269035EE00A6B16E /* nano.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		8A3543202690360600A6B16E /* RunnerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542C6268FFDF200A6B16E /* RunnerApp.swift */; };
-		8A3543212690360600A6B16E /* TreeHoleRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542E8268FFF1300A6B16E /* TreeHoleRepository.swift */; };
-		8A3543222690360600A6B16E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542C4268FFDF200A6B16E /* ContentView.swift */; };
-		8A3543262690371500A6B16E /* TreeHolePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542EA268FFF1F00A6B16E /* TreeHolePage.swift */; };
-		8A3543272690371700A6B16E /* THPostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542E3268FFE9700A6B16E /* THPostDetailView.swift */; };
-		8A3543282690371B00A6B16E /* THPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542E4268FFE9700A6B16E /* THPostView.swift */; };
-		8A3543292690371D00A6B16E /* TreeHoleDetailsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542EB268FFF1F00A6B16E /* TreeHoleDetailsPage.swift */; };
-		8A35432A2690372000A6B16E /* TreeHoleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3542E0268FFE4B00A6B16E /* TreeHoleModels.swift */; };
-		8A35432B2690372400A6B16E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A3542F62690043A00A6B16E /* Localizable.strings */; };
-		8A35433026908A7E00A6B16E /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A35432F26908A7E00A6B16E /* WatchConnectivity.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		8A354305269035EF00A6B16E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8A354302269035EF00A6B16E;
-			remoteInfo = "nano Extension";
-		};
-		8A354314269035F000A6B16E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8A3542F9269035EE00A6B16E;
-			remoteInfo = nano;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8A2CE70C261AA62700F08FC4 /* Embed Watch Content */ = {
@@ -58,20 +24,8 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				8A354316269035F000A6B16E /* nano.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8A35431A269035F000A6B16E /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				8A354304269035EF00A6B16E /* nano Extension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
@@ -115,10 +69,8 @@
 		8A3542EB268FFF1F00A6B16E /* TreeHoleDetailsPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeHoleDetailsPage.swift; sourceTree = "<group>"; };
 		8A3542F52690043A00A6B16E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8A3542F72690043D00A6B16E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		8A3542FA269035EE00A6B16E /* nano.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nano.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A3542FC269035EF00A6B16E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A3542FE269035EF00A6B16E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8A354303269035EF00A6B16E /* nano Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "nano Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A35430C269035EF00A6B16E /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
 		8A35430E269035F000A6B16E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A354311269035F000A6B16E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -137,20 +89,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		07E95D3B874EE14A1B8C8798 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8A354300269035EF00A6B16E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		97C146EB1CF9000F007C117D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -271,8 +209,6 @@
 			isa = PBXGroup;
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
-				8A3542FA269035EE00A6B16E /* nano.app */,
-				8A354303269035EF00A6B16E /* nano Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -297,41 +233,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8A3542F9269035EE00A6B16E /* nano */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8A35431F269035F000A6B16E /* Build configuration list for PBXNativeTarget "nano" */;
-			buildPhases = (
-				8A3542F8269035EE00A6B16E /* Resources */,
-				8A35431A269035F000A6B16E /* Embed App Extensions */,
-				07E95D3B874EE14A1B8C8798 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				8A354306269035EF00A6B16E /* PBXTargetDependency */,
-			);
-			name = nano;
-			productName = nano;
-			productReference = 8A3542FA269035EE00A6B16E /* nano.app */;
-			productType = "com.apple.product-type.application.watchapp2";
-		};
-		8A354302269035EF00A6B16E /* nano Extension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8A35431E269035F000A6B16E /* Build configuration list for PBXNativeTarget "nano Extension" */;
-			buildPhases = (
-				8A3542FF269035EF00A6B16E /* Sources */,
-				8A354300269035EF00A6B16E /* Frameworks */,
-				8A354301269035EF00A6B16E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "nano Extension";
-			productName = "nano Extension";
-			productReference = 8A354303269035EF00A6B16E /* nano Extension.appex */;
-			productType = "com.apple.product-type.watchkit2-extension";
-		};
 		97C146ED1CF9000F007C117D /* Runner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
@@ -349,7 +250,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				8A354315269035F000A6B16E /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -367,12 +267,6 @@
 				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
-					8A3542F9269035EE00A6B16E = {
-						CreatedOnToolsVersion = 12.5.1;
-					};
-					8A354302269035EF00A6B16E = {
-						CreatedOnToolsVersion = 12.5.1;
-					};
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1100;
@@ -395,32 +289,11 @@
 			projectRoot = "";
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
-				8A3542F9269035EE00A6B16E /* nano */,
-				8A354302269035EF00A6B16E /* nano Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		8A3542F8269035EE00A6B16E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8A3542FD269035EF00A6B16E /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8A354301269035EF00A6B16E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8A354312269035F000A6B16E /* Preview Assets.xcassets in Resources */,
-				7713EA9027194CA400219A65 /* InfoPlist.strings in Resources */,
-				8A35432B2690372400A6B16E /* Localizable.strings in Resources */,
-				8A35430F269035F000A6B16E /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		97C146EC1CF9000F007C117D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -506,23 +379,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		8A3542FF269035EF00A6B16E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8A35433026908A7E00A6B16E /* WatchConnectivity.swift in Sources */,
-				8A3543202690360600A6B16E /* RunnerApp.swift in Sources */,
-				8A3543222690360600A6B16E /* ContentView.swift in Sources */,
-				8A3543282690371B00A6B16E /* THPostView.swift in Sources */,
-				8A3543262690371500A6B16E /* TreeHolePage.swift in Sources */,
-				8A3543212690360600A6B16E /* TreeHoleRepository.swift in Sources */,
-				8A35430D269035EF00A6B16E /* ComplicationController.swift in Sources */,
-				8A35432A2690372000A6B16E /* TreeHoleModels.swift in Sources */,
-				8A3543272690371700A6B16E /* THPostDetailView.swift in Sources */,
-				8A3543292690371D00A6B16E /* TreeHoleDetailsPage.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		97C146EA1CF9000F007C117D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -533,20 +389,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		8A354306269035EF00A6B16E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8A354302269035EF00A6B16E /* nano Extension */;
-			targetProxy = 8A354305269035EF00A6B16E /* PBXContainerItemProxy */;
-		};
-		8A354315269035F000A6B16E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = ios;
-			target = 8A3542F9269035EE00A6B16E /* nano */;
-			targetProxy = 8A354314269035F000A6B16E /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		7713EA8927194C0A00219A65 /* InfoPlist.strings */ = {
@@ -676,219 +518,6 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TREE_SHAKE_ICONS = true;
 				VERSIONING_SYSTEM = "apple-generic";
-				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Profile;
-		};
-		8A354317269035F000A6B16E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 185;
-				DEVELOPMENT_TEAM = QZ9KCS2T78;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				IBSC_MODULE = nano_Extension;
-				INFOPLIST_FILE = nano/Info.plist;
-				MARKETING_VERSION = 1.3.3;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development io.github.danxi-dev.dan-xi.watchapp";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Debug;
-		};
-		8A354318269035F000A6B16E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 185;
-				DEVELOPMENT_TEAM = QZ9KCS2T78;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				IBSC_MODULE = nano_Extension;
-				INFOPLIST_FILE = nano/Info.plist;
-				MARKETING_VERSION = 1.3.3;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore io.github.danxi-dev.dan-xi.watchapp";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Release;
-		};
-		8A354319269035F000A6B16E /* Profile */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 185;
-				DEVELOPMENT_TEAM = QZ9KCS2T78;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				IBSC_MODULE = nano_Extension;
-				INFOPLIST_FILE = nano/Info.plist;
-				MARKETING_VERSION = 1.3.3;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development io.github.danxi-dev.dan-xi.watchapp";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Profile;
-		};
-		8A35431B269035F000A6B16E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "nano Extension/nano Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 185;
-				DEVELOPMENT_ASSET_PATHS = "\"nano Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = QZ9KCS2T78;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "nano Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.3.3;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp.watchkitextension";
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development io.github.danxi-dev.dan-xi.watchapp.watchkitextension";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Debug;
-		};
-		8A35431C269035F000A6B16E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "nano Extension/nano Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 185;
-				DEVELOPMENT_ASSET_PATHS = "\"nano Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = QZ9KCS2T78;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "nano Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.3.3;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp.watchkitextension";
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore io.github.danxi-dev.dan-xi.watchapp.watchkitextension";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Release;
-		};
-		8A35431D269035F000A6B16E /* Profile */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "nano Extension/nano Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 185;
-				DEVELOPMENT_ASSET_PATHS = "\"nano Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = QZ9KCS2T78;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "nano Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.3.3;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.danxi-dev.dan-xi.watchapp.watchkitextension";
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development io.github.danxi-dev.dan-xi.watchapp.watchkitextension";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 7.0;
 			};
 			name = Profile;
@@ -1079,26 +708,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8A35431E269035F000A6B16E /* Build configuration list for PBXNativeTarget "nano Extension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8A35431B269035F000A6B16E /* Debug */,
-				8A35431C269035F000A6B16E /* Release */,
-				8A35431D269035F000A6B16E /* Profile */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8A35431F269035F000A6B16E /* Build configuration list for PBXNativeTarget "nano" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8A354317269035F000A6B16E /* Debug */,
-				8A354318269035F000A6B16E /* Release */,
-				8A354319269035F000A6B16E /* Profile */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
