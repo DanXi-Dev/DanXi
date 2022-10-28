@@ -147,10 +147,10 @@ class PlatformPopupMenuX extends StatelessWidget {
           ? null
           : CupertinoActionSheetAction(
               key: cancelData.key,
-              child: cancelData.child,
               isDefaultAction: cancelData.isDefaultAction ?? false,
               isDestructiveAction: cancelData.isDestructiveAction ?? false,
               onPressed: cancelData.onPressed ?? () => Navigator.pop(context),
+              child: cancelData.child,
             ),
     );
   }
@@ -181,7 +181,6 @@ class PlatformPopupMenuX extends StatelessWidget {
                   );
                 },
               ).toList(),
-      child: data?.child,
       color: data?.color,
       elevation: data?.elevation,
       enableFeedback: data?.enableFeedback,
@@ -193,6 +192,7 @@ class PlatformPopupMenuX extends StatelessWidget {
       onCanceled: data?.onCanceled,
       padding: data?.padding ?? const EdgeInsets.all(8.0),
       shape: data?.shape,
+      child: data?.child,
     );
   }
 }

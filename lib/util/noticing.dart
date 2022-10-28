@@ -85,8 +85,8 @@ class Noticing {
                       ),
                 actions: customActions
                         .map((e) => PlatformDialogAction(
-                            child: PlatformText(e.text),
-                            onPressed: e.onPressed))
+                            onPressed: e.onPressed,
+                            child: PlatformText(e.text)))
                         .toList() +
                     [
                       PlatformDialogAction(

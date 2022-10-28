@@ -78,8 +78,8 @@ class OTWelcomeWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: PlatformElevatedButton(
-                child: Text(S.of(context).login),
                 onPressed: loginCallback,
+                child: Text(S.of(context).login),
               ),
             ),
           ],

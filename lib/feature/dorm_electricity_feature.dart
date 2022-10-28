@@ -98,14 +98,16 @@ class DormElectricityFeature extends Feature {
   @override
   void onTap() {
     if (_status == ConnectionStatus.DONE) {
-      final String body = _electricity!.dormName +
-          '\n' +
-          S.of(context!).dorm_electricity_subtitle(
-              _electricity!.available, _electricity!.used) +
-          '\n\n' +
-          S.of(context!).last_updated(_electricity!.updateTime.toString());
+      final String body = '${_electricity?.dormName}\n${S
+          .of(context!)
+          .dorm_electricity_subtitle(
+          _electricity!.available, _electricity!.used)}\n\n${S
+          .of(context!)
+          .last_updated(_electricity!.updateTime.toString())}';
       Noticing.showModalNotice(context!,
-          message: body, title: S.of(context!).dorm_electricity);
+          message: body, title: S
+              .of(context!)
+              .dorm_electricity);
     } else {
       refreshData();
     }

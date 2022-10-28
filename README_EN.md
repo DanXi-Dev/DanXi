@@ -1,14 +1,27 @@
 [中文版](README.md) English Version  
-[Official Website(Chinese Only)](https://danxi.fduhole.com)  
+[Official Website(Chinese Only)](https://danxi.fduhole.com)
+
+# Maintenance Notice
+
+As the Flutter framework has shown incompatibility, instability, and low performance in our
+development, DanXi-Dev officially decided to abandon Flutter and move to Android and iOS native
+development on July 20, 2022.
+
+This repository will only be updated for maintenance purposes. You can browse new
+repository [here (for Android)](https://github.com/DanXi-Dev/DanXi-NG)
+and [here (for iOS, not public for secure reasons)](https://github.com/DanXi-Dev/DanXi-Swift).
+
 # DanXi
+
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
-[![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)  
-  
+[![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
+
 > **CAUTION**   
 > The English version of README may not be synchronized with [the Chinese one](README.md).
 
-日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
-  
+日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and
+again.)
+
 Maybe the best all-rounded service app for Fudan University students!
 
 **DanXi only support Chinese (Simplified) and English language at the moment. Come to help us!**

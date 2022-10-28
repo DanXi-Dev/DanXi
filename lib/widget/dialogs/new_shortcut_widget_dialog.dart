@@ -48,7 +48,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
 
   void _save() async {
     if (!_linkTextFieldController.text.startsWith('http')) {
-      _linkTextFieldController.text = 'http://' + _linkTextFieldController.text;
+      _linkTextFieldController.text = 'http://${_linkTextFieldController.text}';
     }
     // Validate URL
     try {

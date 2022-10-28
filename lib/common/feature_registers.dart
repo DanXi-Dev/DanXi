@@ -18,6 +18,7 @@
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 
 /// A global register table of [Feature], which declares its compatible user groups here.
 Map<String, List<UserGroup>> _kRegister = {};
@@ -32,13 +33,8 @@ void registerFeature(Feature feature,
 }
 
 /// Check whether the [group] can use [feature].
-bool checkFeature(Feature feature, UserGroup group) {
-  if (_kRegister.containsKey(feature.runtimeType.toString())) {
-    return _kRegister[feature.runtimeType.toString()]!.contains(group);
-  } else {
-    return false;
-  }
-}
+bool checkFeature(Feature feature, UserGroup group) =>
+    _kRegister.opt(feature.runtimeType.toString(), []).contains(group);
 
 /// Check whether [info] is in the [groups].
 ///

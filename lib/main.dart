@@ -63,9 +63,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:material_color_generator/material_color_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
-import 'package:material_color_generator/material_color_generator.dart';
 
 import 'common/constant.dart';
 
@@ -189,8 +189,8 @@ class DanxiApp extends StatelessWidget {
       // [DynamicThemeController] enables the app to change between dark/light theme without restart
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
-            context.select<SettingsProvider, MaterialColor>(
-                (value) => generateMaterialColor(color:Color(value.primarySwatch_V2)));
+            context.select<SettingsProvider, MaterialColor>((value) =>
+                generateMaterialColor(color: Color(value.primarySwatch_V2)));
         return DynamicThemeController(
           lightTheme: Constant.lightTheme(
               PlatformX.isCupertino(context), primarySwatch),
