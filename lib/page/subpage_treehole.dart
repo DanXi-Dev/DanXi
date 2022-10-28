@@ -379,7 +379,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await OpenTreeHoleRepository.getInstance()
-            .getFavoriteHoleId(forceUpdate: true);
+            .getFavoriteHoleId();
       } else if (context.read<FDUHoleProvider>().isUserInitialized) {
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);

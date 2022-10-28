@@ -71,6 +71,8 @@ class Constant {
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://www.fduhole.com/#/forgetpassword";
 
+  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
+
   /// The default start date of a semester.
   // ignore: non_constant_identifier_names
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2022, 2, 21);
@@ -202,6 +204,12 @@ class Constant {
             S.of(context).Frankstein73_description),
         Developer("Ivan Fei", "assets/graphics/ivanfei.jpg",
             "https://github.com/ivanfei-1", S.of(context).ivanfei_description),
+        Developer("Boreas618", "assets/graphics/Boreas618.jpg",
+        "https://github.com/Boreas618", S.of(context).boreas618_description),
+        Developer("JingYiJun", "assets/graphics/JingYiJun.jpg",
+        "https://github.com/JingYiJun", S.of(context).boreas618_description),
+        Developer("fsy2001", "assets/graphics/fsy2001.jpg",
+        "https://github.com/fsy2001", S.of(context).boreas618_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].
@@ -423,6 +431,8 @@ class Constant {
     }
   ]
   ''';
+
+  static const WeekDays = ["周一","周二","周三","周四","周五","周六","周日"];
 }
 
 /// A list of Fudan campus.
@@ -521,3 +531,4 @@ extension LanguageEx on Language? {
 
 /// Define a set of possible connection status.
 enum ConnectionStatus { NONE, CONNECTING, DONE, FAILED, FATAL_ERROR }
+

@@ -134,12 +134,12 @@ class PlatformPopupMenuX extends StatelessWidget {
                 key: data?.key,
                 isDefaultAction: data?.isDefaultAction ?? false,
                 isDestructiveAction: data?.isDestructiveAction ?? false,
+                child: data?.child ?? Text(option.label??""),
                 onPressed: data?.onPressed ??
                     () {
                       Navigator.pop(context);
                       option.onTap?.call(option);
                     },
-                child: data?.child ?? Text(option.label),
               );
             },
           ).toList(),
@@ -170,6 +170,7 @@ class PlatformPopupMenuX extends StatelessWidget {
                       option.material?.call(context, platform(context));
                   return PopupMenuItem(
                     value: option,
+                    child: data?.child ?? Text(option.label??""),
                     enabled: data?.enabled ?? true,
                     height: data?.height ?? kMinInteractiveDimension,
                     key: data?.key,
@@ -177,7 +178,6 @@ class PlatformPopupMenuX extends StatelessWidget {
                     onTap: data?.onTap,
                     padding: data?.padding,
                     textStyle: data?.textStyle,
-                    child: data?.child ?? Text(option.label),
                   );
                 },
               ).toList(),
