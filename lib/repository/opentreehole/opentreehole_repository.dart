@@ -513,8 +513,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return provider.userInfo?.is_admin ?? false;
   }
 
-  Future<List<int>?> getFavoriteHoleId({bool forceUpdate = false}) async {
-    return (await getUserProfile(forceUpdate: forceUpdate))!.favorites!;
+  Future<List<int>?> getFavoriteHoleId() async {
+    final Response<Map<String,dynamic>> response = await dio.get(
+        "$_BASE_URL/user/favorites",
+        queryParameters: {"plain":true},
+        options: Options(headers: _tokenHeader));
+    return response.data?['data'].cast<int>();
   }
 
   Future<List<OTHole>?> getFavoriteHoles({
