@@ -183,7 +183,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<String?> getVerifyCode(String email) async {
     Response<Map<String, dynamic>> response =
-    await secureDio.get("$_BASE_AUTH_URL/verify/apikey",
+        await secureDio.get("$_BASE_AUTH_URL/verify/apikey",
             queryParameters: {
               "apikey": Secret.generateOneTimeAPIKey(),
               "email": email,
@@ -319,8 +319,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
       {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/floors",
+    final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
         queryParameters: {
           "start_floor": startFloor,
           "hole_id": post.hole_id,
@@ -339,8 +338,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
       {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/floors",
+    final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
         //queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
         queryParameters: {
           "start_floor": startFloor,
@@ -563,9 +561,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   /// Admin API below
-  Future<List<OTReport>?> adminGetReports() async {
+  Future<List<OTReport>?> adminGetReports(int startReport,
+      [int length = 10]) async {
     final response = await dio.get("$_BASE_URL/reports",
-        //queryParameters: {"category": page, "show_only_undealt": true},
+        queryParameters: {"start_report": startReport, "length": length},
         options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
