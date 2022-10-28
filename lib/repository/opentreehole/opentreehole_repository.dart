@@ -479,7 +479,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "start_time": startTime?.toIso8601String(),
             },
             options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTMessage.fromJson(e)).toList();
+    return response.data?.map((e) => OTMessage.fromJson(e)).toList().reversed.toList();
   }
 
   Future<void> modifyMessage(OTMessage message) async {
