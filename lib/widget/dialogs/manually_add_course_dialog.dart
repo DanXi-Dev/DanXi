@@ -170,7 +170,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                                   : Text(
                                       "${e}",
                                       style: const TextStyle(
-                                          fontWeight: FontWeight.w900),
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.white),
                                     ),
                             ),
                           ))
