@@ -160,12 +160,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     return sems;
   }
 
-  /// JSON Like Text: {aaaa:"asdasd"}
+  /// JSON-Like Text: {aaaa:"asdasd"}
   /// Real JSON Text: {"aaaa":"asdasd"}
   ///
   /// Add a pair of quote on the both sides of every key.
+  /// This requires that no quote is included in the key or value. Or the result will be
+  /// abnormal.
   String _normalizeJson(String jsonLikeText) {
-    var result = "";
+    String result = "";
     bool inQuote = false;
     bool inKey = false;
     for (String char

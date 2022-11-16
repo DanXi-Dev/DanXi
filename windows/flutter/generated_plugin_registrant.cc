@@ -10,6 +10,7 @@
 #include <desktop_window/desktop_window_plugin.h>
 #include <flutter_js/flutter_js_plugin.h>
 #include <platform_device_id_windows/platform_device_id_windows_plugin.h>
+#include <screen_brightness_windows/screen_brightness_windows_plugin.h>
 #include <system_tray/system_tray_plugin.h>
 #include <url_launcher_windows/url_launcher_windows.h>
 
@@ -22,6 +23,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("FlutterJsPlugin"));
   PlatformDeviceIdWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("PlatformDeviceIdWindowsPlugin"));
+  ScreenBrightnessWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("ScreenBrightnessWindowsPlugin"));
   SystemTrayPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SystemTrayPlugin"));
   UrlLauncherWindowsRegisterWithRegistrar(

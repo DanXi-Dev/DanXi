@@ -50,11 +50,10 @@ class BBSReportDetail extends StatefulWidget {
 class _BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController<OTReport> _listViewController =
       PagedListViewController();
-  Future<List<OTReport>?>? _contentFuture;
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<OTReport>?> _loadContent() =>
-      OpenTreeHoleRepository.getInstance().adminGetReports();
+  Future<List<OTReport>?> _loadContent(int page) =>
+      OpenTreeHoleRepository.getInstance().adminGetReports(page);
 
   @override
   Widget build(BuildContext context) {
@@ -74,25 +73,22 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
       body: StatefulBuilder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
         builder: (context, setState) {
-          _contentFuture ??= _loadContent();
           return RefreshIndicator(
             edgeOffset: MediaQuery.of(context).padding.top,
             color: Theme.of(context).colorScheme.secondary,
             backgroundColor: Theme.of(context).dialogBackgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
-              _contentFuture = _loadContent();
-              await _contentFuture;
               await refreshSelf();
-              _listViewController.notifyUpdate(
+              await _listViewController.notifyUpdate(
                   useInitialData: false, queueDataClear: false);
             },
             child: PagedListView<OTReport>(
-              startPage: 1,
+              startPage: 0,
               pagedController: _listViewController,
               withScrollbar: true,
               scrollController: PrimaryScrollController.of(context),
-              allDataReceiver: _contentFuture,
+              dataReceiver: _loadContent,
               builder: _getListItems,
               loadingBuilder: (BuildContext context) => Container(
                 padding: const EdgeInsets.all(8),

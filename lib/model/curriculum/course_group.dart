@@ -44,5 +44,5 @@ class CourseGroup {
   bool operator ==(Object other) => (other is CourseGroup) && id == other.id;
 
   @override
-  int get hashCode => id!;
+  int get hashCode => id ?? name.hashCode;
 }

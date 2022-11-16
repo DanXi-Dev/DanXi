@@ -174,7 +174,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         },
                         groupValue: _selectCampusIndex,
                         children: Constant.CAMPUS_VALUES
-                            .map((e) => Text(e.displayTitle(context)!))
+                            .map((e) => Text(e.displayTitle(context)))
                             .toList()
                             .asMap(),
                       )),
@@ -254,7 +254,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                       5 +
                                   7,
                               child: Text(
-                                "| " + S.of(context).morning,
+                                "| ${S.of(context).morning}",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -268,7 +268,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                       5 +
                                   7,
                               child: Text(
-                                "| " + S.of(context).afternoon,
+                                "| ${S.of(context).afternoon}",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -281,7 +281,7 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                                       4) *
                                   3,
                               child: Text(
-                                "| " + S.of(context).evening,
+                                "| ${S.of(context).evening}",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -391,9 +391,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   }
 
   List<Widget> _buildBusinessViewForRoom(RoomInfo roomInfo) {
-    var _list = <Widget>[];
-    var _time = 1;
-    var _slot = TimeTable.defaultNow().slot + 1;
+    var list = <Widget>[];
+    var time = 1;
+    var slot = TimeTable.defaultNow().slot + 1;
 
     // Prevent repeated read from disk
     final accessibilityColoring =
@@ -401,9 +401,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
     for (var element in roomInfo.busy!) {
       if (accessibilityColoring) {
-        _list.add(Container(
+        list.add(Container(
           decoration: BoxDecoration(
-              border: _slot == _time
+              border: slot == time
                   ? Border.all(
                       color: Theme.of(context).textTheme.bodyText1!.color!,
                       width: 2.5,
@@ -420,9 +420,9 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           height: 22,
         ));
       } else {
-        _list.add(Container(
+        list.add(Container(
           decoration: BoxDecoration(
-              border: _slot == _time
+              border: slot == time
                   ? Border.all(
                       color: Theme.of(context).textTheme.bodyText1!.color!,
                       width: 1.5,
@@ -436,13 +436,13 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         ));
       }
 
-      if (_time++ % 5 == 0) {
-        _list.add(const SizedBox(
+      if (time++ % 5 == 0) {
+        list.add(const SizedBox(
           width: 7,
         ));
       }
     }
-    return _list;
+    return list;
   }
 
   Widget _buildLoadingWidget() => Center(

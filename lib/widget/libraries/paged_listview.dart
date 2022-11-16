@@ -69,7 +69,7 @@ class PagedListView<T> extends StatefulWidget {
   /// and show the widget built by [fatalErrorBuilder].
   final PureValueWidgetBuilder<dynamic>? fatalErrorBuilder;
 
-  /// The start number of page index, usually zero to say that the first page is Page 0.
+  /// The start number of page index, usually is zero when the id of first page is Page 0.
   final int startPage;
 
   /// The method to load new data, usually from network.
@@ -153,6 +153,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
   @override
   Widget build(BuildContext context) {
     bool scrollToEnd(ScrollNotification scrollInfo) {
+      // When nearly scroll to the end, notify the list view to load next page.
       if (scrollInfo.metrics.extentAfter < 500 &&
           !_isRefreshing &&
           !_isEnded &&
@@ -171,9 +172,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       return NotificationListener<ScrollNotification>(
         onNotification: scrollToEnd,
         child: WithScrollbar(
-          child: _buildListBody(),
-          controller: currentController,
-        ),
+            child: _buildListBody(), controller: currentController),
       );
     } else {
       return NotificationListener<ScrollNotification>(
@@ -191,8 +190,14 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
           // Handle Scroll To End Requests
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
-              currentController
-                  ?.jumpTo(currentController!.position.maxScrollExtent);
+              while (currentController!.position.pixels <
+                  currentController!.position.maxScrollExtent) {
+                currentController!
+                    .jumpTo(currentController!.position.maxScrollExtent);
+
+                // TODO: Evil hack to wait for new contents to load
+                await Future.delayed(const Duration(milliseconds: 100));
+              }
               if (_isEnded) _scrollToEndQueued = false;
             }
           });
@@ -407,16 +412,18 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     await _futureData;
   }
 
-  /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
-  /// Will no longer load content on scroll after called.
+  /// Replace all data, either loaded with [initialData] or to be loaded by [dataReceiver], with the provided [data].
+  /// The list view will no longer load new content when scrolling to the end after called this method.
   ///
-  /// Note: [_futureData] will be discarded after called. Call [notifyUpdate] to rebuild it and go back
+  /// Note: [_futureData] will be discarded after being called. Call [notifyUpdate] to rebuild it and go back
   /// to normal mode.
+  ///
+  /// The replaced items will be rebuilt at once (as well as the list view itself).
   replaceDataWith(List<T> data) {
     setState(() {
       // @w568w (2022-1-25): NEVER USE A REFERENCE-ONLY COPY OF LIST.
       // `_data = data;` makes me struggle with a weird bug
-      // that [data] get wrongly cleared by [_clearData] for half a day.
+      // that [data] get wrongly cleared by [_clearData].
       _data.clear();
       _data.addAll(data);
 
@@ -432,12 +439,17 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
     });
   }
 
+  /// Replace the data in a specific range. [start] + [data.length] should be equal or less than [_data.length].
+  /// This method will not affect the other existing items or the mode of the list.
+  ///
+  /// The replaced items will be rebuilt at once (as well as the list view itself).
   replaceDataInRangeWith(Iterable<T> data, int start) {
-    setState(() {
-      _data.setAll(start, data);
-    });
+    setState(() => _data.setAll(start, data));
   }
 
+  /// Require the list view to scroll to the end at once after next rebuilding.
+  ///
+  /// After calling, the list itself will NOT be rebuilt at once.
   queueScrollToEnd() {
     _scrollToEndQueued = true;
   }
@@ -504,9 +516,9 @@ class PagedListViewController<T> implements ListProvider<T> {
   Future<void> notifyUpdate({useInitialData = true, queueDataClear = true}) =>
       _state.notifyUpdate(useInitialData, queueDataClear);
 
-  /// Returns whether the scroll was successful or not
-  /// May fail due to RenderObject not cached
-  /// in which case, try scrolling up/down to find the item
+  /// Returns whether the scroll was successful or not.
+  /// May fail due to RenderObject not cached,
+  /// in which case, try scrolling up/down to find the item.
   Future<bool> scrollToItem(T item,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     try {
@@ -529,16 +541,17 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   ScrollController? getScrollController() => _state.getScrollController();
 
+  /// See [PagedListView.queueScrollToEnd].
   queueScrollToEnd() {
     _state.queueScrollToEnd();
   }
 
-  /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
-  /// Will no longer load content on scroll after this is called.
+  /// See [PagedListView.replaceDataWith].
   replaceDataWith(List<T> data) {
     _state.replaceDataWith(data);
   }
 
+  /// See [PagedListView.replaceDataInRangeWith].
   replaceDataInRangeWith(Iterable<T> data, int start) {
     _state.replaceDataInRangeWith(data, start);
   }
@@ -566,6 +579,7 @@ class PagedListViewController<T> implements ListProvider<T> {
   int length() => _state.length();
 }
 
+/// See [PagedListView.fatalErrorBuilder] for more detail about the error type.
 class FatalException implements Exception {}
 
 mixin ListProvider<T> {
@@ -589,6 +603,3 @@ typedef PureValueWidgetBuilder<T> = Widget Function(
 
 /// Retrieve data function
 typedef DataReceiver<T> = Future<List<T>?> Function(int pageIndex);
-
-/// Notify refreshing callback
-typedef RefreshListener = void Function();
