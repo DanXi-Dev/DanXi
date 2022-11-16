@@ -46,7 +46,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   static const String _BASE_URL = "https://www.fduhole.com/api";
   static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
-  static const String _IMAGE_BASE_URL = "https://pic.hath.top";
+  static const String _IMAGE_BASE_URL = "https://image.fduhole.com";
 
   late FDUHoleProvider provider;
 
@@ -214,7 +214,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<JWToken?> loginWithUsernamePassword(
       String username, String password) async {
     final Response<Map<String, dynamic>> response =
-    await dio.post("$_BASE_AUTH_URL/login", data: {
+        await dio.post("$_BASE_AUTH_URL/login", data: {
       'email': username,
       'password': password,
     });
@@ -423,7 +423,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<OTFloor?> likeFloor(int floorId, bool like) async {
     final Response<Map<String, dynamic>> response =
-    await dio.put("$_BASE_URL/floors/$floorId",
+        await dio.put("$_BASE_URL/floors/$floorId",
             data: {
               "like": like ? "add" : "cancel",
             },
