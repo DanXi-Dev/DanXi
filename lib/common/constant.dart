@@ -204,12 +204,18 @@ class Constant {
             S.of(context).Frankstein73_description),
         Developer("Ivan Fei", "assets/graphics/ivanfei.jpg",
             "https://github.com/ivanfei-1", S.of(context).ivanfei_description),
-        Developer("Boreas618", "assets/graphics/Boreas618.jpg",
-        "https://github.com/Boreas618", S.of(context).boreas618_description),
-        Developer("JingYiJun", "assets/graphics/JingYiJun.jpg",
-        "https://github.com/JingYiJun", S.of(context).boreas618_description),
+        Developer(
+            "Boreas618",
+            "assets/graphics/Boreas618.jpg",
+            "https://github.com/Boreas618",
+            S.of(context).boreas618_description),
+        Developer(
+            "JingYiJun",
+            "assets/graphics/JingYiJun.jpg",
+            "https://github.com/JingYiJun",
+            S.of(context).boreas618_description),
         Developer("fsy2001", "assets/graphics/fsy2001.jpg",
-        "https://github.com/fsy2001", S.of(context).boreas618_description),
+            "https://github.com/fsy2001", S.of(context).boreas618_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].
@@ -263,8 +269,8 @@ class Constant {
       );
     }
     return ThemeData(
-      brightness: Brightness.light,
-      primarySwatch: color,
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: color),
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
@@ -303,8 +309,9 @@ class Constant {
       );
     }
     return ThemeData(
-      brightness: Brightness.dark,
-      primarySwatch: color,
+      useMaterial3: true,
+      colorScheme:
+          ColorScheme.fromSeed(seedColor: color, brightness: Brightness.dark),
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.dark().cardColor,
@@ -432,7 +439,7 @@ class Constant {
   ]
   ''';
 
-  static const WeekDays = ["周一","周二","周三","周四","周五","周六","周日"];
+  static const WeekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 }
 
 /// A list of Fudan campus.
@@ -444,12 +451,7 @@ enum Campus {
   NONE
 }
 
-enum Language{
-  SCHINESE,
-  ENGLISH,
-  JAPANESE,
-  NONE
-}
+enum Language { SCHINESE, ENGLISH, JAPANESE, NONE }
 
 extension CampusEx on Campus? {
   static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
@@ -534,4 +536,3 @@ extension LanguageEx on Language? {
 
 /// Define a set of possible connection status.
 enum ConnectionStatus { NONE, CONNECTING, DONE, FAILED, FATAL_ERROR }
-

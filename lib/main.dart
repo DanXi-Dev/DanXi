@@ -189,8 +189,8 @@ class DanxiApp extends StatelessWidget {
       // [DynamicThemeController] enables the app to change between dark/light theme without restart
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
-            context.select<SettingsProvider, MaterialColor>(
-                (value) => generateMaterialColor(color:Color(value.primarySwatch_V2)));
+            context.select<SettingsProvider, MaterialColor>((value) =>
+                generateMaterialColor(color: Color(value.primarySwatch_V2)));
         return DynamicThemeController(
           lightTheme: Constant.lightTheme(
               PlatformX.isCupertino(context), primarySwatch),
@@ -210,11 +210,11 @@ class DanxiApp extends StatelessWidget {
                                   .bodyText1!
                                   .color)))),
               material: (context, __) => MaterialAppData(
-                  theme: ThemeData(
-                    useMaterial3: true,
-                    colorScheme: ColorScheme.fromSeed(seedColor: primarySwatch),
-                    primaryColor: primarySwatch
-                  )),
+                  theme: PlatformX.isDarkMode
+                      ? Constant.darkTheme(
+                          PlatformX.isCupertino(context), primarySwatch)
+                      : Constant.lightTheme(
+                          PlatformX.isCupertino(context), primarySwatch)),
               // Configure i18n delegates
               localizationsDelegates: const [
                 S.delegate,
