@@ -31,10 +31,13 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
+import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,6 +45,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:win32/win32.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
@@ -382,8 +386,12 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: ValueListenableBuilder<TextEditingValue>(
-                builder: (context, value, child) =>
-                    TagSuggestionWidget(content: value.text),
+                builder: (context, value, child) => TagSuggestionWidget(
+                    content: value.text,
+                    tags: context
+                        .read<FDUHoleProvider>()
+                        .editorCache[widget.editorObject]!
+                        .tags),
                 valueListenable: widget.controller,
               ),
             ),
@@ -426,9 +434,11 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
 }
 
 class TagSuggestionWidget extends StatefulWidget {
-  const TagSuggestionWidget({Key? key, required this.content})
+  const TagSuggestionWidget(
+      {Key? key, required this.content, required this.tags})
       : super(key: key);
   final String content;
+  final List<OTTag> tags;
 
   @override
   TagSuggestionWidgetState createState() => TagSuggestionWidgetState();
@@ -439,9 +449,10 @@ class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
 
   Future<List<String>?> getTagSuggestions(String content) async {
     try {
-      return await fduholeChannel.invokeListMethod("get_tag_suggestions");
+      return await fduholeChannel.invokeListMethod(
+          "get_tag_suggestions", widget.content);
     } on PlatformException catch (_) {
-      return _suggestions = null;
+      return null;
     }
   }
 
@@ -467,7 +478,19 @@ class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(_suggestions?.join(" ") ?? "Unavailable");
+    return Row(
+        children: _suggestions
+                ?.map((e) => Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: RoundChip(
+                          label: e,
+                          color: (e.hashColor()),
+                          onTap: () async {
+                            widget.tags.add(OTTag(null, null, e));
+                          }),
+                    ))
+                .toList() ??
+            []);
   }
 }
 

@@ -100,7 +100,12 @@ import WatchConnectivity
                 self.sendString(text: call.arguments as! String)
                 result(0)
             case "get_tag_suggestions":
-                result(["123", "456"])
+                if #available(iOS 14.0, *) {
+                    let re = TagPredictor.shared?.suggest(call.arguments as! String)
+                    result(re)
+                } else {
+                    result(nil)
+                }
             default:
                 break
             }
