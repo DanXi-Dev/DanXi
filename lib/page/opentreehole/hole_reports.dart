@@ -53,7 +53,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTReport>?> _loadContent(int page) =>
-      OpenTreeHoleRepository.getInstance().adminGetReports(page);
+      OpenTreeHoleRepository.getInstance().adminGetReports(page * 10, 10);
 
   @override
   Widget build(BuildContext context) {
