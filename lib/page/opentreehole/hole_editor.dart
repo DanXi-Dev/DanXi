@@ -22,6 +22,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -36,6 +37,7 @@ import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
@@ -377,6 +379,14 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         .editorCache[widget.editorObject]!
                         .tags),
               ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: ValueListenableBuilder<TextEditingValue>(
+                builder: (context, value, child) =>
+                    TagSuggestionWidget(content: value.text),
+                valueListenable: widget.controller,
+              ),
+            ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -412,6 +422,52 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
             ),
           ]),
     );
+  }
+}
+
+class TagSuggestionWidget extends StatefulWidget {
+  const TagSuggestionWidget({Key? key, required this.content})
+      : super(key: key);
+  final String content;
+
+  @override
+  TagSuggestionWidgetState createState() => TagSuggestionWidgetState();
+}
+
+class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
+  List<String>? _suggestions;
+
+  Future<List<String>?> getTagSuggestions(String content) async {
+    try {
+      return await fduholeChannel.invokeListMethod("get_tag_suggestions");
+    } on PlatformException catch (_) {
+      return _suggestions = null;
+    }
+  }
+
+  void updateTagSuggestions() {
+    getTagSuggestions(widget.content).then((value) {
+      setState(() {
+        _suggestions = value;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateTagSuggestions();
+  }
+
+  @override
+  void didUpdateWidget(covariant TagSuggestionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateTagSuggestions();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(_suggestions?.join(" ") ?? "Unavailable");
   }
 }
 

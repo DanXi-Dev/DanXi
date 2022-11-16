@@ -271,6 +271,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> initSystemTray() async {
+    /*
     if (!PlatformX.isWindows) return;
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
@@ -315,6 +316,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     ];
     await _systemTray.setContextMenu(showingMenu);
+    */
   }
 
   Future<void> onTapNotification(
