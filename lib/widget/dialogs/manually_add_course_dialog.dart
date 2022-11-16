@@ -168,7 +168,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                               child: widget.courseAvailableList.contains(e)
                                   ? const Icon(Icons.done)
                                   : Text(
-                                      "${e}",
+                                      "$e",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w900,
                                           color: Colors.white),

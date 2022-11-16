@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +63,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         ),
                       ))
                   .toList()),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Wrap(
               spacing: 10,
               runSpacing: 10,

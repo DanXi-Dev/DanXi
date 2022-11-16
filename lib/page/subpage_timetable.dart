@@ -292,7 +292,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             List<Course> newCourseList = courseList + [course];
             SettingsProvider.getInstance().manualAddedCourses = newCourseList;
             return newCourseList;
-          }))!;
+          }));
           refresh();
         }),
         hashCode);
@@ -462,7 +462,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
 
-  SemesterSelectionButton({Key? key, this.onSelectionUpdate}) : super(key: key);
+  const SemesterSelectionButton({Key? key, this.onSelectionUpdate}) : super(key: key);
 
   @override
   _SemesterSelectionButtonState createState() =>
