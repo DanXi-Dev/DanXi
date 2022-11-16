@@ -210,11 +210,11 @@ class DanxiApp extends StatelessWidget {
                                   .bodyText1!
                                   .color)))),
               material: (context, __) => MaterialAppData(
-                  theme: ThemeData(
-                    useMaterial3: true,
-                    colorScheme: ColorScheme.fromSeed(seedColor: primarySwatch),
-                    primaryColor: primarySwatch
-                  )),
+                  theme: PlatformX.isDarkMode
+                      ? Constant.darkTheme(
+                          PlatformX.isCupertino(context), primarySwatch)
+                      : Constant.lightTheme(
+                          PlatformX.isCupertino(context), primarySwatch)),
               // Configure i18n delegates
               localizationsDelegates: const [
                 S.delegate,
