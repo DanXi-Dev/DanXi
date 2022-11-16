@@ -202,7 +202,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<JWToken?> register(
       String email, String password, String verifyCode) async {
     final Response<Map<String, dynamic>> response =
-    await dio.post("$_BASE_AUTH_URL/register", data: {
+        await dio.post("$_BASE_AUTH_URL/register", data: {
       "password": password,
       "email": email,
       "verification": int.parse(verifyCode),
@@ -471,13 +471,17 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<List<OTMessage>?> loadMessages(
       {bool unreadOnly = false, DateTime? startTime}) async {
     final Response<List<dynamic>> response =
-    await dio.get("$_BASE_URL/messages",
+        await dio.get("$_BASE_URL/messages",
             queryParameters: {
               "not_read": unreadOnly,
               "start_time": startTime?.toIso8601String(),
             },
             options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTMessage.fromJson(e)).toList().reversed.toList();
+    return response.data
+        ?.map((e) => OTMessage.fromJson(e))
+        .toList()
+        .reversed
+        .toList();
   }
 
   Future<void> modifyMessage(OTMessage message) async {
@@ -512,9 +516,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<int>?> getFavoriteHoleId() async {
-    final Response<Map<String,dynamic>> response = await dio.get(
+    final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/user/favorites",
-        queryParameters: {"plain":true},
+        queryParameters: {"plain": true},
         options: Options(headers: _tokenHeader));
     return response.data?['data'].cast<int>();
   }
@@ -570,7 +574,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<List<OTReport>?> adminGetReports(int startReport,
       [int length = 10]) async {
     final response = await dio.get("$_BASE_URL/reports",
-        queryParameters: {"start_report": startReport, "size": length},
+        queryParameters: {"offset": startReport, "size": length},
         options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
@@ -588,7 +592,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<List<OTHistory>?> getHistory(int? floorId) async {
     final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/floors/$floorId/history");
+        "$_BASE_URL/floors/$floorId/history",
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHistory.fromJson(e)).toList();
   }
 

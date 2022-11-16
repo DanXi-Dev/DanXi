@@ -392,7 +392,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   List<OTTag> deepCopyTagList(List<OTTag> list) =>
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e, List<OTHistory>? history) {
+  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
     List<Widget> _buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
@@ -592,7 +592,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     }));
 
             final newTagsList = deepCopyTagList(_hole.tags ?? []);
-            bool? comfirmChanged = await showPlatformDialog<bool>(
+            bool? confirmChanged = await showPlatformDialog<bool>(
               context: context,
               builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(S.of(context).modify_tag_division),
@@ -614,7 +614,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 ],
               ),
             );
-            if (comfirmChanged ?? false) {
+            if (confirmChanged ?? false) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
                       newTagsList, _hole.hole_id, selectedDivision.division_id);
@@ -644,19 +644,22 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
         ),
-        if (history != null && history!.isNotEmpty)
-          PlatformContextMenuItem(
-            onPressed: () async {
+        PlatformContextMenuItem(
+          onPressed: () async {
+            List<OTHistory>? history =
+                await OpenTreeHoleRepository.getInstance()
+                    .getHistory(e.floor_id);
+            if (history != null) {
               StringBuffer content = StringBuffer();
-              for (int i = 0; i < history!.length; i++) {
-                var record = history![i];
+              for (int i = 0; i < history.length; i++) {
+                var record = history[i];
                 content.writeln(
                     S.of(context).history_time(record.time_updated ?? "?"));
                 content.writeln(
                     S.of(context).history_altered_by(record.user_id ?? "?"));
                 content.writeln(S.of(context).original_content);
                 content.writeln(record.content);
-                if (i < history!.length - 1) {
+                if (i < history.length - 1) {
                   content.writeln("================");
                 }
               }
@@ -664,10 +667,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   title: S.of(context).history_of(e.floor_id ?? "?"),
                   message: content.toString(),
                   selectable: true);
-            },
-            menuContext: menuContext,
-            child: Text(S.of(context).view_history),
-          ),
+            }
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).view_history),
+        ),
       ];
     }
 
@@ -772,11 +776,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       isInMention: isNested,
       parentHole: _hole,
       onLongPress: () async {
-        List<OTHistory>? history = await OpenTreeHoleRepository.getInstance().getHistory(floor.floor_id);
         showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
-                actions: _buildContextMenu(context, floor, history),
+                actions: _buildContextMenu(context, floor),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () => Navigator.of(context).pop(),

@@ -286,11 +286,9 @@ class SettingsProvider with ChangeNotifier {
       String? value = preferences!.getString(KEY_PREFERRED_LANGUAGE);
       return Constant.LANGUAGE_VALUES
           .firstWhere((element) => element.toString() == value, orElse: () {
-        language = defaultLanguage;
         return defaultLanguage;
       });
     }
-    language = defaultLanguage;
     return defaultLanguage;
   }
 
