@@ -61,7 +61,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   const HomeSubpage({Key? key}) : super(key: key);
 
   @override
-  Create<Widget> get title => (cxt) => Text(S.of(cxt).app_name);
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).dashboard);
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
