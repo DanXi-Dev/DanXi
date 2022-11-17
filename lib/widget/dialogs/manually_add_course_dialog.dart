@@ -83,8 +83,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   Widget build(BuildContext context) {
     return PlatformAlertDialog(
       title: Text(S.of(context).add_courses),
-      content: Expanded(
-        child: SingleChildScrollView(
+      content: SingleChildScrollView(
           child: Column(
             children: [
               TextField(
@@ -205,7 +204,6 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             ],
           ),
         ),
-      ),
       actions: [
         PlatformDialogAction(
             child: Text(S.of(context).cancel),
