@@ -301,7 +301,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           newCourses = await showPlatformDialog(
             context: context,
             builder: (_) => DeleteCourseDialog(newCourses),
-          );
+          ) ?? [];
           SettingsProvider.getInstance().manualAddedCourses = newCourses;
           refresh();
         }),
