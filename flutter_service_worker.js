@@ -4,9 +4,9 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "5ac5a6d3bb3bd3acf035f1ab1043e45e",
-"index.html": "5126908471e8a9d4ab7b5cbaeb780941",
-"/": "5126908471e8a9d4ab7b5cbaeb780941",
-"main.dart.js": "953cf6e9dce3b90acfe5eeaaedc80071",
+"index.html": "17b1edbacd6b3fdc882e8265590cb0a9",
+"/": "17b1edbacd6b3fdc882e8265590cb0a9",
+"main.dart.js": "52a741a7258e5a6f6e6a87bcd6998096",
 "flutter.js": "f85e6fb278b0fd20c349186fb46ae36d",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
@@ -51,7 +51,7 @@ const RESOURCES = {
 "assets/assets/graphics/w568w.jpeg": "52a688cf3c32b58e04f9f3e101fba056",
 "assets/assets/graphics/ot_logo.png": "9b7bc821e196bcc2041208463f6cedd8",
 "assets/assets/graphics/Dest1n1.jpg": "a898430901863973c1a753c94972278c",
-"assets/assets/graphics/Boreas618.jpg": "90459208d515ccf31d639805b0021946",
+"assets/assets/graphics/Boreas618.jpg": "154adb094308aaf46375cd53698b7d89",
 "assets/assets/graphics/hasbai.jpeg": "f1fdc1d1cd82fc94d94a5b1fce513932",
 "assets/assets/graphics/app_icon.ico": "7cdbb262b1ce46f765b4e2560884637a",
 "assets/assets/graphics/Frankstein73.jpg": "87ee13095b84effad22219c2d3075c0e",
