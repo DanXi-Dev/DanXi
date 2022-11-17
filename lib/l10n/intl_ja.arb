@@ -407,7 +407,7 @@
   "post_has_stop_words": "ポストに「{stopWord}」の不適切な言葉が含まれている。\nこのような言葉は、理性的な議論に相応しくないため、攻撃や不適切なコメントを呼び起こす可能性が高く、送信を推奨しませんが、続けなければならないのでしょうか？",
   "community_convention": "コミュニティー公約",
   "fduhole_show_banner": "活動を表示する",
-  "fduhole_show_banner_description": "[実験的] 閲覧に支障のない範囲で、学内活動のお知らせをFDUHoleのページ上部に表示します",
+  "fduhole_show_banner_description": "閲覧に支障のない範囲で、学内活動のお知らせをFDUHoleのページ上部に表示します",
   "theme_color": "テーマ色",
   "theme_color_description": "旦夕のテーマ色を設定する",
   "theme_color_description_detail": "テーマカラーを切り替えるには、プリセットカラーまたはカスタムカラーを選択します",

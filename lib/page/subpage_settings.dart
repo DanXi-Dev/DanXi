@@ -609,6 +609,38 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                           },
                         ),
                     selector: (_, model) => model.cleanMode),
+                if (SettingsProvider.getInstance().tagSuggestionAvailable) ...[
+                  Selector<SettingsProvider, bool>(
+                      builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).recommended_tags),
+                          secondary: const Icon(Icons.recommend),
+                          subtitle:
+                              Text(S.of(context).recommended_tags_availibity),
+                          value: value,
+                          onChanged: (bool value) async {
+                            if (!value ||
+                                await Noticing.showConfirmationDialog(
+                                        context,
+                                        S
+                                            .of(context)
+                                            .recommended_tags_description,
+                                        title:
+                                            S.of(context).recommended_tags) ==
+                                    true) {
+                              SettingsProvider.getInstance()
+                                  .isTagSuggestionEnabled = value;
+                            }
+                          }),
+                      selector: (_, model) => model.isTagSuggestionEnabled),
+                ] else
+                  ListTile(
+                    title: Text(S.of(context).recommended_tags),
+                    leading: const Icon(Icons.recommend),
+                    subtitle: Text(S.of(context).unavailable),
+                    onTap: () => Noticing.showModalNotice(context,
+                        title: S.of(context).recommended_tags,
+                        message: S.of(context).recommended_tags_description),
+                  ),
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),

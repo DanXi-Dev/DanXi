@@ -25,6 +25,7 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -38,7 +39,6 @@ import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +46,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:win32/win32.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
@@ -388,36 +387,70 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         .editorCache[widget.editorObject]!
                         .tags),
               ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-              child: Row(
-                children: [
-                  Text(S.of(context).recommended_tags),
-                  ScaleTransform(
-                    scale: 0.75,
-                    child: PlatformIconButton(
-                      padding: const EdgeInsets.only(left: 0),
-                      icon: const Icon(CupertinoIcons.info_circle),
-                      onPressed: () {
-                        Noticing.showNotice(context, "fill the message",
-                            title: S.of(context).recommended_tags,
-                            useSnackBar: false);
-                      },
+            if (SettingsProvider.getInstance().tagSuggestionAvailable)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
+                child: Row(
+                  children: [
+                    Text(S.of(context).recommended_tags),
+                    ScaleTransform(
+                      scale: 0.75,
+                      child: PlatformIconButton(
+                        padding: const EdgeInsets.only(left: 0),
+                        icon: const Icon(CupertinoIcons.info_circle),
+                        onPressed: () {
+                          Noticing.showModalNotice(context,
+                              message:
+                                  S.of(context).recommended_tags_description,
+                              title: S.of(context).recommended_tags);
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4, left: 4, right: 4),
-              child: ValueListenableBuilder<TextEditingValue>(
-                builder: (context, value, child) => TagSuggestionWidget(
-                  content: value.text,
-                  tagSelectorKey: _tagSelectorKey,
+                    Selector<SettingsProvider, bool>(
+                        builder: (_, bool value, __) {
+                          if (!value) {
+                            return PlatformTextButton(
+                              padding: EdgeInsets.zero,
+                              child: Text(S.of(context).enable),
+                              onPressed: () async {
+                                if (await Noticing.showConfirmationDialog(
+                                        context,
+                                        S
+                                            .of(context)
+                                            .recommended_tags_description,
+                                        title:
+                                            S.of(context).recommended_tags) ==
+                                    true) {
+                                  SettingsProvider.getInstance()
+                                      .isTagSuggestionEnabled = true;
+                                }
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                        selector: (_, model) => model.isTagSuggestionEnabled),
+                  ],
                 ),
-                valueListenable: widget.controller,
               ),
-            ),
+            Selector<SettingsProvider, bool>(
+                builder: (_, bool value, __) {
+                  if (value) {
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: 4, left: 4, right: 4),
+                      child: ValueListenableBuilder<TextEditingValue>(
+                        builder: (context, value, child) => TagSuggestionWidget(
+                          content: value.text,
+                          tagSelectorKey: _tagSelectorKey,
+                        ),
+                        valueListenable: widget.controller,
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+                selector: (_, model) => model.isTagSuggestionEnabled),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -467,17 +500,17 @@ class TagSuggestionWidget extends StatefulWidget {
   TagSuggestionWidgetState createState() => TagSuggestionWidgetState();
 }
 
+Future<List<String>?> getTagSuggestions(String content) async {
+  try {
+    return await fduholeChannel.invokeListMethod(
+        "get_tag_suggestions", content);
+  } on PlatformException catch (_) {
+    return null;
+  }
+}
+
 class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
   List<String>? _suggestions;
-
-  Future<List<String>?> getTagSuggestions(String content) async {
-    try {
-      return await fduholeChannel.invokeListMethod(
-          "get_tag_suggestions", widget.content);
-    } on PlatformException catch (_) {
-      return null;
-    }
-  }
 
   void updateTagSuggestions() {
     getTagSuggestions(widget.content).then((value) {
