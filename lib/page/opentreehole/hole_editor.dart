@@ -387,7 +387,8 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                         .editorCache[widget.editorObject]!
                         .tags),
               ),
-            if (SettingsProvider.getInstance().tagSuggestionAvailable)
+            if (widget.allowTags! &&
+                SettingsProvider.getInstance().tagSuggestionAvailable) ...[
               Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
                 child: Row(
@@ -433,24 +434,26 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
                   ],
                 ),
               ),
-            Selector<SettingsProvider, bool>(
-                builder: (_, bool value, __) {
-                  if (value) {
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(bottom: 4, left: 4, right: 4),
-                      child: ValueListenableBuilder<TextEditingValue>(
-                        builder: (context, value, child) => TagSuggestionWidget(
-                          content: value.text,
-                          tagSelectorKey: _tagSelectorKey,
+              Selector<SettingsProvider, bool>(
+                  builder: (_, bool value, __) {
+                    if (value) {
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: 4, left: 4, right: 4),
+                        child: ValueListenableBuilder<TextEditingValue>(
+                          builder: (context, value, child) =>
+                              TagSuggestionWidget(
+                            content: value.text,
+                            tagSelectorKey: _tagSelectorKey,
+                          ),
+                          valueListenable: widget.controller,
                         ),
-                        valueListenable: widget.controller,
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-                selector: (_, model) => model.isTagSuggestionEnabled),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  selector: (_, model) => model.isTagSuggestionEnabled),
+            ],
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
