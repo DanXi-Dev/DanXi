@@ -451,5 +451,6 @@
   "copy_qq_group_id": "Copy QQ Group ID",
   "read_announcements": "Read Dev Team Announcements",
   "admin_no_hide_tag": "Administrators cannot hide tags",
-  "semester_start_at_monday": "The semester start date is usually a Monday, while the date you selected is not. Do you really want to set it to this date?"
+  "semester_start_at_monday": "The semester start date is usually a Monday, while the date you selected is not. Do you really want to set it to this date?",
+  "recommended_tags": "Recommended Tags"
 }

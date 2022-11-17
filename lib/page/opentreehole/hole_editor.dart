@@ -36,6 +36,7 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';
@@ -319,6 +320,9 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
     super.initState();
   }
 
+  final GlobalKey<OTTagSelectorState> _tagSelectorKey =
+      GlobalKey<OTTagSelectorState>();
+
   Widget _buildIntroButton(BuildContext context, IconData iconData,
           String title, String description) =>
       PlatformIconButton(
@@ -376,22 +380,41 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           children: [
             if (widget.allowTags!)
               Padding(
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: OTTagSelector(
+                    key: _tagSelectorKey,
                     initialTags: context
                         .read<FDUHoleProvider>()
                         .editorCache[widget.editorObject]!
                         .tags),
               ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+              child: Row(
+                children: [
+                  Text(S.of(context).recommended_tags),
+                  ScaleTransform(
+                    scale: 0.75,
+                    child: PlatformIconButton(
+                      padding: const EdgeInsets.only(left: 0),
+                      icon: const Icon(CupertinoIcons.info_circle),
+                      onPressed: () {
+                        Noticing.showNotice(context, "fill the message",
+                            title: S.of(context).recommended_tags,
+                            useSnackBar: false);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4, left: 4, right: 4),
               child: ValueListenableBuilder<TextEditingValue>(
                 builder: (context, value, child) => TagSuggestionWidget(
-                    content: value.text,
-                    tags: context
-                        .read<FDUHoleProvider>()
-                        .editorCache[widget.editorObject]!
-                        .tags),
+                  content: value.text,
+                  tagSelectorKey: _tagSelectorKey,
+                ),
                 valueListenable: widget.controller,
               ),
             ),
@@ -435,10 +458,10 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
 
 class TagSuggestionWidget extends StatefulWidget {
   const TagSuggestionWidget(
-      {Key? key, required this.content, required this.tags})
+      {Key? key, required this.content, required this.tagSelectorKey})
       : super(key: key);
   final String content;
-  final List<OTTag> tags;
+  final GlobalKey<OTTagSelectorState> tagSelectorKey;
 
   @override
   TagSuggestionWidgetState createState() => TagSuggestionWidgetState();
@@ -478,15 +501,26 @@ class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
         children: _suggestions
                 ?.map((e) => Padding(
-                      padding: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 4),
                       child: RoundChip(
                           label: e,
                           color: (e.hashColor()),
-                          onTap: () async {
-                            widget.tags.add(OTTag(null, null, e));
+                          onTap: () {
+                            widget.tagSelectorKey.currentState?.setState(() {
+                              if (widget.tagSelectorKey.currentState?.widget
+                                      .initialTags
+                                      .any((element) => element.name == e) ==
+                                  true) {
+                              } else {
+                                widget.tagSelectorKey.currentState!.widget
+                                    .initialTags
+                                    .add(OTTag(0, 0, e));
+                              }
+                            });
                           }),
                     ))
                 .toList() ??
