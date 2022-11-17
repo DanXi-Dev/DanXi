@@ -443,5 +443,6 @@
   "copy_qq_group_id": "复制 QQ 群号",
   "read_announcements": "查看开发组公告",
   "admin_no_hide_tag": "管理员不可以屏蔽标签",
-  "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？"
+  "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？",
+  "recommended_tags": "推荐标签"
 }
