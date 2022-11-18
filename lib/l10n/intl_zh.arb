@@ -445,7 +445,7 @@
   "admin_no_hide_tag": "管理员不可以屏蔽标签",
   "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？",
   "recommended_tags": "推荐标签",
-  "recommended_tags_availibity": "可用性: iOS 14.0 以及更高",
+  "recommended_tags_availibity": "【实验性】在发帖时推荐一些标签",
   "unavailable": "不可用",
   "enable": "启用",
   "recommended_tags_description": "可用性: iOS 14.0 以及更高\n\nFill in..."

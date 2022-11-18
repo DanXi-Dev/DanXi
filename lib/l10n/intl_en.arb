@@ -453,8 +453,8 @@
   "admin_no_hide_tag": "Administrators cannot hide tags",
   "semester_start_at_monday": "The semester start date is usually a Monday, while the date you selected is not. Do you really want to set it to this date?",
   "recommended_tags": "Recommended Tags",
-  "recommended_tags_availibity": "Availibility: iOS 14.0 and higher",
+  "recommended_tags_availibity": "[Experimental] Recommend tags when posting",
   "unavailable": "Unavailable",
   "enable": "Enable",
-  "recommended_tags_description": "Availibility: iOS 14.0 and higher\n\nFill in..."
+  "recommended_tags_description": "Availibility: iOS 14.0 and higher\n\nAll recommendations are processed entirely on-device. If you find the recommendations inappropriate, you can report this to dev@fduhole.com "
 }
