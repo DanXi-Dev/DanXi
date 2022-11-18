@@ -15,9 +15,9 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		F129BF1329254562003EAB9B /* TagPredictorME.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F129BF1229254562003EAB9B /* TagPredictorME.mlpackage */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/TagPredictorTL.mlmodelkey\""; }; };
+		F129BF1329254562003EAB9B /* TagPredictorME.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F129BF1229254562003EAB9B /* TagPredictorME.mlpackage */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/Runner/TagPredictorTL.mlmodelkey\""; }; };
 		F129BF152925457C003EAB9B /* MLModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F129BF142925457C003EAB9B /* MLModels.swift */; };
-		F19C600E2927542300167DC0 /* TagPredictorTL.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F19C600D2927542300167DC0 /* TagPredictorTL.mlpackage */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/TagPredictorTL.mlmodelkey\""; }; };
+		F19C600E2927542300167DC0 /* TagPredictorTL.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F19C600D2927542300167DC0 /* TagPredictorTL.mlpackage */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/Runner/TagPredictorTL.mlmodelkey\""; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */

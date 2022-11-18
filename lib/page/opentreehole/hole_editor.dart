@@ -537,30 +537,33 @@ class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-        children: _suggestions
-                ?.map((e) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 4, horizontal: 4),
-                      child: RoundChip(
-                          label: e,
-                          color: (e.hashColor()),
-                          onTap: () {
-                            widget.tagSelectorKey.currentState?.setState(() {
-                              if (widget.tagSelectorKey.currentState?.widget
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 32),
+      child: Wrap(
+          children: _suggestions
+                  ?.map((e) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 4),
+                        child: RoundChip(
+                            label: e,
+                            color: (e.hashColor()),
+                            onTap: () {
+                              widget.tagSelectorKey.currentState?.setState(() {
+                                if (widget.tagSelectorKey.currentState?.widget
+                                        .initialTags
+                                        .any((element) => element.name == e) ==
+                                    true) {
+                                } else {
+                                  widget.tagSelectorKey.currentState!.widget
                                       .initialTags
-                                      .any((element) => element.name == e) ==
-                                  true) {
-                              } else {
-                                widget.tagSelectorKey.currentState!.widget
-                                    .initialTags
-                                    .add(OTTag(0, 0, e));
-                              }
-                            });
-                          }),
-                    ))
-                .toList() ??
-            []);
+                                      .add(OTTag(0, 0, e));
+                                }
+                              });
+                            }),
+                      ))
+                  .toList() ??
+              []),
+    );
   }
 }
 
