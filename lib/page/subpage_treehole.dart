@@ -63,6 +63,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 
+import '../util/watermark.dart';
 import '../widget/opentreehole/tag_selector/tag.dart';
 
 const kCompatibleUserGroup = [
@@ -378,8 +379,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   Future<void> refreshList() async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
-        await OpenTreeHoleRepository.getInstance()
-            .getFavoriteHoleId();
+        await OpenTreeHoleRepository.getInstance().getFavoriteHoleId();
       } else if (context.read<FDUHoleProvider>().isUserInitialized) {
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);
@@ -591,6 +591,15 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
+    final DisableScreenshots _plugin = DisableScreenshots()
+      ..addWatermark(
+          context,
+          (context.read<FDUHoleProvider>().isUserInitialized
+              ? OpenTreeHoleRepository.getInstance().userInfo?.user_id
+                      .toString()
+              : S.of(context).not_logged_in)!,
+          rowCount: 4,
+          columnCount: 8);
     return Container(
       decoration: _backgroundImage == null
           ? null
