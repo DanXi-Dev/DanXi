@@ -42,7 +42,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
       TextEditingController courseTeacherNameController,
       List<int> courseAvailableList,
       Course newCourse) {
-    newCourse.courseName = courseNameController.text ?? "Unknown Course";
+    newCourse.courseName = courseNameController.text;
     newCourse.courseId = courseIdController.text;
     newCourse.roomId = "999999";
     newCourse.teacherNames = courseTeacherNameController.text.split(" ");
@@ -94,18 +94,18 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.book)
                         : const Icon(CupertinoIcons.book)),
-                autofocus: true,
+                autofocus: false,
               ),
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
               TextField(
                 controller: widget.courseIdController,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     labelText: S.of(context).course_id,
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.numbers)
                         : const Icon(CupertinoIcons.number)),
-                autofocus: true,
+                autofocus: false,
               ),
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
               TextField(
@@ -116,7 +116,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.location_city)
                         : const Icon(CupertinoIcons.location_fill)),
-                autofocus: true,
+                autofocus: false,
               ),
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
               TextField(
@@ -127,7 +127,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.people)
                         : const Icon(CupertinoIcons.person_2_fill)),
-                autofocus: true,
+                autofocus: false,
               ),
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 20),
               TextField(
