@@ -164,7 +164,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                 const Divider(),
                 Align(
                     alignment: Alignment.topLeft,
-                    child: Text(e.floor?.content ?? "?")),
+                    child: Text(e.floor?.content ?? "?", maxLines: 5)),
               ],
             ),
             subtitle: Column(children: [
