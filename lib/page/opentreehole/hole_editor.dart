@@ -509,6 +509,8 @@ Future<List<String>?> getTagSuggestions(String content) async {
         "get_tag_suggestions", content);
   } on PlatformException catch (_) {
     return null;
+  } on MissingPluginException catch (_) {
+    return null;
   }
 }
 
