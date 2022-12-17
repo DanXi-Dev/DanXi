@@ -202,7 +202,7 @@
   "last_30_days": "Last 30 days",
   "older_announcement": "Older",
   "latest_announcement": "Latest",
-  "dashboard": "Dashboard",
+  "dashboard": "Campus",
   "forum": "FDUHole",
   "timetable": "Agenda",
   "week": "Week {week}",
@@ -442,7 +442,7 @@
   "post_has_stop_words": "You are using some inappropriate words: {stopWord}.\nWe do not recommend sending such words as they are not suitable for a rational discussion and are therefore more likely to attract unfriendly comments. Do you really want to send?",
   "community_convention": "Community Convention",
   "fduhole_show_banner": "Show campaigns",
-  "fduhole_show_banner_description": "[Experimental] Show some non-invasive campaigns and announcements",
+  "fduhole_show_banner_description": "Show some non-invasive campaigns and announcements",
   "theme_color": "Theming",
   "theme_color_description": "Customize theme color",
   "theme_color_description_detail": "Choose a preset color or custom color to switch the theme color",
@@ -451,5 +451,10 @@
   "copy_qq_group_id": "Copy QQ Group ID",
   "read_announcements": "Read Dev Team Announcements",
   "admin_no_hide_tag": "Administrators cannot hide tags",
-  "semester_start_at_monday": "The semester start date is usually a Monday, while the date you selected is not. Do you really want to set it to this date?"
+  "semester_start_at_monday": "The semester start date is usually a Monday, while the date you selected is not. Do you really want to set it to this date?",
+  "recommended_tags": "Recommended Tags",
+  "recommended_tags_availibity": "[Experimental] Recommend tags when posting",
+  "unavailable": "Unavailable",
+  "enable": "Enable",
+  "recommended_tags_description": "Availibility: iOS 14.0 and higher\n\nAll recommendations are processed entirely on-device. If you find the recommendations inappropriate, you can report this to dev@fduhole.com "
 }

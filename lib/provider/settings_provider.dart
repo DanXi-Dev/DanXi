@@ -28,6 +28,7 @@ import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,6 +70,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_PRIMARY_SWATCH_V2 = "primary_swatch_v2";
   static const String KEY_PREFERRED_LANGUAGE = "language";
   static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
+  static const String KEY_TAG_SUGGESTIONS_ENABLE = "tag_suggestions";
 
   SettingsProvider._();
 
@@ -232,9 +234,11 @@ class SettingsProvider with ChangeNotifier {
 
   List<Course> get manualAddedCourses {
     if (preferences!.containsKey(KEY_MANUALLY_ADDED_COURSE)) {
-      var courseList = (json.decode(preferences!.getString(KEY_MANUALLY_ADDED_COURSE)!) as List)
-          .map((i) => Course.fromJson(i))
-          .toList();
+      var courseList =
+          (json.decode(preferences!.getString(KEY_MANUALLY_ADDED_COURSE)!)
+                  as List)
+              .map((i) => Course.fromJson(i))
+              .toList();
 
       return courseList;
     }
@@ -268,20 +272,20 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Language get defaultLanguage{
+  Language get defaultLanguage {
     Locale locale = PlatformDispatcher.instance.locale;
-    if(locale.languageCode == 'en') {
+    if (locale.languageCode == 'en') {
       return Language.ENGLISH;
-    } else if(locale.languageCode == 'ja') {
+    } else if (locale.languageCode == 'ja') {
       return Language.JAPANESE;
-    } else if(locale.languageCode == 'zh'){
+    } else if (locale.languageCode == 'zh') {
       return Language.SIMPLE_CHINESE;
-    } else{
+    } else {
       return Language.NONE;
     }
   }
 
-  Language get language{
+  Language get language {
     if (preferences!.containsKey(KEY_PREFERRED_LANGUAGE)) {
       String? value = preferences!.getString(KEY_PREFERRED_LANGUAGE);
       return Constant.LANGUAGE_VALUES
@@ -477,6 +481,24 @@ class SettingsProvider with ChangeNotifier {
   set isBannerEnabled(bool value) {
     preferences!.setBool(KEY_BANNER_ENABLED, value);
     notifyListeners();
+  }
+
+  bool get isTagSuggestionEnabled {
+    if (preferences!.containsKey(KEY_TAG_SUGGESTIONS_ENABLE)) {
+      return preferences!.getBool(KEY_TAG_SUGGESTIONS_ENABLE)!;
+    }
+    return false;
+  }
+
+  set isTagSuggestionEnabled(bool value) {
+    preferences!.setBool(KEY_TAG_SUGGESTIONS_ENABLE, value);
+    notifyListeners();
+  }
+
+  bool tagSuggestionAvailable = false;
+
+  Future<bool> isTagSuggestionAvailable() async {
+    return await getTagSuggestions('test') != null;
   }
 
   /// Primary color used by the app.

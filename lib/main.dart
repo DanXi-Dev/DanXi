@@ -91,8 +91,11 @@ void main() {
     if (SettingsProvider.getInstance().isAdEnabled) {
       MobileAds.instance.initialize();
     }
+    SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
+      SettingsProvider.getInstance().tagSuggestionAvailable = value;
 
-    runApp(const DanxiApp());
+      runApp(const DanxiApp());
+    });
   });
 
   // Init DesktopWindow on desktop environment.

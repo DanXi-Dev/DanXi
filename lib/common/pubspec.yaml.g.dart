@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.11+185';
+const String version = r'1.3.11+321';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,10 +55,10 @@ const int patch = 11;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'185'];
+const List<String> build = <String>[r'321'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1657631654;
+const int timestamp = 1668657226;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -98,7 +98,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://github.com/singularity-s0/flutter_progress_dialog.git',
+      'url': r'https://github.com/Boreas618/flutter_progress_dialog.git',
       'ref': r'master',
     },
   },
@@ -108,12 +108,12 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'master',
     },
   },
-  'beautiful_soup_dart': r'^0.2.0',
-  'quick_actions': r'^0.6.0+9',
+  'beautiful_soup_dart': r'^0.3.0',
+  'quick_actions': r'^1.0.1',
   'qr_flutter': r'^4.0.0',
   'provider': r'^6.0.2',
   'event_bus': r'^2.0.0',
-  'flutter_platform_widgets': r'^1.20.0',
+  'flutter_platform_widgets': r'^2.0.0',
   'share_plus': r'^4.0.4',
   'path_provider': r'^2.0.9',
   'screen_brightness': r'^0.2.1',
@@ -131,17 +131,17 @@ const Map<String, Object> dependencies = <String, Object>{
   'image_picker': r'^0.8.5',
   'clipboard': r'^0.1.3',
   'flutter_inappwebview': r'^5.3.2',
-  'permission_handler': r'^8.3.0',
+  'permission_handler': r'^10.2.0',
   'in_app_review': r'^2.0.4',
   'flutter_linkify': r'^5.0.2',
   'linkify': r'^4.0.0',
   'open_file': r'^3.2.1',
   'dio_log': r'^2.0.2',
   'json_serializable': r'^6.2.0',
-  'photo_view': r'^0.13.0',
+  'photo_view': r'^0.14.0',
   'gallery_saver': r'^2.3.2',
   'flutter_markdown': r'^0.6.10',
-  'markdown': r'^5.0.0',
+  'markdown': r'^6.0.1',
   'system_tray': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/antler119/system_tray.git',
@@ -152,7 +152,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'win32': r'^2.6.1',
   'file_picker': r'^4.5.1',
   'cached_network_image': r'^3.2.1',
-  'google_mobile_ads': r'^1.2.0',
+  'google_mobile_ads': r'^2.3.0',
   'flutter_typeahead': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/selvam920/flutter_typeahead',

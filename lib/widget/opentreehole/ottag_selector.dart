@@ -41,10 +41,10 @@ class OTTagSelector extends StatefulWidget {
       : super(key: key);
 
   @override
-  _OTTagSelectorState createState() => _OTTagSelectorState();
+  OTTagSelectorState createState() => OTTagSelectorState();
 }
 
-class _OTTagSelectorState extends State<OTTagSelector> {
+class OTTagSelectorState extends State<OTTagSelector> {
   List<OTTag>? _allTags;
 
   @override
