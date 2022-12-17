@@ -378,8 +378,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   Future<void> refreshList() async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
-        await OpenTreeHoleRepository.getInstance()
-            .getFavoriteHoleId();
+        await OpenTreeHoleRepository.getInstance().getFavoriteHoleId();
       } else if (context.read<FDUHoleProvider>().isUserInitialized) {
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);
@@ -680,12 +679,19 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             ? (context, index, item) async {
                 await OpenTreeHoleRepository.getInstance()
                     .setFavorite(SetFavoriteMode.DELETE, item.hole_id)
-                    .onError((dynamic error, stackTrace) {
+                    .onError((error, stackTrace) {
                   Noticing.showNotice(context, error.toString(),
                       title: S.of(context).operation_failed,
                       useSnackBar: false);
                   return null;
                 });
+              }
+            : null,
+        onConfirmDismissItem: _postsType == PostsType.FAVORED_DISCUSSION
+            ? (context, index, item) {
+                return Noticing.showConfirmationDialog(
+                    context, S.of(context).remove_favorite_hole_confirmation,
+                    isConfirmDestructive: true);
               }
             : null,
       );

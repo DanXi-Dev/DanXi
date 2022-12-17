@@ -43,6 +43,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Color? getDefaultCardBackgroundColor(
@@ -166,7 +167,8 @@ class OTHoleWidget extends StatelessWidget {
                                 arguments: {"tagFilter": tagName},
                                 forcePushOnMainNavigator: true);
                           },
-                              SettingsProvider.getInstance()
+                              context
+                                  .read<SettingsProvider>()
                                   .useAccessibilityColoring),
                           Row(
                             //mainAxisSize: MainAxisSize.min,

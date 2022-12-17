@@ -440,6 +440,7 @@
   "continue_sending": "Still send",
   "post_has_stop_words_title": "Inappropriate words",
   "post_has_stop_words": "You are using some inappropriate words: {stopWord}.\nWe do not recommend sending such words as they are not suitable for a rational discussion and are therefore more likely to attract unfriendly comments. Do you really want to send?",
+  "remove_favorite_hole_confirmation": "Are you sure to remove this favorite?",
   "community_convention": "Community Convention",
   "fduhole_show_banner": "Show campaigns",
   "fduhole_show_banner_description": "Show some non-invasive campaigns and announcements",
