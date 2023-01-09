@@ -591,13 +591,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    final DisableScreenshots _plugin = DisableScreenshots()
-      ..addWatermark(
+    Watermark.addWatermark(
           context,
-          (context.read<FDUHoleProvider>().isUserInitialized
-              ? OpenTreeHoleRepository.getInstance().userInfo?.user_id
-                      .toString()
-              : S.of(context).not_logged_in)!,
+          PlatformX.isDarkMode,
           rowCount: 4,
           columnCount: 8);
     return Container(

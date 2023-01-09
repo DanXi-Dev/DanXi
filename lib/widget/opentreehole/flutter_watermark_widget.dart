@@ -1,17 +1,18 @@
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class DisableScreenshotsWatermark extends StatelessWidget {
+import 'package:provider/provider.dart';
+
+class FullScreenWatermark extends StatelessWidget {
   final int rowCount;
   final int columnCount;
-  final String text;
   final TextStyle textStyle;
 
-  const DisableScreenshotsWatermark({
+  const FullScreenWatermark({
     Key? key,
     required this.rowCount,
     required this.columnCount,
-    required this.text,
     required this.textStyle,
   }) : super(key: key);
 
@@ -42,7 +43,9 @@ class DisableScreenshotsWatermark extends StatelessWidget {
       final widget = Expanded(
           child: Center(
               child: Transform.rotate(
-                  angle: pi / 10, child: Text(text, style: textStyle))));
+                  angle: pi / 10, child: Consumer<FDUHoleProvider>(
+                builder: (context, holeProvider, _) => Text(holeProvider.userInfo?.user_id.toString() ?? " ", style: textStyle),
+              ))));
       list.add(widget);
     }
     return list;
