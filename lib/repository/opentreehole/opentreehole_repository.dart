@@ -479,8 +479,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             options: Options(headers: _tokenHeader));
     return response.data
         ?.map((e) => OTMessage.fromJson(e))
-        .toList()
-        .reversed
         .toList();
   }
 
@@ -531,7 +529,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/user/favorites",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
         options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+    var result = response.data?.map((e) => OTHole.fromJson(e)).toList();
+    // Reverse the list to make it in the descending order of hole_id
+    return result?.reversed.toList();
   }
 
   Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {

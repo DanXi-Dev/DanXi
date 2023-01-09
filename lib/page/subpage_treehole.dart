@@ -685,12 +685,19 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             ? (context, index, item) async {
                 await OpenTreeHoleRepository.getInstance()
                     .setFavorite(SetFavoriteMode.DELETE, item.hole_id)
-                    .onError((dynamic error, stackTrace) {
+                    .onError((error, stackTrace) {
                   Noticing.showNotice(context, error.toString(),
                       title: S.of(context).operation_failed,
                       useSnackBar: false);
                   return null;
                 });
+              }
+            : null,
+        onConfirmDismissItem: _postsType == PostsType.FAVORED_DISCUSSION
+            ? (context, index, item) {
+                return Noticing.showConfirmationDialog(
+                    context, S.of(context).remove_favorite_hole_confirmation,
+                    isConfirmDestructive: true);
               }
             : null,
       );

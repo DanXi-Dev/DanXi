@@ -89,7 +89,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final ScreenCaptureEvent? screenListener =
-      PlatformX.isWeb ? null : ScreenCaptureEvent();
+      PlatformX.isMobile ? ScreenCaptureEvent() : null;
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
