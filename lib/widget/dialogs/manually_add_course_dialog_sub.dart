@@ -58,6 +58,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                               : Text(
                                   Constant.WeekDays[e],
                                   style: const TextStyle(
+                                    color: Colors.white,
                                       fontWeight: FontWeight.w900),
                                 ),
                         ),
@@ -83,6 +84,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                               : Text(
                                   (e + 1).toString(),
                                   style: const TextStyle(
+                                    color: Colors.white,
                                       fontWeight: FontWeight.w900),
                                 ),
                         ),

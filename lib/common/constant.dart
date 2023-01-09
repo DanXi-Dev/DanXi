@@ -272,6 +272,7 @@ class Constant {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: color),
       cardTheme: CardTheme(
+        elevation: 0.5,
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
       ),

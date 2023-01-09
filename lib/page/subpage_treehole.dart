@@ -63,6 +63,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 
+import '../util/watermark.dart';
 import '../widget/opentreehole/tag_selector/tag.dart';
 
 const kCompatibleUserGroup = [
@@ -590,6 +591,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
+    Watermark.addWatermark(
+          context,
+          PlatformX.isDarkMode,
+          rowCount: 4,
+          columnCount: 8);
     return Container(
       decoration: _backgroundImage == null
           ? null
