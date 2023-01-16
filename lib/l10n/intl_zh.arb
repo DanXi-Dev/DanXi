@@ -217,7 +217,7 @@
   "last_30_days": "过去 30 天",
   "older_announcement": "往期公告",
   "latest_announcement": "最新公告",
-  "dashboard": "校园",
+  "dashboard": "首页",
   "forum": "树洞",
   "timetable": "日程",
   "week": "第 {week} 周",
@@ -432,10 +432,9 @@
   "continue_sending": "继续发送",
   "post_has_stop_words_title": "含有不适当的词语",
   "post_has_stop_words": "内容中含有不适宜使用的词汇：{stopWord}。\n我们不建议发送此类词语，因为它不适用于理性讨论的环境，因而更有可能招致攻击和不恰当言论，一定要继续发送吗？",
-  "remove_favorite_hole_confirmation": "确定要移除本条收藏吗？",
   "community_convention": "社区公约",
   "fduhole_show_banner": "显示一些活动",
-  "fduhole_show_banner_description": "将在树洞页面顶部显示一些不干扰浏览的校园活动公告",
+  "fduhole_show_banner_description": "[实验性] 将在树洞页面顶部显示一些不干扰浏览的校园活动公告",
   "theme_color": "主题色",
   "theme_color_description": "切换旦夕的主题配色",
   "theme_color_description_detail": "选择预设颜色或自定义颜色以切换旦夕主题配色",
@@ -445,9 +444,5 @@
   "read_announcements": "查看开发组公告",
   "admin_no_hide_tag": "管理员不可以屏蔽标签",
   "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？",
-  "recommended_tags": "推荐标签",
-  "recommended_tags_availibity": "【实验性】在发帖时推荐一些标签",
-  "unavailable": "不可用",
-  "enable": "启用",
-  "recommended_tags_description": "可用性: iOS 14.0 以及更高\n\nFill in..."
+  "recommended_tags": "推荐标签"
 }

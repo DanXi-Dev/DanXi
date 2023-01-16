@@ -121,11 +121,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void _rebuildPage() {
     _lastRefreshTime = DateTime.now();
     _subpage = [
-      if (!SettingsProvider.getInstance().hideHole)
-        TreeHoleSubpage(key: treeholePageKey),
       // Don't show Dashboard in visitor mode
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         HomeSubpage(key: dashboardPageKey),
+      if (!SettingsProvider.getInstance().hideHole)
+        TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
@@ -560,13 +560,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             cupertinoTabChildBuilder: (_, index) => _subpage[index],
             bottomNavBar: PlatformNavBar(
               items: [
-                if (!SettingsProvider.getInstance().hideHole)
-                  BottomNavigationBarItem(
-                    icon: PlatformX.isMaterial(context)
-                        ? const Icon(Icons.forum)
-                        : const Icon(CupertinoIcons.text_bubble),
-                    label: S.of(context).forum,
-                  ),
                 // Don't show Dashboard in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
                   BottomNavigationBarItem(
@@ -574,6 +567,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ? const Icon(Icons.dashboard)
                         : const Icon(CupertinoIcons.square_stack_3d_up_fill),
                     label: S.of(context).dashboard,
+                  ),
+                if (!SettingsProvider.getInstance().hideHole)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.forum)
+                        : const Icon(CupertinoIcons.text_bubble),
+                    label: S.of(context).forum,
                   ),
                 // Don't show Timetable in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
