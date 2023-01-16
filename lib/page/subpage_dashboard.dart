@@ -25,7 +25,6 @@ import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/dorm_electricity_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
-import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/fudan_library_crowdedness_feature.dart';
 import 'package:dan_xi/feature/lan_connection_notification.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
@@ -142,7 +141,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
       'aao_notice_feature': FeatureListItem(feature: FudanAAONoticesFeature()),
       'empty_classroom_feature':
           FeatureListItem(feature: EmptyClassroomFeature()),
-      'fudan_daily_feature': FeatureListItem(feature: FudanDailyFeature()),
+      // 'fudan_daily_feature': FeatureListItem(feature: FudanDailyFeature()),
       'new_card': const SizedBox(),
       'qr_feature': FeatureListItem(feature: QRFeature()),
       'pe_feature': FeatureListItem(feature: PEFeature()),

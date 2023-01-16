@@ -150,7 +150,7 @@ class Constant {
             S.of(context).fudan_library_crowdedness,
         'aao_notice_feature': S.of(context).fudan_aao_notices,
         'empty_classroom_feature': S.of(context).empty_classrooms,
-        'fudan_daily_feature': S.of(context).fudan_daily,
+        // 'fudan_daily_feature': S.of(context).fudan_daily,
         'new_card': S.of(context).add_new_card,
         'qr_feature': S.of(context).fudan_qr_code,
         'pe_feature': S.of(context).pe_exercises,
@@ -175,8 +175,8 @@ class Constant {
     DashboardCard("bus_feature", null, null, true),
     DashboardCard("pe_feature", null, null, true),
     DashboardCard("new_card", null, null, true),
-    DashboardCard("fudan_daily_feature", null, null, true),
-    DashboardCard("new_card", null, null, true),
+    // DashboardCard("fudan_daily_feature", null, null, true),
+    // DashboardCard("new_card", null, null, true),
     DashboardCard("qr_feature", null, null, true),
   ];
 
