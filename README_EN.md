@@ -1,15 +1,23 @@
 [中文版](README.md) English Version  
 [Official Website(Chinese Only)](https://danxi.fduhole.com)
 
-# Maintenance Notice
+[//]: # (# Maintenance Notice)
 
-As the Flutter framework has shown incompatibility, instability, and low performance in our
-development, DanXi-Dev officially decided to abandon Flutter and move to Android and iOS native
-development on July 20, 2022.
+[//]: # ()
 
-This repository will only be updated for maintenance purposes. You can browse new
-repository [here (for Android)](https://github.com/DanXi-Dev/DanXi-NG)
-and [here (for iOS, not public for secure reasons)](https://github.com/DanXi-Dev/DanXi-Swift).
+[//]: # (As the Flutter framework has shown incompatibility, instability, and low performance in our)
+
+[//]: # (development, DanXi-Dev officially decided to abandon Flutter and move to Android and iOS native)
+
+[//]: # (development on July 20, 2022.)
+
+[//]: # ()
+
+[//]: # (This repository will only be updated for maintenance purposes. You can browse new)
+
+[//]: # (repository [here &#40;for Android&#41;]&#40;https://github.com/DanXi-Dev/DanXi-NG&#41;)
+
+[//]: # (and [here &#40;for iOS, not public for secure reasons&#41;]&#40;https://github.com/DanXi-Dev/DanXi-Swift&#41;.)
 
 # DanXi
 
