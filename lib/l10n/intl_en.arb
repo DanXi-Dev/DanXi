@@ -457,5 +457,5 @@
   "recommended_tags_availibity": "[Experimental] Recommend tags when posting",
   "unavailable": "Unavailable",
   "enable": "Enable",
-  "recommended_tags_description": "Availibility: iOS 14.0 and higher\n\nAll recommendations are processed entirely on-device. If you find the recommendations inappropriate, you can report this to dev@fduhole.com "
+  "recommended_tags_description": "Availability: iOS 14.0 and higher\n\nAll recommendations are processed entirely on-device. If you find the recommendations inappropriate, you can report issues to dev@fduhole.com ."
 }

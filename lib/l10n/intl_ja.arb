@@ -416,5 +416,10 @@
   "login_problem": "ログインできない場合は、dev@fduhole.comまでご連絡ください、またはQQグループ（番号：{QQ}）にご参加ください。 .\n\nその間に、「開発チームのお知らせ」を読んでくださいと、こんな問題が言及されている可能性があります。",
   "copy_qq_group_id": "番号をコピーする",
   "read_announcements": "お知らせを読む",
-  "semester_start_at_monday": "学期開始日は通常第1週の月曜日ですが、選択された日付が月曜日でないようです。 本当にそのままで設定するのですか？"
+  "semester_start_at_monday": "学期開始日は通常第1週の月曜日ですが、選択された日付が月曜日でないようです。 本当にそのままで設定するのですか？",
+  "recommended_tags": "おすすめタグ",
+  "recommended_tags_availibity": "投稿時にタグをアドバイスする",
+  "unavailable": "使用できません",
+  "enable": "有効",
+  "recommended_tags_description": "対応機種：iOS 14.0 以降\n\nすべてのレコメンデーションは、デバイス上ですべて処理されます。レコメンデーションが不適切だと感じた場合は、dev@fduhole.com に問題を報告することができます。"
 }

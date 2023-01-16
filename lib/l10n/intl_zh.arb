@@ -444,5 +444,9 @@
   "read_announcements": "查看开发组公告",
   "admin_no_hide_tag": "管理员不可以屏蔽标签",
   "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？",
-  "recommended_tags": "推荐标签"
+  "recommended_tags": "推荐标签",
+  "recommended_tags_availibity": "[实验性] 根据你的帖子内容推荐一些标签",
+  "unavailable": "不可用",
+  "enable": "启用",
+  "recommended_tags_description": "系统要求: iOS 14.0 或更高\n\n所有建议完全在设备上本地执行推理。如果你发现建议不合适，请报告至 dev@fduhole.com 。"
 }
