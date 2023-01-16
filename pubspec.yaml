@@ -35,7 +35,7 @@ dependencies:
   flutter_email_sender: ^5.1.0
   auto_size_text: ^3.0.0
   ical: ^0.2.2
-  url_launcher: ^6.0.20
+  url_launcher: ^6.1.7
   desktop_window: ^0.4.0
   intl: ^0.17.0
   http: ^0.13.4
