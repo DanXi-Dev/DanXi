@@ -146,9 +146,12 @@ class CardRepository extends BaseRepositoryWithDio {
 
     //获取用户页面信息
     var userPageResponse = await dio.get(_USER_DETAIL_URL);
-    cardInfo.cash =
-        userPageResponse.data.toString().between("<p>账户余额：", "元</p>");
-    cardInfo.name = userPageResponse.data.toString().between("姓名：", "</p>");
+    var soup = BeautifulSoup(userPageResponse.data.toString());
+
+    var nameElement = soup.find("*", class_: "custname");
+    var cashElement = soup.find("", selector: ".payway-box-bottom-item>p");
+    cardInfo.cash = cashElement?.text.trim();
+    cardInfo.name = nameElement?.text.between("您好，", "！")?.trim();
     List<CardRecord>? records =
         await Retrier.runAsyncWithRetry(() => loadCardRecord(logDays));
     cardInfo.records = records;

@@ -8,7 +8,7 @@
   
   MIT License
   
-  Copyright (c) 2022 Plague Fox
+  Copyright (c) 2023 Plague Fox
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -58,13 +58,14 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'321'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1668657226;
+const int timestamp = 1673948644;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description = r'Maybe the best all-rounded service app for Fudan University students.';
+const String description =
+    r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -120,7 +121,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_email_sender': r'^5.1.0',
   'auto_size_text': r'^3.0.0',
   'ical': r'^0.2.2',
-  'url_launcher': r'^6.0.20',
+  'url_launcher': r'^6.1.7',
   'desktop_window': r'^0.4.0',
   'intl': r'^0.17.0',
   'http': r'^0.13.4',
@@ -181,6 +182,8 @@ const Map<String, Object> dependencies = <String, Object>{
   'nil': r'^1.1.1',
   'flex_color_picker': r'^2.4.0',
   'material_color_generator': r'^1.1.0',
+  'flutter_swiper_view': r'^1.1.8',
+  'boxy': r'^2.0.6+2',
 };
 
 /// Developer dependencies
