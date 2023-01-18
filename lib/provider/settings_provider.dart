@@ -263,7 +263,6 @@ class SettingsProvider with ChangeNotifier {
         return Campus.HANDAN_CAMPUS;
       });
     }
-    campus = Campus.HANDAN_CAMPUS;
     return Campus.HANDAN_CAMPUS;
   }
 
