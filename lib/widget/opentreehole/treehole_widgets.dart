@@ -908,6 +908,7 @@ class OTMessageItem extends StatefulWidget {
         case 'mention':
         case 'favorite':
         case 'modify':
+        case 'reply':
           // data should be [OTFloor]
           final floor = OTFloor.fromJson(data!);
           if (floor.floor_id == null) return;
