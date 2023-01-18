@@ -63,7 +63,10 @@ class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   set _selectBuildingIndex(int value) {
     __selectBuildingIndex = value;
-    SettingsProvider.getInstance().lastECBuildingChoiceRepresentation = value;
+    if (SettingsProvider.getInstance().lastECBuildingChoiceRepresentation !=
+        value) {
+      SettingsProvider.getInstance().lastECBuildingChoiceRepresentation = value;
+    }
   }
 
   double _selectDate = 0;
