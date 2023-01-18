@@ -170,7 +170,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
         )));
     List<Widget> currentCardChildren = [];
     for (var element in widgetSequence) {
-      if (!element.enabled!) continue;
+      if (element.enabled != true) continue;
       if (element.internalString == 'new_card') {
         if (currentCardChildren.isEmpty) continue;
         widgets.add(Card(
@@ -186,15 +186,16 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
         ));
       } else {
         // Skip incompatible items
-        if (widgetMap[element.internalString!] is FeatureContainer) {
-          FeatureContainer container =
-              widgetMap[element.internalString!] as FeatureContainer;
+        var widget = widgetMap[element.internalString!];
+        if (widget == null) continue;
+        if (widget is FeatureContainer) {
+          FeatureContainer container = widget as FeatureContainer;
           if (!checkFeature(
               container.childFeature, StateProvider.personInfo.value!.group)) {
             continue;
           }
         }
-        currentCardChildren.add(widgetMap[element.internalString!]!);
+        currentCardChildren.add(widget);
       }
     }
     if (currentCardChildren.isNotEmpty) {
