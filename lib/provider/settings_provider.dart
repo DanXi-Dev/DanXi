@@ -21,6 +21,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
@@ -71,6 +72,9 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_PREFERRED_LANGUAGE = "language";
   static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
   static const String KEY_TAG_SUGGESTIONS_ENABLE = "tag_suggestions";
+  static const String KEY_LIGHT_WATERMARK_COLOR = "light_watermark_color";
+  static const String KEY_DARK_WATERMARK_COLOR = "dark_watermark_color";
+  static const String KEY_VISIBLE_WATERMARK_MODE = "visible_watermark";
 
   SettingsProvider._();
 
@@ -515,6 +519,47 @@ class SettingsProvider with ChangeNotifier {
     preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
     notifyListeners();
   }
+
+  int get lightWatermarkColor {
+    if (preferences!.containsKey(KEY_LIGHT_WATERMARK_COLOR)) {
+      int? color = preferences!.getInt(KEY_LIGHT_WATERMARK_COLOR);
+      return Color(color!).value;
+    }
+    return 0x02000000;
+  }
+
+  set lightWatermarkColor(int value) {
+    preferences!.setInt(KEY_LIGHT_WATERMARK_COLOR, Color(value).value);
+    notifyListeners();
+  }
+
+  int get darkWatermarkColor {
+    if (preferences!.containsKey(KEY_DARK_WATERMARK_COLOR)) {
+      int? color = preferences!.getInt(KEY_DARK_WATERMARK_COLOR);
+      return Color(color!).value;
+    }
+    return 0x08000000;
+  }
+
+  set darkWatermarkColor(int value) {
+    preferences!.setInt(KEY_DARK_WATERMARK_COLOR, Color(value).value);
+    notifyListeners();
+  }
+
+  bool get visibleWatermarkMode {
+    if (preferences!.containsKey(KEY_VISIBLE_WATERMARK_MODE)) {
+      return preferences!.getBool(KEY_VISIBLE_WATERMARK_MODE)!;
+    } else {
+      return false;
+    }
+  }
+
+  set visibleWatermarkMode(bool mode) {
+    preferences!.setBool(KEY_VISIBLE_WATERMARK_MODE, mode);
+    notifyListeners();
+  }
+
+
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

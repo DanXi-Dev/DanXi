@@ -96,6 +96,7 @@ class _SwatchPickerDialogState extends State<SwatchPickerDialog> {
             ),
           ),
           Expanded(
+            flex:1,
             child: ColorWheelPicker(
               color: _finalSelected,
               onChanged: materialColorGenerator,
