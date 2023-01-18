@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
+import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -596,7 +597,8 @@ class OTFloorMentionWidget extends StatelessWidget {
     required this.hasBackgroundImage,
   }) : super(key: key);
 
-  static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor) {
+  static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor,
+      [String? extraTips]) {
     bool inThatFloorPage = false;
     PagedListViewController<OTFloor>? pagedListViewController;
     try {
@@ -615,6 +617,11 @@ class OTFloorMentionWidget extends StatelessWidget {
           final Widget cardBody = Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (extraTips != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(extraTips),
+                ),
               ConstrainedBox(
                 constraints: BoxConstraints(
                     maxHeight: ViewportUtils.getViewportHeight(context) *
@@ -919,7 +926,20 @@ class OTMessageItem extends StatefulWidget {
           }
           break;
         case 'report':
-          //TODO: Unimplemented
+          // data should be [OTReport]
+          final report = OTReport.fromJson(data!);
+
+          // fixme: [OTReport.floor]'s fields are not filled at all at the moment.
+          //        Currently, we have to construct a fake [OTFloor] to display.
+          final floor =
+              OTFloor.special("点击下面查看帖子，定位用不了", "##${data["floor_id"]}");
+
+          if (await OTFloorMentionWidget.showFloorDetail(
+                      context, floor, report.reason) ==
+                  true &&
+              id != null) {
+            markMessageAsRead(OTMessage(id, null, null, null, true, null));
+          }
           break;
       }
     } catch (ignored) {
