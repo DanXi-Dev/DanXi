@@ -139,7 +139,6 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                       ? const Icon(Icons.calendar_month_outlined)
                       : const Icon(CupertinoIcons.calendar),
                   enabled: false,
-                  labelStyle: TextStyle(color: Color(Colors.black54.value)),
                 ),
                 autofocus: false,
               ),
@@ -187,7 +186,6 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                       ? const Icon(Icons.access_time)
                       : const Icon(CupertinoIcons.time),
                   enabled: false,
-                  labelStyle: TextStyle(color: Color(Colors.black54.value)),
                 ),
                 autofocus: false,
               ),
