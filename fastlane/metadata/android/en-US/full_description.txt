@@ -2,7 +2,6 @@ Maybe the best all-rounded service app for Fudan University students!
 
 - Campus card balance and transactions
 - Dining hall traffic
-- Automatic COVID-19 Safety Check-in
 - Shortcut for Fudan QR Code (with support for Apple Watch)
 - View empty classrooms
 - Tree Hole
