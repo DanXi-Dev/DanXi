@@ -487,6 +487,32 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                 .changeToMaterialPlatform(),
                       ),
                     ),
+                  if (SettingsProvider.getInstance().debugMode)
+                    Card(
+                        child: ListTile(
+                            title: Text("Fancy Watermark"),
+                            leading: Icon(Icons.numbers),
+                            subtitle: Text(
+                                "[WARNING: DEBUG FEATURE] Visible watermark for debug"),
+                            onTap: () {
+                              if (SettingsProvider.getInstance()
+                                  .visibleWatermarkMode) {
+                                SettingsProvider.getInstance()
+                                    .lightWatermarkColor = 0xff000000;
+                                SettingsProvider.getInstance()
+                                    .darkWatermarkColor = 0xff000000;
+                                SettingsProvider.getInstance()
+                                    .visibleWatermarkMode = false;
+                              } else {
+                                SettingsProvider.getInstance()
+                                    .lightWatermarkColor = 0x02000000;
+                                SettingsProvider.getInstance()
+                                    .darkWatermarkColor = 0x08000000;
+                                SettingsProvider.getInstance()
+                                    .visibleWatermarkMode = true;
+                              }
+                              FlutterApp.restartApp(context);
+                            })),
 
                   // Sponsor Option
                   // if (PlatformX.isMobile)
