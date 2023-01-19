@@ -62,7 +62,6 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -88,9 +87,9 @@ void main() {
     // Initialize Ad only if user has opted-in to save resources
     // If user decides to opt-in after the app has started,
     // Admob SDK will automatically initialize on first request.
-    if (SettingsProvider.getInstance().isAdEnabled) {
-      MobileAds.instance.initialize();
-    }
+    // if (SettingsProvider.getInstance().isAdEnabled) {
+    //   MobileAds.instance.initialize();
+    // }
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
 

@@ -19,19 +19,16 @@ import 'dart:async';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -95,35 +92,6 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> diagnoseGoogleAds() async {
-    if (!PlatformX.isMobile) return;
-    _console.writeln("Trying to load google ads……");
-    BannerAd bannerAd;
-    final BannerAdListener listener = BannerAdListener(
-      // Called when an ad is successfully received.
-      onAdLoaded: (Ad ad) {
-        _console.writeln(
-            "Successfully load! ad responseId = ${ad.responseInfo?.responseId}");
-      },
-      // Called when an ad request failed.
-      onAdFailedToLoad: (Ad ad, LoadAdError error) {
-        _console.writeln("Unable to load ads! error is $error");
-        // Dispose the ad here to free resources.
-        ad.dispose();
-      },
-      // Called when an ad opens an overlay that covers the screen.
-      onAdOpened: (Ad ad) {},
-      // Called when an ad removes an overlay that covers the screen.
-      onAdClosed: (Ad ad) {},
-      // Called when an impression occurs on the ad.
-      onAdImpression: (Ad ad) {},
-    );
-    bannerAd = BannerAd(
-      adUnitId: AdManager.unitIdList[0],
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: listener,
-    );
-    bannerAd.load();
   }
 
   static const _IGNORE_KEYS = ["password"];

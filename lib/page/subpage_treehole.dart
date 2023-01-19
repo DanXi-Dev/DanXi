@@ -31,7 +31,6 @@ import 'package:dan_xi/page/curriculum/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -54,7 +53,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 
@@ -310,8 +308,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
 
-  Future<BannerAd?>? bannerAd;
-
   FileImage? _backgroundImage;
 
   /// This is to prevent the entire page being rebuilt on iOS when the keyboard pops up
@@ -476,8 +472,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           });
         }),
         hashCode);
-
-    bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
   }
 
   @override
@@ -597,7 +591,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         builder: _buildListItem,
         headBuilder: (context) => Column(
           children: [
-            AutoBannerAdWidget(bannerAd: bannerAd),
             if (_postsType == PostsType.NORMAL_POSTS) ...[
               buildForumTopBar(),
               _autoSilenceNotice(),

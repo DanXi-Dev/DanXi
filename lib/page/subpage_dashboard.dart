@@ -34,7 +34,6 @@ import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -50,7 +49,6 @@ import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 class HomeSubpage extends PlatformSubpage<HomeSubpage> {
@@ -94,7 +92,6 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
       StateStreamListener();
   late Map<String, Widget> widgetMap;
 
-  Future<BannerAd?>? bannerAd;
   late NotificationProvider _notificationProvider;
 
   @override
@@ -110,7 +107,6 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
           }
         }),
         hashCode);
-    bannerAd = AdManager.loadBannerAd(0); // 0 for main page
     _rebuildFeatures();
   }
 
@@ -158,11 +154,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   }
 
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
-    List<Widget> widgets = [
-      AutoBannerAdWidget(
-        bannerAd: bannerAd,
-      )
-    ];
+    List<Widget> widgets = [];
     NotificationProvider provider = context.watch<NotificationProvider>();
     widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
           feature: e,

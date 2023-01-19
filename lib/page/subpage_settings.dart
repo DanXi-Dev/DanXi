@@ -24,7 +24,6 @@ import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -55,7 +54,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
@@ -114,8 +112,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/flutter/plugins/tree/master/packages/image_picker/image_picker"),
     LicenseItem("Kotlin Stdlib Jdk7", LICENSE_APACHE_2_0,
         "https://github.com/JetBrains/kotlin"),
-    LicenseItem("google_mobile_ads", LICENSE_APACHE_2_0,
-        "https://github.com/googleads/googleads-mobile-flutter"),
     LicenseItem("auto_size_text", LICENSE_MIT,
         "https://github.com/leisim/auto_size_text"),
     LicenseItem("beautiful_soup_dart", LICENSE_MIT,
@@ -223,12 +219,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
   ];
-  Future<BannerAd?>? bannerAd;
 
   @override
   void initState() {
     super.initState();
-    bannerAd = AdManager.loadBannerAd(3); // 3 for settings page
   }
 
   String? _clearCacheSubtitle;
@@ -321,7 +315,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
             child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  AutoBannerAdWidget(bannerAd: bannerAd),
                   //Account Selection
                   Card(
                     child: Column(children: [
@@ -496,29 +489,29 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     ),
 
                   // Sponsor Option
-                  if (PlatformX.isMobile)
-                    Card(
-                      child: ListTile(
-                        isThreeLine:
-                            !SettingsProvider.getInstance().isAdEnabled,
-                        leading: Icon(
-                          PlatformIcons(context).heartSolid,
-                        ),
-                        title: Text(S.of(context).sponsor_us),
-                        subtitle: Text(
-                            SettingsProvider.getInstance().isAdEnabled
-                                ? S.of(context).sponsor_us_enabled
-                                : S.of(context).sponsor_us_disabled),
-                        onTap: () async {
-                          if (SettingsProvider.getInstance().isAdEnabled) {
-                            _toggleAdDisplay();
-                          } else {
-                            _toggleAdDisplay();
-                            await _showAdsThankDialog();
-                          }
-                        },
-                      ),
-                    ),
+                  // if (PlatformX.isMobile)
+                  //   Card(
+                  //     child: ListTile(
+                  //       isThreeLine:
+                  //           !SettingsProvider.getInstance().isAdEnabled,
+                  //       leading: Icon(
+                  //         PlatformIcons(context).heartSolid,
+                  //       ),
+                  //       title: Text(S.of(context).sponsor_us),
+                  //       subtitle: Text(
+                  //           SettingsProvider.getInstance().isAdEnabled
+                  //               ? S.of(context).sponsor_us_enabled
+                  //               : S.of(context).sponsor_us_disabled),
+                  //       onTap: () async {
+                  //         if (SettingsProvider.getInstance().isAdEnabled) {
+                  //           _toggleAdDisplay();
+                  //         } else {
+                  //           _toggleAdDisplay();
+                  //           await _showAdsThankDialog();
+                  //         }
+                  //       },
+                  //     ),
+                  //   ),
 
                   // About
                   _buildAboutCard(context)

@@ -71,7 +71,6 @@ dependencies:
   win32: ^2.6.1
   file_picker: ^4.5.1
   cached_network_image: ^3.2.1
-  google_mobile_ads: ^2.3.0
   flutter_typeahead:
     git:
       url: https://github.com/selvam920/flutter_typeahead
@@ -97,7 +96,6 @@ dependencies:
   flex_color_picker: ^2.4.0
   material_color_generator: ^1.1.0
   flutter_swiper_view: ^1.1.8
-  boxy: ^2.0.6+2
 
 dependency_overrides:
   device_info_plus: ^3.2.1

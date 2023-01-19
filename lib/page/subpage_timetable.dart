@@ -25,7 +25,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
@@ -48,12 +47,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../widget/dialogs/delete_course_dialog.dart';
 import '../widget/dialogs/manually_add_course_dialog.dart';
 
@@ -134,8 +133,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   Future<TimeTable?>? _contentFuture;
 
   bool forceLoadFromRemote = false;
-
-  Future<BannerAd?>? bannerAd;
 
   List<Course> newCourses = [];
 
@@ -306,7 +303,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           refresh();
         }),
         hashCode);
-    bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
   }
 
   Future<void> refresh(
@@ -425,7 +421,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         // This ListView is a workaround, so that we can apply a custom scroll physics to it.
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          AutoBannerAdWidget(bannerAd: bannerAd),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
