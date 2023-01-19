@@ -1,19 +1,33 @@
 中文版 [English Version](README_EN.md)  
-[官方网站](https://danxi.fduhole.com)  
+[官方网站](https://danxi.fduhole.com)
+
+[//]: # (# 暂停开发公告)
+
+[//]: # ()
+
+[//]: # (由于 Flutter 框架在开发中表现出越来越不适应我们需求的兼容性、稳定性和流畅性，旦夕开发组于 2022 年 7 月 20 日 正式决定弃用 Flutter 框架，转向 Android 和 iOS)
+
+[//]: # (原生开发。)
+
+[//]: # ()
+
+[//]: # (现有仓库仅进行维护性更新。新的仓库可在 [这里（Android 端）]&#40;https://github.com/DanXi-Dev/DanXi-NG&#41;)
+
+[//]: # (和 [这里（iOS 端，由于含有测试私钥，仓库尚未公开）]&#40;https://github.com/DanXi-Dev/DanXi-Swift&#41; 查看。)
 
 # 旦夕
+
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
 [![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
-  
+
 （原名旦兮）
 
 日月光华，旦复旦兮.
-  
+
 可能是为 FDUer 准备的,最好的一站式服务 APP!  
 
 - 校园卡余额和消费记录
 - 食堂消费人数
-- 提示并快速平安复旦打卡
 - 快速显示复活码（支持 Apple Watch 显示）
 - 空教室查询
 - 刷锻次数查询
@@ -57,10 +71,10 @@
 
 ```shell script
 $ flutter --version
-Flutter 2.10.4 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision c860cba910 (3 weeks ago) • 2022-03-25 00:23:12 -0500
-Engine • revision 57d3bac3dd
-Tools • Dart 2.16.2 • DevTools 2.9.2
+Flutter 3.3.8 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 52b3dc25f6 (9 days ago) • 2022-11-09 12:09:26 +0800
+Engine • revision 857bd6b74c
+Tools • Dart 2.18.4 • DevTools 2.15.0
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  

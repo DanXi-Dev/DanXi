@@ -29,13 +29,13 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:ical/serializer.dart';
+import 'package:nil/nil.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -98,9 +98,9 @@ class _ExamListState extends State<ExamList> {
             description:
                 "${element.testCategory} ${element.type}\n${element.note}",
             start:
-                DateTime.parse(element.date + ' ' + element.time.split('~')[0]),
+                DateTime.parse('${element.date} ${element.time.split('~')[0]}'),
             end:
-                DateTime.parse(element.date + ' ' + element.time.split('~')[1]),
+                DateTime.parse('${element.date} ${element.time.split('~')[1]}'),
           ));
         } catch (ignored) {
           Noticing.showNotice(
@@ -142,24 +142,23 @@ class _ExamListState extends State<ExamList> {
           ],
         ),
         body: SafeArea(
-            child: Material(
-                child: FutureWidget<List<SemesterInfo>?>(
-                    future: _semesterFuture,
-                    successBuilder: (BuildContext context,
-                        AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                      _unpackedSemester = snapshot.data;
-                      semester ??= _unpackedSemester!.length - 5;
-                      return _loadExamGradeHybridView();
-                    },
-                    loadingBuilder:
-                        Center(child: PlatformCircularProgressIndicator()),
-                    // @w568w (2022-1-27): replacing following lines with `errorBuilder: _loadGradeViewFromDataCenter`
-                    // leads to a 100% execution of _loadGradeViewFromDataCenter.
-                    // I don't know why.
-                    errorBuilder: (BuildContext context,
-                        AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                      return _loadGradeViewFromDataCenter();
-                    }))));
+            child: FutureWidget<List<SemesterInfo>?>(
+                future: _semesterFuture,
+                successBuilder: (BuildContext context,
+                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
+                  _unpackedSemester = snapshot.data;
+                  semester ??= _unpackedSemester!.length - 5;
+                  return _loadExamGradeHybridView();
+                },
+                loadingBuilder:
+                    Center(child: PlatformCircularProgressIndicator()),
+                // @w568w (2022-1-27): replacing following lines with `errorBuilder: _loadGradeViewFromDataCenter`
+                // leads to a 100% execution of _loadGradeViewFromDataCenter.
+                // I don't know why.
+                errorBuilder: (BuildContext context,
+                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
+                  return _loadGradeViewFromDataCenter();
+                })));
   }
 
   Future<void> loadExamAndScore() async {
@@ -222,10 +221,10 @@ class _ExamListState extends State<ExamList> {
               (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
             if (snapshot.error is RangeError) {
               return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Center(
                     child: Text(S.of(context).no_data),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32));
+                  ));
             }
             return _loadGradeViewFromDataCenter();
           });
@@ -254,17 +253,23 @@ class _ExamListState extends State<ExamList> {
   Widget _buildErrorPage(
           BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
       ErrorPageWidget(
-        errorMessage: S.of(context).failed +
-            '\n${S.of(context).need_campus_network}\n\nError:\n' +
-            ErrorPageWidget.generateUserFriendlyDescription(
-                S.of(context), snapshot.error),
+        errorMessage: '${S
+            .of(context)
+            .failed}\n${S
+            .of(context)
+            .need_campus_network}\n\nError:\n${ErrorPageWidget
+            .generateUserFriendlyDescription(
+            S.of(context), snapshot.error)}',
         error: snapshot.error,
         trace: snapshot.stackTrace,
-        onTap: () => setState(() {
-          _semesterFuture = LazyFuture.pack(
-              EduServiceRepository.getInstance().loadSemesters(_info));
-        }),
-        buttonText: S.of(context).retry,
+        onTap: () =>
+            setState(() {
+              _semesterFuture = LazyFuture.pack(
+                  EduServiceRepository.getInstance().loadSemesters(_info));
+            }),
+        buttonText: S
+            .of(context)
+            .retry,
       );
 
   List<Widget> _getListWidgetsGrade(List<ExamScore> scores,
@@ -316,7 +321,7 @@ class _ExamListState extends State<ExamList> {
             },
             errorBuilder: (BuildContext context,
                 AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              return const SizedBox();
+              return nil;
             },
             loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
           ),
@@ -380,8 +385,7 @@ class _ExamListState extends State<ExamList> {
         Expanded(child: Divider(color: color)),
       ]));
 
-  Widget _buildCardHybrid(Exam value, BuildContext context) => ThemedMaterial(
-          child: Card(
+  Widget _buildCardHybrid(Exam value, BuildContext context) => Card(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
@@ -439,7 +443,7 @@ class _ExamListState extends State<ExamList> {
                                       _unpackedSemester![semester!].semesterId)
                           : Future.value(_cachedScoreData),
                       loadingBuilder: PlatformCircularProgressIndicator(),
-                      errorBuilder: const SizedBox(),
+                      errorBuilder: nil,
                       successBuilder: (context, snapshot) {
                         if (snapshot.hasData) {
                           _cachedScoreData = snapshot.data;
@@ -465,7 +469,7 @@ class _ExamListState extends State<ExamList> {
                             // If we cannot find such an element, we will build an empty SizedBox.
                           } catch (_) {}
                         }
-                        return const SizedBox();
+                        return nil;
                       },
                     ),
                   )
@@ -476,11 +480,9 @@ class _ExamListState extends State<ExamList> {
                 ]
               ],
             )),
-      ));
+      );
 
-  Widget _buildCardGrade(ExamScore value, BuildContext context) =>
-      ThemedMaterial(
-          child: Card(
+  Widget _buildCardGrade(ExamScore value, BuildContext context) => Card(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
@@ -519,5 +521,5 @@ class _ExamListState extends State<ExamList> {
                 ),
               ],
             )),
-      ));
+      );
 }

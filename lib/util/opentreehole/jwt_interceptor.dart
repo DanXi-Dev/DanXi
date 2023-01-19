@@ -61,7 +61,7 @@ class JWTInterceptor extends QueuedInterceptor {
         RequestOptions options = RequestOptions(
             path: refreshUrl,
             method: "POST",
-            headers: {"Authorization": "Bearer " + currentToken.refresh!});
+            headers: {"Authorization": "Bearer ${currentToken.refresh!}"});
         Response<Map<String, dynamic>> response;
         try {
           response = await _dio.fetch(options);

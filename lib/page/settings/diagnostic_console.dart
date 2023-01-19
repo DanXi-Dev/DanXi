@@ -91,37 +91,8 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
-  // Future<void> diagnoseGoogleAds() async {
-  //   if (!PlatformX.isMobile) return;
-  //   _console.writeln("Trying to load google ads……");
-  //   BannerAd bannerAd;
-  //   final BannerAdListener listener = BannerAdListener(
-  //     // Called when an ad is successfully received.
-  //     onAdLoaded: (Ad ad) {
-  //       _console.writeln(
-  //           "Successfully load! ad responseId = ${ad.responseInfo?.responseId}");
-  //     },
-  //     // Called when an ad request failed.
-  //     onAdFailedToLoad: (Ad ad, LoadAdError error) {
-  //       _console.writeln("Unable to load ads! error is $error");
-  //       // Dispose the ad here to free resources.
-  //       ad.dispose();
-  //     },
-  //     // Called when an ad opens an overlay that covers the screen.
-  //     onAdOpened: (Ad ad) {},
-  //     // Called when an ad removes an overlay that covers the screen.
-  //     onAdClosed: (Ad ad) {},
-  //     // Called when an impression occurs on the ad.
-  //     onAdImpression: (Ad ad) {},
-  //   );
-  //   bannerAd = BannerAd(
-  //     adUnitId: AdManager.unitIdList[0],
-  //     size: AdSize.banner,
-  //     request: const AdRequest(),
-  //     listener: listener,
-  //   );
-  //   bannerAd.load();
-  // }
+  Future<void> diagnoseGoogleAds() async {
+  }
 
   static const _IGNORE_KEYS = ["password"];
 

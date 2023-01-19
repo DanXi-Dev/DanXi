@@ -34,6 +34,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+@Deprecated(
+    "No more Fudan daily from now on. This feature will be totally removed in the future version.")
 class FudanDailyFeature extends Feature {
   @override
   bool get loadOnTap => false;
@@ -45,10 +47,10 @@ class FudanDailyFeature extends Feature {
 
   //int _countdownRemainingTime = Constant.FUDAN_DAILY_COUNTDOWN_SECONDS; //Value -2 means stop countdown
 
-  Future<void> _loadTickStatus() async {
+  Future<void> _loadTickStatus() {
     _status = ConnectionStatus.CONNECTING;
     // Get the status of reporting
-    await FudanCOVID19Repository.getInstance()
+    return FudanCOVID19Repository.getInstance()
         .hasTick(StateProvider.personInfo.value)
         .then((bool ticked) {
       _status = ConnectionStatus.DONE;
@@ -105,9 +107,9 @@ class FudanDailyFeature extends Feature {
   Widget? get customSubtitle => _hasTicked
       ? null
       : Text(
-          S.of(context!).fudan_daily_tick_link,
-          style: const TextStyle(color: Colors.red),
-        );
+    S.of(context!).fudan_daily_tick_link,
+    style: const TextStyle(color: Colors.red),
+  );
 
   //@override
   //String get tertiaryTitle => S.of(context).fudan_daily_disabled_notice;

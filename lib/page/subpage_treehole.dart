@@ -17,13 +17,11 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -32,25 +30,21 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/curriculum/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/material_banner.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
+import 'package:dan_xi/widget/opentreehole/auto_banner.dart';
 import 'package:dan_xi/widget/opentreehole/login_widgets.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
@@ -63,6 +57,7 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 
+import '../util/watermark.dart';
 import '../widget/opentreehole/tag_selector/tag.dart';
 
 const kCompatibleUserGroup = [
@@ -314,8 +309,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
 
-  BannerAd? bannerAd;
-
   FileImage? _backgroundImage;
 
   /// This is to prevent the entire page being rebuilt on iOS when the keyboard pops up
@@ -378,8 +371,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   Future<void> refreshList() async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
-        await OpenTreeHoleRepository.getInstance()
-            .getFavoriteHoleId(forceUpdate: true);
+        await OpenTreeHoleRepository.getInstance().getFavoriteHoleId();
       } else if (context.read<FDUHoleProvider>().isUserInitialized) {
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);
@@ -426,46 +418,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             .map((e) => _buildListItem(context, null, null, e, isPinned: true))
             .toList(),
       );
-
-  Widget _autoBanner() {
-    void onTapAction(String action) {
-      try {
-        if (action.startsWith("##")) {
-          final floorMatch = floorPattern.firstMatch(action);
-          int floorId = int.parse(floorMatch!.group(1)!);
-          goToFloorIdResultPage(context, floorId);
-        } else if (action.startsWith("#")) {
-          final pidMatch = pidPattern.firstMatch(action);
-          int pid = int.parse(pidMatch!.group(1)!);
-          goToPIDResultPage(context, pid);
-        } else {
-          BrowserUtil.openUrl(action, context);
-        }
-      } catch (e) {
-        Noticing.showErrorDialog(context, e);
-      }
-    }
-
-    return Selector<SettingsProvider, bool>(
-        builder: (BuildContext context, bool bannerEnabled, Widget? child) {
-          List<BannerExtra?>? list =
-              AnnouncementRepository.getInstance().getBannerExtras();
-          if (bannerEnabled && list != null && list.isNotEmpty) {
-            BannerExtra? randomBannerItem = list[Random().nextInt(list.length)];
-            if (randomBannerItem != null) {
-              return SlimMaterialBanner(
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.campaign)
-                      : const Icon(CupertinoIcons.bell_circle),
-                  title: randomBannerItem.title,
-                  actionName: randomBannerItem.actionName,
-                  onTapAction: () => onTapAction(randomBannerItem.action));
-            }
-          }
-          return Container();
-        },
-        selector: (_, model) => model.isBannerEnabled);
-  }
 
   @override
   void initState() {
@@ -521,8 +473,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           });
         }),
         hashCode);
-
-    bannerAd = AdManager.loadBannerAd(1); // 1 for bbs page
   }
 
   @override
@@ -548,6 +498,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     _postSubscription.cancel();
     _refreshSubscription.cancel();
     _divisionChangedSubscription.cancel();
+  }
+
+  void pageRefresh() {
+    refreshSelf();
   }
 
   @override
@@ -587,41 +541,41 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    return Material(
-      child: Container(
-        decoration: _backgroundImage == null
-            ? null
-            : BoxDecoration(
-                image: DecorationImage(
-                    image: _backgroundImage!, fit: BoxFit.cover)),
-        child: RefreshIndicator(
-          // Make the indicator listen to [ScrollNotification] from deeper located [PagedListView].
-          notificationPredicate: (notification) => true,
-          edgeOffset: MediaQuery.of(context).padding.top,
-          key: indicatorKey,
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            // Refresh the list...
-            await refreshList();
-            // ... and scroll it to the top.
-            try {
-              await PrimaryScrollController.of(context)?.animateTo(0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.ease);
-              // It is not important if [listViewController] is not attached to a ListView.
-            } catch (_) {}
-          },
-          child: Builder(builder: (context) {
-            if (_postsType == PostsType.EXTERNAL_VIEW) {
-              return _delegate!.build(context);
-            } else {
-              return _buildOTListView(context,
-                  padding: buildTabBar ? EdgeInsets.zero : null);
-            }
-          }),
-        ),
+    Watermark.addWatermark(context, PlatformX.isDarkMode,
+        rowCount: 4, columnCount: 8);
+    return Container(
+      decoration: _backgroundImage == null
+          ? null
+          : BoxDecoration(
+              image:
+                  DecorationImage(image: _backgroundImage!, fit: BoxFit.cover)),
+      child: RefreshIndicator(
+        // Make the indicator listen to [ScrollNotification] from deeper located [PagedListView].
+        notificationPredicate: (notification) => true,
+        edgeOffset: MediaQuery.of(context).padding.top,
+        key: indicatorKey,
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          // Refresh the list...
+          await refreshList();
+          // ... and scroll it to the top.
+          try {
+            await PrimaryScrollController.of(context)?.animateTo(0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.ease);
+            // It is not important if [listViewController] is not attached to a ListView.
+          } catch (_) {}
+        },
+        child: Builder(builder: (context) {
+          if (_postsType == PostsType.EXTERNAL_VIEW) {
+            return _delegate!.build(context);
+          } else {
+            return _buildOTListView(context,
+                padding: buildTabBar ? EdgeInsets.zero : null);
+          }
+        }),
       ),
     );
   }
@@ -638,11 +592,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         builder: _buildListItem,
         headBuilder: (context) => Column(
           children: [
-            AutoBannerAdWidget(bannerAd: bannerAd),
             if (_postsType == PostsType.NORMAL_POSTS) ...[
               buildForumTopBar(),
               _autoSilenceNotice(),
-              _autoBanner(),
+              const AutoBanner(refreshDuration: Duration(seconds: 10)),
               _autoPinnedPosts(),
             ]
           ],
@@ -678,12 +631,19 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             ? (context, index, item) async {
                 await OpenTreeHoleRepository.getInstance()
                     .setFavorite(SetFavoriteMode.DELETE, item.hole_id)
-                    .onError((dynamic error, stackTrace) {
+                    .onError((error, stackTrace) {
                   Noticing.showNotice(context, error.toString(),
                       title: S.of(context).operation_failed,
                       useSnackBar: false);
                   return null;
                 });
+              }
+            : null,
+        onConfirmDismissItem: _postsType == PostsType.FAVORED_DISCUSSION
+            ? (context, index, item) {
+                return Noticing.showConfirmationDialog(
+                    context, S.of(context).remove_favorite_hole_confirmation,
+                    isConfirmDestructive: true);
               }
             : null,
       );

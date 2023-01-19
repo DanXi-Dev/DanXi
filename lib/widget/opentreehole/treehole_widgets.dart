@@ -19,6 +19,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
+import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -42,6 +43,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:nil/nil.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Color? getDefaultCardBackgroundColor(
@@ -82,11 +85,11 @@ class OTLeadingTag extends StatelessWidget {
 /// Turn tags into Widgets
 Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
-  if (e == null || e.tags == null) return const SizedBox();
-  List<Widget> _tags = [];
+  if (e == null || e.tags == null) return nil;
+  List<Widget> tags = [];
   for (var element in e.tags!) {
     if (element.name == KEY_NO_TAG) continue;
-    _tags.add(Flex(
+    tags.add(Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -103,7 +106,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
     direction: Axis.horizontal,
     spacing: 4,
     runSpacing: 4,
-    children: _tags,
+    children: tags,
   );
 }
 
@@ -165,7 +168,8 @@ class OTHoleWidget extends StatelessWidget {
                                 arguments: {"tagFilter": tagName},
                                 forcePushOnMainNavigator: true);
                           },
-                              SettingsProvider.getInstance()
+                              context
+                                  .read<SettingsProvider>()
                                   .useAccessibilityColoring),
                           Row(
                             //mainAxisSize: MainAxisSize.min,
@@ -197,9 +201,7 @@ class OTHoleWidget extends StatelessWidget {
                             ],
                           ),
                         ]),
-                    const SizedBox(
-                      height: 4,
-                    ),
+                    const SizedBox(height: 4),
                     isFolded
                         ? ExpansionTileX(
                             expandedCrossAxisAlignment:
@@ -208,13 +210,8 @@ class OTHoleWidget extends StatelessWidget {
                             childrenPadding:
                                 const EdgeInsets.symmetric(vertical: 4),
                             tilePadding: EdgeInsets.zero,
-                            title: Text(
-                              S.of(context).folded,
-                              style: infoStyle,
-                            ),
-                            children: [
-                                postContentWidget,
-                              ])
+                            title: Text(S.of(context).folded, style: infoStyle),
+                            children: [postContentWidget])
                         : postContentWidget,
                   ]),
               subtitle:
@@ -349,7 +346,7 @@ class OTFloorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool generateTags = (index == 0);
+    final bool needGenerateTags = (index == 0);
     void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
     }
@@ -371,7 +368,7 @@ class OTFloorWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (generateTags)
+          if (needGenerateTags)
             Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child:
@@ -390,20 +387,16 @@ class OTFloorWidget extends StatelessWidget {
                     ColoredBox(
                         color: nameColor,
                         child: const SizedBox(width: 2, height: 12)),
-                    const SizedBox(
-                      width: 8,
-                    ),
+                    const SizedBox(width: 8),
                     if (floor.anonyname ==
                         parentHole?.floors?.first_floor?.anonyname) ...[
                       OTLeadingTag(color: nameColor),
                       const SizedBox(width: 4),
                     ],
                     Text(
-                      "${floor.anonyname}",
+                      floor.anonyname!,
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: nameColor,
-                      ),
+                          fontWeight: FontWeight.bold, color: nameColor),
                     ),
                   ],
                 ),
@@ -604,7 +597,8 @@ class OTFloorMentionWidget extends StatelessWidget {
     required this.hasBackgroundImage,
   }) : super(key: key);
 
-  static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor) {
+  static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor,
+      [String? extraTips]) {
     bool inThatFloorPage = false;
     PagedListViewController<OTFloor>? pagedListViewController;
     try {
@@ -623,6 +617,11 @@ class OTFloorMentionWidget extends StatelessWidget {
           final Widget cardBody = Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (extraTips != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(extraTips),
+                ),
               ConstrainedBox(
                 constraints: BoxConstraints(
                     maxHeight: ViewportUtils.getViewportHeight(context) *
@@ -745,6 +744,7 @@ class OTFloorWidgetBottomBar extends StatefulWidget {
 
 class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   late OTFloor floor;
+  TextStyle? prebuiltStyle;
 
   @override
   void initState() {
@@ -760,154 +760,138 @@ class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    prebuiltStyle ??=
+        TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         const Divider(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-              child: InkWell(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        (floor.liked ?? false)
-                            ? CupertinoIcons.heart_fill
-                            : CupertinoIcons.heart,
-                        color: Theme.of(context).hintColor,
-                        size: 12,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                          (floor.liked ?? false)
-                              ? S.of(context).liked(floor.like ?? "...")
-                              : S.of(context).like(floor.like ?? "..."),
-                          style: TextStyle(
-                              color: Theme.of(context).hintColor,
-                              fontSize: 12)),
-                    ],
-                  ),
-                ),
-                onTap: () async {
-                  try {
-                    floor.liked ??= false;
-                    setState(() {
-                      floor.liked = !floor.liked!;
-                    });
-                    floor = (await OpenTreeHoleRepository.getInstance()
-                        .likeFloor(floor.floor_id!, floor.liked!))!;
-                    setState(() {});
-                  } catch (e, st) {
-                    Noticing.showErrorDialog(context, e, trace: st);
-                  }
-                },
-              ),
-            ),
-            if (floor.is_me != true)
+        DefaultTextStyle(
+          style: prebuiltStyle!,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
               Expanded(
-                child: InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.exclamationmark_octagon,
-                          color: Theme.of(context).hintColor,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(S.of(context).report,
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12)),
-                      ],
-                    ),
-                  ),
+                child: OTFloorWidgetBottomBarButton(
+                  text: (floor.liked ?? false)
+                      ? S.of(context).liked(floor.like ?? "...")
+                      : S.of(context).like(floor.like ?? "..."),
                   onTap: () async {
-                    if (await OTEditor.reportPost(context, floor.floor_id)) {
-                      Noticing.showMaterialNotice(
-                          context, S.of(context).report_success);
+                    try {
+                      floor.liked ??= false;
+                      setState(() {
+                        floor.liked = !floor.liked!;
+                      });
+                      floor = (await OpenTreeHoleRepository.getInstance()
+                          .likeFloor(floor.floor_id!, floor.liked!))!;
+                      setState(() {});
+                    } catch (e, st) {
+                      Noticing.showErrorDialog(context, e, trace: st);
                     }
                   },
+                  icon: Icon(
+                    (floor.liked ?? false)
+                        ? CupertinoIcons.heart_fill
+                        : CupertinoIcons.heart,
+                    color: Theme.of(context).hintColor,
+                    size: 12,
+                  ),
                 ),
               ),
-            if (floor.is_me == true && floor.deleted == false) ...[
-              Expanded(
-                child: InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.pencil,
-                          color: Theme.of(context).hintColor,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(S.of(context).modify,
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12)),
-                      ],
+              if (floor.is_me != true)
+                Expanded(
+                  child: OTFloorWidgetBottomBarButton(
+                    text: S.of(context).report,
+                    icon: Icon(
+                      CupertinoIcons.exclamationmark_octagon,
+                      color: Theme.of(context).hintColor,
+                      size: 12,
                     ),
-                  ),
-                  onTap: () async {
-                    if (await OTEditor.modifyReply(context, floor.hole_id,
-                        floor.floor_id, floor.content)) {
-                      Noticing.showMaterialNotice(
-                          context, S.of(context).request_success);
-                    }
-                  },
-                ),
-              ),
-              Expanded(
-                child: InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.trash,
-                          color: Theme.of(context).hintColor,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(S.of(context).delete,
-                            style: TextStyle(
-                                color: Theme.of(context).hintColor,
-                                fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                  onTap: () async {
-                    if (await Noticing.showConfirmationDialog(
-                            context,
-                            S.of(context).about_to_delete_floor(
-                                floor.floor_id ?? "null"),
-                            title: S.of(context).are_you_sure,
-                            isConfirmDestructive: true) ==
-                        true) {
-                      try {
-                        await OpenTreeHoleRepository.getInstance()
-                            .deleteFloor(floor.floor_id!);
-                      } catch (e, st) {
-                        Noticing.showErrorDialog(context, e, trace: st);
+                    onTap: () async {
+                      if (await OTEditor.reportPost(context, floor.floor_id)) {
+                        Noticing.showMaterialNotice(
+                            context, S.of(context).report_success);
                       }
-                    }
-                  },
+                    },
+                  ),
                 ),
-              ),
-            ]
-          ],
+              if (floor.is_me == true && floor.deleted == false) ...[
+                Expanded(
+                  child: OTFloorWidgetBottomBarButton(
+                    icon: Icon(
+                      CupertinoIcons.pencil,
+                      color: Theme.of(context).hintColor,
+                      size: 12,
+                    ),
+                    text: S.of(context).modify,
+                    onTap: () async {
+                      if (await OTEditor.modifyReply(context, floor.hole_id,
+                          floor.floor_id, floor.content)) {
+                        Noticing.showMaterialNotice(
+                            context, S.of(context).request_success);
+                      }
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: OTFloorWidgetBottomBarButton(
+                    text: S.of(context).delete,
+                    icon: Icon(
+                      CupertinoIcons.trash,
+                      color: Theme.of(context).hintColor,
+                      size: 12,
+                    ),
+                    onTap: () async {
+                      if (await Noticing.showConfirmationDialog(
+                              context,
+                              S.of(context).about_to_delete_floor(
+                                  floor.floor_id ?? "null"),
+                              title: S.of(context).are_you_sure,
+                              isConfirmDestructive: true) ==
+                          true) {
+                        try {
+                          await OpenTreeHoleRepository.getInstance()
+                              .deleteFloor(floor.floor_id!);
+                        } catch (e, st) {
+                          Noticing.showErrorDialog(context, e, trace: st);
+                        }
+                      }
+                    },
+                  ),
+                ),
+              ]
+            ],
+          ),
         ),
       ],
+    );
+  }
+}
+
+class OTFloorWidgetBottomBarButton extends StatelessWidget {
+  final VoidCallback? onTap;
+  final String text;
+  final Icon icon;
+
+  const OTFloorWidgetBottomBarButton(
+      {Key? key, this.onTap, required this.text, required this.icon})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(width: 4),
+            Text(text),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -931,6 +915,7 @@ class OTMessageItem extends StatefulWidget {
         case 'mention':
         case 'favorite':
         case 'modify':
+        case 'reply':
           // data should be [OTFloor]
           final floor = OTFloor.fromJson(data!);
           if (floor.floor_id == null) return;
@@ -941,7 +926,20 @@ class OTMessageItem extends StatefulWidget {
           }
           break;
         case 'report':
-          //TODO: Unimplemented
+          // data should be [OTReport]
+          final report = OTReport.fromJson(data!);
+
+          // fixme: [OTReport.floor]'s fields are not filled at all at the moment.
+          //        Currently, we have to construct a fake [OTFloor] to display.
+          final floor =
+              OTFloor.special("点击下面查看帖子，定位用不了", "##${data["floor_id"]}");
+
+          if (await OTFloorMentionWidget.showFloorDetail(
+                      context, floor, report.reason) ==
+                  true &&
+              id != null) {
+            markMessageAsRead(OTMessage(id, null, null, null, true, null));
+          }
           break;
       }
     } catch (ignored) {
@@ -977,12 +975,12 @@ class _OTMessageItemState extends State<OTMessageItem> {
               ? const Icon(Icons.developer_board)
               : const Icon(CupertinoIcons.info_circle),
           title: Text(message.message ?? "null",
-              style: (message.has_read == true)
-                  ? TextStyle(color: Theme.of(context).hintColor)
+              style: (message.has_read == false)
+                  ? TextStyle(color: Theme.of(context).colorScheme.primary)
                   : null),
           subtitle: Text(HumanDuration.tryFormat(
               context, DateTime.tryParse(message.time_created ?? ""))),
-          onTap: () async {
+          onTap: () {
             OTMessageItem.markMessageAsRead(message)
                 .then((value) => setState(() {}));
             OTMessageItem.dispMessageDetailBasedOnGuessedDataType(

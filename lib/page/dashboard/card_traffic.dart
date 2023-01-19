@@ -53,7 +53,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
     _personInfo = StateProvider.personInfo.value;
     _selectItem = SettingsProvider.getInstance().campus;
     _sliding = _selectItem!.index;
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _onSelectedItemChanged(_selectItem);
     });
   }
@@ -92,12 +92,12 @@ class _CardCrowdDataState extends State<CardCrowdData> {
                   child: PlatformWidget(
                       material: (_, __) => DropdownButton<Campus>(
                             items: _getItems(),
-                            isExpanded: true,
-                            // Don't select anything if _selectItem == Campus.NONE
-                            value:
-                                _selectItem == Campus.NONE ? null : _selectItem,
-                            hint: Text(_selectItem.displayTitle(context)!),
-                            onChanged: (Campus? e) => _onSelectedItemChanged(e),
+                        isExpanded: true,
+                        // Don't select anything if _selectItem == Campus.NONE
+                        value:
+                        _selectItem == Campus.NONE ? null : _selectItem,
+                        hint: Text(_selectItem.displayTitle(context)),
+                        onChanged: (Campus? e) => _onSelectedItemChanged(e),
                           ),
                       cupertino: (_, __) =>
                           CupertinoSlidingSegmentedControl<int>(
@@ -117,12 +117,13 @@ class _CardCrowdDataState extends State<CardCrowdData> {
   }
 
   List<DropdownMenuItem<Campus>> _getItems() => Constant.CAMPUS_VALUES.map((e) {
-        return DropdownMenuItem(
-            value: e, child: Text(e.displayTitle(context)!));
+    return DropdownMenuItem(
+        value: e, child: Text(e.displayTitle(context)));
       }).toList(growable: false);
 
-  Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
-      .map((e) => Text(e.displayTitle(context)!))
+  Map<int, Text> _getCupertinoItems() =>
+      Constant.CAMPUS_VALUES
+      .map((e) => Text(e.displayTitle(context)))
       .toList(growable: false)
       .asMap();
 

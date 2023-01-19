@@ -15,7 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 
@@ -43,33 +46,45 @@ class AdManager {
   /// ... and later in UI, use
   /// AdWidget(ad: bannerAd)
   ///
-  static BannerAd? loadBannerAd(int index) {
-    if (!PlatformX.isMobile) return null;
-
-    return const BannerAd();
+  static Future<Widget?> loadBannerAd(int index) async {
+    return null;
   }
 }
 
 /// A widget that automatically returns a AdWidget placed in a container
 /// or nothing if user has not opted-in to Ads or [bannerAd] is [null]
 class AutoBannerAdWidget extends StatelessWidget {
-  final BannerAd? bannerAd;
+  final FutureOr<Widget?>? bannerAd;
 
   const AutoBannerAdWidget({Key? key, required this.bannerAd})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox();
-  }
-}
-
-/// Dummy BannerAd
-class BannerAd extends StatelessWidget {
-  const BannerAd({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
+    const nullWidget = SizedBox();
+    if (SettingsProvider.getInstance().isAdEnabled && bannerAd != null) {
+      // const double padding = 8.0;
+      return nullWidget;
+      // return FutureWidget(
+      //     future: Future.value(bannerAd),
+      //     successBuilder:
+      //         (BuildContext context, AsyncSnapshot<BannerAd?> snapshot) {
+      //       BannerAd? ad = snapshot.data;
+      //       return ad != null && ad.responseInfo?.responseId != null
+      //           ? Center(
+      //               child: Container(
+      //                 padding: const EdgeInsets.only(bottom: padding),
+      //                 alignment: Alignment.center,
+      //                 width: ad.size.width.toDouble(),
+      //                 height: ad.size.height.toDouble() + padding,
+      //                 child: AdWidget(ad: ad),
+      //               ),
+      //             )
+      //           : nullWidget;
+      //     },
+      //     errorBuilder: nullWidget,
+      //     loadingBuilder: nullWidget);
+    }
+    return nullWidget;
   }
 }

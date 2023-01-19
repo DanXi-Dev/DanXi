@@ -177,12 +177,12 @@ class _BusPageState extends State<BusPage> {
   }
 
   List<DropdownMenuItem<Campus>> _getItems() => Constant.CAMPUS_VALUES.map((e) {
-        return DropdownMenuItem(
-            value: e, child: Text(e.displayTitle(context)!));
+        return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
       }).toList(growable: false);
 
-  Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
-      .map((e) => Text(e.displayTitle(context)!))
+  Map<int, Text> _getCupertinoItems() =>
+      Constant.CAMPUS_VALUES
+      .map((e) => Text(e.displayTitle(context)))
       .toList(growable: false)
       .asMap();
 
@@ -226,7 +226,7 @@ class _BusPageState extends State<BusPage> {
                       value: _startSelectItem == Campus.NONE
                           ? null
                           : _startSelectItem,
-                      hint: Text(_startSelectItem.displayTitle(context)!),
+                      hint: Text(_startSelectItem.displayTitle(context)),
                       onChanged: (Campus? e) => _onStartLocationChanged(e),
                     ),
                     cupertino: (_, __) => Padding(
@@ -254,7 +254,7 @@ class _BusPageState extends State<BusPage> {
                       // Don't select anything if _selectItem == Campus.NONE
                       value:
                           _endSelectItem == Campus.NONE ? null : _endSelectItem,
-                      hint: Text(_endSelectItem.displayTitle(context)!),
+                      hint: Text(_endSelectItem.displayTitle(context)),
                       onChanged: (Campus? e) => _onEndLocationChanged(e),
                     ),
                     cupertino: (_, __) => Padding(
@@ -281,7 +281,7 @@ class _BusPageState extends State<BusPage> {
         ));
   }
 
-  List<Widget> _getListWidgets(List<BusScheduleItem>? _filteredBusList) {
+  List<Widget> _getListWidgets(List<BusScheduleItem>? filteredBusList) {
     final currentTime = DateTime.now();
     final format = NumberFormat("00");
     List<Widget> widgets = [
@@ -304,8 +304,8 @@ class _BusPageState extends State<BusPage> {
         ),
       )
     ];
-    if (_filteredBusList == null) return [const SizedBox()];
-    for (var value in _filteredBusList) {
+    if (filteredBusList == null) return [const SizedBox()];
+    for (var value in filteredBusList) {
       if (_showAll ||
           value.realStartTime == null ||
           value.realStartTime!.toExactTime().isAfter(currentTime)) {
@@ -330,7 +330,7 @@ class _BusPageState extends State<BusPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      item.start.displayTitle(context)!,
+                      item.start.displayTitle(context),
                       textScaleFactor: 1.2,
                     ),
                     const SizedBox(
@@ -347,7 +347,7 @@ class _BusPageState extends State<BusPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      item.end.displayTitle(context)!,
+                      item.end.displayTitle(context),
                       textScaleFactor: 1.2,
                     ),
                     const SizedBox(

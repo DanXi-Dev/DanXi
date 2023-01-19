@@ -37,7 +37,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -53,7 +52,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
+import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
+
+import '../../model/opentreehole/history.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -101,10 +103,10 @@ class BBSPostDetail extends StatefulWidget {
   const BBSPostDetail({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _BBSPostDetailState createState() => _BBSPostDetailState();
+  BBSPostDetailState createState() => BBSPostDetailState();
 }
 
-class _BBSPostDetailState extends State<BBSPostDetail> {
+class BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   late OTHole _hole;
@@ -170,6 +172,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
     if (widget.arguments!.containsKey('locate')) {
       locateFloor = widget.arguments!["locate"];
     }
+
     StateProvider.needScreenshotWarning = true;
   }
 
@@ -308,26 +311,24 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       ),
       body: Builder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-        builder: (context) => Material(
-          child: Container(
-            decoration: _backgroundImage == null
-                ? null
-                : BoxDecoration(
-                    image: DecorationImage(
-                        image: _backgroundImage!, fit: BoxFit.cover)),
-            child: _searchKeyword == null
-                ? RefreshIndicator(
-                    edgeOffset: MediaQuery.of(context).padding.top,
-                    color: Theme.of(context).colorScheme.secondary,
-                    backgroundColor: Theme.of(context).dialogBackgroundColor,
-                    onRefresh: () async {
-                      HapticFeedback.mediumImpact();
-                      await refreshListView();
-                    },
-                    child: pagedListView,
-                  )
-                : pagedListView,
-          ),
+        builder: (context) => Container(
+          decoration: _backgroundImage == null
+              ? null
+              : BoxDecoration(
+                  image: DecorationImage(
+                      image: _backgroundImage!, fit: BoxFit.cover)),
+          child: _searchKeyword == null
+              ? RefreshIndicator(
+                  edgeOffset: MediaQuery.of(context).padding.top,
+                  color: Theme.of(context).colorScheme.secondary,
+                  backgroundColor: Theme.of(context).dialogBackgroundColor,
+                  onRefresh: () async {
+                    HapticFeedback.mediumImpact();
+                    await refreshListView();
+                  },
+                  child: pagedListView,
+                )
+              : pagedListView,
         ),
       ),
     );
@@ -591,17 +592,15 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                     }));
 
             final newTagsList = deepCopyTagList(_hole.tags ?? []);
-            bool? comfirmChanged = await showPlatformDialog<bool>(
+            bool? confirmChanged = await showPlatformDialog<bool>(
               context: context,
               builder: (BuildContext context) => PlatformAlertDialog(
                 title: Text(S.of(context).modify_tag_division),
-                content: ThemedMaterial(
-                  child: Column(
-                    children: [
-                      divisionOptionsView,
-                      OTTagSelector(initialTags: newTagsList),
-                    ],
-                  ),
+                content: Column(
+                  children: [
+                    divisionOptionsView,
+                    OTTagSelector(initialTags: newTagsList),
+                  ],
                 ),
                 actions: <Widget>[
                   PlatformDialogAction(
@@ -615,7 +614,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                 ],
               ),
             );
-            if (comfirmChanged ?? false) {
+            if (confirmChanged ?? false) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
                       newTagsList, _hole.hole_id, selectedDivision.division_id);
@@ -645,19 +644,22 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
         ),
-        if (e.history != null && e.history!.isNotEmpty)
-          PlatformContextMenuItem(
-            onPressed: () async {
+        PlatformContextMenuItem(
+          onPressed: () async {
+            List<OTHistory>? history =
+                await OpenTreeHoleRepository.getInstance()
+                    .getHistory(e.floor_id);
+            if (history != null) {
               StringBuffer content = StringBuffer();
-              for (int i = 0; i < e.history!.length; i++) {
-                var record = e.history![i];
+              for (int i = 0; i < history.length; i++) {
+                var record = history[i];
                 content.writeln(
-                    S.of(context).history_time(record.altered_time ?? "?"));
+                    S.of(context).history_time(record.time_updated ?? "?"));
                 content.writeln(
-                    S.of(context).history_altered_by(record.altered_by ?? "?"));
+                    S.of(context).history_altered_by(record.user_id ?? "?"));
                 content.writeln(S.of(context).original_content);
                 content.writeln(record.content);
-                if (i < e.history!.length - 1) {
+                if (i < history.length - 1) {
                   content.writeln("================");
                 }
               }
@@ -665,10 +667,11 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
                   title: S.of(context).history_of(e.floor_id ?? "?"),
                   message: content.toString(),
                   selectable: true);
-            },
-            menuContext: menuContext,
-            child: Text(S.of(context).view_history),
-          ),
+            }
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).view_history),
+        ),
       ];
     }
 
@@ -740,7 +743,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       {bool isNested = false}) {
     if (_onlyShowDZ &&
         _hole.floors?.first_floor?.anonyname != floor.anonyname) {
-      return const SizedBox();
+      return nil;
     }
 
     Future<List<ImageUrlInfo>?> loadPageImage(
@@ -772,7 +775,7 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
       index: _searchKeyword == null ? index : null,
       isInMention: isNested,
       parentHole: _hole,
-      onLongPress: () {
+      onLongPress: () async {
         showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
@@ -794,14 +797,21 @@ class _BBSPostDetailState extends State<BBSPostDetail> {
             await refreshListView(scrollToEnd: true);
           }
         } else {
+          // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
           ProgressFuture progressDialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
-          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-            "post": await OpenTreeHoleRepository.getInstance()
-                .loadSpecificHole(floor.hole_id!),
-            "locate": floor
-          });
-          progressDialog.dismiss(showAnim: false);
+          try {
+            OTHole? hole = await OpenTreeHoleRepository.getInstance()
+                .loadSpecificHole(floor.hole_id!);
+            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+              "post": await prefetchAllFloors(hole!),
+              "locate": floor
+            });
+          } catch (e, st) {
+            Noticing.showErrorDialog(context, e, trace: st);
+          } finally {
+            progressDialog.dismiss(showAnim: false);
+          }
         }
       },
       onTapImage: (String? url, Object heroTag) {
@@ -848,16 +858,12 @@ StatelessWidget smartRender(
     ImageTapCallback? onTapImage,
     bool translucentCard,
     {bool preview = false}) {
-  try {
-    return PostRenderWidget(
-      render: kMarkdownRender,
-      content: preprocessContentForDisplay(content),
-      onTapImage: onTapImage,
-      onTapLink: onTapLink,
-      hasBackgroundImage: translucentCard,
-      isPreviewWidget: preview,
-    );
-  } catch (e) {
-    return Text(S.of(context).parse_fatal_error);
-  }
+  return PostRenderWidget(
+    render: kMarkdownRender,
+    content: preprocessContentForDisplay(content),
+    onTapImage: onTapImage,
+    onTapLink: onTapLink,
+    hasBackgroundImage: translucentCard,
+    isPreviewWidget: preview,
+  );
 }

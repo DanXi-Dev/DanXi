@@ -97,6 +97,8 @@ class PagedListView<T> extends StatefulWidget {
   /// Sliding an item away will cause this function to be called.
   final void Function(BuildContext, int, T)? onDismissItem;
 
+  final Future<bool?> Function(BuildContext, int, T)? onConfirmDismissItem;
+
   const PagedListView(
       {Key? key,
       this.pagedController,
@@ -115,7 +117,8 @@ class PagedListView<T> extends StatefulWidget {
       this.noneItem,
       this.fatalErrorBuilder,
       this.padding,
-      this.onDismissItem})
+      this.onDismissItem,
+      this.onConfirmDismissItem})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         assert(dataReceiver != null || allDataReceiver != null),
         super(key: key);
@@ -332,6 +335,9 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         item = Dismissible(
           key: valueKeys[index],
           background: ColoredBox(color: Theme.of(context).errorColor),
+          confirmDismiss: (direction) =>
+              widget.onConfirmDismissItem?.call(context, index, _data[index]) ??
+              Future.value(null),
           onDismissed: (direction) {
             widget.onDismissItem!.call(context, index, _data[index]);
             _data.removeAt(index);

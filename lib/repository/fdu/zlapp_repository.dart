@@ -28,6 +28,8 @@ import 'package:intl/intl.dart';
 
 import '../independent_cookie_jar.dart';
 
+@Deprecated(
+    "No more Fudan daily from now on. This feature will be totally removed in the future version.")
 class FudanCOVID19Repository extends BaseRepositoryWithDio {
   dynamic _historyData;
 
@@ -109,14 +111,14 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
 
   Future<void> tick(PersonInfo? info) async {
     _historyData ??=
-        await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
+    await Retrier.runAsyncWithRetry(() => _getHistoryInfo(info));
     Map<String, String> headers = {
       "Origin": "https://zlapp.fudan.edu.cn",
       "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history"
     };
     Map<String, dynamic>? payload =
-        await Cache.getRemotely<Map<String, dynamic>?>(
-            _KEY_PREF,
+    await Cache.getRemotely<Map<String, dynamic>?>(
+        _KEY_PREF,
             () async => _buildPayloadFromHistory(),
             (cachedValue) => jsonDecode(cachedValue!),
             (object) => jsonEncode(object));
@@ -126,7 +128,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
     await dio.post(SAVE_URL,
         data: payload.encodeMap(),
         options:
-            DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));
+        DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(headers));
   }
 }
 

@@ -15,9 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -58,8 +58,9 @@ import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_tray/system_tray.dart' as tray;
+
+import '../provider/language_manager.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -84,10 +85,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  SharedPreferences? _preferences;
-
   final ScreenCaptureEvent? screenListener =
-      PlatformX.isWeb ? null : ScreenCaptureEvent();
+      PlatformX.isMobile ? ScreenCaptureEvent() : null;
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
@@ -194,12 +193,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
       // In case that [_preferences] is still not initialized.
-      if (_preferences != null) {
-        PersonInfo.removeFromSharedPreferences(_preferences!);
-      } else {
-        PersonInfo.removeFromSharedPreferences(
-            await SharedPreferences.getInstance());
-      }
+      PersonInfo.removeFromSharedPreferences(
+          SettingsProvider.getInstance().preferences!);
       FlutterApp.restartApp(context);
     }
   }
@@ -216,7 +211,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     child: PlatformText(S.of(context).retry),
                     onPressed: () {
                       Navigator.pop(context);
-                      _loadDataFromBmob();
+                      _loadDataFromGithubRepo();
                     }),
                 PlatformDialogAction(
                     child: PlatformText(S.of(context).skip),
@@ -225,7 +220,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ));
   }
 
-  void _loadDataFromBmob() {
+  void _loadDataFromGithubRepo() {
     AnnouncementRepository.getInstance().loadAnnouncements().then((value) {
       _loadUpdate().then(
           (value) => _loadAnnouncement().catchError((ignored) {}),
@@ -271,6 +266,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> initSystemTray() async {
+    /*
     if (!PlatformX.isWindows) return;
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
@@ -315,6 +311,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     ];
     await _systemTray.setContextMenu(showingMenu);
+    */
   }
 
   Future<void> onTapNotification(
@@ -334,6 +331,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    LanguageManager(SettingsProvider.getInstance().language).setLanguage();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
       if (StateProvider.personInfo.value != null) {
@@ -356,7 +354,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         hashCode);
 
     // Load the latest version, announcement & the start date of the following term.
-    _loadDataFromBmob();
+    _loadDataFromGithubRepo();
     // Configure shortcut listeners on Android & iOS.
     if (PlatformX.isMobile) {
       quickActions.initialize((shortcutType) {
@@ -368,9 +366,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     // Configure watch listeners on iOS.
     if (_needSendToWatch &&
-        _preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+        SettingsProvider.getInstance().fduholeToken != null) {
       sendFduholeTokenToWatch(
-          _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+          SettingsProvider.getInstance().fduholeToken!.access!);
       // Only send once.
       _needSendToWatch = false;
     }
@@ -415,10 +413,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
           break;
         case 'get_token':
-          // If we haven't loaded [StateProvider.personInfo]
-          if (_preferences!.containsKey(SettingsProvider.KEY_FDUHOLE_TOKEN)) {
+          if (SettingsProvider.getInstance().fduholeToken != null) {
             sendFduholeTokenToWatch(
-                _preferences!.getString(SettingsProvider.KEY_FDUHOLE_TOKEN));
+                SettingsProvider.getInstance().fduholeToken!.access!);
           } else {
             // Notify that we should send the token to watch later
             _needSendToWatch = true;
@@ -508,15 +505,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ///
   /// If user hasn't logged in before, request him to do so.
   void _loadPersonInfoOrLogin() {
-    _preferences = SettingsProvider.getInstance().preferences;
+    var preferences = SettingsProvider.getInstance().preferences;
 
-    if (PersonInfo.verifySharedPreferences(_preferences!)) {
+    if (PersonInfo.verifySharedPreferences(preferences!)) {
       StateProvider.personInfo.value =
-          PersonInfo.fromSharedPreferences(_preferences!);
+          PersonInfo.fromSharedPreferences(preferences);
       TestLifeCycle.onStart(context);
     } else {
       LoginDialog.showLoginDialog(
-          context, _preferences, StateProvider.personInfo, false);
+          context, preferences, StateProvider.personInfo, false);
     }
   }
 
@@ -531,7 +528,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               leading: Icon(PlatformIcons(context).accountCircle),
               title: Text(S.of(context).login),
               onTap: () => LoginDialog.showLoginDialog(
-                  context, _preferences, StateProvider.personInfo, false),
+                  context,
+                  SettingsProvider.getInstance().preferences,
+                  StateProvider.personInfo,
+                  false),
             ),
           )
         ]),
@@ -539,7 +539,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
-    if (PlatformX.isDebugMode(_preferences)) showDebugBtn(context);
+    if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
+      showDebugBtn(context);
+    }
 
     return MultiProvider(
       providers: [ValueListenableProvider.value(value: _pageIndex)],

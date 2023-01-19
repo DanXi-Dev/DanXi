@@ -27,7 +27,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -110,28 +109,25 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
             iosContentBottomPadding: false,
             iosContentPadding: false,
             body: SafeArea(
-              child: Material(
-                child: AnimatedSwitcher(
-                  switchInCurve: Curves.ease,
-                  switchOutCurve: Curves.ease,
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    var tween = Tween<Offset>(
-                        begin: const Offset(1, 0), end: const Offset(0, 0));
-                    // reverse the animation if invoked jumpBack().
-                    if (_backwardRun > 0) {
-                      tween = Tween<Offset>(
-                          begin: const Offset(-1, 0), end: const Offset(0, 0));
-                      _backwardRun--;
-                    }
-                    return MySlideTransition(
-                      position: tween.animate(animation),
-                      child: child,
-                    );
-                  },
-                  duration: const Duration(milliseconds: 250),
-                  child: _currentWidget,
-                ),
+              child: AnimatedSwitcher(
+                switchInCurve: Curves.ease,
+                switchOutCurve: Curves.ease,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  var tween = Tween<Offset>(
+                      begin: const Offset(1, 0), end: const Offset(0, 0));
+                  // reverse the animation if invoked jumpBack().
+                  if (_backwardRun > 0) {
+                    tween = Tween<Offset>(
+                        begin: const Offset(-1, 0), end: const Offset(0, 0));
+                    _backwardRun--;
+                  }
+                  return MySlideTransition(
+                    position: tween.animate(animation),
+                    child: child,
+                  );
+                },
+                duration: const Duration(milliseconds: 250),
+                child: _currentWidget,
               ),
             )),
       ),
@@ -169,7 +165,7 @@ abstract class SubStatelessWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (backable) const ThemedMaterial(child: BackButton()),
+                if (backable) const BackButton(),
                 buildContent(context),
               ],
             ),

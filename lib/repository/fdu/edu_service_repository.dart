@@ -135,7 +135,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Returns an unpacked list of [SemesterInfo].
   Future<List<SemesterInfo>?> loadSemesters(PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
-          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters());
+          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters(),
+          retryTimes: 2);
 
   Future<List<SemesterInfo>?> _loadSemesters() async {
     await dio.get(EXAM_TABLE_URL,
@@ -159,12 +160,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     return sems;
   }
 
-  /// JSON Like Text: {aaaa:"asdasd"}
+  /// JSON-Like Text: {aaaa:"asdasd"}
   /// Real JSON Text: {"aaaa":"asdasd"}
   ///
   /// Add a pair of quote on the both sides of every key.
+  /// This requires that no quote is included in the key or value. Or the result will be
+  /// abnormal.
   String _normalizeJson(String jsonLikeText) {
-    var result = "";
+    String result = "";
     bool inQuote = false;
     bool inKey = false;
     for (String char

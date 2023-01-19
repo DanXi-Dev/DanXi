@@ -38,5 +38,5 @@ class Review {
   bool operator ==(Object other) => (other is Review) && id == other.id;
 
   @override
-  int get hashCode => id!;
+  int get hashCode => id ?? time_created.hashCode;
 }

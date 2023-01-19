@@ -18,17 +18,20 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A class to manage [SharedPreferences] Settings
@@ -65,6 +68,13 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_CUSTOM_USER_AGENT = "custom_user_agent";
   static const String KEY_BANNER_ENABLED = "banner_enabled";
   static const String KEY_PRIMARY_SWATCH = "primary_swatch";
+  static const String KEY_PRIMARY_SWATCH_V2 = "primary_swatch_v2";
+  static const String KEY_PREFERRED_LANGUAGE = "language";
+  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
+  static const String KEY_TAG_SUGGESTIONS_ENABLE = "tag_suggestions";
+  static const String KEY_LIGHT_WATERMARK_COLOR = "light_watermark_color";
+  static const String KEY_DARK_WATERMARK_COLOR = "dark_watermark_color";
+  static const String KEY_VISIBLE_WATERMARK_MODE = "visible_watermark";
 
   SettingsProvider._();
 
@@ -226,6 +236,28 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  List<Course> get manualAddedCourses {
+    if (preferences!.containsKey(KEY_MANUALLY_ADDED_COURSE)) {
+      var courseList =
+          (json.decode(preferences!.getString(KEY_MANUALLY_ADDED_COURSE)!)
+                  as List)
+              .map((i) => Course.fromJson(i))
+              .toList();
+
+      return courseList;
+    }
+    return List<Course>.empty();
+  }
+
+  set manualAddedCourses(List<Course>? value) {
+    if (value != null) {
+      preferences!.setString(KEY_MANUALLY_ADDED_COURSE, jsonEncode(value));
+    } else if (preferences!.containsKey(KEY_MANUALLY_ADDED_COURSE)) {
+      preferences!.remove(KEY_MANUALLY_ADDED_COURSE);
+    }
+    notifyListeners();
+  }
+
   Campus get campus {
     if (preferences!.containsKey(KEY_PREFERRED_CAMPUS)) {
       String? value = preferences!.getString(KEY_PREFERRED_CAMPUS);
@@ -235,7 +267,6 @@ class SettingsProvider with ChangeNotifier {
         return Campus.HANDAN_CAMPUS;
       });
     }
-    campus = Campus.HANDAN_CAMPUS;
     return Campus.HANDAN_CAMPUS;
   }
 
@@ -244,6 +275,34 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Language get defaultLanguage {
+    Locale locale = PlatformDispatcher.instance.locale;
+    if (locale.languageCode == 'en') {
+      return Language.ENGLISH;
+    } else if (locale.languageCode == 'ja') {
+      return Language.JAPANESE;
+    } else if (locale.languageCode == 'zh') {
+      return Language.SIMPLE_CHINESE;
+    } else {
+      return Language.NONE;
+    }
+  }
+
+  Language get language {
+    if (preferences!.containsKey(KEY_PREFERRED_LANGUAGE)) {
+      String? value = preferences!.getString(KEY_PREFERRED_LANGUAGE);
+      return Constant.LANGUAGE_VALUES
+          .firstWhere((element) => element.toString() == value, orElse: () {
+        return defaultLanguage;
+      });
+    }
+    return defaultLanguage;
+  }
+
+  set language(Language language) {
+    preferences!.setString(KEY_PREFERRED_LANGUAGE, language.toString());
+    notifyListeners();
+  }
   /*Push Token
   String? get lastPushToken {
     if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {
@@ -427,22 +486,79 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Primary color used by the app.
-  String get primarySwatch {
-    if (preferences!.containsKey(KEY_PRIMARY_SWATCH)) {
-      String color = preferences!.getString(KEY_PRIMARY_SWATCH)!;
-      if (color.trim().isNotEmpty) {
-        return color;
-      }
+  bool get isTagSuggestionEnabled {
+    if (preferences!.containsKey(KEY_TAG_SUGGESTIONS_ENABLE)) {
+      return preferences!.getBool(KEY_TAG_SUGGESTIONS_ENABLE)!;
     }
-    return 'blue';
+    return false;
+  }
+
+  set isTagSuggestionEnabled(bool value) {
+    preferences!.setBool(KEY_TAG_SUGGESTIONS_ENABLE, value);
+    notifyListeners();
+  }
+
+  bool tagSuggestionAvailable = false;
+
+  Future<bool> isTagSuggestionAvailable() async {
+    return await getTagSuggestions('test') != null;
+  }
+
+  /// Primary color used by the app.
+  int get primarySwatch_V2 {
+    if (preferences!.containsKey(KEY_PRIMARY_SWATCH_V2)) {
+      int? color = preferences!.getInt(KEY_PRIMARY_SWATCH_V2);
+      return Color(color!).value;
+    }
+    return Colors.blue.value;
   }
 
   /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
-  void setPrimarySwatch(String value) {
-    preferences!.setString(KEY_PRIMARY_SWATCH, value);
+  void setPrimarySwatch_V2(int value) {
+    preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
     notifyListeners();
   }
+
+  int get lightWatermarkColor {
+    if (preferences!.containsKey(KEY_LIGHT_WATERMARK_COLOR)) {
+      int? color = preferences!.getInt(KEY_LIGHT_WATERMARK_COLOR);
+      return Color(color!).value;
+    }
+    return 0x02000000;
+  }
+
+  set lightWatermarkColor(int value) {
+    preferences!.setInt(KEY_LIGHT_WATERMARK_COLOR, Color(value).value);
+    notifyListeners();
+  }
+
+  int get darkWatermarkColor {
+    if (preferences!.containsKey(KEY_DARK_WATERMARK_COLOR)) {
+      int? color = preferences!.getInt(KEY_DARK_WATERMARK_COLOR);
+      return Color(color!).value;
+    }
+    return 0x08000000;
+  }
+
+  set darkWatermarkColor(int value) {
+    preferences!.setInt(KEY_DARK_WATERMARK_COLOR, Color(value).value);
+    notifyListeners();
+  }
+
+  bool get visibleWatermarkMode {
+    if (preferences!.containsKey(KEY_VISIBLE_WATERMARK_MODE)) {
+      return preferences!.getBool(KEY_VISIBLE_WATERMARK_MODE)!;
+    } else {
+      return false;
+    }
+  }
+
+  set visibleWatermarkMode(bool mode) {
+    preferences!.setBool(KEY_VISIBLE_WATERMARK_MODE, mode);
+    notifyListeners();
+  }
+
+
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

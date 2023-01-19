@@ -105,16 +105,14 @@ class _OTSearchPageState extends State<OTSearchPage> {
           builder: (context, value, child) => value.text.isEmpty
               ? _buildSearchHistory(context)
               : Expanded(
-                  child: Material(
-                    child: ListView(
-                      primary: false,
-                      shrinkWrap: true,
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      children: suggestionProviders
-                          .map((e) => e.call(context, value.text))
-                          .toList(),
-                    ),
+                  child: ListView(
+                    primary: false,
+                    shrinkWrap: true,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    children: suggestionProviders
+                        .map((e) => e.call(context, value.text))
+                        .toList(),
                   ),
                 ));
 

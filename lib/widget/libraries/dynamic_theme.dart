@@ -41,21 +41,20 @@ class _DynamicThemeControllerState extends State<DynamicThemeController>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
-    _brightness =
-        WidgetsBinding.instance!.platformDispatcher.platformBrightness;
-    WidgetsBinding.instance!.platformDispatcher.onPlatformBrightnessChanged =
+    WidgetsBinding.instance.addObserver(this);
+    _brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
         () {
       setState(() {
         _brightness =
-            WidgetsBinding.instance!.platformDispatcher.platformBrightness;
+            WidgetsBinding.instance.platformDispatcher.platformBrightness;
       });
     };
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

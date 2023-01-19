@@ -88,9 +88,7 @@ class EcardBalanceFeature extends Feature {
       case ConnectionStatus.CONNECTING:
         return S.of(context!).loading;
       case ConnectionStatus.DONE:
-        return Constant.yuanSymbol(_lastTransaction?.payment) +
-            " " +
-            (_lastTransaction?.location ?? "");
+        return "${Constant.yuanSymbol(_lastTransaction?.payment)} ${_lastTransaction?.location ?? ""}";
       case ConnectionStatus.FAILED:
       case ConnectionStatus.FATAL_ERROR:
         return S.of(context!).failed;

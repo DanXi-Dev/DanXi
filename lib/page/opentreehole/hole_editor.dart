@@ -22,21 +22,26 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
@@ -314,6 +319,9 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
     super.initState();
   }
 
+  final GlobalKey<OTTagSelectorState> _tagSelectorKey =
+      GlobalKey<OTTagSelectorState>();
+
   Widget _buildIntroButton(BuildContext context, IconData iconData,
           String title, String description) =>
       PlatformIconButton(
@@ -371,15 +379,81 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
           children: [
             if (widget.allowTags!)
               Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: ThemedMaterial(
-                  child: OTTagSelector(
-                      initialTags: context
-                          .read<FDUHoleProvider>()
-                          .editorCache[widget.editorObject]!
-                          .tags),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: OTTagSelector(
+                    key: _tagSelectorKey,
+                    initialTags: context
+                        .read<FDUHoleProvider>()
+                        .editorCache[widget.editorObject]!
+                        .tags),
+              ),
+            if (widget.allowTags! &&
+                SettingsProvider.getInstance().tagSuggestionAvailable) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
+                child: Row(
+                  children: [
+                    Text(S.of(context).recommended_tags),
+                    ScaleTransform(
+                      scale: 0.75,
+                      child: PlatformIconButton(
+                        padding: const EdgeInsets.only(left: 0),
+                        icon: const Icon(CupertinoIcons.info_circle),
+                        onPressed: () {
+                          Noticing.showModalNotice(context,
+                              message:
+                                  S.of(context).recommended_tags_description,
+                              title: S.of(context).recommended_tags);
+                        },
+                      ),
+                    ),
+                    Selector<SettingsProvider, bool>(
+                        builder: (_, bool value, __) {
+                          if (!value) {
+                            return PlatformTextButton(
+                              padding: EdgeInsets.zero,
+                              child: Text(S.of(context).enable),
+                              onPressed: () async {
+                                if (await Noticing.showConfirmationDialog(
+                                        context,
+                                        S
+                                            .of(context)
+                                            .recommended_tags_description,
+                                        title:
+                                            S.of(context).recommended_tags) ==
+                                    true) {
+                                  SettingsProvider.getInstance()
+                                      .isTagSuggestionEnabled = true;
+                                }
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                        selector: (_, model) => model.isTagSuggestionEnabled),
+                  ],
                 ),
               ),
+              Selector<SettingsProvider, bool>(
+                  builder: (_, bool value, __) {
+                    if (value) {
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: 4, left: 4, right: 4),
+                        child: ValueListenableBuilder<TextEditingValue>(
+                          builder: (context, value, child) =>
+                              TagSuggestionWidget(
+                            content: value.text,
+                            tagSelectorKey: _tagSelectorKey,
+                          ),
+                          valueListenable: widget.controller,
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  selector: (_, model) => model.isTagSuggestionEnabled),
+            ],
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -414,6 +488,83 @@ class _BBSEditorWidgetState extends State<BBSEditorWidget> {
               ),
             ),
           ]),
+    );
+  }
+}
+
+class TagSuggestionWidget extends StatefulWidget {
+  const TagSuggestionWidget(
+      {Key? key, required this.content, required this.tagSelectorKey})
+      : super(key: key);
+  final String content;
+  final GlobalKey<OTTagSelectorState> tagSelectorKey;
+
+  @override
+  TagSuggestionWidgetState createState() => TagSuggestionWidgetState();
+}
+
+Future<List<String>?> getTagSuggestions(String content) async {
+  try {
+    return await fduholeChannel.invokeListMethod(
+        "get_tag_suggestions", content);
+  } on PlatformException catch (_) {
+    return null;
+  } on MissingPluginException catch (_) {
+    return null;
+  }
+}
+
+class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
+  List<String>? _suggestions;
+
+  void updateTagSuggestions() {
+    getTagSuggestions(widget.content).then((value) {
+      setState(() {
+        _suggestions = value;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateTagSuggestions();
+  }
+
+  @override
+  void didUpdateWidget(covariant TagSuggestionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateTagSuggestions();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 32),
+      child: Wrap(
+          children: _suggestions
+                  ?.map((e) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 4),
+                        child: RoundChip(
+                            label: e,
+                            color: (e.hashColor()),
+                            onTap: () {
+                              widget.tagSelectorKey.currentState?.setState(() {
+                                if (widget.tagSelectorKey.currentState?.widget
+                                        .initialTags
+                                        .any((element) => element.name == e) ==
+                                    true) {
+                                } else {
+                                  widget.tagSelectorKey.currentState!.widget
+                                      .initialTags
+                                      .add(OTTag(0, 0, e));
+                                }
+                              });
+                            }),
+                      ))
+                  .toList() ??
+              []),
     );
   }
 }
@@ -534,16 +685,15 @@ class BBSEditorPageState extends State<BBSEditorPage> {
       ),
       body: SafeArea(
           bottom: false,
-          child: Material(
-              child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: BBSEditorWidget(
-                    controller: _controller,
-                    allowTags: _supportTags,
-                    editorObject: _object,
-                    fullscreen: _isFullscreen,
-                    tip: _tip,
-                  )))),
+          child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: BBSEditorWidget(
+                controller: _controller,
+                allowTags: _supportTags,
+                editorObject: _object,
+                fullscreen: _isFullscreen,
+                tip: _tip,
+              ))),
     );
   }
 

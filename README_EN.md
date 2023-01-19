@@ -1,21 +1,41 @@
 [中文版](README.md) English Version  
-[Official Website(Chinese Only)](https://danxi.fduhole.com)  
+[Official Website(Chinese Only)](https://danxi.fduhole.com)
+
+[//]: # (# Maintenance Notice)
+
+[//]: # ()
+
+[//]: # (As the Flutter framework has shown incompatibility, instability, and low performance in our)
+
+[//]: # (development, DanXi-Dev officially decided to abandon Flutter and move to Android and iOS native)
+
+[//]: # (development on July 20, 2022.)
+
+[//]: # ()
+
+[//]: # (This repository will only be updated for maintenance purposes. You can browse new)
+
+[//]: # (repository [here &#40;for Android&#41;]&#40;https://github.com/DanXi-Dev/DanXi-NG&#41;)
+
+[//]: # (and [here &#40;for iOS, not public for secure reasons&#41;]&#40;https://github.com/DanXi-Dev/DanXi-Swift&#41;.)
+
 # DanXi
+
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
-[![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)  
-  
+[![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
+
 > **CAUTION**   
 > The English version of README may not be synchronized with [the Chinese one](README.md).
 
-日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and again.)   
-  
+日月光华，旦复旦兮.(The sun and the moon are shining, full of glory. And the morning sun rises, again and
+again.)
+
 Maybe the best all-rounded service app for Fudan University students!
 
 **DanXi only support Chinese (Simplified) and English language at the moment. Come to help us!**
 
 - Campus card balance and transactions
 - Dining hall traffic
-- Automatic COVID-19 Safety Check-in
 - Shortcut for Fudan QR Code (with support for Apple Watch)
 - View empty classrooms
 - Tree Hole
@@ -55,10 +75,10 @@ Will consider after Flutter macOS support becomes stable.
 
 ```shell script
 $ flutter --version
-Flutter 2.10.4 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision c860cba910 (3 weeks ago) • 2022-03-25 00:23:12 -0500
-Engine • revision 57d3bac3dd
-Tools • Dart 2.16.2 • DevTools 2.9.2
+Flutter 3.3.8 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 52b3dc25f6 (9 days ago) • 2022-11-09 12:09:26 +0800
+Engine • revision 857bd6b74c
+Tools • Dart 2.18.4 • DevTools 2.15.0
 ```
 ## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  

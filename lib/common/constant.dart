@@ -71,6 +71,8 @@ class Constant {
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://www.fduhole.com/#/forgetpassword";
 
+  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
+
   /// The default start date of a semester.
   // ignore: non_constant_identifier_names
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2022, 2, 21);
@@ -148,7 +150,7 @@ class Constant {
             S.of(context).fudan_library_crowdedness,
         'aao_notice_feature': S.of(context).fudan_aao_notices,
         'empty_classroom_feature': S.of(context).empty_classrooms,
-        'fudan_daily_feature': S.of(context).fudan_daily,
+        // 'fudan_daily_feature': S.of(context).fudan_daily,
         'new_card': S.of(context).add_new_card,
         'qr_feature': S.of(context).fudan_qr_code,
         'pe_feature': S.of(context).pe_exercises,
@@ -173,8 +175,8 @@ class Constant {
     DashboardCard("bus_feature", null, null, true),
     DashboardCard("pe_feature", null, null, true),
     DashboardCard("new_card", null, null, true),
-    DashboardCard("fudan_daily_feature", null, null, true),
-    DashboardCard("new_card", null, null, true),
+    // DashboardCard("fudan_daily_feature", null, null, true),
+    // DashboardCard("new_card", null, null, true),
     DashboardCard("qr_feature", null, null, true),
   ];
 
@@ -202,6 +204,18 @@ class Constant {
             S.of(context).Frankstein73_description),
         Developer("Ivan Fei", "assets/graphics/ivanfei.jpg",
             "https://github.com/ivanfei-1", S.of(context).ivanfei_description),
+        Developer(
+            "Boreas618",
+            "assets/graphics/Boreas618.jpg",
+            "https://github.com/Boreas618",
+            S.of(context).boreas618_description),
+        Developer(
+            "JingYiJun",
+            "assets/graphics/JingYiJun.jpg",
+            "https://github.com/JingYiJun",
+            S.of(context).boreas618_description),
+        Developer("fsy2001", "assets/graphics/fsy2001.jpg",
+            "https://github.com/fsy2001", S.of(context).boreas618_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].
@@ -209,7 +223,7 @@ class Constant {
   /// If [num] is empty, return an empty string.
   static String yuanSymbol(String? num) {
     if (num == null || num.trim().isEmpty) return "";
-    return '\u00A5' + num;
+    return '\u00A5$num';
   }
 
   /// Get the link to update the application.
@@ -250,14 +264,15 @@ class Constant {
           color: ThemeData.light().cardColor,
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
       );
     }
     return ThemeData(
-      brightness: Brightness.light,
-      primarySwatch: color,
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: color),
       cardTheme: CardTheme(
+        elevation: 0.5,
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
       ),
@@ -288,15 +303,16 @@ class Constant {
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: const Color(0xFF007AFF)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
         dialogBackgroundColor: const Color.fromRGBO(28, 28, 30, 1.0),
         textTheme: Typography.whiteCupertino,
       );
     }
     return ThemeData(
-      brightness: Brightness.dark,
-      primarySwatch: color,
+      useMaterial3: true,
+      colorScheme:
+          ColorScheme.fromSeed(seedColor: color, brightness: Brightness.dark),
       cardTheme: CardTheme(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.dark().cardColor,
@@ -378,12 +394,21 @@ class Constant {
 
   /// A list of Fudan campus.
   ///
-  /// It is a copy of [Campus.values] expect [Campus.NONE].
+  /// It is a copy of [Campus.values] except [Campus.NONE].
   static const CAMPUS_VALUES = [
     Campus.HANDAN_CAMPUS,
     Campus.FENGLIN_CAMPUS,
     Campus.JIANGWAN_CAMPUS,
     Campus.ZHANGJIANG_CAMPUS
+  ];
+
+  ///A list of provided languages
+  ///
+  /// It is a copy of [Language.values] except [Language.NONE].
+  static const LANGUAGE_VALUES = [
+    Language.SIMPLE_CHINESE,
+    Language.ENGLISH,
+    Language.JAPANESE
   ];
 
   /// A default configuration JSON string for setting special days to celebrate
@@ -414,6 +439,8 @@ class Constant {
     }
   ]
   ''';
+
+  static const WeekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 }
 
 /// A list of Fudan campus.
@@ -425,14 +452,18 @@ enum Campus {
   NONE
 }
 
+enum Language { SIMPLE_CHINESE, ENGLISH, JAPANESE, NONE }
+
 extension CampusEx on Campus? {
   static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
 
   /// Find the corresponding [Campus] from its Chinese name in [_CAMPUS_NAME].
   static Campus fromChineseName(String? name) {
-    for (int i = 0; i < _CAMPUS_NAME.length; i++) {
-      if (name!.contains(_CAMPUS_NAME[i])) {
-        return Constant.CAMPUS_VALUES[i];
+    if (name != null) {
+      for (int i = 0; i < _CAMPUS_NAME.length; i++) {
+        if (name.contains(_CAMPUS_NAME[i])) {
+          return Constant.CAMPUS_VALUES[i];
+        }
       }
     }
     return Campus.NONE;
@@ -457,7 +488,7 @@ extension CampusEx on Campus? {
   }
 
   /// Get the i18n name of this campus for display.
-  String? displayTitle(BuildContext? context) {
+  String displayTitle(BuildContext? context) {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
         return S.of(context!).handan_campus;
@@ -470,6 +501,36 @@ extension CampusEx on Campus? {
       // Select area when it's none
       case Campus.NONE:
         return S.of(context!).choose_area;
+      case null:
+        return "?";
+    }
+  }
+}
+
+extension LanguageEx on Language? {
+  static const _LANGUAGE = ["简体中文", "English", "日本語"];
+
+  /// Find the corresponding [Language] from its Chinese name in [_LANGUAGE].
+  static Language fromChineseName(String name) {
+    for (int i = 0; i < _LANGUAGE.length; i++) {
+      if (name.contains(_LANGUAGE[i])) {
+        return Constant.LANGUAGE_VALUES[i];
+      }
+    }
+    return Language.NONE;
+  }
+
+  /// Get the i18n name of this language for display.
+  String displayTitle(BuildContext? context) {
+    switch (this) {
+      case Language.SIMPLE_CHINESE:
+        return S.of(context!).simplified_chinese_languae;
+      case Language.ENGLISH:
+        return S.of(context!).english_languae;
+      case Language.JAPANESE:
+        return S.of(context!).japanese_languae;
+      case Language.NONE:
+        return "?";
       case null:
         return "?";
     }

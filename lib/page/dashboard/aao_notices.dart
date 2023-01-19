@@ -20,7 +20,6 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/aao_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -59,8 +58,8 @@ class _AAONoticesListState extends State<AAONoticesList> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
           title: TopController(
-        child: Text(S.of(context).fudan_aao_notices),
         controller: _controller,
+        child: Text(S.of(context).fudan_aao_notices),
       )),
       body: Column(
         children: [
@@ -68,15 +67,14 @@ class _AAONoticesListState extends State<AAONoticesList> {
               child: PagedListView<Notice>(
             withScrollbar: true,
             scrollController: PrimaryScrollController.of(context),
-            builder: (_, __, ___, Notice value) => ThemedMaterial(
-                child: ListTile(
+            builder: (_, __, ___, Notice value) => ListTile(
               leading: PlatformX.isMaterial(context)
                   ? const Icon(Icons.info)
                   : const Icon(CupertinoIcons.info_circle_fill),
               title: Text(value.title),
               subtitle: Text(value.time),
               onTap: () => BrowserUtil.openUrl(value.url, context, null, true),
-            )),
+            ),
             loadingBuilder: (_) => Center(
               child: PlatformCircularProgressIndicator(),
             ),

@@ -25,7 +25,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
@@ -54,6 +53,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../widget/dialogs/delete_course_dialog.dart';
+import '../widget/dialogs/manually_add_course_dialog.dart';
+
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT
@@ -70,6 +72,18 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+        AppBarButtonItem(
+          S.of(cxt).add_courses,
+          Icon(PlatformX.isMaterial(cxt) ? Icons.delete : CupertinoIcons.delete),
+          () => DeleteCourseEvent().fire(),
+        ),
+        AppBarButtonItem(
+          S.of(cxt).add_courses,
+          Icon(PlatformX.isMaterial(cxt)
+              ? Icons.add
+              : CupertinoIcons.add_circled),
+          () => ManuallyAddCourseEvent().fire(),
+        ),
         AppBarButtonItem(
           S.of(cxt).share,
           Icon(PlatformX.isMaterial(cxt)
@@ -91,9 +105,19 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
 class ShareTimetableEvent {}
 
+class ManuallyAddCourseEvent {}
+
+class DeleteCourseEvent {}
+
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
+  final StateStreamListener<ManuallyAddCourseEvent> _addCourseSubscription =
+      StateStreamListener();
+  final StateStreamListener<DeleteCourseEvent> _deleteCourseSubscription =
+      StateStreamListener();
+
+  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
 
   /// A map of all converters.
   ///
@@ -110,12 +134,23 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   bool forceLoadFromRemote = false;
 
-  BannerAd? bannerAd;
+  List<Course> newCourses = [];
+
+  List<int> courseAvailableList = <int>[];
 
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  void pageRefresh() {
+    refreshSelf();
+  }
+
+  List<Course> getCourseList() {
+    return SettingsProvider.getInstance().manualAddedCourses;
+  }
+
   void _setContent() {
+    newCourses = getCourseList();
     if (checkGroup(kCompatibleUserGroup)) {
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
@@ -166,6 +201,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
           NotLoginError(S.of(context).not_fudan_student)));
     }
+    _contentFuture?.then((value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
   }
 
   void _startShare(
@@ -217,6 +253,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     super.initState();
+    _setContent();
     converters = {
       //S.current.import_into_cal: CalendarImporter(), // Unfinished
       S.current.share_as_ics: ICSConverter()
@@ -236,8 +273,36 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           );
         }),
         hashCode);
-    _setContent();
-    bannerAd = AdManager.loadBannerAd(2); // 2 for agenda page
+    _addCourseSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<ManuallyAddCourseEvent>().listen((_) async {
+          //if (_table == null) return;
+          newCourses = (await showPlatformDialog<Course?>(
+            context: context,
+            builder: (_) => ManuallyAddCourseDialog(
+              courseAvailableList
+            ),
+          ).then<List<Course>>((course) {
+            List<Course> courseList = getCourseList();
+            if(course == null) {
+              return courseList;
+            }
+            List<Course> newCourseList = courseList + [course];
+            SettingsProvider.getInstance().manualAddedCourses = newCourseList;
+            return newCourseList;
+          }));
+          refresh();
+        }),
+        hashCode);
+    _deleteCourseSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<DeleteCourseEvent>().listen((_) async {
+          newCourses = await showPlatformDialog(
+            context: context,
+            builder: (_) => DeleteCourseDialog(newCourses),
+          ) ?? [];
+          SettingsProvider.getInstance().manualAddedCourses = newCourses;
+          refresh();
+        }),
+        hashCode);
   }
 
   Future<void> refresh(
@@ -245,10 +310,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       bool forceReloadFromRemote = false}) async {
     if (forceReloadFromRemote) forceLoadFromRemote = true;
     _setContent();
-
     // If there is no data before, we call setState once to show a ProgressIndicator.
     if (reloadWhenEmptyData) setState(() {});
-
     await _contentFuture;
     setState(() {});
   }
@@ -257,14 +320,21 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   void dispose() {
     super.dispose();
     _shareSubscription.cancel();
+    _addCourseSubscription.cancel();
+    _deleteCourseSubscription.cancel();
   }
 
   @override
   Widget buildPage(BuildContext context) {
     return FutureWidget<TimeTable?>(
       successBuilder:
-          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) =>
-              _buildPage(snapshot.data!),
+          (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
+        if (snapshot.hasData) {
+          return _buildPage(snapshot.data!);
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
       future: _contentFuture,
       errorBuilder: (BuildContext context,
               AsyncSnapshot<TimeTable?> snapshot) =>
@@ -337,51 +407,48 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
     final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
         compact: TableDisplayType.STANDARD, containCourseOtherWeeks: false);
-    return Material(
-      child: RefreshIndicator(
-        key: indicatorKey,
-        edgeOffset: MediaQuery.of(context).padding.top,
-        color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          forceLoadFromRemote = true;
-          HapticFeedback.mediumImpact();
-          await refresh();
-        },
-        child: ListView(
-          // This ListView is a workaround, so that we can apply a custom scroll physics to it.
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            AutoBannerAdWidget(bannerAd: bannerAd),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PlatformIconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: _showingTime!.week > 0 ? goToPrev : null,
-                ),
-                Text(S.of(context).week(_showingTime!.week)),
-                PlatformIconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed:
-                      _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
-                )
-              ],
-            ),
-            ScheduleView(
-              scheduleData,
-              style,
-              _table!.now(),
-              _showingTime!.week,
-              tapCallback: _onTapCourse,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(S.of(context).semester_start_date),
-              StartDateSelectionButton(
-                  onUpdate: (() => indicatorKey.currentState?.show())),
-            ]),
-          ],
-        ),
+    return RefreshIndicator(
+      key: indicatorKey,
+      edgeOffset: MediaQuery.of(context).padding.top,
+      color: Theme.of(context).colorScheme.secondary,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      onRefresh: () async {
+        forceLoadFromRemote = true;
+        HapticFeedback.mediumImpact();
+        await refresh();
+      },
+      child: ListView(
+        // This ListView is a workaround, so that we can apply a custom scroll physics to it.
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PlatformIconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: _showingTime!.week > 0 ? goToPrev : null,
+              ),
+              Text(S.of(context).week(_showingTime!.week)),
+              PlatformIconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed:
+                    _showingTime!.week < TimeTable.MAX_WEEK ? goToNext : null,
+              )
+            ],
+          ),
+          ScheduleView(
+            scheduleData,
+            style,
+            _table!.now(),
+            _showingTime!.week,
+            tapCallback: _onTapCourse,
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(S.of(context).semester_start_date),
+            StartDateSelectionButton(
+                onUpdate: (() => indicatorKey.currentState?.show())),
+          ]),
+        ],
       ),
     );
   }
@@ -390,8 +457,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
 
-  const SemesterSelectionButton({Key? key, this.onSelectionUpdate})
-      : super(key: key);
+  const SemesterSelectionButton({Key? key, this.onSelectionUpdate}) : super(key: key);
 
   @override
   _SemesterSelectionButtonState createState() =>
@@ -519,6 +585,14 @@ class StartDateSelectionButton extends StatelessWidget {
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
         if (newDate != null && newDate != startTime) {
+          // Notice user that newDate is not a Monday.
+          if (newDate.weekday != DateTime.monday) {
+            bool? confirmed = await Noticing.showConfirmationDialog(
+                context, S.of(context).semester_start_at_monday);
+            if (confirmed != true) {
+              return;
+            }
+          }
           SettingsProvider.getInstance().thisSemesterStartDate =
               newDate.toIso8601String();
           onUpdate?.call();

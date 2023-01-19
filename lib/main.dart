@@ -62,6 +62,7 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:material_color_generator/material_color_generator.dart';
 import 'package:provider/provider.dart';
 import 'common/constant.dart';
 
@@ -87,8 +88,11 @@ void main() {
     // if (SettingsProvider.getInstance().isAdEnabled) {
     //   MobileAds.instance.initialize();
     // }
+    SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
+      SettingsProvider.getInstance().tagSuggestionAvailable = value;
 
-    runApp(const DanxiApp());
+      runApp(const DanxiApp());
+    });
   });
 
   // Init DesktopWindow on desktop environment.
@@ -123,9 +127,8 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) => PlatformX.isMaterial(context)
-        ? Container(color: Theme.of(context).scaffoldBackgroundColor)
-        : const SizedBox(),
+    '/placeholder': (context, {arguments}) =>
+        ColoredBox(color: Theme.of(context).scaffoldBackgroundColor),
     '/home': (context, {arguments}) => const HomePage(),
     '/diagnose': (context, {arguments}) =>
         DiagnosticConsole(arguments: arguments),
@@ -175,7 +178,7 @@ class DanxiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
     // Replace the global error widget with a simple Text
     if (!kDebugMode) ErrorWidget.builder = errorBuilder;
@@ -183,53 +186,60 @@ class DanxiApp extends StatelessWidget {
     Widget mainApp = PlatformProvider(
       // Uncomment this line below to force the app to use Cupertino Widgets
       // initialPlatform: TargetPlatform.iOS,
-
       // [DynamicThemeController] enables the app to change between dark/light theme without restart
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
-            context.select<SettingsProvider, MaterialColor>(
-                (value) => Constant.getColorFromString(value.primarySwatch));
+            context.select<SettingsProvider, MaterialColor>((value) =>
+                generateMaterialColor(color: Color(value.primarySwatch_V2)));
         return DynamicThemeController(
           lightTheme: Constant.lightTheme(
               PlatformX.isCupertino(context), primarySwatch),
           darkTheme:
               Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch),
-          child: PlatformApp(
-            scrollBehavior: TouchMouseScrollBehavior(),
-            debugShowCheckedModeBanner: false,
-            // Fix cupertino UI text color issue by override text color
-            cupertino: (context, __) => CupertinoAppData(
-                theme: CupertinoThemeData(
-                    textTheme: CupertinoTextThemeData(
-                        textStyle: TextStyle(
-                            color: PlatformX.getTheme(context, primarySwatch)
-                                .textTheme
-                                .bodyText1!
-                                .color)))),
-            // Configure i18n delegates
-            localizationsDelegates: const [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            onUnknownRoute: (settings) => throw AssertionError(
-                "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
-            home: PlatformMasterDetailApp(
-              // Configure the page route behaviour of the whole app
-              onGenerateRoute: (settings) {
-                final Function? pageContentBuilder =
-                    DanxiApp.routes[settings.name!];
-                if (pageContentBuilder != null) {
-                  return platformPageRoute(
-                      context: context,
-                      builder: (context) => pageContentBuilder(context,
-                          arguments: settings.arguments));
-                }
-                return null;
-              },
-              navigatorKey: _navigatorKey,
+          child: Material(
+            child: PlatformApp(
+              scrollBehavior: TouchMouseScrollBehavior(),
+              debugShowCheckedModeBanner: false,
+              // Fix cupertino UI text color issue by override text color
+              cupertino: (context, __) => CupertinoAppData(
+                  theme: CupertinoThemeData(
+                      textTheme: CupertinoTextThemeData(
+                          textStyle: TextStyle(
+                              color: PlatformX.getTheme(context, primarySwatch)
+                                  .textTheme
+                                  .bodyText1!
+                                  .color)))),
+              material: (context, __) => MaterialAppData(
+                  theme: PlatformX.isDarkMode
+                      ? Constant.darkTheme(
+                          PlatformX.isCupertino(context), primarySwatch)
+                      : Constant.lightTheme(
+                          PlatformX.isCupertino(context), primarySwatch)),
+              // Configure i18n delegates
+              localizationsDelegates: const [
+                S.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate
+              ],
+              supportedLocales: S.delegate.supportedLocales,
+              onUnknownRoute: (settings) => throw AssertionError(
+                  "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
+              home: PlatformMasterDetailApp(
+                // Configure the page route behaviour of the whole app
+                onGenerateRoute: (settings) {
+                  final Function? pageContentBuilder =
+                      DanxiApp.routes[settings.name!];
+                  if (pageContentBuilder != null) {
+                    return platformPageRoute(
+                        context: context,
+                        builder: (context) => pageContentBuilder(context,
+                            arguments: settings.arguments));
+                  }
+                  return null;
+                },
+                navigatorKey: navigatorKey,
+              ),
             ),
           ),
         );

@@ -25,7 +25,6 @@ import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
 import 'package:dan_xi/feature/dorm_electricity_feature.dart';
 import 'package:dan_xi/feature/ecard_balance_feature.dart';
 import 'package:dan_xi/feature/empty_classroom_feature.dart';
-import 'package:dan_xi/feature/fudan_daily_feature.dart';
 import 'package:dan_xi/feature/fudan_library_crowdedness_feature.dart';
 import 'package:dan_xi/feature/lan_connection_notification.dart';
 import 'package:dan_xi/feature/next_course_feature.dart';
@@ -35,7 +34,6 @@ import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/ad_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -60,7 +58,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   const HomeSubpage({Key? key}) : super(key: key);
 
   @override
-  Create<Widget> get title => (cxt) => Text(S.of(cxt).app_name);
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).dashboard);
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
@@ -94,7 +92,6 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
       StateStreamListener();
   late Map<String, Widget> widgetMap;
 
-  BannerAd? bannerAd;
   late NotificationProvider _notificationProvider;
 
   @override
@@ -110,7 +107,6 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
           }
         }),
         hashCode);
-    bannerAd = AdManager.loadBannerAd(0); // 0 for main page
     _rebuildFeatures();
   }
 
@@ -141,7 +137,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
       'aao_notice_feature': FeatureListItem(feature: FudanAAONoticesFeature()),
       'empty_classroom_feature':
           FeatureListItem(feature: EmptyClassroomFeature()),
-      'fudan_daily_feature': FeatureListItem(feature: FudanDailyFeature()),
+      // 'fudan_daily_feature': FeatureListItem(feature: FudanDailyFeature()),
       'new_card': const SizedBox(),
       'qr_feature': FeatureListItem(feature: QRFeature()),
       'pe_feature': FeatureListItem(feature: PEFeature()),
@@ -158,11 +154,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   }
 
   List<Widget> _buildCards(List<DashboardCard> widgetSequence) {
-    List<Widget> widgets = [
-      AutoBannerAdWidget(
-        bannerAd: bannerAd,
-      )
-    ];
+    List<Widget> widgets = [];
     NotificationProvider provider = context.watch<NotificationProvider>();
     widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
           feature: e,
@@ -170,7 +162,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
         )));
     List<Widget> currentCardChildren = [];
     for (var element in widgetSequence) {
-      if (!element.enabled!) continue;
+      if (element.enabled != true) continue;
       if (element.internalString == 'new_card') {
         if (currentCardChildren.isEmpty) continue;
         widgets.add(Card(
@@ -186,15 +178,16 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
         ));
       } else {
         // Skip incompatible items
-        if (widgetMap[element.internalString!] is FeatureContainer) {
-          FeatureContainer container =
-              widgetMap[element.internalString!] as FeatureContainer;
+        var widget = widgetMap[element.internalString!];
+        if (widget == null) continue;
+        if (widget is FeatureContainer) {
+          FeatureContainer container = widget as FeatureContainer;
           if (!checkFeature(
               container.childFeature, StateProvider.personInfo.value!.group)) {
             continue;
           }
         }
-        currentCardChildren.add(widgetMap[element.internalString!]!);
+        currentCardChildren.add(widget);
       }
     }
     if (currentCardChildren.isNotEmpty) {
@@ -228,10 +221,9 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
               LimitedQueuedInterceptor.getInstance().dropAllRequest();
               triggerRebuildFeatures();
             },
-            child: Material(
-                child: ListView(
+            child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: _buildCards(widgetList),
-            ))));
+            )));
   }
 }
