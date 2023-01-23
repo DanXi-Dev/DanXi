@@ -315,6 +315,8 @@
   "scroll_to_end": "去往底部",
   "only_show_dz": "只看洞主",
   "show_all_replies": "查看全部",
+  "hide_hole_confirm": "确定要永久隐藏此树洞吗？隐藏后，除非重新安装应用，否则将无法在帖子列表中再看到此树洞。",
+  "hide_hole_success": "树洞已隐藏，下次刷新列表后生效。",
   "search_hint": "搜索 或 #PID",
   "favorites": "收藏",
   "no_favorites": "收藏列表为空",

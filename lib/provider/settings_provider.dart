@@ -21,7 +21,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
@@ -59,7 +58,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
-  static const String KEY_HIDDEN_HOLE = "hidden_hole";
+  static const String KEY_HIDDEN_TREEHOLE = "hidden_hole";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
   static const String KEY_CELEBRATION = "celebration";
   static const String KEY_BACKGROUND_IMAGE_PATH = "background";
@@ -75,6 +74,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_LIGHT_WATERMARK_COLOR = "light_watermark_color";
   static const String KEY_DARK_WATERMARK_COLOR = "dark_watermark_color";
   static const String KEY_VISIBLE_WATERMARK_MODE = "visible_watermark";
+  static const String KEY_HIDDEN_HOLES = "hidden_holes";
 
   SettingsProvider._();
 
@@ -303,6 +303,7 @@ class SettingsProvider with ChangeNotifier {
     preferences!.setString(KEY_PREFERRED_LANGUAGE, language.toString());
     notifyListeners();
   }
+
   /*Push Token
   String? get lastPushToken {
     if (preferences!.containsKey(KEY_LAST_PUSH_TOKEN)) {
@@ -339,7 +340,7 @@ class SettingsProvider with ChangeNotifier {
     //preferences!.remove(KEY_LAST_PUSH_TOKEN);
     preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
     preferences!.remove(KEY_FDUHOLE_SORTORDER);
-    preferences!.remove(KEY_HIDDEN_HOLE);
+    preferences!.remove(KEY_HIDDEN_TREEHOLE);
     preferences!.remove(KEY_HIDDEN_TAGS);
   }
 
@@ -427,15 +428,15 @@ class SettingsProvider with ChangeNotifier {
 
   /// Hide FDUHole
   bool get hideHole {
-    if (preferences!.containsKey(KEY_HIDDEN_HOLE)) {
-      return preferences!.getBool(KEY_HIDDEN_HOLE)!;
+    if (preferences!.containsKey(KEY_HIDDEN_TREEHOLE)) {
+      return preferences!.getBool(KEY_HIDDEN_TREEHOLE)!;
     } else {
       return false;
     }
   }
 
   set hideHole(bool mode) {
-    preferences!.setBool(KEY_HIDDEN_HOLE, mode);
+    preferences!.setBool(KEY_HIDDEN_TREEHOLE, mode);
     notifyListeners();
   }
 
@@ -558,7 +559,20 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  List<int> get hiddenHoles {
+    if (preferences!.containsKey(KEY_HIDDEN_HOLES)) {
+      return jsonDecode(preferences!.getString(KEY_HIDDEN_HOLES)!)
+          .map<int>((e) => e as int)
+          .toList();
+    } else {
+      return [];
+    }
+  }
 
+  set hiddenHoles(List<int> list) {
+    preferences!.setString(KEY_HIDDEN_HOLES, jsonEncode(list));
+    notifyListeners();
+  }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

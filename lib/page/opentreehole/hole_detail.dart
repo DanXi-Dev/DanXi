@@ -297,7 +297,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     onTap: (_) {
                       setState(() => _onlyShowDZ = !_onlyShowDZ);
                       refreshListView(ignorePrefetch: false);
-                    })
+                    }),
+                PopupMenuOption(
+                    label: S.of(context).hide_hole,
+                    onTap: (_) async {
+                      bool? result = await Noticing.showConfirmationDialog(
+                          context, S.of(context).hide_hole_confirm,
+                          isConfirmDestructive: true);
+                      if (result == true) {
+                        var list = SettingsProvider.getInstance().hiddenHoles;
+                        if (_hole.hole_id != null &&
+                            !list.contains(_hole.hole_id!)) {
+                          list.add(_hole.hole_id!);
+                          SettingsProvider.getInstance().hiddenHoles = list;
+                        }
+                        Noticing.showNotice(
+                            context, S.of(context).hide_hole_success);
+                      }
+                    }),
               ],
               cupertino: (context, platform) => CupertinoPopupMenuData(
                   cancelButtonData: CupertinoPopupMenuCancelButtonData(

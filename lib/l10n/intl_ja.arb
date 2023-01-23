@@ -311,6 +311,8 @@
   "scroll_to_end": "底へ行く",
   "only_show_dz": "Po主だけを表示",
   "show_all_replies": "すべて表示",
+  "hide_hole_confirm": "ホールを隠しますか？一度隠すと、アプリを再インストールしない限り、このホールは投稿リストに表示されなくなります。",
+  "hide_hole_success": "ホールを隠しました。リフレッシュ後に効果が現れます。",
   "search_hint": "検索内容・#PID",
   "favorites": "お気に入り",
   "no_favorites": "お気に入りなし",

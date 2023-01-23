@@ -15,7 +15,7 @@ import platform_device_id
 import platform_device_id_macos
 import screen_brightness_macos
 import share_plus_macos
-import shared_preferences_macos
+import shared_preferences_foundation
 import sqflite
 import system_tray
 import url_launcher_macos

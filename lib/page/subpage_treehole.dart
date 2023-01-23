@@ -355,6 +355,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             : SettingsProvider.getInstance().hiddenTags ?? [];
         loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+        // Filter hidden posts
+        List<int> hiddenPosts = SettingsProvider.getInstance().hiddenHoles;
+        loadedPost?.removeWhere((element) =>
+            hiddenPosts.any((blockPost) => element.hole_id == blockPost));
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
