@@ -300,6 +300,7 @@
   "delete": "Delete",
   "confirm": "Confirm",
   "are_you_sure": "Are you sure?",
+  "are_you_sure_pin_unpin": "Are you sure you want to pin/unpin this post?",
   "about_to_delete_floor": "You are about to delete floor #{floor}",
   "search": "Search",
   "history": "History",

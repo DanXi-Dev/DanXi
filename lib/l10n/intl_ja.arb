@@ -336,6 +336,7 @@
   "delete": "削除",
   "confirm": "確認",
   "are_you_sure": "削除は大丈夫ですか？",
+  "are_you_sure_pin_unpin": "ピンとアンピンは大丈夫ですか？",
   "about_to_delete_floor": "#{floor}を削除しようとしている",
   "formula": "[フォーミュラ]",
   "view_count": "ビュー：{view}",

@@ -508,8 +508,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            FDUHoleProvider provider = context.read<FDUHoleProvider>();
+            bool? confirmed = await Noticing.showConfirmationDialog(
+                context, S.of(context).are_you_sure_pin_unpin,
+                isConfirmDestructive: true);
+            if (confirmed != true) return;
 
+            FDUHoleProvider provider = context.read<FDUHoleProvider>();
             List<int> pinned = provider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
                 .toList();
@@ -520,7 +524,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminModifyDivision(
-                    provider.currentDivision!.division_id!, null, null, pinned);
+                provider.currentDivision!.division_id!, null, null, pinned);
             if (result != null && result < 300) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
