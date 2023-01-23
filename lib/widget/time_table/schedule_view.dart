@@ -26,7 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:intl/intl.dart';
 
-double kRatio = 1.25;
+double kRatio = 0.8;
 
 /// A time table widget, usually used to show student's course schedule table.
 class ScheduleView extends StatefulWidget {
@@ -67,6 +67,8 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   List<Widget> _buildTable(int cols, int rows) {
+    double ratio = kRatio * (DateTime.daysPerWeek + 1) / cols;
+
     List<Widget?> result = List.generate(
         cols * rows,
         (index) => Container(
@@ -75,12 +77,12 @@ class _ScheduleViewState extends State<ScheduleView> {
               decoration: BoxDecoration(
                   color: Theme.of(context).hintColor.withOpacity(0.14),
                   borderRadius: BorderRadius.circular(4)),
-            ).withRatio(kRatio).withGridPlacement(
+            ).withRatio(ratio).withGridPlacement(
                 rowStart: index ~/ cols, columnStart: index % cols));
 
     // Build corner
     result[0] = const SizedBox()
-        .withRatio(kRatio)
+        .withRatio(ratio)
         .withGridPlacement(columnStart: 0, rowStart: 0);
 
     // Build time indicator
@@ -92,13 +94,13 @@ class _ScheduleViewState extends State<ScheduleView> {
           .toExactTime()
           .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
       result[cols * (slot + 1)] = Center(
-              child: Column(
-        children: [
-          Text((slot + 1).toString()),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Text(
-              startTime,
+          child: Column(
+            children: [
+              Text((slot + 1).toString()),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(
+                  startTime,
               style:
                   TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
             ),
@@ -108,9 +110,7 @@ class _ScheduleViewState extends State<ScheduleView> {
             style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
           )
         ],
-      ))
-          .withRatio(kRatio)
-          .withGridPlacement(columnStart: 0, rowStart: slot + 1);
+      )).withRatio(ratio).withGridPlacement(columnStart: 0, rowStart: slot + 1);
     }
 
     // Build day indicator & courses
@@ -120,7 +120,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
       TextStyle highlightStyle =
-          TextStyle(color: Theme.of(context).colorScheme.secondary);
+      TextStyle(color: Theme.of(context).colorScheme.secondary);
       // Build weekday indicators
       result[1 + day] = Center(
         child: Column(
@@ -128,9 +128,9 @@ class _ScheduleViewState extends State<ScheduleView> {
           children: [
             deltaDay == 0
                 ? Text(
-                    widget.laneEventsList[day].day,
-                    style: highlightStyle,
-                  )
+              widget.laneEventsList[day].day,
+              style: highlightStyle,
+            )
                 : Text(
                     widget.laneEventsList[day].day,
                   ),
@@ -142,12 +142,12 @@ class _ScheduleViewState extends State<ScheduleView> {
                 : Text(DateFormat.Md().format(date))
           ],
         ),
-      ).withRatio(kRatio).withGridPlacement(columnStart: day + 1, rowStart: 0);
+      ).withRatio(ratio).withGridPlacement(columnStart: day + 1, rowStart: 0);
 
       convertToBlock(widget.laneEventsList[day].events).forEach((element) {
         result[1 + day + cols * (element.firstSlot + 1)] =
             _buildScheduleBlock(element)
-                .withRatio(kRatio / element.slotSpan)
+                .withRatio(ratio / element.slotSpan)
                 .withGridPlacement(
                     columnStart: 1 + day,
                     rowStart: element.firstSlot + 1,
