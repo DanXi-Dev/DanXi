@@ -54,7 +54,7 @@ class Noticing {
           isThemeDark ? Brightness.light : Brightness.dark;
       final TextStyle? contentTextStyle =
           Theme.of(context).snackBarTheme.contentTextStyle ??
-              ThemeData(brightness: invertBrightness).textTheme.subtitle1;
+              ThemeData(brightness: invertBrightness).textTheme.titleMedium;
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Linkify(

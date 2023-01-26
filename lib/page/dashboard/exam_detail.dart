@@ -280,7 +280,7 @@ class ExamListState extends State<ExamList> {
   }
 
   Widget _buildLimitedCard() => Card(
-      color: Theme.of(context).errorColor,
+      color: Theme.of(context).colorScheme.error,
       child: ListTile(
         visualDensity: VisualDensity.comfortable,
         title: Text(
@@ -347,7 +347,7 @@ class ExamListState extends State<ExamList> {
     List<Widget> widgets = [_buildGPACard()];
     List<Widget> secondaryWidgets = [
       _buildDividerWithText(S.of(context).other_types_exam,
-          Theme.of(context).textTheme.bodyText1!.color)
+          Theme.of(context).textTheme.bodyLarge!.color)
     ]; //These widgets are displayed after the ones above
     if (_examData.isEmpty) return widgets;
     for (var value in _examData) {

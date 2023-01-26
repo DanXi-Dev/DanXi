@@ -244,16 +244,32 @@ class Constant {
   /// * [darkTheme]
   static ThemeData lightTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
+      Color toggleableActiveColor = const Color(0xFF007AFF);
+      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
+          (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return null;
+        }
+        if (states.contains(MaterialState.selected)) {
+          return toggleableActiveColor;
+        }
+        return null;
+      });
+
       return ThemeData(
         brightness: Brightness.light,
         colorScheme: const ColorScheme.light().copyWith(
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
-            primary: const Color(0xFF007AFF)),
-        toggleableActiveColor: const Color(0xFF007AFF),
+            primary: const Color(0xFF007AFF),
+            background: const Color.fromRGBO(242, 242, 247, 1)),
+        switchTheme: SwitchThemeData(
+          thumbColor: toggleableProperty,
+          trackColor: toggleableProperty,
+        ),
+        radioTheme: RadioThemeData(fillColor: toggleableProperty),
         indicatorColor: const Color(0xFF007AFF),
         canvasColor: const Color.fromRGBO(242, 242, 247, 1),
-        backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         cardTheme: CardTheme(
           margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
@@ -282,17 +298,32 @@ class Constant {
   /// See [lightTheme] for more details.
   static ThemeData darkTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
+      Color toggleableActiveColor = const Color(0xFF007AFF);
+      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
+          (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return null;
+        }
+        if (states.contains(MaterialState.selected)) {
+          return toggleableActiveColor;
+        }
+        return null;
+      });
       return ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark().copyWith(
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
-            primary: const Color(0xFF007AFF)),
+            primary: const Color(0xFF007AFF),
+            background: Colors.black),
         indicatorColor: const Color(0xFF007AFF),
-        toggleableActiveColor: const Color(0xFF007AFF),
+        switchTheme: SwitchThemeData(
+          thumbColor: toggleableProperty,
+          trackColor: toggleableProperty,
+        ),
+        radioTheme: RadioThemeData(fillColor: toggleableProperty),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,
-        backgroundColor: Colors.black,
         cardTheme: CardTheme(
           margin: const EdgeInsets.fromLTRB(7, 8, 7, 8),
           color: const Color.fromRGBO(28, 28, 30, 1),

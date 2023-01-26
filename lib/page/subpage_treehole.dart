@@ -401,10 +401,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       child: ListTile(
         leading: Icon(
           CupertinoIcons.exclamationmark_triangle,
-          color: Theme.of(context).errorColor,
+          color: Theme.of(context).colorScheme.error,
         ),
         title: Text(S.of(context).silence_notice,
-            style: TextStyle(color: Theme.of(context).errorColor)),
+            style: TextStyle(color: Theme.of(context).colorScheme.error)),
         subtitle: Text(
           S.of(context).ban_post_until(
               "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),

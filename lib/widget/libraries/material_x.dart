@@ -319,7 +319,7 @@ class _ExpansionTileXState extends State<ExpansionTileX>
     final ColorScheme colorScheme = theme.colorScheme;
     _borderColorTween.end = Colors.transparent;
     _headerColorTween
-      ..begin = widget.collapsedTextColor ?? theme.textTheme.subtitle1!.color
+      ..begin = widget.collapsedTextColor ?? theme.textTheme.titleMedium!.color
       ..end = widget.textColor ?? colorScheme.primary;
     _iconColorTween
       ..begin = widget.collapsedIconColor ?? theme.listTileTheme.iconColor

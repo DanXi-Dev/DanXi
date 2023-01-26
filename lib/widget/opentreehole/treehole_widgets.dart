@@ -97,7 +97,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
             onTap: () => onTap(element.name),
             label: element.name,
             color: useAccessibilityColoring
-                ? Theme.of(context).textTheme.bodyText1!.color
+                ? Theme.of(context).textTheme.bodyLarge!.color
                 : element.color,
           ),
         ]));

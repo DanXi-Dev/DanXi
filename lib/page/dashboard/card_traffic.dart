@@ -68,6 +68,7 @@ class CardCrowdDataState extends State<CardCrowdData> {
       if (e is UnsuitableTimeException) {
         Noticing.showNotice(context, S.of(context).out_of_dining_time);
       }
+      return null;
     });
     refreshSelf();
   }

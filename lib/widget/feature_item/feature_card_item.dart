@@ -95,7 +95,7 @@ class FeatureCardItemState extends State<FeatureCardItem>
                     summary.join("\n"),
                     style: PlatformX.getTheme(context)
                         .textTheme
-                        .headline1!
+                        .displayLarge!
                         .copyWith(fontSize: 12),
                   )
             ],

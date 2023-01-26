@@ -249,10 +249,14 @@ class ScheduleViewState extends State<ScheduleView> {
   }
 
   Widget _buildCourseBody(Course course, {bool enabled = true}) {
-    final TextStyle? textStyle = Theme.of(context).textTheme.overline?.copyWith(
-        color: Theme.of(context).colorScheme.secondary.computeLuminance() >= 0.5
-            ? Colors.black
-            : Colors.white);
+    final TextStyle? textStyle = Theme.of(context)
+        .textTheme
+        .labelSmall
+        ?.copyWith(
+            color: Theme.of(context).colorScheme.secondary.computeLuminance() >=
+                    0.5
+                ? Colors.black
+                : Colors.white);
     return Container(
       margin: const EdgeInsets.all(2),
       padding: const EdgeInsets.all(2),

@@ -209,7 +209,7 @@ class DanxiApp extends StatelessWidget {
                           textStyle: TextStyle(
                               color: PlatformX.getTheme(context, primarySwatch)
                                   .textTheme
-                                  .bodyText1!
+                                  .bodyLarge!
                                   .color)))),
               material: (context, __) => MaterialAppData(
                   theme: PlatformX.isDarkMode

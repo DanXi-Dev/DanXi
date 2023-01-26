@@ -190,7 +190,7 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
         children: [
           Text(
             S.of(context).select_login_method,
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
           const SizedBox(
@@ -261,12 +261,12 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       children: <Widget>[
         Text(
           S.of(context).fudan_uis_quick_login,
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         Text(
           S.of(context).choose_your_email_below,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(
@@ -363,7 +363,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
         const SizedBox(height: 4),
         Text(
           S.of(context).input_your_email_password,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
@@ -389,7 +389,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
         const SizedBox(height: 16),
         Text(
           S.of(context).tip_that_fduhole_is_not_fdu,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 16),
         Column(
@@ -451,7 +451,7 @@ class OTLoadingWidget extends SubStatelessWidget {
       children: <Widget>[
         Text(
           S.of(context).obtaining_information,
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         const SizedBox(
@@ -479,12 +479,12 @@ class OTSetPasswordWidget extends SubStatelessWidget {
       children: <Widget>[
         Text(
           S.of(context).set_password,
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         Text(
           S.of(context).set_your_fduhole_password,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
@@ -543,12 +543,12 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
         children: [
           Text(
             S.of(context).welcome_to_fduhole,
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
           Text(
             S.of(context).agree_license_tip,
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
@@ -587,7 +587,7 @@ class OTLicenseBodyState extends State<OTLicenseBody> {
         CheckboxListTile(
             title: Text(
               S.of(context).i_have_read_and_agreed("《社区公约》"),
-              style: Theme.of(context).textTheme.subtitle2,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             controlAffinity: ListTileControlAffinity.leading,
             value: _agreed,
@@ -625,12 +625,12 @@ class OTEmailVerifyCodeWidget extends SubStatelessWidget {
       children: <Widget>[
         Text(
           S.of(context).secure_verification,
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         Text(
           S.of(context).input_your_email_secure_code,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
@@ -681,12 +681,12 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
       children: <Widget>[
         Text(
           S.of(context).registration_succeed,
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         Text(
           S.of(context).save_your_information,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
@@ -746,12 +746,12 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
       children: <Widget>[
         Text(
           S.of(context).welcome_back,
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         Text(
           S.of(context).account_is_set,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),

@@ -269,11 +269,11 @@ class PagedListViewState<T> extends State<PagedListView<T>>
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(S.of(context).failed,
-                  style: Theme.of(context).textTheme.subtitle1),
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 4),
               Text(error,
-                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: Theme.of(context).textTheme.caption!.color))
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall!.color))
             ]),
           ),
           onTap: () {
@@ -334,7 +334,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       if (widget.onDismissItem != null) {
         item = Dismissible(
           key: valueKeys[index],
-          background: ColoredBox(color: Theme.of(context).errorColor),
+          background: ColoredBox(color: Theme.of(context).colorScheme.error),
           confirmDismiss: (direction) =>
               widget.onConfirmDismissItem?.call(context, index, _data[index]) ??
               Future.value(null),

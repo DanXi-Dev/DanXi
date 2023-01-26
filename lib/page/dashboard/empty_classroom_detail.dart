@@ -89,7 +89,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   Widget _buildCupertinoDatePicker() => SizedBox(
       height: ViewportUtils.getMainNavigatorHeight(context) / 3,
       child: CupertinoDatePicker(
-        backgroundColor: Theme.of(context).bottomAppBarColor,
+        backgroundColor: BottomAppBarTheme.of(context).color,
         mode: CupertinoDatePickerMode.date,
         initialDateTime: DateTime.now(),
         minimumDate: DateTime.now().add(const Duration(days: -1)),
@@ -408,15 +408,15 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           decoration: BoxDecoration(
               border: slot == time
                   ? Border.all(
-                      color: Theme.of(context).textTheme.bodyText1!.color!,
+                      color: Theme.of(context).textTheme.bodyLarge!.color!,
                       width: 2.5,
                     )
                   : Border.all(
-                      color: Theme.of(context).textTheme.bodyText1!.color!,
+                      color: Theme.of(context).textTheme.bodyLarge!.color!,
                       width: 0.75,
                     ),
               color:
-                  element ? Theme.of(context).textTheme.bodyText1!.color : null,
+                  element ? Theme.of(context).textTheme.bodyLarge!.color : null,
               borderRadius: const BorderRadius.all(Radius.circular(5.0))),
           width: ViewportUtils.getMainNavigatorWidth(context) / 32,
           margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -427,7 +427,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           decoration: BoxDecoration(
               border: slot == time
                   ? Border.all(
-                      color: Theme.of(context).textTheme.bodyText1!.color!,
+                color: Theme.of(context).textTheme.bodyLarge!.color!,
                       width: 1.5,
                     )
                   : null,

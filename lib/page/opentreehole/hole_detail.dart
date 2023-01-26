@@ -389,7 +389,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           errorBuilder: () => Icon(
             PlatformIcons(context).error,
-            color: Theme.of(context).errorColor,
+            color: Theme.of(context).colorScheme.error,
           ),
         ),
         onPressed: () async {
