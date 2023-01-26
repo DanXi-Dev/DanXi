@@ -43,10 +43,10 @@ class ScheduleView extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ScheduleViewState createState() => _ScheduleViewState();
+  ScheduleViewState createState() => ScheduleViewState();
 }
 
-class _ScheduleViewState extends State<ScheduleView> {
+class ScheduleViewState extends State<ScheduleView> {
   int _maxSlot = 0;
 
   @override

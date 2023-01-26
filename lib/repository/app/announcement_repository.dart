@@ -17,7 +17,7 @@
 
 import 'dart:convert';
 
-import 'package:beautiful_soup_dart/src/extensions.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
@@ -124,7 +124,7 @@ class AnnouncementRepository {
   }
 
   List<Celebration> getCelebrations() {
-    List celebrationJson = jsonDecode(_announcementCache!
+    List<Map<String, dynamic>> celebrationJson = jsonDecode(_announcementCache!
         .firstWhere((element) => element.maxVersion == _ID_CELEBRATION)
         .content!);
     return celebrationJson.map((e) => Celebration.fromJson(e)).toList();

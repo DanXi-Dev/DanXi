@@ -66,7 +66,8 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
     // Notify a completer in queue to complete itself.
     if (_requestWorkingQueue.isNotEmpty) {
       _requestWorkingQueue.removeFirst().complete();

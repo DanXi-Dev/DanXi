@@ -77,7 +77,7 @@ class AutoBBSImage extends StatelessWidget {
                   return BBSImagePlaceholder(
                     size: maxWidth,
                     child: Icon(PlatformIcons(context).error,
-                        color: Theme.of(context).errorColor),
+                        color: Theme.of(context).colorScheme.error),
                   );
                 },
                 progressIndicatorBuilder: (context, url, progress) {

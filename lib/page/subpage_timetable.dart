@@ -47,6 +47,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -74,7 +75,8 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
           S.of(cxt).add_courses,
-          Icon(PlatformX.isMaterial(cxt) ? Icons.delete : CupertinoIcons.delete),
+          Icon(
+              PlatformX.isMaterial(cxt) ? Icons.delete : CupertinoIcons.delete),
           () => DeleteCourseEvent().fire(),
         ),
         AppBarButtonItem(
@@ -201,7 +203,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
           NotLoginError(S.of(context).not_fudan_student)));
     }
-    _contentFuture?.then((value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
+    _contentFuture?.then(
+        (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
   }
 
   void _startShare(
@@ -226,9 +229,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
     } else if (PlatformX.isAndroid) {
-      Share.shareFiles([outputFile.absolute.path],
-          mimeTypes: [converter.mimeType!]);
-    } else {
+      Share.shareXFiles(
+          [XFile(outputFile.absolute.path, mimeType: converter.mimeType!)]);
+    } else if (mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
@@ -278,12 +281,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           //if (_table == null) return;
           newCourses = (await showPlatformDialog<Course?>(
             context: context,
-            builder: (_) => ManuallyAddCourseDialog(
-              courseAvailableList
-            ),
+            builder: (_) => ManuallyAddCourseDialog(courseAvailableList),
           ).then<List<Course>>((course) {
             List<Course> courseList = getCourseList();
-            if(course == null) {
+            if (course == null) {
               return courseList;
             }
             List<Course> newCourseList = courseList + [course];
@@ -296,9 +297,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     _deleteCourseSubscription.bindOnlyInvalid(
         Constant.eventBus.on<DeleteCourseEvent>().listen((_) async {
           newCourses = await showPlatformDialog(
-            context: context,
-            builder: (_) => DeleteCourseDialog(newCourses),
-          ) ?? [];
+                context: context,
+                builder: (_) => DeleteCourseDialog(newCourses),
+              ) ??
+              [];
           SettingsProvider.getInstance().manualAddedCourses = newCourses;
           refresh();
         }),
@@ -369,7 +371,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             children: [
               Text(
                 event.course.courseName!,
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               Text((event.course.teacherNames ?? []).join(",")),
               Text(event.course.roomName!),
@@ -457,14 +459,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
 
-  const SemesterSelectionButton({Key? key, this.onSelectionUpdate}) : super(key: key);
+  const SemesterSelectionButton({Key? key, this.onSelectionUpdate})
+      : super(key: key);
 
   @override
-  _SemesterSelectionButtonState createState() =>
-      _SemesterSelectionButtonState();
+  SemesterSelectionButtonState createState() => SemesterSelectionButtonState();
 }
 
-class _SemesterSelectionButtonState extends State<SemesterSelectionButton> {
+class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   List<SemesterInfo>? _semesterInfo;
   SemesterInfo? _selectionInfo;
   late Future<void> _future;
@@ -584,7 +586,7 @@ class StartDateSelectionButton extends StatelessWidget {
             initialDate: startTime,
             firstDate: DateTime.fromMillisecondsSinceEpoch(0),
             lastDate: startTime.add(const Duration(days: 365 * 100)));
-        if (newDate != null && newDate != startTime) {
+        if (newDate != null && newDate != startTime && context.mounted) {
           // Notice user that newDate is not a Monday.
           if (newDate.weekday != DateTime.monday) {
             bool? confirmed = await Noticing.showConfirmationDialog(

@@ -430,7 +430,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                       .primarySwatch_V2,
                                 ),
                               );
-                              if (result != null) {
+                              if (result != null && mounted) {
                                 context
                                     .read<SettingsProvider>()
                                     .setPrimarySwatch_V2(result.value);
@@ -1013,7 +1013,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             confirmText: S.of(context).send_email,
                             cancelText: S.of(context).i_see,
                             title: S.of(context).contact_us);
-                        if (sendEmail == true) {
+                        if (sendEmail == true && mounted) {
                           final Email email = Email(
                             body: '',
                             subject: S.of(context).app_feedback,

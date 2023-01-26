@@ -28,6 +28,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class BrowserUtil {
   static InAppBrowserClassOptions getOptions(BuildContext context) =>
@@ -49,8 +50,8 @@ class BrowserUtil {
     url = Uri.encodeFull(Uri.decodeFull(url));
 
     if ((cookieJar == null && needAutoLogin == false) || PlatformX.isDesktop) {
-      if (await canLaunch(url)) {
-        launch(url, enableJavaScript: true);
+      if (await canLaunchUrlString(url)) {
+        launchUrlString(url);
         return;
       }
       throw "This URL cannot be launched.";
@@ -133,7 +134,7 @@ class CustomInAppBrowser extends InAppBrowser {
 
   @override
   void onDownloadStart(Uri url) {
-    launch(url.toString());
+    launchUrl(url);
   }
 
   String uisLoginJavaScript(PersonInfo info) =>

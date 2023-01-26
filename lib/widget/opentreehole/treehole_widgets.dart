@@ -45,7 +45,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
@@ -124,8 +124,8 @@ class OTHoleWidget extends StatelessWidget {
       this.isFolded = false})
       : super(key: key);
 
-  _launchUrlWithNotice(BuildContext context, LinkableElement link) async {
-    if (await canLaunch(link.url)) {
+  void _launchUrlWithNotice(BuildContext context, LinkableElement link) async {
+    if (await canLaunchUrlString(link.url)) {
       BrowserUtil.openUrl(link.url, context);
     } else {
       Noticing.showNotice(context, S.of(context).cannot_launch_url);
@@ -441,7 +441,7 @@ class OTFloorWidget extends StatelessWidget {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       onOpen: (link) async {
-                        if (await canLaunch(link.url)) {
+                        if (await canLaunchUrlString(link.url)) {
                           BrowserUtil.openUrl(link.url, context);
                         } else {
                           Noticing.showNotice(
@@ -548,10 +548,10 @@ class OTMentionPreviewWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _OTMentionPreviewWidgetState createState() => _OTMentionPreviewWidgetState();
+  OTMentionPreviewWidgetState createState() => OTMentionPreviewWidgetState();
 }
 
-class _OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
+class OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
   bool isShowingPreview = false;
 
   @override
@@ -739,10 +739,10 @@ class OTFloorWidgetBottomBar extends StatefulWidget {
       : super(key: key);
 
   @override
-  _OTFloorWidgetBottomBarState createState() => _OTFloorWidgetBottomBarState();
+  OTFloorWidgetBottomBarState createState() => OTFloorWidgetBottomBarState();
 }
 
-class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
+class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   late OTFloor floor;
   TextStyle? prebuiltStyle;
 
@@ -949,10 +949,10 @@ class OTMessageItem extends StatefulWidget {
   }
 
   @override
-  _OTMessageItemState createState() => _OTMessageItemState();
+  OTMessageItemState createState() => OTMessageItemState();
 }
 
-class _OTMessageItemState extends State<OTMessageItem> {
+class OTMessageItemState extends State<OTMessageItem> {
   late OTMessage message;
 
   @override

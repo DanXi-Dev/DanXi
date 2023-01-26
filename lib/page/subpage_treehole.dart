@@ -477,11 +477,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         }),
         hashCode);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Watermark.addWatermark(
-          context,
-          PlatformX.isDarkMode,
-          rowCount: 4,
-          columnCount: 8);
+      Watermark.addWatermark(context, PlatformX.isDarkMode,
+          rowCount: 4, columnCount: 8);
     });
   }
 
@@ -569,8 +566,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           // Refresh the list...
           await refreshList();
           // ... and scroll it to the top.
+          if (!mounted) return;
           try {
-            await PrimaryScrollController.of(context)?.animateTo(0,
+            await PrimaryScrollController.of(context).animateTo(0,
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.ease);
             // It is not important if [listViewController] is not attached to a ListView.

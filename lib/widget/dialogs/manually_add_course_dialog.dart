@@ -1,14 +1,13 @@
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/dialogs/manually_add_course_dialog_sub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
-
-import '../../generated/l10n.dart';
-import '../../provider/settings_provider.dart';
-import '../../util/platform_universal.dart';
 
 class ManuallyAddCourseDialog extends StatefulWidget {
   ManuallyAddCourseDialog(this.courseAvailableList, {Key? key})
@@ -76,7 +75,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     for (var element in courseTime) {
       outCome.add((element.slot + 1).toString());
     }
-    return outCome.join(",") ?? "";
+    return outCome.join(",");
   }
 
   @override

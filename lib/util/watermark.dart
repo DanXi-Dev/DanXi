@@ -30,6 +30,6 @@ class Watermark {
                       decoration: TextDecoration.none),
             ));
 
-    overlayState?.insert(overlayEntry!);
+    overlayState.insert(overlayEntry!);
   }
 }

@@ -79,10 +79,10 @@ class TagContainer extends StatefulWidget {
         super(key: key);
 
   @override
-  _TagContainerState createState() => _TagContainerState();
+  TagContainerState createState() => TagContainerState();
 }
 
-class _TagContainerState extends State<TagContainer> {
+class TagContainerState extends State<TagContainer> {
   List<Tag>? tagList;
   late bool fillRandomColor;
   List<String?> selectedCategories = [];

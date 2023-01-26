@@ -164,11 +164,10 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
       : super(key: key);
 
   @override
-  _FlutterTaggingState<T> createState() => _FlutterTaggingState<T>();
+  FlutterTaggingState<T> createState() => FlutterTaggingState<T>();
 }
 
-class _FlutterTaggingState<T extends Taggable>
-    extends State<FlutterTagging<T>> {
+class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
   late final TextEditingController _textController;
   late final FocusNode _focusNode;
   T? _additionItem;

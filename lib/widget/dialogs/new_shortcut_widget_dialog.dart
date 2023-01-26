@@ -36,10 +36,10 @@ class NewShortcutDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _NewShortcutDialogState createState() => _NewShortcutDialogState();
+  NewShortcutDialogState createState() => NewShortcutDialogState();
 }
 
-class _NewShortcutDialogState extends State<NewShortcutDialog> {
+class NewShortcutDialogState extends State<NewShortcutDialog> {
   final TextEditingController _nameTextFieldController =
       TextEditingController();
   final TextEditingController _linkTextFieldController =
@@ -58,7 +58,7 @@ class _NewShortcutDialogState extends State<NewShortcutDialog> {
         DashboardCard("custom_card", _nameTextFieldController.text,
             _linkTextFieldController.text, true)
       ]).toList();
-      Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
       _errorText = S.of(context).unable_to_access_url;
       refreshSelf();

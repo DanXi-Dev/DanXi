@@ -76,10 +76,10 @@ class LoginDialog extends StatefulWidget {
       : super(key: key);
 
   @override
-  _LoginDialogState createState() => _LoginDialogState();
+  LoginDialogState createState() => LoginDialogState();
 }
 
-class _LoginDialogState extends State<LoginDialog> {
+class LoginDialogState extends State<LoginDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   String _errorText = "";

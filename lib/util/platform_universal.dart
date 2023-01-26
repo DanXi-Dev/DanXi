@@ -21,7 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/src/platform.dart' as platformImpl;
+import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:uuid/uuid.dart';
 
@@ -106,10 +106,10 @@ class PlatformX {
   }
 
   static bool isMaterial(BuildContext context) =>
-      platformImpl.isMaterial(context);
+      platform_impl.isMaterial(context);
 
   static bool isCupertino(BuildContext context) =>
-      platformImpl.isCupertino(context);
+      platform_impl.isCupertino(context);
 
   static bool get isDarkMode =>
       WidgetsBinding.instance.window.platformBrightness == Brightness.dark;

@@ -31,10 +31,10 @@ class DynamicThemeController extends StatefulWidget {
       : super(key: key);
 
   @override
-  _DynamicThemeControllerState createState() => _DynamicThemeControllerState();
+  DynamicThemeControllerState createState() => DynamicThemeControllerState();
 }
 
-class _DynamicThemeControllerState extends State<DynamicThemeController>
+class DynamicThemeControllerState extends State<DynamicThemeController>
     with WidgetsBindingObserver {
   late Brightness _brightness;
 

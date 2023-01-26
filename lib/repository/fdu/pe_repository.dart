@@ -46,6 +46,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
         String url = e.response!.requestOptions.path;
         token = Uri.tryParse(url)!.queryParameters['token']!;
       }
+      return null;
     });
     final List<ExerciseItem> items = [];
     final Response<String> r = await dio.get("$_INFO_URL?token=$token");

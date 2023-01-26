@@ -35,10 +35,10 @@ class WithStateKey<T> extends StatefulWidget {
   const WithStateKey({Key? key, this.childKey, this.child}) : super(key: key);
 
   @override
-  _WithStateKeyState<T> createState() => _WithStateKeyState<T>();
+  WithStateKeyState<T> createState() => WithStateKeyState<T>();
 }
 
-class _WithStateKeyState<T> extends State<WithStateKey<T>>
+class WithStateKeyState<T> extends State<WithStateKey<T>>
     with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {

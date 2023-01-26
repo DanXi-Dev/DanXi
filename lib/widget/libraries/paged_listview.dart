@@ -124,10 +124,10 @@ class PagedListView<T> extends StatefulWidget {
         super(key: key);
 
   @override
-  _PagedListViewState<T> createState() => _PagedListViewState<T>();
+  PagedListViewState<T> createState() => PagedListViewState<T>();
 }
 
-class _PagedListViewState<T> extends State<PagedListView<T>>
+class PagedListViewState<T> extends State<PagedListView<T>>
     with ListProvider<T> {
   /// The key for ListView.
   final GlobalKey _scrollKey = GlobalKey();
@@ -508,12 +508,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 }
 
 class PagedListViewController<T> implements ListProvider<T> {
-  late _PagedListViewState<T> _state;
+  late PagedListViewState<T> _state;
 
   PagedListViewController();
 
   @protected
-  setListener(_PagedListViewState<T> state) {
+  setListener(PagedListViewState<T> state) {
     _state = state;
   }
 

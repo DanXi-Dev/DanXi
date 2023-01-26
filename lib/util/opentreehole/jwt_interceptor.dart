@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 
 /// An interceptor that refresh the jwt token automatically.
 ///
@@ -53,7 +54,7 @@ class JWTInterceptor extends QueuedInterceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) async {
-    print("Huston, we have troubles: $err");
+    debugPrint("Huston, we have troubles: $err");
 
     if (err.response?.statusCode == HttpStatus.unauthorized) {
       JWToken? currentToken = tokenGetter.call();
