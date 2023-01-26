@@ -28,7 +28,7 @@ dependencies:
   qr_flutter: ^4.0.0
   provider: ^6.0.2
   event_bus: ^2.0.0
-  flutter_platform_widgets: ^2.0.0
+  flutter_platform_widgets: ^2.2.6
   share_plus: ^4.0.4
   path_provider: ^2.0.9
   screen_brightness: ^0.2.1

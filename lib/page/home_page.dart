@@ -45,6 +45,7 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
@@ -555,7 +556,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             // Override the builder to prevent the repeatedly built states on iOS.
             // I don't know why it works...
             cupertinoTabChildBuilder: (_, index) => _subpage[index],
-            bottomNavBar: PlatformNavBar(
+            bottomNavBar: PlatformNavBarM3(
               items: [
                 // Don't show Dashboard in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
@@ -588,8 +589,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ],
               currentIndex: pageIndex,
-              material: (_, __) =>
-                  MaterialNavBarData(type: BottomNavigationBarType.fixed),
               itemChanged: (index) {
                 if (index != pageIndex) {
                   // Dispatch [SubpageViewState] events.
