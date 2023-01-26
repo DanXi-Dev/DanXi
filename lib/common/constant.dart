@@ -69,9 +69,7 @@ class Constant {
 
   /// A link to the "forget password" page of FDUHole.
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
-      "https://www.fduhole.com/#/forgetpassword";
-
-  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
+      "https://auth.fduhole.com/register?type=forget_password";
 
   /// The default start date of a semester.
   // ignore: non_constant_identifier_names
