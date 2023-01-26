@@ -53,6 +53,14 @@ Color? getDefaultCardBackgroundColor(
         ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
         : null;
 
+void launchUrlWithNotice(BuildContext context, LinkableElement link) async {
+  if (await canLaunchUrlString(link.url)) {
+    BrowserUtil.openUrl(link.url, context);
+  } else {
+    Noticing.showNotice(context, S.of(context).cannot_launch_url);
+  }
+}
+
 class OTLeadingTag extends StatelessWidget {
   final Color color;
   final String text;
@@ -124,14 +132,6 @@ class OTHoleWidget extends StatelessWidget {
       this.isFolded = false})
       : super(key: key);
 
-  void _launchUrlWithNotice(BuildContext context, LinkableElement link) async {
-    if (await canLaunchUrlString(link.url)) {
-      BrowserUtil.openUrl(link.url, context);
-    } else {
-      Noticing.showNotice(context, S.of(context).cannot_launch_url);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     Linkify postContentWidget = Linkify(
@@ -140,7 +140,7 @@ class OTHoleWidget extends StatelessWidget {
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
-      onOpen: (link) => _launchUrlWithNotice(context, link),
+      onOpen: (link) => launchUrlWithNotice(context, link),
     );
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
@@ -298,7 +298,7 @@ class OTHoleWidget extends StatelessWidget {
                     style: const TextStyle(fontSize: 14),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    onOpen: (link) => _launchUrlWithNotice(context, link))),
+                    onOpen: (link) => launchUrlWithNotice(context, link))),
           ],
         ),
         onTap: () async {
@@ -434,19 +434,14 @@ class OTFloorWidget extends StatelessWidget {
               child: isInMention
                   // If content is being quoted, limit its height so that the view won't be too long.
                   ? Linkify(
-                      text: renderText(floor.filteredContent!,
+                  text: renderText(floor.filteredContent!,
                               S.of(context).image_tag, S.of(context).formula)
                           .trim(),
                       textScaleFactor: 0.8,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      onOpen: (link) async {
-                        if (await canLaunchUrlString(link.url)) {
-                          BrowserUtil.openUrl(link.url, context);
-                        } else {
-                          Noticing.showNotice(
-                              context, S.of(context).cannot_launch_url);
-                        }
+                      onOpen: (link) {
+                        launchUrlWithNotice(context, link);
                       })
                   : smartRender(
                       context,

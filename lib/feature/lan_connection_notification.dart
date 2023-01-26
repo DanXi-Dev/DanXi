@@ -17,11 +17,11 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 /// A notification to warn of inability to connect to Fudan LAN.
 class LanConnectionNotification extends Feature {
@@ -51,7 +51,7 @@ class LanConnectionNotification extends Feature {
             content: PostRenderWidget(
               content: S.of(context!).lan_connection_issue_1_guide_content,
               render: kMarkdownRender,
-              onTapLink: (url) => launchUrlString(url!),
+              onTapLink: (url) => BrowserUtil.openUrl(url!, null),
               hasBackgroundImage: false,
             ),
             actions: [

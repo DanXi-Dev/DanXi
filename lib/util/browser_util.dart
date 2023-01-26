@@ -51,7 +51,7 @@ class BrowserUtil {
 
     if ((cookieJar == null && needAutoLogin == false) || PlatformX.isDesktop) {
       if (await canLaunchUrlString(url)) {
-        launchUrlString(url);
+        launchUrlString(url, mode: LaunchMode.externalApplication);
         return;
       }
       throw "This URL cannot be launched.";
@@ -134,7 +134,7 @@ class CustomInAppBrowser extends InAppBrowser {
 
   @override
   void onDownloadStart(Uri url) {
-    launchUrl(url);
+    launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
   String uisLoginJavaScript(PersonInfo info) =>
