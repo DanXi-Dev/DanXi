@@ -22,6 +22,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:intl/intl.dart';
@@ -95,12 +96,12 @@ class _ScheduleViewState extends State<ScheduleView> {
           .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
       result[cols * (slot + 1)] = Center(
           child: Column(
-            children: [
-              Text((slot + 1).toString()),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(
-                  startTime,
+        children: [
+          Text((slot + 1).toString()),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Text(
+              startTime,
               style:
                   TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
             ),
@@ -120,7 +121,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           (widget.showingWeek - widget.today.week) * 7;
       DateTime date = DateTime.now().add(Duration(days: deltaDay));
       TextStyle highlightStyle =
-      TextStyle(color: Theme.of(context).colorScheme.secondary);
+          TextStyle(color: Theme.of(context).colorScheme.secondary);
       // Build weekday indicators
       result[1 + day] = Center(
         child: Column(
@@ -128,9 +129,9 @@ class _ScheduleViewState extends State<ScheduleView> {
           children: [
             deltaDay == 0
                 ? Text(
-              widget.laneEventsList[day].day,
-              style: highlightStyle,
-            )
+                    widget.laneEventsList[day].day,
+                    style: highlightStyle,
+                  )
                 : Text(
                     widget.laneEventsList[day].day,
                   ),
@@ -164,6 +165,14 @@ class _ScheduleViewState extends State<ScheduleView> {
   List<ScheduleBlock> convertToBlock(List<Event> list) {
     List<ScheduleBlock> result = list.map((e) => ScheduleBlock(e)).toList();
     bool flag = true;
+
+    bool isSameCourse(Course a, Course b) {
+      if (a.courseName != b.courseName || a.roomName != b.roomName) {
+        return false;
+      }
+      return listEquals(a.teacherNames, b.teacherNames);
+    }
+
     while (flag) {
       flag = false;
       for (int i = 0; i < result.length;) {
@@ -172,8 +181,8 @@ class _ScheduleViewState extends State<ScheduleView> {
             int startSlot = element.firstSlot;
             int endSlot = startSlot + element.slotSpan;
 
-            return element.event.first.course.courseName ==
-                    result[i].event.first.course.courseName &&
+            return isSameCourse(
+                    element.event.first.course, result[i].event.first.course) &&
                 ((result[i].firstSlot + result[i].slotSpan == startSlot) ||
                     (result[i].firstSlot == endSlot));
           });
