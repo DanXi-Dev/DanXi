@@ -181,7 +181,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   /// if [ignorePrefetch] and [hasPrefetchedAllData], it will discard the prefetched data first.
   Future<void> refreshListView(
       {bool scrollToEnd = false, bool ignorePrefetch = true}) async {
-    Future<void> _realRefresh() async {
+    Future<void> realRefresh() async {
       if (scrollToEnd) _listViewController.queueScrollToEnd();
       await _listViewController.notifyUpdate(
           useInitialData: false, queueDataClear: true);
@@ -198,11 +198,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       // Wait build() complete (so `allDataReceiver` has been set to `null`), then trigger a refresh in
       // the list view.
       Completer<void> completer = Completer();
-      WidgetsBinding.instance.addPostFrameCallback((_) => _realRefresh()
+      WidgetsBinding.instance.addPostFrameCallback((_) => realRefresh()
           .then(completer.complete, onError: completer.completeError));
       return completer.future;
     }
-    return _realRefresh();
+    return realRefresh();
   }
 
   @override
@@ -219,7 +219,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         _listViewController.replaceInitialData(
             (await OpenTreeHoleRepository.getInstance().loadFloors(_hole))!);
       } catch (_) {}
-      if (locateFloor != null) {
+      if (locateFloor != null && mounted) {
         try {
           // Scroll to the specific floor
           await PagedListViewHelper.scrollToItem(
@@ -311,8 +311,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                           list.add(_hole.hole_id!);
                           SettingsProvider.getInstance().hiddenHoles = list;
                         }
-                        Noticing.showNotice(
-                            context, S.of(context).hide_hole_success);
+                        if (mounted) {
+                          Noticing.showNotice(
+                              context, S.of(context).hide_hole_success);
+                        }
                       }
                     }),
               ],
@@ -410,12 +412,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
-    List<Widget> _buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
+    List<Widget> buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
       Future<void> onExecutePenalty(int level) async {
         int? result = await OpenTreeHoleRepository.getInstance()
             .adminAddPenalty(
                 e.floor_id, level, TreeHoleSubpageState.getDivisionId(context));
-        if (result != null && result < 300) {
+        if (result != null && result < 300 && mounted) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);
         }
@@ -441,7 +443,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       ];
     }
 
-    List<Widget> _buildAdminMenu(BuildContext menuContext, OTFloor e) {
+    List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
           onPressed: () async {
@@ -465,7 +467,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).input_reason);
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminDeleteFloor(e.floor_id, reason);
-              if (result != null && result < 300) {
+              if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
               }
@@ -483,7 +485,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 true) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminDeleteHole(e.hole_id);
-              if (result != null && result < 300) {
+              if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
               }
@@ -497,7 +499,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (subMenuContext) => PlatformContextMenu(
-                  actions: _buildAdminPenaltyMenu(subMenuContext, e),
+                  actions: buildAdminPenaltyMenu(subMenuContext, e),
                   cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(subMenuContext).cancel),
                     onPressed: () => Navigator.of(subMenuContext).pop(),
@@ -511,7 +513,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             bool? confirmed = await Noticing.showConfirmationDialog(
                 context, S.of(context).are_you_sure_pin_unpin,
                 isConfirmDestructive: true);
-            if (confirmed != true) return;
+            if (confirmed != true || !mounted) return;
 
             FDUHoleProvider provider = context.read<FDUHoleProvider>();
             List<int> pinned = provider.currentDivision!.pinned!
@@ -524,8 +526,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminModifyDivision(
-                provider.currentDivision!.division_id!, null, null, pinned);
-            if (result != null && result < 300) {
+                    provider.currentDivision!.division_id!, null, null, pinned);
+            if (result != null && result < 300 && mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
             }
@@ -542,7 +544,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminAddSpecialTag(tag, e.floor_id);
-            if (result != null && result < 300) {
+            if (result != null && result < 300 && mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
             }
@@ -558,7 +560,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     (element) => element.division_id == _hole.division_id,
                     orElse: () => OTDivision(_hole.division_id, '', '', null));
 
-            List<Widget> _buildDivisionOptionsList(BuildContext cxt) {
+            List<Widget> buildDivisionOptionsList(BuildContext cxt) {
               List<Widget> list = [];
               onTapListener(OTDivision newDivision) {
                 Navigator.of(cxt).pop(newDivision);
@@ -600,7 +602,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                                               shrinkWrap: true,
                                               primary: false,
                                               children:
-                                                  _buildDivisionOptionsList(
+                                              buildDivisionOptionsList(
                                                       context)));
                                       return PlatformX.isCupertino(context)
                                           ? SafeArea(
@@ -639,7 +641,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
                       newTagsList, _hole.hole_id, selectedDivision.division_id);
-              if (result != null && result < 300) {
+              if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
               }
@@ -657,7 +659,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminFoldFloor(reason.isEmpty ? [] : [reason], e.floor_id);
-            if (result != null && result < 300) {
+            if (result != null && result < 300 && mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(context).operation_successful);
             }
@@ -670,7 +672,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             List<OTHistory>? history =
                 await OpenTreeHoleRepository.getInstance()
                     .getHistory(e.floor_id);
-            if (history != null) {
+            if (history != null && mounted) {
               StringBuffer content = StringBuffer();
               for (int i = 0; i < history.length; i++) {
                 var record = history[i];
@@ -726,8 +728,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           child: Text(S.of(menuContext).copy),
           onPressed: () async {
             await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
-            Noticing.showMaterialNotice(
-                context, S.of(menuContext).copy_success);
+            if (mounted) {
+              Noticing.showMaterialNotice(
+                  context, S.of(menuContext).copy_success);
+            }
           }),
       PlatformContextMenuItem(
         menuContext: menuContext,
@@ -744,7 +748,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (subMenuContext) => PlatformContextMenu(
-                  actions: _buildAdminMenu(subMenuContext, e),
+                  actions: buildAdminMenu(subMenuContext, e),
                   cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(subMenuContext).cancel),
                     onPressed: () => Navigator.of(subMenuContext).pop(),
@@ -824,10 +828,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           try {
             OTHole? hole = await OpenTreeHoleRepository.getInstance()
                 .loadSpecificHole(floor.hole_id!);
-            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": await prefetchAllFloors(hole!),
-              "locate": floor
-            });
+            if (mounted) {
+              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                "post": await prefetchAllFloors(hole!),
+                "locate": floor
+              });
+            }
           } catch (e, st) {
             Noticing.showErrorDialog(context, e, trace: st);
           } finally {
@@ -853,7 +859,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Iterable<ImageUrlInfo> extractAllImagesInFloor(String content) {
-    final imageExp = RegExp(r'\!\[.*?\]\((.*?)\)');
+    final imageExp = RegExp(r'!\[.*?\]\((.*?)\)');
     return imageExp.allMatches(content).map((e) => ImageUrlInfo(
         e.group(1),
         OpenTreeHoleRepository.getInstance()

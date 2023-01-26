@@ -25,12 +25,12 @@ class GpaTablePage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _GpaTablePageState createState() => _GpaTablePageState();
+  GpaTablePageState createState() => GpaTablePageState();
 
   const GpaTablePage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _GpaTablePageState extends State<GpaTablePage> {
+class GpaTablePageState extends State<GpaTablePage> {
   List<GPAListItem>? gpaList;
   static const String NAME_HIDDEN = "****";
 

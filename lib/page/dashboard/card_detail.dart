@@ -37,12 +37,12 @@ class CardDetailPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _CardDetailPageState createState() => _CardDetailPageState();
+  CardDetailPageState createState() => CardDetailPageState();
 
   const CardDetailPage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _CardDetailPageState extends State<CardDetailPage> {
+class CardDetailPageState extends State<CardDetailPage> {
   CardInfo? _cardInfo;
   List<Tag>? _tags;
   late List<int> _tagDays;

@@ -37,12 +37,12 @@ class AnnouncementList extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _AnnouncementListState createState() => _AnnouncementListState();
+  AnnouncementListState createState() => AnnouncementListState();
 
   const AnnouncementList({Key? key, this.arguments}) : super(key: key);
 }
 
-class _AnnouncementListState extends State<AnnouncementList> {
+class AnnouncementListState extends State<AnnouncementList> {
   List<Announcement> _data = [];
   bool _showingLatest = true;
   late Future<bool?> _future;

@@ -310,10 +310,10 @@ class BBSEditorWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BBSEditorWidgetState createState() => _BBSEditorWidgetState();
+  BBSEditorWidgetState createState() => BBSEditorWidgetState();
 }
 
-class _BBSEditorWidgetState extends State<BBSEditorWidget> {
+class BBSEditorWidgetState extends State<BBSEditorWidget> {
   @override
   void initState() {
     super.initState();

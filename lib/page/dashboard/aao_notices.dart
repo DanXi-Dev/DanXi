@@ -35,12 +35,12 @@ class AAONoticesList extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _AAONoticesListState createState() => _AAONoticesListState();
+  AAONoticesListState createState() => AAONoticesListState();
 
   const AAONoticesList({Key? key, this.arguments}) : super(key: key);
 }
 
-class _AAONoticesListState extends State<AAONoticesList> {
+class AAONoticesListState extends State<AAONoticesList> {
   List<Notice>? _data;
   ScrollController? _controller;
 

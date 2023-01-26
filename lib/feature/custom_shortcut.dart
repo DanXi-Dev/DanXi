@@ -20,7 +20,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 /// A feature providing a shortcut a custom link.
 class CustomShortcutFeature extends Feature {
@@ -42,7 +42,7 @@ class CustomShortcutFeature extends Feature {
 
   @override
   void onTap() async {
-    if (await canLaunch(link!)) {
+    if (await canLaunchUrlString(link!)) {
       BrowserUtil.openUrl(link!, context);
     } else {
       Noticing.showNotice(context!, S.of(context!).cannot_launch_url);

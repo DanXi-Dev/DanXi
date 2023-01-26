@@ -57,7 +57,6 @@ import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:system_tray/system_tray.dart' as tray;
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -132,8 +131,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       SettingsSubpage(key: settingsPageKey),
     ];
   }
-
-  final tray.SystemTray _systemTray = tray.SystemTray();
 
   @override
   void dispose() {
@@ -669,7 +666,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadAnnouncement() async {
     final Announcement? announcement =
         await AnnouncementRepository.getInstance().getLastNewAnnouncement();
-    if (announcement != null) {
+    if (announcement != null && mounted) {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(

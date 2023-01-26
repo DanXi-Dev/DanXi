@@ -31,12 +31,12 @@ class TextSelectorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _TextSelectorPageState createState() => _TextSelectorPageState();
+  TextSelectorPageState createState() => TextSelectorPageState();
 
   const TextSelectorPage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _TextSelectorPageState extends State<TextSelectorPage> {
+class TextSelectorPageState extends State<TextSelectorPage> {
   @override
   void initState() {
     super.initState();

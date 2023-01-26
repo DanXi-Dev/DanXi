@@ -44,10 +44,10 @@ class BBSReportDetail extends StatefulWidget {
   const BBSReportDetail({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _BBSReportDetailState createState() => _BBSReportDetailState();
+  BBSReportDetailState createState() => BBSReportDetailState();
 }
 
-class _BBSReportDetailState extends State<BBSReportDetail> {
+class BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController<OTReport> _listViewController =
       PagedListViewController();
 
@@ -116,7 +116,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
           onPressed: () async {
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
-            if (result != null && result < 300) {
+            if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
             }
@@ -190,7 +190,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
                   onTap: () async {
                     int? result = await OpenTreeHoleRepository.getInstance()
                         .adminSetReportDealt(e.report_id!);
-                    if (result != null && result < 300) {
+                    if (result != null && result < 300 && mounted) {
                       Noticing.showModalNotice(context,
                           message: S.of(context).operation_successful);
                     }
@@ -204,6 +204,7 @@ class _BBSReportDetailState extends State<BBSReportDetail> {
               try {
                 final OTHole? post = await OpenTreeHoleRepository.getInstance()
                     .loadSpecificHole(e.hole_id!);
+                if (!mounted) return;
                 smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"post": post!, "locate": e.floor});
               } catch (error, st) {

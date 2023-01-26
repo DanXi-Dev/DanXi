@@ -31,6 +31,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
@@ -66,7 +67,7 @@ class ImageViewerPage extends StatefulWidget {
   ];
 
   @override
-  _ImageViewerPageState createState() => _ImageViewerPageState();
+  ImageViewerPageState createState() => ImageViewerPageState();
 
   ImageViewerPage({Key? key, this.arguments})
       : assert(arguments == null || arguments['hd_url'] != null),
@@ -86,7 +87,7 @@ class ImageViewerPage extends StatefulWidget {
   }
 }
 
-class _ImageViewerPageState extends State<ImageViewerPage> {
+class ImageViewerPageState extends State<ImageViewerPage> {
   final FocusNode _focusNode = FocusNode();
 
   late List<ImageUrlInfo> _imageList;
@@ -133,12 +134,11 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     File image =
         await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isMobile) {
-      Share.shareFiles([
-        image.absolute.path
-      ], mimeTypes: [
-        ImageViewerPage.getMineType(_imageList[showIndex].hdUrl)
+      Share.shareXFiles([
+        XFile(image.absolute.path,
+            mimeType: ImageViewerPage.getMineType(_imageList[showIndex].hdUrl))
       ]);
-    } else {
+    } else if (context.mounted) {
       Noticing.showNotice(context, image.absolute.path);
     }
   }
@@ -170,12 +170,13 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         result =
             await GallerySaver.saveImage(tempFileWithExtName.absolute.path);
       } catch (_) {}
+      if (!mounted) return;
       if (result != null && result) {
         Noticing.showNotice(context, S.of(context).image_save_success);
       } else {
         Noticing.showNotice(context, S.of(context).image_save_failed);
       }
-    } else {
+    } else if (mounted) {
       Noticing.showNotice(context, image.absolute.path);
     }
   }
@@ -216,7 +217,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(PlatformIcons(context).error),
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
                 onPressed: () => Noticing.showNotice(
                     context, originalLoadFailError[_imageList[showIndex]]!,
                     title: S.of(context).fatal_error, useSnackBar: false),
@@ -291,10 +292,10 @@ class ImageViewerBodyView extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ImageViewerBodyViewState createState() => _ImageViewerBodyViewState();
+  ImageViewerBodyViewState createState() => ImageViewerBodyViewState();
 }
 
-class _ImageViewerBodyViewState extends State<ImageViewerBodyView> {
+class ImageViewerBodyViewState extends State<ImageViewerBodyView> {
   late String safeShowingUrl;
   String? originalLoadFailError;
   bool originalLoading = true;

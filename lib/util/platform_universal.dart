@@ -77,13 +77,13 @@ class PlatformX {
         : Theme.of(context).colorScheme.secondary;
   }
 
-  static const illegalCharWindows = [r'\/', r':', r'@'];
+  static const illegalCharWindows = [r'/', r':', r'@'];
 
   static String get fileSystemSlash => isWindows ? "\\" : "/";
 
   static File createPlatformFile(String path) {
-    String fileSystemSlashRegex = isWindows ? r'\\' : r'\/';
-    path = path.replaceAll(RegExp(r'\/'), fileSystemSlash);
+    String fileSystemSlashRegex = isWindows ? r'\\' : r'/';
+    path = path.replaceAll(RegExp(r'/'), fileSystemSlash);
     List<String> pathSegment = path.split(RegExp(fileSystemSlashRegex));
 
     // Skip the disk letter(like "C:")

@@ -21,7 +21,8 @@ import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
 /// A notification to warn of inability to connect to Fudan LAN.
 class LanConnectionNotification extends Feature {
   @override
@@ -50,7 +51,7 @@ class LanConnectionNotification extends Feature {
             content: PostRenderWidget(
               content: S.of(context!).lan_connection_issue_1_guide_content,
               render: kMarkdownRender,
-              onTapLink: (url) => launch(url!),
+              onTapLink: (url) => launchUrlString(url!),
               hasBackgroundImage: false,
             ),
             actions: [

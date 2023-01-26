@@ -35,6 +35,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:ical/serializer.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:nil/nil.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -48,12 +49,12 @@ class ExamList extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _ExamListState createState() => _ExamListState();
+  ExamListState createState() => ExamListState();
 
   const ExamList({Key? key, this.arguments}) : super(key: key);
 }
 
-class _ExamListState extends State<ExamList> {
+class ExamListState extends State<ExamList> {
   List<Exam> _examData = [];
   PersonInfo? _info;
   Future<List<GPAListItem>?>? _gpaListFuture;
@@ -117,9 +118,9 @@ class _ExamListState extends State<ExamList> {
     if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: "text/calendar");
     } else if (PlatformX.isAndroid) {
-      Share.shareFiles([outputFile.absolute.path],
-          mimeTypes: ["text/calendar"]);
-    } else {
+      Share.shareXFiles(
+          [XFile(outputFile.absolute.path, mimeType: "text/calendar")]);
+    } else if (mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
@@ -253,23 +254,15 @@ class _ExamListState extends State<ExamList> {
   Widget _buildErrorPage(
           BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
       ErrorPageWidget(
-        errorMessage: '${S
-            .of(context)
-            .failed}\n${S
-            .of(context)
-            .need_campus_network}\n\nError:\n${ErrorPageWidget
-            .generateUserFriendlyDescription(
-            S.of(context), snapshot.error)}',
+        errorMessage:
+            '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), snapshot.error)}',
         error: snapshot.error,
         trace: snapshot.stackTrace,
-        onTap: () =>
-            setState(() {
-              _semesterFuture = LazyFuture.pack(
-                  EduServiceRepository.getInstance().loadSemesters(_info));
-            }),
-        buttonText: S
-            .of(context)
-            .retry,
+        onTap: () => setState(() {
+          _semesterFuture = LazyFuture.pack(
+              EduServiceRepository.getInstance().loadSemesters(_info));
+        }),
+        buttonText: S.of(context).retry,
       );
 
   List<Widget> _getListWidgetsGrade(List<ExamScore> scores,

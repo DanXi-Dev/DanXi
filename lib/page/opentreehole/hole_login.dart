@@ -39,12 +39,12 @@ class HoleLoginPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _HoleLoginPageState createState() => _HoleLoginPageState();
+  HoleLoginPageState createState() => HoleLoginPageState();
 
   const HoleLoginPage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _HoleLoginPageState extends State<HoleLoginPage> {
+class HoleLoginPageState extends State<HoleLoginPage> {
   late SubStatelessWidget _currentWidget;
   late PersonInfo info;
   LoginInfoModel model = LoginInfoModel();
@@ -136,7 +136,7 @@ class _HoleLoginPageState extends State<HoleLoginPage> {
 }
 
 abstract class SubStatelessWidget extends StatelessWidget {
-  final _HoleLoginPageState state;
+  final HoleLoginPageState state;
   final bool backable = true;
 
   const SubStatelessWidget({Key? key, required this.state}) : super(key: key);
@@ -178,7 +178,7 @@ abstract class SubStatelessWidget extends StatelessWidget {
 
 class OTLoginMethodSelectionWidget extends SubStatelessWidget {
   const OTLoginMethodSelectionWidget(
-      {Key? key, required _HoleLoginPageState state})
+      {Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -216,7 +216,7 @@ class OTLoginMethodSelectionWidget extends SubStatelessWidget {
 }
 
 class OTEmailSelectionWidget extends SubStatelessWidget {
-  const OTEmailSelectionWidget({Key? key, required _HoleLoginPageState state})
+  const OTEmailSelectionWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   /// Check [email] usability.
@@ -324,7 +324,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  OTEmailPasswordLoginWidget({Key? key, required _HoleLoginPageState state})
+  OTEmailPasswordLoginWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   Future<void> executeLogin(BuildContext context) async {
@@ -341,7 +341,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
     if (_usernameController.text.isEmpty) {
       _usernameController.text = model.selectedEmail ?? "";
     }
-    void _doLogin() {
+    void doLogin() {
       model.selectedEmail = _usernameController.text;
       model.password = _passwordController.text;
       if (_passwordController.text.isNotEmpty &&
@@ -384,7 +384,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                 ? const Icon(Icons.lock_outline)
                 : const Icon(CupertinoIcons.lock_circle),
           ),
-          onSubmitted: (_) => _doLogin(),
+          onSubmitted: (_) => doLogin(),
         ),
         const SizedBox(height: 16),
         Text(
@@ -396,7 +396,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             PlatformElevatedButton(
-              onPressed: _doLogin,
+              onPressed: doLogin,
               child: Text(S.of(context).login),
             ),
             const SizedBox(height: 16),
@@ -442,7 +442,7 @@ class OTLoadingWidget extends SubStatelessWidget {
   @override
   final bool backable = false;
 
-  OTLoadingWidget({required _HoleLoginPageState state})
+  OTLoadingWidget({required HoleLoginPageState state})
       : super(key: UniqueKey(), state: state);
 
   @override
@@ -468,7 +468,7 @@ class OTLoadingWidget extends SubStatelessWidget {
 class OTSetPasswordWidget extends SubStatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
 
-  OTSetPasswordWidget({Key? key, required _HoleLoginPageState state})
+  OTSetPasswordWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -516,11 +516,11 @@ class OTSetPasswordWidget extends SubStatelessWidget {
 }
 
 class OTRegisterLicenseWidget extends SubStatelessWidget {
-  const OTRegisterLicenseWidget({Key? key, required _HoleLoginPageState state})
+  const OTRegisterLicenseWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   static Future<void> executeRegister(
-      BuildContext context, _HoleLoginPageState state) async {
+      BuildContext context, HoleLoginPageState state) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
     if (model.verifyCode == null) {
@@ -573,10 +573,10 @@ class OTLicenseBody extends StatefulWidget {
       : super(key: key);
 
   @override
-  _OTLicenseBodyState createState() => _OTLicenseBodyState();
+  OTLicenseBodyState createState() => OTLicenseBodyState();
 }
 
-class _OTLicenseBodyState extends State<OTLicenseBody> {
+class OTLicenseBodyState extends State<OTLicenseBody> {
   bool _agreed = false;
 
   @override
@@ -614,7 +614,7 @@ class _OTLicenseBodyState extends State<OTLicenseBody> {
 class OTEmailVerifyCodeWidget extends SubStatelessWidget {
   final TextEditingController _verifyCodeController = TextEditingController();
 
-  OTEmailVerifyCodeWidget({Key? key, required _HoleLoginPageState state})
+  OTEmailVerifyCodeWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -670,7 +670,7 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
   @override
   final bool backable = false;
 
-  const OTRegisterSuccessWidget({Key? key, required _HoleLoginPageState state})
+  const OTRegisterSuccessWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override
@@ -735,7 +735,7 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
   @override
   final bool backable = false;
 
-  const OTLoginSuccessWidget({Key? key, required _HoleLoginPageState state})
+  const OTLoginSuccessWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
 
   @override

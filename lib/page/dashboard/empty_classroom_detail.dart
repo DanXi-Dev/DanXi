@@ -43,13 +43,13 @@ class EmptyClassroomDetailPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _EmptyClassroomDetailPageState createState() =>
-      _EmptyClassroomDetailPageState();
+  EmptyClassroomDetailPageState createState() =>
+      EmptyClassroomDetailPageState();
 
   const EmptyClassroomDetailPage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
+class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   PersonInfo? _personInfo;
 
   List<Tag>? _campusTags;

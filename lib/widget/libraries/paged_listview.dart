@@ -171,11 +171,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
     if (widget.withScrollbar) {
       return NotificationListener<ScrollNotification>(
+        onNotification: scrollToEnd,
         child: WithScrollbar(
           child: _buildListBody(),
           controller: widget.scrollController,
         ),
-        onNotification: scrollToEnd,
       );
     } else {
       return NotificationListener<ScrollNotification>(
@@ -191,7 +191,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         successBuilder: (_, AsyncSnapshot<List<T>?> snapshot) {
           if (_dataClearQueued) _clearData();
           // Handle Scroll To End Requests
-          WidgetsBinding.instance!.addPostFrameCallback((_) async {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
               while (currentController!.position.pixels <
                   currentController!.position.maxScrollExtent) {

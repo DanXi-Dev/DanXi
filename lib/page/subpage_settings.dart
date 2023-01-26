@@ -72,7 +72,7 @@ Future<void> updateOTUserProfile(BuildContext context) async {
 
 class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
-  _SettingsSubpageState createState() => _SettingsSubpageState();
+  SettingsSubpageState createState() => SettingsSubpageState();
 
   const SettingsSubpage({Key? key}) : super(key: key);
 
@@ -80,7 +80,7 @@ class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
 }
 
-class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
+class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
@@ -220,11 +220,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   String? _clearCacheSubtitle;
 
   Future<void> _deleteAllDataAndExit() async {
@@ -344,7 +339,9 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                     child: Text(
                                       S.of(context).i_see,
                                       style: TextStyle(
-                                          color: Theme.of(context).errorColor),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error),
                                     ),
                                     onPressed: () {
                                       Navigator.of(context).pop();
@@ -490,9 +487,9 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   if (SettingsProvider.getInstance().debugMode)
                     Card(
                         child: ListTile(
-                            title: Text("Fancy Watermark"),
-                            leading: Icon(Icons.numbers),
-                            subtitle: Text(
+                            title: const Text("Fancy Watermark"),
+                            leading: const Icon(Icons.numbers),
+                            subtitle: const Text(
                                 "[WARNING: DEBUG FEATURE] Visible watermark for debug"),
                             onTap: () {
                               if (SettingsProvider.getInstance()
@@ -733,8 +730,9 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 leading: nil,
                 title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
-                        S.of(context).logout,
-                        style: TextStyle(color: Theme.of(context).errorColor),
+                  S.of(context).logout,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
                       )
                     : Text(
                         S.of(context).login,
@@ -779,43 +777,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     );
   }
 
-  void _toggleAdDisplay() {
-    SettingsProvider.getInstance().isAdEnabled =
-        !SettingsProvider.getInstance().isAdEnabled;
-    dashboardPageKey.currentState?.setState(() {});
-    treeholePageKey.currentState?.setState(() {});
-    timetablePageKey.currentState?.setState(() {});
-    setState(() {});
-  }
-
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
-
-  /*Future<bool?> _showAdsDialog() => showPlatformDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-            title: Text(S.of(context).sponsor_us),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).sponsor_us_detail),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: Text(S.of(context).cancel),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-              TextButton(
-                child: Text(S.of(context).i_see),
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-            ],
-          ));*/
-
-  _showAdsThankDialog() {
-    Noticing.showNotice(context, S.of(context).thankyouforenablingads,
-        title: "", useSnackBar: false);
-  }
 
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
@@ -856,10 +818,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     final Color originalDividerColor = Theme.of(context).dividerColor;
     final double avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 8;
-    final TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
+    final TextStyle? defaultText = Theme.of(context).textTheme.bodyMedium;
     final TextStyle linkText = Theme.of(context)
         .textTheme
-        .bodyText2!
+        .bodyMedium!
         .copyWith(color: Theme.of(context).colorScheme.secondary);
 
     final developersIcons = Constant.getDevelopers(context)
