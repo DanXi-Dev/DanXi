@@ -730,14 +730,14 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 leading: nil,
                 title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
-                  S.of(context).logout,
+                        S.of(context).logout,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.error),
                       )
                     : Text(
-                        S.of(context).login,
-                        style:
-                            TextStyle(color: Theme.of(context).indicatorColor),
+                  S.of(context).login,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary),
                       ),
                 onTap: () async {
                   if (!context.read<FDUHoleProvider>().isUserInitialized) {
@@ -745,10 +745,12 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Noticing.showNotice(
                           context, S.of(context).login_from_treehole_page,
                           title: S.of(context).login);
+                    } else {
+                      await OpenTreeHoleRepository.getInstance()
+                          .initializeRepo();
+                      treeholePageKey.currentState?.setState(() {});
+                      refreshSelf();
                     }
-                    await OpenTreeHoleRepository.getInstance().initializeRepo();
-                    treeholePageKey.currentState?.setState(() {});
-                    refreshSelf();
                   } else if (await Noticing.showConfirmationDialog(
                           context, S.of(context).logout_fduhole,
                           title: S.of(context).logout,
