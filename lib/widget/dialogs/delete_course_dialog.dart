@@ -53,7 +53,7 @@ class _DeleteCourseDialogState extends State<DeleteCourseDialog> {
       actions: [
         PlatformDialogAction(
             child: Text(S.of(context).cancel),
-            onPressed: () => {Navigator.pop(context)}),
+            onPressed: () => {Navigator.pop(context, widget.manuallyAddedCourseList)}),
         PlatformDialogAction(
             child: Text(S.of(context).confirm),
             onPressed: () {
