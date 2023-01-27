@@ -26,6 +26,8 @@ import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:nil/nil.dart';
 
+import '../../../util/platform_universal.dart';
+
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
 /*BaseRender kHtmlRender = (BuildContext context, String? content,
@@ -60,7 +62,8 @@ const double kFontLargerSize = 24.0;
 MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) =>
     MarkdownStyleSheet.fromTheme(Theme.of(context));
 
-MarkdownStyleSheet _fontSizeOverride(
+//Override the font size and background of blockquote
+MarkdownStyleSheet _MarkdownStyleOverride(
     MarkdownStyleSheet sheet, double fontSize) {
   return sheet.copyWith(
     p: sheet.p?.copyWith(fontSize: fontSize),
@@ -69,6 +72,10 @@ MarkdownStyleSheet _fontSizeOverride(
     strong: sheet.strong?.copyWith(fontSize: fontSize),
     del: sheet.del?.copyWith(fontSize: fontSize),
     blockquote: sheet.blockquote?.copyWith(fontSize: fontSize),
+    blockquoteDecoration: BoxDecoration(
+      color: PlatformX.isDarkMode ? Colors.blue.shade800 : Colors.blue.shade100,
+      borderRadius: BorderRadius.circular(2.0),
+    ),
     listBullet: sheet.listBullet?.copyWith(fontSize: fontSize),
     checkbox: sheet.checkbox?.copyWith(fontSize: fontSize),
   );
@@ -85,7 +92,7 @@ final BaseRender kMarkdownRender = (BuildContext context,
   return MarkdownBody(
     softLineBreak: true,
     data: content!,
-    styleSheet: _fontSizeOverride(
+    styleSheet: _MarkdownStyleOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
@@ -190,7 +197,7 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
     softLineBreak: true,
     selectable: true,
     data: content!,
-    styleSheet: _fontSizeOverride(
+    styleSheet: _MarkdownStyleOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
