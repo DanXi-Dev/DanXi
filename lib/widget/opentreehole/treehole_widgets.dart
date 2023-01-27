@@ -137,6 +137,9 @@ class OTHoleWidget extends StatelessWidget {
     Linkify postContentWidget = Linkify(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag, S.of(context).formula),
+      linkStyle: const TextStyle(
+        color: Colors.blue,
+        decoration: TextDecoration.none),
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -296,6 +299,9 @@ class OTHoleWidget extends StatelessWidget {
                 child: Linkify(
                     text: lastReplyContent,
                     style: const TextStyle(fontSize: 14),
+                    linkStyle: const TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.none),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     onOpen: (link) => launchUrlWithNotice(context, link))),

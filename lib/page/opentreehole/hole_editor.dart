@@ -344,6 +344,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 text: description,
                                 onOpen: (element) =>
                                     BrowserUtil.openUrl(element.url, context),
+                                linkStyle: const TextStyle(color: Colors.blue,
+                                    decoration: TextDecoration.none),
                               )),
                         ]),
                   ),
