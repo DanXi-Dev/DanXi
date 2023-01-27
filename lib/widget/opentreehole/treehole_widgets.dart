@@ -243,7 +243,7 @@ class OTHoleWidget extends StatelessWidget {
           if (!isFolded &&
               postElement.floors?.last_floor !=
                   postElement.floors?.first_floor) ...[
-            const Divider(height: 4),
+            const Divider(height: 4, thickness: 0.2,),
             _buildCommentView(context, postElement)
           ]
         ],
@@ -760,7 +760,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Divider(),
+        const Divider(thickness: 0.2,),
         DefaultTextStyle(
           style: prebuiltStyle!,
           child: Row(
