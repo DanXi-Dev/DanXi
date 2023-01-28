@@ -227,20 +227,22 @@ class DanxiApp extends StatelessWidget {
               supportedLocales: S.delegate.supportedLocales,
               onUnknownRoute: (settings) => throw AssertionError(
                   "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
-              home: PlatformMasterDetailApp(
-                // Configure the page route behaviour of the whole app
-                onGenerateRoute: (settings) {
-                  final Function? pageContentBuilder =
-                      DanxiApp.routes[settings.name!];
-                  if (pageContentBuilder != null) {
-                    return platformPageRoute(
-                        context: context,
-                        builder: (context) => pageContentBuilder(context,
-                            arguments: settings.arguments));
-                  }
-                  return null;
-                },
-                navigatorKey: navigatorKey,
+              home: ThemedSystemOverlay(
+                child: PlatformMasterDetailApp(
+                  // Configure the page route behaviour of the whole app
+                  onGenerateRoute: (settings) {
+                    final Function? pageContentBuilder =
+                        DanxiApp.routes[settings.name!];
+                    if (pageContentBuilder != null) {
+                      return platformPageRoute(
+                          context: context,
+                          builder: (context) => pageContentBuilder(context,
+                              arguments: settings.arguments));
+                    }
+                    return null;
+                  },
+                  navigatorKey: navigatorKey,
+                ),
               ),
             ),
           ),
