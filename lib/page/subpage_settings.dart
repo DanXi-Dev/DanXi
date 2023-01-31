@@ -495,16 +495,16 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               if (SettingsProvider.getInstance()
                                   .visibleWatermarkMode) {
                                 SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0xff000000;
+                                    .lightWatermarkColor = 0x2a000000;
                                 SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0xff000000;
+                                    .darkWatermarkColor = 0x2a000000;
                                 SettingsProvider.getInstance()
                                     .visibleWatermarkMode = false;
                               } else {
                                 SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0x02000000;
+                                    .lightWatermarkColor = 0x04000000;
                                 SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0x08000000;
+                                    .darkWatermarkColor = 0x0a000000;
                                 SettingsProvider.getInstance()
                                     .visibleWatermarkMode = true;
                               }

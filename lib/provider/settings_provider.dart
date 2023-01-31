@@ -525,7 +525,7 @@ class SettingsProvider with ChangeNotifier {
       int? color = preferences!.getInt(KEY_LIGHT_WATERMARK_COLOR);
       return Color(color!).value;
     }
-    return 0x02000000;
+    return 0x04000000;
   }
 
   set lightWatermarkColor(int value) {
@@ -538,7 +538,7 @@ class SettingsProvider with ChangeNotifier {
       int? color = preferences!.getInt(KEY_DARK_WATERMARK_COLOR);
       return Color(color!).value;
     }
-    return 0x08000000;
+    return 0x0a000000;
   }
 
   set darkWatermarkColor(int value) {

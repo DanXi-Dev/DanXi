@@ -477,8 +477,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         }),
         hashCode);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Watermark.addWatermark(context, PlatformX.isDarkMode,
-          rowCount: 4, columnCount: 8);
+      Watermark.addWatermark(context, rowCount: 4, columnCount: 8);
     });
   }
 
