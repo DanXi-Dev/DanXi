@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.11+321';
+const String version = r'1.3.11+330';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,17 +55,16 @@ const int patch = 11;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'321'];
+const List<String> build = <String>[r'330'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1673948644;
+const int timestamp = 1675139169;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -114,7 +113,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'qr_flutter': r'^4.0.0',
   'provider': r'^6.0.2',
   'event_bus': r'^2.0.0',
-  'flutter_platform_widgets': r'^2.0.0',
+  'flutter_platform_widgets': r'^2.2.6',
   'share_plus': r'^4.0.4',
   'path_provider': r'^2.0.9',
   'screen_brightness': r'^0.2.1',
@@ -153,7 +152,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'win32': r'^2.6.1',
   'file_picker': r'^4.5.1',
   'cached_network_image': r'^3.2.1',
-  'google_mobile_ads': r'^2.3.0',
   'flutter_typeahead': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/selvam920/flutter_typeahead',
@@ -183,7 +181,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'flex_color_picker': r'^2.4.0',
   'material_color_generator': r'^1.1.0',
   'flutter_swiper_view': r'^1.1.8',
-  'boxy': r'^2.0.6+2',
 };
 
 /// Developer dependencies
