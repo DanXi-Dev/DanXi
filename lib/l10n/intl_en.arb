@@ -260,7 +260,7 @@
   "course_id": "Course Code",
   "course_room_name": "Classroom",
   "course_teacher_name": "Teacher Name",
-  "course_schedule":"Course Schedule",
+  "course_schedule": "Course Schedule",
   "course_available_week": "Available Weeks",
   "add_class_time": "Add Class Slot",
   "login_with_uis": "Sign in anonymously as:",
@@ -460,5 +460,5 @@
   "recommended_tags_availibity": "[Experimental] Recommend tags when posting",
   "unavailable": "Unavailable",
   "enable": "Enable",
-  "recommended_tags_description": "Availability: iOS 14.0 and higher\n\nAll recommendations are processed entirely on-device. If you find the recommendations inappropriate, you can report issues to dev@fduhole.com ."
+  "recommended_tags_description": "Availability: iOS 14.0 and higher\n\nAll data is processed on-device. If you find the recommendations inappropriate, you can report issues to dev@fduhole.com ."
 }

@@ -277,7 +277,7 @@
   "course_room_name": "教室",
   "course_teacher_name": "教师姓名",
   "course_available_week": "开课星期",
-  "course_schedule":"上课时间",
+  "course_schedule": "上课时间",
   "add_class_time": "添加上课时间",
   "login_with_uis": "将使用以下信息匿名登录树洞",
   "reply_to": "回复 #{name}",
@@ -451,5 +451,5 @@
   "recommended_tags_availibity": "[实验性] 根据你的帖子内容推荐一些标签",
   "unavailable": "不可用",
   "enable": "启用",
-  "recommended_tags_description": "系统要求: iOS 14.0 或更高\n\n所有建议完全在设备上本地执行推理。如果你发现建议不合适，请报告至 dev@fduhole.com 。"
+  "recommended_tags_description": "系统要求: iOS 14.0 或更高\n\n所有数据均在本地处理。如果您发现推荐的内容不合适，请报告至 dev@fduhole.com 。"
 }
