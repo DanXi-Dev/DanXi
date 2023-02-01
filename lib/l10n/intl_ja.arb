@@ -273,7 +273,7 @@
   "course_room_name": "クラスルーム",
   "course_teacher_name": "教員名",
   "course_available_week": "週を開始",
-  "course_schedule":"コーススケジュール",
+  "course_schedule": "コーススケジュール",
   "add_class_time": "授業時間を追加",
   "login_with_uis": "以下の情報は、匿名でホールにログインするために使用されます。",
   "reply_to": "Re： #{name}",
@@ -424,5 +424,8 @@
   "recommended_tags_availibity": "投稿時にタグをアドバイスする",
   "unavailable": "使用できません",
   "enable": "有効",
-  "recommended_tags_description": "対応機種：iOS 14.0 以降\n\nすべてのレコメンデーションは、デバイス上ですべて処理されます。レコメンデーションが不適切だと感じた場合は、dev@fduhole.com に問題を報告することができます。"
+  "recommended_tags_description": "対応機種：iOS 14.0 以降\n\nすべてのレコメンデーションは、デバイス上ですべて処理されます。レコメンデーションが不適切だと感じた場合は、dev@fduhole.com に問題を報告することができます。",
+  "hide_notification_description": "この通知を永久に隠しますか？設定で隠されたすべての通知をいつでも表示できます。",
+  "show_hidden_notifications": "隠された通知を表示",
+  "show_hidden_notifications_description": "クリックしてすべての隠された通知を復元する"
 }

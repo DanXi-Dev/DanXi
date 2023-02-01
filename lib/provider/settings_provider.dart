@@ -75,6 +75,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_DARK_WATERMARK_COLOR = "dark_watermark_color";
   static const String KEY_VISIBLE_WATERMARK_MODE = "visible_watermark";
   static const String KEY_HIDDEN_HOLES = "hidden_holes";
+  static const String KEY_HIDDEN_NOTIFICATIONS = "hidden_notifications";
 
   SettingsProvider._();
 
@@ -571,6 +572,21 @@ class SettingsProvider with ChangeNotifier {
 
   set hiddenHoles(List<int> list) {
     preferences!.setString(KEY_HIDDEN_HOLES, jsonEncode(list));
+    notifyListeners();
+  }
+
+  List<String> get hiddenNotifications {
+    if (preferences!.containsKey(KEY_HIDDEN_NOTIFICATIONS)) {
+      return jsonDecode(preferences!.getString(KEY_HIDDEN_NOTIFICATIONS)!)
+          .map<String>((e) => e as String)
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
+  set hiddenNotifications(List<String> list) {
+    preferences!.setString(KEY_HIDDEN_NOTIFICATIONS, jsonEncode(list));
     notifyListeners();
   }
 }

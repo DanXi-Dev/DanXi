@@ -438,6 +438,19 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               }
                             },
                           ),
+                        if (context.select<SettingsProvider, bool>(
+                            (value) => value.hiddenNotifications.isNotEmpty))
+                          ListTile(
+                            title:
+                                Text(S.of(context).show_hidden_notifications),
+                            subtitle: Text(S
+                                .of(context)
+                                .show_hidden_notifications_description),
+                            leading: const Icon(Icons.notifications_off),
+                            onTap: () => context
+                                .read<SettingsProvider>()
+                                .hiddenNotifications = [],
+                          ),
                       ],
                     ),
                   ),
