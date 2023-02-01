@@ -84,7 +84,7 @@ class Constant {
 
   // Client version descriptor
   static String get version =>
-      "DanXi/${FlutterApp.versionName} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+      "DanXi/${FlutterApp.versionName}b${pubspec.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
 
   static List<String> fduHoleTips = [];
 
