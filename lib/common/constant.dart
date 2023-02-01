@@ -21,13 +21,16 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
+import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
 
 /// Store some important constants, like app id, default color styles, etc.
 class Constant {
@@ -78,6 +81,10 @@ class Constant {
   static EventBus eventBus = EventBus(sync: true);
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
+
+  // Client version descriptor
+  static String get version =>
+      "DanXi/${FlutterApp.versionName} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
 
   static List<String> fduHoleTips = [];
 

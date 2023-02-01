@@ -18,6 +18,7 @@
 import 'dart:async';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -97,7 +98,9 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> diagnoseDanXi() async {
     _console.writeln(
-        "User Agent used by DanXi: ${UserAgentInterceptor.defaultUsedUserAgent}");
+        "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
+    _console
+        .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
 
     _console.writeln("Everything we stored in the local device:");
     var allKeys = context.read<SettingsProvider>().preferences?.getKeys();

@@ -31,6 +31,7 @@ import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/opentreehole/fduhole_platform_bridge.dart';
 import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -115,6 +116,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         () => provider.token,
         (token) => provider.token =
             SettingsProvider.getInstance().fduholeToken = token));
+    dio.interceptors.add(UserAgentInterceptor(userAgent: Constant.version));
   }
 
   void initializeToken() {
@@ -477,9 +479,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "start_time": startTime?.toIso8601String(),
             },
             options: Options(headers: _tokenHeader));
-    return response.data
-        ?.map((e) => OTMessage.fromJson(e))
-        .toList();
+    return response.data?.map((e) => OTMessage.fromJson(e)).toList();
   }
 
   Future<void> modifyMessage(OTMessage message) async {
