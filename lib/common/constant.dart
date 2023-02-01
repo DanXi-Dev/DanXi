@@ -297,6 +297,7 @@ class Constant {
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
       ),
+      dividerTheme: const DividerThemeData(thickness: 0.2),
     );
   }
 
@@ -353,6 +354,7 @@ class Constant {
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.dark().cardColor,
       ),
+      dividerTheme: const DividerThemeData(thickness: 0.2),
     );
   }
 
