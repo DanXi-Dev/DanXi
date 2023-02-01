@@ -4,14 +4,14 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "7ec4ad567653d3a8f5a943fe715111c7",
-"index.html": "0bb377bf0668d6d505bf38f666837974",
-"/": "0bb377bf0668d6d505bf38f666837974",
-"main.dart.js": "f6dbf366c099faac24a0b1893b092a06",
+"index.html": "5380cf23d9cf66dc5f5650531bd0d735",
+"/": "5380cf23d9cf66dc5f5650531bd0d735",
+"main.dart.js": "cd6f69ab5251044176a5c95108ca605a",
 "flutter.js": "1cfe996e845b3a8a33f57607e8b09ee4",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
 "assets/AssetManifest.json": "7c7f1ba65b9fbd44faba00f316ff8343",
-"assets/NOTICES": "6f3eecd162118d5b16b79034f21412c5",
+"assets/NOTICES": "517fa1923acf8cf686562c8aa26272b1",
 "assets/FontManifest.json": "e8992b70c205310bdb1568e9790e27a1",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_AMS-Regular.ttf": "657a5353a553777e270827bd1630e467",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Script-Regular.ttf": "55d2dcd4778875a53ff09320a85a5296",
