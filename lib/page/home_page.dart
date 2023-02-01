@@ -63,8 +63,6 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
-import '../provider/language_manager.dart';
-
 const fduholeChannel = MethodChannel('fduhole');
 
 void sendFduholeTokenToWatch(String? token) {
@@ -332,7 +330,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    LanguageManager(SettingsProvider.getInstance().language).setLanguage();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
       if (StateProvider.personInfo.value != null) {
