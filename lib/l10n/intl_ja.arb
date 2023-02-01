@@ -424,7 +424,6 @@
   "recommended_tags_availibity": "投稿時にタグをアドバイスする",
   "unavailable": "使用できません",
   "enable": "有効",
-  "recommended_tags_description": "対応機種：iOS 14.0 以降\n\nすべてのレコメンデーションは、デバイス上ですべて処理されます。レコメンデーションが不適切だと感じた場合は、dev@fduhole.com に問題を報告することができます。",
   "hide_notification_description": "この通知を永久に隠しますか？設定で隠されたすべての通知をいつでも表示できます。",
   "show_hidden_notifications": "隠された通知を表示",
   "show_hidden_notifications_description": "クリックしてすべての隠された通知を復元する"
