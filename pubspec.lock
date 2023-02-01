@@ -453,10 +453,10 @@ packages:
     dependency: "direct main"
     description:
       name: flex_color_picker
-      sha256: b5c6a51554e8adef6fb4239786b42af30202941d50625649afa75fc98b26bb70
+      sha256: "607c9fdb26be84d4a5a0931ab42a7eda725372e4f5ebaa2526ab6b22ead752f9"
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.1"
+    version: "3.1.0"
   flex_seed_scheme:
     dependency: transitive
     description:
@@ -856,15 +856,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.0"
-  keframe:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "8f4934ef56de7928adb64f21cb9def5327cfbb5d"
-      url: "https://github.com/w568w/keframe"
-    source: git
-    version: "3.0.0"
   lazy_load_indexed_stack:
     dependency: "direct main"
     description:
