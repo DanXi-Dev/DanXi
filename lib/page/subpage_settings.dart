@@ -214,10 +214,15 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("otp", LICENSE_MIT, "https://github.com/Daegalus/dart-otp"),
     LicenseItem(
         "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
-    LicenseItem("add_2_calendar", LICENSE_MIT,
-        "https://github.com/singularity-s0/add_2_calendar"),
     LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
+    LicenseItem("nil", LICENSE_MIT, "https://github.com/letsar/nil"),
+    LicenseItem("flex_color_picker", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/rydmike/flex_color_picker"),
+    LicenseItem("material_color_generator", LICENSE_BSD_2_0_CLAUSE,
+        "https://github.com/berkanaslan/material-color-generator"),
+    LicenseItem("material_color_generator", LICENSE_MIT,
+        "https://github.com/feicien/flutter_swiper_view"),
   ];
 
   String? _clearCacheSubtitle;
