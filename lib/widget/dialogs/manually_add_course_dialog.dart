@@ -159,8 +159,11 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                             backgroundColor: Color(context
                                 .read<SettingsProvider>()
                                 .primarySwatch_V2),
+                            foregroundColor: Colors.white,
                             child: widget.courseAvailableList.contains(e)
-                                ? const Icon(Icons.done)
+                                ? Icon(PlatformX.isMaterial(context)
+                                  ? Icons.done
+                                  : CupertinoIcons.checkmark_alt)
                                 : Text(
                                     "$e",
                                     style: const TextStyle(
