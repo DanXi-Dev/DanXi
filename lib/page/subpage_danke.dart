@@ -21,6 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -83,9 +84,8 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         initialOptions: InAppWebViewGroupOptions(crossPlatform: settings),
         initialUrlRequest: URLRequest(
             url: Uri.https('danke.fduhole.com', '/jump', {
-          'access': OpenTreeHoleRepository.getInstance().provider.token?.access,
-          'refresh':
-              OpenTreeHoleRepository.getInstance().provider.token?.refresh
+          'access': SettingsProvider.getInstance().fduholeToken?.access,
+          'refresh': SettingsProvider.getInstance().fduholeToken?.refresh,
         })),
         // onWebViewCreated: (InAppWebViewController controller) async {
         //   if (OpenTreeHoleRepository.getInstance().provider.isUserInitialized) {
