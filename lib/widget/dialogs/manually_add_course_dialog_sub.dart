@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import '../../generated/l10n.dart';
 import '../../common/constant.dart';
 import '../../model/time_table.dart';
 import '../../provider/settings_provider.dart';
+import '../../util/platform_universal.dart';
 
 class AddCourseDialogSub extends StatefulWidget {
   AddCourseDialogSub(this.selectedWeekDay, this.selectedSlots, {Key? key})
@@ -51,14 +53,18 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         },
                         child: CircleAvatar(
                           radius: 24.0,
-                          backgroundColor: Color(
-                              context.read<SettingsProvider>().primarySwatch_V2),
+                          backgroundColor: Color(context
+                              .read<SettingsProvider>()
+                              .primarySwatch_V2),
+                          foregroundColor: Colors.white,
                           child: e == widget.selectedWeekDay
-                              ? const Icon(Icons.done)
+                              ? Icon(PlatformX.isMaterial(context)
+                                  ? Icons.done
+                                  : CupertinoIcons.checkmark_alt)
                               : Text(
                                   Constant.WeekDays[e],
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.w900),
                                 ),
                         ),
@@ -77,14 +83,18 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         },
                         child: CircleAvatar(
                           radius: 24.0,
-                          backgroundColor: Color(
-                              context.read<SettingsProvider>().primarySwatch_V2),
+                          backgroundColor: Color(context
+                              .read<SettingsProvider>()
+                              .primarySwatch_V2),
+                          foregroundColor: Colors.white,
                           child: widget.selectedSlots[e] == true
-                              ? const Icon(Icons.done)
+                              ? Icon(PlatformX.isMaterial(context)
+                                  ? Icons.done
+                                  : CupertinoIcons.checkmark_alt)
                               : Text(
                                   (e + 1).toString(),
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.w900),
                                 ),
                         ),

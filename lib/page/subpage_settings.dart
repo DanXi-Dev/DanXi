@@ -506,7 +506,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             title: const Text("Fancy Watermark"),
                             leading: const Icon(Icons.numbers),
                             subtitle: const Text(
-                                "[WARNING: DEBUG FEATURE] Visible watermark for debug"),
+                                "[WARNING: DEBUG FEATURE] Visible watermark"),
                             onTap: () {
                               if (SettingsProvider.getInstance()
                                   .visibleWatermarkMode) {
@@ -518,9 +518,9 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                     .visibleWatermarkMode = false;
                               } else {
                                 SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0x04000000;
+                                    .lightWatermarkColor = 0x01000000;
                                 SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0x0a000000;
+                                    .darkWatermarkColor = 0x01000000;
                                 SettingsProvider.getInstance()
                                     .visibleWatermarkMode = true;
                               }

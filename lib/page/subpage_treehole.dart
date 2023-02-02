@@ -143,7 +143,7 @@ class OTTitle extends StatelessWidget {
     return Expanded(
       child: TagContainer(
           fillRandomColor: false,
-          fixedColor: Theme.of(context).colorScheme.tertiary,
+          fixedColor: Theme.of(context).colorScheme.primary,
           fontSize: 12,
           enabled: true,
           wrapped: false,

@@ -426,5 +426,7 @@
   "enable": "有効",
   "hide_notification_description": "この通知を永久に隠しますか？設定で隠されたすべての通知をいつでも表示できます。",
   "show_hidden_notifications": "隠された通知を表示",
-  "show_hidden_notifications_description": "クリックしてすべての隠された通知を復元する"
+  "show_hidden_notifications_description": "クリックしてすべての隠された通知を復元する",
+  "warning": "警告",
+  "invalid_course_info": "コーススロットに関する有効な情報を提供してください"
 }

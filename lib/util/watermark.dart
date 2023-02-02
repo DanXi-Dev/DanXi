@@ -27,7 +27,7 @@ class Watermark {
                               SettingsProvider.getInstance().darkWatermarkColor)
                           : Color(SettingsProvider.getInstance()
                               .lightWatermarkColor),
-                      fontSize: 18,
+                      fontSize: 26,
                       decoration: TextDecoration.none),
             ));
 
