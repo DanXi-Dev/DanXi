@@ -454,7 +454,6 @@
   "login_problem": "If you encounter problems while logging in, please contact us at dev@fduhole.com or QQ group {QQ}.\n\nYou may also want to read Dev Team Announcements in case your problem is a known issue.",
   "copy_qq_group_id": "Copy QQ Group ID",
   "read_announcements": "Read Dev Team Announcements",
-  "admin_no_hide_tag": "Administrators cannot hide tags",
   "semester_start_at_monday": "The semester start date is usually a Monday, while the date you selected is not. Do you really want to set it to this date?",
   "recommended_tags": "Recommended Tags",
   "recommended_tags_availibity": "[Experimental] Recommend tags when posting",

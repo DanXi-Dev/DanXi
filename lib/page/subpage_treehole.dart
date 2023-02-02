@@ -350,9 +350,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         if (loadedPost?.isEmpty ?? false) return [];
 
         // Filter blocked posts
-        List<OTTag> hiddenTags = OpenTreeHoleRepository.getInstance().isAdmin
-            ? []
-            : SettingsProvider.getInstance().hiddenTags ?? [];
+        List<OTTag> hiddenTags =
+            SettingsProvider.getInstance().hiddenTags ?? [];
         loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
         // Filter hidden posts
