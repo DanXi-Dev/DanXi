@@ -453,6 +453,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       final Response<Map<String, dynamic>> response = await dio
           .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
+      provider.userInfo?.favorites = null;
     }
     return provider.userInfo;
   }
@@ -462,7 +463,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/users/${provider.userInfo!.user_id}",
         data: provider.userInfo!.toJson(),
         options: Options(headers: _tokenHeader));
-    return provider.userInfo = OTUser.fromJson(response.data!);
+    provider.userInfo = OTUser.fromJson(response.data!);
+    provider.userInfo?.favorites = null;
+    return provider.userInfo;
   }
 
   Future<void> updateHoleViewCount(int holeId) async {
