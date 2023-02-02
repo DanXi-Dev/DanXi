@@ -32,18 +32,18 @@ class OTHoleRenderable extends OTHole {
 
   factory OTHoleRenderable.fromOTHole(OTHole postElement) {
     String renderedFirstFloorText = renderText(
-        postElement.floors!.first_floor!.filteredContent!,
+        postElement.floors?.first_floor?.filteredContent ?? "",
         S.current.image_tag,
         S.current.formula);
     String renderedLastFloorText = renderText(
-        postElement.floors!.last_floor!.filteredContent!,
+        postElement.floors?.last_floor?.filteredContent ?? "",
         S.current.image_tag,
         S.current.formula);
     String humanReadableCreatedTime = HumanDuration.tryFormat(
-        DateTime.parse(postElement.time_created!).toLocal());
+        DateTime.tryParse(postElement.time_created ?? "")?.toLocal());
     String humanReadableLastRepliedTime = HumanDuration.tryFormat(
-        DateTime.parse(postElement.floors!.last_floor!.time_created!)
-            .toLocal());
+        DateTime.tryParse(postElement.floors?.last_floor?.time_created ?? "")
+            ?.toLocal());
     return OTHoleRenderable(
         postElement.hole_id,
         postElement.division_id,

@@ -654,8 +654,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             : null,
       );
 
-  Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
-      OTHoleRenderable postElement,
+  Widget _buildListItem(BuildContext context, ListProvider<OTHoleRenderable>? _,
+      int? __, OTHoleRenderable postElement,
       {bool isPinned = false}) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
