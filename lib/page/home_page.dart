@@ -573,7 +573,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     label: S.of(context).forum,
                   ),
                 BottomNavigationBarItem(
-                  icon: const Icon(CupertinoIcons.book),
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.egg_alt)
+                      : const Icon(CupertinoIcons.book),
                   label: S.of(context).danke,
                 ),
                 // Don't show Timetable in visitor mode
