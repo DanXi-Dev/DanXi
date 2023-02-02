@@ -178,8 +178,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 Text(
-                  HumanDuration.tryFormat(
-                      context, DateTime.parse(e.time_created!)),
+                  HumanDuration.tryFormat(DateTime.parse(e.time_created!)),
                   style: TextStyle(
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),

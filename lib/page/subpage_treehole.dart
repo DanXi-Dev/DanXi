@@ -27,6 +27,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/model/renderable/renderables.dart';
 import 'package:dan_xi/page/curriculum/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
@@ -295,10 +296,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   ListDelegate? _delegate;
 
-  final PagedListViewController<OTHole> listViewController =
+  final PagedListViewController<OTHoleRenderable> listViewController =
       PagedListViewController();
 
-  final TimeBasedLoadAdaptLayer<OTHole> adaptLayer =
+  final TimeBasedLoadAdaptLayer<OTHoleRenderable> adaptLayer =
       TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   /// Fields related to the display states.
@@ -314,7 +315,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   late bool _fieldInitComplete;
 
   ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
-  Future<List<OTHole>?> _loadContent(int page) async {
+  Future<List<OTHoleRenderable>?> _loadContent(int page) async {
     if (!checkGroup(kCompatibleUserGroup)) {
       throw NotLoginError("Logged in as a visitor.");
     }
@@ -334,7 +335,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
-        List<OTHole>? loadedPost = await adaptLayer
+        List<OTHoleRenderable>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
           DateTime time = DateTime.now();
           if (lastElement != null) {
@@ -362,7 +363,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
-            ? [OTHole.DUMMY_POST]
+            ? [OTHoleRenderable.dummy()]
             : loadedPost;
       case PostsType.EXTERNAL_VIEW:
         // If we are showing a widget predefined
@@ -586,8 +587,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   }
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>
-      PagedListView<OTHole>(
-        noneItem: OTHole.DUMMY_POST,
+      PagedListView<OTHoleRenderable>(
+        noneItem: OTHoleRenderable.dummy(),
         pagedController: listViewController,
         withScrollbar: true,
         scrollController: PrimaryScrollController.of(context),
@@ -654,7 +655,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       );
 
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
-      OTHole postElement,
+      OTHoleRenderable postElement,
       {bool isPinned = false}) {
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||

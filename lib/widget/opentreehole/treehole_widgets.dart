@@ -20,6 +20,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
+import 'package:dan_xi/model/renderable/renderables.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -120,7 +121,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
 }
 
 class OTHoleWidget extends StatelessWidget {
-  final OTHole postElement;
+  final OTHoleRenderable postElement;
   final bool translucent;
   final bool isPinned;
   final bool isFolded;
@@ -136,8 +137,7 @@ class OTHoleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Linkify postContentWidget = LinkifyX(
-      text: renderText(postElement.floors!.first_floor!.filteredContent!,
-          S.of(context).image_tag, S.of(context).formula),
+      text: postElement.renderedFirstFloorText,
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -222,11 +222,7 @@ class OTHoleWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("#${postElement.hole_id}", style: infoStyle),
-                      Text(
-                          HumanDuration.tryFormat(
-                              context,
-                              DateTime.parse(postElement.time_created!)
-                                  .toLocal()),
+                      Text(postElement.humanReadableCreatedTime,
                           style: infoStyle),
                       Row(children: [
                         Text("${postElement.reply} ", style: infoStyle),
@@ -252,11 +248,8 @@ class OTHoleWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCommentView(BuildContext context, OTHole postElement) {
-    final String lastReplyContent = renderText(
-        postElement.floors!.last_floor!.filteredContent!,
-        S.of(context).image_tag,
-        S.of(context).formula);
+  Widget _buildCommentView(BuildContext context, OTHoleRenderable postElement) {
+    final String lastReplyContent = postElement.renderedLastFloorText;
     return ListTile(
         dense: true,
         minLeadingWidth: 16,
@@ -280,11 +273,7 @@ class OTHoleWidget extends StatelessWidget {
                     Text(
                       S.of(context).latest_reply(
                           postElement.floors!.last_floor!.anonyname ?? "?",
-                          HumanDuration.tryFormat(
-                              context,
-                              DateTime.parse(postElement
-                                      .floors!.last_floor!.time_created!)
-                                  .toLocal())),
+                          postElement.humanReadableLastRepliedTime),
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Icon(CupertinoIcons.search,
@@ -495,7 +484,7 @@ class OTFloorWidget extends StatelessWidget {
                 ),
               Text(
                 HumanDuration.tryFormat(
-                    context, DateTime.tryParse(floor.time_created ?? "")),
+                    DateTime.tryParse(floor.time_created ?? "")),
                 style:
                     TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
               ),
@@ -975,7 +964,7 @@ class OTMessageItemState extends State<OTMessageItem> {
                   ? TextStyle(color: Theme.of(context).colorScheme.primary)
                   : null),
           subtitle: Text(HumanDuration.tryFormat(
-              context, DateTime.tryParse(message.time_created ?? ""))),
+              DateTime.tryParse(message.time_created ?? ""))),
           onTap: () {
             OTMessageItem.markMessageAsRead(message)
                 .then((value) => setState(() {}));

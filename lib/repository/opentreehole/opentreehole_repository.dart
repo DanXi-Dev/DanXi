@@ -28,6 +28,7 @@ import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/model/renderable/renderables.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -242,14 +243,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return _divisionCache;
   }
 
-  List<OTHole> getPinned(int divisionId) {
+  List<OTHoleRenderable> getPinned(int divisionId) {
     try {
       return _divisionCache
               .firstWhere((element) => element.division_id == divisionId)
-              .pinned ??
-          List<OTHole>.empty();
+              .pinned
+              ?.map((e) => OTHoleRenderable.fromOTHole(e))
+              .toList() ??
+          List<OTHoleRenderable>.empty();
     } catch (ignored) {
-      return List<OTHole>.empty();
+      return List<OTHoleRenderable>.empty();
     }
   }
 
@@ -275,7 +278,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
+  Future<List<OTHoleRenderable>?> loadHoles(DateTime startTime, int divisionId,
       {int length = Constant.POST_COUNT_PER_PAGE,
       int prefetchLength = Constant.POST_COUNT_PER_PAGE,
       String? tag,
@@ -291,14 +294,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "order": sortOrder.getInternalString()
         },
         options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+    return response.data?.map((e) => OTHoleRenderable.fromJson(e)).toList();
   }
 
-  Future<OTHole?> loadSpecificHole(int holeId) async {
+  Future<OTHoleRenderable?> loadSpecificHole(int holeId) async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/holes/$holeId",
         options: Options(headers: _tokenHeader));
-    final hole = OTHole.fromJson(response.data!);
+    final hole = OTHoleRenderable.fromJson(response.data!);
     for (var floor in hole.floors!.prefetch!) {
       cacheFloor(floor);
       floor.mention?.forEach((mention) {
@@ -528,7 +531,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return provider.userInfo?.favorites;
   }
 
-  Future<List<OTHole>?> getFavoriteHoles({
+  Future<List<OTHoleRenderable>?> getFavoriteHoles({
     int length = Constant.POST_COUNT_PER_PAGE,
     int prefetchLength = Constant.POST_COUNT_PER_PAGE,
   }) async {
@@ -536,7 +539,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/user/favorites",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
         options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+    return response.data?.map((e) => OTHoleRenderable.fromJson(e)).toList();
   }
 
   Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {
