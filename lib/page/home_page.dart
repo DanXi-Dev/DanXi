@@ -45,6 +45,7 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
@@ -52,7 +53,6 @@ import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
@@ -62,8 +62,6 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
-
-import '../provider/language_manager.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -332,7 +330,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    LanguageManager(SettingsProvider.getInstance().language).setLanguage();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
       if (StateProvider.personInfo.value != null) {
@@ -675,7 +672,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       .developer_announcement(announcement.createdAt ?? "?"),
                 ),
                 content: SingleChildScrollView(
-                    child: Linkify(
+                    child: LinkifyX(
                   text: announcement.content!,
                   onOpen: (element) =>
                       BrowserUtil.openUrl(element.url, context),

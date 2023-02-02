@@ -34,6 +34,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
@@ -134,12 +135,9 @@ class OTHoleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Linkify postContentWidget = Linkify(
+    Linkify postContentWidget = LinkifyX(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag, S.of(context).formula),
-      linkStyle: const TextStyle(
-        color: Colors.blue,
-        decoration: TextDecoration.none),
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -296,12 +294,9 @@ class OTHoleWidget extends StatelessWidget {
             ),
             Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Linkify(
+                child: LinkifyX(
                     text: lastReplyContent,
                     style: const TextStyle(fontSize: 14),
-                    linkStyle: const TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.none),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     onOpen: (link) => launchUrlWithNotice(context, link))),
@@ -439,8 +434,8 @@ class OTFloorWidget extends StatelessWidget {
               alignment: Alignment.topLeft,
               child: isInMention
                   // If content is being quoted, limit its height so that the view won't be too long.
-                  ? Linkify(
-                  text: renderText(floor.filteredContent!,
+                  ? LinkifyX(
+                      text: renderText(floor.filteredContent!,
                               S.of(context).image_tag, S.of(context).formula)
                           .trim(),
                       textScaleFactor: 0.8,

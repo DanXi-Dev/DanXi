@@ -60,8 +60,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import '../provider/language_manager.dart';
-
 Future<void> updateOTUserProfile(BuildContext context) async {
   try {
     await OpenTreeHoleRepository.getInstance().updateUserProfile();
@@ -223,6 +221,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/berkanaslan/material-color-generator"),
     LicenseItem("material_color_generator", LICENSE_MIT,
         "https://github.com/feicien/flutter_swiper_view"),
+    LicenseItem(
+        "mutex", LICENSE_BSD_3_0_CLAUSE, "https://github.com/hoylen/dart-mutex")
   ];
 
   String? _clearCacheSubtitle;
@@ -285,8 +285,6 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     List<Widget> list = [];
     onTapListener(Language language) {
       SettingsProvider.getInstance().language = language;
-      LanguageManager(SettingsProvider.getInstance().language).setLanguage();
-      FlutterApp.restartApp(context);
     }
 
     for (var value in Constant.LANGUAGE_VALUES) {

@@ -35,6 +35,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
@@ -42,7 +43,6 @@ import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
@@ -340,12 +340,10 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                           const Divider(),
                           Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: Linkify(
+                              child: LinkifyX(
                                 text: description,
                                 onOpen: (element) =>
                                     BrowserUtil.openUrl(element.url, context),
-                                linkStyle: const TextStyle(color: Colors.blue,
-                                    decoration: TextDecoration.none),
                               )),
                         ]),
                   ),

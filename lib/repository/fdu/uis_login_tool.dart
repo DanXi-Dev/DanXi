@@ -31,19 +31,22 @@ import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_log/dio_log.dart';
+import 'package:mutex/mutex.dart';
 
 class UISLoginTool {
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
   static const String CREDENTIALS_INVALID = "密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
   static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
+  static final Mutex _mutex = Mutex();
 
-  static Future<E> tryAsyncWithAuth<E>(Dio dio,
-      String serviceUrl,
-      IndependentCookieJar jar,
-      PersonInfo? info,
-      Future<E> Function() function,
-      {int retryTimes = 1}) =>
+  static Future<E> tryAsyncWithAuth<E>(
+          Dio dio,
+          String serviceUrl,
+          IndependentCookieJar jar,
+          PersonInfo? info,
+          Future<E> Function() function,
+          {int retryTimes = 1}) =>
       Retrier.tryAsyncWithFix(() async {
         await throwIfNotLogin(serviceUrl, jar);
         return function();
@@ -69,14 +72,15 @@ class UISLoginTool {
   /// Warning: if it has logged in or it's logging in, return null.
   static Future<Response<dynamic>?> loginUIS(Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
-    if (dio.interceptors.requestLock.locked) return null;
+    await _mutex.acquire();
     dio.interceptors.requestLock.lock();
     Response<dynamic>? result =
-    await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
-        .whenComplete(() {
+        await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
+            .whenComplete(() {
       if (dio.interceptors.requestLock.locked) {
         dio.interceptors.requestLock.unlock();
       }
+      _mutex.release();
     });
     return result;
   }

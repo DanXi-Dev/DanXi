@@ -48,6 +48,13 @@ class DashboardReorderPageState extends State<DashboardReorderPage> {
   Widget build(BuildContext context) {
     sequence = SettingsProvider.getInstance().dashboardWidgetsSequence;
 
+    // remove invalid cards
+    Map<String, String> widgetName = Constant.getFeatureName(context);
+    sequence?.removeWhere((element) =>
+        (element.internalString == null) ||
+        (!element.isSpecialCard &&
+            !widgetName.containsKey(element.internalString)));
+
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: false,

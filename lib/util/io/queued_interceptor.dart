@@ -22,7 +22,7 @@ import 'package:dan_xi/model/pair.dart';
 import 'package:dio/dio.dart';
 
 /// The number of how many requests we allow to be executed simultaneously.
-const _kQueueLengthLimit = 4;
+const _kQueueLengthLimit = 32;
 
 /// How many seconds the request can wait before it goes into the working queue
 /// regardless of the length of [_requestWorkingQueue] > [_kQueueLengthLimit].

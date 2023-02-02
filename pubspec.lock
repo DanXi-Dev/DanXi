@@ -269,10 +269,10 @@ packages:
     dependency: transitive
     description:
       name: cross_file
-      sha256: f71079978789bc2fe78d79227f1f8cfe195b31bbd8db2399b0d15a4b96fb843b
+      sha256: "0b0036e8cccbfbe0555fd83c1d31a6f30b77a96b598b35a5d36dd41f718695e9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3+2"
+    version: "0.3.3+4"
   crypto:
     dependency: transitive
     description:
@@ -453,10 +453,10 @@ packages:
     dependency: "direct main"
     description:
       name: flex_color_picker
-      sha256: b5c6a51554e8adef6fb4239786b42af30202941d50625649afa75fc98b26bb70
+      sha256: "607c9fdb26be84d4a5a0931ab42a7eda725372e4f5ebaa2526ab6b22ead752f9"
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.1"
+    version: "3.1.0"
   flex_seed_scheme:
     dependency: transitive
     description:
@@ -599,10 +599,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_markdown
-      sha256: "981442432b632237ffc1cf8092b4173b9e9f2278b5740637287c3069b51c8f09"
+      sha256: "818cf6c28377ba2c91ed283c96fd712e9c175dd2d2488eb7fc93b6afb9ad2e08"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.13"
+    version: "0.6.13+1"
   flutter_math_fork:
     dependency: "direct main"
     description:
@@ -623,10 +623,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_platform_widgets
-      sha256: "04a373ebf654162791bfce4b7c157f48ec35ea8b0abe2a68de837ceda8bd39ff"
+      sha256: "654379d0b1c74011b0a440140d7445d472d9ea319aebab91217b88790341552d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.6"
+    version: "3.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -640,7 +640,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: fbaa12c039ff1109bd1d06f21ba17c29fd3d1215
+      resolved-ref: "0e2a8de7f2ade2db37983ac8e4279a020e555e57"
       url: "https://github.com/Boreas618/flutter_progress_dialog.git"
     source: git
     version: "0.1.1"
@@ -684,10 +684,10 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: cb7de7ed78efb928d12fd30027204b141c3a8afe
+      resolved-ref: bb926f7a924b0d1ac6ddedc277b5ebf310ca2e4d
       url: "https://github.com/ponnamkarthik/FlutterToast.git"
     source: git
-    version: "8.1.1"
+    version: "8.1.2"
   frontend_server_client:
     dependency: transitive
     description:
@@ -852,19 +852,10 @@ packages:
     dependency: "direct main"
     description:
       name: json_serializable
-      sha256: "040088d9eb2337f3a51ddabe35261e2fea1c351e3dd29d755ed1290b6b700a75"
+      sha256: dadc08bd61f72559f938dd08ec20dbfec6c709bba83515085ea943d2078d187a
       url: "https://pub.dev"
     source: hosted
-    version: "6.6.0"
-  keframe:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "8f4934ef56de7928adb64f21cb9def5327cfbb5d"
-      url: "https://github.com/w568w/keframe"
-    source: git
-    version: "3.0.0"
+    version: "6.6.1"
   lazy_load_indexed_stack:
     dependency: "direct main"
     description:
@@ -954,6 +945,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  mutex:
+    dependency: "direct main"
+    description:
+      name: mutex
+      sha256: "03116a4e46282a671b46c12de649d72c0ed18188ffe12a8d0fc63e83f4ad88f4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   nanoid:
     dependency: transitive
     description:
@@ -1446,10 +1445,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_foundation
-      sha256: "1ffa239043ab8baf881ec3094a3c767af9d10399b2839020b9e4d44c0bb23951"
+      sha256: "2b55c18636a4edc529fa5cd44c03d3f3100c00513f518c5127c951978efcccd0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.2"
+    version: "2.1.3"
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -1507,10 +1506,10 @@ packages:
     dependency: transitive
     description:
       name: source_gen
-      sha256: "2d79738b6bbf38a43920e2b8d189e9a3ce6cc201f4b8fc76be5e4fe377b1c38d"
+      sha256: c2bea18c95cfa0276a366270afaa2850b09b4a76db95d546f3d003dcc7011298
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.6"
+    version: "1.2.7"
   source_helper:
     dependency: transitive
     description:

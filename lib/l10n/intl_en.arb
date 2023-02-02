@@ -460,7 +460,7 @@
   "recommended_tags_availibity": "[Experimental] Recommend tags when posting",
   "unavailable": "Unavailable",
   "enable": "Enable",
-  "recommended_tags_description": "Availability: iOS 14.0 and higher\n\nAll data is processed on-device. If you find the recommendations inappropriate, you can report issues to dev@fduhole.com .",
+  "recommended_tags_description": "WARNING: This is an experimental feature. Recommendations may be incorrect or inappropriate, and are for reference only. If you find the recommendations inappropriate, please report to dev@fduhole.com .\n\nAll data is processed locally and is not uploaded to our servers.\n\nModel Version: 0.1a (CoreML)\n\nAvailability: iOS 14.0 and higher",
   "hide_notification_description": "Do you want to hide this notification permanently? You can always unhide all hidden notifications in Settings.",
   "show_hidden_notifications": "Show Hidden Dashboard Notifications",
   "show_hidden_notifications_description": "Click to restore all hidden notifications on the dashboard"

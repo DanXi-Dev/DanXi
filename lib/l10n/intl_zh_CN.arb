@@ -451,7 +451,7 @@
   "recommended_tags_availibity": "[实验性] 根据你的帖子内容推荐一些标签",
   "unavailable": "不可用",
   "enable": "启用",
-  "recommended_tags_description": "系统要求: iOS 14.0 或更高\n\n所有数据均在本地处理。如果您发现推荐的内容不合适，请报告至 dev@fduhole.com 。",
+  "recommended_tags_description": "警告：这是一个实验性功能。推荐的内容可能不正确或者不恰当，仅供参考。如果您发现推荐的内容不恰当，请报告至 dev@fduhole.com 。\n\n所有数据均在本地处理，不会上传至服务器。\n\n模型版本：0.1a (CoreML)\n\n系统要求：iOS 14.0及以上",
   "hide_notification_description": "你想要永久隐藏这条通知吗？你可以在设置中显示所有已隐藏的通知。",
   "show_hidden_notifications": "显示已隐藏的首页通知",
   "show_hidden_notifications_description": "点击以恢复所有已隐藏的首页通知卡片"
