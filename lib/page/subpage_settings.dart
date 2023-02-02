@@ -221,6 +221,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/berkanaslan/material-color-generator"),
     LicenseItem("material_color_generator", LICENSE_MIT,
         "https://github.com/feicien/flutter_swiper_view"),
+    LicenseItem(
+        "mutex", LICENSE_BSD_3_0_CLAUSE, "https://github.com/hoylen/dart-mutex")
   ];
 
   String? _clearCacheSubtitle;
