@@ -25,11 +25,11 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A list page showing announcement from developers.
@@ -122,10 +122,11 @@ class AnnouncementListState extends State<AnnouncementList> {
                       .of(context)
                       .developer_announcement(value.createdAt ?? "")),
                   content: SingleChildScrollView(
-                    child: Linkify(
-                        text: value.content!,
-                        onOpen: (element) =>
-                            BrowserUtil.openUrl(element.url, context)),
+                    child: LinkifyX(
+                      text: value.content!,
+                      onOpen: (element) =>
+                          BrowserUtil.openUrl(element.url, context),
+                    ),
                   ),
                   actions: <Widget>[
                     PlatformDialogAction(
