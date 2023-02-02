@@ -456,5 +456,6 @@
   "show_hidden_notifications": "显示已隐藏的首页通知",
   "show_hidden_notifications_description": "点击以恢复所有已隐藏的首页通知卡片",
   "warning": "警告",
-  "invalid_course_info": "请提供完整的课程时间信息"
+  "invalid_course_info": "请提供完整的课程时间信息",
+  "danke": "评教"
 }

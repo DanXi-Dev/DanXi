@@ -668,12 +668,11 @@ packages:
   flutter_typeahead:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: "6ab59e4f2bf79a41baa4d06d21ed22e8a39ab7f4"
-      url: "https://github.com/selvam920/flutter_typeahead"
-    source: git
-    version: "3.2.4"
+      name: flutter_typeahead
+      sha256: "73eb76fa640ea630e2d957e7b469ab2b91e4da6c4950d6032fab7009275637b7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.3.3"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -1777,5 +1776,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.19.0 <4.0.0"
+  dart: ">=2.19.0 <3.0.0"
   flutter: ">=3.7.0"
