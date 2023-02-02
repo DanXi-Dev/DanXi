@@ -71,10 +71,7 @@ dependencies:
   win32: ^2.4.1
   file_picker: ^4.6.1
   cached_network_image: ^3.2.1
-  flutter_typeahead:
-    git:
-      url: https://github.com/selvam920/flutter_typeahead
-      ref: master
+  flutter_typeahead: ^4.3.3
   collection: '>=1.15.0 <2.0.0'
   meta: '>=1.3.0 <2.0.0'
   flutter_layout_grid: ^2.0.1
