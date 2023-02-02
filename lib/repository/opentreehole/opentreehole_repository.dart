@@ -514,11 +514,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<int>?> getFavoriteHoleId() async {
+    if (provider.userInfo?.favorites != null) {
+      return provider.userInfo?.favorites;
+    }
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/user/favorites",
         queryParameters: {"plain": true},
         options: Options(headers: _tokenHeader));
-    return response.data?['data'].cast<int>();
+    provider.userInfo?.favorites = response.data?['data']?.cast<int>();
+    return provider.userInfo?.favorites;
   }
 
   Future<List<OTHole>?> getFavoriteHoles({
@@ -544,10 +548,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
-    if (provider.userInfo?.favorites != null) {
-      final Map<String, dynamic> result = response.data;
-      provider.userInfo!.favorites = result["data"].cast<int>();
-    }
+    final Map<String, dynamic> result = response.data;
+    provider.userInfo?.favorites = result["data"]?.cast<int>();
   }
 
   /// Modify a floor
