@@ -465,5 +465,9 @@
   "show_hidden_notifications_description": "Click to restore all hidden notifications on the dashboard",
   "warning": "Warning",
   "invalid_course_info": "Please provide valid information about course slots",
-  "danke": "Course"
+  "danke": "Course",
+  "fix_danke_description": "Having trouble with Danke? Click to try resetting and fixing it.",
+  "fix": "Fix",
+  "refresh": "Refresh",
+  "reset": "Reset"
 }
