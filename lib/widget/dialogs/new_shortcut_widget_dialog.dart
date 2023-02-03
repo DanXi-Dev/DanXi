@@ -24,16 +24,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Allows user to create custom dashboard widgets that link to certain websites.
 class NewShortcutDialog extends StatefulWidget {
-  final SharedPreferences? sharedPreferences;
 
   const NewShortcutDialog({
-    Key? key,
-    required this.sharedPreferences,
-  }) : super(key: key);
+    Key? key}) : super(key: key);
 
   @override
   NewShortcutDialogState createState() => NewShortcutDialogState();
