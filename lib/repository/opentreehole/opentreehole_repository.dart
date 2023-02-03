@@ -383,18 +383,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
     Response<String> r = await dio.get("$_IMAGE_BASE_URL/upload");
     String? token = tokenReg.firstMatch(r.data!)?.group(1);
-    Response<Map<String, dynamic>> response = await dio
-        .post<Map<String, dynamic>>("$_IMAGE_BASE_URL/json",
+    Response<Map<String, dynamic>> response =
+        await dio.post<Map<String, dynamic>>("$_IMAGE_BASE_URL/json",
             data: FormData.fromMap({
               "type": "file",
               "action": "upload",
               "auth_token": token!,
               "source": await MultipartFile.fromFile(path, filename: fileName)
             }),
-            options: Options(headers: _tokenHeader))
-        .onError(((error, stackTrace) {
-      throw ImageUploadError();
-    }));
+            options: Options(headers: _tokenHeader));
     return response.data!['image']['display_url'];
   }
 
@@ -713,8 +710,6 @@ class NotLoginError implements FatalException {
 }
 
 class LoginExpiredError implements Exception {}
-
-class ImageUploadError implements Exception {}
 
 class PushNotificationRegData {
   final String deviceId, token;
