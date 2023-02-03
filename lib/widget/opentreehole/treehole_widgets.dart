@@ -46,7 +46,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
@@ -55,10 +54,12 @@ Color? getDefaultCardBackgroundColor(
         : null;
 
 void launchUrlWithNotice(BuildContext context, LinkableElement link) async {
-  if (await canLaunchUrlString(link.url)) {
-    BrowserUtil.openUrl(link.url, context);
-  } else {
-    Noticing.showNotice(context, S.of(context).cannot_launch_url);
+  try {
+    await BrowserUtil.openUrl(link.url, context);
+  } catch (_) {
+    if (context.mounted) {
+      Noticing.showNotice(context, S.of(context).cannot_launch_url);
+    }
   }
 }
 
