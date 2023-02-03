@@ -412,7 +412,7 @@ class OTFloorWidget extends StatelessWidget {
                         text: S.of(context).deleted,
                       ),
                     ],
-                    if (floor.history?.isNotEmpty == true) ...[
+                    if ((floor.modified ?? 0) > 0) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
                         color: Theme.of(context).colorScheme.primary,
