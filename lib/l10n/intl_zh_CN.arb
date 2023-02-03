@@ -457,5 +457,9 @@
   "show_hidden_notifications_description": "点击以恢复所有已隐藏的首页通知卡片",
   "warning": "警告",
   "invalid_course_info": "请提供完整的课程时间信息",
-  "danke": "评教"
+  "danke": "评教",
+  "fix_danke_description": "使用评教时遇到了问题？点击确认以尝试重置并修复。",
+  "fix": "修复",
+  "refresh": "刷新",
+  "reset": "重置"
 }
