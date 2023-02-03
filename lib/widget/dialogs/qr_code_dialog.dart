@@ -50,10 +50,10 @@ class QRDialog extends StatefulWidget {
   const QRDialog({Key? key, this.personInfo}) : super(key: key);
 
   @override
-  _QRDialogState createState() => _QRDialogState();
+  QRDialogState createState() => QRDialogState();
 }
 
-class _QRDialogState extends State<QRDialog> {
+class QRDialogState extends State<QRDialog> {
   @override
   Widget build(BuildContext context) => PlatformAlertDialog(
         title: Text(S.of(context).fudan_qr_code),

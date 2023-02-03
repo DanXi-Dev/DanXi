@@ -22,11 +22,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:intl/intl.dart';
 
-double kRatio = 1.25;
+double kRatio = 0.8;
 
 /// A time table widget, usually used to show student's course schedule table.
 class ScheduleView extends StatefulWidget {
@@ -42,10 +43,10 @@ class ScheduleView extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ScheduleViewState createState() => _ScheduleViewState();
+  ScheduleViewState createState() => ScheduleViewState();
 }
 
-class _ScheduleViewState extends State<ScheduleView> {
+class ScheduleViewState extends State<ScheduleView> {
   int _maxSlot = 0;
 
   @override
@@ -67,6 +68,8 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   List<Widget> _buildTable(int cols, int rows) {
+    double ratio = kRatio * (DateTime.daysPerWeek + 1) / cols;
+
     List<Widget?> result = List.generate(
         cols * rows,
         (index) => Container(
@@ -75,12 +78,12 @@ class _ScheduleViewState extends State<ScheduleView> {
               decoration: BoxDecoration(
                   color: Theme.of(context).hintColor.withOpacity(0.14),
                   borderRadius: BorderRadius.circular(4)),
-            ).withRatio(kRatio).withGridPlacement(
+            ).withRatio(ratio).withGridPlacement(
                 rowStart: index ~/ cols, columnStart: index % cols));
 
     // Build corner
     result[0] = const SizedBox()
-        .withRatio(kRatio)
+        .withRatio(ratio)
         .withGridPlacement(columnStart: 0, rowStart: 0);
 
     // Build time indicator
@@ -92,7 +95,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           .toExactTime()
           .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE)));
       result[cols * (slot + 1)] = Center(
-              child: Column(
+          child: Column(
         children: [
           Text((slot + 1).toString()),
           Padding(
@@ -108,9 +111,7 @@ class _ScheduleViewState extends State<ScheduleView> {
             style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
           )
         ],
-      ))
-          .withRatio(kRatio)
-          .withGridPlacement(columnStart: 0, rowStart: slot + 1);
+      )).withRatio(ratio).withGridPlacement(columnStart: 0, rowStart: slot + 1);
     }
 
     // Build day indicator & courses
@@ -142,12 +143,12 @@ class _ScheduleViewState extends State<ScheduleView> {
                 : Text(DateFormat.Md().format(date))
           ],
         ),
-      ).withRatio(kRatio).withGridPlacement(columnStart: day + 1, rowStart: 0);
+      ).withRatio(ratio).withGridPlacement(columnStart: day + 1, rowStart: 0);
 
       convertToBlock(widget.laneEventsList[day].events).forEach((element) {
         result[1 + day + cols * (element.firstSlot + 1)] =
             _buildScheduleBlock(element)
-                .withRatio(kRatio / element.slotSpan)
+                .withRatio(ratio / element.slotSpan)
                 .withGridPlacement(
                     columnStart: 1 + day,
                     rowStart: element.firstSlot + 1,
@@ -164,6 +165,14 @@ class _ScheduleViewState extends State<ScheduleView> {
   List<ScheduleBlock> convertToBlock(List<Event> list) {
     List<ScheduleBlock> result = list.map((e) => ScheduleBlock(e)).toList();
     bool flag = true;
+
+    bool isSameCourse(Course a, Course b) {
+      if (a.courseName != b.courseName || a.roomName != b.roomName) {
+        return false;
+      }
+      return listEquals(a.teacherNames, b.teacherNames);
+    }
+
     while (flag) {
       flag = false;
       for (int i = 0; i < result.length;) {
@@ -172,8 +181,8 @@ class _ScheduleViewState extends State<ScheduleView> {
             int startSlot = element.firstSlot;
             int endSlot = startSlot + element.slotSpan;
 
-            return element.event.first.course.courseName ==
-                    result[i].event.first.course.courseName &&
+            return isSameCourse(
+                    element.event.first.course, result[i].event.first.course) &&
                 ((result[i].firstSlot + result[i].slotSpan == startSlot) ||
                     (result[i].firstSlot == endSlot));
           });
@@ -240,10 +249,14 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   Widget _buildCourseBody(Course course, {bool enabled = true}) {
-    final TextStyle? textStyle = Theme.of(context).textTheme.overline?.copyWith(
-        color: Theme.of(context).colorScheme.secondary.computeLuminance() >= 0.5
-            ? Colors.black
-            : Colors.white);
+    final TextStyle? textStyle = Theme.of(context)
+        .textTheme
+        .labelSmall
+        ?.copyWith(
+            color: Theme.of(context).colorScheme.secondary.computeLuminance() >=
+                    0.5
+                ? Colors.black
+                : Colors.white);
     return Container(
       margin: const EdgeInsets.all(2),
       padding: const EdgeInsets.all(2),

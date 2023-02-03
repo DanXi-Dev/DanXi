@@ -26,7 +26,7 @@ class FeatureListItem extends StatefulWidget implements FeatureContainer {
   final Map<String, dynamic>? arguments;
 
   @override
-  _FeatureListItemState createState() => _FeatureListItemState();
+  FeatureListItemState createState() => FeatureListItemState();
 
   const FeatureListItem({required this.feature, this.arguments, Key? key})
       : super(key: key);
@@ -35,7 +35,7 @@ class FeatureListItem extends StatefulWidget implements FeatureContainer {
   Feature get childFeature => feature;
 }
 
-class _FeatureListItemState extends State<FeatureListItem>
+class FeatureListItemState extends State<FeatureListItem>
     with FeatureContainerState {
   /// Control whether this feature is going to be loaded when the container is built
   late bool loadWidget;

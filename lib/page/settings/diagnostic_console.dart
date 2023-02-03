@@ -18,6 +18,7 @@
 import 'dart:async';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -39,10 +40,10 @@ class DiagnosticConsole extends StatefulWidget {
   const DiagnosticConsole({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _DiagnosticConsoleState createState() => _DiagnosticConsoleState();
+  DiagnosticConsoleState createState() => DiagnosticConsoleState();
 }
 
-class _DiagnosticConsoleState extends State<DiagnosticConsole> {
+class DiagnosticConsoleState extends State<DiagnosticConsole> {
   final StringBufferNotifier _console = StringBufferNotifier();
 
   late List<DiagnosticMethod> diagnoses;
@@ -91,14 +92,15 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
-  Future<void> diagnoseGoogleAds() async {
-  }
+  Future<void> diagnoseGoogleAds() async {}
 
   static const _IGNORE_KEYS = ["password"];
 
   Future<void> diagnoseDanXi() async {
     _console.writeln(
-        "User Agent used by DanXi: ${UserAgentInterceptor.defaultUsedUserAgent}");
+        "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
+    _console
+        .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
 
     _console.writeln("Everything we stored in the local device:");
     var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
@@ -119,13 +121,14 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
   Future<void> changePassword() async {
     if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
     String? email = await Noticing.showInputDialog(context, "Input email");
+    if (!mounted) return;
     String? password =
         await Noticing.showInputDialog(context, "Input password");
     if ((email ?? "").isEmpty || (password ?? "").isEmpty) return;
 
     int? result = await OpenTreeHoleRepository.getInstance()
         .adminChangePassword(email!, password!);
-    if (result != null && result < 300) {
+    if (result != null && result < 300 && mounted) {
       Noticing.showModalNotice(context,
           message: S.of(context).operation_successful);
     }
@@ -133,7 +136,7 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> setUserAgent() async {
     String? ua = await Noticing.showInputDialog(context, "Input user agent");
-    if (ua == null) return;
+    if (ua == null || !mounted) return;
     if (ua.isEmpty) {
       context.read<SettingsProvider>().customUserAgent = null;
     } else {
@@ -168,7 +171,9 @@ class _DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Copy Everything"),
                   onPressed: () async {
                     await FlutterClipboard.copy(_console.toString());
-                    Noticing.showMaterialNotice(context, "Copied.");
+                    if (mounted) {
+                      Noticing.showMaterialNotice(context, "Copied.");
+                    }
                   },
                 ),
                 PlatformElevatedButton(

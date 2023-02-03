@@ -124,10 +124,10 @@ class PagedListView<T> extends StatefulWidget {
         super(key: key);
 
   @override
-  _PagedListViewState<T> createState() => _PagedListViewState<T>();
+  PagedListViewState<T> createState() => PagedListViewState<T>();
 }
 
-class _PagedListViewState<T> extends State<PagedListView<T>>
+class PagedListViewState<T> extends State<PagedListView<T>>
     with ListProvider<T> {
   /// The key for ListView.
   final GlobalKey _scrollKey = GlobalKey();
@@ -171,11 +171,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 
     if (widget.withScrollbar) {
       return NotificationListener<ScrollNotification>(
+        onNotification: scrollToEnd,
         child: WithScrollbar(
           child: _buildListBody(),
           controller: widget.scrollController,
         ),
-        onNotification: scrollToEnd,
       );
     } else {
       return NotificationListener<ScrollNotification>(
@@ -191,7 +191,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
         successBuilder: (_, AsyncSnapshot<List<T>?> snapshot) {
           if (_dataClearQueued) _clearData();
           // Handle Scroll To End Requests
-          WidgetsBinding.instance!.addPostFrameCallback((_) async {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (_scrollToEndQueued) {
               while (currentController!.position.pixels <
                   currentController!.position.maxScrollExtent) {
@@ -269,11 +269,11 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(S.of(context).failed,
-                  style: Theme.of(context).textTheme.subtitle1),
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 4),
               Text(error,
-                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: Theme.of(context).textTheme.caption!.color))
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall!.color))
             ]),
           ),
           onTap: () {
@@ -334,7 +334,7 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
       if (widget.onDismissItem != null) {
         item = Dismissible(
           key: valueKeys[index],
-          background: ColoredBox(color: Theme.of(context).errorColor),
+          background: ColoredBox(color: Theme.of(context).colorScheme.error),
           confirmDismiss: (direction) =>
               widget.onConfirmDismissItem?.call(context, index, _data[index]) ??
               Future.value(null),
@@ -508,12 +508,12 @@ class _PagedListViewState<T> extends State<PagedListView<T>>
 }
 
 class PagedListViewController<T> implements ListProvider<T> {
-  late _PagedListViewState<T> _state;
+  late PagedListViewState<T> _state;
 
   PagedListViewController();
 
   @protected
-  setListener(_PagedListViewState<T> state) {
+  setListener(PagedListViewState<T> state) {
     _state = state;
   }
 

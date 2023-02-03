@@ -28,10 +28,10 @@ class BBSTagsContainer extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BBSTagsContainerState createState() => _BBSTagsContainerState();
+  BBSTagsContainerState createState() => BBSTagsContainerState();
 }
 
-class _BBSTagsContainerState extends State<BBSTagsContainer> {
+class BBSTagsContainerState extends State<BBSTagsContainer> {
   final FocusNode _searchFocus = FocusNode();
   List<OTTag>? filteredTags;
 

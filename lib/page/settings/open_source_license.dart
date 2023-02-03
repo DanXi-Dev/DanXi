@@ -33,10 +33,10 @@ class OpenSourceLicenseList extends StatefulWidget {
   const OpenSourceLicenseList({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _OpenSourceListState createState() => _OpenSourceListState();
+  OpenSourceListState createState() => OpenSourceListState();
 }
 
-class _OpenSourceListState extends State<OpenSourceLicenseList> {
+class OpenSourceListState extends State<OpenSourceLicenseList> {
   List<LicenseItem>? _items;
 
   int debugModeEnableStatus = 0;

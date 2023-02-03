@@ -28,7 +28,7 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   final Function? onDismissed;
 
   @override
-  _FeatureCardItemState createState() => _FeatureCardItemState();
+  FeatureCardItemState createState() => FeatureCardItemState();
 
   const FeatureCardItem(
       {required this.feature, this.arguments, this.onDismissed, Key? key})
@@ -38,7 +38,7 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   Feature get childFeature => feature;
 }
 
-class _FeatureCardItemState extends State<FeatureCardItem>
+class FeatureCardItemState extends State<FeatureCardItem>
     with FeatureContainerState {
   late Key _key;
 
@@ -95,7 +95,7 @@ class _FeatureCardItemState extends State<FeatureCardItem>
                     summary.join("\n"),
                     style: PlatformX.getTheme(context)
                         .textTheme
-                        .headline1!
+                        .displayLarge!
                         .copyWith(fontSize: 12),
                   )
             ],

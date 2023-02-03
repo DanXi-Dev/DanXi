@@ -40,6 +40,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/library_repository.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
@@ -157,8 +158,21 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     List<Widget> widgets = [];
     NotificationProvider provider = context.watch<NotificationProvider>();
     widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
-          feature: e,
-          onDismissed: () => provider.removeNotification(e),
+      feature: e,
+          onDismissed: () async {
+            final name = e.runtimeType.toString();
+            provider.removeNotification(e);
+            // Ask the user if he/she wants to hide the notification permanently.
+            bool? hide = await Noticing.showConfirmationDialog(
+                context, S.of(context).hide_notification_description,
+                isConfirmDestructive: true);
+            if (hide == true && mounted) {
+              final provider = context.read<SettingsProvider>();
+              final oldList = provider.hiddenNotifications;
+              oldList.add(name);
+              provider.hiddenNotifications = oldList;
+            }
+          },
         )));
     List<Widget> currentCardChildren = [];
     for (var element in widgetSequence) {

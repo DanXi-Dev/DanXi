@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.11+321';
+const String version = r'1.3.11+331';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -55,10 +55,10 @@ const int patch = 11;
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'321'];
+const List<String> build = <String>[r'331'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1673948644;
+const int timestamp = 1675399857;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -95,7 +95,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_localizations': <String, Object>{
     'sdk': r'flutter',
   },
-  'cupertino_icons': r'^1.0.4',
+  'cupertino_icons': r'^1.0.5',
   'dio_cookie_manager': r'^2.0.0',
   'flutter_progress_dialog': <String, Object>{
     'git': <String, Object>{
@@ -112,10 +112,10 @@ const Map<String, Object> dependencies = <String, Object>{
   'beautiful_soup_dart': r'^0.3.0',
   'quick_actions': r'^1.0.1',
   'qr_flutter': r'^4.0.0',
-  'provider': r'^6.0.2',
+  'provider': r'^6.0.5',
   'event_bus': r'^2.0.0',
-  'flutter_platform_widgets': r'^2.0.0',
-  'share_plus': r'^4.0.4',
+  'flutter_platform_widgets': r'^3.0.0',
+  'share_plus': r'^4.5.3',
   'path_provider': r'^2.0.9',
   'screen_brightness': r'^0.2.1',
   'flutter_email_sender': r'^5.1.0',
@@ -150,16 +150,10 @@ const Map<String, Object> dependencies = <String, Object>{
     },
   },
   'bitsdojo_window': r'^0.1.2',
-  'win32': r'^2.6.1',
-  'file_picker': r'^4.5.1',
+  'win32': r'^2.4.1',
+  'file_picker': r'^4.6.1',
   'cached_network_image': r'^3.2.1',
-  'google_mobile_ads': r'^2.3.0',
-  'flutter_typeahead': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/selvam920/flutter_typeahead',
-      'ref': r'master',
-    },
-  },
+  'flutter_typeahead': r'^4.3.3',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^2.0.1',
@@ -173,17 +167,11 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_fgbg': r'^0.2.0',
   'lazy_load_indexed_stack': r'^0.1.3',
   'js': r'^0.6.4',
-  'keframe': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/w568w/keframe',
-      'ref': r'master',
-    },
-  },
   'nil': r'^1.1.1',
-  'flex_color_picker': r'^2.4.0',
+  'flex_color_picker': r'^3.1.0',
   'material_color_generator': r'^1.1.0',
   'flutter_swiper_view': r'^1.1.8',
-  'boxy': r'^2.0.6+2',
+  'mutex': r'^3.0.1',
 };
 
 /// Developer dependencies
@@ -198,7 +186,7 @@ const Map<String, Object> devDependencies = <String, Object>{
 
 /// Dependency overrides
 const Map<String, Object> dependencyOverrides = <String, Object>{
-  'device_info_plus': r'^3.2.1',
+  'device_info_plus': r'^3.2.4',
   'fluttertoast': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/ponnamkarthik/FlutterToast.git',

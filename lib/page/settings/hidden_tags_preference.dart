@@ -29,14 +29,14 @@ class BBSHiddenTagsPreferencePage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _BBSHiddenTagsPreferencePageState createState() =>
-      _BBSHiddenTagsPreferencePageState();
+  BBSHiddenTagsPreferencePageState createState() =>
+      BBSHiddenTagsPreferencePageState();
 
   const BBSHiddenTagsPreferencePage({Key? key, this.arguments})
       : super(key: key);
 }
 
-class _BBSHiddenTagsPreferencePageState
+class BBSHiddenTagsPreferencePageState
     extends State<BBSHiddenTagsPreferencePage> {
   late List<OTTag> tags;
 

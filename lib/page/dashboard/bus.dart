@@ -39,12 +39,12 @@ class BusPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _BusPageState createState() => _BusPageState();
+  BusPageState createState() => BusPageState();
 
   const BusPage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _BusPageState extends State<BusPage> {
+class BusPageState extends State<BusPage> {
   Future<List<BusScheduleItem>?>? _busListWeekday;
   Future<List<BusScheduleItem>?>? _busListHoliday;
   List<BusScheduleItem>? _busListWeekdayLoaded;

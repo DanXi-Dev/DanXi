@@ -1,38 +1,27 @@
 ---
 name: Bug报告
 about: 说明你遇到的Bug。
-title: "[BUG]"
+title: "[BUG] "
 labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**描述 Bug**
+简要描述 Bug 是什么。
+如果你认为标题已经说得很清楚了，可以删除这一项。
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**复现步骤**
+复现该 Bug 的步骤：
+1. 到 xx 页面
+2. 点击 xxx
+3. 选择 xxx
+4. 出现错误
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**截图**
+如果方便的话，你可以添加截图。
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+**系统信息**
+ - 设备型号：
+ - 系统版本：
+ - 旦夕版本（见「设置-关于本应用」）：

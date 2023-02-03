@@ -154,8 +154,8 @@ class _OTSearchPageState extends State<OTSearchPage> {
 }
 
 /// Some search suggestion providers.
-final RegExp pidPattern = RegExp(r'#{1}([0-9]+)');
-final RegExp floorPattern = RegExp(r'#{2}([0-9]+)');
+final RegExp pidPattern = RegExp(r'#([0-9]+)');
+final RegExp floorPattern = RegExp(r'##([0-9]+)');
 
 Widget searchByText(BuildContext context, String searchKeyword) {
   return ListTile(

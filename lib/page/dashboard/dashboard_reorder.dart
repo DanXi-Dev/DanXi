@@ -36,17 +36,24 @@ class DashboardReorderPage extends StatefulWidget {
   const DashboardReorderPage({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _DashboardReorderPage createState() => _DashboardReorderPage();
+  DashboardReorderPageState createState() => DashboardReorderPageState();
 }
 
 const List<String> NONFUNCTIONAL_WIDGET_LIST = ['divider', 'new_card'];
 
-class _DashboardReorderPage extends State<DashboardReorderPage> {
+class DashboardReorderPageState extends State<DashboardReorderPage> {
   List<DashboardCard>? sequence;
 
   @override
   Widget build(BuildContext context) {
     sequence = SettingsProvider.getInstance().dashboardWidgetsSequence;
+
+    // remove invalid cards
+    Map<String, String> widgetName = Constant.getFeatureName(context);
+    sequence?.removeWhere((element) =>
+        (element.internalString == null) ||
+        (!element.isSpecialCard &&
+            !widgetName.containsKey(element.internalString)));
 
     return PlatformScaffold(
       iosContentBottomPadding: false,

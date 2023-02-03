@@ -59,8 +59,6 @@ import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../provider/language_manager.dart';
-
 Future<void> updateOTUserProfile(BuildContext context) async {
   try {
     await OpenTreeHoleRepository.getInstance().updateUserProfile();
@@ -71,7 +69,7 @@ Future<void> updateOTUserProfile(BuildContext context) async {
 
 class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
-  _SettingsSubpageState createState() => _SettingsSubpageState();
+  SettingsSubpageState createState() => SettingsSubpageState();
 
   const SettingsSubpage({Key? key}) : super(key: key);
 
@@ -79,7 +77,7 @@ class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
 }
 
-class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
+class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
@@ -213,16 +211,18 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("otp", LICENSE_MIT, "https://github.com/Daegalus/dart-otp"),
     LicenseItem(
         "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
-    LicenseItem("add_2_calendar", LICENSE_MIT,
-        "https://github.com/singularity-s0/add_2_calendar"),
     LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
+    LicenseItem("nil", LICENSE_MIT, "https://github.com/letsar/nil"),
+    LicenseItem("flex_color_picker", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/rydmike/flex_color_picker"),
+    LicenseItem("material_color_generator", LICENSE_BSD_2_0_CLAUSE,
+        "https://github.com/berkanaslan/material-color-generator"),
+    LicenseItem("material_color_generator", LICENSE_MIT,
+        "https://github.com/feicien/flutter_swiper_view"),
+    LicenseItem(
+        "mutex", LICENSE_BSD_3_0_CLAUSE, "https://github.com/hoylen/dart-mutex")
   ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   String? _clearCacheSubtitle;
 
@@ -284,8 +284,6 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     List<Widget> list = [];
     onTapListener(Language language) {
       SettingsProvider.getInstance().language = language;
-      LanguageManager(SettingsProvider.getInstance().language).setLanguage();
-      FlutterApp.restartApp(context);
     }
 
     for (var value in Constant.LANGUAGE_VALUES) {
@@ -343,7 +341,9 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                     child: Text(
                                       S.of(context).i_see,
                                       style: TextStyle(
-                                          color: Theme.of(context).errorColor),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error),
                                     ),
                                     onPressed: () {
                                       Navigator.of(context).pop();
@@ -432,13 +432,26 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                       .primarySwatch_V2,
                                 ),
                               );
-                              if (result != null) {
+                              if (result != null && mounted) {
                                 context
                                     .read<SettingsProvider>()
                                     .setPrimarySwatch_V2(result.value);
                                 FlutterApp.restartApp(context);
                               }
                             },
+                          ),
+                        if (context.select<SettingsProvider, bool>(
+                            (value) => value.hiddenNotifications.isNotEmpty))
+                          ListTile(
+                            title:
+                                Text(S.of(context).show_hidden_notifications),
+                            subtitle: Text(S
+                                .of(context)
+                                .show_hidden_notifications_description),
+                            leading: const Icon(Icons.notifications_off),
+                            onTap: () => context
+                                .read<SettingsProvider>()
+                                .hiddenNotifications = [],
                           ),
                       ],
                     ),
@@ -489,24 +502,24 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   if (SettingsProvider.getInstance().debugMode)
                     Card(
                         child: ListTile(
-                            title: Text("Fancy Watermark"),
-                            leading: Icon(Icons.numbers),
-                            subtitle: Text(
-                                "[WARNING: DEBUG FEATURE] Visible watermark for debug"),
+                            title: const Text("Fancy Watermark"),
+                            leading: const Icon(Icons.numbers),
+                            subtitle: const Text(
+                                "[WARNING: DEBUG FEATURE] Visible watermark"),
                             onTap: () {
                               if (SettingsProvider.getInstance()
                                   .visibleWatermarkMode) {
                                 SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0xff000000;
+                                    .lightWatermarkColor = 0x2a000000;
                                 SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0xff000000;
+                                    .darkWatermarkColor = 0x2a000000;
                                 SettingsProvider.getInstance()
                                     .visibleWatermarkMode = false;
                               } else {
                                 SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0x02000000;
+                                    .lightWatermarkColor = 0x01000000;
                                 SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0x08000000;
+                                    .darkWatermarkColor = 0x01000000;
                                 SettingsProvider.getInstance()
                                     .visibleWatermarkMode = true;
                               }
@@ -661,10 +674,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).fduhole_hidden_tags),
-                  subtitle: Text(OpenTreeHoleRepository.getInstance().isAdmin
-                      ? S.of(context).admin_no_hide_tag
-                      : S.of(context).fduhole_hidden_tags_description),
-                  enabled: !OpenTreeHoleRepository.getInstance().isAdmin,
+                  subtitle: Text(S.of(context).fduhole_hidden_tags_description),
                   onTap: () async {
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
                     treeholePageKey.currentState?.setState(() {});
@@ -732,12 +742,13 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,
-                        style: TextStyle(color: Theme.of(context).errorColor),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
                       )
                     : Text(
-                        S.of(context).login,
-                        style:
-                            TextStyle(color: Theme.of(context).indicatorColor),
+                  S.of(context).login,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary),
                       ),
                 onTap: () async {
                   if (!context.read<FDUHoleProvider>().isUserInitialized) {
@@ -745,10 +756,12 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Noticing.showNotice(
                           context, S.of(context).login_from_treehole_page,
                           title: S.of(context).login);
+                    } else {
+                      await OpenTreeHoleRepository.getInstance()
+                          .initializeRepo();
+                      treeholePageKey.currentState?.setState(() {});
+                      refreshSelf();
                     }
-                    await OpenTreeHoleRepository.getInstance().initializeRepo();
-                    treeholePageKey.currentState?.setState(() {});
-                    refreshSelf();
                   } else if (await Noticing.showConfirmationDialog(
                           context, S.of(context).logout_fduhole,
                           title: S.of(context).logout,
@@ -777,43 +790,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     );
   }
 
-  void _toggleAdDisplay() {
-    SettingsProvider.getInstance().isAdEnabled =
-        !SettingsProvider.getInstance().isAdEnabled;
-    dashboardPageKey.currentState?.setState(() {});
-    treeholePageKey.currentState?.setState(() {});
-    timetablePageKey.currentState?.setState(() {});
-    setState(() {});
-  }
-
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
-
-  /*Future<bool?> _showAdsDialog() => showPlatformDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-            title: Text(S.of(context).sponsor_us),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).sponsor_us_detail),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: Text(S.of(context).cancel),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-              TextButton(
-                child: Text(S.of(context).i_see),
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-            ],
-          ));*/
-
-  _showAdsThankDialog() {
-    Noticing.showNotice(context, S.of(context).thankyouforenablingads,
-        title: "", useSnackBar: false);
-  }
 
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
@@ -854,10 +831,10 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     final Color originalDividerColor = Theme.of(context).dividerColor;
     final double avatarSize =
         (ViewportUtils.getMainNavigatorWidth(context) - 120) / 8;
-    final TextStyle? defaultText = Theme.of(context).textTheme.bodyText2;
+    final TextStyle? defaultText = Theme.of(context).textTheme.bodyMedium;
     final TextStyle linkText = Theme.of(context)
         .textTheme
-        .bodyText2!
+        .bodyMedium!
         .copyWith(color: Theme.of(context).colorScheme.secondary);
 
     final developersIcons = Constant.getDevelopers(context)
@@ -1049,7 +1026,7 @@ class _SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             confirmText: S.of(context).send_email,
                             cancelText: S.of(context).i_see,
                             title: S.of(context).contact_us);
-                        if (sendEmail == true) {
+                        if (sendEmail == true && mounted) {
                           final Email email = Email(
                             body: '',
                             subject: S.of(context).app_feedback,

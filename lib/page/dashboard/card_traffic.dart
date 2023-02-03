@@ -36,12 +36,12 @@ class CardCrowdData extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _CardCrowdDataState createState() => _CardCrowdDataState();
+  CardCrowdDataState createState() => CardCrowdDataState();
 
   const CardCrowdData({Key? key, this.arguments}) : super(key: key);
 }
 
-class _CardCrowdDataState extends State<CardCrowdData> {
+class CardCrowdDataState extends State<CardCrowdData> {
   PersonInfo? _personInfo;
   Map<String, TrafficInfo>? _trafficInfo;
   Campus? _selectItem = Campus.NONE;
@@ -68,6 +68,7 @@ class _CardCrowdDataState extends State<CardCrowdData> {
       if (e is UnsuitableTimeException) {
         Noticing.showNotice(context, S.of(context).out_of_dining_time);
       }
+      return null;
     });
     refreshSelf();
   }

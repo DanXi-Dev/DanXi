@@ -9,7 +9,7 @@ import bitsdojo_window_macos
 import desktop_window
 import device_info_plus_macos
 import flutter_js
-import path_provider_macos
+import path_provider_foundation
 import platform_device_id
 import platform_device_id_macos
 import screen_brightness_macos

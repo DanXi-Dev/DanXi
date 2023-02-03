@@ -21,9 +21,6 @@ part 'announcement.g.dart';
 
 @JsonSerializable()
 class Announcement {
-  // ignore: unused_field
-  final String __type = "Announcement";
-
   String? createdAt;
   String? updatedAt;
   String? objectId;
@@ -42,8 +39,4 @@ class Announcement {
   Map<String, dynamic> toJson() => _$AnnouncementToJson(this);
 
   Announcement(this.content);
-
-  @override
-  Map<String, dynamic> getParams() =>
-      Map<String, dynamic>.from({"content": content, "maxVersion": maxVersion});
 }

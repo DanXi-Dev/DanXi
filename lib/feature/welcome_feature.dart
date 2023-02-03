@@ -132,7 +132,7 @@ class WelcomeFeature extends Feature {
             PlatformX.isMaterial(context!)
                 ? Icons.block
                 : CupertinoIcons.xmark_circle,
-            color: Theme.of(context!).errorColor,
+            color: Theme.of(context!).colorScheme.error,
           );
         } else {
           status = Icon(

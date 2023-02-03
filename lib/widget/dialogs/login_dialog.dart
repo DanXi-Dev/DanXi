@@ -76,10 +76,10 @@ class LoginDialog extends StatefulWidget {
       : super(key: key);
 
   @override
-  _LoginDialogState createState() => _LoginDialogState();
+  LoginDialogState createState() => LoginDialogState();
 }
 
-class _LoginDialogState extends State<LoginDialog> {
+class LoginDialogState extends State<LoginDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   String _errorText = "";
@@ -183,10 +183,10 @@ class _LoginDialogState extends State<LoginDialog> {
   @override
   Widget build(BuildContext context) {
     var defaultText =
-        Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12);
+        Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 12);
     var linkText = Theme.of(context)
         .textTheme
-        .bodyText2!
+        .bodyMedium!
         .copyWith(color: Theme.of(context).colorScheme.secondary, fontSize: 12);
 
     //Tackle #25
@@ -207,7 +207,7 @@ class _LoginDialogState extends State<LoginDialog> {
             children: [
               Text(
                 S.of(context).login_uis_description,
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               if (_group == DEFAULT_USERGROUP) ...[
                 GestureDetector(

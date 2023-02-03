@@ -19,9 +19,9 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// Simple helper class to show a notice,
@@ -54,10 +54,10 @@ class Noticing {
           isThemeDark ? Brightness.light : Brightness.dark;
       final TextStyle? contentTextStyle =
           Theme.of(context).snackBarTheme.contentTextStyle ??
-              ThemeData(brightness: invertBrightness).textTheme.subtitle1;
+              ThemeData(brightness: invertBrightness).textTheme.titleMedium;
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Linkify(
+          content: LinkifyX(
         style: contentTextStyle,
         text: message,
         onOpen: (element) => BrowserUtil.openUrl(element.url, context),
@@ -69,14 +69,14 @@ class Noticing {
                 title: title == null ? null : Text(title),
                 content: centerContent!
                     ? Center(
-                        child: Linkify(
+                        child: LinkifyX(
                         textAlign:
                             centerContent ? TextAlign.center : TextAlign.start,
                         text: message,
                         onOpen: (element) =>
                             BrowserUtil.openUrl(element.url, context),
                       ))
-                    : Linkify(
+                    : LinkifyX(
                         textAlign:
                             centerContent ? TextAlign.center : TextAlign.start,
                         text: message,
@@ -114,14 +114,14 @@ class Noticing {
               title: title == null ? null : Text(title),
               content: centerContent!
                   ? Center(
-                      child: Linkify(
+                      child: LinkifyX(
                       textAlign:
                           centerContent ? TextAlign.center : TextAlign.start,
                       text: message,
                       onOpen: (element) =>
                           BrowserUtil.openUrl(element.url, context),
                     ))
-                  : Linkify(
+                  : LinkifyX(
                       textAlign:
                           centerContent ? TextAlign.center : TextAlign.start,
                       text: message,
@@ -203,14 +203,14 @@ class Noticing {
               title: title == null ? null : Text(title),
               content: centerContent!
                   ? Center(
-                      child: Linkify(
+                      child: LinkifyX(
                       textAlign:
                           centerContent ? TextAlign.center : TextAlign.start,
                       text: message,
                       onOpen: (element) =>
                           BrowserUtil.openUrl(element.url, context),
                     ))
-                  : Linkify(
+                  : LinkifyX(
                       textAlign:
                           centerContent ? TextAlign.center : TextAlign.start,
                       text: message,
@@ -248,8 +248,8 @@ class Noticing {
           child: ListTile(
               title: Text(title),
               subtitle: selectable
-                  ? SelectableLinkify(text: message)
-                  : Linkify(text: message))),
+                  ? SelectableLinkifyX(text: message)
+                  : LinkifyX(text: message))),
     );
     Widget body;
     if (PlatformX.isCupertino(context)) {

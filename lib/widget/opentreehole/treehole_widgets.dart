@@ -34,6 +34,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
@@ -45,13 +46,22 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
     hasBackgroundImage
         ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
         : null;
+
+void launchUrlWithNotice(BuildContext context, LinkableElement link) async {
+  try {
+    await BrowserUtil.openUrl(link.url, context);
+  } catch (_) {
+    if (context.mounted) {
+      Noticing.showNotice(context, S.of(context).cannot_launch_url);
+    }
+  }
+}
 
 class OTLeadingTag extends StatelessWidget {
   final Color color;
@@ -97,7 +107,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
             onTap: () => onTap(element.name),
             label: element.name,
             color: useAccessibilityColoring
-                ? Theme.of(context).textTheme.bodyText1!.color
+                ? Theme.of(context).textTheme.bodyLarge!.color
                 : element.color,
           ),
         ]));
@@ -124,23 +134,15 @@ class OTHoleWidget extends StatelessWidget {
       this.isFolded = false})
       : super(key: key);
 
-  _launchUrlWithNotice(BuildContext context, LinkableElement link) async {
-    if (await canLaunch(link.url)) {
-      BrowserUtil.openUrl(link.url, context);
-    } else {
-      Noticing.showNotice(context, S.of(context).cannot_launch_url);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    Linkify postContentWidget = Linkify(
+    Linkify postContentWidget = LinkifyX(
       text: renderText(postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag, S.of(context).formula),
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
-      onOpen: (link) => _launchUrlWithNotice(context, link),
+      onOpen: (link) => launchUrlWithNotice(context, link),
     );
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
@@ -293,12 +295,12 @@ class OTHoleWidget extends StatelessWidget {
             ),
             Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Linkify(
+                child: LinkifyX(
                     text: lastReplyContent,
                     style: const TextStyle(fontSize: 14),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    onOpen: (link) => _launchUrlWithNotice(context, link))),
+                    onOpen: (link) => launchUrlWithNotice(context, link))),
           ],
         ),
         onTap: () async {
@@ -410,7 +412,7 @@ class OTFloorWidget extends StatelessWidget {
                         text: S.of(context).deleted,
                       ),
                     ],
-                    if (floor.history?.isNotEmpty == true) ...[
+                    if ((floor.modified ?? 0) > 0) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
                         color: Theme.of(context).colorScheme.primary,
@@ -433,20 +435,15 @@ class OTFloorWidget extends StatelessWidget {
               alignment: Alignment.topLeft,
               child: isInMention
                   // If content is being quoted, limit its height so that the view won't be too long.
-                  ? Linkify(
+                  ? LinkifyX(
                       text: renderText(floor.filteredContent!,
                               S.of(context).image_tag, S.of(context).formula)
                           .trim(),
                       textScaleFactor: 0.8,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      onOpen: (link) async {
-                        if (await canLaunch(link.url)) {
-                          BrowserUtil.openUrl(link.url, context);
-                        } else {
-                          Noticing.showNotice(
-                              context, S.of(context).cannot_launch_url);
-                        }
+                      onOpen: (link) {
+                        launchUrlWithNotice(context, link);
                       })
                   : smartRender(
                       context,
@@ -548,10 +545,10 @@ class OTMentionPreviewWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _OTMentionPreviewWidgetState createState() => _OTMentionPreviewWidgetState();
+  OTMentionPreviewWidgetState createState() => OTMentionPreviewWidgetState();
 }
 
-class _OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
+class OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
   bool isShowingPreview = false;
 
   @override
@@ -739,10 +736,10 @@ class OTFloorWidgetBottomBar extends StatefulWidget {
       : super(key: key);
 
   @override
-  _OTFloorWidgetBottomBarState createState() => _OTFloorWidgetBottomBarState();
+  OTFloorWidgetBottomBarState createState() => OTFloorWidgetBottomBarState();
 }
 
-class _OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
+class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   late OTFloor floor;
   TextStyle? prebuiltStyle;
 
@@ -949,10 +946,10 @@ class OTMessageItem extends StatefulWidget {
   }
 
   @override
-  _OTMessageItemState createState() => _OTMessageItemState();
+  OTMessageItemState createState() => OTMessageItemState();
 }
 
-class _OTMessageItemState extends State<OTMessageItem> {
+class OTMessageItemState extends State<OTMessageItem> {
   late OTMessage message;
 
   @override

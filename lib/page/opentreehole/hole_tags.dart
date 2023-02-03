@@ -34,12 +34,12 @@ class BBSTagsPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  _BBSTagsPageState createState() => _BBSTagsPageState();
+  BBSTagsPageState createState() => BBSTagsPageState();
 
   const BBSTagsPage({Key? key, this.arguments}) : super(key: key);
 }
 
-class _BBSTagsPageState extends State<BBSTagsPage> {
+class BBSTagsPageState extends State<BBSTagsPage> {
   Future<List<OTTag>?>? _content;
 
   @override

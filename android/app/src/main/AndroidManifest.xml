@@ -1,21 +1,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.w568w.dan_xi">
 
+    <!-- Access to the Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
+    <!-- Set quick actions -->
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+    <!-- Keep the screen on when showing QR code -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Write images, ics files -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
-
-    <!--    <permission-->
-    <!--        android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE"-->
-    <!--        android:protectionLevel="signature" />-->
-    <!--    <uses-permission android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE" />-->
+    <!-- Receive push notifications -->
+    <permission
+        android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE" />
 
     <queries>
         <intent>
@@ -29,9 +28,6 @@
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
-        <!--        <meta-data-->
-        <!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
-        <!--            android:value="ca-app-pub-4420475240805528~1600292719" />-->
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -65,5 +61,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
     </application>
 </manifest>

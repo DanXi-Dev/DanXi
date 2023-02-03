@@ -15,14 +15,17 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io' show Platform;
 import 'dart:math';
 
+import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:event_bus/event_bus.dart';
@@ -41,37 +44,11 @@ class Constant {
   static String get DEFAULT_USER_AGENT =>
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
-  /// The Bmob verification keys.
-  static const BMOB_APP_ID = "d651f7399053222e2b4d2575f7ca8ddb";
-  static const BMOB_API_KEY = "bd9e3d90d593c053d4832c817b620890";
-
   static const String APPSTORE_APPID = '1568629997';
-
-  static const String ADMOB_APP_ID_ANDROID =
-      "ca-app-pub-4420475240805528~7573357474";
-  static const String ADMOB_APP_ID_IOS =
-      "ca-app-pub-4420475240805528~1122982272";
-
-  /// One unit id for each Ad placement.
-  /// Respectively, Dashboard, TreeHole, Agenda, Settings.
-  static const List<String> ADMOB_UNIT_ID_LIST_ANDROID = [
-    "ca-app-pub-4420475240805528/9095994576",
-    "ca-app-pub-4420475240805528/5760203038",
-    "ca-app-pub-4420475240805528/9738976495",
-    "ca-app-pub-4420475240805528/4447121366",
-  ];
-  static const List<String> ADMOB_UNIT_ID_LIST_IOS = [
-    "ca-app-pub-4420475240805528/6845054570",
-    "ca-app-pub-4420475240805528/6065507131",
-    "ca-app-pub-4420475240805528/6308694497",
-    "ca-app-pub-4420475240805528/4752425464",
-  ];
 
   /// A link to the "forget password" page of FDUHole.
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
-      "https://www.fduhole.com/#/forgetpassword";
-
-  static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
+      "https://auth.fduhole.com/register?type=forget_password";
 
   /// The default start date of a semester.
   // ignore: non_constant_identifier_names
@@ -80,6 +57,13 @@ class Constant {
   static EventBus eventBus = EventBus(sync: true);
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
+
+  static const LINKIFY_THEME =
+      TextStyle(color: Colors.blue, decoration: TextDecoration.none);
+
+  // Client version descriptor
+  static String get version =>
+      "DanXi/${FlutterApp.versionName}b${pubspec.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
 
   static List<String> fduHoleTips = [];
 
@@ -244,16 +228,32 @@ class Constant {
   /// * [darkTheme]
   static ThemeData lightTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
+      Color toggleableActiveColor = const Color(0xFF007AFF);
+      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
+          (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return null;
+        }
+        if (states.contains(MaterialState.selected)) {
+          return toggleableActiveColor;
+        }
+        return null;
+      });
+
       return ThemeData(
         brightness: Brightness.light,
         colorScheme: const ColorScheme.light().copyWith(
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
-            primary: const Color(0xFF007AFF)),
-        toggleableActiveColor: const Color(0xFF007AFF),
+            primary: const Color(0xFF007AFF),
+            background: const Color.fromRGBO(242, 242, 247, 1)),
+        switchTheme: SwitchThemeData(
+          thumbColor: toggleableProperty,
+          trackColor: toggleableProperty,
+        ),
+        radioTheme: RadioThemeData(fillColor: toggleableProperty),
         indicatorColor: const Color(0xFF007AFF),
         canvasColor: const Color.fromRGBO(242, 242, 247, 1),
-        backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         cardTheme: CardTheme(
           margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
@@ -276,23 +276,39 @@ class Constant {
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.light().cardColor,
       ),
+      dividerTheme: const DividerThemeData(thickness: 0.2),
     );
   }
 
   /// See [lightTheme] for more details.
   static ThemeData darkTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
+      Color toggleableActiveColor = const Color(0xFF007AFF);
+      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
+          (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return null;
+        }
+        if (states.contains(MaterialState.selected)) {
+          return toggleableActiveColor;
+        }
+        return null;
+      });
       return ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark().copyWith(
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
-            primary: const Color(0xFF007AFF)),
+            primary: const Color(0xFF007AFF),
+            background: Colors.black),
         indicatorColor: const Color(0xFF007AFF),
-        toggleableActiveColor: const Color(0xFF007AFF),
+        switchTheme: SwitchThemeData(
+          thumbColor: toggleableProperty,
+          trackColor: toggleableProperty,
+        ),
+        radioTheme: RadioThemeData(fillColor: toggleableProperty),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,
-        backgroundColor: Colors.black,
         cardTheme: CardTheme(
           margin: const EdgeInsets.fromLTRB(7, 8, 7, 8),
           color: const Color.fromRGBO(28, 28, 30, 1),
@@ -317,6 +333,7 @@ class Constant {
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         color: ThemeData.dark().cardColor,
       ),
+      dividerTheme: const DividerThemeData(thickness: 0.2),
     );
   }
 

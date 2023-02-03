@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Hold a list of notification shown in [HomeSubpage].
@@ -30,6 +31,10 @@ class NotificationProvider with ChangeNotifier {
         element.runtimeType.toString() == feature.runtimeType.toString())) {
       return;
     }
+    if (SettingsProvider.getInstance()
+        .hiddenNotifications
+        .contains(feature.runtimeType.toString())) return;
+
     _notifications.add(feature);
     notifyListeners();
   }

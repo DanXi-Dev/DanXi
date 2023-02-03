@@ -144,7 +144,7 @@ class OTTitle extends StatelessWidget {
     return Expanded(
       child: TagContainer(
           fillRandomColor: false,
-          fixedColor: Theme.of(context).colorScheme.tertiary,
+          fixedColor: Theme.of(context).colorScheme.primary,
           fontSize: 12,
           enabled: true,
           wrapped: false,
@@ -351,11 +351,14 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         if (loadedPost?.isEmpty ?? false) return [];
 
         // Filter blocked posts
-        List<OTTag> hiddenTags = OpenTreeHoleRepository.getInstance().isAdmin
-            ? []
-            : SettingsProvider.getInstance().hiddenTags ?? [];
+        List<OTTag> hiddenTags =
+            SettingsProvider.getInstance().hiddenTags ?? [];
         loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
             hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+        // Filter hidden posts
+        List<int> hiddenPosts = SettingsProvider.getInstance().hiddenHoles;
+        loadedPost?.removeWhere((element) =>
+            hiddenPosts.any((blockPost) => element.hole_id == blockPost));
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
@@ -398,10 +401,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       child: ListTile(
         leading: Icon(
           CupertinoIcons.exclamationmark_triangle,
-          color: Theme.of(context).errorColor,
+          color: Theme.of(context).colorScheme.error,
         ),
         title: Text(S.of(context).silence_notice,
-            style: TextStyle(color: Theme.of(context).errorColor)),
+            style: TextStyle(color: Theme.of(context).colorScheme.error)),
         subtitle: Text(
           S.of(context).ban_post_until(
               "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),
@@ -473,6 +476,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           });
         }),
         hashCode);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Watermark.addWatermark(context, rowCount: 4, columnCount: 8);
+    });
   }
 
   @override
@@ -541,8 +547,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
   Widget _buildPageBody(BuildContext context, bool buildTabBar) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    Watermark.addWatermark(context, PlatformX.isDarkMode,
-        rowCount: 4, columnCount: 8);
     return Container(
       decoration: _backgroundImage == null
           ? null
@@ -561,8 +565,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           // Refresh the list...
           await refreshList();
           // ... and scroll it to the top.
+          if (!mounted) return;
           try {
-            await PrimaryScrollController.of(context)?.animateTo(0,
+            await PrimaryScrollController.of(context).animateTo(0,
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.ease);
             // It is not important if [listViewController] is not attached to a ListView.

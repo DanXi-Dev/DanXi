@@ -31,6 +31,7 @@ import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/opentreehole/fduhole_platform_bridge.dart';
 import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -115,6 +116,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         () => provider.token,
         (token) => provider.token =
             SettingsProvider.getInstance().fduholeToken = token));
+    dio.interceptors.add(UserAgentInterceptor(userAgent: Constant.version));
   }
 
   void initializeToken() {
@@ -381,18 +383,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
     Response<String> r = await dio.get("$_IMAGE_BASE_URL/upload");
     String? token = tokenReg.firstMatch(r.data!)?.group(1);
-    Response<Map<String, dynamic>> response = await dio
-        .post<Map<String, dynamic>>("$_IMAGE_BASE_URL/json",
+    Response<Map<String, dynamic>> response =
+        await dio.post<Map<String, dynamic>>("$_IMAGE_BASE_URL/json",
             data: FormData.fromMap({
               "type": "file",
               "action": "upload",
               "auth_token": token!,
               "source": await MultipartFile.fromFile(path, filename: fileName)
             }),
-            options: Options(headers: _tokenHeader))
-        .onError(((error, stackTrace) {
-      throw ImageUploadError();
-    }));
+            options: Options(headers: _tokenHeader));
     return response.data!['image']['display_url'];
   }
 
@@ -451,6 +450,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       final Response<Map<String, dynamic>> response = await dio
           .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
+      provider.userInfo?.favorites = null;
     }
     return provider.userInfo;
   }
@@ -460,7 +460,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/users/${provider.userInfo!.user_id}",
         data: provider.userInfo!.toJson(),
         options: Options(headers: _tokenHeader));
-    return provider.userInfo = OTUser.fromJson(response.data!);
+    provider.userInfo = OTUser.fromJson(response.data!);
+    provider.userInfo?.favorites = null;
+    return provider.userInfo;
   }
 
   Future<void> updateHoleViewCount(int holeId) async {
@@ -477,9 +479,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "start_time": startTime?.toIso8601String(),
             },
             options: Options(headers: _tokenHeader));
-    return response.data
-        ?.map((e) => OTMessage.fromJson(e))
-        .toList();
+    return response.data?.map((e) => OTMessage.fromJson(e)).toList();
   }
 
   Future<void> modifyMessage(OTMessage message) async {
@@ -514,11 +514,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<int>?> getFavoriteHoleId() async {
+    if (provider.userInfo?.favorites != null) {
+      return provider.userInfo?.favorites;
+    }
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/user/favorites",
         queryParameters: {"plain": true},
         options: Options(headers: _tokenHeader));
-    return response.data?['data'].cast<int>();
+    provider.userInfo?.favorites = response.data?['data']?.cast<int>();
+    return provider.userInfo?.favorites;
   }
 
   Future<List<OTHole>?> getFavoriteHoles({
@@ -529,9 +533,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/user/favorites",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
         options: Options(headers: _tokenHeader));
-    var result = response.data?.map((e) => OTHole.fromJson(e)).toList();
-    // Reverse the list to make it in the descending order of hole_id
-    return result?.reversed.toList();
+    return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
   Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {
@@ -546,10 +548,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
-    if (provider.userInfo?.favorites != null) {
-      final Map<String, dynamic> result = response.data;
-      provider.userInfo!.favorites = result["data"].cast<int>();
-    }
+    final Map<String, dynamic> result = response.data;
+    provider.userInfo?.favorites = result["data"]?.cast<int>();
   }
 
   /// Modify a floor
@@ -710,8 +710,6 @@ class NotLoginError implements FatalException {
 }
 
 class LoginExpiredError implements Exception {}
-
-class ImageUploadError implements Exception {}
 
 class PushNotificationRegData {
   final String deviceId, token;

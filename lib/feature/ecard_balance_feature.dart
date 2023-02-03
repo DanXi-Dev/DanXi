@@ -113,7 +113,7 @@ class EcardBalanceFeature extends Feature {
             color: num.tryParse(_balance!) == null
                 ? null
                 : num.tryParse(_balance!)! < 20.0
-                    ? Theme.of(context!).errorColor
+                    ? Theme.of(context!).colorScheme.error
                     : null),
       );
     }

@@ -25,6 +25,7 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
@@ -46,21 +47,19 @@ import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/linkify_x.dart';
+import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:system_tray/system_tray.dart' as tray;
-
-import '../provider/language_manager.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -124,13 +123,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
+      const DankeSubPage(),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
       SettingsSubpage(key: settingsPageKey),
     ];
   }
-
-  final tray.SystemTray _systemTray = tray.SystemTray();
 
   @override
   void dispose() {
@@ -331,7 +329,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    LanguageManager(SettingsProvider.getInstance().language).setLanguage();
     // Refresh the page when account changes.
     StateProvider.personInfo.addListener(() {
       if (StateProvider.personInfo.value != null) {
@@ -557,7 +554,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             // Override the builder to prevent the repeatedly built states on iOS.
             // I don't know why it works...
             cupertinoTabChildBuilder: (_, index) => _subpage[index],
-            bottomNavBar: PlatformNavBar(
+            bottomNavBar: PlatformNavBarM3(
               items: [
                 // Don't show Dashboard in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
@@ -574,6 +571,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         : const Icon(CupertinoIcons.text_bubble),
                     label: S.of(context).forum,
                   ),
+                BottomNavigationBarItem(
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.egg_alt)
+                      : const Icon(CupertinoIcons.book),
+                  label: S.of(context).danke,
+                ),
                 // Don't show Timetable in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
                   BottomNavigationBarItem(
@@ -590,8 +593,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ],
               currentIndex: pageIndex,
-              material: (_, __) =>
-                  MaterialNavBarData(type: BottomNavigationBarType.fixed),
               itemChanged: (index) {
                 if (index != pageIndex) {
                   // Dispatch [SubpageViewState] events.
@@ -668,7 +669,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadAnnouncement() async {
     final Announcement? announcement =
         await AnnouncementRepository.getInstance().getLastNewAnnouncement();
-    if (announcement != null) {
+    if (announcement != null && mounted) {
       showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
@@ -678,7 +679,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       .developer_announcement(announcement.createdAt ?? "?"),
                 ),
                 content: SingleChildScrollView(
-                    child: Linkify(
+                    child: LinkifyX(
                   text: announcement.content!,
                   onOpen: (element) =>
                       BrowserUtil.openUrl(element.url, context),

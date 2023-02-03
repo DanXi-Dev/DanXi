@@ -37,10 +37,10 @@ class OTMessagesPage extends StatefulWidget {
   const OTMessagesPage({Key? key, this.arguments}) : super(key: key);
 
   @override
-  _OTMessagesPageState createState() => _OTMessagesPageState();
+  OTMessagesPageState createState() => OTMessagesPageState();
 }
 
-class _OTMessagesPageState extends State<OTMessagesPage> {
+class OTMessagesPageState extends State<OTMessagesPage> {
   final PagedListViewController<OTMessage> _listViewController =
       PagedListViewController();
 

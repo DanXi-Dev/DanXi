@@ -15,7 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A Widget to dynamically switch theme for its children based on system settings
 class DynamicThemeController extends StatefulWidget {
@@ -31,10 +33,10 @@ class DynamicThemeController extends StatefulWidget {
       : super(key: key);
 
   @override
-  _DynamicThemeControllerState createState() => _DynamicThemeControllerState();
+  DynamicThemeControllerState createState() => DynamicThemeControllerState();
 }
 
-class _DynamicThemeControllerState extends State<DynamicThemeController>
+class DynamicThemeControllerState extends State<DynamicThemeController>
     with WidgetsBindingObserver {
   late Brightness _brightness;
 
@@ -65,5 +67,35 @@ class _DynamicThemeControllerState extends State<DynamicThemeController>
             ? widget.lightTheme
             : widget.darkTheme,
         child: widget.child);
+  }
+}
+
+/// A Widget to decide the system overlay style based on the theme.
+class ThemedSystemOverlay extends StatelessWidget {
+  final Widget child;
+
+  const ThemedSystemOverlay({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var baseStyle = Theme.of(context).brightness == Brightness.light
+        ? SystemUiOverlayStyle.dark
+        : SystemUiOverlayStyle.light;
+    if (PlatformX.isAndroid) {
+      // Copy from Flutter's [AnimatedPhysicalModel] widget.
+      final bottomColor = ElevationOverlay.applySurfaceTint(
+          Theme.of(context).colorScheme.background,
+          Theme.of(context).colorScheme.surfaceTint,
+          3.0);
+
+      baseStyle = baseStyle.copyWith(
+          systemNavigationBarColor: bottomColor,
+          systemNavigationBarIconBrightness:
+              bottomColor.computeLuminance() > 0.5
+                  ? Brightness.dark
+                  : Brightness.light);
+    }
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: baseStyle, child: child);
   }
 }

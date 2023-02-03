@@ -50,7 +50,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   factory PostgraduateTimetableRepository.getInstance() => _instance;
 
   Future<String> _loadToken() async {
-    Response tokenData = await dio.get(GET_TOKEN_URL);
+    Response<dynamic> tokenData = await dio.get(GET_TOKEN_URL);
     var temp = tokenData.data is Map
         ? tokenData.data
         : jsonDecode(tokenData.data.toString());
@@ -90,7 +90,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
 
   Future<TimeTable?> _loadTimeTableRemotely(OnCaptchaCallback callback,
       {DateTime? startTime}) async {
-    Response coursePage = await dio.get(
+    Response<dynamic> coursePage = await dio.get(
         TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
         options: Options());
     return TimeTable.fromPGJson(

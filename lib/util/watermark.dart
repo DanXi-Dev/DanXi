@@ -1,4 +1,5 @@
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 
 import '../widget/opentreehole/flutter_watermark_widget.dart';
@@ -6,7 +7,7 @@ import '../widget/opentreehole/flutter_watermark_widget.dart';
 class Watermark {
   static OverlayEntry? overlayEntry;
 
-  static void addWatermark(BuildContext context, bool isDarkMode,
+  static void addWatermark(BuildContext context,
       {int rowCount = 3, int columnCount = 10, TextStyle? textStyle}) async {
 
     if (overlayEntry != null) {
@@ -21,15 +22,15 @@ class Watermark {
               columnCount: columnCount,
               textStyle: textStyle ??
                   TextStyle(
-                      color: isDarkMode
+                      color: PlatformX.isDarkMode
                           ? Color(
                               SettingsProvider.getInstance().darkWatermarkColor)
                           : Color(SettingsProvider.getInstance()
                               .lightWatermarkColor),
-                      fontSize: 18,
+                      fontSize: 26,
                       decoration: TextDecoration.none),
             ));
 
-    overlayState?.insert(overlayEntry!);
+    overlayState.insert(overlayEntry!);
   }
 }
