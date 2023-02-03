@@ -71,10 +71,10 @@
 
 ```shell script
 $ flutter --version
-Flutter 3.7.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision b06b8b2710 (2 days ago) • 2023-01-23 16:55:55 -0800
-Engine • revision b24591ed32
-Tools • Dart 2.19.0 • DevTools 2.20.1
+Flutter 3.7.1 • channel stable • https://github.com/flutter/flutter.git 
+Framework • revision 7048ed95a5 (2 days ago) • 2023-02-01 09:07:31 -0800
+Engine • revision 800594f1f4
+Tools • Dart 2.19.1 • DevTools 2.20.1
 ```
 ## 编译说明
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
