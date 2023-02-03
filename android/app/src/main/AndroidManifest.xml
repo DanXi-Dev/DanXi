@@ -1,15 +1,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.w568w.dan_xi">
 
+    <!-- Access to the Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
+    <!-- Set quick actions -->
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+    <!-- Keep the screen on when showing QR code -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Read and write images, ics files -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Read and write calendar -->
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-
+    <!-- Receive push notifications -->
     <permission
         android:name="io.github.danxi_dev.dan_xi.permission.MIPUSH_RECEIVE"
         android:protectionLevel="signature" />
@@ -60,5 +65,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
     </application>
 </manifest>
