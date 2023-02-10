@@ -435,6 +435,7 @@
   "continue_sending": "继续发送",
   "post_has_stop_words_title": "含有不适当的词语",
   "post_has_stop_words": "内容中含有不适宜使用的词汇：{stopWord}。\n我们不建议发送此类词语，因为它不适用于理性讨论的环境，因而更有可能招致攻击和不恰当言论，一定要继续发送吗？",
+  "remove_favorite_hole_confirmation": "你确定要删除该条收藏吗？",
   "community_convention": "社区公约",
   "fduhole_show_banner": "显示一些活动",
   "fduhole_show_banner_description": "[实验性] 将在树洞页面顶部显示一些不干扰浏览的校园活动公告",
@@ -445,7 +446,6 @@
   "login_problem": "如果您登录时遇到问题，请联系 dev@fduhole.com 或加入 QQ 群 {QQ}.\n\n与此同时，建议您阅读开发组公告，您遇到的问题可能已经在其中被提及。",
   "copy_qq_group_id": "复制 QQ 群号",
   "read_announcements": "查看开发组公告",
-  "admin_no_hide_tag": "管理员不可以屏蔽标签",
   "semester_start_at_monday": "学期开始日期通常是指第一周的星期一，但你选择的日期似乎不是周一。你确定要设置为该日期吗？",
   "recommended_tags": "推荐标签",
   "recommended_tags_availibity": "[实验性] 根据你的帖子内容推荐一些标签",
@@ -456,5 +456,10 @@
   "show_hidden_notifications": "显示已隐藏的首页通知",
   "show_hidden_notifications_description": "点击以恢复所有已隐藏的首页通知卡片",
   "warning": "警告",
-  "invalid_course_info": "请提供完整的课程时间信息"
+  "invalid_course_info": "请提供完整的课程时间信息",
+  "danke": "评教",
+  "fix_danke_description": "使用评教时遇到了问题？点击确认以尝试重置并修复。",
+  "fix": "修复",
+  "refresh": "刷新",
+  "reset": "重置"
 }

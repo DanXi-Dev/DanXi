@@ -54,7 +54,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../widget/dialogs/delete_course_dialog.dart';
 import '../widget/dialogs/manually_add_course_dialog.dart';
 
 const kCompatibleUserGroup = [
@@ -73,12 +72,6 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-        AppBarButtonItem(
-          S.of(cxt).add_courses,
-          Icon(
-              PlatformX.isMaterial(cxt) ? Icons.delete : CupertinoIcons.delete),
-          () => DeleteCourseEvent().fire(),
-        ),
         AppBarButtonItem(
           S.of(cxt).add_courses,
           Icon(PlatformX.isMaterial(cxt)
@@ -109,14 +102,10 @@ class ShareTimetableEvent {}
 
 class ManuallyAddCourseEvent {}
 
-class DeleteCourseEvent {}
-
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
   final StateStreamListener<ManuallyAddCourseEvent> _addCourseSubscription =
-      StateStreamListener();
-  final StateStreamListener<DeleteCourseEvent> _deleteCourseSubscription =
       StateStreamListener();
 
   static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
@@ -294,17 +283,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           refresh();
         }),
         hashCode);
-    _deleteCourseSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<DeleteCourseEvent>().listen((_) async {
-          newCourses = await showPlatformDialog(
-                context: context,
-                builder: (_) => DeleteCourseDialog(newCourses),
-              ) ??
-              [];
-          SettingsProvider.getInstance().manualAddedCourses = newCourses;
-          refresh();
-        }),
-        hashCode);
   }
 
   Future<void> refresh(
@@ -323,7 +301,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     super.dispose();
     _shareSubscription.cancel();
     _addCourseSubscription.cancel();
-    _deleteCourseSubscription.cancel();
   }
 
   @override
@@ -363,19 +340,38 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     });
   }
 
-  Widget _buildCourseItem(Event event) => Card(
+  Widget _buildCourseItem(Event event, BuildContext context) => Card(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(
-                event.course.courseName!,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              Text((event.course.teacherNames ?? []).join(",")),
-              Text(event.course.roomName!),
-              Text(event.course.courseId!),
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.course.courseName!,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Text((event.course.teacherNames ?? []).join(",")),
+                  Text(event.course.roomName!),
+                  Text(event.course.courseId!),
+                ],
+              )),
+              if (event.course.roomId == "999999") ...[
+                PlatformIconButton(
+                  icon: Icon(PlatformX.isMaterial(context)
+                      ? Icons.delete
+                      : CupertinoIcons.delete),
+                  onPressed: () {
+                    newCourses.removeWhere(
+                        (e) => e.courseId == event.course.courseId);
+                    SettingsProvider.getInstance().manualAddedCourses =
+                        newCourses;
+                    Navigator.of(context).pop();
+                    refresh();
+                  },
+                ),
+              ]
             ],
           ),
         ),
@@ -388,7 +384,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
-          children: block.event.map((e) => _buildCourseItem(e)).toList(),
+          children: block.event.map((e) => _buildCourseItem(e,context)).toList(),
         ),
       ),
     );

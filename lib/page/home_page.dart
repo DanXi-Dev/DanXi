@@ -24,6 +24,7 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
@@ -125,6 +126,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
+      const DankeSubPage(),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
       SettingsSubpage(key: settingsPageKey),
@@ -570,6 +572,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         : const Icon(CupertinoIcons.text_bubble),
                     label: S.of(context).forum,
                   ),
+                BottomNavigationBarItem(
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.egg_alt)
+                      : const Icon(CupertinoIcons.book),
+                  label: S.of(context).danke,
+                ),
                 // Don't show Timetable in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
                   BottomNavigationBarItem(

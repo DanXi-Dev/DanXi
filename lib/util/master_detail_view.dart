@@ -40,19 +40,21 @@ class PlatformMasterDetailApp extends StatelessWidget {
       return WillPopScope(
           child: buildView(context),
           onWillPop: () async {
-            if (isTablet(context) &&
-                (detailNavigatorKey.currentState?.canPop() ?? false)) {
+            if (isTablet(context) && detailNavigatorKey.currentState != null) {
               // DO NOT use pop(), which pops the current route without asking
               // for others' thoughts.
               // Instead, use maybePop(). It asks the last route if it can be
               // popped. If the current route gives a deterministic answer, it
               // returns true. Otherwise, only the system can decide whether to
               // pop the page, and it returns false.
-              await detailNavigatorKey.currentState?.maybePop();
-              return false;
-            } else if (navigatorKey?.currentState?.canPop() ?? false) {
-              await navigatorKey?.currentState?.maybePop();
-              return false;
+              bool processed =
+                  await detailNavigatorKey.currentState!.maybePop();
+              if (processed) return false;
+            }
+
+            if (navigatorKey?.currentState != null) {
+              bool processed = await navigatorKey!.currentState!.maybePop();
+              if (processed) return false;
             }
             return true;
           });

@@ -428,5 +428,9 @@
   "show_hidden_notifications": "隠された通知を表示",
   "show_hidden_notifications_description": "クリックしてすべての隠された通知を復元する",
   "warning": "警告",
-  "invalid_course_info": "コーススロットに関する有効な情報を提供してください"
+  "invalid_course_info": "コーススロットに関する有効な情報を提供してください",
+  "fix_danke_description": "問題が発生しましたか？ 確認をクリックしてリセットして修正してみてください。",
+  "fix": "修正",
+  "refresh": "更新",
+  "reset": "リセット"
 }

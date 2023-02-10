@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -22,8 +24,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>321</string>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
@@ -59,10 +59,10 @@
 	<string>为向系统日历中添加课程表和考试日程</string>
 	<key>NSCameraUsageDescription</key>
 	<string>为上传图片至树洞</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>为平安复旦打卡提供位置信息</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string></string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>为平安复旦打卡提供位置信息</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>为上传图片至树洞</string>
 	<key>UIApplicationSceneManifest</key>
@@ -70,6 +70,8 @@
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -99,9 +101,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
 </dict>
 </plist>

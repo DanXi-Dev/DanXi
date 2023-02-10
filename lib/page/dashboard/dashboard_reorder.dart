@@ -111,14 +111,11 @@ class DashboardReorderPageState extends State<DashboardReorderPage> {
                       title: Text(S.of(context).new_shortcut_card),
                       onTap: () {
                         showPlatformDialog(
-                            context: context,
-                            barrierDismissible: true,
-                            builder: (BuildContext context) =>
-                                NewShortcutDialog(
-                                  sharedPreferences:
-                                      SettingsProvider.getInstance()
-                                          .preferences,
-                                )).then((value) => refreshSelf());
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) =>
+                                    const NewShortcutDialog())
+                            .then((value) => refreshSelf());
                       },
                     ),
                   ),

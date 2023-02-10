@@ -21,8 +21,6 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'history.dart';
-
 part 'floor.g.dart';
 
 @JsonSerializable()
@@ -38,7 +36,7 @@ class OTFloor {
   bool? is_me;
   bool? liked;
   List<String>? fold;
-  List<OTHistory>? history;
+  int? modified;
   int? like;
   List<OTFloor>? mention;
 
@@ -86,7 +84,7 @@ class OTFloor {
 
   @override
   String toString() {
-    return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, like: $like, mention: $mention}';
+    return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, special_tag: $special_tag, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, modified: $modified, like: $like, mention: $mention}';
   }
 
   @override

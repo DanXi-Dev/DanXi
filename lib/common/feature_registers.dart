@@ -23,6 +23,13 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 /// A global register table of [Feature], which declares its compatible user groups here.
 Map<String, List<UserGroup>> _kRegister = {};
 
+/// Register a [feature] with compatible user [groups].
+///
+/// If [groups] not provided, use default groups instead.
+///
+/// See also:
+/// - [UserGroup]
+/// - [Feature]
 void registerFeature(Feature feature,
     {List<UserGroup> groups = const [
       UserGroup.FUDAN_UNDERGRADUATE_STUDENT,

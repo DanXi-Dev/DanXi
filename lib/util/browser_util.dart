@@ -44,17 +44,18 @@ class BrowserUtil {
                   incognito: true),
               ios: IOSInAppWebViewOptions(sharedCookiesEnabled: true)));
 
-  static openUrl(String url, BuildContext? context,
+  static Future<void> openUrl(String url, BuildContext? context,
       [IndependentCookieJar? cookieJar, bool needAutoLogin = false]) async {
     // Sanitize URL
     url = Uri.encodeFull(Uri.decodeFull(url));
 
     if ((cookieJar == null && needAutoLogin == false) || PlatformX.isDesktop) {
-      if (await canLaunchUrlString(url)) {
-        launchUrlString(url, mode: LaunchMode.externalApplication);
-        return;
+      bool launched =
+          await launchUrlString(url, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        throw "This URL cannot be launched.";
       }
-      throw "This URL cannot be launched.";
+      return;
     }
 
     if (cookieJar != null) {
