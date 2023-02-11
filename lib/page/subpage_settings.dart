@@ -748,7 +748,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             color: Theme.of(context).colorScheme.error),
                       )
                     : Text(
-                  S.of(context).login,
+                        S.of(context).login,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary),
                       ),
@@ -1197,7 +1197,13 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   title: Text(S.of(context).notification_settings),
                   leading: icon,
                   subtitle: Text(S.of(context).unauthorized),
-                  onTap: onSettingsUpdate);
+                  onTap: () {
+                    Permission.notification.request().then((value) {
+                      if (value.isGranted) {
+                        onSettingsUpdate();
+                      }
+                    });
+                  });
             }
           },
           errorBuilder: errorBuilder,
