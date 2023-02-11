@@ -17,18 +17,106 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:async';
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floors.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/pair.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/language_manager.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
+import 'package:flutter/painting.dart';
+import 'package:isolate_manager/isolate_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+enum _OTHoleIsolateRenderableType {
+  /// Render a list of [OTHole]s.
+  RenderHoleList,
+
+  /// Render a list of JSON objects.
+  RenderJsonList,
+}
 
 class OTHoleRenderable extends OTHole {
   String humanReadableCreatedTime;
   String humanReadableLastRepliedTime;
   String renderedFirstFloorText;
   String renderedLastFloorText;
+
+  static IsolateManager<List<OTHoleRenderable>?>? _isolateManager;
+
+  /// Parse a list of JSON objects into a list of [OTHoleRenderable]s,
+  /// and return the list.
+  ///
+  /// This method will be executed in a background isolate.
+  @pragma("vm:entry-point")
+  static Future<void> _isolateParsing(dynamic params) async {
+    final controller =
+        IsolateManagerController<List<OTHoleRenderable>?>(params);
+
+    // Get initialParams.
+    // Notice that this `initialParams` different from the `params` above.
+    final initialParams = controller.initialParams as Map<String, dynamic>;
+    final preferences = initialParams["pref"] as SharedPreferences;
+    final locale = initialParams["locale"] as Locale;
+
+    SettingsProvider.getInstance().preferences = preferences;
+    await S.load(locale);
+
+    // Listen to the message receiving from main isolate, this area of code will be called each time
+    // you use `compute` or `sendMessage`.
+    controller.onIsolateMessage.listen((message) {
+      try {
+        final type =
+            (message as Pair<_OTHoleIsolateRenderableType, dynamic>).first;
+        final data = message.second;
+        switch (type) {
+          case _OTHoleIsolateRenderableType.RenderHoleList:
+            controller.sendResult((data as List<OTHole>)
+                .map((e) => OTHoleRenderable.fromOTHole(e))
+                .toList());
+            break;
+          case _OTHoleIsolateRenderableType.RenderJsonList:
+            controller.sendResult((data as List<Map<String, dynamic>>)
+                .map((e) => OTHoleRenderable.fromJson(e))
+                .toList());
+            break;
+        }
+      } catch (err) {
+        // fixme: send the real exception to main isolate, instead of `null`!
+        controller.sendResult(null);
+      }
+    });
+  }
+
+  static void _ensureIsolateManager() {
+    _isolateManager ??=
+        IsolateManager.createOwnIsolate(_isolateParsing, initialParams: {
+      "pref": SettingsProvider.getInstance().preferences,
+      "locale":
+          LanguageManager.toLocale(SettingsProvider.getInstance().language)
+    });
+  }
+
+  /// Parse a list of JSON objects into a list of [OTHoleRenderable]s,
+  /// and return the list.
+  static Future<List<OTHoleRenderable>?> fromJsonList(
+      List<Map<String, dynamic>> jsonList) {
+    _ensureIsolateManager();
+    return _isolateManager!
+        .compute(Pair(_OTHoleIsolateRenderableType.RenderJsonList, jsonList));
+  }
+
+  // Parse a list of [OTHole]s into a list of [OTHoleRenderable]s,
+// and return the list.
+  static Future<List<OTHoleRenderable>?> fromOTHoleList(List<OTHole> holeList) {
+    _ensureIsolateManager();
+    return _isolateManager!
+        .compute(Pair(_OTHoleIsolateRenderableType.RenderHoleList, holeList));
+  }
 
   factory OTHoleRenderable.fromOTHole(OTHole postElement) {
     String renderedFirstFloorText = renderText(

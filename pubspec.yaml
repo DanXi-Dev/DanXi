@@ -90,7 +90,7 @@ dependencies:
   material_color_generator: ^1.1.0
   flutter_swiper_view: ^1.1.8
   mutex: ^3.0.1
-
+  isolate_manager: ^2.2.0+2
 
 dependency_overrides:
   device_info_plus: ^3.2.4

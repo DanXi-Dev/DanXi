@@ -238,8 +238,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
     final Response<List<dynamic>> response = await dio
         .get("$_BASE_URL/divisions", options: Options(headers: _tokenHeader));
-    _divisionCache =
-        response.data?.map((e) => OTDivision.fromJson(e)).toList() ?? [];
+    Future<OTDivision> parseDivision(dynamic e) async {
+      var division = OTDivision.fromJson(e as Map<String, dynamic>);
+      if (division.pinned != null) {
+        division.pinnedRenderable =
+            await OTHoleRenderable.fromOTHoleList(division.pinned!);
+      }
+      return division;
+    }
+
+    _divisionCache = response.data != null
+        ? [for (final e in response.data!) await parseDivision(e)]
+        : [];
     return _divisionCache;
   }
 
@@ -247,9 +257,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     try {
       return _divisionCache
               .firstWhere((element) => element.division_id == divisionId)
-              .pinned
-              ?.map((e) => OTHoleRenderable.fromOTHole(e))
-              .toList() ??
+              .pinnedRenderable ??
           List<OTHoleRenderable>.empty();
     } catch (ignored) {
       return List<OTHoleRenderable>.empty();
@@ -294,7 +302,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "order": sortOrder.getInternalString()
         },
         options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTHoleRenderable.fromJson(e)).toList();
+    return response.data != null
+        ? await OTHoleRenderable.fromJsonList(
+            response.data!.map((e) => e as Map<String, dynamic>).toList())
+        : null;
   }
 
   Future<OTHoleRenderable?> loadSpecificHole(int holeId) async {
@@ -536,7 +547,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/user/favorites",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
         options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => OTHoleRenderable.fromJson(e)).toList();
+    return response.data != null
+        ? await OTHoleRenderable.fromJsonList(
+            response.data!.map((e) => e as Map<String, dynamic>).toList())
+        : null;
   }
 
   Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {

@@ -18,6 +18,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/renderable/renderables.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'division.g.dart';
@@ -28,6 +29,7 @@ class OTDivision {
   String? name;
   String? description;
   List<OTHole>? pinned;
+  List<OTHoleRenderable>? pinnedRenderable;
 
   factory OTDivision.fromJson(Map<String, dynamic> json) =>
       _$OTDivisionFromJson(json);
