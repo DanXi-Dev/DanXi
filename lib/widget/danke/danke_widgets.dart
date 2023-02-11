@@ -91,64 +91,81 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      // credits group
-      child: Column(children: [
-        ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(16, 4, 10, 0),
-          title: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 4,
-              children: [
-                // credits group
-                Wrap(
-                  // TODO 学分tag之间水平间距
-                  // TODO card的整体高度
-                  direction: Axis.vertical,
-                  alignment: WrapAlignment.start,
-                  spacing: 2,
-                  // for each credit in credits create a text
-                  children: <Widget>[
-                    ...credits.map((credit) => OTLeadingTag(
-                          color: Colors.orange,
-                          text: "$credit 学分",
-                        )),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "$apartmentName / $courseName",
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          courseCode,
-                          textAlign: TextAlign.left,
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                const Divider(
-                  height: 0,
-                  thickness: 1,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Text("评分："),
-                    Text(totalRatingCalc(courseScore)),
-                  ],
-                ),
-              ]),
-        )
-      ]),
+    return SizedBox(
+      height: 130,
+      // TODO card的整体高度
+      // TODO info style
+      child: Card(
+        // credits group
+        child: Column(children: [
+          ListTile(
+            contentPadding: const EdgeInsets.fromLTRB(16, 5, 16, 0),
+            title: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.spaceBetween,
+                runSpacing: 4,
+                children: [
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$apartmentName / $courseName",
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                courseCode,
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          // credits group
+                          Wrap(
+                            // TODO 学分tag之间水平间距
+                            direction: Axis.vertical,
+                            alignment: WrapAlignment.start,
+                            spacing: 5,
+                            // for each credit in credits create a text
+                            children: <Widget>[
+                              ...credits.map((credit) => OTLeadingTag(
+                                color: Colors.orange,
+                                text: "$credit 学分",
+                              )),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        // TODO 用图标
+                        children: const [Text("评分数：3", style: TextStyle(fontSize: 12),)],
+                      )
+                    ],
+                  ),
+                  const Divider(
+                    height: 5,
+                    thickness: 1,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("评分: ${totalRatingCalc(courseScore)}", style: const TextStyle(
+                        fontSize: 12
+                      ),),
+                    ],
+                  ),
+                ]),
+          )
+        ]),
+      ),
     );
     throw UnimplementedError();
   }
