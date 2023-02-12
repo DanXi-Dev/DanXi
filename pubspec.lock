@@ -598,10 +598,11 @@ packages:
   flutter_markdown:
     dependency: "direct main"
     description:
-      name: flutter_markdown
-      sha256: "818cf6c28377ba2c91ed283c96fd712e9c175dd2d2488eb7fc93b6afb9ad2e08"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: fcc290c6f667e6108dda038faeb9153aae4dd41e
+      url: "https://github.com/singularity-s0/flutter_markdown_selectable.git"
+    source: git
     version: "0.6.13+1"
   flutter_math_fork:
     dependency: "direct main"
@@ -831,6 +832,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  isolate_contactor:
+    dependency: transitive
+    description:
+      name: isolate_contactor
+      sha256: e6afce524574cd16a4370dfae75a1718e561ea24175e0b2db5db4ba82d86662f
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
+  isolate_manager:
+    dependency: "direct main"
+    description:
+      name: isolate_manager
+      sha256: e3c45ca3db27ad1d55acc539dc243f0bd27fe25006ae9f27e83b0a5beec17285
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0+2"
   js:
     dependency: "direct main"
     description:

@@ -282,8 +282,7 @@ class LoginDialogState extends State<LoginDialog> {
               ),
               const SizedBox(height: 12),
               //Legal
-              RichText(
-                  text: TextSpan(children: [
+              Text.rich(TextSpan(children: [
                 TextSpan(
                   style: defaultText,
                   text: S.of(context).terms_and_conditions_content,
