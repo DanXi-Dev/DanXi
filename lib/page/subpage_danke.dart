@@ -152,14 +152,29 @@ import 'package:provider/provider.dart';
 
 class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
-  DankeSubPageState createState() {
-    return DankeSubPageState();
-  }
+  DankeSubPageState createState() => DankeSubPageState();
 
   const DankeSubPage({Key? key}) : super(key: key);
 
   @override
-  Create<Widget> get title => (cxt) => const Text("蛋壳");
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).danke);
+
+  // @override
+  // Create<List<AppBarButtonItem>> get trailing {
+  //   return (cxt) => [
+  //         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
+  //             () {
+  //           RefreshPageEvent().fire();
+  //         }),
+  //         AppBarButtonItem(
+  //             S.of(cxt).reset,
+  //             Icon(PlatformX.isMaterial(cxt)
+  //                 ? Icons.medical_services_outlined
+  //                 : CupertinoIcons.rays), () {
+  //           ResetWebViewEvent().fire();
+  //         }),
+  //       ];
+  // }
 }
 
 class DankeSubPageState extends State {
@@ -168,7 +183,7 @@ class DankeSubPageState extends State {
     return Container(
       // padding top 100
       padding: const EdgeInsets.only(top: 100),
-      child: const CourseCard(apartmentName: "A-soul",
+      child: const CourseCardWidget(departmentName: "A-soul",
           courseName: "嘉然今天吃什么",
           courseCode: "PTSD114514",
           credits: [2],
