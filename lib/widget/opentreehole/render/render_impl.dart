@@ -63,7 +63,7 @@ MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) =>
     MarkdownStyleSheet.fromTheme(Theme.of(context));
 
 //Override the font size and background of blockquote
-MarkdownStyleSheet _MarkdownStyleOverride(
+MarkdownStyleSheet _markdownStyleOverride(
     MarkdownStyleSheet sheet, double fontSize) {
   return sheet.copyWith(
     p: sheet.p?.copyWith(fontSize: fontSize),
@@ -92,7 +92,7 @@ final BaseRender kMarkdownRender = (BuildContext context,
   return MarkdownBody(
     softLineBreak: true,
     data: content!,
-    styleSheet: _MarkdownStyleOverride(
+    styleSheet: _markdownStyleOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
@@ -197,7 +197,7 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
     softLineBreak: true,
     selectable: true,
     data: content!,
-    styleSheet: _MarkdownStyleOverride(
+    styleSheet: _markdownStyleOverride(
         _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
     onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),

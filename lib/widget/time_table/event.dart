@@ -19,7 +19,7 @@ import 'package:dan_xi/model/time_table.dart';
 
 /// [Event] represents a specific course at a specific time.
 ///
-/// Usually ignore [course.times], and treat the [course] as a single event.
+/// Usually you can ignore [course.times], and treat the [course] as a single event.
 class Event {
   final Course course;
 

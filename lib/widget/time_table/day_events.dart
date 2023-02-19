@@ -19,7 +19,7 @@ import 'package:dan_xi/model/time_table.dart';
 
 /// [DayEvents] is a list of [Event]s on a specific day.
 class DayEvents {
-  // A localized string representing the day of week.
+  /// A localized string representing the day of week.
   final String day;
 
   final int weekday;

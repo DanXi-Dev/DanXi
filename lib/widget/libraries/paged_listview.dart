@@ -42,7 +42,7 @@ class PagedListView<T> extends StatefulWidget {
   /// [noneItem] only come into effect when it is NOT null.
   final T? noneItem;
 
-  /// Use the PagedListViewController to control its behaviour, e.g. refreshing
+  /// The [PagedListViewController] used to control its behaviour, e.g. refresh.
   final PagedListViewController<T>? pagedController;
 
   /// The data that will be used as preloaded data before loading.

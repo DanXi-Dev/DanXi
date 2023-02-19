@@ -32,6 +32,8 @@ double kRatio = 0.8;
 /// A time table widget, usually used to show student's course schedule table.
 class ScheduleView extends StatefulWidget {
   final List<DayEvents> laneEventsList;
+
+  /// It is unused for now, do not rely on this to customize the style.
   final TimetableStyle timetableStyle;
   final TimeNow today;
   final int showingWeek;

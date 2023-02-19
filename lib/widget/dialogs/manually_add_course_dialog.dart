@@ -10,18 +10,10 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 class ManuallyAddCourseDialog extends StatefulWidget {
-  ManuallyAddCourseDialog(this.courseAvailableList, {Key? key})
+  const ManuallyAddCourseDialog(this.courseAvailableList, {Key? key})
       : super(key: key);
 
-  TextEditingController courseNameController = TextEditingController();
-
-  TextEditingController courseIdController = TextEditingController();
-
-  TextEditingController courseRoomIdController = TextEditingController();
-
-  TextEditingController courseTeacherNameController = TextEditingController();
-
-  List<int> courseAvailableList;
+  final List<int> courseAvailableList;
 
   @override
   State<ManuallyAddCourseDialog> createState() =>
@@ -33,6 +25,11 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   int selectedWeekDay = 0;
   List<bool> selectedSlots = List.generate(15, (index) => false);
   List<Widget> selectedCourseTimeInfo = [];
+
+  TextEditingController courseNameController = TextEditingController();
+  TextEditingController courseIdController = TextEditingController();
+  TextEditingController courseRoomIdController = TextEditingController();
+  TextEditingController courseTeacherNameController = TextEditingController();
 
   Course newCourseListGenerator(
       TextEditingController courseNameController,
@@ -77,6 +74,15 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   }
 
   @override
+  void dispose() {
+    courseNameController.dispose();
+    courseIdController.dispose();
+    courseRoomIdController.dispose();
+    courseTeacherNameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PlatformAlertDialog(
       title: Text(S.of(context).add_courses),
@@ -84,7 +90,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
         child: Column(
           children: [
             TextField(
-              controller: widget.courseNameController,
+              controller: courseNameController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: S.of(context).course_name,
@@ -95,7 +101,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
             TextField(
-              controller: widget.courseIdController,
+              controller: courseIdController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: S.of(context).course_id,
@@ -106,7 +112,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
             TextField(
-              controller: widget.courseRoomIdController,
+              controller: courseRoomIdController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: S.of(context).course_room_name,
@@ -117,7 +123,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
             TextField(
-              controller: widget.courseTeacherNameController,
+              controller: courseTeacherNameController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: S.of(context).course_teacher_name,
@@ -162,8 +168,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                             foregroundColor: Colors.white,
                             child: widget.courseAvailableList.contains(e)
                                 ? Icon(PlatformX.isMaterial(context)
-                                  ? Icons.done
-                                  : CupertinoIcons.checkmark_alt)
+                                    ? Icons.done
+                                    : CupertinoIcons.checkmark_alt)
                                 : Text(
                                     "$e",
                                     style: const TextStyle(
@@ -226,10 +232,10 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                 Navigator.pop(
                     context,
                     newCourseListGenerator(
-                        widget.courseNameController,
-                        widget.courseIdController,
-                        widget.courseRoomIdController,
-                        widget.courseTeacherNameController,
+                        courseNameController,
+                        courseIdController,
+                        courseRoomIdController,
+                        courseTeacherNameController,
                         widget.courseAvailableList,
                         newCourse));
               }
