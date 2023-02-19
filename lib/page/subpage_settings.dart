@@ -890,8 +890,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Divider(
                         color: originalDividerColor,
                       ),
-                      RichText(
-                          text: TextSpan(children: [
+                      Text.rich(TextSpan(children: [
                         TextSpan(
                           style: defaultText,
                           text: S.of(context).terms_and_conditions_content,
@@ -925,8 +924,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         textScaleFactor: 1.1,
                       ),
                       Divider(color: originalDividerColor),
-                      RichText(
-                          text: TextSpan(children: [
+                      Text.rich(TextSpan(children: [
                         TextSpan(
                           style: defaultText,
                           text: S.of(context).acknowledgements_1,
