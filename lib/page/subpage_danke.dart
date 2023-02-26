@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
+import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -153,42 +154,87 @@ import 'package:provider/provider.dart';
 class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   DankeSubPageState createState() => DankeSubPageState();
+  // leading button
+  // @override
+  // Create<List<AppBarButtonItem>> get leading => (cxt) => [
+  //   AppBarButtonItem(
+  //     S.of(cxt).messages,
+  //     Icon(PlatformX.isMaterial(cxt)
+  //         ? Icons.notifications
+  //         : CupertinoIcons.bell),
+  //         () {
+  //       // if (cxt.read<FDUHoleProvider>().isUserInitialized) {
+  //       //   smartNavigatorPush(cxt, '/bbs/messages',
+  //       //       forcePushOnMainNavigator: true);
+  //       // }
+  //     },
+  //   )
+  // ];
 
   const DankeSubPage({Key? key}) : super(key: key);
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).danke);
 
+
+  // @override
+  // Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+  //   AppBarButtonItem(
+  //     S.of(cxt).add_courses,
+  //     Icon(PlatformX.isMaterial(cxt)
+  //         ? Icons.add
+  //         : CupertinoIcons.add_circled),
+  //         () => ManuallyAddCourseEvent().fire(),
+  //   ),
+  //   AppBarButtonItem(
+  //     S.of(cxt).share,
+  //     Icon(PlatformX.isMaterial(cxt)
+  //         ? Icons.share
+  //         : CupertinoIcons.square_arrow_up),
+  //         () => ShareTimetableEvent().fire(),
+  //   ),
+  // ];
+
+  // trailing buttons
   // @override
   // Create<List<AppBarButtonItem>> get trailing {
   //   return (cxt) => [
   //         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
   //             () {
-  //           RefreshPageEvent().fire();
+  //           // RefreshPageEvent().fire();
   //         }),
   //         AppBarButtonItem(
   //             S.of(cxt).reset,
   //             Icon(PlatformX.isMaterial(cxt)
   //                 ? Icons.medical_services_outlined
   //                 : CupertinoIcons.rays), () {
-  //           ResetWebViewEvent().fire();
+  //           // ResetWebViewEvent().fire();
   //         }),
   //       ];
   // }
 }
 
-class DankeSubPageState extends State {
+class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
+
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Container(
-      // padding top 100
-      padding: const EdgeInsets.only(top: 100),
-      child: const CourseCardWidget(departmentName: "A-soul",
-          courseName: "嘉然今天吃什么",
-          courseCode: "PTSD114514",
-          credits: [2],
-          courseScore: 5
+      // padding top
+      padding: const EdgeInsets.only(top: 105),
+      child: Column(
+        children: [
+          const CourseCardWidget(departmentName: "A-soul",
+              courseName: "嘉然今天吃什么",
+              courseCode: "PTSD114514",
+              credits: [2],
+              courseScore: 5
+          ),
+          CourseSearchBar(onSearch: (String text) {
+            print(text);
+          }),
+        ]
       ),
+          // button
     );
   }
 }
