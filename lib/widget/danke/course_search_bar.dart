@@ -51,12 +51,19 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
   // increase the height of the search bar
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
       child: Row(
         children: [
+          PlatformIconButton(
+            icon: Icon(
+              PlatformIcons(context).search,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            // color: Colors.blue,
+          ),
           Expanded(
             child: SizedBox(
-              height: 35,
+              height: 40,
               child: PlatformWidget(
                 // fixme material usage
                 // material: (_, __) => Material(
@@ -76,15 +83,16 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
                 // ),
                 cupertino: (_, __) => CupertinoTextField(
                   controller: _controller,
-                  placeholder: S.of(context).search,
+                  // todo placeholder language
+                  placeholder: "搜索课程名称或代码",
                   // increase text size and hint text size
                   style: const TextStyle(fontSize: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     color: CupertinoDynamicColor.resolve(
                         CupertinoColors.secondarySystemGroupedBackground,
                         context),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   onSubmitted: (value) {
                     widget.onSearch(value);

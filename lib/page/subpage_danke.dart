@@ -154,6 +154,7 @@ import 'package:provider/provider.dart';
 class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   DankeSubPageState createState() => DankeSubPageState();
+
   // leading button
   // @override
   // Create<List<AppBarButtonItem>> get leading => (cxt) => [
@@ -176,65 +177,61 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).danke);
 
+// @override
+// Create<List<AppBarButtonItem>> get trailing => (cxt) => [
+//   AppBarButtonItem(
+//     S.of(cxt).add_courses,
+//     Icon(PlatformX.isMaterial(cxt)
+//         ? Icons.add
+//         : CupertinoIcons.add_circled),
+//         () => ManuallyAddCourseEvent().fire(),
+//   ),
+//   AppBarButtonItem(
+//     S.of(cxt).share,
+//     Icon(PlatformX.isMaterial(cxt)
+//         ? Icons.share
+//         : CupertinoIcons.square_arrow_up),
+//         () => ShareTimetableEvent().fire(),
+//   ),
+// ];
 
-  // @override
-  // Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-  //   AppBarButtonItem(
-  //     S.of(cxt).add_courses,
-  //     Icon(PlatformX.isMaterial(cxt)
-  //         ? Icons.add
-  //         : CupertinoIcons.add_circled),
-  //         () => ManuallyAddCourseEvent().fire(),
-  //   ),
-  //   AppBarButtonItem(
-  //     S.of(cxt).share,
-  //     Icon(PlatformX.isMaterial(cxt)
-  //         ? Icons.share
-  //         : CupertinoIcons.square_arrow_up),
-  //         () => ShareTimetableEvent().fire(),
-  //   ),
-  // ];
-
-  // trailing buttons
-  // @override
-  // Create<List<AppBarButtonItem>> get trailing {
-  //   return (cxt) => [
-  //         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
-  //             () {
-  //           // RefreshPageEvent().fire();
-  //         }),
-  //         AppBarButtonItem(
-  //             S.of(cxt).reset,
-  //             Icon(PlatformX.isMaterial(cxt)
-  //                 ? Icons.medical_services_outlined
-  //                 : CupertinoIcons.rays), () {
-  //           // ResetWebViewEvent().fire();
-  //         }),
-  //       ];
-  // }
+// trailing buttons
+// @override
+// Create<List<AppBarButtonItem>> get trailing {
+//   return (cxt) => [
+//         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
+//             () {
+//           // RefreshPageEvent().fire();
+//         }),
+//         AppBarButtonItem(
+//             S.of(cxt).reset,
+//             Icon(PlatformX.isMaterial(cxt)
+//                 ? Icons.medical_services_outlined
+//                 : CupertinoIcons.rays), () {
+//           // ResetWebViewEvent().fire();
+//         }),
+//       ];
+// }
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
-
   @override
   Widget buildPage(BuildContext context) {
     return Container(
       // padding top
       padding: const EdgeInsets.only(top: 105),
-      child: Column(
-        children: [
-          const CourseCardWidget(departmentName: "A-soul",
-              courseName: "嘉然今天吃什么",
-              courseCode: "PTSD114514",
-              credits: [2],
-              courseScore: 5
-          ),
-          CourseSearchBar(onSearch: (String text) {
-            print(text);
-          }),
-        ]
-      ),
-          // button
+      child: Column(children: [
+        CourseSearchBar(onSearch: (String text) {
+          print(text);
+        }),
+        const CourseCardWidget(
+            departmentName: "A-soul",
+            courseName: "嘉然今天吃什么",
+            courseCode: "PTSD114514",
+            credits: [2],
+            courseScore: 5),
+      ]),
+      // button
     );
   }
 }
