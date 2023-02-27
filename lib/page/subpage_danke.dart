@@ -215,21 +215,40 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
+  double searchBarPositionBoxHeight = 260;
+
+  void _searchCourse(String text) {
+    // todo change page layout
+    setState(
+      () {
+        searchBarPositionBoxHeight = text.isEmpty ? 260 : 0;
+      },
+    );
+    // search from course list
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     return Container(
       // padding top
       padding: const EdgeInsets.only(top: 105),
       child: Column(children: [
-        CourseSearchBar(onSearch: (String text) {
-          print(text);
-        }),
-        const CourseCardWidget(
-            departmentName: "A-soul",
-            courseName: "嘉然今天吃什么",
-            courseCode: "PTSD114514",
-            credits: [2],
-            courseScore: 5),
+        // animated sized box
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: searchBarPositionBoxHeight,
+        ),
+        CourseSearchBar(
+          onSearch: (String text) {
+            _searchCourse(text);
+          },
+        ),
+        // const CourseCardWidget(
+        //     departmentName: "A-soul",
+        //     courseName: "嘉然今天吃什么",
+        //     courseCode: "PTSD114514",
+        //     credits: [2],
+        //     courseScore: 5),
       ]),
       // button
     );
