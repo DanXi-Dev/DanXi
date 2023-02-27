@@ -33,8 +33,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-// search bar widget
-
 class CourseSearchBar extends StatefulWidget {
   final Function(String) onSearch;
 
@@ -65,23 +63,10 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
             child: SizedBox(
               height: 40,
               child: PlatformWidget(
-                // fixme material usage
-                // material: (_, __) => Material(
-                //   elevation: 4,
-                //   borderRadius: BorderRadius.circular(20),
-                //   child: TextField(
-                //     controller: _controller,
-                //     decoration: InputDecoration(
-                //       // contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                //       border: InputBorder.none,
-                //       hintText: S.of(context).search,
-                //     ),
-                //     onSubmitted: (value) {
-                //       widget.onSearch(value);
-                //     },
-                //   ),
-                // ),
                 cupertino: (_, __) => CupertinoTextField(
+                  keyboardType: TextInputType.text,
+                  // press enter key to search
+                  textInputAction: TextInputAction.search,
                   controller: _controller,
                   // todo placeholder language
                   placeholder: "搜索课程名称或代码",
@@ -95,7 +80,7 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   onSubmitted: (value) {
-                    widget.onSearch(value);
+                      widget.onSearch(value);
                   },
                 ),
               ),
