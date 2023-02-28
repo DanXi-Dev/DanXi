@@ -36,7 +36,7 @@ import 'package:provider/provider.dart';
 class CourseSearchBar extends StatefulWidget {
   final Function(String) onSearch;
 
-  const CourseSearchBar({Key? key, required this.onSearch}) : super(key: key);
+  CourseSearchBar({Key? key, required this.onSearch}) : super(key: key);
 
   @override
   _CourseSearchBarState createState() => _CourseSearchBarState();
@@ -44,6 +44,25 @@ class CourseSearchBar extends StatefulWidget {
 
 class _CourseSearchBarState extends State<CourseSearchBar> {
   final TextEditingController _controller = TextEditingController();
+
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      widget.onSearch(_controller.text);
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   // increase the height of the search bar
@@ -80,7 +99,12 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   onSubmitted: (value) {
-                      widget.onSearch(value);
+                    widget.onSearch(value);
+                  },
+                  focusNode: _focusNode,
+                  onTapOutside: (e) {
+                    _focusNode.unfocus();
+                    _onFocusChange();
                   },
                 ),
               ),

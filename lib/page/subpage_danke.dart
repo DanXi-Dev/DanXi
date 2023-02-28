@@ -155,7 +155,7 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   DankeSubPageState createState() => DankeSubPageState();
 
-  // leading button
+  /// leading button
   // @override
   // Create<List<AppBarButtonItem>> get leading => (cxt) => [
   //   AppBarButtonItem(
@@ -195,23 +195,23 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
 //   ),
 // ];
 
-// trailing buttons
-// @override
-// Create<List<AppBarButtonItem>> get trailing {
-//   return (cxt) => [
-//         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
-//             () {
-//           // RefreshPageEvent().fire();
-//         }),
-//         AppBarButtonItem(
-//             S.of(cxt).reset,
-//             Icon(PlatformX.isMaterial(cxt)
-//                 ? Icons.medical_services_outlined
-//                 : CupertinoIcons.rays), () {
-//           // ResetWebViewEvent().fire();
-//         }),
-//       ];
-// }
+  /// trailing buttons
+  // @override
+  // Create<List<AppBarButtonItem>> get trailing {
+  //   return (cxt) => [
+  //         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
+  //             () {
+  //           // RefreshPageEvent().fire();
+  //         }),
+  //         AppBarButtonItem(
+  //             S.of(cxt).reset,
+  //             Icon(PlatformX.isMaterial(cxt)
+  //                 ? Icons.medical_services_outlined
+  //                 : CupertinoIcons.rays), () {
+  //           // ResetWebViewEvent().fire();
+  //         }),
+  //       ];
+  // }
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
