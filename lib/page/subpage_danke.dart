@@ -25,12 +25,14 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/widget/danke/danke_widgets.dart';
+import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
+
+import '../widget/danke/random_review_widgets.dart';
 
 // class DankeSubPage extends PlatformSubpage<DankeSubPage> {
 //   @override
@@ -196,32 +198,32 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
 // ];
 
   /// trailing buttons
-  // @override
-  // Create<List<AppBarButtonItem>> get trailing {
-  //   return (cxt) => [
-  //         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
-  //             () {
-  //           // RefreshPageEvent().fire();
-  //         }),
-  //         AppBarButtonItem(
-  //             S.of(cxt).reset,
-  //             Icon(PlatformX.isMaterial(cxt)
-  //                 ? Icons.medical_services_outlined
-  //                 : CupertinoIcons.rays), () {
-  //           // ResetWebViewEvent().fire();
-  //         }),
-  //       ];
-  // }
+// @override
+// Create<List<AppBarButtonItem>> get trailing {
+//   return (cxt) => [
+//         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
+//             () {
+//           // RefreshPageEvent().fire();
+//         }),
+//         AppBarButtonItem(
+//             S.of(cxt).reset,
+//             Icon(PlatformX.isMaterial(cxt)
+//                 ? Icons.medical_services_outlined
+//                 : CupertinoIcons.rays), () {
+//           // ResetWebViewEvent().fire();
+//         }),
+//       ];
+// }
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
-  double searchBarPositionBoxHeight = 260;
+  double searchBarPositionBoxHeight = 220;
 
   void _searchCourse(String text) {
     // todo change page layout
     setState(
       () {
-        searchBarPositionBoxHeight = text.isEmpty ? 260 : 0;
+        searchBarPositionBoxHeight = text.isEmpty ? 220 : 0;
       },
     );
     // search from course list
@@ -249,6 +251,13 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         //     courseCode: "PTSD114514",
         //     credits: [2],
         //     courseScore: 5),
+        const RandomReviewWidgets(
+          departmentName: "A-soul",
+          courseName: "嘉然今天吃什么",
+          userId: "1919810",
+          reviewContent:
+              "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
+        ),
       ]),
       // button
     );
