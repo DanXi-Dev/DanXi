@@ -78,12 +78,12 @@ class RandomReviewWidgets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: buildCard(context));
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: _buildCard(context));
     throw UnimplementedError();
   }
 
-  buildCard(BuildContext context) {
+  _buildCard(BuildContext context) {
     // style of the card
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);

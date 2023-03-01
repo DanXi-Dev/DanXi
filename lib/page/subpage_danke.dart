@@ -26,6 +26,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/danke/review_vote_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -257,6 +258,10 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
           userId: "1919810",
           reviewContent:
               "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
+        ),
+        const ReviewVoteWidget(
+          reviewTotalVote: 10,
+          reviewVote: 0,
         ),
       ]),
       // button
