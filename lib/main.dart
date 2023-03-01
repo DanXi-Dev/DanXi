@@ -108,7 +108,9 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
         PointerDeviceKind.touch,
         if (PlatformX.isWindows) PointerDeviceKind.mouse,
         PointerDeviceKind.stylus,
-        PointerDeviceKind.invertedStylus
+        PointerDeviceKind.invertedStylus,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.unknown,
         // etc.
       };
 }
