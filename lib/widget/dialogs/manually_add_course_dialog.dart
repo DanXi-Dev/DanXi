@@ -22,8 +22,6 @@ class ManuallyAddCourseDialog extends StatefulWidget {
 
 class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   Course newCourse = Course()..times = [];
-  int selectedWeekDay = 0;
-  List<bool> selectedSlots = List.generate(15, (index) => false);
   List<Widget> selectedCourseTimeInfo = [];
 
   TextEditingController courseNameController = TextEditingController();
@@ -53,7 +51,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     List<CourseTime>? courseTime = await showPlatformDialog<List<CourseTime>>(
         context: context,
         builder: (context) =>
-            AddCourseDialogSub(selectedWeekDay, selectedSlots));
+            AddCourseDialogSub());
     if (courseTime != null) {
       newCourse.times!.addAll(courseTime);
       selectedCourseTimeInfo.add(
