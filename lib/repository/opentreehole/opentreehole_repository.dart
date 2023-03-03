@@ -283,7 +283,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     sortOrder ??= SortOrder.LAST_REPLIED;
     final Response<List<dynamic>> response = await dio.get("$_BASE_URL/holes",
         queryParameters: {
-          "start_time": startTime.toIso8601String(),
+          "start_time": startTime.toUtc().toIso8601String(),
           "division_id": divisionId,
           "length": length,
           "prefetch_length": prefetchLength,
@@ -476,7 +476,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         await dio.get("$_BASE_URL/messages",
             queryParameters: {
               "not_read": unreadOnly,
-              "start_time": startTime?.toIso8601String(),
+              "start_time": startTime?.toUtc().toIso8601String(),
             },
             options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTMessage.fromJson(e)).toList();
