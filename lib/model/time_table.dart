@@ -240,10 +240,11 @@ class TimeTable {
     }
     for (var course in courses!) {
       // if the course is available in this week
-      if ((course.availableWeeks!.contains(week) &&
-          course.times!.any((element) => element.weekDay != 6))) {
+      if (course.availableWeeks!.contains(week)) {
         for (var courseTime in course.times!) {
-          table[courseTime.weekDay]!.add(Event(course, courseTime));
+          if (courseTime.weekDay != 6) {
+            table[courseTime.weekDay]!.add(Event(course, courseTime));
+          }
         }
         // or the course is available in the next week and the course is on Sunday
       } else if ((course.availableWeeks!.contains(week + 1) &&
