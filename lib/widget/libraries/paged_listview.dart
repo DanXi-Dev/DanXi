@@ -278,7 +278,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           ),
           onTap: () {
             setState(() {
-              _futureData = _setFuture();
+              _futureData = _setFuture(useInitialData: false);
             });
           }),
     );
@@ -361,7 +361,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
 
   bool get isEnded => _isEnded;
 
-  // Move things into a separate function to control reload more easily
+  /// Move things into a separate function to control reload more easily
+  ///
+  /// [useInitialData] is used to determine whether to use the initial data.
+  ///
+  /// Warn: if [useInitialData] is true, the initial data will be used for next loading,
+  /// let alone the current [pageIndex]!
   Future<List<T>?> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
