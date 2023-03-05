@@ -10,17 +10,15 @@ import '../../provider/settings_provider.dart';
 import '../../util/platform_universal.dart';
 
 class AddCourseDialogSub extends StatefulWidget {
-  AddCourseDialogSub(this.selectedWeekDay, this.selectedSlots, {Key? key})
+  const AddCourseDialogSub({Key? key})
       : super(key: key);
-
-  int selectedWeekDay;
-  List<bool> selectedSlots;
-
   @override
   State<AddCourseDialogSub> createState() => _AddCourseDialogSubState();
 }
 
 class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
+  int selectedWeekDay = 0;
+  List<bool> selectedSlots = List.generate(15, (index) => false);
   List<CourseTime>? newCourseTime;
 
   List<CourseTime>? newCourseTimeGenerator(
@@ -48,7 +46,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                   .map((e) => GestureDetector(
                         onTap: () {
                           setState(() {
-                            widget.selectedWeekDay = e;
+                            selectedWeekDay = e;
                           });
                         },
                         child: CircleAvatar(
@@ -57,7 +55,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                               .read<SettingsProvider>()
                               .primarySwatch_V2),
                           foregroundColor: Colors.white,
-                          child: e == widget.selectedWeekDay
+                          child: e == selectedWeekDay
                               ? Icon(PlatformX.isMaterial(context)
                                   ? Icons.done
                                   : CupertinoIcons.checkmark_alt)
@@ -78,7 +76,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                   .map((e) => GestureDetector(
                         onTap: () {
                           setState(() {
-                            widget.selectedSlots[e] = !widget.selectedSlots[e];
+                            selectedSlots[e] = !selectedSlots[e];
                           });
                         },
                         child: CircleAvatar(
@@ -87,7 +85,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                               .read<SettingsProvider>()
                               .primarySwatch_V2),
                           foregroundColor: Colors.white,
-                          child: widget.selectedSlots[e] == true
+                          child: selectedSlots[e] == true
                               ? Icon(PlatformX.isMaterial(context)
                                   ? Icons.done
                                   : CupertinoIcons.checkmark_alt)
@@ -112,7 +110,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
               Navigator.pop(
                   context,
                   newCourseTimeGenerator(
-                      widget.selectedWeekDay, widget.selectedSlots));
+                      selectedWeekDay, selectedSlots));
             }),
       ],
     );
