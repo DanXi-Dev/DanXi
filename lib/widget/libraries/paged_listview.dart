@@ -42,7 +42,7 @@ class PagedListView<T> extends StatefulWidget {
   /// [noneItem] only come into effect when it is NOT null.
   final T? noneItem;
 
-  /// Use the PagedListViewController to control its behaviour, e.g. refreshing
+  /// The [PagedListViewController] used to control its behaviour, e.g. refresh.
   final PagedListViewController<T>? pagedController;
 
   /// The data that will be used as preloaded data before loading.
@@ -278,7 +278,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           ),
           onTap: () {
             setState(() {
-              _futureData = _setFuture();
+              _futureData = _setFuture(useInitialData: false);
             });
           }),
     );
@@ -361,7 +361,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
 
   bool get isEnded => _isEnded;
 
-  // Move things into a separate function to control reload more easily
+  /// Move things into a separate function to control reload more easily
+  ///
+  /// [useInitialData] is used to determine whether to use the initial data.
+  ///
+  /// Warn: if [useInitialData] is true, the initial data will be used for next loading,
+  /// let alone the current [pageIndex]!
   Future<List<T>?> _setFuture({useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;

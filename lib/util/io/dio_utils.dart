@@ -40,6 +40,12 @@ class DioUtils {
             return status! < 400;
           });
 
+  /// Process the redirect response manually and return the final response.
+  ///
+  /// What makes this method necessary is that the default behavior of [Dio] is
+  /// NOT to trigger any interceptors when sending redirected requests.
+  /// Thus, some necessary headers (e.g. cookies) will be missing from the second
+  /// request and on.
   static Future<Response<dynamic>> processRedirect(
       Dio dio, Response<dynamic> response) async {
     // Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
@@ -58,6 +64,11 @@ class DioUtils {
     }
   }
 
+  /// Get the error message from the response.
+  ///
+  /// See also:
+  ///
+  /// * [ErrorPageWidget]
   static String? guessErrorMessageFromResponse(Response<dynamic>? response) {
     if (response?.data is Map<String, dynamic>) {
       if (response?.data['message'] != null) {

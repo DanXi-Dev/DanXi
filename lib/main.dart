@@ -85,12 +85,6 @@ void main() {
   FeatureMap.registerAllFeatures();
   unawaited(LazyFuture.pack(ScreenProxy.init()));
   SettingsProvider.getInstance().init().then((_) {
-    // Initialize Ad only if user has opted-in to save resources
-    // If user decides to opt-in after the app has started,
-    // Admob SDK will automatically initialize on first request.
-    // if (SettingsProvider.getInstance().isAdEnabled) {
-    //   MobileAds.instance.initialize();
-    // }
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
 
@@ -114,7 +108,9 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
         PointerDeviceKind.touch,
         if (PlatformX.isWindows) PointerDeviceKind.mouse,
         PointerDeviceKind.stylus,
-        PointerDeviceKind.invertedStylus
+        PointerDeviceKind.invertedStylus,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.unknown,
         // etc.
       };
 }
@@ -183,13 +179,14 @@ class DanxiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-    // Replace the global error widget with a simple Text
+    // Replace the global error widget with a simple Text.
     if (!kDebugMode) ErrorWidget.builder = errorBuilder;
 
     Widget mainApp = PlatformProvider(
-      // Uncomment this line below to force the app to use Cupertino Widgets
+      // Uncomment this line below to force the app to use Cupertino Widgets.
       // initialPlatform: TargetPlatform.iOS,
-      // [DynamicThemeController] enables the app to change between dark/light theme without restart
+
+      // [DynamicThemeController] enables the app to change between dark/light theme without restart on iOS.
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
             context.select<SettingsProvider, MaterialColor>((value) =>
@@ -218,7 +215,7 @@ class DanxiApp extends StatelessWidget {
                           PlatformX.isCupertino(context), primarySwatch)
                       : Constant.lightTheme(
                           PlatformX.isCupertino(context), primarySwatch)),
-              // Configure i18n delegates
+              // Configure i18n delegates.
               localizationsDelegates: const [
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
@@ -252,6 +249,7 @@ class DanxiApp extends StatelessWidget {
         );
       },
     );
+
     if (PlatformX.isAndroid || PlatformX.isIOS) {
       // Listen to Foreground / Background Event with [FGBGNotifier].
       mainApp = FGBGNotifier(

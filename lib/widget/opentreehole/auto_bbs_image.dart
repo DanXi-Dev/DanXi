@@ -48,7 +48,6 @@ class BBSImagePlaceholder extends StatelessWidget {
 /// A network image loader that will show the image from network, and
 /// fit the image's size to at most [maxWidth].
 class AutoBBSImage extends StatelessWidget {
-  @protected
   final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
   final String src;
   final double? maxWidth;

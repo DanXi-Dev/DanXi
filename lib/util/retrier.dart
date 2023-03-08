@@ -78,7 +78,7 @@ class Retrier {
 
   /// Try to run [function] asynchronously, and forever.
   /// Return the results of [function] if it executes successfully. Otherwise, it will be stuck in an infinite loop.
-  @Deprecated("Don't retry forever. Will cause excessive resource comsumption.")
+  @Deprecated("Don't retry forever. Will cause excessive resource consumption.")
   static Future<E> runAsyncWithRetryForever<E>(
       Future<E> Function() function) async {
     late Function errorCatcher;

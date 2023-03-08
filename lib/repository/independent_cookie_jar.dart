@@ -166,6 +166,9 @@ class IndependentCookieJar implements CookieJar {
   factory IndependentCookieJar.createFrom(IndependentCookieJar otherJar) =>
       IndependentCookieJar()..cloneFrom(otherJar);
 
+  /// Clone cookies from [otherJar] to this jar.
+  ///
+  /// The original cookies in this jar will be cleared before cloning.
   void cloneFrom(IndependentCookieJar otherJar) {
     _deepClone(otherJar.domainCookies, domainCookies);
     _deepClone(otherJar.hostCookies, hostCookies);

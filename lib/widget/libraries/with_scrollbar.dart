@@ -20,8 +20,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-//import 'custom_cupertino_scrollbar.dart';
-
 /// A widget that will add a scroll bar for its child.
 class WithScrollbar extends StatelessWidget {
   final ScrollController? controller;

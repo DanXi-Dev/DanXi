@@ -17,9 +17,9 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 
 /// A dialog allowing user to choose a swatch color from the list [Constant.TAG_COLOR_LIST].
@@ -34,7 +34,7 @@ class SwatchPickerDialog extends StatefulWidget {
 }
 
 class _SwatchPickerDialogState extends State<SwatchPickerDialog> {
-  //To create [currentSelected] and [finalSelected] is a temporary solution to a curious bug.
+  // To create [currentSelected] and [finalSelected] is a temporary solution to a curious bug.
   late MaterialColor _currentSelected;
   late MaterialColor _finalSelected;
 
@@ -46,13 +46,12 @@ class _SwatchPickerDialogState extends State<SwatchPickerDialog> {
     _finalSelected = _currentSelected;
   }
 
-  void materialColorGenerator(Color color) {
+  void onColorChanged(Color color) {
     _currentSelected = generateMaterialColor(color: color);
   }
 
   void onWheel(_) {
-    _finalSelected = _currentSelected;
-    setState(() => {});
+    setState(() => _finalSelected = _currentSelected);
   }
 
   @override
@@ -96,10 +95,10 @@ class _SwatchPickerDialogState extends State<SwatchPickerDialog> {
             ),
           ),
           Expanded(
-            flex:1,
+            flex: 1,
             child: ColorWheelPicker(
               color: _finalSelected,
-              onChanged: materialColorGenerator,
+              onChanged: onColorChanged,
               onWheel: onWheel,
               shouldUpdate: true,
               wheelSquarePadding: 8.0,

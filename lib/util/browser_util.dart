@@ -44,6 +44,14 @@ class BrowserUtil {
                   incognito: true),
               ios: IOSInAppWebViewOptions(sharedCookiesEnabled: true)));
 
+  /// Open a URL in the browser.
+  ///
+  /// Note: any external links in the app should be opened using this method.
+  ///
+  /// If we are on mobile platforms and we need overall control over the browser
+  /// (i.e. [cookieJar] is not null or [needAutoLogin] is true),
+  /// we will use [InAppBrowser] to open the URL; otherwise, the url is processed
+  /// by the system, using something like an external browser app.
   static Future<void> openUrl(String url, BuildContext? context,
       [IndependentCookieJar? cookieJar, bool needAutoLogin = false]) async {
     // Sanitize URL

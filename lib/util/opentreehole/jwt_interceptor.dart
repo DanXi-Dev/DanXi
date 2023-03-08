@@ -39,7 +39,7 @@ class JWTInterceptor extends QueuedInterceptor {
       RequestOptions options, JWToken token) {
     Map<String, dynamic> newHeader =
         options.headers.map((key, value) => MapEntry(key, value));
-    newHeader['Authorization'] = token.access;
+    newHeader['Authorization'] = "Bearer ${token.access!}";
     return options.copyWith(headers: newHeader);
   }
 

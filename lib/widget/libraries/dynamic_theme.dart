@@ -19,7 +19,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// A Widget to dynamically switch theme for its children based on system settings
+/// A Widget to dynamically switch theme for its children based on system settings.
 class DynamicThemeController extends StatefulWidget {
   final Widget child;
   final ThemeData lightTheme;

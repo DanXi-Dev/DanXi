@@ -518,9 +518,9 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                     .visibleWatermarkMode = false;
                               } else {
                                 SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0x01000000;
+                                    .lightWatermarkColor = 0x04000000;
                                 SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0x01000000;
+                                    .darkWatermarkColor = 0x0a000000;
                                 SettingsProvider.getInstance()
                                     .visibleWatermarkMode = true;
                               }
@@ -748,7 +748,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             color: Theme.of(context).colorScheme.error),
                       )
                     : Text(
-                  S.of(context).login,
+                        S.of(context).login,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary),
                       ),
@@ -890,8 +890,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Divider(
                         color: originalDividerColor,
                       ),
-                      RichText(
-                          text: TextSpan(children: [
+                      Text.rich(TextSpan(children: [
                         TextSpan(
                           style: defaultText,
                           text: S.of(context).terms_and_conditions_content,
@@ -925,8 +924,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         textScaleFactor: 1.1,
                       ),
                       Divider(color: originalDividerColor),
-                      RichText(
-                          text: TextSpan(children: [
+                      Text.rich(TextSpan(children: [
                         TextSpan(
                           style: defaultText,
                           text: S.of(context).acknowledgements_1,
@@ -1197,7 +1195,13 @@ class OTNotificationSettingsTile extends StatelessWidget {
                   title: Text(S.of(context).notification_settings),
                   leading: icon,
                   subtitle: Text(S.of(context).unauthorized),
-                  onTap: onSettingsUpdate);
+                  onTap: () {
+                    Permission.notification.request().then((value) {
+                      if (value.isGranted) {
+                        onSettingsUpdate();
+                      }
+                    });
+                  });
             }
           },
           errorBuilder: errorBuilder,

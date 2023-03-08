@@ -16,7 +16,9 @@
  */
 
 /// VagueTime is a data class of time & date, which contains incomplete time fields to be
-/// filled later. It is useful to represent some schedule(e.g. 8:00 everyday).
+/// filled later.
+///
+/// It is useful to represent some schedule (e.g. 8:00 everyday).
 class VagueTime implements Comparable<VagueTime> {
   final int? year, month, day, hour, minute, second, millisecond, microsecond;
 

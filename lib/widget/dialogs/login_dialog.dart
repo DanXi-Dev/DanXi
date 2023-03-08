@@ -142,8 +142,9 @@ class LoginDialogState extends State<LoginDialog> {
   }
 
   void requestInternetAccess() async {
-    //This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection
+    // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
     try {
+      // fixme: use a privacy-friendly captive portal detection method.
       await Dio().head('http://captive.apple.com');
     } catch (ignored) {}
   }
@@ -282,8 +283,7 @@ class LoginDialogState extends State<LoginDialog> {
               ),
               const SizedBox(height: 12),
               //Legal
-              RichText(
-                  text: TextSpan(children: [
+              Text.rich(TextSpan(children: [
                 TextSpan(
                   style: defaultText,
                   text: S.of(context).terms_and_conditions_content,

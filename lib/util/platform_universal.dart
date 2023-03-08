@@ -25,7 +25,7 @@ import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:uuid/uuid.dart';
 
-/// A universal implementation of Platform in dart:io and kIsWeb in dart:core.
+/// A universal implementation of [Platform] in dart:io and [kIsWeb] in dart:core.
 class PlatformX {
   static bool get isWeb => kIsWeb;
 
