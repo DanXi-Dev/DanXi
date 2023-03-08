@@ -414,16 +414,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
     List<Widget> buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
       Future<void> onExecutePenalty(int level) async {
-        int divisionId = TreeHoleSubpageState.getDivisionId(context);
-
         // Confirm the operation
         bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of level $level to floor ${e.floor_id} in division $divisionId. Are you sure?",
+            "You are going to add a penalty of level $level to floor ${e.floor_id} in its division. Are you sure?",
             isConfirmDestructive: true);
         if (confirmed != true) return;
 
         int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenalty(e.floor_id, level, divisionId);
+            .adminAddPenalty(e.floor_id, level);
         if (result != null && result < 300 && mounted) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);
@@ -431,8 +429,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
 
       Future<void> onExecutePenaltyDays() async {
-        int divisionId = TreeHoleSubpageState.getDivisionId(context);
-
         // Input the number of days
         String? dayStr = await Noticing.showInputDialog(
             context, "Please input the number of days");
@@ -442,12 +438,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
         // Confirm the operation
         bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of $days days to floor ${e.floor_id} in division $divisionId. Are you sure?",
+            "You are going to add a penalty of $days days to floor ${e.floor_id} in its division. Are you sure?",
             isConfirmDestructive: true);
         if (confirmed != true) return;
 
         int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenaltyDays(e.floor_id, days, divisionId);
+            .adminAddPenaltyDays(e.floor_id, days);
         if (result != null && result < 300 && mounted) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);

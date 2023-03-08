@@ -604,19 +604,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   @Deprecated("Use adminAddPenaltyDays instead")
-  Future<int?> adminAddPenalty(
-      int? floorId, int penaltyLevel, int divisionId) async {
+  Future<int?> adminAddPenalty(int? floorId, int penaltyLevel) async {
     return (await dio.post("$_BASE_URL/penalty/$floorId",
-            data: jsonEncode(
-                {"penalty_level": penaltyLevel, "division_id": divisionId}),
+            data: jsonEncode({"penalty_level": penaltyLevel}),
             options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
-  Future<int?> adminAddPenaltyDays(
-      int? floorId, int penaltyDays, int divisionId) async {
+  Future<int?> adminAddPenaltyDays(int? floorId, int penaltyDays) async {
     return (await dio.post("$_BASE_URL/penalty/$floorId",
-            data: jsonEncode({"days": penaltyDays, "division_id": divisionId}),
+            data: jsonEncode({"days": penaltyDays}),
             options: Options(headers: _tokenHeader)))
         .statusCode;
   }
