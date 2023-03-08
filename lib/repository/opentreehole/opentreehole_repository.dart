@@ -52,7 +52,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   late FDUHoleProvider provider;
 
   /// Cached floors, used by [mentions]
-  List<OTFloor> _floorCache = [];
+  final Map<int, OTFloor> _floorCache = {};
 
   /// Cached OTDivisions
   List<OTDivision> _divisionCache = [];
@@ -86,21 +86,21 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     provider.token = null;
     provider.userInfo = null;
     _pushNotificationRegData = null;
-    _floorCache = [];
-    _divisionCache = [];
-    _tagCache = [];
+    _floorCache.clear();
+    _divisionCache.clear();
+    _tagCache.clear();
   }
 
   void cacheFloor(OTFloor floor) {
-    _floorCache.remove(floor);
-    _floorCache.add(floor);
+    if (floor.floor_id == null) return;
+    _floorCache[floor.floor_id!] = floor;
     if (_floorCache.length > 200) {
       reduceFloorCache();
     }
   }
 
   void reduceFloorCache({int factor = 2}) {
-    _floorCache = _floorCache.sublist(_floorCache.length ~/ factor);
+    _floorCache.removeWhere((key, value) => key % factor == 0);
   }
 
   OpenTreeHoleRepository._() {
@@ -309,16 +309,17 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<OTFloor?> loadSpecificFloor(int floorId) async {
-    try {
-      return _floorCache.lastWhere((element) => element.floor_id == floorId);
-    } catch (ignored) {
-      final Response<Map<String, dynamic>> response = await dio.get(
-          "$_BASE_URL/floors/$floorId",
-          options: Options(headers: _tokenHeader));
-      final floor = OTFloor.fromJson(response.data!);
-      cacheFloor(floor);
-      return floor;
+    final result = _floorCache[floorId];
+    if (result != null) {
+      return result;
     }
+
+    final Response<Map<String, dynamic>> response = await dio.get(
+        "$_BASE_URL/floors/$floorId",
+        options: Options(headers: _tokenHeader));
+    final floor = OTFloor.fromJson(response.data!);
+    cacheFloor(floor);
+    return floor;
   }
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
