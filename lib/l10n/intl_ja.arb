@@ -432,5 +432,9 @@
   "fix_danke_description": "問題が発生しましたか？ 確認をクリックしてリセットして修正してみてください。",
   "fix": "修正",
   "refresh": "更新",
-  "reset": "リセット"
+  "reset": "リセット",
+  "theme_type": "テーマタイプ",
+  "theme_type_light": "ライト",
+  "theme_type_dark": "ダーク",
+  "theme_type_system": "システム"
 }

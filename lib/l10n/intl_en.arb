@@ -469,5 +469,9 @@
   "fix_danke_description": "Having trouble with Danke? Click to try resetting and fixing it.",
   "fix": "Fix",
   "refresh": "Refresh",
-  "reset": "Reset"
+  "reset": "Reset",
+  "theme_type": "Theme Type",
+  "theme_type_light": "Light",
+  "theme_type_dark": "Dark",
+  "theme_type_system": "System"
 }

@@ -203,6 +203,10 @@ class DanxiApp extends StatelessWidget {
               // Fix cupertino UI text color issue by override text color
               cupertino: (context, __) => CupertinoAppData(
                   theme: CupertinoThemeData(
+                      brightness: context
+                          .select<SettingsProvider, ThemeType>(
+                              (s) => s.themeType)
+                          .getBrightness(),
                       textTheme: CupertinoTextThemeData(
                           textStyle: TextStyle(
                               color: PlatformX.getTheme(context, primarySwatch)
@@ -210,11 +214,7 @@ class DanxiApp extends StatelessWidget {
                                   .bodyLarge!
                                   .color)))),
               material: (context, __) => MaterialAppData(
-                  theme: PlatformX.isDarkMode
-                      ? Constant.darkTheme(
-                          PlatformX.isCupertino(context), primarySwatch)
-                      : Constant.lightTheme(
-                          PlatformX.isCupertino(context), primarySwatch)),
+                  theme: PlatformX.getTheme(context, primarySwatch)),
               // Configure i18n delegates.
               localizationsDelegates: const [
                 S.delegate,

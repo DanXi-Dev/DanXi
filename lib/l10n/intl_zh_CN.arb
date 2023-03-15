@@ -461,5 +461,9 @@
   "fix_danke_description": "使用评教时遇到了问题？点击确认以尝试重置并修复。",
   "fix": "修复",
   "refresh": "刷新",
-  "reset": "重置"
+  "reset": "重置",
+  "theme_type": "主题",
+  "theme_type_light": "浅色",
+  "theme_type_dark": "深色",
+  "theme_type_system": "跟随系统"
 }
