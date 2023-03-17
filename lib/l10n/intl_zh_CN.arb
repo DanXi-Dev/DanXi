@@ -200,6 +200,7 @@
   "login_uis_pwd": "密码",
   "cancel": "取消",
   "login": "登录",
+  "get_started": "开始使用",
   "login_as_others": "其他登录方式",
   "visitor": "仅 FDUHole",
   "fudan_postgraduate_student": "复旦研究生 UIS 登录",
