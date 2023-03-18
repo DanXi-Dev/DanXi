@@ -414,9 +414,36 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
     List<Widget> buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
       Future<void> onExecutePenalty(int level) async {
+        // Confirm the operation
+        bool? confirmed = await Noticing.showConfirmationDialog(context,
+            "You are going to add a penalty of level $level to floor ${e.floor_id} in its division. Are you sure?",
+            isConfirmDestructive: true);
+        if (confirmed != true) return;
+
         int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenalty(
-                e.floor_id, level, TreeHoleSubpageState.getDivisionId(context));
+            .adminAddPenalty(e.floor_id, level);
+        if (result != null && result < 300 && mounted) {
+          Noticing.showMaterialNotice(
+              context, S.of(context).operation_successful);
+        }
+      }
+
+      Future<void> onExecutePenaltyDays() async {
+        // Input the number of days
+        String? dayStr = await Noticing.showInputDialog(
+            context, "Please input the number of days");
+        if (dayStr == null) return;
+        int? days = int.tryParse(dayStr);
+        if (days == null) return;
+
+        // Confirm the operation
+        bool? confirmed = await Noticing.showConfirmationDialog(context,
+            "You are going to add a penalty of $days days to floor ${e.floor_id} in its division. Are you sure?",
+            isConfirmDestructive: true);
+        if (confirmed != true) return;
+
+        int? result = await OpenTreeHoleRepository.getInstance()
+            .adminAddPenaltyDays(e.floor_id, days);
         if (result != null && result < 300 && mounted) {
           Noticing.showMaterialNotice(
               context, S.of(context).operation_successful);
@@ -439,7 +466,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           isDestructive: true,
           child: Text(S.of(context).level(3)),
-        )
+        ),
+        PlatformContextMenuItem(
+          onPressed: onExecutePenaltyDays,
+          menuContext: menuContext,
+          isDestructive: true,
+          child: const Text("Custom penalty..."),
+        ),
       ];
     }
 
@@ -479,12 +512,33 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await Noticing.showConfirmationDialog(
-                    context, S.of(context).are_you_sure,
-                    isConfirmDestructive: true) ==
-                true) {
+            bool? lock = await Noticing.showConfirmationDialog(
+                context, "Lock or unlock the hole?",
+                confirmText: "Lock", cancelText: "Unlock");
+            if (lock != null) {
               int? result = await OpenTreeHoleRepository.getInstance()
-                  .adminDeleteHole(e.hole_id);
+                  .adminLockHole(e.hole_id, lock);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("Lock/Unlock hole"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            bool? hide = await Noticing.showConfirmationDialog(
+                context, "Hide or unhide the hole?",
+                confirmText: "Hide", cancelText: "Unhide");
+            if (hide != null) {
+              int? result = hide
+                  ? await OpenTreeHoleRepository.getInstance()
+                      .adminDeleteHole(e.hole_id)
+                  : await OpenTreeHoleRepository.getInstance()
+                      .adminUndeleteHole(e.hole_id);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);

@@ -146,7 +146,7 @@ class TimeTable {
 
   factory TimeTable.mergeManuallyAddedCourses(
       TimeTable? formerTimeTable, List<Course?> newCourses) {
-    if(formerTimeTable == null){
+    if (formerTimeTable == null) {
       return TimeTable();
     }
     if (newCourses.isEmpty) {
@@ -227,26 +227,30 @@ class TimeTable {
   }
 
   /// Convert the specific [week]'s timetable to [DayEvents], usually for a [ScheduleView].
-  ///
-  /// if [containCourseOtherWeeks], the result will contain other weeks' courses,
-  /// even if they do not take place in this [week].
+  /// If the course is available in this week, it will be added to the [DayEvents] of the day of the course.
+  /// Else if the course is available in the next week and the course is on Sunday, it will be added to the [DayEvents] of the day of the course.
   List<DayEvents> toDayEvents(int week,
-      {TableDisplayType compact = TableDisplayType.COMPAT,
-      bool containCourseOtherWeeks = false}) {
+      {TableDisplayType compact = TableDisplayType.COMPAT}) {
     Map<int, List<Event>> table = {};
     List<DayEvents> result = [];
     for (int i = 0; i < DateTime.daysPerWeek; i++) {
       table[i] = [];
     }
     for (var course in courses!) {
+      // if the course is available in this week
       if (course.availableWeeks!.contains(week)) {
         for (var courseTime in course.times!) {
-          table[courseTime.weekDay]!.add(Event(course, courseTime));
+          if (courseTime.weekDay != 6) {
+            table[courseTime.weekDay]!.add(Event(course, courseTime));
+          }
         }
-      } else if (containCourseOtherWeeks) {
+      }
+      // or the course is available in the next week and the course is on Sunday
+      if (course.availableWeeks!.contains(week + 1)) {
         for (var courseTime in course.times!) {
-          table[courseTime.weekDay]!
-              .add(Event(course, courseTime, enabled: false));
+          if (courseTime.weekDay == 6) {
+            table[courseTime.weekDay]!.add(Event(course, courseTime));
+          }
         }
       }
     }

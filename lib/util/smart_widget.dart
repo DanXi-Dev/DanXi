@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:nil/nil.dart';
 
-/// A helper class to convert [String],[WidgetBuilder],[List<Widget>] or something similar into [Widget].
+/// A helper class to convert [String], [WidgetBuilder], [List<Widget>] or something similar into [Widget].
 class SmartWidget {
   static Widget toWidget<T>(dynamic object, BuildContext context,
       {Widget? fallback,

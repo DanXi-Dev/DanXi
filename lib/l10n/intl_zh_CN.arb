@@ -200,6 +200,7 @@
   "login_uis_pwd": "密码",
   "cancel": "取消",
   "login": "登录",
+  "get_started": "开始使用",
   "login_as_others": "其他登录方式",
   "visitor": "仅 FDUHole",
   "fudan_postgraduate_student": "复旦研究生 UIS 登录",
@@ -461,5 +462,9 @@
   "fix_danke_description": "使用评教时遇到了问题？点击确认以尝试重置并修复。",
   "fix": "修复",
   "refresh": "刷新",
-  "reset": "重置"
+  "reset": "重置",
+  "theme_type": "主题",
+  "theme_type_light": "浅色",
+  "theme_type_dark": "深色",
+  "theme_type_system": "跟随系统"
 }

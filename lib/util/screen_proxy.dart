@@ -18,6 +18,7 @@
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+/// A proxy class for [ScreenBrightness] to make it work on all platforms.
 class ScreenProxy {
   static Future<void> init() async {
     if (PlatformX.isMobile) await ScreenBrightness().setAutoReset(false);

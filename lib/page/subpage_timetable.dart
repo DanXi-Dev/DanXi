@@ -247,7 +247,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     super.initState();
     _setContent();
     converters = {
-      //S.current.import_into_cal: CalendarImporter(), // Unfinished
       S.current.share_as_ics: ICSConverter()
     };
     _shareSubscription.bindOnlyInvalid(
@@ -404,7 +403,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
 
     final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
-        compact: TableDisplayType.STANDARD, containCourseOtherWeeks: false);
+        compact: TableDisplayType.STANDARD);
     return RefreshIndicator(
       key: indicatorKey,
       edgeOffset: MediaQuery.of(context).padding.top,

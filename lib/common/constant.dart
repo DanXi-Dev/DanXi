@@ -39,8 +39,20 @@ class Constant {
 
   static const SUPPORT_QQ_GROUP = "941342818";
 
+  /// The division name of the curriculum page. We use this to determine whether
+  /// we should show the curriculum page (instead of a normal treehole division).
+  ///
+  /// See also:
+  ///
+  /// * [ListDelegate], which determines the page content per division.
+  /// * [PostsType], which can represent a special division.
+  /// * [OTDivision], whose name is what we compare with.
   static const SPECIAL_DIVISION_FOR_CURRICULUM = "评教";
 
+  /// The default user agent used by the app.
+  ///
+  /// Note that this is not the same as the user agent used by the WebView, or the
+  /// treehole's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
   static String get DEFAULT_USER_AGENT =>
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
@@ -51,9 +63,9 @@ class Constant {
       "https://auth.fduhole.com/register?type=forget_password";
 
   /// The default start date of a semester.
-  // ignore: non_constant_identifier_names
-  static final DEFAULT_SEMESTER_START_DATE = DateTime(2022, 2, 21);
+  static final DEFAULT_SEMESTER_START_DATE = DateTime(2023, 2, 20);
 
+  /// A global queue to send events across the widget tree.
   static EventBus eventBus = EventBus(sync: true);
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
@@ -61,21 +73,30 @@ class Constant {
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
 
-  // Client version descriptor
+  /// Client version descriptor.
+  ///
+  /// It is used to identify the client in the HTTP request header.
+  /// Currently, it is used in the [OpenTreeHoleRepository] to tell the server
+  /// about the client version.
   static String get version =>
       "DanXi/${FlutterApp.versionName}b${pubspec.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
 
+  /// The tips to be shown as hints in the [BBSEditorWidget].
   static List<String> fduHoleTips = [];
 
-  /// Load in the tips to be shown in the [BBSEditorWidget].
+  /// Load in the tips in the [BBSEditorWidget].
   static Future<List<String>> _loadTips() async {
     String tipLines = await rootBundle.loadString("assets/texts/tips.dat");
     return tipLines.split("\n");
   }
 
+  /// The stop words to be determined in the [BBSEditorWidget].
+  ///
+  /// Stop words are used to warn the user when he/she is about to post
+  /// something that is not encouraged by the treehole community.
   static List<String> _stopWords = [];
 
-  /// Load in the stop words to be shown in the [BBSEditorWidget].
+  /// Load in the stop words in the [BBSEditorWidget].
   static Future<List<String>> _loadStopWords() async {
     String wordLines =
         await rootBundle.loadString("assets/texts/stop_words.dat");
@@ -120,7 +141,7 @@ class Constant {
     }
   }
 
-  /// Get i18n names of all features.
+  /// Get i18n names of all features by their representation names.
   ///
   /// For any feature newly added, its representation name should be added here.
   static Map<String, String> getFeatureName(BuildContext context) => {
@@ -212,9 +233,12 @@ class Constant {
 
   /// Get the link to update the application.
   static String updateUrl() {
-    // Don't use GitHub URL, since access is not guaranteed
+    // Don't use GitHub URL, since access is not guaranteed in China.
     if (PlatformX.isIOS) {
       return "https://apps.apple.com/app/id$APPSTORE_APPID";
+    }
+    if (PlatformX.isAndroid) {
+      return "https://static.fduhole.com/danxi-latest.apk";
     }
     return "https://danxi.fduhole.com";
   }

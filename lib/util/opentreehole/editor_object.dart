@@ -17,6 +17,10 @@
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 
 /// [EditorObject] represents an object the [BBSEditorWidget] replies or posts to.
+///
+/// See also:
+///
+/// * [FDUHoleProvider], where [EditorObject]s are usually stored.
 class EditorObject {
   /// The post id or discussion id.
   ///

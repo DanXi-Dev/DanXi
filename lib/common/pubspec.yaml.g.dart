@@ -40,7 +40,7 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.11+331';
+const String version = r'1.3.13+335';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
@@ -49,16 +49,16 @@ const int major = 1;
 const int minor = 3;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 11;
+const int patch = 13;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'331'];
+const List<String> build = <String>[r'335'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1675399857;
+const int timestamp = 1679109386;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -141,7 +141,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'json_serializable': r'^6.2.0',
   'photo_view': r'^0.14.0',
   'gallery_saver': r'^2.3.2',
-  'flutter_markdown': r'^0.6.10',
+  'flutter_markdown': <String, Object>{
+    'git': <String, Object>{
+      'url':
+          r'https://github.com/singularity-s0/flutter_markdown_selectable.git',
+    },
+  },
   'markdown': r'^6.0.1',
   'system_tray': <String, Object>{
     'git': <String, Object>{

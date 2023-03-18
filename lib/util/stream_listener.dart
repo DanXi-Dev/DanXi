@@ -25,25 +25,27 @@ class StateStreamListener<T> extends StreamListener<T, int> {}
 ///
 /// Example:
 ///
+/// ```dart
 /// class _OneState extends State<One>{
-//   static StateStreamListener _subscription = StateStreamListener();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _subscription.bindOnlyInvalid(
+///   static StateStreamListener _subscription = StateStreamListener();
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _subscription.bindOnlyInvalid(
 //         Constant.eventBus
-//             .on<Event>()
-//             .listen((_) => refreshSelf()),
-//         hashCode);
-//   }
-//
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     _subscription.cancel();
-//   }
-// }
+///             .on<Event>()
+///             .listen((_) => refreshSelf()),
+///         hashCode);
+///   }
+///
+///   @override
+///   void dispose() {
+///     super.dispose();
+///     _subscription.cancel();
+///   }
+/// }
+/// ```
 
 class StreamListener<T, S> {
   StreamSubscription<T>? _subscription;

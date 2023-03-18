@@ -17,12 +17,23 @@
 
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 
 /// A global register table of [Feature], which declares its compatible user groups here.
 Map<String, List<UserGroup>> _kRegister = {};
 
+/// Register a [feature] with its compatible user [groups].
+///
+/// By default, only compatible features will be shown in the [HomeSubpage].
+/// Others will be hidden without any notice.
+///
+/// If [groups] not provided, use default groups instead.
+///
+/// See also:
+/// - [UserGroup]
+/// - [Feature]
 void registerFeature(Feature feature,
     {List<UserGroup> groups = const [
       UserGroup.FUDAN_UNDERGRADUATE_STUDENT,

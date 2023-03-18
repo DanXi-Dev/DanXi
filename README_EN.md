@@ -75,10 +75,10 @@ Will consider after Flutter macOS support becomes stable.
 
 ```shell script
 $ flutter --version
-Flutter 3.7.1 • channel stable • https://github.com/flutter/flutter.git 
-Framework • revision 7048ed95a5 (2 days ago) • 2023-02-01 09:07:31 -0800
-Engine • revision 800594f1f4
-Tools • Dart 2.19.1 • DevTools 2.20.1
+Flutter 3.7.7 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 2ad6cd72c0 (6 days ago) • 2023-03-08 09:41:59 -0800
+Engine • revision 1837b5be5f
+Tools • Dart 2.19.4 • DevTools 2.20.1
 ```
 ## Notes on compilation
 The app is compiled with [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).  

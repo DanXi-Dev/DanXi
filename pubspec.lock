@@ -598,10 +598,11 @@ packages:
   flutter_markdown:
     dependency: "direct main"
     description:
-      name: flutter_markdown
-      sha256: "818cf6c28377ba2c91ed283c96fd712e9c175dd2d2488eb7fc93b6afb9ad2e08"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: ba45571df8bd0c112cea3fe56b3337385169f3aa
+      url: "https://github.com/singularity-s0/flutter_markdown_selectable.git"
+    source: git
     version: "0.6.13+1"
   flutter_math_fork:
     dependency: "direct main"
