@@ -53,6 +53,7 @@ jobs:
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
           prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
           name: Release ${{ github.ref }}
           generate_release_notes: true
           fail_on_unmatched_files: true
@@ -63,6 +64,7 @@ jobs:
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
           prerelease: true
+          tag_name: nightly
           name: Nightly build
           generate_release_notes: true
           fail_on_unmatched_files: true
