@@ -2,6 +2,11 @@ name: Automated-CI-Android
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag name for release. If set to nightly, the release will be a pre-release."
+        required: false
+        default: nightly
 
 jobs:
   Automated-CI-Android:
@@ -42,11 +47,22 @@ jobs:
         run: |
           flutter build apk --release
 
-      - name: Release
+      - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
+        name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
           prerelease: false
           name: Release ${{ github.ref }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+
+      - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name == 'nightly'
+        name: Release Nightly
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+          prerelease: true
+          name: Nightly build
           generate_release_notes: true
           fail_on_unmatched_files: true
