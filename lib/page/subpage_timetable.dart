@@ -247,7 +247,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     super.initState();
     _setContent();
     converters = {
-      //S.current.import_into_cal: CalendarImporter(), // Unfinished
       S.current.share_as_ics: ICSConverter()
     };
     _shareSubscription.bindOnlyInvalid(

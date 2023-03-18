@@ -512,6 +512,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
+            bool? lock = await Noticing.showConfirmationDialog(
+                context, "Lock or unlock the hole?",
+                confirmText: "Lock", cancelText: "Unlock");
+            if (lock != null) {
+              int? result = await OpenTreeHoleRepository.getInstance()
+                  .adminLockHole(e.hole_id, lock);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("Lock/Unlock hole"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
             if (await Noticing.showConfirmationDialog(
                     context, S.of(context).are_you_sure,
                     isConfirmDestructive: true) ==
