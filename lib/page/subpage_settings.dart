@@ -297,6 +297,22 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     return list;
   }
 
+  List<Widget> _buildThemeList(BuildContext menuContext) {
+    List<Widget> list = [];
+    onTapListener(ThemeType theme) {
+      SettingsProvider.getInstance().themeType = theme;
+    }
+
+    for (var value in ThemeType.values) {
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(value.displayTitle(menuContext) ?? "null"),
+        onPressed: () => onTapListener(value),
+      ));
+    }
+    return list;
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     // Load preference fields
@@ -441,6 +457,24 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                               }
                             },
                           ),
+                        ListTile(
+                          title: Text(S.of(context).theme),
+                          subtitle: Text(context
+                                  .select<SettingsProvider, ThemeType>(
+                                      (s) => s.themeType)
+                                  .displayTitle(context) ??
+                              "null"),
+                          leading: const Icon(Icons.brightness_4),
+                          onTap: () => showPlatformModalSheet(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  PlatformContextMenu(
+                                      actions: _buildThemeList(context),
+                                      cancelButton: CupertinoActionSheetAction(
+                                          child: Text(S.of(context).cancel),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop()))),
+                        ),
                         if (context.select<SettingsProvider, bool>(
                             (value) => value.hiddenNotifications.isNotEmpty))
                           ListTile(

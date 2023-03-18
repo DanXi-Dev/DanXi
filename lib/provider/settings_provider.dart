@@ -76,6 +76,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_VISIBLE_WATERMARK_MODE = "visible_watermark";
   static const String KEY_HIDDEN_HOLES = "hidden_holes";
   static const String KEY_HIDDEN_NOTIFICATIONS = "hidden_notifications";
+  static const String KEY_THEME_TYPE = "theme_type";
 
   SettingsProvider._();
 
@@ -526,7 +527,7 @@ class SettingsProvider with ChangeNotifier {
       int? color = preferences!.getInt(KEY_LIGHT_WATERMARK_COLOR);
       return Color(color!).value;
     }
-    return 0x04000000;
+    return 0x03000000;
   }
 
   set lightWatermarkColor(int value) {
@@ -539,7 +540,7 @@ class SettingsProvider with ChangeNotifier {
       int? color = preferences!.getInt(KEY_DARK_WATERMARK_COLOR);
       return Color(color!).value;
     }
-    return 0x0a000000;
+    return 0x09000000;
   }
 
   set darkWatermarkColor(int value) {
@@ -587,6 +588,21 @@ class SettingsProvider with ChangeNotifier {
 
   set hiddenNotifications(List<String> list) {
     preferences!.setString(KEY_HIDDEN_NOTIFICATIONS, jsonEncode(list));
+    notifyListeners();
+  }
+
+  ThemeType get themeType {
+    if (preferences!.containsKey(KEY_THEME_TYPE)) {
+      return themeTypeFromInternalString(
+              preferences!.getString(KEY_THEME_TYPE)) ??
+          ThemeType.SYSTEM;
+    } else {
+      return ThemeType.SYSTEM;
+    }
+  }
+
+  set themeType(ThemeType type) {
+    preferences!.setString(KEY_THEME_TYPE, type.internalString());
     notifyListeners();
   }
 }
@@ -702,6 +718,56 @@ OTNotificationTypes? notificationTypeFromInternalString(String str) {
       return OTNotificationTypes.FAVORITE;
     case 'report':
       return OTNotificationTypes.REPORT;
+    default:
+      return null;
+  }
+}
+
+enum ThemeType { LIGHT, DARK, SYSTEM }
+
+extension ThemeTypeEx on ThemeType {
+  String? displayTitle(BuildContext context) {
+    switch (this) {
+      case ThemeType.LIGHT:
+        return S.of(context).theme_type_light;
+      case ThemeType.DARK:
+        return S.of(context).theme_type_dark;
+      case ThemeType.SYSTEM:
+        return S.of(context).theme_type_system;
+    }
+  }
+
+  String internalString() {
+    switch (this) {
+      case ThemeType.LIGHT:
+        return 'light';
+      case ThemeType.DARK:
+        return 'dark';
+      case ThemeType.SYSTEM:
+        return 'system';
+    }
+  }
+
+  Brightness getBrightness() {
+    switch (this) {
+      case ThemeType.LIGHT:
+        return Brightness.light;
+      case ThemeType.DARK:
+        return Brightness.dark;
+      case ThemeType.SYSTEM:
+        return WidgetsBinding.instance.window.platformBrightness;
+    }
+  }
+}
+
+ThemeType? themeTypeFromInternalString(String? str) {
+  switch (str) {
+    case 'light':
+      return ThemeType.LIGHT;
+    case 'dark':
+      return ThemeType.DARK;
+    case 'system':
+      return ThemeType.SYSTEM;
     default:
       return null;
   }

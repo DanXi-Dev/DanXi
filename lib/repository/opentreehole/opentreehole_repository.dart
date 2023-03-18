@@ -604,6 +604,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminLockHole(int? holeId, bool lock) async {
+    return (await dio.put("$_BASE_URL/holes/$holeId",
+            data: {"lock": lock}, options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
+  Future<int?> adminUndeleteHole(int? holeId) async {
+    return (await dio.put("$_BASE_URL/holes/$holeId",
+            data: {"unhidden": true}, options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   @Deprecated("Use adminAddPenaltyDays instead")
   Future<int?> adminAddPenalty(int? floorId, int penaltyLevel) async {
     return (await dio.post("$_BASE_URL/penalty/$floorId",

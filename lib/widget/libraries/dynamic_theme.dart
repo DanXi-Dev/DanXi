@@ -15,9 +15,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 /// A Widget to dynamically switch theme for its children based on system settings.
 class DynamicThemeController extends StatefulWidget {
@@ -62,8 +64,17 @@ class DynamicThemeControllerState extends State<DynamicThemeController>
 
   @override
   Widget build(BuildContext context) {
+    final type =
+        context.select<SettingsProvider, ThemeType>((s) => s.themeType);
+
+    var effectiveBrightness = _brightness;
+    if (type == ThemeType.LIGHT) {
+      effectiveBrightness = Brightness.light;
+    } else if (type == ThemeType.DARK) {
+      effectiveBrightness = Brightness.dark;
+    }
     return Theme(
-        data: _brightness == Brightness.light
+        data: effectiveBrightness == Brightness.light
             ? widget.lightTheme
             : widget.darkTheme,
         child: widget.child);

@@ -199,6 +199,13 @@ class OTHoleWidget extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.primary,
                                   text: S.of(context).hole_hidden,
                                 ),
+                              ],
+                              if (postElement.locked == true) ...[
+                                const SizedBox(width: 4),
+                                OTLeadingTag(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  text: S.of(context).hole_locked,
+                                )
                               ]
                             ],
                           ),
