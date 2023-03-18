@@ -408,6 +408,7 @@
   "input_reason": "输入内容（留空以还原）",
   "operation_successful": "操作成功",
   "hole_hidden": "已隐藏",
+  "hole_locked": "已锁定",
   "semester_start_date": "设置学期开始日期：",
   "delete_this_tag": "删除此标签？",
   "unknown_start_date": "我们对该学期({semesterName})的开学日期尚不了解，请手动设置开学日期",
