@@ -1,0 +1,52 @@
+name: Automated-CI-Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Automated-CI-Android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Prepare Flutter Dependencies
+        run: |
+          flutter pub get
+          flutter pub global activate intl_utils
+          flutter pub global run intl_utils:generate
+      
+      - name: Generate Models
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+  
+      - name: Import Secrets
+        uses: actions/checkout@v2
+        with:
+          repository: DanXi-Dev/DanXi-secrets
+          path: secrets
+          ssh-key: ${{ secrets.SECRETS_SSH_KEY }}
+      
+      - name: Populate Secrets
+        run: |
+          mv -f secrets/Secret.dart lib/common/Secret.dart
+          mv -f secrets/sksl_default.json CI/sksl_default.json
+          mv -f secrets/key.properties android/key.properties
+          mv -f secrets/danxi.keystore android/danxi.keystore
+
+      - name: Build APK
+        run: |
+          flutter build apk --release
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+          prerelease: false
+          name: Release ${{ github.ref }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
