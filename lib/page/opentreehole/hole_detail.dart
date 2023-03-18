@@ -530,12 +530,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await Noticing.showConfirmationDialog(
-                    context, S.of(context).are_you_sure,
-                    isConfirmDestructive: true) ==
-                true) {
-              int? result = await OpenTreeHoleRepository.getInstance()
-                  .adminDeleteHole(e.hole_id);
+            bool? hide = await Noticing.showConfirmationDialog(
+                context, "Hide or unhide the hole?",
+                confirmText: "Hide", cancelText: "Unhide");
+            if (hide != null) {
+              int? result = hide
+                  ? await OpenTreeHoleRepository.getInstance()
+                      .adminDeleteHole(e.hole_id)
+                  : await OpenTreeHoleRepository.getInstance()
+                      .adminUndeleteHole(e.hole_id);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
