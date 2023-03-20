@@ -16,10 +16,10 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/curriculum/course_group.dart';
+import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
-import 'package:dan_xi/repository/curriculum/curriculum_board_repository.dart';
+import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';

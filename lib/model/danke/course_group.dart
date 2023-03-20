@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/curriculum/course.dart';
+import 'package:dan_xi/model/danke/course.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'course_group.g.dart';
