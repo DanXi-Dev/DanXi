@@ -34,6 +34,7 @@ class OTHole {
   int? reply;
   OTFloors? floors;
   bool? hidden;
+  bool? locked;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 
@@ -51,7 +52,7 @@ class OTHole {
 
   @override
   String toString() {
-    return 'OTHole{id: $hole_id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden}';
+    return 'OTHole{id: $hole_id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden, locked: $locked}';
   }
 
   bool get is_folded =>
