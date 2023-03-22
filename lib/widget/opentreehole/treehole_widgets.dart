@@ -432,7 +432,14 @@ class OTFloorWidget extends StatelessWidget {
                         color: Colors.red,
                         text: floor.special_tag!,
                       ),
-                    ]
+                    ],
+                    if (parentHole?.hidden == true) ...[
+                      const SizedBox(width: 4),
+                      OTLeadingTag(
+                        color: Colors.red,
+                        text: S.of(context).hole_hidden,
+                      ),
+                    ],
                   ],
                 )
               ],
