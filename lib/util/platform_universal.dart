@@ -19,9 +19,11 @@ import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -127,4 +129,15 @@ class PlatformX {
   }
 
   static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode;
+
+  static Future<bool> get galleryStorageGranted async {
+    if (isAndroid) {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      if ((androidInfo.version.sdkInt ?? 0) >= 29) return true;
+      return await Permission.storage.status.isGranted;
+    } else {
+      return true;
+    }
+  }
 }
