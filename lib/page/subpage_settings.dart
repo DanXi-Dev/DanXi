@@ -219,7 +219,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/rydmike/flex_color_picker"),
     LicenseItem("material_color_generator", LICENSE_BSD_2_0_CLAUSE,
         "https://github.com/berkanaslan/material-color-generator"),
-    LicenseItem("material_color_generator", LICENSE_MIT,
+    LicenseItem("flutter_swiper_view", LICENSE_MIT,
         "https://github.com/feicien/flutter_swiper_view"),
     LicenseItem(
         "mutex", LICENSE_BSD_3_0_CLAUSE, "https://github.com/hoylen/dart-mutex")
