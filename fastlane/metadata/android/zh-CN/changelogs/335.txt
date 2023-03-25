@@ -1,0 +1,1 @@
+一些更新，这将是 1.3.x 的最后一版。更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。
