@@ -159,9 +159,8 @@ class ImageViewerPageState extends State<ImageViewerPage> {
     File image =
         await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isAndroid) {
-      PermissionStatus status = await Permission.storage.status;
-      if (!status.isGranted &&
-          !(await Permission.storage.request().isGranted)) {
+      bool hasPermission = await PlatformX.galleryStorageGranted;
+      if (!hasPermission && !(await Permission.storage.request().isGranted)) {
         // Failed to request the permission
         return;
       }
