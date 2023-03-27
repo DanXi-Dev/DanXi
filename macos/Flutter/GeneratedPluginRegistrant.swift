@@ -7,14 +7,14 @@ import Foundation
 
 import bitsdojo_window_macos
 import desktop_window
-import device_info_plus_macos
+import device_info_plus
 import flutter_js
 import in_app_review
 import path_provider_foundation
 import platform_device_id
 import platform_device_id_macos
 import screen_brightness_macos
-import share_plus_macos
+import share_plus
 import shared_preferences_foundation
 import sqflite
 import system_tray

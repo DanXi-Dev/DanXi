@@ -23,8 +23,7 @@ OTHole _$OTHoleFromJson(Map<String, dynamic> json) => OTHole(
       ..hidden = json['hidden'] as bool?
       ..locked = json['locked'] as bool?;
 
-Map<String, dynamic> _$OTHoleToJson(OTHole instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$OTHoleToJson(OTHole instance) => <String, dynamic>{
       'hole_id': instance.hole_id,
       'division_id': instance.division_id,
       'time_updated': instance.time_updated,

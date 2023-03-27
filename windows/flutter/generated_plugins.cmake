@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   platform_device_id_windows
   screen_brightness_windows
+  share_plus
   system_tray
   url_launcher_windows
 )
