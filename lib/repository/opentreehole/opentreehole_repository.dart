@@ -116,7 +116,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         () => provider.token,
         (token) => provider.token =
             SettingsProvider.getInstance().fduholeToken = token));
-    dio.interceptors.add(UserAgentInterceptor(userAgent: Constant.version));
+    dio.interceptors.add(
+        UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
   }
 
   void initializeToken() {
