@@ -680,6 +680,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<List<String>?> adminGetPunishmentHistory(int floorId) async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/floors/$floorId/punishment",
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => e as String).toList();
+  }
+
   /// Upload or update Push Notification token to server
   Future<void> updatePushNotificationToken(
       String token, String id, PushNotificationServiceType service) async {

@@ -656,7 +656,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                                               shrinkWrap: true,
                                               primary: false,
                                               children:
-                                              buildDivisionOptionsList(
+                                                  buildDivisionOptionsList(
                                                       context)));
                                       return PlatformX.isCupertino(context)
                                           ? SafeArea(
@@ -720,6 +720,27 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            List<String>? history = await OpenTreeHoleRepository.getInstance()
+                .adminGetPunishmentHistory(e.floor_id!);
+            if (history != null && mounted) {
+              StringBuffer content = StringBuffer();
+              for (int i = 0; i < history.length; i++) {
+                content.writeln(history[i]);
+                if (i < history.length - 1) {
+                  content.writeln("================");
+                }
+              }
+              Noticing.showModalNotice(context,
+                  title: S.of(context).punishment_history_of(e.floor_id ?? "?"),
+                  message: content.toString(),
+                  selectable: true);
+            }
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).show_punishment_history),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
