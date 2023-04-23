@@ -433,7 +433,11 @@ class OTFloorWidget extends StatelessWidget {
                         text: floor.special_tag!,
                       ),
                     ],
-                    if (parentHole?.hidden == true) ...[
+                    // We will only show the hidden tag if this hole is hidden
+                    // and this floor is the first floor.
+                    if (parentHole?.hidden == true &&
+                        floor.floor_id ==
+                            parentHole?.floors?.first_floor?.floor_id) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
                         color: Colors.red,
