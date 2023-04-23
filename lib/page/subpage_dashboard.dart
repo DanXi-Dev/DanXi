@@ -17,20 +17,9 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
-import 'package:dan_xi/feature/aao_notice_feature.dart';
 import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/feature/bus_feature.dart';
 import 'package:dan_xi/feature/custom_shortcut.dart';
-import 'package:dan_xi/feature/dining_hall_crowdedness_feature.dart';
-import 'package:dan_xi/feature/dorm_electricity_feature.dart';
-import 'package:dan_xi/feature/ecard_balance_feature.dart';
-import 'package:dan_xi/feature/empty_classroom_feature.dart';
-import 'package:dan_xi/feature/fudan_library_crowdedness_feature.dart';
 import 'package:dan_xi/feature/lan_connection_notification.dart';
-import 'package:dan_xi/feature/next_course_feature.dart';
-import 'package:dan_xi/feature/pe_feature.dart';
-import 'package:dan_xi/feature/qr_feature.dart';
-import 'package:dan_xi/feature/welcome_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -126,26 +115,16 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   /// Only call this when new (online) data should be loaded.
   void _rebuildFeatures() {
     checkConnection();
-    widgetMap = {
-      'welcome_feature': FeatureListItem(feature: WelcomeFeature()),
-      'next_course_feature': FeatureListItem(feature: NextCourseFeature()),
-      'divider': const Divider(),
-      'ecard_balance_feature': FeatureListItem(feature: EcardBalanceFeature()),
-      'dining_hall_crowdedness_feature':
-          FeatureListItem(feature: DiningHallCrowdednessFeature()),
-      'fudan_library_crowdedness_feature':
-          FeatureListItem(feature: FudanLibraryCrowdednessFeature()),
-      'aao_notice_feature': FeatureListItem(feature: FudanAAONoticesFeature()),
-      'empty_classroom_feature':
-          FeatureListItem(feature: EmptyClassroomFeature()),
-      // 'fudan_daily_feature': FeatureListItem(feature: FudanDailyFeature()),
-      'new_card': const SizedBox(),
-      'qr_feature': FeatureListItem(feature: QRFeature()),
-      'pe_feature': FeatureListItem(feature: PEFeature()),
-      'bus_feature': FeatureListItem(feature: BusFeature()),
-      'dorm_electricity_feature':
-          FeatureListItem(feature: DormElectricityFeature()),
-    };
+    // Get all feature builders from [featureFactory] and build them.
+    widgetMap = featureFactory.map((key, value) => MapEntry(
+        key,
+        FeatureListItem(
+          feature: value(),
+        )));
+    // Add other custom widgets, such as [Divider].
+    widgetMap.addAll({
+      Constant.FEATURE_DIVIDER: const Divider(),
+    });
   }
 
   @override
@@ -177,7 +156,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     List<Widget> currentCardChildren = [];
     for (var element in widgetSequence) {
       if (element.enabled != true) continue;
-      if (element.internalString == 'new_card') {
+      if (element.internalString == Constant.FEATURE_NEW_CARD) {
         if (currentCardChildren.isEmpty) continue;
         widgets.add(Card(
           child: Column(
@@ -185,7 +164,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
           ),
         ));
         currentCardChildren = [];
-      } else if (element.internalString == 'custom_card') {
+      } else if (element.internalString == Constant.FEATURE_CUSTOM_CARD) {
         currentCardChildren.add(FeatureListItem(
           feature:
               CustomShortcutFeature(title: element.title, link: element.link),

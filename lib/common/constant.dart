@@ -18,9 +18,12 @@
 import 'dart:io' show Platform;
 import 'dart:math';
 
+import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
+import 'package:dan_xi/page/dashboard/dashboard_reorder.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -32,7 +35,7 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Store some important constants, like app id, default color styles, etc.
+/// Store some important constants, such as app id, default color styles, etc.
 class Constant {
   /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
@@ -141,36 +144,48 @@ class Constant {
     }
   }
 
-  /// Get i18n names of all features by their representation names.
+  /// The keys of special cards that are not features, but can be added to the dashboard.
   ///
-  /// For any feature newly added, its representation name should be added here.
-  static Map<String, String> getFeatureName(BuildContext context) => {
-        'welcome_feature': S.of(context).welcome_feature,
-        'next_course_feature': S.of(context).today_course,
-        'divider': S.of(context).divider,
-        'ecard_balance_feature': S.of(context).ecard_balance,
-        'dining_hall_crowdedness_feature':
-            S.of(context).dining_hall_crowdedness,
-        'fudan_library_crowdedness_feature':
-            S.of(context).fudan_library_crowdedness,
-        'aao_notice_feature': S.of(context).fudan_aao_notices,
-        'empty_classroom_feature': S.of(context).empty_classrooms,
-        // 'fudan_daily_feature': S.of(context).fudan_daily,
-        'new_card': S.of(context).add_new_card,
-        'qr_feature': S.of(context).fudan_qr_code,
-        'pe_feature': S.of(context).pe_exercises,
-        'bus_feature': S.of(context).bus_query,
-        'dorm_electricity_feature': S.of(context).dorm_electricity,
-      };
+  /// See also:
+  /// - [DashboardCard]
+  /// - [registerFeature]
+
+  /// A divider.
+  static const FEATURE_DIVIDER = "divider";
+
+  /// Not a displayable feature, but indicates the start of a new card.
+  /// i.e. the content below this feature will be shown in a new card.
+  static const FEATURE_NEW_CARD = "new_card";
+
+  /// A custom card, allowing user to tap to jump to a web location.
+  static const FEATURE_CUSTOM_CARD = "custom_card";
+
+  /// Get i18n names of all features (included special cards, e.g. "divider" or "new_card")
+  /// by their representation names.
+  /// This is used to display the name of a feature in the settings page.
+  ///
+  /// See also:
+  /// - [DashboardReorderPage]
+  /// - [FeatureMap]
+  static Map<String, String> getFeatureName(BuildContext context) {
+    Map<String, String> names =
+        featureDisplayName.map((key, value) => MapEntry(key, value(context)));
+
+    names.addAll({
+      FEATURE_NEW_CARD: S.of(context).add_new_card,
+      FEATURE_DIVIDER: S.of(context).divider,
+    });
+    return names;
+  }
 
   /// A default dashboard card list to be shown on the initial startup.
   ///
-  /// It will be overwritten by data stored with key [SettingsProvider.KEY_DASHBOARD_WIDGETS]
+  /// It will be overwritten by data stored with key [SettingsProvider.KEY_DASHBOARD_WIDGETS].
   static List<DashboardCard> defaultDashboardCardList = [
-    DashboardCard("new_card", null, null, true),
+    DashboardCard(FEATURE_NEW_CARD, null, null, true),
     DashboardCard("welcome_feature", null, null, true),
     DashboardCard("next_course_feature", null, null, true),
-    DashboardCard("divider", null, null, true),
+    DashboardCard(FEATURE_DIVIDER, null, null, true),
     DashboardCard("ecard_balance_feature", null, null, true),
     DashboardCard("dining_hall_crowdedness_feature", null, null, true),
     DashboardCard("fudan_library_crowdedness_feature", null, null, true),
@@ -179,9 +194,7 @@ class Constant {
     DashboardCard("dorm_electricity_feature", null, null, true),
     DashboardCard("bus_feature", null, null, true),
     DashboardCard("pe_feature", null, null, true),
-    DashboardCard("new_card", null, null, true),
-    // DashboardCard("fudan_daily_feature", null, null, true),
-    // DashboardCard("new_card", null, null, true),
+    DashboardCard(FEATURE_NEW_CARD, null, null, true),
     DashboardCard("qr_feature", null, null, true),
   ];
 
@@ -384,10 +397,6 @@ class Constant {
     'grey'
   ];
 
-  /// Get a random color string from [TAG_COLOR_LIST].
-  static String get randomColor =>
-      TAG_COLOR_LIST[Random().nextInt(TAG_COLOR_LIST.length)];
-
   /// Get the corresponding [Color] from a color string.
   static MaterialColor getColorFromString(String? color) {
     switch (color) {
@@ -484,6 +493,8 @@ class Constant {
   static const WeekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 }
 
+enum Language { SIMPLE_CHINESE, ENGLISH, JAPANESE, NONE }
+
 /// A list of Fudan campus.
 enum Campus {
   HANDAN_CAMPUS,
@@ -492,8 +503,6 @@ enum Campus {
   ZHANGJIANG_CAMPUS,
   NONE
 }
-
-enum Language { SIMPLE_CHINESE, ENGLISH, JAPANESE, NONE }
 
 extension CampusEx on Campus? {
   static const _CAMPUS_NAME = ["邯郸", "枫林", "江湾", "张江"];
@@ -529,19 +538,19 @@ extension CampusEx on Campus? {
   }
 
   /// Get the i18n name of this campus for display.
-  String displayTitle(BuildContext? context) {
+  String displayTitle(BuildContext context) {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
-        return S.of(context!).handan_campus;
+        return S.of(context).handan_campus;
       case Campus.FENGLIN_CAMPUS:
-        return S.of(context!).fenglin_campus;
+        return S.of(context).fenglin_campus;
       case Campus.JIANGWAN_CAMPUS:
-        return S.of(context!).jiangwan_campus;
+        return S.of(context).jiangwan_campus;
       case Campus.ZHANGJIANG_CAMPUS:
-        return S.of(context!).zhangjiang_campus;
+        return S.of(context).zhangjiang_campus;
       // Select area when it's none
       case Campus.NONE:
-        return S.of(context!).choose_area;
+        return S.of(context).choose_area;
       case null:
         return "?";
     }

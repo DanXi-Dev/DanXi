@@ -29,6 +29,7 @@ import 'package:dan_xi/feature/next_course_feature.dart';
 import 'package:dan_xi/feature/pe_feature.dart';
 import 'package:dan_xi/feature/qr_feature.dart';
 import 'package:dan_xi/feature/welcome_feature.dart';
+import 'package:dan_xi/generated/l10n.dart';
 
 /// Save information of every feature.
 ///
@@ -40,16 +41,31 @@ class FeatureMap {
   ///
   /// Should be invoked only once at startup.
   static registerAllFeatures() {
-    registerFeature(BusFeature());
-    registerFeature(DiningHallCrowdednessFeature());
-    registerFeature(DormElectricityFeature());
-    registerFeature(EcardBalanceFeature());
-    registerFeature(EmptyClassroomFeature());
-    registerFeature(FudanAAONoticesFeature());
-    registerFeature(FudanLibraryCrowdednessFeature());
-    registerFeature(NextCourseFeature());
-    registerFeature(PEFeature());
-    registerFeature(QRFeature());
-    registerFeature(WelcomeFeature());
+    registerFeature(
+        "bus_feature", () => BusFeature(), (cxt) => S.of(cxt).bus_query);
+    registerFeature(
+        "dining_hall_crowdedness_feature",
+        () => DiningHallCrowdednessFeature(),
+        (cxt) => S.of(cxt).dining_hall_crowdedness);
+    registerFeature("dorm_electricity_feature", () => DormElectricityFeature(),
+        (cxt) => S.of(cxt).dorm_electricity);
+    registerFeature("ecard_balance_feature", () => EcardBalanceFeature(),
+        (cxt) => S.of(cxt).ecard_balance);
+    registerFeature("empty_classroom_feature", () => EmptyClassroomFeature(),
+        (cxt) => S.of(cxt).empty_classrooms);
+    registerFeature(
+        "fudan_library_crowdedness_feature",
+        () => FudanLibraryCrowdednessFeature(),
+        (cxt) => S.of(cxt).fudan_library_crowdedness);
+    registerFeature("next_course_feature", () => NextCourseFeature(),
+        (cxt) => S.of(cxt).today_course);
+    registerFeature(
+        "pe_feature", () => PEFeature(), (cxt) => S.of(cxt).pe_exercises);
+    registerFeature(
+        "qr_feature", () => QRFeature(), (cxt) => S.of(cxt).fudan_qr_code);
+    registerFeature("welcome_feature", () => WelcomeFeature(),
+        (cxt) => S.of(cxt).welcome_feature);
+    registerFeature("aao_notice_feature", () => FudanAAONoticesFeature(),
+        (cxt) => S.of(cxt).fudan_aao_notices);
   }
 }

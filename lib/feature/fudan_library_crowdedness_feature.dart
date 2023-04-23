@@ -21,10 +21,9 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fdu/library_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:dan_xi/widget/feature_item/feature_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class FudanLibraryCrowdednessFeature extends Feature {
   @override
@@ -98,10 +97,7 @@ class FudanLibraryCrowdednessFeature extends Feature {
   @override
   Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
-      return ScaleTransform(
-        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
-        child: PlatformCircularProgressIndicator(),
-      );
+      return const FeatureProgressIndicator();
     }
     return null;
   }

@@ -16,22 +16,24 @@
  */
 
 import 'package:dan_xi/feature/feature_map.dart';
-import 'package:dan_xi/page/subpage_dashboard.dart';
+import 'package:dan_xi/feature/lan_connection_notification.dart';
+import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// A Feature is a functional item shown on the dashboard, with which user interacts via tapping.
 ///
 ///
-/// ## Note: A Checklist After Creating a New [Feature] (For a Notification, you don't need to do these!)
+/// ## Note: A Checklist After Creating a New [Feature]
+/// (For a Notification (see [LanConnectionNotification] as an example), you don't need to do any of these!)
 ///
 /// 1. Register it in [FeatureMap].
-/// 2. Add it to [HomeSubpageState.widgetMap] in [HomeSubpage],
-///   whose initialization you will find at [HomeSubpageState._rebuildFeatures].
-/// 3. Insert it at a appropriate position to [Constant.defaultDashboardCardList].
-/// 4. Also add it to [Constant.getFeatureName].
+/// 2. Insert it at a appropriate position to [Constant.defaultDashboardCardList].
+///
+/// See also:
+/// - [NotificationProvider], a provider to hold a list of notifications.
 abstract class Feature {
-  /// Request FeatureContainer to update the content text/icon since they're changed
+  /// Request [FeatureContainer] to update the widget status since they're changed.
   @nonVirtual
   notifyUpdate() => container.doUpdate();
 
