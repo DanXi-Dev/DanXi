@@ -5,7 +5,8 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   desktop_window
-  flutter_js
+        file_selector_windows
+        flutter_js
   permission_handler_windows
   platform_device_id_windows
   screen_brightness_windows
