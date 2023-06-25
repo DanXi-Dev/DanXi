@@ -65,10 +65,10 @@ class QRDialogState extends State<QRDialog> {
                 future: LazyFuture.pack(QRCodeRepository.getInstance()
                     .getQRCode(widget.personInfo)),
                 successBuilder: (_, snapshot) {
-                  return QrImage(
+                  return QrImageView(
                       data: snapshot.data!,
                       size: 200.0,
-                      foregroundColor: Colors.black,
+                      // foregroundColor: Colors.black,
                       backgroundColor: Colors.white);
                 },
                 loadingBuilder: Text(S.of(context).loading_qr_code),
