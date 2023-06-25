@@ -27,7 +27,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/curriculum/course_list_widget.dart';
+import 'package:dan_xi/page/danke/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
