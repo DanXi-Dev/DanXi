@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:flutter/cupertino.dart';
@@ -62,7 +63,7 @@ class BBSTagsContainerState extends State<BBSTagsContainer> {
                     (e) => Padding(
                         padding: const EdgeInsets.only(top: 16, right: 12),
                         child: RoundChip(
-                            label: e.name,
+                            label: Constant.withZwb(e.name),
                             color: e.color,
                             onTap: () => widget.onTap?.call(e))),
                   )

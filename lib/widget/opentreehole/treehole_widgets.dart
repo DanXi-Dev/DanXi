@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -105,7 +106,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
         children: [
           RoundChip(
             onTap: () => onTap(element.name),
-            label: element.name,
+            label: Constant.withZwb(element.name),
             color: useAccessibilityColoring
                 ? Theme.of(context).textTheme.bodyLarge!.color
                 : element.color,

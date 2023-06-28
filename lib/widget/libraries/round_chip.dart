@@ -53,6 +53,7 @@ class RoundChip extends StatelessWidget {
                 label ?? "",
                 style: TextStyle(
                     fontSize: 14,
+                    leadingDistribution: TextLeadingDistribution.even,
                     color:
                         PlatformX.isDarkMode ? Colors.white : effectiveColor),
               ),
