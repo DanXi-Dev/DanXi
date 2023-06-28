@@ -57,8 +57,8 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     return temp['data']['token'];
   }
 
-  String encryptDES(String pwd) =>
-      js.evaluate(DES_JS.replaceFirst("PASSWORD", pwd));
+  String encryptDES(String pwd) => js.evaluate(
+      DES_JS.replaceFirst("PASSWORD", base64Encode(utf8.encode(pwd))));
 
   Future<void> _requestLogin(
       String id, String pwd, String yzm, String token) async {
@@ -1068,5 +1068,5 @@ function w(D) {
     }
     return G
 }
-o("PASSWORD")
+o(atob("PASSWORD"))
 ''';
