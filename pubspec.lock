@@ -114,7 +114,7 @@ packages:
     description:
       path: bitsdojo_window_windows
       ref: master
-      resolved-ref: "6595419747e0ccdbfee5158ed133b386cd641d0a"
+      resolved-ref: "6360a4010afe1f2bd381b2a6844a62e68fdad463"
       url: "https://github.com/DartGit-dev/bitsdojo_window.git"
     source: git
     version: "0.2.0"
@@ -1745,7 +1745,6 @@ packages:
     version: "1.3.2"
   uni_links:
     dependency: "direct main"
-    description:
       name: uni_links
       sha256: "051098acfc9e26a9fde03b487bef5d3d228ca8f67693480c6f33fd4fbb8e2b6e"
       url: "https://pub.dev"
@@ -1768,8 +1767,6 @@ packages:
     source: hosted
     version: "0.1.0"
   url_launcher:
-    dependency: "direct main"
-    description:
       name: url_launcher
       sha256: "781bd58a1eb16069412365c98597726cd8810ae27435f04b3b4d3a470bacd61e"
       url: "https://pub.dev"
