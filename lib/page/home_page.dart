@@ -58,6 +58,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
@@ -98,6 +99,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static final StateStreamListener<CredentialsInvalidException>
       _credentialsInvalidSubscription = StateStreamListener();
 
+  /// Listener to Android Activity intents.
+  static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
+      StateStreamListener();
+
   /// If we need to send the QR code to iWatch now.
   ///
   /// When notified [watchActivated], we should send it after [StateProvider.personInfo] is loaded.
@@ -137,6 +142,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _captchaSubscription.cancel();
+    _receivedIntentSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
   }
@@ -315,6 +321,26 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     */
   }
 
+  Future<void> _initReceiveIntents() async {
+    Future<void> dealWithIntent(ri.Intent? intent) async {
+      if (intent?.isNotNull == true) {
+        if (intent?.extra?.containsKey("key_message") == true) {
+          final keyMessage = intent!.extra!["key_message"];
+          final content = keyMessage["content"] as String;
+          final payload = jsonDecode(Uri.decodeComponent(content));
+          await onTapNotification(context, payload['code'], payload['data']);
+        }
+      }
+    }
+
+    ri.Intent? intent = await ri.ReceiveIntent.getInitialIntent();
+    await dealWithIntent(intent);
+    _receivedIntentSubscription.bindOnlyInvalid(
+        ri.ReceiveIntent.receivedIntentStream.listen((ri.Intent? intent) {
+      dealWithIntent(intent);
+    }), hashCode);
+  }
+
   Future<void> onTapNotification(
     BuildContext context,
     String? code,
@@ -351,6 +377,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .on<CredentialsInvalidException>()
             .listen((_) => _dealWithCredentialsInvalidException()),
         hashCode);
+    _initReceiveIntents();
 
     // Load the latest version, announcement & the start date of the following term.
     _loadDataFromGithubRepo();

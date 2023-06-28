@@ -95,6 +95,9 @@ dependencies:
   flutter_swiper_view: ^1.1.8
   mutex: ^3.0.1
   device_info_plus: ^9.0.2
+  receive_intent:
+    git:
+      url: https://github.com/w568w/receive_intent.git
 
 
 dependency_overrides:
