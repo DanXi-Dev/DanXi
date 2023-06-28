@@ -244,6 +244,17 @@ class Constant {
     return '\u00A5$num';
   }
 
+  /// An Unicode ZERO WIDTH SPACE wrapper.
+  ///
+  /// We mainly use it to relieve vertical alignment issues.
+  /// See https://github.com/flutter/flutter/issues/128019 for details.
+  ///
+  /// Remove this method and its usage if the issue has been resolved.
+  static String withZwb(String? originalStr) {
+    if (originalStr == null) return "";
+    return '$originalStr\u200b';
+  }
+
   /// Get the link to update the application.
   static String updateUrl() {
     // Don't use GitHub URL, since access is not guaranteed in China.
