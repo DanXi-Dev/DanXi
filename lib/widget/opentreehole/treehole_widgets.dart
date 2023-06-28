@@ -138,8 +138,12 @@ class OTHoleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Linkify postContentWidget = LinkifyX(
-      text: renderText(postElement.floors!.first_floor!.filteredContent!,
-          S.of(context).image_tag, S.of(context).formula),
+      text: renderText(
+          // if the floor has been folded, do not show the content directly!
+          postElement.floors!.first_floor!.foldReason ??
+              postElement.floors!.first_floor!.filteredContent!,
+          S.of(context).image_tag,
+          S.of(context).formula),
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -263,7 +267,9 @@ class OTHoleWidget extends StatelessWidget {
 
   Widget _buildCommentView(BuildContext context, OTHole postElement) {
     final String lastReplyContent = renderText(
-        postElement.floors!.last_floor!.filteredContent!,
+        // if the floor has been folded, do not show the content directly!
+        postElement.floors!.last_floor!.foldReason ??
+            postElement.floors!.last_floor!.filteredContent!,
         S.of(context).image_tag,
         S.of(context).formula);
     return ListTile(
