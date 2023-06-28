@@ -34,7 +34,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       "https://my.fudan.edu.cn/simple_list/stqk";
   static const String SCORE_DETAIL_URL =
       "https://my.fudan.edu.cn/list/bks_xx_cj";
-  static const String CARD_DETAIL_URL = "https://my.fudan.edu.cn/list/ykt_xx";
+  static const String CARD_DETAIL_URL =
+      "https://my.fudan.edu.cn/data_tables/ykt_xx.json";
 
   DataCenterRepository._();
 
@@ -132,12 +133,10 @@ class DataCenterRepository extends BaseRepositoryWithDio {
           dio, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
 
   Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
-    Response<String> r = await dio.get(CARD_DETAIL_URL);
-    BeautifulSoup soup = BeautifulSoup(r.data.toString());
-    dom.Element tableBody = soup.find("tbody")!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => CardDetailInfo.fromDataCenterHtml(e))
+    Response<Map<String, dynamic>> r = await dio.post(CARD_DETAIL_URL);
+    return r.data?["data"]
+        .map<CardDetailInfo>(
+            (e) => CardDetailInfo.fromList(List<String>.from(e)))
         .toList();
   }
 
@@ -158,15 +157,14 @@ class CardDetailInfo {
   CardDetailInfo(this.id, this.name, this.status, this.permission,
       this.expireDate, this.balance);
 
-  factory CardDetailInfo.fromDataCenterHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
+  factory CardDetailInfo.fromList(List<String> elements) {
     return CardDetailInfo(
-        elements[0].text.trim(),
-        elements[1].text.trim(),
-        elements[2].text.trim(),
-        elements[3].text.trim(),
-        elements[4].text.trim(),
-        elements[5].text.trim());
+        elements[0].trim(),
+        elements[1].trim(),
+        elements[2].trim(),
+        elements[3].trim(),
+        elements[4].trim(),
+        elements[5].trim());
   }
 }
 
