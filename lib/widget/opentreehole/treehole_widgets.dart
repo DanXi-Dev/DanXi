@@ -655,45 +655,47 @@ class OTFloorMentionWidget extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(
-                      onPressed: () async {
-                        // Note how this code use [cxt] for some context but [context] for others.
-                        // This is to prevent looking up deactivated context after [pop].
-                        Navigator.pop(cxt);
-                        // If this floor is directly in the hole
-                        if (inThatFloorPage &&
-                            pagedListViewController != null) {
-                          // Scroll to the corresponding post
-                          await PagedListViewHelper.scrollToItem(
-                              context,
-                              pagedListViewController,
-                              floor,
-                              ScrollDirection.UP);
-                          return;
-                        }
+                    // Only show "locate" button if the floor is valid
+                    if (floor.valid)
+                      TextButton(
+                        onPressed: () async {
+                          // Note how this code use [cxt] for some context but [context] for others.
+                          // This is to prevent looking up deactivated context after [pop].
+                          Navigator.pop(cxt);
+                          // If this floor is directly in the hole
+                          if (inThatFloorPage &&
+                              pagedListViewController != null) {
+                            // Scroll to the corresponding post
+                            await PagedListViewHelper.scrollToItem(
+                                context,
+                                pagedListViewController,
+                                floor,
+                                ScrollDirection.UP);
+                            return;
+                          }
 
-                        // If this floor is in another hole
-                        ProgressFuture progressDialog = showProgressDialog(
-                            loadingText: S.of(context).loading,
-                            context: context);
-                        try {
-                          OTHole? hole =
-                              await OpenTreeHoleRepository.getInstance()
-                                  .loadSpecificHole(floor.hole_id!);
+                          // If this floor is in another hole
+                          ProgressFuture progressDialog = showProgressDialog(
+                              loadingText: S.of(context).loading,
+                              context: context);
+                          try {
+                            OTHole? hole =
+                                await OpenTreeHoleRepository.getInstance()
+                                    .loadSpecificHole(floor.hole_id!);
 
-                          smartNavigatorPush(context, "/bbs/postDetail",
-                              arguments: {
-                                "post": await prefetchAllFloors(hole!),
-                                "locate": floor,
-                              });
-                        } catch (e, st) {
-                          Noticing.showErrorDialog(context, e, trace: st);
-                        } finally {
-                          progressDialog.dismiss(showAnim: false);
-                        }
-                      },
-                      child: Text(S.of(cxt).jump_to_hole),
-                    ),
+                            smartNavigatorPush(context, "/bbs/postDetail",
+                                arguments: {
+                                  "post": await prefetchAllFloors(hole!),
+                                  "locate": floor,
+                                });
+                          } catch (e, st) {
+                            Noticing.showErrorDialog(context, e, trace: st);
+                          } finally {
+                            progressDialog.dismiss(showAnim: false);
+                          }
+                        },
+                        child: Text(S.of(cxt).jump_to_hole),
+                      ),
                     TextButton(
                       child: Text(S.of(cxt).ok),
                       onPressed: () {
@@ -922,16 +924,15 @@ class OTMessageItem extends StatefulWidget {
     await OpenTreeHoleRepository.getInstance().modifyMessage(message);
   }
 
-  static void dispMessageDetailBasedOnGuessedDataType(
-      BuildContext context, String? code, Map<String, dynamic>? data,
-      [int? id]) async {
+  static void dispatchMessageByCode(BuildContext context, String? code,
+      Map<String, dynamic>? data, int? id, String? description) async {
     try {
       switch (code) {
         case 'mention':
         case 'favorite':
         case 'modify':
         case 'reply':
-          // data should be [OTFloor]
+          // data should be an [OTFloor].
           final floor = OTFloor.fromJson(data!);
           if (floor.floor_id == null) return;
           if (await OTFloorMentionWidget.showFloorDetail(context, floor) ==
@@ -956,10 +957,19 @@ class OTMessageItem extends StatefulWidget {
             markMessageAsRead(OTMessage(id, null, null, null, true, null));
           }
           break;
+        case 'mail':
+          final floor = OTFloor.special(
+              S.of(context).forum_message, description ?? "null");
+
+          if (await OTFloorMentionWidget.showFloorDetail(context, floor) ==
+                  true &&
+              id != null) {
+            markMessageAsRead(OTMessage(id, null, null, null, true, null));
+          }
+          break;
       }
     } catch (ignored) {
       // TODO: Support Other Types
-      return;
     }
   }
 
@@ -998,8 +1008,8 @@ class OTMessageItemState extends State<OTMessageItem> {
           onTap: () {
             OTMessageItem.markMessageAsRead(message)
                 .then((value) => setState(() {}));
-            OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
-                context, message.code, message.data, message.message_id);
+            OTMessageItem.dispatchMessageByCode(context, message.code,
+                message.data, message.message_id, message.description);
           }),
     );
   }

@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -134,6 +135,25 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
+  Future<void> sendMessage() async {
+    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    String? message = await Noticing.showInputDialog(context, "Input Message");
+    if (!mounted) return;
+    String? ids = await Noticing.showInputDialog(context, "Input Id List",
+        hintText: "e.g. 123 or 123,456");
+    if ((message ?? "").isEmpty || (ids ?? "").isEmpty) return;
+
+    final idList = (jsonDecode("[$ids]") as List<dynamic>)
+        .map<int>((e) => e as int)
+        .toList(growable: false);
+    int? result = await OpenTreeHoleRepository.getInstance()
+        .adminSendMessage(message!, idList);
+    if (result != null && result < 300 && mounted) {
+      Noticing.showModalNotice(context,
+          message: S.of(context).operation_successful);
+    }
+  }
+
   Future<void> setUserAgent() async {
     String? ua = await Noticing.showInputDialog(context, "Input user agent");
     if (ua == null || !mounted) return;
@@ -162,6 +182,10 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                 PlatformElevatedButton(
                   onPressed: changePassword,
                   child: const Text("Password Change [Only ADMIN]"),
+                ),
+                PlatformElevatedButton(
+                  onPressed: sendMessage,
+                  child: const Text("Send Message [Only ADMIN]"),
                 ),
                 PlatformElevatedButton(
                   onPressed: setUserAgent,

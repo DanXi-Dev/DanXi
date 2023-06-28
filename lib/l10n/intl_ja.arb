@@ -469,5 +469,6 @@
   "you_need_login": "「ログイン」をクリックすると、FDUHoleにログインします。",
   "your_gpa": "あなたの成績点",
   "your_gpa_subtitle": "総学点{credits}、ランキングは{rank}位です。詳細はこちらをご覧ください",
-  "zhangjiang_campus": "張江キャンパス"
+  "zhangjiang_campus": "張江キャンパス",
+  "forum_message": "メッセージ"
 }

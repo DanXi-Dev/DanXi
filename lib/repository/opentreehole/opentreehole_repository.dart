@@ -674,6 +674,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  Future<int?> adminSendMessage(String message, List<int> ids) async {
+    return (await dio.post("$_BASE_URL/messages",
+            data: {"description": message, "recipients": ids},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
+  }
+
   Future<int?> adminSetReportDealt(int reportId) async {
     return (await dio.delete("$_BASE_URL/reports/$reportId",
             options: Options(headers: _tokenHeader)))

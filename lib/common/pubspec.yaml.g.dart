@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'335'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1682143130;
+const int timestamp = 1687923491;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -115,26 +115,30 @@ const Map<String, Object> dependencies = <String, Object>{
   'provider': r'^6.0.5',
   'event_bus': r'^2.0.0',
   'flutter_platform_widgets': r'^3.0.0',
-  'share_plus': r'^6.3.1',
+  'share_plus': r'^7.0.2',
   'path_provider': r'^2.0.9',
   'screen_brightness': r'^0.2.1',
-  'flutter_email_sender': r'^5.1.0',
+  'flutter_email_sender': r'^6.0.0',
   'auto_size_text': r'^3.0.0',
-  'ical': r'^0.2.2',
+  'ical': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/dartclub/ical.git',
+      'ref': r'main',
+    },
+  },
   'url_launcher': r'^6.1.7',
   'desktop_window': r'^0.4.0',
-  'intl': r'^0.17.0',
   'http': r'^0.13.4',
   'dio': r'^4.0.6',
   'shared_preferences': r'^2.0.15',
   'flutter_phoenix': r'^1.0.0',
   'asn1lib': r'^1.1.0',
-  'image_picker': r'^0.8.5',
+  'image_picker': r'^1.0.0',
   'clipboard': r'^0.1.3',
   'flutter_inappwebview': r'^5.3.2',
   'permission_handler': r'^10.2.0',
   'in_app_review': r'^2.0.4',
-  'flutter_linkify': r'^5.0.2',
+  'flutter_linkify': r'^6.0.0',
   'linkify': r'^4.0.0',
   'open_file': <String, Object>{
     'git': <String, Object>{
@@ -151,37 +155,43 @@ const Map<String, Object> dependencies = <String, Object>{
           r'https://github.com/singularity-s0/flutter_markdown_selectable.git',
     },
   },
-  'markdown': r'^6.0.1',
+  'markdown': r'^6.0.0',
   'system_tray': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/antler119/system_tray.git',
       'ref': r'main',
     },
   },
-  'bitsdojo_window': r'^0.1.5',
-  'win32': r'^3.1.3',
-  'file_picker': r'^5.2.6',
+  'bitsdojo_window': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
+      'path': r'bitsdojo_window',
+      'ref': r'master',
+    },
+  },
+  'win32': r'^5.0.2',
+  'file_picker': r'^5.3.2',
   'cached_network_image': r'^3.2.1',
   'flutter_typeahead': r'^4.3.3',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^2.0.1',
-  'flutter_js': r'^0.6.0',
-  'flutter_math_fork': r'^0.6.2',
+  'flutter_js': r'^0.7.0',
+  'flutter_math_fork': r'^0.7.1',
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.6',
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.2',
   'lunar': r'^1.2.20',
   'flutter_fgbg': r'^0.2.0',
-  'lazy_load_indexed_stack': r'^0.1.3',
+  'lazy_load_indexed_stack': r'^1.0.0',
   'js': r'^0.6.5',
   'nil': r'^1.1.1',
-  'flex_color_picker': r'^3.1.0',
+  'flex_color_picker': r'^3.2.0',
   'material_color_generator': r'^1.1.0',
   'flutter_swiper_view': r'^1.1.8',
   'mutex': r'^3.0.1',
-  'device_info_plus': r'^8.1.0',
+  'device_info_plus': r'^9.0.2',
 };
 
 /// Developer dependencies
@@ -196,6 +206,7 @@ const Map<String, Object> devDependencies = <String, Object>{
 
 /// Dependency overrides
 const Map<String, Object> dependencyOverrides = <String, Object>{
+  'intl': r'^0.18.1',
   'fluttertoast': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/ponnamkarthik/FlutterToast.git',
@@ -205,6 +216,34 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
   'linkify': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/singularity-s0/linkify.git',
+      'ref': r'master',
+    },
+  },
+  'bitsdojo_window_platform_interface': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
+      'path': r'bitsdojo_window_platform_interface',
+      'ref': r'master',
+    },
+  },
+  'bitsdojo_window_windows': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
+      'path': r'bitsdojo_window_windows',
+      'ref': r'master',
+    },
+  },
+  'bitsdojo_window_macos': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
+      'path': r'bitsdojo_window_macos',
+      'ref': r'master',
+    },
+  },
+  'bitsdojo_window_linux': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
+      'path': r'bitsdojo_window_linux',
       'ref': r'master',
     },
   },

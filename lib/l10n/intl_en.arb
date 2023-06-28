@@ -477,5 +477,6 @@
   "you_need_login": "You need log in now.",
   "your_gpa": "Your GPA",
   "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}, Tap to View Details",
-  "zhangjiang_campus": "Zhangjiang"
+  "zhangjiang_campus": "Zhangjiang",
+  "forum_message": "Message"
 }

@@ -56,6 +56,9 @@ class OTFloor {
 
   factory OTFloor.onlyId(int floorId) => OTFloor.special('', '', null, floorId);
 
+  /// Check whether the object has a valid position (i.e. valid floor and hole id).
+  bool get valid => (floor_id ?? -1) > 0 && (hole_id ?? -1) > 0;
+
   @override
   bool operator ==(Object other) =>
       (other is OTFloor) && floor_id == other.floor_id;
@@ -88,5 +91,5 @@ class OTFloor {
   }
 
   @override
-  int get hashCode => floor_id!;
+  int get hashCode => floor_id ?? 0;
 }

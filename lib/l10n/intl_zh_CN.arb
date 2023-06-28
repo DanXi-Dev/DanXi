@@ -469,5 +469,6 @@
   "you_need_login": "点击[登录]以登录到 FDUHole。",
   "your_gpa": "你的绩点",
   "your_gpa_subtitle": "总学分数{credits}，绩点排名第{rank}名，点击查看详情",
-  "zhangjiang_campus": "张江校区"
+  "zhangjiang_campus": "张江校区",
+  "forum_message": "站内信"
 }

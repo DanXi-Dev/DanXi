@@ -25,6 +25,7 @@ part 'message.g.dart';
 class OTMessage {
   int? message_id;
   String? message;
+  String? description;
   String? code;
   String? time_created;
   bool? has_read;
