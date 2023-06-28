@@ -30,7 +30,7 @@ class Watermark {
       overlayEntry!.remove();
     }
 
-    OverlayState? overlayState = Overlay.of(context);
+    OverlayState? overlayState = Overlay.of(context, rootOverlay: true);
 
     overlayEntry = OverlayEntry(
         builder: (context) => FullScreenWatermark(
