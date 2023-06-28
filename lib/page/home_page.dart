@@ -326,7 +326,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     smartNavigatorPush(context, '/bbs/messages',
         forcePushOnMainNavigator: true);
-    //OTMessageItem.dispMessageDetailBasedOnGuessedDataType(context, code, data);
   }
 
   @override
