@@ -28,8 +28,8 @@ import 'package:dan_xi/util/js/js.dart'
     if (dart.library.js) 'package:dan_xi/util/js/js_web.dart' as js;
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   static const String TIME_TABLE_UG_URL =
@@ -124,7 +124,9 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   }
 
   TimeTable loadTimeTableLocally() {
-    SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
+    // FIXME: Do not read this should-be-private field everywhere!
+    XSharedPreferences preferences =
+        SettingsProvider.getInstance().preferences!;
     if (preferences.containsKey(TimeTableRepository.KEY_TIMETABLE_CACHE)) {
       return TimeTable.fromJson(jsonDecode(
           preferences.getString(TimeTableRepository.KEY_TIMETABLE_CACHE)!));

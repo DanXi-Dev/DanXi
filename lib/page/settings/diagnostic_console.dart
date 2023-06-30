@@ -104,7 +104,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
         .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
 
     _console.writeln("Everything we stored in the local device:");
-    var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
+    var allKeys = await context.read<SettingsProvider>().preferences?.getKeys();
     if (allKeys != null) {
       for (var key in allKeys) {
         // Skip some keys
@@ -112,7 +112,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
         _console.writeln("Key: $key");
         _console.writeln(
-            "Value: ${context.read<SettingsProvider>().preferences?.get(key)}");
+            "Value: ${context.read<SettingsProvider>().preferences?.getString(key)}");
       }
     } else {
       _console.writeln("Nothing!");
