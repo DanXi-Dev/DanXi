@@ -23,10 +23,10 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -132,8 +132,8 @@ class CustomInAppBrowser extends InAppBrowser {
       // Ensure requestReview is called only after the user used the app for a while
       // And ensure that the API is not called too frequently.
       // TODO: Any better ways to implement this?
-      final SharedPreferences preferences =
-          await SharedPreferences.getInstance();
+      final XSharedPreferences preferences =
+          await XSharedPreferences.getInstance();
       if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
           preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
         if (Random().nextDouble() > 0.997) inAppReview.requestReview();

@@ -23,8 +23,8 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementRepository {
   static const KEY_SEEN_ANNOUNCEMENT = "seen_announcement";
@@ -53,7 +53,7 @@ class AnnouncementRepository {
   Future<Announcement?> getLastNewAnnouncement() async {
     Announcement? announcement = getLastAnnouncement();
     if (announcement == null) return null;
-    SharedPreferences pre = await SharedPreferences.getInstance();
+    XSharedPreferences pre = await XSharedPreferences.getInstance();
     List<String>? list = [];
     if (pre.containsKey(KEY_SEEN_ANNOUNCEMENT)) {
       list = pre.getStringList(KEY_SEEN_ANNOUNCEMENT)!;

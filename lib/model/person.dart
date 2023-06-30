@@ -16,8 +16,8 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum UserGroup {
   /// Not logged in
@@ -68,7 +68,7 @@ class PersonInfo {
   }
 
   /// Verify if we have valid [PersonInfo] data stored in the [preferences].
-  static bool verifySharedPreferences(SharedPreferences preferences) {
+  static bool verifySharedPreferences(XSharedPreferences preferences) {
     return preferences.containsKey("id") &&
         preferences.containsKey("password") &&
         preferences.containsKey("name") &&
@@ -77,7 +77,7 @@ class PersonInfo {
         preferences.getString("name") != null;
   }
 
-  factory PersonInfo.fromSharedPreferences(SharedPreferences preferences) {
+  factory PersonInfo.fromSharedPreferences(XSharedPreferences preferences) {
     return PersonInfo(
         preferences.getString("id"),
         preferences.getString("password"),
@@ -90,7 +90,7 @@ class PersonInfo {
             : UserGroup.FUDAN_UNDERGRADUATE_STUDENT);
   }
 
-  Future<void> saveToSharedPreferences(SharedPreferences preferences) async {
+  Future<void> saveToSharedPreferences(XSharedPreferences preferences) async {
     await preferences.setString("id", id!);
     await preferences.setString("password", password!);
     await preferences.setString("name", name!);
@@ -98,7 +98,7 @@ class PersonInfo {
   }
 
   static Future<void> removeFromSharedPreferences(
-      SharedPreferences preferences) async {
+      XSharedPreferences preferences) async {
     const fieldString = ["id", "password", "name", "user_group"];
     for (var element in fieldString) {
       if (preferences.containsKey(element)) await preferences.remove(element);
