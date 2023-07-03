@@ -57,19 +57,19 @@ class PlatformX {
       deviceId = await PlatformDeviceId.getDeviceId;
     } catch (_) {}
     if (PlatformX.isAndroid) {
-      if (deviceId == null) {
+      if (deviceId?.isNotEmpty == false) {
         try {
-          deviceId = await DeviceIdentity.androidId;
+          deviceId ??= await DeviceIdentity.androidId;
         } catch (_) {}
       }
-      if (deviceId == null) {
+      if (deviceId?.isNotEmpty == false) {
         try {
-          deviceId = await DeviceIdentity.oaid;
+          deviceId ??= await DeviceIdentity.oaid;
         } catch (_) {}
       }
-      if (deviceId == null) {
+      if (deviceId?.isNotEmpty == false) {
         try {
-          deviceId = await DeviceIdentity.ua;
+          deviceId ??= await DeviceIdentity.ua;
         } catch (_) {}
       }
     }
