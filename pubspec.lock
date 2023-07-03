@@ -318,6 +318,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.0"
+  device_identity:
+    dependency: "direct main"
+    description:
+      name: device_identity
+      sha256: abc4834cb07a1b5f4cecba04a05839b13a45d5ae5c4cc40baa2ae12882339d03
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   device_info:
     dependency: transitive
     description:
