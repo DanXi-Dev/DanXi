@@ -76,8 +76,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       } else {
         provider.token = SettingsProvider.getInstance().fduholeToken;
       }
-      await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     }
+    await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     clearCache();
     SettingsProvider.getInstance().deleteAllFduholeData();
   }
