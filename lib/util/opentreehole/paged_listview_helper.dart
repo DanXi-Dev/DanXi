@@ -49,8 +49,8 @@ class PagedListViewHelper {
       StopScrollJudge? stopScrollJudge}) async {
     stopScrollJudge ??= _defaultStopDecider(
         pagedListViewController, direction, firstPageItemCount);
-
     final scrollHeight = ViewportUtils.getViewportHeight(context);
+    var offset = pagedListViewController.getScrollController()?.offset;
     while (!(await pagedListViewController.scrollToItem(objectItem))) {
       if (stopScrollJudge.call()) {
         return false;
@@ -59,6 +59,12 @@ class PagedListViewHelper {
           direction == ScrollDirection.UP ? -scrollHeight : scrollHeight,
           const Duration(milliseconds: 1),
           Curves.linear);
+      if (offset == pagedListViewController.getScrollController()?.offset) {
+        // FIXME: We are too fast, wait for the scroll to finish.
+        // We need a better way to do this!
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+      offset = pagedListViewController.getScrollController()?.offset;
     }
     return true;
   }
