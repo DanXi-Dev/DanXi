@@ -104,9 +104,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
       StateStreamListener();
 
-  /// Listener to the url scheme.
-  static final StateStreamListener<Uri?> _receivedUriSchemeSubscription =
-      StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
   ///
@@ -326,13 +323,20 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     */
   }
 
-  /// Deal with url_scheme
+  /// Deal with url_scheme.
   /// https://pub.dev/packages/uni_links
   Future<void> _initUniLinks() async {
-    Future<void> dealWithUri(Uri? initialUri) async {
-      if (initialUri != null) {
-        initialUri.pathSegments.any((element) => element == "bbs");
-        // after user is logged in, we should redirect to the bbs page
+    Future<void> dealWithUri(Uri initialUri) async {
+      print("initialUri dealing");
+      print("initialUriSegments: ${initialUri.pathSegments}");
+      if (initialUri.pathSegments.contains("hole")) {
+        await jumpToElements(context, 'hole');
+      } else if (initialUri.pathSegments.contains("floor")) {
+        await jumpToElements(context, 'floor');
+      } else {
+        // todo throw exception
+        print("is Unknown uri: $initialUri");
+        await jumpToElements(context, 'sss');
       }
     }
 
@@ -340,17 +344,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     try {
       initialUri = await getInitialUri();
     } on PlatformException {
-      // todo deal with exception
+      // todo throw with exception
       print('Failed to get initial link.');
     } on FormatException {
       print('Failed to parse the initial link as Uri.');
     }
-    await dealWithUri(initialUri);
+    if (initialUri != null) await dealWithUri(initialUri);
 
-    _receivedUriSchemeSubscription.bindOnlyInvalid(
-        uriLinkStream.listen((Uri? uri) async {
-      await dealWithUri(uri);
-    }), hashCode);
   }
 
   Future<void> _initReceiveIntents() async {
@@ -373,7 +373,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }), hashCode);
   }
 
-  ///
+  /// Jump to the specified element e.g. hole, floor.
+  /// If the user is not initialized, jump to the login page.
   Future<void> jumpToElements(
     BuildContext context,
     String element,
@@ -385,9 +386,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       OpenTreeHoleRepository.getInstance().initializeToken();
     }
     if (element == 'hole') {
-      smartNavigatorPush(context, '/bbs/discussions', forcePushOnMainNavigator: true);
+      smartNavigatorPush(context, '/bbs/discussions',
+          forcePushOnMainNavigator: true);
     } else if (element == 'floor') {
-      smartNavigatorPush(context, '/bbs//bbs/postDetail', forcePushOnMainNavigator: true);
+      smartNavigatorPush(context, '/bbs//bbs/postDetail',
+          forcePushOnMainNavigator: true);
     } else {
       // todo throw error
       smartNavigatorPush(context, '/home', forcePushOnMainNavigator: true);
@@ -431,6 +434,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .listen((_) => _dealWithCredentialsInvalidException()),
         hashCode);
     _initReceiveIntents();
+    _initUniLinks();
 
     // Load the latest version, announcement & the start date of the following term.
     _loadDataFromGithubRepo();
