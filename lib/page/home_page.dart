@@ -104,6 +104,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
       StateStreamListener();
 
+  /// Listener to the url scheme.
+  StreamSubscription<Uri?>? _uniLinksSubscription;
 
   /// If we need to send the QR code to iWatch now.
   ///
@@ -351,6 +353,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     if (initialUri != null) await dealWithUri(initialUri);
 
+    _uniLinksSubscription = uriLinkStream.listen((Uri? uri) async {
+      if (uri != null) await dealWithUri(uri);
+    }, onError: (Object err) {
+      print('Failed to get uri: $err');
+    });
   }
 
   Future<void> _initReceiveIntents() async {
