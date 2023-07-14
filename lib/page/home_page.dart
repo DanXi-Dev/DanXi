@@ -338,7 +338,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     Uri? initialUri;
     try {
-      final initialUri = await getInitialLink();
+      initialUri = await getInitialUri();
     } on PlatformException {
       // todo deal with exception
       print('Failed to get initial link.');
