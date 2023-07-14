@@ -64,6 +64,7 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
+import 'package:uni_links/uni_links.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -101,6 +102,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Listener to Android Activity intents.
   static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
+      StateStreamListener();
+
+  /// Listener to the url scheme.
+  static final StateStreamListener<Uri?> _receivedUriSchemeSubscription =
       StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
@@ -321,6 +326,33 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     */
   }
 
+  /// Deal with url_scheme
+  /// https://pub.dev/packages/uni_links
+  Future<void> _initUniLinks() async {
+    Future<void> dealWithUri(Uri? initialUri) async {
+      if (initialUri != null) {
+        initialUri.pathSegments.any((element) => element == "bbs");
+        // after user is logged in, we should redirect to the bbs page
+      }
+    }
+
+    Uri? initialUri;
+    try {
+      final initialUri = await getInitialLink();
+    } on PlatformException {
+      // todo deal with exception
+      print('Failed to get initial link.');
+    } on FormatException {
+      print('Failed to parse the initial link as Uri.');
+    }
+    await dealWithUri(initialUri);
+
+    _receivedUriSchemeSubscription.bindOnlyInvalid(
+        uriLinkStream.listen((Uri? uri) async {
+      await dealWithUri(uri);
+    }), hashCode);
+  }
+
   Future<void> _initReceiveIntents() async {
     Future<void> dealWithIntent(ri.Intent? intent) async {
       if (intent?.isNotNull == true) {
@@ -339,6 +371,27 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ri.ReceiveIntent.receivedIntentStream.listen((ri.Intent? intent) {
       dealWithIntent(intent);
     }), hashCode);
+  }
+
+  ///
+  Future<void> jumpToElements(
+    BuildContext context,
+    String element,
+  ) async {
+    // Jump to the login page if the user is not initialized
+    // TODO throw error and jump to login page
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+      // Do a quick initialization and push
+      OpenTreeHoleRepository.getInstance().initializeToken();
+    }
+    if (element == 'hole') {
+      smartNavigatorPush(context, '/bbs/discussions', forcePushOnMainNavigator: true);
+    } else if (element == 'floor') {
+      smartNavigatorPush(context, '/bbs//bbs/postDetail', forcePushOnMainNavigator: true);
+    } else {
+      // todo throw error
+      smartNavigatorPush(context, '/home', forcePushOnMainNavigator: true);
+    }
   }
 
   Future<void> onTapNotification(

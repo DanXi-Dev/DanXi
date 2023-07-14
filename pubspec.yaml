@@ -38,7 +38,8 @@ dependencies:
     git:
       url: https://github.com/dartclub/ical.git
       ref: main
-  url_launcher: ^6.1.7
+  url_launcher: ^6.1.12
+  uni_links: ^0.5.1
   desktop_window: ^0.4.0
   http: ^0.13.4
   dio: ^4.0.6
