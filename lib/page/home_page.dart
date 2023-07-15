@@ -52,6 +52,7 @@ import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
+import 'package:dio/dio.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,7 @@ import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../model/opentreehole/floor.dart';
+import '../widget/opentreehole/treehole_widgets.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -338,10 +340,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       print("initialUriSegments: ${initialUri.pathSegments}");
       print(initialUri.pathSegments.contains("floor"));
       if (initialUri.pathSegments.contains("hole")) {
-        await jumpToElements(context, 'hole', int.parse(initialUri.pathSegments[1]));
+        await jumpToElements(
+            context, 'hole', int.parse(initialUri.pathSegments[1]));
       } else if (initialUri.pathSegments.contains("floor")) {
-        print("floor");
-        // await jumpToElements(context, 'floor');
+        await jumpToElements(context, 'floor', int.parse(initialUri.pathSegments[1]));
       } else {
         // todo throw exception
         print("is Unknown uri: $initialUri");
@@ -386,12 +388,20 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             await OpenTreeHoleRepository.getInstance().loadSpecificHole(postId),
       });
     } else if (element == 'floor') {
-      print("jump to floor");
-      OTHole? exampleFloor =
-          await OpenTreeHoleRepository.getInstance().loadSpecificHole(2345);
-      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-        "post": exampleFloor!,
-      });
+      try {
+        final floor = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificFloor(postId))!;
+        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificHole(floor.hole_id!))!;
+        smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+          "post": hole,
+          "floor": floor,
+        });
+      } catch (error, st) {
+        // todo throw error
+        print(error);
+        print(st);
+      }
     } else {
       // todo throw error
       smartNavigatorPush(context, '/home', forcePushOnMainNavigator: true);
