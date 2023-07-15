@@ -336,9 +336,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// https://pub.dev/packages/uni_links
   Future<void> _initUniLinks() async {
     Future<void> dealWithUri(Uri initialUri) async {
-      print("initialUri dealing");
+      // print("initialUri dealing");
       print("initialUriSegments: ${initialUri.pathSegments}");
-      print(initialUri.pathSegments.contains("floor"));
       if (initialUri.pathSegments.contains("hole")) {
         await jumpToElements(
             context, 'hole', int.parse(initialUri.pathSegments[1]));
@@ -347,7 +346,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       } else {
         // todo throw exception
         print("is Unknown uri: $initialUri");
-        // await jumpToElements(context, 'sss');
+        smartNavigatorPush(context, '/bbs/discussions', forcePushOnMainNavigator: true);
       }
     }
 
@@ -404,7 +403,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     } else {
       // todo throw error
-      smartNavigatorPush(context, '/home', forcePushOnMainNavigator: true);
+      print("Unknown element: $element");
+      // smartNavigatorPush(context, '/bbs');
     }
   }
 
