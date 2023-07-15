@@ -22,7 +22,9 @@ import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -66,6 +68,8 @@ import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 import 'package:uni_links/uni_links.dart';
 
+import '../model/opentreehole/floor.dart';
+
 const fduholeChannel = MethodChannel('fduhole');
 
 void sendFduholeTokenToWatch(String? token) {
@@ -105,6 +109,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       StateStreamListener();
 
   /// Listener to the url scheme.
+  /// debounced to avoid duplicated events.
   static final Stream<Uri?> _uniLinksSubscription = uriLinkStream;
 
   /// If we need to send the QR code to iWatch now.
@@ -331,14 +336,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Future<void> dealWithUri(Uri initialUri) async {
       print("initialUri dealing");
       print("initialUriSegments: ${initialUri.pathSegments}");
+      print(initialUri.pathSegments.contains("floor"));
       if (initialUri.pathSegments.contains("hole")) {
-        await jumpToElements(context, 'hole');
+        await jumpToElements(context, 'hole', int.parse(initialUri.pathSegments[1]));
       } else if (initialUri.pathSegments.contains("floor")) {
-        await jumpToElements(context, 'floor');
+        print("floor");
+        // await jumpToElements(context, 'floor');
       } else {
         // todo throw exception
         print("is Unknown uri: $initialUri");
-        await jumpToElements(context, 'sss');
+        // await jumpToElements(context, 'sss');
       }
     }
 
@@ -360,6 +367,37 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
+  /// Jump to the specified element e.g. hole, floor.
+  /// If the user is not initialized, jump to the login page.
+  Future<void> jumpToElements(
+    BuildContext context,
+    String element,
+    int postId,
+  ) async {
+    // Jump to the login page if the user is not initialized
+    // TODO throw error and jump to login page
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+      // Do a quick initialization and push
+      OpenTreeHoleRepository.getInstance().initializeToken();
+    }
+    if (element == 'hole') {
+      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+        "post":
+            await OpenTreeHoleRepository.getInstance().loadSpecificHole(postId),
+      });
+    } else if (element == 'floor') {
+      print("jump to floor");
+      OTHole? exampleFloor =
+          await OpenTreeHoleRepository.getInstance().loadSpecificHole(2345);
+      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+        "post": exampleFloor!,
+      });
+    } else {
+      // todo throw error
+      smartNavigatorPush(context, '/home', forcePushOnMainNavigator: true);
+    }
+  }
+
   Future<void> _initReceiveIntents() async {
     Future<void> dealWithIntent(ri.Intent? intent) async {
       if (intent?.isNotNull == true) {
@@ -378,30 +416,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ri.ReceiveIntent.receivedIntentStream.listen((ri.Intent? intent) {
       dealWithIntent(intent);
     }), hashCode);
-  }
-
-  /// Jump to the specified element e.g. hole, floor.
-  /// If the user is not initialized, jump to the login page.
-  Future<void> jumpToElements(
-    BuildContext context,
-    String element,
-  ) async {
-    // Jump to the login page if the user is not initialized
-    // TODO throw error and jump to login page
-    if (!context.read<FDUHoleProvider>().isUserInitialized) {
-      // Do a quick initialization and push
-      OpenTreeHoleRepository.getInstance().initializeToken();
-    }
-    if (element == 'hole') {
-      smartNavigatorPush(context, '/bbs/discussions',
-          forcePushOnMainNavigator: true);
-    } else if (element == 'floor') {
-      smartNavigatorPush(context, '/bbs//bbs/postDetail',
-          forcePushOnMainNavigator: true);
-    } else {
-      // todo throw error
-      smartNavigatorPush(context, '/home', forcePushOnMainNavigator: true);
-    }
   }
 
   Future<void> onTapNotification(
