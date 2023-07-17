@@ -158,6 +158,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return true;
   }
 
+  Future<bool> _shareHoleAsUri(int? holeId) async {
+    String uri = 'danxi://bbs/hole/$holeId';
+    try {
+      if (holeId == null) return false;
+      FlutterClipboard.copy(uri);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -309,6 +320,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       setState(() => _onlyShowDZ = !_onlyShowDZ);
                       refreshListView(ignorePrefetch: false);
                     }),
+                PopupMenuOption(
+                  label: 'Share',
+                  onTap: (_) async {
+                    if (mounted) {
+                      // todo multi-language
+                      Noticing.showMaterialNotice(
+                          context, 'Share Hole success! Please check your clipboard.');
+                    }
+                  },
+                ),
                 PopupMenuOption(
                     label: S.of(context).hide_hole,
                     onTap: (_) async {
@@ -837,7 +858,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (mounted) {
               // todo multi-language
               Noticing.showMaterialNotice(
-                  context, 'Share success! Please check your clipboard.');
+                  context, 'Share floor success! Please check your clipboard.');
             }
           }
         },
