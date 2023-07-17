@@ -24,7 +24,6 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -52,7 +51,6 @@ import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dio/dio.dart';
 import 'package:dio_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -68,9 +66,6 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 import 'package:uni_links/uni_links.dart';
-
-import '../model/opentreehole/floor.dart';
-import '../widget/opentreehole/treehole_widgets.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -332,81 +327,78 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     */
   }
 
-  /// Deal with url_scheme.
-  /// https://pub.dev/packages/uni_links
+  // Deal with url_scheme.
+  // https://pub.dev/packages/uni_links
   Future<void> _initUniLinks() async {
     Future<void> dealWithUri(Uri initialUri) async {
-      // print("initialUri dealing");
-      print("initialUriSegments: ${initialUri.pathSegments}");
+      // jump to the corresponding page according to the uri pattern
       if (initialUri.pathSegments.contains("hole")) {
         await jumpToElements(
             context, 'hole', int.parse(initialUri.pathSegments[1]));
       } else if (initialUri.pathSegments.contains("floor")) {
-        await jumpToElements(context, 'floor', int.parse(initialUri.pathSegments[1]));
+        await jumpToElements(
+            context, 'floor', int.parse(initialUri.pathSegments[1]));
       } else {
-        // todo throw exception
-        print("is Unknown uri: $initialUri");
-        smartNavigatorPush(context, '/bbs/discussions', forcePushOnMainNavigator: true);
+        // todo error multi-language
+        Error error = ArgumentError("Invalid uri");
+        // DEBUG
+        // smartNavigatorPush(context, "/login");
+        Noticing.showErrorDialog(context, error);
       }
     }
 
     Uri? initialUri;
-    try {
-      initialUri = await getInitialUri();
-    } on PlatformException {
-      // todo throw with exception
-      print('Failed to get initial link.');
-    } on FormatException {
-      print('Failed to parse the initial link as Uri.');
-    }
+    initialUri = await getInitialUri();
     if (initialUri != null) await dealWithUri(initialUri);
 
     _uniLinksSubscription.listen((Uri? uri) async {
       if (uri != null) await dealWithUri(uri);
-    }, onError: (Object err) {
-      print('Failed to get uri: $err');
+    }, onError: (Object error) {
+      // Handle exception by warning the user their action did not succeed
+      return Noticing.showErrorDialog(context, error);
     });
   }
 
-  /// Jump to the specified element e.g. hole, floor.
-  /// If the user is not initialized, jump to the login page.
+  // Jump to the specified element e.g. hole, floor.
+  // If the user is not initialized, jump to the login page.
   Future<void> jumpToElements(
     BuildContext context,
     String element,
     int postId,
   ) async {
     // Jump to the login page if the user is not initialized
-    // TODO throw error and jump to login page
+    // Throw an error if the user is not logged in
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       // Do a quick initialization and push
-      OpenTreeHoleRepository.getInstance().initializeToken();
-    }
-    if (element == 'hole') {
-      smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-        "post":
-            await OpenTreeHoleRepository.getInstance().loadSpecificHole(postId),
-      });
-    } else if (element == 'floor') {
       try {
+        OpenTreeHoleRepository.getInstance().initializeToken();
+      } on NotLoginError {
+        Noticing.showErrorDialog(context, NotLoginError);
+      }
+    }
+    try {
+      if (element == 'hole' && mounted) {
+        smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+          "post": await OpenTreeHoleRepository.getInstance()
+              .loadSpecificHole(postId),
+        });
+      } else if (element == 'floor') {
         final floor = (await OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(postId))!;
         final OTHole hole = (await OpenTreeHoleRepository.getInstance()
             .loadSpecificHole(floor.hole_id!))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-          "post": hole,
-          "locate": floor,
-        });
+            "post": hole,
+            "locate": floor,
+          });
         }
-      } catch (error, st) {
-        // todo throw error
-        print(error);
-        print(st);
+      } else {
+        // todo error multi-language
+        throw ArgumentError("Invalid element");
       }
-    } else {
-      // todo throw error
-      print("Unknown element: $element");
-      // smartNavigatorPush(context, '/bbs');
+    } catch (e) {
+      if (mounted) Noticing.showErrorDialog(context, e);
     }
   }
 
