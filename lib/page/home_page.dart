@@ -392,10 +392,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .loadSpecificFloor(postId))!;
         final OTHole hole = (await OpenTreeHoleRepository.getInstance()
             .loadSpecificHole(floor.hole_id!))!;
-        smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+        if (mounted) {
+          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
           "post": hole,
-          "floor": floor,
+          "locate": floor,
         });
+        }
       } catch (error, st) {
         // todo throw error
         print(error);
