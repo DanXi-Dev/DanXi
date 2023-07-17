@@ -147,6 +147,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return favorites!.any((elementId) => elementId == _hole.hole_id);
   }
 
+  Future<bool> _shareFloorAsUri(int? floorId) async {
+    String uri = 'danxi://bbs/floor/$floorId';
+    try {
+      if (floorId == null) return false;
+      FlutterClipboard.copy(uri);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -817,6 +828,20 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           }
         },
         child: Text(S.of(menuContext).report),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        isDestructive: true,
+        onPressed: () async {
+          if (await _shareFloorAsUri(e.floor_id)) {
+            if (mounted) {
+              // todo multi-language
+              Noticing.showMaterialNotice(
+                  context, 'Share success! Please check your clipboard.');
+            }
+          }
+        },
+        child: Text(S.of(menuContext).share),
       ),
       if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
         PlatformContextMenuItem(
