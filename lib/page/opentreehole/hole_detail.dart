@@ -323,10 +323,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: 'Share',
                   onTap: (_) async {
-                    if (mounted) {
-                      // todo multi-language
-                      Noticing.showMaterialNotice(
-                          context, 'Share Hole success! Please check your clipboard.');
+                    if (await _shareHoleAsUri(_hole.hole_id)) {
+                      if (mounted) {
+                        // todo multi-language
+                        Noticing.showMaterialNotice(
+                            context, 'Share Hole success! Please check your clipboard.');
+                      }
                     }
                   },
                 ),
