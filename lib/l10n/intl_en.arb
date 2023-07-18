@@ -482,5 +482,5 @@
   "shareHoleSuccess": "Share Hole success! Please check your clipboard.",
   "shareFloorSuccess": "Share floor success! Please check your clipboard.",
   "invalidUri": "Invalid uri",
-  "elementNotFound": "未找到要跳转的元素"
+  "elementNotFound": "No element found to jump to"
 }
