@@ -133,7 +133,8 @@ class OTTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<OTDivision> divisions =
-        OpenTreeHoleRepository.getInstance().getDivisions();
+        context.select<FDUHoleProvider, List<OTDivision>>(
+            (value) => value.divisionCache);
     OTDivision? division = context
         .select<FDUHoleProvider, OTDivision?>((value) => value.currentDivision);
     int currentIndex = 0;
@@ -503,10 +504,6 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     _postSubscription.cancel();
     _refreshSubscription.cancel();
     _divisionChangedSubscription.cancel();
-  }
-
-  void pageRefresh() {
-    refreshSelf();
   }
 
   @override
