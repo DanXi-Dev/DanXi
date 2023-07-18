@@ -478,5 +478,9 @@
   "your_gpa": "Your GPA",
   "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}, Tap to View Details",
   "zhangjiang_campus": "Zhangjiang",
-  "forum_message": "Message"
+  "forum_message": "Message",
+  "shareHoleSuccess": "Share Hole success! Please check your clipboard.",
+  "shareFloorSuccess": "Share floor success! Please check your clipboard.",
+  "invalidUri": "Invalid uri",
+  "elementNotFound": "No element found to jump to"
 }
