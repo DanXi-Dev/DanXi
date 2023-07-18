@@ -147,6 +147,30 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return favorites!.any((elementId) => elementId == _hole.hole_id);
   }
 
+  // construct the uri of the floor and copy it to clipboard
+  Future<bool> _shareFloorAsUri(int? floorId) async {
+    String uri = 'danxi://forum/floor/$floorId';
+    try {
+      if (floorId == null) return false;
+      FlutterClipboard.copy(uri);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
+  // construct the uri of the hole and copy it to clipboard
+  Future<bool> _shareHoleAsUri(int? holeId) async {
+    String uri = 'danxi://forum/hole/$holeId';
+    try {
+      if (holeId == null) return false;
+      FlutterClipboard.copy(uri);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -307,6 +331,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       setState(() => _onlyShowDZ = !_onlyShowDZ);
                       refreshListView(ignorePrefetch: false);
                     }),
+                PopupMenuOption(
+                  label: 'Share',
+                  onTap: (_) async {
+                    if (await _shareHoleAsUri(_hole.hole_id)) {
+                      if (mounted) {
+                        Noticing.showMaterialNotice(
+                            context, S.of(context).shareHoleSuccess);
+                      }
+                    }
+                  },
+                ),
                 PopupMenuOption(
                     label: S.of(context).hide_hole,
                     onTap: (_) async {
@@ -826,6 +861,19 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           }
         },
         child: Text(S.of(menuContext).report),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        isDestructive: true,
+        onPressed: () async {
+          if (await _shareFloorAsUri(e.floor_id)) {
+            if (mounted) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).shareFloorSuccess);
+            }
+          }
+        },
+        child: Text(S.of(menuContext).share),
       ),
       if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
         PlatformContextMenuItem(
