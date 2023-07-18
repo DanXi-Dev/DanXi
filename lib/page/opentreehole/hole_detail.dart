@@ -147,8 +147,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return favorites!.any((elementId) => elementId == _hole.hole_id);
   }
 
+  // construct the uri of the floor and copy it to clipboard
   Future<bool> _shareFloorAsUri(int? floorId) async {
-    String uri = 'danxi://bbs/floor/$floorId';
+    String uri = 'danxi://forum/floor/$floorId';
     try {
       if (floorId == null) return false;
       FlutterClipboard.copy(uri);
@@ -158,8 +159,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return true;
   }
 
+  // construct the uri of the hole and copy it to clipboard
   Future<bool> _shareHoleAsUri(int? holeId) async {
-    String uri = 'danxi://bbs/hole/$holeId';
+    String uri = 'danxi://forum/hole/$holeId';
     try {
       if (holeId == null) return false;
       FlutterClipboard.copy(uri);

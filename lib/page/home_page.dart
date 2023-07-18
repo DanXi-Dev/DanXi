@@ -340,8 +340,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             context, 'floor', int.parse(initialUri.pathSegments[1]));
       } else {
         Error error = ArgumentError(S.of(context).invalidUri);
-        // DEBUG
-        // smartNavigatorPush(context, "/login");
         Noticing.showErrorDialog(context, error);
       }
     }
@@ -359,16 +357,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   // Jump to the specified element e.g. hole, floor.
-  // If the user is not initialized, jump to the login page.
   Future<void> jumpToElements(
     BuildContext context,
     String element,
     int postId,
   ) async {
-    // Jump to the login page if the user is not initialized
+    // Do a quick initialization and push
     // Throw an error if the user is not logged in
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
-      // Do a quick initialization and push
       try {
         OpenTreeHoleRepository.getInstance().initializeToken();
       } on NotLoginError {
