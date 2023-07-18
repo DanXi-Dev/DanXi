@@ -325,9 +325,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   onTap: (_) async {
                     if (await _shareHoleAsUri(_hole.hole_id)) {
                       if (mounted) {
-                        // todo multi-language
                         Noticing.showMaterialNotice(
-                            context, 'Share Hole success! Please check your clipboard.');
+                            context, S.of(context).shareHoleSuccess);
                       }
                     }
                   },
@@ -858,9 +857,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         onPressed: () async {
           if (await _shareFloorAsUri(e.floor_id)) {
             if (mounted) {
-              // todo multi-language
               Noticing.showMaterialNotice(
-                  context, 'Share floor success! Please check your clipboard.');
+                  context, S.of(context).shareFloorSuccess);
             }
           }
         },

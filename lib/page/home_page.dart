@@ -339,8 +339,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         await jumpToElements(
             context, 'floor', int.parse(initialUri.pathSegments[1]));
       } else {
-        // todo error multi-language
-        Error error = ArgumentError("Invalid uri");
+        Error error = ArgumentError(S.of(context).invalidUri);
         // DEBUG
         // smartNavigatorPush(context, "/login");
         Noticing.showErrorDialog(context, error);
@@ -394,8 +393,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           });
         }
       } else {
-        // todo error multi-language
-        throw ArgumentError("Invalid element");
+        throw ArgumentError(S.of(context).elementNotFound);
       }
     } catch (e) {
       if (mounted) Noticing.showErrorDialog(context, e);
