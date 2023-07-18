@@ -257,6 +257,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : S.of(context).end_reached),
         ),
       ),
+      // Only show empty message when searching, for now.
+      emptyBuilder: _searchKeyword != null
+          ? (context) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(S.of(context).no_data),
+                ),
+              )
+          : null,
     );
 
     return PlatformScaffold(
