@@ -715,6 +715,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         data: {"device_id": deviceId}, options: Options(headers: _tokenHeader));
   }
 
+  Future<int?> deleteAllPushNotificationToken() async {
+    final resp = await dio.delete("$_BASE_URL/users/push-tokens/_all",
+        options: Options(headers: _tokenHeader));
+    return resp.statusCode;
+  }
+
   @override
   String get linkHost => "api.fduhole.com";
 }
