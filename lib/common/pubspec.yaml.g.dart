@@ -40,32 +40,31 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.3.13+335';
+const String version = r'1.4.0+336';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
 
 /// The minor version number: "2" in "1.2.3".
-const int minor = 3;
+const int minor = 4;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 13;
+const int patch = 0;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
 
 /// The build identifier: "foo" in "1.2.3+foo".
-const List<String> build = <String>[r'335'];
+const List<String> build = <String>[r'336'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1687923491;
+const int timestamp = 1689749046;
 
 /// Name [name]
 const String name = r'dan_xi';
 
 /// Description [description]
-const String description =
-    r'Maybe the best all-rounded service app for Fudan University students.';
+const String description = r'Maybe the best all-rounded service app for Fudan University students.';
 
 /// Repository [repository]
 const String repository = r'';
@@ -84,7 +83,7 @@ const String publishTo = r'none';
 
 /// Environment
 const Map<String, String> environment = <String, String>{
-  'sdk': '>=2.12.0 <3.0.0',
+  'sdk': '>=2.15.0 <3.0.0',
 };
 
 /// Dependencies
@@ -126,7 +125,8 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'main',
     },
   },
-  'url_launcher': r'^6.1.7',
+  'url_launcher': r'^6.1.12',
+  'uni_links': r'^0.5.1',
   'desktop_window': r'^0.4.0',
   'http': r'^0.13.4',
   'dio': r'^4.0.6',
@@ -151,8 +151,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'gallery_saver': r'^2.3.2',
   'flutter_markdown': <String, Object>{
     'git': <String, Object>{
-      'url':
-          r'https://github.com/singularity-s0/flutter_markdown_selectable.git',
+      'url': r'https://github.com/singularity-s0/flutter_markdown_selectable.git',
     },
   },
   'markdown': r'^6.0.0',
@@ -192,6 +191,14 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_swiper_view': r'^1.1.8',
   'mutex': r'^3.0.1',
   'device_info_plus': r'^9.0.2',
+  'receive_intent': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/w568w/receive_intent.git',
+    },
+  },
+  'flutter_secure_storage': r'^8.0.0',
+  'encrypt_shared_preferences': r'^0.3.5',
+  'device_identity': r'^1.0.0',
 };
 
 /// Developer dependencies

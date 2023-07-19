@@ -32,7 +32,9 @@ class Extra {
 
   List<BannerExtra?>? banners;
 
-  Extra(this.timetable, this.userAgent, this.stopWords, this.banners);
+  List<String?>? careWords;
+
+  Extra(this.timetable, this.userAgent, this.stopWords, this.banners, this.careWords);
 
   factory Extra.fromJson(Map<String, dynamic> json) => _$ExtraFromJson(json);
 

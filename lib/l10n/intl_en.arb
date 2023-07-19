@@ -482,5 +482,7 @@
   "shareHoleSuccess": "Share Hole success! Please check your clipboard.",
   "shareFloorSuccess": "Share floor success! Please check your clipboard.",
   "invalidUri": "Invalid uri",
-  "elementNotFound": "No element found to jump to"
+  "elementNotFound": "No element found to jump to",
+  "danxi_care": "DanXi Care",
+  "danxi_care_message": "I understand that you may be going through a very painful time right now, and the troubles in your life may make you feel like you can't face them. But please remember, you are not alone. There are many people in this world who are willing to lend a helping hand and help you get through difficult times. You can share your troubles with family, friends or professional counselors, they are all there for you.\n\nThere will always be ups and downs in life, dark moments will pass and tomorrow will come. Sometimes we may feel like there is only despair ahead of us, but that does not mean there is no hope for the future. Please let time heal your wounds, seek help and believe that you have the ability to overcome this difficult period."
 }
