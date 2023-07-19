@@ -165,6 +165,16 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     Noticing.showNotice(context, "Restart app to take effects");
   }
 
+  Future<void> deleteAllPushToken() async {
+    try {
+      final ret = await OpenTreeHoleRepository.getInstance()
+          .deleteAllPushNotificationToken();
+      Noticing.showNotice(context, "Status code $ret");
+    } catch (e) {
+      Noticing.showNotice(context, "$e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) => PlatformScaffold(
         iosContentBottomPadding: true,
@@ -190,6 +200,10 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                 PlatformElevatedButton(
                   onPressed: setUserAgent,
                   child: const Text("Set User Agent"),
+                ),
+                PlatformElevatedButton(
+                  onPressed: deleteAllPushToken,
+                  child: const Text("Delete All Push Token"),
                 ),
                 PlatformElevatedButton(
                   child: const Text("Copy Everything"),
