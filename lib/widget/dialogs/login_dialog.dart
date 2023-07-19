@@ -235,7 +235,7 @@ class LoginDialogState extends State<LoginDialog> {
               TextField(
                 controller: _nameController,
                 enabled: _group != UserGroup.VISITOR,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
                     icon: PlatformX.isMaterial(context)
