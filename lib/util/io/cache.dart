@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 
 /// A helper class to cache data locally and load it remotely if necessary.
 class Cache {
@@ -30,7 +30,8 @@ class Cache {
   static Future<T?> get<T>(String key, Future<T> Function() fetch,
       T Function(String? cachedValue) decode, String Function(T object) encode,
       {bool Function(String cachedValue)? validate}) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    XSharedPreferences preferences =
+        SettingsProvider.getInstance().preferences!;
     validate ??= (v) => true;
     if (!preferences.containsKey(key)) {
       // Reload the cache
@@ -56,7 +57,8 @@ class Cache {
   static Future<T?> getRemotely<T>(String key, Future<T> Function() fetch,
       T Function(String? cachedValue) decode, String Function(T object) encode,
       {bool Function(T value)? validate}) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    XSharedPreferences preferences =
+        SettingsProvider.getInstance().preferences!;
     validate ??= (v) => v != null;
     T newValue = await fetch();
     if (validate(newValue)) {
@@ -72,7 +74,8 @@ class Cache {
   static Future<T?> getNew<T>(String key, Future<T> Function() fetch,
       T Function(String? cachedValue) decode, String Function(T object) encode,
       {bool Function(String cachedValue)? validate}) async {
-    SharedPreferences preferences = SettingsProvider.getInstance().preferences!;
+    XSharedPreferences preferences =
+        SettingsProvider.getInstance().preferences!;
     validate ??= (v) => true;
     if (!preferences.containsKey(key)) {
       // Reload the cache

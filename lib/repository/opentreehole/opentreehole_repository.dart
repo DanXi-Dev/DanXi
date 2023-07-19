@@ -54,9 +54,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Cached floors, used by [mentions]
   final Map<int, OTFloor> _floorCache = {};
 
-  /// Cached OTDivisions
-  List<OTDivision> _divisionCache = [];
-
   /// Cached OTTags
   List<OTTag> _tagCache = [];
 
@@ -76,8 +73,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       } else {
         provider.token = SettingsProvider.getInstance().fduholeToken;
       }
-      await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     }
+    await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     clearCache();
     SettingsProvider.getInstance().deleteAllFduholeData();
   }
@@ -85,9 +82,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   void clearCache() {
     provider.token = null;
     provider.userInfo = null;
+    provider.divisionCache = [];
     _pushNotificationRegData = null;
     _floorCache.clear();
-    _divisionCache.clear();
     _tagCache.clear();
   }
 
@@ -135,7 +132,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     } catch (_) {}
 
     if (provider.userInfo == null) await getUserProfile(forceUpdate: true);
-    if (_divisionCache.isEmpty) await loadDivisions(useCache: false);
+    if (provider.divisionCache.isEmpty) await loadDivisions(useCache: false);
     if (_pushNotificationRegData != null) {
       // No need for [await] here, we can do this in the background
       updatePushNotificationToken(
@@ -233,19 +230,19 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTDivision>?> loadDivisions({bool useCache = true}) async {
-    if (_divisionCache.isNotEmpty && useCache) {
-      return _divisionCache;
+    if (provider.divisionCache.isNotEmpty && useCache) {
+      return provider.divisionCache;
     }
     final Response<List<dynamic>> response = await dio
         .get("$_BASE_URL/divisions", options: Options(headers: _tokenHeader));
-    _divisionCache =
+    provider.divisionCache =
         response.data?.map((e) => OTDivision.fromJson(e)).toList() ?? [];
-    return _divisionCache;
+    return provider.divisionCache;
   }
 
   List<OTHole> getPinned(int divisionId) {
     try {
-      return _divisionCache
+      return provider.divisionCache
               .firstWhere((element) => element.division_id == divisionId)
               .pinned ??
           List<OTHole>.empty();
@@ -255,15 +252,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   List<OTDivision> getDivisions() {
-    return _divisionCache;
+    return provider.divisionCache;
   }
 
   Future<OTDivision?> loadSpecificDivision(int divisionId,
       {bool useCache = true}) async {
     if (useCache) {
       try {
-        final OTDivision cached =
-            _divisionCache.firstWhere((e) => e.division_id == divisionId);
+        final OTDivision cached = provider.divisionCache
+            .firstWhere((e) => e.division_id == divisionId);
         return cached;
       } catch (_) {}
     }
@@ -271,8 +268,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/divisions/$divisionId",
         options: Options(headers: _tokenHeader));
     final newDivision = OTDivision.fromJson(response.data!);
-    _divisionCache.removeWhere((element) => element.division_id == divisionId);
-    _divisionCache.add(newDivision);
+    var newList = provider.divisionCache.toList();
+    newList.removeWhere((element) => element.division_id == divisionId);
+    newList.add(newDivision);
+    provider.divisionCache = newList;
     return newDivision;
   }
 

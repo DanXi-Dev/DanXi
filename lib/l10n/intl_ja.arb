@@ -470,5 +470,9 @@
   "your_gpa": "あなたの成績点",
   "your_gpa_subtitle": "総学点{credits}、ランキングは{rank}位です。詳細はこちらをご覧ください",
   "zhangjiang_campus": "張江キャンパス",
-  "forum_message": "メッセージ"
+  "forum_message": "メッセージ",
+  "shareHoleSuccess": "Share Hole success! Please check your clipboard.",
+  "shareFloorSuccess": "Share floor success! Please check your clipboard.",
+  "invalidUri": "Invalid uri",
+  "elementNotFound": "No element found to jump to"
 }

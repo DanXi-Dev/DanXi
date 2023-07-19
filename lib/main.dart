@@ -56,6 +56,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:device_identity/device_identity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -87,8 +88,9 @@ void main() {
   SettingsProvider.getInstance().init().then((_) {
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
-
-      runApp(const DanxiApp());
+      DeviceIdentity.register().then((value) {
+        runApp(const DanxiApp());
+      });
     });
   });
 

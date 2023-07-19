@@ -30,8 +30,8 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// A class to manage [SharedPreferences] Settings
 ///
@@ -39,7 +39,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Avoid returning [null] in [SettingsProvider]. Return the default value instead.
 /// Only return [null] when there is no default value.
 class SettingsProvider with ChangeNotifier {
-  SharedPreferences? preferences;
+  XSharedPreferences? preferences;
   static final _instance = SettingsProvider._();
   static const String KEY_PREFERRED_CAMPUS = "campus";
 
@@ -144,7 +144,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   Future<void> init() async =>
-      preferences = await SharedPreferences.getInstance();
+      preferences = await XSharedPreferences.getInstance();
 
   @Deprecated(
       "SettingsProvider do not need a BuildContext any more. Use SettingsProvider.getInstance() instead")
