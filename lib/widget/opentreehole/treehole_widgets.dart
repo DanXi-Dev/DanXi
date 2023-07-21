@@ -492,7 +492,7 @@ class OTFloorWidget extends StatelessWidget {
       subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
         if ((floor.hole_id ?? 0) > 0 || (floor.floor_id ?? 0) > 0) ...[
           const SizedBox(
-            height: 4,
+            height: 0,
           )
         ],
         if (showBottomBar) OTFloorWidgetBottomBar(floor: floor, index: index),
@@ -814,8 +814,8 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     },
                     icon: Icon(
                       (floor.liked ?? false)
-                          ? CupertinoIcons.heart_fill
-                          : CupertinoIcons.heart,
+                          ? CupertinoIcons.hand_thumbsup_fill
+                          : CupertinoIcons.hand_thumbsup,
                       color: Theme.of(context).primaryColor,
                       size: 16,
                     ),
@@ -838,8 +838,8 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     },
                     icon: Icon(
                       (floor.disliked ?? false)
-                          ? CupertinoIcons.heart_slash_fill
-                          : CupertinoIcons.heart_slash,
+                          ? CupertinoIcons.hand_thumbsdown_fill
+                          : CupertinoIcons.hand_thumbsdown,
                       color: Theme.of(context).primaryColor,
                       size: 16,
                     ),
