@@ -19,6 +19,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
@@ -116,6 +117,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   /// Fields related to the display states.
   bool? _isFavored;
   bool _onlyShowDZ = false;
+  bool _multiSelectMode = false;
+  final List<int> _selectedFloors = [];
 
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
@@ -330,6 +333,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     onTap: (_) {
                       setState(() => _onlyShowDZ = !_onlyShowDZ);
                       refreshListView(ignorePrefetch: false);
+                    }),
+                PopupMenuOption(
+                    label: _multiSelectMode ? "退出多选模式" : "进入多选模式",
+                    onTap: (_) {
+                      setState(() {
+                        _multiSelectMode = !_multiSelectMode;
+                        // if we have just entered multi-choice mode, clear the selected floors.
+                        if (_multiSelectMode) {
+                          _selectedFloors.clear();
+                        }
+                      });
                     }),
                 PopupMenuOption(
                   label: 'Share',
@@ -894,6 +908,101 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return menu;
   }
 
+  List<Widget> _buildMultiSelectContextMenu(BuildContext menuContext) {
+    Future<void> multiExecution(
+        List<int> floorsList, Future<int?> Function(int floors) action) async {
+      final floors = floorsList.toList();
+      List<int?> results = await Future.wait(floors.map(action));
+
+      List<int> successIds = [];
+      List<int> failedIds = [];
+      results.forEachIndexed((index, result) {
+        if (result != null && result < 300) {
+          successIds.add(floors[index]);
+        } else {
+          failedIds.add(floors[index]);
+        }
+      });
+      if (mounted) {
+        Noticing.showMaterialNotice(context,
+            "${S.of(context).operation_successful}\nOK ($successIds), Failed ($failedIds)");
+      }
+    }
+
+    List<Widget> buildAdminMenu(BuildContext menuContext) {
+      return [
+        PlatformContextMenuItem(
+          onPressed: () async {
+            if (await Noticing.showConfirmationDialog(
+                    context, S.of(context).are_you_sure,
+                    isConfirmDestructive: true) ==
+                true) {
+              final reason = await Noticing.showInputDialog(
+                  context, S.of(context).input_reason);
+              await multiExecution(
+                  _selectedFloors,
+                  (floor) async => await OpenTreeHoleRepository.getInstance()
+                      .adminDeleteFloor(floor, reason));
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: Text(S.of(context).delete_floor),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            final tag = await Noticing.showInputDialog(
+                context, S.of(context).input_reason);
+            if (tag == null) {
+              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
+            }
+            await multiExecution(
+                _selectedFloors,
+                (floor) async => await OpenTreeHoleRepository.getInstance()
+                    .adminAddSpecialTag(tag, floor));
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).add_special_tag),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            final reason = await Noticing.showInputDialog(
+                context, S.of(context).input_reason);
+            if (reason == null) {
+              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
+            }
+            await multiExecution(
+                _selectedFloors,
+                (floor) async => await OpenTreeHoleRepository.getInstance()
+                    .adminFoldFloor(reason.isEmpty ? [] : [reason], floor));
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).fold_floor),
+        ),
+      ];
+    }
+
+    List<Widget> menu = [
+      if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+        PlatformContextMenuItem(
+          onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (subMenuContext) => PlatformContextMenu(
+                  actions: buildAdminMenu(subMenuContext),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(subMenuContext).cancel),
+                    onPressed: () => Navigator.of(subMenuContext).pop(),
+                  ))),
+          isDestructive: true,
+          menuContext: menuContext,
+          child: Text(S.of(context).admin_options),
+        ),
+      ]
+    ];
+
+    return menu;
+  }
+
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
@@ -925,7 +1034,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
     }
 
-    return OTFloorWidget(
+    final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
       index: _searchKeyword == null ? index : null,
@@ -935,43 +1044,57 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
-                actions: _buildContextMenu(context, floor),
+                actions: _multiSelectMode
+                    ? _buildMultiSelectContextMenu(context)
+                    : _buildContextMenu(context, floor),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () => Navigator.of(context).pop(),
                 )));
       },
-      onTap: () async {
-        if (_searchKeyword == null) {
-          int? replyId;
-          // Set the replyId to null when tapping on the first reply.
-          if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
-            replyId = floor.floor_id;
-            OpenTreeHoleRepository.getInstance().cacheFloor(floor);
-          }
-          if (await OTEditor.createNewReply(context, _hole.hole_id, replyId)) {
-            await refreshListView(scrollToEnd: true);
-          }
-        } else {
-          // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
-          ProgressFuture progressDialog = showProgressDialog(
-              loadingText: S.of(context).loading, context: context);
-          try {
-            OTHole? hole = await OpenTreeHoleRepository.getInstance()
-                .loadSpecificHole(floor.hole_id!);
-            if (mounted) {
-              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                "post": await prefetchAllFloors(hole!),
-                "locate": floor
+      onTap: _multiSelectMode
+          ? () {
+              // If we are in multi-select mode, we should (un)select the floor.
+              setState(() {
+                if (_selectedFloors.contains(floor.floor_id)) {
+                  _selectedFloors.remove(floor.floor_id);
+                } else if (floor.floor_id != null) {
+                  _selectedFloors.add(floor.floor_id!);
+                }
               });
             }
-          } catch (e, st) {
-            Noticing.showErrorDialog(context, e, trace: st);
-          } finally {
-            progressDialog.dismiss(showAnim: false);
-          }
-        }
-      },
+          : () async {
+              if (_searchKeyword == null) {
+                int? replyId;
+                // Set the replyId to null when tapping on the first reply.
+                if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
+                  replyId = floor.floor_id;
+                  OpenTreeHoleRepository.getInstance().cacheFloor(floor);
+                }
+                if (await OTEditor.createNewReply(
+                    context, _hole.hole_id, replyId)) {
+                  await refreshListView(scrollToEnd: true);
+                }
+              } else {
+                // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
+                ProgressFuture progressDialog = showProgressDialog(
+                    loadingText: S.of(context).loading, context: context);
+                try {
+                  OTHole? hole = await OpenTreeHoleRepository.getInstance()
+                      .loadSpecificHole(floor.hole_id!);
+                  if (mounted) {
+                    smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+                      "post": await prefetchAllFloors(hole!),
+                      "locate": floor
+                    });
+                  }
+                } catch (e, st) {
+                  Noticing.showErrorDialog(context, e, trace: st);
+                } finally {
+                  progressDialog.dismiss(showAnim: false);
+                }
+              }
+            },
       onTapImage: (String? url, Object heroTag) {
         final int length = _listViewController.length();
         smartNavigatorPush(context, '/image/detail', arguments: {
@@ -987,6 +1110,35 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         });
       },
     );
+
+    if (_multiSelectMode && _selectedFloors.contains(floor.floor_id)) {
+      return Stack(
+        children: [
+          floorWidget,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Center(
+                child: Icon(
+                  PlatformX.isMaterial(context)
+                      ? Icons.check_circle
+                      : CupertinoIcons.check_mark_circled_solid,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ),
+          )
+        ],
+      );
+    } else {
+      return floorWidget;
+    }
   }
 
   Iterable<ImageUrlInfo> extractAllImagesInFloor(String content) {
