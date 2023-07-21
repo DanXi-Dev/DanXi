@@ -806,7 +806,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                           floor.liked = !floor.liked!;
                         });
                         floor = (await OpenTreeHoleRepository.getInstance()
-                            .likeFloor(floor.floor_id!, floor.liked!))!;
+                            .likeFloor(floor.floor_id!, (floor.liked??false)?1:0))!;
                         setState(() {});
                       } catch (e, st) {
                         Noticing.showErrorDialog(context, e, trace: st);
@@ -820,8 +820,31 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       size: 16,
                     ),
                   ),
+                  const SizedBox(width: 5),
+                  OTFloorWidgetBottomBarButton(
+                    text: "${floor.dislike}",
+                    onTap: () async {
+                      try {
+                        floor.disliked ??= false;
+                        setState(() {
+                          floor.disliked = !floor.disliked!;
+                        });
+                        floor = (await OpenTreeHoleRepository.getInstance()
+                            .likeFloor(floor.floor_id!, (floor.disliked??false)?-1:0))!;
+                        setState(() {});
+                      } catch (e, st) {
+                        Noticing.showErrorDialog(context, e, trace: st);
+                      }
+                    },
+                    icon: Icon(
+                      (floor.disliked ?? false)
+                          ? CupertinoIcons.heart_slash_fill
+                          : CupertinoIcons.heart_slash,
+                      color: Theme.of(context).primaryColor,
+                      size: 16,
+                    ),
+                  ),
                   PopupMenuButton<ActionItem>(
-                    padding: const EdgeInsets.all(0.0),
                     icon: Icon(
                       CupertinoIcons.ellipsis_circle,
                       color: Theme.of(context).primaryColor,
@@ -965,7 +988,7 @@ class OTFloorWidgetBottomBarButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

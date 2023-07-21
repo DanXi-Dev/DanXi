@@ -421,12 +421,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.where((element) => element != null).toList();
   }*/
 
-  Future<OTFloor?> likeFloor(int floorId, bool like) async {
+  Future<OTFloor?> likeFloor(int floorId, int like) async {
     final Response<Map<String, dynamic>> response =
-        await dio.put("$_BASE_URL/floors/$floorId",
-            data: {
-              "like": like ? "add" : "cancel",
-            },
+        await dio.post("$_BASE_URL/floors/$floorId/like/$like",
             options: Options(headers: _tokenHeader));
     return OTFloor.fromJson(response.data!);
   }
