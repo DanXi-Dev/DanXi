@@ -656,7 +656,6 @@ class OTFloorMentionWidget extends StatelessWidget {
                             OTHole? hole =
                                 await OpenTreeHoleRepository.getInstance()
                                     .loadSpecificHole(floor.hole_id!);
-
                             smartNavigatorPush(context, "/bbs/postDetail",
                                 arguments: {
                                   "post": await prefetchAllFloors(hole!),
@@ -837,11 +836,13 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       if (item == ActionItem.Report) {
                         if (await OTEditor.reportPost(
                             context, floor.floor_id)) {
+                          if(!context.mounted) return;
                           Noticing.showMaterialNotice(
                               context, S.of(context).report_success);
                         }
                       }
                       if (item == ActionItem.Delete) {
+                        if(!context.mounted) return;
                         if (await Noticing.showConfirmationDialog(
                                 context,
                                 S.of(context).about_to_delete_floor(
@@ -853,13 +854,16 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                             await OpenTreeHoleRepository.getInstance()
                                 .deleteFloor(floor.floor_id!);
                           } catch (e, st) {
+                            if(!context.mounted) return;
                             Noticing.showErrorDialog(context, e, trace: st);
                           }
                         }
                       }
                       if (item == ActionItem.Modify) {
+                        if(!context.mounted) return;
                         if (await OTEditor.modifyReply(context, floor.hole_id,
                             floor.floor_id, floor.content)) {
+                          if(!context.mounted) return;
                           Noticing.showMaterialNotice(
                               context, S.of(context).request_success);
                         }
@@ -881,6 +885,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                             Navigator.of(context).pop();
                             if (await OTEditor.modifyReply(context, floor.hole_id,
                                 floor.floor_id, floor.content)) {
+                              if(!context.mounted) return;
                               Noticing.showMaterialNotice(
                                   context, S.of(context).request_success);
                             }
@@ -929,6 +934,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                           onTap: () async {
                             Navigator.of(context).pop();
                             if (await OTEditor.reportPost(context, floor.floor_id)) {
+                              if(!context.mounted) return;
                               Noticing.showMaterialNotice(
                                   context, S.of(context).report_success);
                             }
