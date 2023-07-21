@@ -1017,7 +1017,9 @@ StatelessWidget smartRender(
     bool translucentCard,
     {bool preview = false}) {
   return PostRenderWidget(
-    render: kMarkdownRender,
+    render: SettingsProvider.getInstance().isMarkdownRenderingEnabled
+        ? kMarkdownRender
+        : kPlainRender,
     content: preprocessContentForDisplay(content),
     onTapImage: onTapImage,
     onTapLink: onTapLink,
