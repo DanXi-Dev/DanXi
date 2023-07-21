@@ -360,7 +360,6 @@ class Constant {
         color: ThemeData.light().cardColor,
       ),
       dividerTheme: const DividerThemeData(thickness: 0.2),
-        pageTransitionsTheme: const PageTransitionsTheme(builders: {TargetPlatform.android: CupertinoPageTransitionsBuilder(),})
     );
   }
 
@@ -418,7 +417,6 @@ class Constant {
         color: ThemeData.dark().cardColor,
       ),
       dividerTheme: const DividerThemeData(thickness: 0.2),
-        pageTransitionsTheme: const PageTransitionsTheme(builders: {TargetPlatform.android: CupertinoPageTransitionsBuilder(),})
     );
   }
 
