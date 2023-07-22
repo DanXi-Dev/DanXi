@@ -295,6 +295,20 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
+  Future<List<OTHole>?> loadUserHoles(DateTime startTime,
+      {int length = Constant.POST_COUNT_PER_PAGE, SortOrder? sortOrder}) async {
+    sortOrder ??= SortOrder.LAST_REPLIED;
+    final Response<List<dynamic>> response =
+        await dio.get("$_BASE_URL/users/me/holes",
+            queryParameters: {
+              "offset": startTime.toUtc().toIso8601String(),
+              "size": length,
+              "order": sortOrder.getInternalString()
+            },
+            options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+  }
+
   Future<OTHole?> loadSpecificHole(int holeId) async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/holes/$holeId",
