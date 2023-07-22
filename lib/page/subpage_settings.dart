@@ -775,14 +775,14 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               ],
               ListTile(
                 leading: nil,
-                title: const Text("查看我的帖子"),
+                title: Text(S.of(context).list_my_posts),
                 onTap: () => smartNavigatorPush(context, '/bbs/discussions',
                     arguments: {'showFilterByMe': true},
                     forcePushOnMainNavigator: true),
               ),
               ListTile(
                 leading: nil,
-                title: const Text("查看处罚历史"),
+                title: Text(S.of(context).list_my_punishments),
                 onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"punishmentHistory": true}),
               ),

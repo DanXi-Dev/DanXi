@@ -552,7 +552,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
             title: Text(switch (_postsType) {
-              PostsType.FILTER_BY_ME => "查看我的帖子",
+              PostsType.FILTER_BY_ME => S.of(context).list_my_posts,
               PostsType.FILTER_BY_TAG =>
                 S.of(context).filtering_by_tag(_tagFilter ?? "?"),
               _ => throw Exception("Unreachable"),

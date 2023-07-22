@@ -327,7 +327,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           child: switch (_renderMode) {
             RenderMode.NORMAL => Text("#${_hole.hole_id}"),
             RenderMode.SEARCH_RESULT => Text(S.of(context).search_result),
-            RenderMode.PUNISHMENT_HISTORY => const Text("查看处罚历史"),
+            RenderMode.PUNISHMENT_HISTORY =>
+              Text(S.of(context).list_my_punishments),
           },
         ),
         trailingActions: [
@@ -359,7 +360,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       refreshListView(ignorePrefetch: false);
                     }),
                 PopupMenuOption(
-                    label: _multiSelectMode ? "退出多选模式" : "进入多选模式",
+                    label: _multiSelectMode
+                        ? S.of(context).multiple_select_mode_exit
+                        : S.of(context).multiple_select_mode_enter,
                     onTap: (_) {
                       setState(() {
                         _multiSelectMode = !_multiSelectMode;
