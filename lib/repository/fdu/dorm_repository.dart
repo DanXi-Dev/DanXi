@@ -20,24 +20,30 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 
+/// To implement a repository, you should extend BaseRepositoryWithDio.
 class FudanDormRepository extends BaseRepositoryWithDio {
+  /// You can get the url from the UIS login page.
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanelec%252Fwap%252Fdefault%252Finfo%26from%3Dwap";
 
+  /// A repository acts as a spider. This is the page containing the target data.
   static const String electricityUrl =
       'https://zlapp.fudan.edu.cn/fudanelec/wap/default/info';
 
+  /// Singleton pattern.
   FudanDormRepository._();
-
   static final _instance = FudanDormRepository._();
-
   factory FudanDormRepository.getInstance() => _instance;
 
+  /// For every network request, you should write a private `_xxx` and a public
+  /// `xxx`. `_xxx` is the actual implementation, and the `xxx` wraps it with
+  /// [Retrier] and/or [UISLoginTool.tryAsyncWithAuth].
   Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
     return UISLoginTool.tryAsyncWithAuth(
         dio, _LOGIN_URL, cookieJar!, info, () => _loadElectricityInfo());
   }
 
+  /// Show your great talent here.
   Future<ElectricityItem?> _loadElectricityInfo() async {
     final Response<Map<String, dynamic>> r = await dio.get(electricityUrl);
     final Map<String, dynamic> json = r.data!;
@@ -60,6 +66,8 @@ class FudanDormRepository extends BaseRepositoryWithDio {
   String get linkHost => "zlapp.fudan.edu.cn";
 }
 
+/// This class represents the electricity info of a dorm. It's an interface for
+/// the UI to use.
 class ElectricityItem {
   final String available;
   final String used;
