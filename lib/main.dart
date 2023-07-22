@@ -83,12 +83,31 @@ void main() {
   }
 
   // Init Feature registration.
+  //
+  // Feature map is a map that contains all the features in the home screen.
+  //
+  // If you want to add a new feature, refer to "Note: A Checklist After
+  // Creating a New [Feature]" in `feature/base_feature.dart`
+  //
+  // A detailed example of a feature can be found in
+  // `feature/dorm_electricity_feature.dart`. This file contains extensive
+  // comments which would be helpful for you to get started.
   FeatureMap.registerAllFeatures();
+
+  // Init ScreenProxy. It is a proxy class for [ScreenBrightness] to make it
+  // work on all platforms.
+  // We need to adjust the screen brightness when showing tht Fudan QR Code.
   unawaited(LazyFuture.pack(ScreenProxy.init()));
+
+  // Init SettingsProvider. SettingsProvider is a singleton class that stores
+  // all the settings of the app.
   SettingsProvider.getInstance().init().then((_) {
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
       DeviceIdentity.register().then((value) {
+        // This is the entrypoint of a simple Flutter app.
+        // runApp() is a function that takes a [Widget] and makes it the root
+        // of the widget tree.
         runApp(const DanxiApp());
       });
     });
@@ -127,6 +146,8 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
 ///
 class DanxiApp extends StatelessWidget {
   /// Routes to every pages.
+  /// Every route record is a function that returns a [Widget]. After registering
+  //  the route, you can call [smartNavigatorPush] to navigate to the page.
   static final Map<String, Function> routes = {
     '/placeholder': (context, {arguments}) =>
         ColoredBox(color: Theme.of(context).scaffoldBackgroundColor),
@@ -177,18 +198,28 @@ class DanxiApp extends StatelessWidget {
       builder: (context) =>
           ErrorPageWidget.buildWidget(context, details.exception));
 
+  /// For every Flutter widget class, you need to override the build() method.
+  /// The build() method returns a [Widget] that will be displayed on the screen.
   @override
   Widget build(BuildContext context) {
+    // We use [GlobalKey] to get the navigator state of the root navigator.
     final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
     // Replace the global error widget with a simple Text.
     if (!kDebugMode) ErrorWidget.builder = errorBuilder;
 
+    // We use [PlatformProvider] to make the app adapt to different platforms.
+    // For example, on Android, it will use Material Design, while on iOS, it
+    // will use Cupertino Design.
+    //
+    // You may find [PlatformX] in `lib/util/platform_universal.dart` useful to
+    // get the current platform.
     Widget mainApp = PlatformProvider(
       // Uncomment this line below to force the app to use Cupertino Widgets.
       // initialPlatform: TargetPlatform.iOS,
 
-      // [DynamicThemeController] enables the app to change between dark/light theme without restart on iOS.
+      // [DynamicThemeController] enables the app to change between dark/light
+      // theme without restart on iOS.
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
             context.select<SettingsProvider, MaterialColor>((value) =>
@@ -200,6 +231,8 @@ class DanxiApp extends StatelessWidget {
               Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch),
           child: Material(
             child: PlatformApp(
+              // Remember? We have just defined this scroll behavior class above
+              // to enable scrolling with mouse & stylus.
               scrollBehavior: TouchMouseScrollBehavior(),
               debugShowCheckedModeBanner: false,
               // Fix cupertino UI text color issue by override text color
@@ -219,6 +252,8 @@ class DanxiApp extends StatelessWidget {
                   theme: PlatformX.getTheme(context, primarySwatch)),
               // Configure i18n delegates.
               localizationsDelegates: const [
+                // [S] is a generated class that contains all the strings in the
+                // app for l10n.
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
@@ -231,7 +266,7 @@ class DanxiApp extends StatelessWidget {
                   "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
               home: ThemedSystemOverlay(
                 child: PlatformMasterDetailApp(
-                  // Configure the page route behaviour of the whole app
+                  // Configure the page route behaviour of the whole app.
                   onGenerateRoute: (settings) {
                     final Function? pageContentBuilder =
                         DanxiApp.routes[settings.name!];
@@ -253,7 +288,7 @@ class DanxiApp extends StatelessWidget {
     );
 
     if (PlatformX.isAndroid || PlatformX.isIOS) {
-      // Listen to Foreground / Background Event with [FGBGNotifier].
+      // Wrap mainApp with [FGBGNotifier] to listen to ForeGround / BackGround events.
       mainApp = FGBGNotifier(
           onEvent: (FGBGType value) {
             switch (value) {
@@ -267,9 +302,21 @@ class DanxiApp extends StatelessWidget {
           },
           child: mainApp);
     }
+
+    // Init FDUHoleProvider. This object provides some global states about
+    // FDUHole such as the current division and the json web token.
     var fduHoleProvider = FDUHoleProvider();
+    // Init OpenTreeHoleRepository with the provider. This is the api implementations
+    // of OpenTreeHole.
     OpenTreeHoleRepository.init(fduHoleProvider);
+
+    // Wrap the whole app with [Phoenix] to enable fast reload. When user
+    // logouts the Fudan UIS account, the whole app will be reloaded.
+    //
+    // You can call FlutterApp.restartApp() to refresh the app.
     return Phoenix(
+      // Wrap the app with a global state management provider. As the name
+      // suggests, it groups multiple providers.
       child: MultiProvider(providers: [
         ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
