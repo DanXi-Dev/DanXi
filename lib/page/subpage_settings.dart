@@ -766,6 +766,15 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     });
                   },
                 ),
+                if (SettingsProvider.getInstance().debugMode)
+                  ListTile(
+                      leading: const Icon(Icons.speed),
+                      title: const Text("Light Rendering"),
+                      subtitle: const Text("[WARNING: DEBUG FEATURE] Disable Markdown Rendering"),
+                      onTap: () {
+                        SettingsProvider.getInstance().isMarkdownRenderingEnabled = !SettingsProvider.getInstance().isMarkdownRenderingEnabled;
+                      }
+                  ),
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).modify_password),
