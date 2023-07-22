@@ -93,6 +93,8 @@ String preprocessContentForDisplay(String content) {
 ///
 /// [String] searchKeyword: if set, the page will show the result of searching [searchKeyword].
 ///
+/// [bool] punishmentHistory: if set AND true (i.e. [punishmentHistory == true]), the page will show the punishment history of the post.
+///
 /// [bool] scroll_to_end: if [scroll_to_end] is true, the page will scroll to the end of
 /// the post as soon as the page shows. This implies that [post] should be a [OTHole].
 /// If [scroll_to_end] is true, *all* the floors should be prefetched beforehand.
@@ -111,6 +113,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   late OTHole _hole;
+  RenderMode _renderMode = RenderMode.NORMAL;
   String? _searchKeyword;
   FileImage? _backgroundImage;
 
@@ -132,15 +135,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
-    if (_searchKeyword != null) {
-      var result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
-          _searchKeyword,
-          startFloor: _listViewController.length());
-      return result;
-    } else {
-      return await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_hole, startFloor: page * Constant.POST_COUNT_PER_PAGE);
+    Future<List<OTFloor>?> loadPunishmentHistory(int page) async {
+      if (page == 0) {
+        return (await OpenTreeHoleRepository.getInstance()
+                .getPunishmentHistory())
+            ?.map((e) => e.floor!)
+            .toList();
+      } else {
+        // notify the list view that there is no more data - the first page is the last page.
+        return [];
+      }
     }
+
+    return switch (_renderMode) {
+      RenderMode.NORMAL => await OpenTreeHoleRepository.getInstance()
+          .loadFloors(_hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
+      RenderMode.SEARCH_RESULT => await OpenTreeHoleRepository.getInstance()
+          .loadSearchResults(_searchKeyword,
+              startFloor: _listViewController.length()),
+      RenderMode.PUNISHMENT_HISTORY => await loadPunishmentHistory(page),
+    };
   }
 
   Future<bool?> _isHoleFavorite() async {
@@ -178,6 +192,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   void initState() {
     super.initState();
     if (widget.arguments!.containsKey('post')) {
+      _renderMode = RenderMode.NORMAL;
       _hole = widget.arguments!['post'];
       // Cache preloaded floor only when user views the Hole
       for (var floor
@@ -190,10 +205,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .updateHoleViewCount(_hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
+      _renderMode = RenderMode.SEARCH_RESULT;
       _searchKeyword = widget.arguments!['searchKeyword'];
       // Create a dummy post for displaying search result
       _hole = OTHole.dummy();
+    } else if (widget.arguments!.containsKey('punishmentHistory') &&
+        widget.arguments!['punishmentHistory'] == true) {
+      _renderMode = RenderMode.PUNISHMENT_HISTORY;
+      // Create a dummy post for displaying punishment history
+      _hole = OTHole.dummy();
     }
+
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
     if (widget.arguments!.containsKey('locate')) {
@@ -285,7 +307,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
       ),
       // Only show empty message when searching, for now.
-      emptyBuilder: _searchKeyword != null
+      emptyBuilder: _renderMode != RenderMode.NORMAL
           ? (context) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -302,12 +324,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: Text(_searchKeyword == null
-              ? "#${_hole.hole_id}"
-              : S.of(context).search_result),
+          child: switch (_renderMode) {
+            RenderMode.NORMAL => Text("#${_hole.hole_id}"),
+            RenderMode.SEARCH_RESULT => Text(S.of(context).search_result),
+            RenderMode.PUNISHMENT_HISTORY => const Text("查看处罚历史"),
+          },
         ),
         trailingActions: [
-          if (_searchKeyword == null) ...[
+          if (_renderMode == RenderMode.NORMAL) ...[
             _buildFavoredActionButton(),
             PlatformIconButton(
               padding: EdgeInsets.zero,
@@ -394,7 +418,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : BoxDecoration(
                   image: DecorationImage(
                       image: _backgroundImage!, fit: BoxFit.cover)),
-          child: _searchKeyword == null
+          child: _renderMode == RenderMode.NORMAL
               ? RefreshIndicator(
                   edgeOffset: MediaQuery.of(context).padding.top,
                   color: Theme.of(context).colorScheme.secondary,
@@ -1013,15 +1037,19 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     Future<List<ImageUrlInfo>?> loadPageImage(
         BuildContext pageContext, int pageIndex) async {
-      List<OTFloor>? result;
-      if (_searchKeyword != null) {
-        result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
-            _searchKeyword,
-            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE);
-      } else {
-        result = await OpenTreeHoleRepository.getInstance().loadFloors(_hole,
-            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE);
-      }
+      List<OTFloor>? result = switch (_renderMode) {
+        RenderMode.NORMAL => await OpenTreeHoleRepository.getInstance()
+            .loadFloors(_hole,
+                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+        RenderMode.SEARCH_RESULT => await OpenTreeHoleRepository.getInstance()
+            .loadSearchResults(_searchKeyword,
+                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+        RenderMode.PUNISHMENT_HISTORY =>
+          (await OpenTreeHoleRepository.getInstance().getPunishmentHistory())
+              ?.map((e) => e.floor!)
+              .toList(),
+      };
+
       if (result == null || result.isEmpty) {
         return null;
       } else {
@@ -1037,7 +1065,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
-      index: _searchKeyword == null ? index : null,
+      index: _renderMode == RenderMode.NORMAL ? index : null,
       isInMention: isNested,
       parentHole: _hole,
       onLongPress: () async {
@@ -1064,7 +1092,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               });
             }
           : () async {
-              if (_searchKeyword == null) {
+        if (_renderMode == RenderMode.NORMAL) {
                 int? replyId;
                 // Set the replyId to null when tapping on the first reply.
                 if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
@@ -1177,3 +1205,5 @@ StatelessWidget smartRender(
     isPreviewWidget: preview,
   );
 }
+
+enum RenderMode { NORMAL, SEARCH_RESULT, PUNISHMENT_HISTORY }

@@ -25,6 +25,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
+import 'package:dan_xi/model/opentreehole/punishment.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
@@ -566,6 +567,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return (await dio.delete("$_BASE_URL/floors/$floorId",
             options: Options(headers: _tokenHeader)))
         .statusCode;
+  }
+
+  /// Get user's punishment history
+  Future<List<OTPunishment>?> getPunishmentHistory() async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/me/punishments",
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
   }
 
   /// Admin API below

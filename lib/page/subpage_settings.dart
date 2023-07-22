@@ -775,6 +775,12 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               ],
               ListTile(
                 leading: nil,
+                title: const Text("查看处罚历史"),
+                onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
+                    arguments: {"punishmentHistory": true}),
+              ),
+              ListTile(
+                leading: nil,
                 title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,
