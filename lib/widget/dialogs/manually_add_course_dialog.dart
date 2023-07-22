@@ -49,9 +49,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
 
   void onButtonPressed() async {
     List<CourseTime>? courseTime = await showPlatformDialog<List<CourseTime>>(
-        context: context,
-        builder: (context) =>
-            AddCourseDialogSub());
+        context: context, builder: (context) => const AddCourseDialogSub());
     if (courseTime != null) {
       newCourse.times!.addAll(courseTime);
       selectedCourseTimeInfo.add(
