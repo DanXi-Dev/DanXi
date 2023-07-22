@@ -80,7 +80,7 @@ Tools • Dart 3.0.5 • DevTools 2.23.1
    
 如果你正在为`iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835)`Xcode`。
   
-确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。
+确定配置正确后，你需要首先在项目根目录下运行 `dart run build_runner build --delete-conflicting-outputs`，然后运行 `flutter run [ios/android]`即可运行应用。
 
 ## 赞助
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
