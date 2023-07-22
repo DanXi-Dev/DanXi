@@ -1,19 +1,5 @@
-中文版 [English Version](README_EN.md)  
+中文版 [English Version](README_EN.md)
 [官方网站](https://danxi.fduhole.com)
-
-[//]: # (# 暂停开发公告)
-
-[//]: # ()
-
-[//]: # (由于 Flutter 框架在开发中表现出越来越不适应我们需求的兼容性、稳定性和流畅性，旦夕开发组于 2022 年 7 月 20 日 正式决定弃用 Flutter 框架，转向 Android 和 iOS)
-
-[//]: # (原生开发。)
-
-[//]: # ()
-
-[//]: # (现有仓库仅进行维护性更新。新的仓库可在 [这里（Android 端）]&#40;https://github.com/DanXi-Dev/DanXi-NG&#41;)
-
-[//]: # (和 [这里（iOS 端，由于含有测试私钥，仓库尚未公开）]&#40;https://github.com/DanXi-Dev/DanXi-Swift&#41; 查看。)
 
 # 旦夕
 
@@ -24,7 +10,7 @@
 
 日月光华，旦复旦兮.
 
-可能是为 FDUer 准备的,最好的一站式服务 APP!  
+可能是为 FDUer 准备的,最好的一站式服务 APP!
 
 - 校园卡余额和消费记录
 - 食堂消费人数
@@ -41,6 +27,7 @@
 欢迎各位大佬加入开发~
 
 # 安装
+
 如果您遇到了本应用中不符合预期的行为，欢迎 [新建 Issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose) 或 [发起 Pull request](https://github.com/DanXi-Dev/DanXi/compare)。
 
 ## iOS(watchOS)/iPadOS
@@ -48,41 +35,56 @@
 从 [App Store](https://apps.apple.com/app/id1568629997) 下载
 
 ## Android
-打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 apk 安装包，安装即可。  
+
+打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 apk 安装包，安装即可。
 （依据设备差异，您可能需要在设置中允许「安装来自未知来源的应用」）
 
 ## Windows
-打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。  
+
+打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
 
 ## macOS
+
 使用 Apple Silicon 的用户可以直接从 [App Store](https://apps.apple.com/app/id1568629997) 下载。
 
 其他用户：我们将等待 Flutter 框架对 macOS 的支持稳定后考虑发行专属的 macOS 版本。
 
 # 构建
+
 ## 我们当前使用的 Flutter 编译版本
 
-```shell script
+```shell
 $ flutter --version
 Flutter 3.10.5 • channel stable • https://github.com/flutter/flutter.git
 Framework • revision 796c8ef792 (2 weeks ago) • 2023-06-13 15:51:02 -0700
 Engine • revision 45f6e00911
 Tools • Dart 3.0.5 • DevTools 2.23.1
 ```
+
 ## 编译说明
-本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。  
-  
-为了构建本应用，您需要按照`Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装`Flutter SDK`。
-  
-如果您正在为`Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/)`Visual Studio`。  
-  
-如果您正在为`Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio)`Android Command Line Tools`。
-   
-如果你正在为`iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835)`Xcode`。
-  
-确定配置正确后，在项目根目录下运行`flutter run [ios/android]`即可运行应用。
+
+本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。
+
+为了构建本应用，您需要按照 `Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装 `Flutter SDK`。
+
+如果您正在为 `Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/) `Visual Studio`。
+
+如果您正在为 `Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio) `Android Command Line Tools`。
+
+如果你正在为 `iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
+
+确定配置正确后，你需要首先在项目根目录下运行 `dart run build_runner build --delete-conflicting-outputs`，`dart run intl_utils:generate` 然后运行  `flutter run [ios/android]`即可运行应用。
 
 ## 赞助
+
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
 
 我们的邮箱：[dev@fduhole.com](mailto:dev@fduhole.com)
+
+[//]: #
+[//]: #
+[//]: #
+[//]: #
+[//]: #
+[//]: #
+[//]: #

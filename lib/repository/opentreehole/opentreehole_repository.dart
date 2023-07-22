@@ -25,9 +25,11 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
+import 'package:dan_xi/model/opentreehole/punishment.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -294,6 +296,20 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
+  Future<List<OTHole>?> loadUserHoles(DateTime startTime,
+      {int length = Constant.POST_COUNT_PER_PAGE, SortOrder? sortOrder}) async {
+    sortOrder ??= SortOrder.LAST_REPLIED;
+    final Response<List<dynamic>> response =
+        await dio.get("$_BASE_URL/users/me/holes",
+            queryParameters: {
+              "offset": startTime.toUtc().toIso8601String(),
+              "size": length,
+              "order": sortOrder.getInternalString()
+            },
+            options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+  }
+
   Future<OTHole?> loadSpecificHole(int holeId) async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/holes/$holeId",
@@ -366,7 +382,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<int?> newHole(int divisionId, String? content,
       {List<OTTag>? tags}) async {
     if (content == null) return -1;
-    if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, "默认")];
+    if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
     final Response<dynamic> response = await dio.post("$_BASE_URL/holes",
         data: {
@@ -566,6 +582,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return (await dio.delete("$_BASE_URL/floors/$floorId",
             options: Options(headers: _tokenHeader)))
         .statusCode;
+  }
+
+  /// Get user's punishment history
+  Future<List<OTPunishment>?> getPunishmentHistory() async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/me/punishments",
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
   }
 
   /// Admin API below

@@ -266,6 +266,7 @@ class ChangeDivisionEvent {
 enum PostsType {
   FAVORED_DISCUSSION,
   FILTER_BY_TAG,
+  FILTER_BY_ME,
   NORMAL_POSTS,
   EXTERNAL_VIEW
 }
@@ -274,7 +275,9 @@ enum PostsType {
 ///
 /// Arguments:
 /// [bool] showFavoredDiscussion: if [showFavoredDiscussion] is not null,
-/// it means this page is showing user's favored posts.
+/// it means this page is showing user's favored posts (whether it is false or true).
+/// [bool] showFilterByMe: if [showFilterByMe] is not null, it means this page is showing
+/// the posts which is created by the user (whether it is false or true).
 /// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
 /// the posts which is tagged with [tagFilter].
 ///
@@ -333,6 +336,23 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         // Favored discussion has only one page.
         if (page > 1) return [];
         return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
+      case PostsType.FILTER_BY_ME:
+        List<OTHole>? loadedPost = await adaptLayer
+            .generateReceiver(listViewController, (lastElement) {
+          DateTime time = DateTime.now();
+          if (lastElement != null) {
+            time = DateTime.parse(lastElement.time_updated!);
+          }
+          return OpenTreeHoleRepository.getInstance()
+              .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
+        }).call(page);
+        // If not more posts, notify ListView that we reached the end.
+        if (loadedPost?.isEmpty ?? false) return [];
+
+        // About this line, see [PagedListView].
+        return loadedPost == null || loadedPost.isEmpty
+            ? [OTHole.DUMMY_POST]
+            : loadedPost;
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
@@ -492,6 +512,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       } else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
           false) {
         _postsType = PostsType.FAVORED_DISCUSSION;
+      } else if (widget.arguments?.containsKey('showFilterByMe') ?? false) {
+        _postsType = PostsType.FILTER_BY_ME;
       }
       _fieldInitComplete = true;
     }
@@ -522,13 +544,19 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             builder: (context) => _buildPageBody(context, false),
           ),
         );
+      case PostsType.FILTER_BY_ME:
       case PostsType.FILTER_BY_TAG:
         return PlatformScaffold(
           iosContentPadding: false,
           iosContentBottomPadding: false,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
-            title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
+            title: Text(switch (_postsType) {
+              PostsType.FILTER_BY_ME => S.of(context).list_my_posts,
+              PostsType.FILTER_BY_TAG =>
+                S.of(context).filtering_by_tag(_tagFilter ?? "?"),
+              _ => throw Exception("Unreachable"),
+            }),
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)

@@ -784,6 +784,19 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               ],
               ListTile(
                 leading: nil,
+                title: Text(S.of(context).list_my_posts),
+                onTap: () => smartNavigatorPush(context, '/bbs/discussions',
+                    arguments: {'showFilterByMe': true},
+                    forcePushOnMainNavigator: true),
+              ),
+              ListTile(
+                leading: nil,
+                title: Text(S.of(context).list_my_punishments),
+                onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
+                    arguments: {"punishmentHistory": true}),
+              ),
+              ListTile(
+                leading: nil,
                 title: context.read<FDUHoleProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,

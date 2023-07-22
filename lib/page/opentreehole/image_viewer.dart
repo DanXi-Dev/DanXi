@@ -31,7 +31,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
