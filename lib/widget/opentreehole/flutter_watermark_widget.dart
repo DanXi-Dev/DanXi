@@ -47,8 +47,8 @@ class FullScreenWatermark extends StatelessWidget {
     for (var i = 0; i < columnCount; i++) {
       final widget = Expanded(
           child: Row(
-            children: _createRowWidgets(),
-          ));
+        children: _createRowWidgets(),
+      ));
       list.add(widget);
     }
     return list;
@@ -59,12 +59,23 @@ class FullScreenWatermark extends StatelessWidget {
     for (var i = 0; i < rowCount; i++) {
       final widget = Expanded(
           child: Center(
-              child: Transform.rotate(
-                  angle: pi / 10, child: Consumer<FDUHoleProvider>(
-                builder: (context, holeProvider, _) => Text(holeProvider.userInfo?.user_id.toString() ?? " ", style: textStyle),
-              ))));
+              child: Transform.translate(
+        offset: Offset(_getPositionNoise(), _getPositionNoise()),
+        child: Transform.rotate(
+            angle: pi / 10,
+            child: Consumer<FDUHoleProvider>(
+              builder: (context, holeProvider, _) => Text(
+                  holeProvider.userInfo?.user_id.toString() ?? " ",
+                  style: textStyle),
+            )),
+      )));
       list.add(widget);
     }
     return list;
+  }
+
+  double _getPositionNoise() {
+    Random rand = Random();
+    return rand.nextDouble() * 4 * (rand.nextBool() ? 1 : -1);
   }
 }
