@@ -373,7 +373,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       });
                     }),
                 PopupMenuOption(
-                  label: 'Share',
+                  label: S.of(context).share,
                   onTap: (_) async {
                     if (await _shareHoleAsUri(_hole.hole_id)) {
                       if (mounted) {
