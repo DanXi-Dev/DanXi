@@ -84,4 +84,4 @@ If you are building for `Android`, you should also [install and configure](https
 
 If you are building for `iOS/iPadOS`, you should also [install and configure](https://apps.apple.com/cn/app/xcode/id497799835) `Xcode`.  
 
-Run the command `flutter run [ios/android]` to start the app.
+Run the command `dart run build_runner build --delete-conflicting-outputs` and then `flutter run [ios/android]` to start the app.
