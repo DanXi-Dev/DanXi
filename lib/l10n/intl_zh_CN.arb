@@ -474,5 +474,7 @@
   "shareHoleSuccess": "分享该洞成功！请检查剪贴板。",
   "shareFloorSuccess": "分享该楼层成功！请检查剪贴板。",
   "invalidUri": "无效的 URI",
-  "elementNotFound": "未找到要跳转的元素"
+  "elementNotFound": "未找到要跳转的元素",
+  "share_floor": "分享楼层",
+  "share_hole": "分享帖子"
 }

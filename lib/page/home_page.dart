@@ -340,7 +340,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             context, 'floor', int.parse(initialUri.pathSegments[1]));
       } else {
         Error error = ArgumentError(S.of(context).invalidUri);
-        Noticing.showErrorDialog(context, error);
+        throw error;
       }
     }
 
@@ -370,7 +370,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       } catch (_) {}
     }
     try {
-      if (element == 'hole' && mounted) {
+      if (element == 'hole' && context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail", arguments: {
           "post": await OpenTreeHoleRepository.getInstance()
               .loadSpecificHole(postId),

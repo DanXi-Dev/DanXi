@@ -474,5 +474,7 @@
   "shareHoleSuccess": "Share Hole success! Please check your clipboard.",
   "shareFloorSuccess": "Share floor success! Please check your clipboard.",
   "invalidUri": "Invalid uri",
-  "elementNotFound": "No element found to jump to"
+  "elementNotFound": "No element found to jump to",
+  "share_floor": "分享楼层",
+  "share_hole": "分享树洞"
 }

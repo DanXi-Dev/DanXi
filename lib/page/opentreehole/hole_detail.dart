@@ -323,7 +323,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       refreshListView(ignorePrefetch: false);
                     }),
                 PopupMenuOption(
-                  label: 'Share',
+                  label: S.of(context).share_hole,
                   onTap: (_) async {
                     if (await _shareHoleAsUri(_hole.hole_id)) {
                       if (mounted) {
@@ -853,7 +853,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
           }
         },
-        child: Text(S.of(menuContext).share),
+        child: Text(S.of(context).share_floor),
       ),
       PlatformContextMenuItem(
         menuContext: menuContext,
