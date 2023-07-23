@@ -327,8 +327,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     */
   }
 
-  // Deal with url_scheme.
-  // https://pub.dev/packages/uni_links
+  /// Deal with url_scheme.
+  /// https://pub.dev/packages/uni_links
   Future<void> _initUniLinks() async {
     Future<void> dealWithUri(Uri initialUri) async {
       // jump to the corresponding page according to the uri pattern
@@ -356,7 +356,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  // Jump to the specified element e.g. hole, floor.
+  /// Jump to the specified element e.g. hole, floor.
   Future<void> jumpToElements(
     BuildContext context,
     String element,
