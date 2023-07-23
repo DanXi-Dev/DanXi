@@ -367,9 +367,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       try {
         OpenTreeHoleRepository.getInstance().initializeToken();
-      } on NotLoginError {
-        Noticing.showErrorDialog(context, NotLoginError);
-      }
+      } catch (_) {}
     }
     try {
       if (element == 'hole' && mounted) {
@@ -423,7 +421,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ) async {
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       // Do a quick initialization and push
-      OpenTreeHoleRepository.getInstance().initializeToken();
+      try {
+        OpenTreeHoleRepository.getInstance().initializeToken();
+      } catch (_) {}
     }
     smartNavigatorPush(context, '/bbs/messages',
         forcePushOnMainNavigator: true);
