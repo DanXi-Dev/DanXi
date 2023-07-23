@@ -845,17 +845,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           }),
       PlatformContextMenuItem(
         menuContext: menuContext,
-        isDestructive: true,
-        onPressed: () async {
-          if (await OTEditor.reportPost(context, e.floor_id)) {
-            Noticing.showMaterialNotice(context, S.of(context).report_success);
-          }
-        },
-        child: Text(S.of(menuContext).report),
-      ),
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        isDestructive: true,
         onPressed: () async {
           if (await _shareFloorAsUri(e.floor_id)) {
             if (mounted) {
@@ -865,6 +854,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           }
         },
         child: Text(S.of(menuContext).share),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        isDestructive: true,
+        onPressed: () async {
+          if (await OTEditor.reportPost(context, e.floor_id)) {
+            Noticing.showMaterialNotice(context, S.of(context).report_success);
+          }
+        },
+        child: Text(S.of(menuContext).report),
       ),
       if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
         PlatformContextMenuItem(
