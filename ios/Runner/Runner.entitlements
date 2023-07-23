@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>webcredentials:www.fduhole.com</string>
+		<string>applinks:www.fduhole.com</string>
 	</array>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>

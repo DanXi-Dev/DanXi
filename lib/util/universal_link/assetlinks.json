@@ -1,0 +1,5 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target" : { "namespace": "android_app", "package_name": "io.github.danxi_dev.dan_xi",
+    "sha256_cert_fingerprints": ["8D:3A:9A:8E:C8:37:34:39:3C:78:88:0A:62:F8:56:BC:9F:E1:A3:8D:8E:80:E0:BC:15:15:D8:CB:F1:8D:C1:8A"] }
+}]
