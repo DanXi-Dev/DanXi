@@ -87,7 +87,7 @@ dependencies:
   screen_capture_event: ^1.0.0+1
   otp: ^3.0.2
   lunar: ^1.2.20
-  flutter_fgbg: ^0.2.0
+  flutter_fgbg: ^0.3.0
   lazy_load_indexed_stack: ^1.0.0
   js: ^0.6.5
   nil: ^1.1.1
