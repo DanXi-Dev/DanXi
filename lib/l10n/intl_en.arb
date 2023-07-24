@@ -488,5 +488,9 @@
   "list_my_posts": "My Posts",
   "list_my_punishments": "My Punishments",
   "multiple_select_mode_exit": "Stop Multi-Select",
-  "multiple_select_mode_enter": "Start Multi-Select"
+  "multiple_select_mode_enter": "Start Multi-Select",
+  "copy_floor_id": "Copy Floor ID",
+  "copy_floor_id_success": "Copy Floor ID success! Please check your clipboard.",
+  "copy_hole_id": "Copy Hole ID",
+  "copy_hole_id_success": "Copy Hole ID success! Please check your clipboard."
 }

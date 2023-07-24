@@ -384,6 +384,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   },
                 ),
                 PopupMenuOption(
+                  label: S.of(context).copy_hole_id,
+                  onTap: (_) async {
+                    FlutterClipboard.copy('#${_hole.hole_id}');
+                      if (mounted) {
+                        Noticing.showMaterialNotice(
+                            context, S.of(context).copy_hole_id_success);
+                      }
+                  },
+                ),
+                PopupMenuOption(
                     label: S.of(context).hide_hole,
                     onTap: (_) async {
                       bool? result = await Noticing.showConfirmationDialog(
@@ -896,6 +906,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
+          FlutterClipboard.copy('##${e.floor_id}');
+            if (mounted) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).copy_floor_id_success);
+            }
+        },
+        child: Text(S.of(context).copy_floor_id),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        onPressed: () async {
           if (await _shareFloorAsUri(e.floor_id)) {
             if (mounted) {
               Noticing.showMaterialNotice(
@@ -1200,7 +1221,9 @@ StatelessWidget smartRender(
     bool translucentCard,
     {bool preview = false}) {
   return PostRenderWidget(
-    render: kMarkdownRender,
+    render: SettingsProvider.getInstance().isMarkdownRenderingEnabled
+        ? kMarkdownRender
+        : kPlainRender,
     content: preprocessContentForDisplay(content),
     onTapImage: onTapImage,
     onTapLink: onTapLink,

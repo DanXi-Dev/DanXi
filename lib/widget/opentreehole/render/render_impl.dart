@@ -117,6 +117,19 @@ final BaseRender kMarkdownRender = (BuildContext context,
   );
 };
 
+final BaseRender kPlainRender = (BuildContext context,
+    String? content,
+    ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    bool translucentCard,
+    bool isPreviewWidget){
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [Text(content??"")],
+  );
+};
+
 class MarkdownLatexSupport extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) =>
