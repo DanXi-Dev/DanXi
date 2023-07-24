@@ -1,4 +1,6 @@
 PODS:
+  - device_identity (0.0.1):
+    - Flutter
   - device_info (0.0.1):
     - Flutter
   - device_info_plus (0.0.1):
@@ -102,6 +104,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - device_identity (from `.symlinks/plugins/device_identity/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -140,6 +143,8 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  device_identity:
+    :path: ".symlinks/plugins/device_identity/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
   device_info_plus:
@@ -194,6 +199,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  device_identity: ad27231cb8754e5bc63ce2225e2e1d95d374ca88
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac

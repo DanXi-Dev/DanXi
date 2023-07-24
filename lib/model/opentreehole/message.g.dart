@@ -15,8 +15,7 @@ OTMessage _$OTMessageFromJson(Map<String, dynamic> json) => OTMessage(
       json['data'] as Map<String, dynamic>?,
     )..description = json['description'] as String?;
 
-Map<String, dynamic> _$OTMessageToJson(OTMessage instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$OTMessageToJson(OTMessage instance) => <String, dynamic>{
       'message_id': instance.message_id,
       'message': instance.message,
       'description': instance.description,

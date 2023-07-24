@@ -77,6 +77,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_HIDDEN_HOLES = "hidden_holes";
   static const String KEY_HIDDEN_NOTIFICATIONS = "hidden_notifications";
   static const String KEY_THEME_TYPE = "theme_type";
+  static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
 
   SettingsProvider._();
 
@@ -603,6 +604,18 @@ class SettingsProvider with ChangeNotifier {
 
   set themeType(ThemeType type) {
     preferences!.setString(KEY_THEME_TYPE, type.internalString());
+    notifyListeners();
+  }
+
+  bool get isMarkdownRenderingEnabled {
+    if (preferences!.containsKey(KEY_MARKDOWN_ENABLED)) {
+      return preferences!.getBool(KEY_MARKDOWN_ENABLED)!;
+    }
+    return true;
+  }
+
+  set isMarkdownRenderingEnabled(bool value) {
+    preferences!.setBool(KEY_MARKDOWN_ENABLED, value);
     notifyListeners();
   }
 }

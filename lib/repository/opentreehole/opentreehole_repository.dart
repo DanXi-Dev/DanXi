@@ -25,9 +25,11 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
+import 'package:dan_xi/model/opentreehole/punishment.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -54,9 +56,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Cached floors, used by [mentions]
   final Map<int, OTFloor> _floorCache = {};
 
-  /// Cached OTDivisions
-  List<OTDivision> _divisionCache = [];
-
   /// Cached OTTags
   List<OTTag> _tagCache = [];
 
@@ -76,8 +75,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       } else {
         provider.token = SettingsProvider.getInstance().fduholeToken;
       }
-      await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     }
+    await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     clearCache();
     SettingsProvider.getInstance().deleteAllFduholeData();
   }
@@ -85,9 +84,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   void clearCache() {
     provider.token = null;
     provider.userInfo = null;
+    provider.divisionCache = [];
     _pushNotificationRegData = null;
     _floorCache.clear();
-    _divisionCache.clear();
     _tagCache.clear();
   }
 
@@ -135,7 +134,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     } catch (_) {}
 
     if (provider.userInfo == null) await getUserProfile(forceUpdate: true);
-    if (_divisionCache.isEmpty) await loadDivisions(useCache: false);
+    if (provider.divisionCache.isEmpty) await loadDivisions(useCache: false);
     if (_pushNotificationRegData != null) {
       // No need for [await] here, we can do this in the background
       updatePushNotificationToken(
@@ -233,19 +232,19 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTDivision>?> loadDivisions({bool useCache = true}) async {
-    if (_divisionCache.isNotEmpty && useCache) {
-      return _divisionCache;
+    if (provider.divisionCache.isNotEmpty && useCache) {
+      return provider.divisionCache;
     }
     final Response<List<dynamic>> response = await dio
         .get("$_BASE_URL/divisions", options: Options(headers: _tokenHeader));
-    _divisionCache =
+    provider.divisionCache =
         response.data?.map((e) => OTDivision.fromJson(e)).toList() ?? [];
-    return _divisionCache;
+    return provider.divisionCache;
   }
 
   List<OTHole> getPinned(int divisionId) {
     try {
-      return _divisionCache
+      return provider.divisionCache
               .firstWhere((element) => element.division_id == divisionId)
               .pinned ??
           List<OTHole>.empty();
@@ -255,15 +254,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   List<OTDivision> getDivisions() {
-    return _divisionCache;
+    return provider.divisionCache;
   }
 
   Future<OTDivision?> loadSpecificDivision(int divisionId,
       {bool useCache = true}) async {
     if (useCache) {
       try {
-        final OTDivision cached =
-            _divisionCache.firstWhere((e) => e.division_id == divisionId);
+        final OTDivision cached = provider.divisionCache
+            .firstWhere((e) => e.division_id == divisionId);
         return cached;
       } catch (_) {}
     }
@@ -271,8 +270,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/divisions/$divisionId",
         options: Options(headers: _tokenHeader));
     final newDivision = OTDivision.fromJson(response.data!);
-    _divisionCache.removeWhere((element) => element.division_id == divisionId);
-    _divisionCache.add(newDivision);
+    var newList = provider.divisionCache.toList();
+    newList.removeWhere((element) => element.division_id == divisionId);
+    newList.add(newDivision);
+    provider.divisionCache = newList;
     return newDivision;
   }
 
@@ -292,6 +293,20 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "order": sortOrder.getInternalString()
         },
         options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+  }
+
+  Future<List<OTHole>?> loadUserHoles(DateTime startTime,
+      {int length = Constant.POST_COUNT_PER_PAGE, SortOrder? sortOrder}) async {
+    sortOrder ??= SortOrder.LAST_REPLIED;
+    final Response<List<dynamic>> response =
+        await dio.get("$_BASE_URL/users/me/holes",
+            queryParameters: {
+              "offset": startTime.toUtc().toIso8601String(),
+              "size": length,
+              "order": sortOrder.getInternalString()
+            },
+            options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
@@ -367,7 +382,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<int?> newHole(int divisionId, String? content,
       {List<OTTag>? tags}) async {
     if (content == null) return -1;
-    if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, "默认")];
+    if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
     final Response<dynamic> response = await dio.post("$_BASE_URL/holes",
         data: {
@@ -422,12 +437,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.where((element) => element != null).toList();
   }*/
 
-  Future<OTFloor?> likeFloor(int floorId, bool like) async {
+  Future<OTFloor?> likeFloor(int floorId, int like) async {
     final Response<Map<String, dynamic>> response =
-        await dio.put("$_BASE_URL/floors/$floorId",
-            data: {
-              "like": like ? "add" : "cancel",
-            },
+        await dio.post("$_BASE_URL/floors/$floorId/like/$like",
             options: Options(headers: _tokenHeader));
     return OTFloor.fromJson(response.data!);
   }
@@ -572,6 +584,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         .statusCode;
   }
 
+  /// Get user's punishment history
+  Future<List<OTPunishment>?> getPunishmentHistory() async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/me/punishments",
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
+  }
+
   /// Admin API below
   Future<List<OTReport>?> adminGetReports(int startReport,
       [int length = 10]) async {
@@ -714,6 +734,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<void> deletePushNotificationToken(String deviceId) async {
     await dio.delete("$_BASE_URL/users/push-tokens",
         data: {"device_id": deviceId}, options: Options(headers: _tokenHeader));
+  }
+
+  Future<int?> deleteAllPushNotificationToken() async {
+    final resp = await dio.delete("$_BASE_URL/users/push-tokens/_all",
+        options: Options(headers: _tokenHeader));
+    return resp.statusCode;
   }
 
   @override

@@ -766,6 +766,15 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     });
                   },
                 ),
+                if (SettingsProvider.getInstance().debugMode)
+                  ListTile(
+                      leading: const Icon(Icons.speed),
+                      title: const Text("Light Rendering"),
+                      subtitle: const Text("[WARNING: DEBUG FEATURE] Disable Markdown Rendering"),
+                      onTap: () {
+                        SettingsProvider.getInstance().isMarkdownRenderingEnabled = !SettingsProvider.getInstance().isMarkdownRenderingEnabled;
+                      }
+                  ),
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).modify_password),
@@ -773,6 +782,19 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
                 ),
               ],
+              ListTile(
+                leading: nil,
+                title: Text(S.of(context).list_my_posts),
+                onTap: () => smartNavigatorPush(context, '/bbs/discussions',
+                    arguments: {'showFilterByMe': true},
+                    forcePushOnMainNavigator: true),
+              ),
+              ListTile(
+                leading: nil,
+                title: Text(S.of(context).list_my_punishments),
+                onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
+                    arguments: {"punishmentHistory": true}),
+              ),
               ListTile(
                 leading: nil,
                 title: context.read<FDUHoleProvider>().isUserInitialized

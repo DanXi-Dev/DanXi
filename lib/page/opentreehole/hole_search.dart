@@ -22,10 +22,12 @@ import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/danxi_care.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -157,18 +159,31 @@ class _OTSearchPageState extends State<OTSearchPage> {
 final RegExp pidPattern = RegExp(r'#([0-9]+)');
 final RegExp floorPattern = RegExp(r'##([0-9]+)');
 
+final GlobalKey _globalKey = GlobalKey();
+
 Widget searchByText(BuildContext context, String searchKeyword) {
-  return ListTile(
-    title: Text(S.of(context).search_by_text_tip(searchKeyword)),
-    leading: PlatformX.isMaterial(context)
-        ? const Icon(Icons.text_fields)
-        : const Icon(CupertinoIcons.search),
-    onTap: () {
-      submit(context, searchKeyword);
-      smartNavigatorPush(context, "/bbs/postDetail",
-          arguments: {"searchKeyword": searchKeyword});
-    },
-  );
+  return Builder(
+      key: _globalKey,
+      builder: (context) {
+        return ListTile(
+          title: Text(S.of(context).search_by_text_tip(searchKeyword)),
+          leading: PlatformX.isMaterial(context)
+              ? const Icon(Icons.text_fields)
+              : const Icon(CupertinoIcons.search),
+          onTap: () async {
+            submit(context, searchKeyword);
+            bool isCareWordsDetected = await detectCareWords(searchKeyword);
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              if (isCareWordsDetected) {
+                await showPlatformDialog(
+                    context: context, builder: (_) => const CareDialog());
+              }
+              smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
+                  arguments: {"searchKeyword": searchKeyword});
+            });
+          },
+        );
+      });
 }
 
 Widget searchByPid(BuildContext context, String searchKeyword) {

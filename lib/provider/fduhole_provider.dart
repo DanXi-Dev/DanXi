@@ -56,5 +56,18 @@ class FDUHoleProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Cached OTDivisions.
+  ///
+  /// Note: DO NOT call modify methods on this list, as it will not trigger
+  /// the listeners!
+  List<OTDivision> _divisionCache = List.empty(growable: false);
+
+  List<OTDivision> get divisionCache => _divisionCache;
+
+  set divisionCache(List<OTDivision> value) {
+    _divisionCache = List.unmodifiable(value);
+    notifyListeners();
+  }
+
   bool get isUserInitialized => token != null && userInfo != null;
 }

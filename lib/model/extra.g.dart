@@ -17,6 +17,7 @@ Extra _$ExtraFromJson(Map<String, dynamic> json) => Extra(
               ? null
               : BannerExtra.fromJson(e as Map<String, dynamic>))
           .toList(),
+      (json['careWords'] as List<dynamic>?)?.map((e) => e as String?).toList(),
     );
 
 Map<String, dynamic> _$ExtraToJson(Extra instance) => <String, dynamic>{
@@ -24,6 +25,7 @@ Map<String, dynamic> _$ExtraToJson(Extra instance) => <String, dynamic>{
       'userAgent': instance.userAgent,
       'stopWords': instance.stopWords,
       'banners': instance.banners,
+      'careWords': instance.careWords,
     };
 
 TimeTableExtra _$TimeTableExtraFromJson(Map<String, dynamic> json) =>

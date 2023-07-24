@@ -99,10 +99,21 @@ class Constant {
   /// something that is not encouraged by the treehole community.
   static List<String> _stopWords = [];
 
+  /// The care words to be determined in the [BBSEditorWidget] and [OTSearchPage].
+  ///
+  /// Care words are used to encourage some depressed and show some care from the community
+  static List<String> _careWords = [];
+
   /// Load in the stop words in the [BBSEditorWidget].
   static Future<List<String>> _loadStopWords() async {
     String wordLines =
         await rootBundle.loadString("assets/texts/stop_words.dat");
+    return wordLines.split("\n");
+  }
+
+  static Future<List<String>> _loadCareWords() async {
+    String wordLines =
+    await rootBundle.loadString("assets/texts/care_words.dat");
     return wordLines.split("\n");
   }
 
@@ -129,6 +140,30 @@ class Constant {
     // Fall back to local copy
     if (_stopWords.isEmpty) _stopWords = await _loadStopWords();
     return _stopWords;
+  }
+
+  /// Get care words list from
+  ///
+  /// If failed to get, return an empty string
+  static Future<List<String>> get careWords async {
+    List<String?>? list;
+
+    try {
+      list = AnnouncementRepository.getInstance().getCareWords();
+    } catch (_) {}
+
+    if(list != null) {
+      List<String> filterList = list
+          .filter((e) => e != null && e.trim().isNotEmpty)
+          .map((e) => e!)
+          .toList();
+      if (filterList.isNotEmpty) {
+        return filterList;
+      }
+    }
+
+    if (_careWords.isEmpty) _careWords =  await _loadCareWords();
+    return _careWords;
   }
 
   /// Get a random tip from [_loadTips].
