@@ -61,11 +61,11 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
+import 'package:uni_links/uni_links.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
-import 'package:uni_links/uni_links.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -408,6 +408,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     }
 
+    if (!PlatformX.isAndroid) return;
     ri.Intent? intent = await ri.ReceiveIntent.getInitialIntent();
     await dealWithIntent(intent);
     _receivedIntentSubscription.bindOnlyInvalid(
