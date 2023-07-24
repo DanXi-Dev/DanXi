@@ -479,6 +479,8 @@
   "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}, Tap to View Details",
   "zhangjiang_campus": "Zhangjiang",
   "forum_message": "Message",
+  "share_floor": "Share Floor",
+  "share_hole": "Share Hole",
   "shareHoleSuccess": "Share Hole success! Please check your clipboard.",
   "shareFloorSuccess": "Share floor success! Please check your clipboard.",
   "invalidUri": "Invalid uri",

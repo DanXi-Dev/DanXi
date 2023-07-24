@@ -166,7 +166,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // construct the uri of the floor and copy it to clipboard
   Future<bool> _shareFloorAsUri(int? floorId) async {
-    String uri = 'danxi://forum/floor/$floorId';
+    String uri = 'https://www.fduhole.com/floor/$floorId';
     try {
       if (floorId == null) return false;
       FlutterClipboard.copy(uri);
@@ -178,7 +178,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // construct the uri of the hole and copy it to clipboard
   Future<bool> _shareHoleAsUri(int? holeId) async {
-    String uri = 'danxi://forum/hole/$holeId';
+    String uri = 'https://www.fduhole.com/hole/$holeId';
     try {
       if (holeId == null) return false;
       FlutterClipboard.copy(uri);
@@ -373,7 +373,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       });
                     }),
                 PopupMenuOption(
-                  label: S.of(context).share,
+                  label: S.of(context).share_hole,
                   onTap: (_) async {
                     if (await _shareHoleAsUri(_hole.hole_id)) {
                       if (mounted) {
@@ -924,7 +924,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
           }
         },
-        child: Text(S.of(menuContext).share),
+        child: Text(S.of(context).share_floor),
       ),
       PlatformContextMenuItem(
         menuContext: menuContext,

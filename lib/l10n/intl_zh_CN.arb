@@ -471,6 +471,8 @@
   "your_gpa_subtitle": "总学分数{credits}，绩点排名第{rank}名，点击查看详情",
   "zhangjiang_campus": "张江校区",
   "forum_message": "站内信",
+  "share_floor": "分享楼层",
+  "share_hole": "分享帖子",
   "shareHoleSuccess": "分享该洞成功！请检查剪贴板。",
   "shareFloorSuccess": "分享该楼层成功！请检查剪贴板。",
   "invalidUri": "无效的 URI",
