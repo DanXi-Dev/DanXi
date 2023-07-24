@@ -107,7 +107,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Listener to the url scheme.
   /// debounced to avoid duplicated events.
-  static final Stream<Uri?> _uniLinksSubscription = uriLinkStream;
+  static final StateStreamListener<Uri?> _uniLinksSubscription = StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
   ///
@@ -149,6 +149,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _captchaSubscription.cancel();
     _receivedIntentSubscription.cancel();
+    _uniLinksSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
   }
@@ -333,11 +334,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Future<void> dealWithUri(Uri initialUri) async {
       // jump to the corresponding page according to the uri pattern
       if (initialUri.pathSegments.contains("hole")) {
-        await jumpToElements(
-            context, 'hole', int.parse(initialUri.pathSegments[1]));
+        await jumpToElements('hole', int.parse(initialUri.pathSegments[1]));
       } else if (initialUri.pathSegments.contains("floor")) {
-        await jumpToElements(
-            context, 'floor', int.parse(initialUri.pathSegments[1]));
+        await jumpToElements('floor', int.parse(initialUri.pathSegments[1]));
       } else {
         Error error = ArgumentError(S.of(context).invalidUri);
         throw error;
@@ -348,33 +347,40 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     initialUri = await getInitialUri();
     if (initialUri != null) await dealWithUri(initialUri);
 
-    _uniLinksSubscription.listen((Uri? uri) async {
-      if (uri != null) await dealWithUri(uri);
-    }, onError: (Object error) {
-      // Handle exception by warning the user their action did not succeed
-      return Noticing.showErrorDialog(context, error);
-    });
+    _uniLinksSubscription.bindOnlyInvalid(
+        uriLinkStream.listen((Uri? uri) async {
+          if (uri != null) await dealWithUri(uri);
+        }, onError: (Object error) {
+          // Handle exception by warning the user their action did not succeed
+          return Noticing.showErrorDialog(context, error);
+        }), hashCode);
   }
 
   /// Jump to the specified element e.g. hole, floor.
   Future<void> jumpToElements(
-    BuildContext context,
     String element,
     int postId,
   ) async {
+    if (!mounted) {
+      return;
+    }
     // Do a quick initialization and push
     // Throw an error if the user is not logged in
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       try {
-        OpenTreeHoleRepository.getInstance().initializeToken();
-      } catch (_) {}
+        await OpenTreeHoleRepository.getInstance().initializeRepo();
+      } catch (ignored) {}
     }
     try {
-      if (element == 'hole' && context.mounted) {
-        smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-          "post": await OpenTreeHoleRepository.getInstance()
-              .loadSpecificHole(postId),
+      if (element == 'hole') {
+        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificHole(postId))!;
+        if (mounted) {
+          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+          "post": hole,
         });
+        }
+
       } else if (element == 'floor') {
         final floor = (await OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(postId))!;
