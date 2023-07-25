@@ -55,8 +55,7 @@ class QRDialog extends StatefulWidget {
 
 class QRDialogState extends State<QRDialog> {
   @override
-  Widget build(BuildContext context) => WillPopScope(
-      child: PlatformAlertDialog(
+  Widget build(BuildContext context) => PlatformAlertDialog(
         title: Text(S.of(context).fudan_qr_code),
         content: SizedBox(
             width: double.maxFinite,
@@ -89,10 +88,5 @@ class QRDialogState extends State<QRDialog> {
                 Navigator.pop(context);
               }),
         ],
-      ),
-      onWillPop: () async {
-        ScreenProxy.resetBrightness();
-        //ScreenProxy.keepOn(false);
-        return true;
-      });
+      );
 }
