@@ -37,10 +37,12 @@ class QRHelper {
     //ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
 
-    showPlatformDialog(
+    await showPlatformDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => QRDialog(personInfo: personInfo));
+    ScreenProxy.resetBrightness();
+    //ScreenProxy.keepOn(false);
   }
 }
 
@@ -83,8 +85,6 @@ class QRDialogState extends State<QRDialog> {
           TextButton(
               child: PlatformText(S.of(context).i_see),
               onPressed: () async {
-                ScreenProxy.resetBrightness();
-                //ScreenProxy.keepOn(false);
                 Navigator.pop(context);
               }),
         ],
