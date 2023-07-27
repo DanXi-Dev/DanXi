@@ -28,11 +28,13 @@ import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/danxi_care.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
@@ -605,6 +607,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
 
   bool _isFullscreen = false;
   bool? _supportTags;
+  bool _confirmCareWords = false;
 
   String? _tip;
   late EditorObject _object;
@@ -680,7 +683,23 @@ class BBSEditorPageState extends State<BBSEditorPage> {
               icon: PlatformX.isMaterial(context)
                   ? const Icon(Icons.send)
                   : const Icon(CupertinoIcons.paperplane),
-              onPressed: _canSend ? () => _sendDocument(_object) : null),
+              onPressed: _canSend
+                  ? () async {
+                      bool isCareWordsDetected =
+                          await detectCareWords(_controller.text);
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        if (isCareWordsDetected && _confirmCareWords == false) {
+                          await showPlatformDialog(
+                              context: context,
+                              builder: (_) => const CareDialog());
+                          _confirmCareWords = true;
+                          return;
+                        }
+                        _sendDocument(_object);
+                      });
+                    }
+                  : null,
+          ),
         ],
       ),
       body: SafeArea(
