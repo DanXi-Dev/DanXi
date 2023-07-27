@@ -688,7 +688,9 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                       bool isCareWordsDetected =
                           await detectCareWords(_controller.text);
                       WidgetsBinding.instance.addPostFrameCallback((_) async {
-                        if (isCareWordsDetected && _confirmCareWords == false) {
+                        // only show once
+                        if (isCareWordsDetected == true &&
+                            _confirmCareWords == false) {
                           await showPlatformDialog(
                               context: context,
                               builder: (_) => const CareDialog());
