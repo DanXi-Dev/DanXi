@@ -173,14 +173,12 @@ Widget searchByText(BuildContext context, String searchKeyword) {
           onTap: () async {
             submit(context, searchKeyword);
             bool isCareWordsDetected = await detectCareWords(searchKeyword);
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              if (isCareWordsDetected) {
-                await showPlatformDialog(
-                    context: context, builder: (_) => const CareDialog());
-              }
+            if (context.mounted && isCareWordsDetected) {
+              await showPlatformDialog(
+                  context: context, builder: (_) => const CareDialog());
+            }
               smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
                   arguments: {"searchKeyword": searchKeyword});
-            });
           },
         );
       });

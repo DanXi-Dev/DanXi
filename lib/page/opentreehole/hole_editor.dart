@@ -687,18 +687,16 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                   ? () async {
                       bool isCareWordsDetected =
                           await detectCareWords(_controller.text);
-                      WidgetsBinding.instance.addPostFrameCallback((_) async {
-                        // only show once
-                        if (isCareWordsDetected == true &&
-                            _confirmCareWords == false) {
-                          await showPlatformDialog(
-                              context: context,
-                              builder: (_) => const CareDialog());
-                          _confirmCareWords = true;
-                          return;
-                        }
-                        _sendDocument(_object);
-                      });
+                      // only show once
+                      if (context.mounted == true &&
+                          isCareWordsDetected == true &&
+                          _confirmCareWords == false) {
+                        await showPlatformDialog(
+                            context: context, builder: (_) => const CareDialog());
+                        _confirmCareWords = true;
+                        return;
+                      }
+                      _sendDocument(_object);
                     }
                   : null,
           ),
