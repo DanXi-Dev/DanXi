@@ -127,7 +127,7 @@
   "fduhole_hidden_tags": "屏蔽标签",
   "fduhole_hidden_tags_description": "隐藏树洞中带有某些标签的帖子",
   "fduhole_hidden_tags_title": "屏蔽标签",
-  "fduhole_nsfw_behavior": "NSFW 内容",
+  "fduhole_nsfw_behavior": "具有谨慎阅读（带星号）标签的内容",
   "fduhole_show_banner": "显示一些活动",
   "fduhole_show_banner_description": "[实验性] 将在树洞页面顶部显示一些不干扰浏览的校园活动公告",
   "fduhole_user_id": "已登录 (ID: {id})",
