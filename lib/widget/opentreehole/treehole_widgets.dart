@@ -994,7 +994,12 @@ class OTFloorWidgetBottomBarButton extends StatelessWidget {
           children: [
             icon,
             const SizedBox(width: 4),
-            Text(text, style: const TextStyle(fontWeight: FontWeight.bold),),
+            Text(
+              text,
+              style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
