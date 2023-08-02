@@ -388,10 +388,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   label: S.of(context).copy_hole_id,
                   onTap: (_) async {
                     FlutterClipboard.copy('#${_hole.hole_id}');
-                      if (mounted) {
-                        Noticing.showMaterialNotice(
-                            context, S.of(context).copy_hole_id_success);
-                      }
+                    if (mounted) {
+                      Noticing.showMaterialNotice(
+                          context, S.of(context).copy_hole_id_success);
+                    }
                   },
                 ),
                 PopupMenuOption(
@@ -922,10 +922,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         menuContext: menuContext,
         onPressed: () async {
           FlutterClipboard.copy('##${e.floor_id}');
-            if (mounted) {
-              Noticing.showMaterialNotice(
-                  context, S.of(context).copy_floor_id_success);
-            }
+          if (mounted) {
+            Noticing.showMaterialNotice(
+                context, S.of(context).copy_floor_id_success);
+          }
         },
         child: Text(S.of(context).copy_floor_id),
       ),
@@ -1131,7 +1131,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               });
             }
           : () async {
-        if (_renderMode == RenderMode.NORMAL) {
+              if (_renderMode == RenderMode.NORMAL) {
                 int? replyId;
                 // Set the replyId to null when tapping on the first reply.
                 if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
