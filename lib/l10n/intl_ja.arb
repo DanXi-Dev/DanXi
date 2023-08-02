@@ -312,6 +312,7 @@
   "post_has_no_tags_title": "タグなし",
   "post_has_stop_words": "ポストに「{stopWord}」の不適切な言葉が含まれている。\nこのような言葉は、理性的な議論に相応しくないため、攻撃や不適切なコメントを呼び起こす可能性が高く、送信を推奨しませんが、続けなければならないのでしょうか？",
   "post_has_stop_words_title": "不適切な言葉",
+  "post_time": "投稿時間：{time}",
   "postgraduates_need_login": "ここにクリックすると、クラススケジュールシステムにログインする。",
   "posting": "ポストを発表中...",
   "preview": "プレビュー",
