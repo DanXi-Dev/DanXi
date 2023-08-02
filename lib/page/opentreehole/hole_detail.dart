@@ -870,7 +870,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
 
     String postTime = DateFormat("yyyy/MM/dd HH:mm:ss")
-        .format(DateTime.tryParse(e.time_updated!)!);
+        .format(DateTime.tryParse(e.time_created!)!.toLocal());
     String postTimeStr = S.of(menuContext).post_time(postTime);
 
     List<Widget> menu = [
