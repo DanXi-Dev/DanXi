@@ -52,6 +52,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:intl/intl.dart';
 import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
@@ -868,6 +869,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       ];
     }
 
+    String postTime = DateFormat("yyyy/MM/dd HH:mm:ss")
+        .format(DateTime.tryParse(e.time_updated!)!);
+    String postTimeStr = S.of(menuContext).post_time(postTime);
+
     List<Widget> menu = [
       if (e.is_me == true && e.deleted == false)
         PlatformContextMenuItem(
@@ -887,6 +892,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
 
       // Standard Operations
+      PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: Text(postTimeStr),
+          onPressed: () async {
+            await FlutterClipboard.copy(postTimeStr);
+            if (mounted) {
+              Noticing.showMaterialNotice(
+                  context, S.of(menuContext).copy_success);
+            }
+          }),
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () => smartNavigatorPush(context, "/text/detail",
