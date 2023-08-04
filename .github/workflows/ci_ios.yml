@@ -70,7 +70,6 @@ jobs:
       
       - name: Populate Secrets
         run: |
-          mv -f secrets/Secret.dart lib/common/Secret.dart
           mv -f secrets/sksl_default.json CI/sksl_default.json
 
       - name: Configure Xcode
