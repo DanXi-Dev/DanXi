@@ -18,7 +18,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
@@ -146,14 +145,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    final response = await secureDio.get("$_BASE_AUTH_URL/verify/apikey",
-        queryParameters: {
-          "apikey": Secret.generateOneTimeAPIKey(),
-          "email": email,
-          "check_register": 1,
-        },
-        options: Options(validateStatus: (code) => code! <= 409));
-    return response.statusCode == 409;
+    final Response<Map<String, dynamic>> response = await secureDio.get(
+        "$_BASE_AUTH_URL/verify/email",
+        queryParameters: {"email": email, "check": true});
+    return response.data!["registered"];
   }
 
   Dio get secureDio {
@@ -183,17 +178,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       return httpClient;
     };*/
     return secureDio;
-  }
-
-  Future<String?> getVerifyCode(String email) async {
-    Response<Map<String, dynamic>> response =
-        await secureDio.get("$_BASE_AUTH_URL/verify/apikey",
-            queryParameters: {
-              "apikey": Secret.generateOneTimeAPIKey(),
-              "email": email,
-            },
-            options: Options(validateStatus: (code) => code! < 300));
-    return response.data?["code"].toString();
   }
 
   Future<void> requestEmailVerifyCode(String email) async {
@@ -438,9 +422,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }*/
 
   Future<OTFloor?> likeFloor(int floorId, int like) async {
-    final Response<Map<String, dynamic>> response =
-        await dio.post("$_BASE_URL/floors/$floorId/like/$like",
-            options: Options(headers: _tokenHeader));
+    final Response<Map<String, dynamic>> response = await dio.post(
+        "$_BASE_URL/floors/$floorId/like/$like",
+        options: Options(headers: _tokenHeader));
     return OTFloor.fromJson(response.data!);
   }
 
