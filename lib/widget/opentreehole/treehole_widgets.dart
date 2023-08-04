@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -52,6 +53,8 @@ Color? getDefaultCardBackgroundColor(
     hasBackgroundImage
         ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
         : null;
+
+enum ActionItem { Modify, Delete, Report }
 
 void launchUrlWithNotice(BuildContext context, LinkableElement link) async {
   try {
@@ -105,7 +108,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
         children: [
           RoundChip(
             onTap: () => onTap(element.name),
-            label: element.name,
+            label: Constant.withZwb(element.name),
             color: useAccessibilityColoring
                 ? Theme.of(context).textTheme.bodyLarge!.color
                 : element.color,
@@ -137,8 +140,12 @@ class OTHoleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Linkify postContentWidget = LinkifyX(
-      text: renderText(postElement.floors!.first_floor!.filteredContent!,
-          S.of(context).image_tag, S.of(context).formula),
+      text: renderText(
+          // if the floor has been folded, do not show the content directly!
+          postElement.floors!.first_floor!.foldReason ??
+              postElement.floors!.first_floor!.filteredContent!,
+          S.of(context).image_tag,
+          S.of(context).formula),
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -262,7 +269,9 @@ class OTHoleWidget extends StatelessWidget {
 
   Widget _buildCommentView(BuildContext context, OTHole postElement) {
     final String lastReplyContent = renderText(
-        postElement.floors!.last_floor!.filteredContent!,
+        // if the floor has been folded, do not show the content directly!
+        postElement.floors!.last_floor!.foldReason ??
+            postElement.floors!.last_floor!.filteredContent!,
         S.of(context).image_tag,
         S.of(context).formula);
     return ListTile(
@@ -407,6 +416,15 @@ class OTFloorWidget extends StatelessWidget {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: nameColor),
                     ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      HumanDuration.tryFormat(
+                          context, DateTime.tryParse(floor.time_created ?? "")),
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 12),
+                    )
                   ],
                 ),
                 Row(
@@ -433,7 +451,11 @@ class OTFloorWidget extends StatelessWidget {
                         text: floor.special_tag!,
                       ),
                     ],
-                    if (parentHole?.hidden == true) ...[
+                    // We will only show the hidden tag if this hole is hidden
+                    // and this floor is the first floor.
+                    if (parentHole?.hidden == true &&
+                        floor.floor_id ==
+                            parentHole?.floors?.first_floor?.floor_id) ...[
                       const SizedBox(width: 4),
                       OTLeadingTag(
                         color: Colors.red,
@@ -470,54 +492,10 @@ class OTFloorWidget extends StatelessWidget {
       subtitle: Column(mainAxisSize: MainAxisSize.min, children: [
         if ((floor.hole_id ?? 0) > 0 || (floor.floor_id ?? 0) > 0) ...[
           const SizedBox(
-            height: 8,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (index == null)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "#${floor.hole_id}",
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
-                    Text(
-                      "  (##${floor.floor_id})",
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor, fontSize: 10),
-                    ),
-                  ],
-                ),
-              if (index != null)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "${index! + 1}F",
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "  (##${floor.floor_id})",
-                      style: TextStyle(
-                          color: Theme.of(context).hintColor, fontSize: 10),
-                    ),
-                  ],
-                ),
-              Text(
-                HumanDuration.tryFormat(
-                    context, DateTime.tryParse(floor.time_created ?? "")),
-                style:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
-              ),
-            ],
-          ),
+            height: 0,
+          )
         ],
-        if (showBottomBar) OTFloorWidgetBottomBar(floor: floor),
+        if (showBottomBar) OTFloorWidgetBottomBar(floor: floor, index: index),
       ]),
       onTap: onTap,
     );
@@ -651,45 +629,46 @@ class OTFloorMentionWidget extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(
-                      onPressed: () async {
-                        // Note how this code use [cxt] for some context but [context] for others.
-                        // This is to prevent looking up deactivated context after [pop].
-                        Navigator.pop(cxt);
-                        // If this floor is directly in the hole
-                        if (inThatFloorPage &&
-                            pagedListViewController != null) {
-                          // Scroll to the corresponding post
-                          await PagedListViewHelper.scrollToItem(
-                              context,
-                              pagedListViewController,
-                              floor,
-                              ScrollDirection.UP);
-                          return;
-                        }
+                    // Only show "locate" button if the floor is valid
+                    if (floor.valid)
+                      TextButton(
+                        onPressed: () async {
+                          // Note how this code use [cxt] for some context but [context] for others.
+                          // This is to prevent looking up deactivated context after [pop].
+                          Navigator.pop(cxt);
+                          // If this floor is directly in the hole
+                          if (inThatFloorPage &&
+                              pagedListViewController != null) {
+                            // Scroll to the corresponding post
+                            await PagedListViewHelper.scrollToItem(
+                                context,
+                                pagedListViewController,
+                                floor,
+                                ScrollDirection.UP);
+                            return;
+                          }
 
-                        // If this floor is in another hole
-                        ProgressFuture progressDialog = showProgressDialog(
-                            loadingText: S.of(context).loading,
-                            context: context);
-                        try {
-                          OTHole? hole =
-                              await OpenTreeHoleRepository.getInstance()
-                                  .loadSpecificHole(floor.hole_id!);
-
-                          smartNavigatorPush(context, "/bbs/postDetail",
-                              arguments: {
-                                "post": await prefetchAllFloors(hole!),
-                                "locate": floor,
-                              });
-                        } catch (e, st) {
-                          Noticing.showErrorDialog(context, e, trace: st);
-                        } finally {
-                          progressDialog.dismiss(showAnim: false);
-                        }
-                      },
-                      child: Text(S.of(cxt).jump_to_hole),
-                    ),
+                          // If this floor is in another hole
+                          ProgressFuture progressDialog = showProgressDialog(
+                              loadingText: S.of(context).loading,
+                              context: context);
+                          try {
+                            OTHole? hole =
+                                await OpenTreeHoleRepository.getInstance()
+                                    .loadSpecificHole(floor.hole_id!);
+                            smartNavigatorPush(context, "/bbs/postDetail",
+                                arguments: {
+                                  "post": await prefetchAllFloors(hole!),
+                                  "locate": floor,
+                                });
+                          } catch (e, st) {
+                            Noticing.showErrorDialog(context, e, trace: st);
+                          } finally {
+                            progressDialog.dismiss(showAnim: false);
+                          }
+                        },
+                        child: Text(S.of(cxt).jump_to_hole),
+                      ),
                     TextButton(
                       child: Text(S.of(cxt).ok),
                       onPressed: () {
@@ -745,8 +724,10 @@ class OTFloorMentionWidget extends StatelessWidget {
 
 class OTFloorWidgetBottomBar extends StatefulWidget {
   final OTFloor floor;
+  final int? index;
 
-  const OTFloorWidgetBottomBar({Key? key, required this.floor})
+  const OTFloorWidgetBottomBar(
+      {Key? key, required this.floor, required this.index})
       : super(key: key);
 
   @override
@@ -756,6 +737,7 @@ class OTFloorWidgetBottomBar extends StatefulWidget {
 class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   late OTFloor floor;
   TextStyle? prebuiltStyle;
+  ActionItem? selectedActionItem;
 
   @override
   void initState() {
@@ -773,109 +755,222 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
   Widget build(BuildContext context) {
     prebuiltStyle ??=
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Divider(),
-        DefaultTextStyle(
+    return DefaultTextStyle(
           style: prebuiltStyle!,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(
-                child: OTFloorWidgetBottomBarButton(
-                  text: (floor.liked ?? false)
-                      ? S.of(context).liked(floor.like ?? "...")
-                      : S.of(context).like(floor.like ?? "..."),
-                  onTap: () async {
-                    try {
-                      floor.liked ??= false;
+              if (widget.index == null)
+                Expanded(
+                    child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "#${floor.hole_id}",
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                    ),
+                    Text(
+                      "  (##${floor.floor_id})",
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 10),
+                    ),
+                  ],
+                )),
+              if (widget.index != null)
+                Expanded(
+                    child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "${widget.index! + 1}F",
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "  (##${floor.floor_id})",
+                      style: TextStyle(
+                          color: Theme.of(context).hintColor, fontSize: 10),
+                    ),
+                  ],
+                )),
+              Row(
+                children: [
+                  OTFloorWidgetBottomBarButton(
+                    text: "${floor.like}",
+                    onTap: () async {
+                      try {
+                        floor.liked ??= false;
+                        setState(() {
+                          floor.liked = !floor.liked!;
+                        });
+                        floor = (await OpenTreeHoleRepository.getInstance()
+                            .likeFloor(floor.floor_id!, (floor.liked??false)?1:0))!;
+                        setState(() {});
+                      } catch (e, st) {
+                        Noticing.showErrorDialog(context, e, trace: st);
+                      }
+                    },
+                    icon: Icon(
+                      (floor.liked ?? false)
+                          ? CupertinoIcons.hand_thumbsup_fill
+                          : CupertinoIcons.hand_thumbsup,
+                      color: Theme.of(context).primaryColor,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  OTFloorWidgetBottomBarButton(
+                    text: "${floor.dislike}",
+                    onTap: () async {
+                      try {
+                        floor.disliked ??= false;
+                        setState(() {
+                          floor.disliked = !floor.disliked!;
+                        });
+                        floor = (await OpenTreeHoleRepository.getInstance()
+                            .likeFloor(floor.floor_id!, (floor.disliked??false)?-1:0))!;
+                        setState(() {});
+                      } catch (e, st) {
+                        Noticing.showErrorDialog(context, e, trace: st);
+                      }
+                    },
+                    icon: Icon(
+                      (floor.disliked ?? false)
+                          ? CupertinoIcons.hand_thumbsdown_fill
+                          : CupertinoIcons.hand_thumbsdown,
+                      color: Theme.of(context).primaryColor,
+                      size: 16,
+                    ),
+                  ),
+                  PopupMenuButton<ActionItem>(
+                    icon: Icon(
+                      CupertinoIcons.ellipsis_circle,
+                      color: Theme.of(context).primaryColor,
+                      size: 16,
+                    ),
+                    initialValue: selectedActionItem,
+                    // Callback that sets the selected popup menu item.
+                    onSelected: (ActionItem item) async {
                       setState(() {
-                        floor.liked = !floor.liked!;
+                        selectedActionItem = item;
                       });
-                      floor = (await OpenTreeHoleRepository.getInstance()
-                          .likeFloor(floor.floor_id!, floor.liked!))!;
-                      setState(() {});
-                    } catch (e, st) {
-                      Noticing.showErrorDialog(context, e, trace: st);
-                    }
-                  },
-                  icon: Icon(
-                    (floor.liked ?? false)
-                        ? CupertinoIcons.heart_fill
-                        : CupertinoIcons.heart,
-                    color: Theme.of(context).hintColor,
-                    size: 12,
-                  ),
-                ),
-              ),
-              if (floor.is_me != true)
-                Expanded(
-                  child: OTFloorWidgetBottomBarButton(
-                    text: S.of(context).report,
-                    icon: Icon(
-                      CupertinoIcons.exclamationmark_octagon,
-                      color: Theme.of(context).hintColor,
-                      size: 12,
-                    ),
-                    onTap: () async {
-                      if (await OTEditor.reportPost(context, floor.floor_id)) {
-                        Noticing.showMaterialNotice(
-                            context, S.of(context).report_success);
+                      if (item == ActionItem.Report) {
+                        if (await OTEditor.reportPost(
+                            context, floor.floor_id)) {
+                          if(!context.mounted) return;
+                          Noticing.showMaterialNotice(
+                              context, S.of(context).report_success);
+                        }
                       }
-                    },
-                  ),
-                ),
-              if (floor.is_me == true && floor.deleted == false) ...[
-                Expanded(
-                  child: OTFloorWidgetBottomBarButton(
-                    icon: Icon(
-                      CupertinoIcons.pencil,
-                      color: Theme.of(context).hintColor,
-                      size: 12,
-                    ),
-                    text: S.of(context).modify,
-                    onTap: () async {
-                      if (await OTEditor.modifyReply(context, floor.hole_id,
-                          floor.floor_id, floor.content)) {
-                        Noticing.showMaterialNotice(
-                            context, S.of(context).request_success);
+                      if (item == ActionItem.Delete) {
+                        if(!context.mounted) return;
+                        if (await Noticing.showConfirmationDialog(
+                                context,
+                                S.of(context).about_to_delete_floor(
+                                    floor.floor_id ?? "null"),
+                                title: S.of(context).are_you_sure,
+                                isConfirmDestructive: true) ==
+                            true) {
+                          try {
+                            await OpenTreeHoleRepository.getInstance()
+                                .deleteFloor(floor.floor_id!);
+                          } catch (e, st) {
+                            if(!context.mounted) return;
+                            Noticing.showErrorDialog(context, e, trace: st);
+                          }
+                        }
                       }
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: OTFloorWidgetBottomBarButton(
-                    text: S.of(context).delete,
-                    icon: Icon(
-                      CupertinoIcons.trash,
-                      color: Theme.of(context).hintColor,
-                      size: 12,
-                    ),
-                    onTap: () async {
-                      if (await Noticing.showConfirmationDialog(
-                              context,
-                              S.of(context).about_to_delete_floor(
-                                  floor.floor_id ?? "null"),
-                              title: S.of(context).are_you_sure,
-                              isConfirmDestructive: true) ==
-                          true) {
-                        try {
-                          await OpenTreeHoleRepository.getInstance()
-                              .deleteFloor(floor.floor_id!);
-                        } catch (e, st) {
-                          Noticing.showErrorDialog(context, e, trace: st);
+                      if (item == ActionItem.Modify) {
+                        if(!context.mounted) return;
+                        if (await OTEditor.modifyReply(context, floor.hole_id,
+                            floor.floor_id, floor.content)) {
+                          if(!context.mounted) return;
+                          Noticing.showMaterialNotice(
+                              context, S.of(context).request_success);
                         }
                       }
                     },
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<ActionItem>>[
+                          if (floor.is_me == true && floor.deleted == false)
+                      PopupMenuItem<ActionItem>(
+                        value: ActionItem.Modify,
+                        child: OTFloorWidgetBottomBarButton(
+                          icon: Icon(
+                            CupertinoIcons.pencil,
+                            color: Theme.of(context).hintColor,
+                            size: 12,
+                          ),
+                          text: S.of(context).modify,
+                          onTap: () async {
+                            Navigator.of(context).pop();
+                            if (await OTEditor.modifyReply(context, floor.hole_id,
+                                floor.floor_id, floor.content)) {
+                              if(!context.mounted) return;
+                              Noticing.showMaterialNotice(
+                                  context, S.of(context).request_success);
+                            }
+                          },
+                        ),
+                      ),
+                          if (floor.is_me == true && floor.deleted == false)
+                      PopupMenuItem<ActionItem>(
+                        value: ActionItem.Delete,
+                        child: OTFloorWidgetBottomBarButton(
+                          text: S.of(context).delete,
+                          icon: Icon(
+                            CupertinoIcons.trash,
+                            color: Theme.of(context).hintColor,
+                            size: 12,
+                          ),
+                          onTap: () async {
+                            Navigator.of(context).pop();
+                            if (await Noticing.showConfirmationDialog(
+                                context,
+                                S.of(context).about_to_delete_floor(
+                                    floor.floor_id ?? "null"),
+                                title: S.of(context).are_you_sure,
+                                isConfirmDestructive: true) ==
+                                true) {
+                              try {
+                                await OpenTreeHoleRepository.getInstance()
+                                    .deleteFloor(floor.floor_id!);
+                              } catch (e, st) {
+                                Noticing.showErrorDialog(context, e, trace: st);
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                          if (floor.is_me != true)
+                            PopupMenuItem<ActionItem>(
+                        value: ActionItem.Report,
+                        child: OTFloorWidgetBottomBarButton(
+                          text: S.of(context).report,
+                          icon: Icon(
+                            CupertinoIcons.exclamationmark_octagon,
+                            color: Theme.of(context).hintColor,
+                            size: 12,
+                          ),
+                          onTap: () async {
+                            Navigator.of(context).pop();
+                            if (await OTEditor.reportPost(context, floor.floor_id)) {
+                              if(!context.mounted) return;
+                              Noticing.showMaterialNotice(
+                                  context, S.of(context).report_success);
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ]
+                ],
+              )
             ],
           ),
-        ),
-      ],
-    );
+        );
   }
 }
 
@@ -893,13 +988,18 @@ class OTFloorWidgetBottomBarButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon,
             const SizedBox(width: 4),
-            Text(text),
+            Text(
+              text,
+              style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
@@ -918,16 +1018,15 @@ class OTMessageItem extends StatefulWidget {
     await OpenTreeHoleRepository.getInstance().modifyMessage(message);
   }
 
-  static void dispMessageDetailBasedOnGuessedDataType(
-      BuildContext context, String? code, Map<String, dynamic>? data,
-      [int? id]) async {
+  static void dispatchMessageByCode(BuildContext context, String? code,
+      Map<String, dynamic>? data, int? id, String? description) async {
     try {
       switch (code) {
         case 'mention':
         case 'favorite':
         case 'modify':
         case 'reply':
-          // data should be [OTFloor]
+          // data should be an [OTFloor].
           final floor = OTFloor.fromJson(data!);
           if (floor.floor_id == null) return;
           if (await OTFloorMentionWidget.showFloorDetail(context, floor) ==
@@ -952,10 +1051,19 @@ class OTMessageItem extends StatefulWidget {
             markMessageAsRead(OTMessage(id, null, null, null, true, null));
           }
           break;
+        case 'mail':
+          final floor = OTFloor.special(
+              S.of(context).forum_message, description ?? "null");
+
+          if (await OTFloorMentionWidget.showFloorDetail(context, floor) ==
+                  true &&
+              id != null) {
+            markMessageAsRead(OTMessage(id, null, null, null, true, null));
+          }
+          break;
       }
     } catch (ignored) {
       // TODO: Support Other Types
-      return;
     }
   }
 
@@ -994,8 +1102,8 @@ class OTMessageItemState extends State<OTMessageItem> {
           onTap: () {
             OTMessageItem.markMessageAsRead(message)
                 .then((value) => setState(() {}));
-            OTMessageItem.dispMessageDetailBasedOnGuessedDataType(
-                context, message.code, message.data, message.message_id);
+            OTMessageItem.dispatchMessageByCode(context, message.code,
+                message.data, message.message_id, message.description);
           }),
     );
   }

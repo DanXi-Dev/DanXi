@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -51,8 +52,8 @@ class NewShortcutDialogState extends State<NewShortcutDialog> {
       await Dio().head(_linkTextFieldController.text);
       SettingsProvider.getInstance().dashboardWidgetsSequence =
           SettingsProvider.getInstance().dashboardWidgetsSequence.followedBy([
-        DashboardCard("custom_card", _nameTextFieldController.text,
-            _linkTextFieldController.text, true)
+            DashboardCard(Constant.FEATURE_CUSTOM_CARD,
+            _nameTextFieldController.text, _linkTextFieldController.text, true)
       ]).toList();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {

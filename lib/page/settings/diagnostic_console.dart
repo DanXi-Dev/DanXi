@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -103,7 +104,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
         .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
 
     _console.writeln("Everything we stored in the local device:");
-    var allKeys = context.read<SettingsProvider>().preferences?.getKeys();
+    var allKeys = await context.read<SettingsProvider>().preferences?.getKeys();
     if (allKeys != null) {
       for (var key in allKeys) {
         // Skip some keys
@@ -111,7 +112,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
         _console.writeln("Key: $key");
         _console.writeln(
-            "Value: ${context.read<SettingsProvider>().preferences?.get(key)}");
+            "Value: ${context.read<SettingsProvider>().preferences?.getString(key)}");
       }
     } else {
       _console.writeln("Nothing!");
@@ -134,6 +135,25 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
+  Future<void> sendMessage() async {
+    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    String? message = await Noticing.showInputDialog(context, "Input Message");
+    if (!mounted) return;
+    String? ids = await Noticing.showInputDialog(context, "Input Id List",
+        hintText: "e.g. 123 or 123,456");
+    if ((message ?? "").isEmpty || (ids ?? "").isEmpty) return;
+
+    final idList = (jsonDecode("[$ids]") as List<dynamic>)
+        .map<int>((e) => e as int)
+        .toList(growable: false);
+    int? result = await OpenTreeHoleRepository.getInstance()
+        .adminSendMessage(message!, idList);
+    if (result != null && result < 300 && mounted) {
+      Noticing.showModalNotice(context,
+          message: S.of(context).operation_successful);
+    }
+  }
+
   Future<void> setUserAgent() async {
     String? ua = await Noticing.showInputDialog(context, "Input user agent");
     if (ua == null || !mounted) return;
@@ -143,6 +163,16 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
       context.read<SettingsProvider>().customUserAgent = ua;
     }
     Noticing.showNotice(context, "Restart app to take effects");
+  }
+
+  Future<void> deleteAllPushToken() async {
+    try {
+      final ret = await OpenTreeHoleRepository.getInstance()
+          .deleteAllPushNotificationToken();
+      Noticing.showNotice(context, "Status code $ret");
+    } catch (e) {
+      Noticing.showNotice(context, "$e");
+    }
   }
 
   @override
@@ -164,8 +194,16 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Password Change [Only ADMIN]"),
                 ),
                 PlatformElevatedButton(
+                  onPressed: sendMessage,
+                  child: const Text("Send Message [Only ADMIN]"),
+                ),
+                PlatformElevatedButton(
                   onPressed: setUserAgent,
                   child: const Text("Set User Agent"),
+                ),
+                PlatformElevatedButton(
+                  onPressed: deleteAllPushToken,
+                  child: const Text("Delete All Push Token"),
                 ),
                 PlatformElevatedButton(
                   child: const Text("Copy Everything"),

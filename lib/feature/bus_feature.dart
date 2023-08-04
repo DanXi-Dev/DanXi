@@ -23,9 +23,8 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/bus_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/vague_time.dart';
-import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:dan_xi/widget/feature_item/feature_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -116,17 +115,11 @@ class BusFeature extends Feature {
         : BusDirectionExtension.FORWARD_ARROW;
     return Wrap(
       children: [
-        /*SmallTag(
-          label: S.of(context).next_bus,
-        ),
-        const SizedBox(
-          width: 6,
-        ),*/
         Text(
           "${DateFormat("HH:mm").format(element.realStartTime!.toExactTime())} "
-          "${from.displayTitle(context)}"
+          "${from.displayTitle(context!)}"
           "$connectChar"
-          "${to.displayTitle(context)}",
+          "${to.displayTitle(context!)}",
           overflow: TextOverflow.ellipsis,
           softWrap: true,
           maxLines: 1,
@@ -170,10 +163,7 @@ class BusFeature extends Feature {
   @override
   Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
-      return ScaleTransform(
-        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
-        child: PlatformCircularProgressIndicator(),
-      );
+      return const FeatureProgressIndicator();
     }
     return null;
   }

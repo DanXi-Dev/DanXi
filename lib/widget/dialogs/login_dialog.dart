@@ -26,6 +26,7 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dio/dio.dart';
@@ -35,7 +36,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -47,14 +47,14 @@ const kCompatibleUserGroup = [
 ///
 /// Also contains the logic to process logging in.
 class LoginDialog extends StatefulWidget {
-  final SharedPreferences? sharedPreferences;
+  final XSharedPreferences? sharedPreferences;
   final ValueNotifier<PersonInfo?> personInfo;
   final bool dismissible;
   static bool _isShown = false;
 
   static bool get dialogShown => _isShown;
 
-  static showLoginDialog(BuildContext context, SharedPreferences? preferences,
+  static showLoginDialog(BuildContext context, XSharedPreferences? preferences,
       ValueNotifier<PersonInfo?> personInfo, bool dismissible) async {
     if (_isShown) return;
     _isShown = true;
@@ -235,7 +235,7 @@ class LoginDialogState extends State<LoginDialog> {
               TextField(
                 controller: _nameController,
                 enabled: _group != UserGroup.VISITOR,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
                     icon: PlatformX.isMaterial(context)

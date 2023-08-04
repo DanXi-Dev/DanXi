@@ -127,8 +127,8 @@ class CustomInAppBrowser extends InAppBrowser {
     //   // Ensure requestReview is called only after the user used the app for a while
     //   // And ensure that the API is not called too frequently.
     //   // TODO: Any better ways to implement this?
-    //   final SharedPreferences preferences =
-    //       await SharedPreferences.getInstance();
+    //   final XSharedPreferences preferences =
+    //       await XSharedPreferences.getInstance();
     //   if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
     //       preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
     //     if (Random().nextDouble() > 0.997) inAppReview.requestReview();

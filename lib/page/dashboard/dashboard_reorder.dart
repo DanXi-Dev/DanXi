@@ -39,7 +39,10 @@ class DashboardReorderPage extends StatefulWidget {
   DashboardReorderPageState createState() => DashboardReorderPageState();
 }
 
-const List<String> NONFUNCTIONAL_WIDGET_LIST = ['divider', 'new_card'];
+const List<String> NONFUNCTIONAL_WIDGET_LIST = [
+  Constant.FEATURE_DIVIDER,
+  Constant.FEATURE_NEW_CARD
+];
 
 class DashboardReorderPageState extends State<DashboardReorderPage> {
   List<DashboardCard>? sequence;
@@ -77,8 +80,8 @@ class DashboardReorderPageState extends State<DashboardReorderPage> {
                       leading: Icon(PlatformIcons(context).addCircled),
                       title: Text(S.of(context).add_new_card),
                       onTap: () {
-                        sequence!
-                            .add(DashboardCard("new_card", null, null, true));
+                        sequence!.add(DashboardCard(
+                            Constant.FEATURE_NEW_CARD, null, null, true));
                         SettingsProvider.getInstance()
                             .dashboardWidgetsSequence = sequence;
                         refreshSelf();
@@ -94,7 +97,8 @@ class DashboardReorderPageState extends State<DashboardReorderPage> {
                       title: Text(S.of(context).add_new_divider),
                       onTap: () {
                         sequence!.add(
-                          DashboardCard("divider", null, null, true),
+                          DashboardCard(
+                              Constant.FEATURE_DIVIDER, null, null, true),
                         );
                         SettingsProvider.getInstance()
                             .dashboardWidgetsSequence = sequence;
@@ -182,7 +186,8 @@ class DashboardReorderPageState extends State<DashboardReorderPage> {
       }
 
       // Custom Widgets
-      else if (sequence![index].internalString == 'custom_card') {
+      else if (sequence![index].internalString ==
+          Constant.FEATURE_CUSTOM_CARD) {
         widgets.add(
           Dismissible(
             key: UniqueKey(),

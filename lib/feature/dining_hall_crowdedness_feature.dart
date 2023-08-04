@@ -26,11 +26,10 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/libraries/scale_transform.dart';
+import 'package:dan_xi/widget/feature_item/feature_progress_indicator.dart';
 import 'package:dan_xi/widget/libraries/small_tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
   PersonInfo? _info;
@@ -241,10 +240,7 @@ class DiningHallCrowdednessFeature extends Feature {
   @override
   Widget? get trailing {
     if (_status == ConnectionStatus.CONNECTING) {
-      return ScaleTransform(
-        scale: PlatformX.isMaterial(context!) ? 0.5 : 1.0,
-        child: PlatformCircularProgressIndicator(),
-      );
+      return const FeatureProgressIndicator();
     }
     return null;
   }

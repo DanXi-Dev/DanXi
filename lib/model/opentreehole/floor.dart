@@ -39,6 +39,8 @@ class OTFloor {
   int? modified;
   int? like;
   List<OTFloor>? mention;
+  int? dislike;
+  bool? disliked;
 
   factory OTFloor.fromJson(Map<String, dynamic> json) =>
       _$OTFloorFromJson(json);
@@ -47,14 +49,17 @@ class OTFloor {
 
   /// Generate an empty BBSPost for special sakes.
   factory OTFloor.dummy() =>
-      OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, []);
+      OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, [], 0, false);
 
   factory OTFloor.special(String title, String content,
           [int? holeId, int? floorId]) =>
       OTFloor(floorId ?? 0, holeId ?? 0, content, title, '', '', false, [], 0,
-          false, false, []);
+          false, false, [], 0, false);
 
   factory OTFloor.onlyId(int floorId) => OTFloor.special('', '', null, floorId);
+
+  /// Check whether the object has a valid position (i.e. valid floor and hole id).
+  bool get valid => (floor_id ?? -1) > 0 && (hole_id ?? -1) > 0;
 
   @override
   bool operator ==(Object other) =>
@@ -72,7 +77,9 @@ class OTFloor {
       this.like,
       this.is_me,
       this.liked,
-      this.mention);
+      this.mention,
+      this.dislike,
+      this.disliked);
 
   String? get filteredContent => SettingsProvider.getInstance().cleanMode
       ? CleanModeFilter.cleanText(content)
@@ -88,5 +95,5 @@ class OTFloor {
   }
 
   @override
-  int get hashCode => floor_id!;
+  int get hashCode => floor_id ?? 0;
 }

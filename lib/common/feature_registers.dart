@@ -20,32 +20,46 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:flutter/widgets.dart';
 
-/// A global register table of [Feature], which declares its compatible user groups here.
-Map<String, List<UserGroup>> _kRegister = {};
+/// A global register table of [Feature]s, which declares their compatible user groups here.
+Map<String, List<UserGroup>> _group = {};
 
-/// Register a [feature] with its compatible user [groups].
+/// A global register table of [Feature]s, which declares their creation functions here.
+Map<String, Feature Function()> featureFactory = {};
+
+/// A global register table of [Feature]s, which declares their display names here.
+Map<String, String Function(BuildContext)> featureDisplayName = {};
+
+/// Register the [feature] with its compatible user [groups].
+///
+/// The [key] will be used to serialize the feature in settings and
+/// [featureFactory] will be used to create the feature.
 ///
 /// By default, only compatible features will be shown in the [HomeSubpage].
 /// Others will be hidden without any notice.
 ///
-/// If [groups] not provided, use default groups instead.
+/// If [groups] not provided, use default groups defined here.
 ///
 /// See also:
 /// - [UserGroup]
 /// - [Feature]
-void registerFeature(Feature feature,
+void registerFeature(String key, Feature Function() featureFactoryFunc,
+    String Function(BuildContext) displayNameFunc,
     {List<UserGroup> groups = const [
       UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
       UserGroup.FUDAN_POSTGRADUATE_STUDENT,
       UserGroup.FUDAN_STAFF
     ]}) {
-  _kRegister[feature.runtimeType.toString()] = groups;
+  Feature feature = featureFactoryFunc();
+  _group[feature.runtimeType.toString()] = groups;
+  featureFactory[key] = featureFactoryFunc;
+  featureDisplayName[key] = displayNameFunc;
 }
 
 /// Check whether the [group] can use [feature].
 bool checkFeature(Feature feature, UserGroup group) =>
-    _kRegister.opt(feature.runtimeType.toString(), []).contains(group);
+    _group.opt(feature.runtimeType.toString(), []).contains(group);
 
 /// Check whether [info] is in the [groups].
 ///

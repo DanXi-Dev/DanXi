@@ -17,6 +17,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'dashboard_card.g.dart';
@@ -36,7 +37,7 @@ class DashboardCard {
   Map<String, dynamic> toJson() => _$DashboardCardToJson(this);
 
   bool get isSpecialCard =>
-      internalString == 'new_card' ||
-      internalString == 'custom_card' ||
-      internalString == 'divider';
+      internalString == Constant.FEATURE_NEW_CARD ||
+      internalString == Constant.FEATURE_CUSTOM_CARD ||
+      internalString == Constant.FEATURE_DIVIDER;
 }

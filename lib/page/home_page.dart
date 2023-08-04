@@ -23,6 +23,7 @@ import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
+import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
@@ -59,7 +60,9 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
+import 'package:uni_links/uni_links.dart';
 
 const fduholeChannel = MethodChannel('fduhole');
 
@@ -94,6 +97,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _captchaSubscription = StateStreamListener();
   static final StateStreamListener<CredentialsInvalidException>
       _credentialsInvalidSubscription = StateStreamListener();
+
+  /// Listener to Android Activity intents.
+  static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
+      StateStreamListener();
+
+  /// Listener to the url scheme.
+  /// debounced to avoid duplicated events.
+  static final StateStreamListener<Uri?> _uniLinksSubscription = StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
   ///
@@ -134,6 +145,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _captchaSubscription.cancel();
+    _receivedIntentSubscription.cancel();
+    _uniLinksSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
   }
@@ -312,6 +325,99 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     */
   }
 
+  /// Deal with url_scheme.
+  /// https://pub.dev/packages/uni_links
+  Future<void> _initUniLinks() async {
+    Future<void> dealWithUri(Uri initialUri) async {
+      // jump to the corresponding page according to the uri pattern
+      if (initialUri.pathSegments.contains("hole")) {
+        await jumpToElements('hole', int.parse(initialUri.pathSegments[1]));
+      } else if (initialUri.pathSegments.contains("floor")) {
+        await jumpToElements('floor', int.parse(initialUri.pathSegments[1]));
+      } else {
+        Error error = ArgumentError(S.of(context).invalidUri);
+        throw error;
+      }
+    }
+
+    Uri? initialUri;
+    initialUri = await getInitialUri();
+    if (initialUri != null) await dealWithUri(initialUri);
+
+    _uniLinksSubscription.bindOnlyInvalid(
+        uriLinkStream.listen((Uri? uri) async {
+          if (uri != null) await dealWithUri(uri);
+        }, onError: (Object error) {
+          // Handle exception by warning the user their action did not succeed
+          return Noticing.showErrorDialog(context, error);
+        }), hashCode);
+  }
+
+  /// Jump to the specified element e.g. hole, floor.
+  Future<void> jumpToElements(
+    String element,
+    int postId,
+  ) async {
+    if (!mounted) {
+      return;
+    }
+    // Do a quick initialization and push
+    // Throw an error if the user is not logged in
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+      try {
+        await OpenTreeHoleRepository.getInstance().initializeRepo();
+      } catch (ignored) {}
+    }
+    try {
+      if (element == 'hole') {
+        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificHole(postId))!;
+        if (mounted) {
+          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+          "post": hole,
+        });
+        }
+
+      } else if (element == 'floor') {
+        final floor = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificFloor(postId))!;
+        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+            .loadSpecificHole(floor.hole_id!))!;
+        if (mounted) {
+          smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+            "post": hole,
+            "locate": floor,
+          });
+        }
+      } else {
+        throw ArgumentError(S.of(context).elementNotFound);
+      }
+    } catch (e) {
+      if (mounted) Noticing.showErrorDialog(context, e);
+    }
+  }
+
+  Future<void> _initReceiveIntents() async {
+    Future<void> dealWithIntent(ri.Intent? intent) async {
+      if (intent?.isNotNull == true) {
+        if (intent?.extra?.containsKey("key_message") == true) {
+          final keyMessage = intent!.extra!["key_message"];
+          final content = keyMessage["content"] as String;
+          final payload = jsonDecode(Uri.decodeComponent(content));
+          await onTapNotification(context, payload['code'], payload['data']);
+        }
+      }
+    }
+
+    if (!PlatformX.isAndroid) return;
+    ri.Intent? intent = await ri.ReceiveIntent.getInitialIntent();
+    await dealWithIntent(intent);
+    _receivedIntentSubscription.bindOnlyInvalid(
+        ri.ReceiveIntent.receivedIntentStream.listen((ri.Intent? intent) {
+      dealWithIntent(intent);
+    }), hashCode);
+  }
+
   Future<void> onTapNotification(
     BuildContext context,
     String? code,
@@ -319,11 +425,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ) async {
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       // Do a quick initialization and push
-      OpenTreeHoleRepository.getInstance().initializeToken();
+      try {
+        OpenTreeHoleRepository.getInstance().initializeToken();
+      } catch (_) {}
     }
     smartNavigatorPush(context, '/bbs/messages',
         forcePushOnMainNavigator: true);
-    //OTMessageItem.dispMessageDetailBasedOnGuessedDataType(context, code, data);
   }
 
   @override
@@ -349,6 +456,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .on<CredentialsInvalidException>()
             .listen((_) => _dealWithCredentialsInvalidException()),
         hashCode);
+    _initReceiveIntents();
+    _initUniLinks();
 
     // Load the latest version, announcement & the start date of the following term.
     _loadDataFromGithubRepo();
