@@ -194,15 +194,12 @@ const Map<String, Object> dependencies = <String, Object>{
   'receive_intent': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/w568w/receive_intent.git',
-    },
   },
   'flutter_secure_storage': r'^8.0.0',
   'encrypt_shared_preferences': r'^0.3.5',
   'device_identity': r'^1.0.0',
 };
 
-/// Developer dependencies
-const Map<String, Object> devDependencies = <String, Object>{
   'build_runner': r'^2.1.2',
   'pubspec_generator': r'^3.0.1',
   'flutter_test': <String, Object>{

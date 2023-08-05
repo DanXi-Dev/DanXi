@@ -18,18 +18,20 @@ import 'dart:core';
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'course_rank.g.dart';
+part 'course_grade.g.dart';
 
 @JsonSerializable()
-class Rank {
+class Grade {
   int? overall;
   int? content;
   int? workload;
   int? assessment;
 
-  Rank(this.overall, this.content, this.workload, this.assessment);
+  Grade(this.overall, this.content, this.workload, this.assessment);
 
-  factory Rank.fromJson(Map<String, dynamic> json) => _$RankFromJson(json);
+  factory Grade.fromJson(Map<String, dynamic> json) => _$GradeFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RankToJson(this);
+  Map<String, dynamic> toJson() => _$GradeToJson(this);
+
+  factory Grade.dummy() => Grade(11, 4, 5, 14);
 }

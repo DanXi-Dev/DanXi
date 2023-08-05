@@ -19,7 +19,7 @@ Course _$CourseFromJson(Map<String, dynamic> json) => Course(
       json['year'] as String?,
       json['semester'] as int?,
       (json['review_list'] as List<dynamic>?)
-          ?.map((e) => Review.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => CourseReview.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

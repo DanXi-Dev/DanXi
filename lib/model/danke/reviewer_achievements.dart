@@ -30,4 +30,6 @@ class ReviewerAchievement {
       _$ReviewerAchievementFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReviewerAchievementToJson(this);
+
+  factory ReviewerAchievement.dummy() => ReviewerAchievement("狗勋章");
 }

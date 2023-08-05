@@ -1,19 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'course_rank.dart';
+part of 'course_grade.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Rank _$RankFromJson(Map<String, dynamic> json) => Rank(
+Grade _$GradeFromJson(Map<String, dynamic> json) => Grade(
       json['overall'] as int?,
       json['content'] as int?,
       json['workload'] as int?,
       json['assessment'] as int?,
     );
 
-Map<String, dynamic> _$RankToJson(Rank instance) => <String, dynamic>{
+Map<String, dynamic> _$GradeToJson(Grade instance) => <String, dynamic>{
       'overall': instance.overall,
       'content': instance.content,
       'workload': instance.workload,

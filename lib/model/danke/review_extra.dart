@@ -31,4 +31,6 @@ class ReviewExtra {
       _$ReviewExtraFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReviewExtraToJson(this);
+
+  factory ReviewExtra.dummy() => ReviewExtra([ReviewerAchievement.dummy()]);
 }

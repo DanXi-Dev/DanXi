@@ -6,34 +6,39 @@ part of 'review.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Review _$ReviewFromJson(Map<String, dynamic> json) => Review(
-      json['id'] as int?,
-      json['reviewerId'] as int?,
+CourseReview _$CourseReviewFromJson(Map<String, dynamic> json) => CourseReview(
+      json['review_id'] as int?,
+      json['reviewer_id'] as int?,
       json['title'] as String?,
       json['content'] as String?,
       json['timeCreated'] as String?,
       json['timeUpdated'] as String?,
-      json['rank'] == null
+      json['course_grade'] == null
           ? null
-          : Rank.fromJson(json['rank'] as Map<String, dynamic>),
-      json['remark'] as int?,
-      json['vote'] as int?,
-      json['isMe'] as bool?,
-      json['extra'] == null
+          : Grade.fromJson(json['course_grade'] as Map<String, dynamic>),
+      json['like'] as int?,
+      json['liked'] as int?,
+      json['is_me'] as bool?,
+      json['modified'] as int?,
+      json['deleted'] as bool?,
+      json['review_extra'] == null
           ? null
-          : ReviewExtra.fromJson(json['extra'] as Map<String, dynamic>),
+          : ReviewExtra.fromJson(json['review_extra'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$ReviewToJson(Review instance) => <String, dynamic>{
-      'id': instance.id,
-      'reviewerId': instance.reviewerId,
+Map<String, dynamic> _$CourseReviewToJson(CourseReview instance) =>
+    <String, dynamic>{
+      'review_id': instance.review_id,
+      'reviewer_id': instance.reviewer_id,
       'title': instance.title,
       'content': instance.content,
       'timeCreated': instance.timeCreated,
       'timeUpdated': instance.timeUpdated,
-      'rank': instance.rank,
-      'remark': instance.remark,
-      'vote': instance.vote,
-      'isMe': instance.isMe,
-      'extra': instance.extra,
+      'course_grade': instance.course_grade,
+      'like': instance.like,
+      'liked': instance.liked,
+      'is_me': instance.is_me,
+      'modified': instance.modified,
+      'deleted': instance.deleted,
+      'review_extra': instance.review_extra,
     };

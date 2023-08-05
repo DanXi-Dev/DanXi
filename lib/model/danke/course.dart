@@ -43,7 +43,7 @@ class Course {
   //     3：（第二年的）春季学期；
   //     4：（第二年的）暑假
   int? semester;
-  List<Review>? review_list;
+  List<CourseReview>? review_list;
 
   Course(
       this.id,
