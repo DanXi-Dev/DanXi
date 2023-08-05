@@ -327,22 +327,22 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           TargetContent(
             align: ContentAlign.bottom,
             builder: (context, controller) {
-              return const Column(
+              return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "学期选择:",
-                    style: TextStyle(
+                    S.of(context).choose_semester,
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         fontSize: 20.0),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 10.0),
+                    padding: const EdgeInsets.only(top: 10.0),
                     child: Text(
-                      "选择你想查看的学期",
-                      style: TextStyle(color: Colors.white),
+                      S.of(context).choose_semester_message,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -356,7 +356,6 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       TargetFocus(
         identify: "ManuallyAddCourseButton",
         keyTarget: keyButton,
-        // color: Colors.purple,
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -366,18 +365,18 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    S.of(context).skip,
+                    S.of(context).manually_add_course,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 20.0,
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10.0),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
                     child: Text(
-                      "是否有课未收录在课表上，但你又想查看的呢，自己手动添加它吧",
-                      style: TextStyle(color: Colors.white),
+                      S.of(context).manually_add_course_message,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   ElevatedButton(
@@ -409,45 +408,22 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Text(
-                    "学期开始日期选择:",
-                    style: TextStyle(
+                  Text(
+                    S.of(context).start_date_select,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 20.0,
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10.0),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
                     child: Column(
                       children: [
                         Align(
-                          // alignment: Alignment.center,
                           child: Text(
-                            "必须选择学期的开始日期才能查看你的课表",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 20.0,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          // alignment: Alignment.center,
-                          child: Text(
-                            "不选择将导致日期错误",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 20.0,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          // alignment: Alignment.center,
-                          child: Text(
-                            "tips:开始日期是第一周的周一",
-                            style: TextStyle(
+                            S.of(context).start_date_select_message,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               fontSize: 20.0,

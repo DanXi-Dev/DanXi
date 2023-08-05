@@ -500,5 +500,5 @@
   "manually_add_course":"Add lesson manually:",
   "manually_add_course_message":"If there is a class that is not included in the class schedule, but you want to check it, add it manually yourself.",
   "start_date_select": "Term start date query",
-  "start_date_select_message": "You must select the start date of the semester to view your class schedule. Not selecting will result in a date error. Tip: Start date is the Monday of the first week."
+  "start_date_select_message": "You must select the start date of the semester to view your class schedule. Not selecting will result in a date error. \nTip: Start date is the Monday of the first week."
 }
