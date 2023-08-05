@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'336'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1689749046;
+const int timestamp = 1691072369;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -83,7 +83,7 @@ const String publishTo = r'none';
 
 /// Environment
 const Map<String, String> environment = <String, String>{
-  'sdk': '>=2.15.0 <3.0.0',
+  'sdk': '>=3.0.0',
 };
 
 /// Dependencies
@@ -182,7 +182,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'screen_capture_event': r'^1.0.0+1',
   'otp': r'^3.0.2',
   'lunar': r'^1.2.20',
-  'flutter_fgbg': r'^0.2.0',
+  'flutter_fgbg': r'^0.3.0',
   'lazy_load_indexed_stack': r'^1.0.0',
   'js': r'^0.6.5',
   'nil': r'^1.1.1',
@@ -209,6 +209,7 @@ const Map<String, Object> devDependencies = <String, Object>{
     'sdk': r'flutter',
   },
   'flutter_lints': r'^2.0.1',
+  'intl_utils': r'^2.8.3',
 };
 
 /// Dependency overrides

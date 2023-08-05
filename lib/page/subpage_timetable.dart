@@ -16,6 +16,7 @@
  */
 
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -52,8 +53,13 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../widget/dialogs/manually_add_course_dialog.dart';
+
+GlobalKey keyButton = GlobalKey();
+GlobalKey keyButton1 = GlobalKey();
+GlobalKey keyButton2 = GlobalKey();
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -73,9 +79,10 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
           S.of(cxt).add_courses,
-          Icon(PlatformX.isMaterial(cxt)
-              ? Icons.add
-              : CupertinoIcons.add_circled),
+          Icon(
+            PlatformX.isMaterial(cxt) ? Icons.add : CupertinoIcons.add_circled,
+            key: keyButton,
+          ),
           () => ManuallyAddCourseEvent().fire(),
         ),
         AppBarButtonItem(
@@ -89,11 +96,17 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
-          onSelectionUpdate: () {
-            timetablePageKey.currentState?.indicatorKey.currentState?.show();
-          },
-        ), null, useCustomWidget: true),
+        AppBarButtonItem(
+            S.of(cxt).select_semester,
+            SemesterSelectionButton(
+              key: keyButton1,
+              onSelectionUpdate: () {
+                timetablePageKey.currentState?.indicatorKey.currentState
+                    ?.show();
+              },
+            ),
+            null,
+            useCustomWidget: true),
       ];
 }
 
@@ -102,6 +115,7 @@ class ShareTimetableEvent {}
 class ManuallyAddCourseEvent {}
 
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
+  late TutorialCoachMark tutorialCoachMark;
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
   final StateStreamListener<ManuallyAddCourseEvent> _addCourseSubscription =
@@ -243,11 +257,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   @override
   void initState() {
+    if (SettingsProvider.getInstance().hasVistedTimeTable == false) {
+      createTutorial();
+      Future.delayed(Duration.zero, showTutorial);
+      SettingsProvider.getInstance().hasVistedTimeTable = true;
+    }
     super.initState();
     _setContent();
-    converters = {
-      S.current.share_as_ics: ICSConverter()
-    };
+    converters = {S.current.share_as_ics: ICSConverter()};
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
@@ -281,6 +298,180 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           refresh();
         }),
         hashCode);
+  }
+
+  void showTutorial() {
+    tutorialCoachMark.show(context: context);
+  }
+
+  void createTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      targets: _createTargets(),
+      colorShadow: const Color.fromARGB(255, 9, 110, 192),
+      textSkip: "SKIP",
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      pulseAnimationDuration: const Duration(milliseconds: 1000),
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+    );
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+
+    targets.add(
+      TargetFocus(
+        identify: "SemesterSelectionButton",
+        keyTarget: keyButton1,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return const Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "学期选择:",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20.0),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      "选择你想查看的学期",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    targets.add(
+      TargetFocus(
+        identify: "ManuallyAddCourseButton",
+        keyTarget: keyButton,
+        // color: Colors.purple,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    S.of(context).skip,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      "是否有课未收录在课表上，但你又想查看的呢，自己手动添加它吧",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      controller.previous();
+                    },
+                    child: const Icon(Icons.chevron_left),
+                  ),
+                ],
+              );
+            },
+          )
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    targets.add(
+      TargetFocus(
+        identify: "StartDateSelectionButton",
+        keyTarget: keyButton2,
+        shape: ShapeLightFocus.Circle,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const Text(
+                    "学期开始日期选择:",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: Column(
+                      children: [
+                        Align(
+                          // alignment: Alignment.center,
+                          child: Text(
+                            "必须选择学期的开始日期才能查看你的课表",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Align(
+                          // alignment: Alignment.center,
+                          child: Text(
+                            "不选择将导致日期错误",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Align(
+                          // alignment: Alignment.center,
+                          child: Text(
+                            "tips:开始日期是第一周的周一",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      controller.previous();
+                    },
+                    child: const Icon(Icons.chevron_left),
+                  ),
+                ],
+              );
+            },
+          )
+        ],
+      ),
+    );
+
+    return targets;
   }
 
   Future<void> refresh(
@@ -343,7 +534,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Expanded(child: Column(
+              Expanded(
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -382,7 +574,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
-          children: block.event.map((e) => _buildCourseItem(e,context)).toList(),
+          children:
+              block.event.map((e) => _buildCourseItem(e, context)).toList(),
         ),
       ),
     );
@@ -401,8 +594,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (_showingTime!.weekday < 0) _showingTime!.weekday = 0;
     if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
 
-    final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
-        compact: TableDisplayType.STANDARD);
+    final List<DayEvents> scheduleData = _table!
+        .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return RefreshIndicator(
       key: indicatorKey,
       edgeOffset: MediaQuery.of(context).padding.top,
@@ -442,6 +635,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(S.of(context).semester_start_date),
             StartDateSelectionButton(
+                key: keyButton2,
                 onUpdate: (() => indicatorKey.currentState?.show())),
           ]),
         ],

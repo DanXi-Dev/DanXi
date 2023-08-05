@@ -486,5 +486,11 @@
   "copy_floor_id": "拷贝楼层号",
   "copy_floor_id_success": "楼层号已保存至剪贴板。",
   "copy_hole_id": "拷贝洞号",
-  "copy_hole_id_success": "洞号已保存至剪贴板。"
+  "copy_hole_id_success": "洞号已保存至剪贴板。",
+  "choose_semester": "学期选择:",
+  "choose_semester_message": "选择你想查看的学期",
+  "manually_add_course":"手动添加课程:",
+  "manually_add_course_message":"是否有课未收录在课表上，但你又想查看的呢，自己手动添加它吧。",
+  "start_date_select": "学期开始日期查询:",
+  "start_date_select_message": "必须选择学期的开始日期才能查看你的课表。不选择将导致日期错误。提示:开始日期是第一周的周一。"
 }

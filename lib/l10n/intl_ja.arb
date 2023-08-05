@@ -486,5 +486,11 @@
   "copy_floor_id": "拷贝楼层号",
   "copy_floor_id_success": "楼层号成功保存至剪贴板",
   "copy_hole_id": "拷贝洞号",
-  "copy_hole_id_success": "洞号成功保存至剪贴板"
+  "copy_hole_id_success": "洞号成功保存至剪贴板",
+  "choose_semester": "学期の選択:",
+  "choose_semester_message": "見たい学期を選ぶ",
+  "manually_add_course":"カリキュラムを手動で追加するには：",
+  "manually_add_course_message":"授業表に収録されていない授業があるかどうか、また見たいのではないでしょうか。自分で手動で追加しましょう。",
+  "start_date_select": "学期開始日照会:",
+  "start_date_select_message": "授業表を見るには、学期の開始日を選択しなければなりません。選択しないと日付エラーになります。ヒント：開始日は第1週の月曜日です。"
 }
