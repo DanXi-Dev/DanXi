@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
@@ -33,6 +34,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../widget/danke/course_review_widget.dart';
 import '../widget/danke/random_review_widgets.dart';
 
 // class DankeSubPage extends PlatformSubpage<DankeSubPage> {
@@ -262,6 +264,9 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         const ReviewVoteWidget(
           reviewTotalVote: 10,
           reviewVote: 0,
+        ),
+        CourseReviewWidget(
+          review: CourseReview.dummy(),
         ),
       ]),
       // button

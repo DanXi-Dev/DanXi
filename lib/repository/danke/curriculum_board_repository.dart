@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
-import 'package:dan_xi/model/danke/review.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/dio.dart';

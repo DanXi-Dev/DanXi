@@ -116,9 +116,10 @@ class RandomReviewWidgets extends StatelessWidget {
                               // todo add card information style
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,vertical: 2),
+                                    horizontal: 10, vertical: 2),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "$departmentName / $courseName",
@@ -129,8 +130,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                     const Text(
                                       "好评如潮",
                                       style: TextStyle(
-                                          color: Colors.green,
-                                      fontSize: 12),
+                                          color: Colors.green, fontSize: 12),
                                     )
                                   ],
                                 ),
@@ -160,7 +160,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                                 WrapCrossAlignment.center,
                                             children: [
                                               Icon(
-                                                // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
+                                                  // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
                                                   CupertinoIcons.person,
                                                   size: infoStyle.fontSize,
                                                   color: infoStyle.color),
@@ -175,7 +175,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                           ),
                                           Wrap(
                                             crossAxisAlignment:
-                                            WrapCrossAlignment.center,
+                                                WrapCrossAlignment.center,
                                             children: [
                                               Icon(
                                                 Icons.thumb_up_outlined,
@@ -185,10 +185,10 @@ class RandomReviewWidgets extends StatelessWidget {
                                               const SizedBox(
                                                 width: 3,
                                               ),
-                                              Text(
+                                              const Text(
                                                 '2',
                                                 textAlign: TextAlign.left,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                     fontSize: 10,
                                                     color: Colors.grey),
                                               ),

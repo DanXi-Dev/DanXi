@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'review.dart';
+part of 'course_review.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

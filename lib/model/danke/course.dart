@@ -15,16 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/danke/review.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'course.g.dart';
 
 @JsonSerializable()
 class Course {
-  int? id;
-  String? name;
-  String? code;
+  int? course_id;
+  String? course_name;
+  String? course_code;
   String? code_id;
   double? credit;
   String? department;
@@ -46,9 +46,9 @@ class Course {
   List<CourseReview>? review_list;
 
   Course(
-      this.id,
-      this.name,
-      this.code,
+      this.course_id,
+      this.course_name,
+      this.course_code,
       this.code_id,
       this.credit,
       this.department,
@@ -63,9 +63,12 @@ class Course {
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);
 
+  factory Course.dummy() => Course(-3, "Asoul虚拟偶像运营与管理", "OP114514", "01", 4.0,
+      "计算机科学与技术系", "Asoul", 100, 4, "2021", 1, [CourseReview.dummy()]);
   @override
-  bool operator ==(Object other) => (other is Course) && id == other.id;
+  bool operator ==(Object other) =>
+      (other is Course) && course_id == other.course_id;
 
   @override
-  int get hashCode => id ?? name.hashCode;
+  int get hashCode => course_id ?? course_name.hashCode;
 }

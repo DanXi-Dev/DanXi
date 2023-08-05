@@ -22,13 +22,12 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'course_grade.dart';
 
-part 'review.g.dart';
+part 'course_review.g.dart';
 
 /// [CourseReview] is the model class for course review.
 /// It is used to store the data of a course review analogous to the [OTFloor].
 ///
-/// [review_id] is the unique id of a review, based on which the review is compared.
-/// [reviewer_id] is the unique id of the reviewer.
+/// [reviewer_id] is
 /// [liked] is used to show whether the user have up vote or down vote the review, 1 for up vote, -1 for down vote, 0 for no vote.
 /// [is_me] is used to show whether the review is written by the user.
 /// [modified] is used to show whether the review is modified.
@@ -38,9 +37,16 @@ part 'review.g.dart';
 
 @JsonSerializable()
 class CourseReview {
+  /// The unique id of a review, based on which the review is compared.
   int? review_id;
+
+  /// The user id of the reviewer.
   int? reviewer_id;
+
+  /// The title of the review.
   String? title;
+
+  /// The content of the review.
   String? content;
   String? timeCreated;
   String? timeUpdated;
@@ -60,8 +66,8 @@ class CourseReview {
 
   /// [dummy] is used to generate a dummy [CourseReview] object for testing.
   factory CourseReview.dummy() => CourseReview(
-      -5,
-      -5,
+      114514,
+      114514,
       "作为嘉然小姐的狗的测评",
       "关注嘉然天天天天天天解馋",
       "dummy",

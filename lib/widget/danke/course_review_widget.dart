@@ -32,3 +32,144 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
+
+import 'package:dan_xi/model/danke/course.dart';
+import 'package:dan_xi/model/danke/course_grade.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
+
+class CourseReviewWidget extends StatelessWidget {
+  final CourseReview review;
+
+  // changeable style of the card
+  final bool translucent;
+
+  const CourseReviewWidget(
+      {Key? key, required this.review, this.translucent = false})
+      : super(key: key);
+
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: _buildCard(context));
+    throw UnimplementedError();
+  }
+
+  _buildCard(BuildContext context) {
+    // style of the card
+    final TextStyle infoStyle =
+        TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
+
+    return Card(
+      color: translucent
+          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+          : null,
+      // credits group
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        ListTile(
+          contentPadding: const EdgeInsets.fromLTRB(0, 3, 0, 2),
+          title: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: WrapAlignment.spaceBetween,
+              runSpacing: 4,
+              children: [
+                Column(
+                  children: [
+                    // course name, department name, course code and credits
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // use Expanded wrap the text to avoid overflow
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // todo add card information style
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 2),
+                                child:
+                                    ReviewerHeader(userId: review.reviewer_id!),
+                              ),
+                              const Divider(),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 2),
+                                child: Text(
+                                  review.content!,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          ?.color,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ]),
+        ),
+        // rating and comment count
+      ]),
+    );
+  }
+}
+
+class ReviewerHeader extends StatelessWidget {
+  final int userId;
+
+  // final String reviewContent;
+
+  const ReviewerHeader({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // user
+        Text(
+          "| user $userId",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        ),
+        const Wrap(
+          // todo this is the badge list of the user
+          spacing: 3,
+          children: [
+            // rating
+            Icon(
+              Icons.circle,
+              color: Colors.yellow,
+              size: 12,
+            ),
+            Icon(
+              Icons.circle,
+              color: Colors.red,
+              size: 12,
+            ),
+            Icon(
+              Icons.circle,
+              color: Colors.blue,
+              size: 12,
+            ),
+          ],
+        ),
+        // review content
+        // Padding(
+        //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        //   child: Text(
+        //     reviewContent,
+        //     style: TextStyle(
+        //         color: Theme.of(context).textTheme.bodyText1?.color,
+        //         fontSize: 12),
+        //   ),
+        // )
+      ],
+    );
+  }
+}
