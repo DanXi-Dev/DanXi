@@ -257,10 +257,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   @override
   void initState() {
-    if (SettingsProvider.getInstance().hasVistedTimeTable == false) {
+    if (SettingsProvider.getInstance().hasVisitedTimeTable == false) {
       createTutorial();
-      Future.delayed(Duration.zero, showTutorial);
-      SettingsProvider.getInstance().hasVistedTimeTable = true;
+      showTutorial();
+      SettingsProvider.getInstance().hasVisitedTimeTable = true;
     }
     super.initState();
     _setContent();

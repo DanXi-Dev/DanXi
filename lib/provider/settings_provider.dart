@@ -177,14 +177,14 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get hasVistedTimeTable {
+  bool get hasVisitedTimeTable {
     if (preferences!.containsKey(KEY_VISITED_TIMETABLE)) {
       return preferences!.getBool(KEY_VISITED_TIMETABLE)!;
     }
     return false;
   }
 
-  set hasVistedTimeTable(bool value) {
+  set hasVisitedTimeTable(bool value) {
     preferences!.setBool(KEY_VISITED_TIMETABLE, value);
     notifyListeners();
   }
