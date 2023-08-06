@@ -115,7 +115,6 @@ class ShareTimetableEvent {}
 class ManuallyAddCourseEvent {}
 
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
-  late TutorialCoachMark tutorialCoachMark;
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
   final StateStreamListener<ManuallyAddCourseEvent> _addCourseSubscription =
@@ -258,8 +257,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     if (SettingsProvider.getInstance().hasVisitedTimeTable == false) {
-      createTutorial();
-      showTutorial();
+      // Future.delayed(Duration.zero, showTutorial);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTutorial(createTutorial());
+      });
       SettingsProvider.getInstance().hasVisitedTimeTable = true;
     }
     super.initState();
@@ -300,12 +301,12 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         hashCode);
   }
 
-  void showTutorial() {
+  void showTutorial(TutorialCoachMark tutorialCoachMark) {
     tutorialCoachMark.show(context: context);
   }
 
-  void createTutorial() {
-    tutorialCoachMark = TutorialCoachMark(
+  TutorialCoachMark createTutorial() {
+    return TutorialCoachMark(
       targets: _createTargets(),
       colorShadow: const Color.fromARGB(255, 9, 110, 192),
       textSkip: "SKIP",
@@ -418,19 +419,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0),
-                    child: Column(
-                      children: [
-                        Align(
-                          child: Text(
-                            S.of(context).start_date_select_message,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 20.0,
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      S.of(context).start_date_select_message,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   ElevatedButton(
@@ -449,6 +440,97 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
     return targets;
   }
+
+  // void createTutorial() {
+  //   tutorialCoachMark = TutorialCoachMark(
+  //     targets: _createTargets(),
+  //     colorShadow: const Color.fromARGB(255, 9, 110, 192),
+  //     textSkip: "SKIP",
+  //     paddingFocus: 10,
+  //     opacityShadow: 0.5,
+  //     pulseAnimationDuration: const Duration(milliseconds: 1000),
+  //     imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+  //   );
+  // }
+
+  // List<TargetFocus> _createTargets() {
+  //   return [
+  //     _createTarget(
+  //       identify: "SemesterSelectionButton",
+  //       keyTarget: keyButton1,
+  //       title: S.of(context).choose_semester,
+  //       message: S.of(context).choose_semester_message,
+  //     ),
+  //     _createTarget(
+  //       identify: "ManuallyAddCourseButton",
+  //       keyTarget: keyButton,
+  //       title: S.of(context).manually_add_course,
+  //       message: S.of(context).manually_add_course_message,
+  //       // hasActionWidget: true,
+  //       shape: ShapeLightFocus.RRect,
+  //       radius: 5,
+  //     ),
+  //     _createTarget(
+  //       identify: "StartDateSelectionButton",
+  //       keyTarget: keyButton2,
+  //       title: S.of(context).start_date_select,
+  //       message: S.of(context).start_date_select_message,
+  //       shape: ShapeLightFocus.Circle,
+  //     ),
+  //   ];
+  // }
+
+  // TargetFocus _createTarget({
+  //   required String identify,
+  //   required GlobalKey keyTarget,
+  //   required String title,
+  //   required String message,
+  //   ShapeLightFocus shape = ShapeLightFocus.RRect,
+  //   double radius = 5,
+  //   bool? hasActionWidget,
+  // }) {
+  //   return TargetFocus(
+  //     identify: identify,
+  //     keyTarget: keyTarget,
+  //     contents: [
+  //       TargetContent(
+  //         align: ContentAlign.bottom,
+  //         builder: (context, controller) {
+  //           return Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: <Widget>[
+  //               Text(
+  //                 title,
+  //                 style: const TextStyle(
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.white,
+  //                   fontSize: 20.0,
+  //                 ),
+  //               ),
+  //               Padding(
+  //                 padding: const EdgeInsets.only(top: 10.0),
+  //                 child: Text(
+  //                   message,
+  //                   style: const TextStyle(color: Colors.white),
+  //                 ),
+  //               ),
+  //               if (hasActionWidget != false)
+  //                 ElevatedButton(
+  //                   onPressed: () {
+  //                     controller.previous();
+  //                   },
+  //                   child: const Icon(Icons.chevron_left),
+  //                 ),
+  //             ],
+  //           );
+  //         },
+  //       ),
+  //     ],
+  //     shape: shape,
+  //     radius: radius,
+  //   );
+  // }
 
   Future<void> refresh(
       {bool reloadWhenEmptyData = false,

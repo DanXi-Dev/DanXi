@@ -486,11 +486,5 @@
   "copy_floor_id": "拷贝楼层号",
   "copy_floor_id_success": "楼层号成功保存至剪贴板",
   "copy_hole_id": "拷贝洞号",
-  "copy_hole_id_success": "洞号成功保存至剪贴板",
-  "choose_semester": "Choose semester:",
-  "choose_semester_message": "Select the semester you want to view.",
-  "manually_add_course":"Add lesson manually:",
-  "manually_add_course_message":"If there is a class that is not included in the class schedule, but you want to check it, add it manually yourself.",
-  "start_date_select": "Semester start date query",
-  "start_date_select_message": "You must select the start date of the semester to view your class schedule. Not selecting will result in a date error. \nTip: Start date is the Monday of the first week."
+  "copy_hole_id_success": "洞号成功保存至剪贴板"
 }
