@@ -256,11 +256,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   @override
   void initState() {
-    if (SettingsProvider.getInstance().hasVisitedTimeTable == false) {
-      // Future.delayed(Duration.zero, showTutorial);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showTutorial(createTutorial());
-      });
+    if (!SettingsProvider.getInstance().hasVisitedTimeTable) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => createTutorial().show(context: context));
       SettingsProvider.getInstance().hasVisitedTimeTable = true;
     }
     super.initState();
@@ -301,48 +299,40 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         hashCode);
   }
 
-  void showTutorial(TutorialCoachMark tutorialCoachMark) {
-    tutorialCoachMark.show(context: context);
-  }
+  TutorialCoachMark createTutorial() => TutorialCoachMark(
+        targets: _createTargets(),
+        colorShadow: const Color.fromARGB(255, 9, 110, 192),
+        textSkip: S.of(context).skip,
+        paddingFocus: 10,
+        opacityShadow: 0.5,
+        pulseAnimationDuration: const Duration(milliseconds: 1000),
+        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      );
 
-  TutorialCoachMark createTutorial() {
-    return TutorialCoachMark(
-      targets: _createTargets(),
-      colorShadow: const Color.fromARGB(255, 9, 110, 192),
-      textSkip: "SKIP",
-      paddingFocus: 10,
-      opacityShadow: 0.5,
-      pulseAnimationDuration: const Duration(milliseconds: 1000),
-      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-    );
-  }
-
-  List<TargetFocus> _createTargets() {
-    return [
-      _createTarget(
-        identify: "SemesterSelectionButton",
-        keyTarget: keyButton1,
-        title: S.of(context).choose_semester,
-        message: S.of(context).choose_semester_message,
-        hasActionWidget: false,
-      ),
-      _createTarget(
-        identify: "ManuallyAddCourseButton",
-        keyTarget: keyButton,
-        title: S.of(context).manually_add_course,
-        message: S.of(context).manually_add_course_message,
-        hasActionWidget: true,
-        shape: ShapeLightFocus.RRect,
-      ),
-      _createTarget(
-        identify: "StartDateSelectionButton",
-        keyTarget: keyButton2,
-        title: S.of(context).start_date_select,
-        message: S.of(context).start_date_select_message,
-        hasActionWidget: true,
-      ),
-    ];
-  }
+  List<TargetFocus> _createTargets() => [
+        _createTarget(
+          identify: "SemesterSelectionButton",
+          keyTarget: keyButton1,
+          title: S.of(context).choose_semester,
+          message: S.of(context).choose_semester_message,
+          hasActionWidget: false,
+        ),
+        _createTarget(
+          identify: "ManuallyAddCourseButton",
+          keyTarget: keyButton,
+          title: S.of(context).manually_add_course,
+          message: S.of(context).manually_add_course_message,
+          hasActionWidget: true,
+          shape: ShapeLightFocus.RRect,
+        ),
+        _createTarget(
+          identify: "StartDateSelectionButton",
+          keyTarget: keyButton2,
+          title: S.of(context).start_date_select,
+          message: S.of(context).start_date_select_message,
+          hasActionWidget: true,
+        ),
+      ];
 
   TargetFocus _createTarget({
     required String identify,
@@ -352,15 +342,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     ShapeLightFocus shape = ShapeLightFocus.Circle,
     double radius = 5,
     bool? hasActionWidget,
-  }) {
-    return TargetFocus(
-      identify: identify,
-      keyTarget: keyTarget,
-      contents: [
-        TargetContent(
-          align: ContentAlign.bottom,
-          builder: (context, controller) {
-            return Column(
+  }) =>
+      TargetFocus(
+        identify: identify,
+        keyTarget: keyTarget,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -381,20 +370,16 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 ),
                 if (hasActionWidget != false)
                   ElevatedButton(
-                    onPressed: () {
-                      controller.previous();
-                    },
+                    onPressed: controller.previous,
                     child: const Icon(Icons.chevron_left),
                   ),
               ],
-            );
-          },
-        ),
-      ],
-      shape: shape,
-      radius: radius,
-    );
-  }
+            ),
+          ),
+        ],
+        shape: shape,
+        radius: radius,
+      );
 
   Future<void> refresh(
       {bool reloadWhenEmptyData = false,

@@ -1727,6 +1727,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  tutorial_coach_mark:
+    dependency: "direct main"
+    description:
+      name: tutorial_coach_mark
+      sha256: ba60583d1b500111bf5040eb24330862b25162d926f72923b8e45c16621878b0
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.9"
   typed_data:
     dependency: transitive
     description:
