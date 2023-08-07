@@ -318,219 +318,83 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   }
 
   List<TargetFocus> _createTargets() {
-    List<TargetFocus> targets = [];
-
-    targets.add(
-      TargetFocus(
+    return [
+      _createTarget(
         identify: "SemesterSelectionButton",
         keyTarget: keyButton1,
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    S.of(context).choose_semester,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 20.0),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: Text(
-                      S.of(context).choose_semester_message,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
+        title: S.of(context).choose_semester,
+        message: S.of(context).choose_semester_message,
+        hasActionWidget: false,
       ),
-    );
-    targets.add(
-      TargetFocus(
+      _createTarget(
         identify: "ManuallyAddCourseButton",
         keyTarget: keyButton,
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    S.of(context).manually_add_course,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 20.0,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: Text(
-                      S.of(context).manually_add_course_message,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      controller.previous();
-                    },
-                    child: const Icon(Icons.chevron_left),
-                  ),
-                ],
-              );
-            },
-          )
-        ],
+        title: S.of(context).manually_add_course,
+        message: S.of(context).manually_add_course_message,
+        hasActionWidget: true,
         shape: ShapeLightFocus.RRect,
-        radius: 5,
       ),
-    );
-
-    targets.add(
-      TargetFocus(
+      _createTarget(
         identify: "StartDateSelectionButton",
         keyTarget: keyButton2,
-        shape: ShapeLightFocus.Circle,
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    S.of(context).start_date_select,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 20.0,
-                    ),
+        title: S.of(context).start_date_select,
+        message: S.of(context).start_date_select_message,
+        hasActionWidget: true,
+      ),
+    ];
+  }
+
+  TargetFocus _createTarget({
+    required String identify,
+    required GlobalKey keyTarget,
+    required String title,
+    required String message,
+    ShapeLightFocus shape = ShapeLightFocus.Circle,
+    double radius = 5,
+    bool? hasActionWidget,
+  }) {
+    return TargetFocus(
+      identify: identify,
+      keyTarget: keyTarget,
+      contents: [
+        TargetContent(
+          align: ContentAlign.bottom,
+          builder: (context, controller) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 20.0,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: Text(
-                      S.of(context).start_date_select_message,
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white),
                   ),
+                ),
+                if (hasActionWidget != false)
                   ElevatedButton(
                     onPressed: () {
                       controller.previous();
                     },
                     child: const Icon(Icons.chevron_left),
                   ),
-                ],
-              );
-            },
-          )
-        ],
-      ),
+              ],
+            );
+          },
+        ),
+      ],
+      shape: shape,
+      radius: radius,
     );
-
-    return targets;
   }
-
-  // void createTutorial() {
-  //   tutorialCoachMark = TutorialCoachMark(
-  //     targets: _createTargets(),
-  //     colorShadow: const Color.fromARGB(255, 9, 110, 192),
-  //     textSkip: "SKIP",
-  //     paddingFocus: 10,
-  //     opacityShadow: 0.5,
-  //     pulseAnimationDuration: const Duration(milliseconds: 1000),
-  //     imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-  //   );
-  // }
-
-  // List<TargetFocus> _createTargets() {
-  //   return [
-  //     _createTarget(
-  //       identify: "SemesterSelectionButton",
-  //       keyTarget: keyButton1,
-  //       title: S.of(context).choose_semester,
-  //       message: S.of(context).choose_semester_message,
-  //     ),
-  //     _createTarget(
-  //       identify: "ManuallyAddCourseButton",
-  //       keyTarget: keyButton,
-  //       title: S.of(context).manually_add_course,
-  //       message: S.of(context).manually_add_course_message,
-  //       // hasActionWidget: true,
-  //       shape: ShapeLightFocus.RRect,
-  //       radius: 5,
-  //     ),
-  //     _createTarget(
-  //       identify: "StartDateSelectionButton",
-  //       keyTarget: keyButton2,
-  //       title: S.of(context).start_date_select,
-  //       message: S.of(context).start_date_select_message,
-  //       shape: ShapeLightFocus.Circle,
-  //     ),
-  //   ];
-  // }
-
-  // TargetFocus _createTarget({
-  //   required String identify,
-  //   required GlobalKey keyTarget,
-  //   required String title,
-  //   required String message,
-  //   ShapeLightFocus shape = ShapeLightFocus.RRect,
-  //   double radius = 5,
-  //   bool? hasActionWidget,
-  // }) {
-  //   return TargetFocus(
-  //     identify: identify,
-  //     keyTarget: keyTarget,
-  //     contents: [
-  //       TargetContent(
-  //         align: ContentAlign.bottom,
-  //         builder: (context, controller) {
-  //           return Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: <Widget>[
-  //               Text(
-  //                 title,
-  //                 style: const TextStyle(
-  //                   fontWeight: FontWeight.bold,
-  //                   color: Colors.white,
-  //                   fontSize: 20.0,
-  //                 ),
-  //               ),
-  //               Padding(
-  //                 padding: const EdgeInsets.only(top: 10.0),
-  //                 child: Text(
-  //                   message,
-  //                   style: const TextStyle(color: Colors.white),
-  //                 ),
-  //               ),
-  //               if (hasActionWidget != false)
-  //                 ElevatedButton(
-  //                   onPressed: () {
-  //                     controller.previous();
-  //                   },
-  //                   child: const Icon(Icons.chevron_left),
-  //                 ),
-  //             ],
-  //           );
-  //         },
-  //       ),
-  //     ],
-  //     shape: shape,
-  //     radius: radius,
-  //   );
-  // }
 
   Future<void> refresh(
       {bool reloadWhenEmptyData = false,
