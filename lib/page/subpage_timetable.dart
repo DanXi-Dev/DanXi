@@ -16,6 +16,7 @@
  */
 
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -52,8 +53,13 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../widget/dialogs/manually_add_course_dialog.dart';
+
+GlobalKey keyButton = GlobalKey();
+GlobalKey keyButton1 = GlobalKey();
+GlobalKey keyButton2 = GlobalKey();
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -73,9 +79,10 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
           S.of(cxt).add_courses,
-          Icon(PlatformX.isMaterial(cxt)
-              ? Icons.add
-              : CupertinoIcons.add_circled),
+          Icon(
+            PlatformX.isMaterial(cxt) ? Icons.add : CupertinoIcons.add_circled,
+            key: keyButton,
+          ),
           () => ManuallyAddCourseEvent().fire(),
         ),
         AppBarButtonItem(
@@ -89,11 +96,17 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(S.of(cxt).select_semester, SemesterSelectionButton(
-          onSelectionUpdate: () {
-            timetablePageKey.currentState?.indicatorKey.currentState?.show();
-          },
-        ), null, useCustomWidget: true),
+        AppBarButtonItem(
+            S.of(cxt).select_semester,
+            SemesterSelectionButton(
+              key: keyButton1,
+              onSelectionUpdate: () {
+                timetablePageKey.currentState?.indicatorKey.currentState
+                    ?.show();
+              },
+            ),
+            null,
+            useCustomWidget: true),
       ];
 }
 
@@ -243,11 +256,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   @override
   void initState() {
+    if (!SettingsProvider.getInstance().hasVisitedTimeTable) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => createTutorial().show(context: context));
+      SettingsProvider.getInstance().hasVisitedTimeTable = true;
+    }
     super.initState();
     _setContent();
-    converters = {
-      S.current.share_as_ics: ICSConverter()
-    };
+    converters = {S.current.share_as_ics: ICSConverter()};
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
@@ -282,6 +298,88 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         }),
         hashCode);
   }
+
+  TutorialCoachMark createTutorial() => TutorialCoachMark(
+        targets: _createTargets(),
+        colorShadow: const Color.fromARGB(255, 9, 110, 192),
+        textSkip: S.of(context).skip,
+        paddingFocus: 10,
+        opacityShadow: 0.5,
+        pulseAnimationDuration: const Duration(milliseconds: 1000),
+        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      );
+
+  List<TargetFocus> _createTargets() => [
+        _createTarget(
+          identify: "SemesterSelectionButton",
+          keyTarget: keyButton1,
+          title: S.of(context).choose_semester,
+          message: S.of(context).choose_semester_message,
+          hasActionWidget: false,
+        ),
+        _createTarget(
+          identify: "ManuallyAddCourseButton",
+          keyTarget: keyButton,
+          title: S.of(context).manually_add_course,
+          message: S.of(context).manually_add_course_message,
+          hasActionWidget: true,
+          shape: ShapeLightFocus.RRect,
+        ),
+        _createTarget(
+          identify: "StartDateSelectionButton",
+          keyTarget: keyButton2,
+          title: S.of(context).start_date_select,
+          message: S.of(context).start_date_select_message,
+          hasActionWidget: true,
+        ),
+      ];
+
+  TargetFocus _createTarget({
+    required String identify,
+    required GlobalKey keyTarget,
+    required String title,
+    required String message,
+    ShapeLightFocus shape = ShapeLightFocus.Circle,
+    double radius = 5,
+    bool? hasActionWidget,
+  }) =>
+      TargetFocus(
+        identify: identify,
+        keyTarget: keyTarget,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                if (hasActionWidget != false)
+                  ElevatedButton(
+                    onPressed: controller.previous,
+                    child: const Icon(Icons.chevron_left),
+                  ),
+              ],
+            ),
+          ),
+        ],
+        shape: shape,
+        radius: radius,
+      );
 
   Future<void> refresh(
       {bool reloadWhenEmptyData = false,
@@ -343,7 +441,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Expanded(child: Column(
+              Expanded(
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -382,7 +481,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
-          children: block.event.map((e) => _buildCourseItem(e,context)).toList(),
+          children:
+              block.event.map((e) => _buildCourseItem(e, context)).toList(),
         ),
       ),
     );
@@ -401,8 +501,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (_showingTime!.weekday < 0) _showingTime!.weekday = 0;
     if (_showingTime!.weekday > 6) _showingTime!.weekday = 6;
 
-    final List<DayEvents> scheduleData = _table!.toDayEvents(_showingTime!.week,
-        compact: TableDisplayType.STANDARD);
+    final List<DayEvents> scheduleData = _table!
+        .toDayEvents(_showingTime!.week, compact: TableDisplayType.STANDARD);
     return RefreshIndicator(
       key: indicatorKey,
       edgeOffset: MediaQuery.of(context).padding.top,
@@ -442,6 +542,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(S.of(context).semester_start_date),
             StartDateSelectionButton(
+                key: keyButton2,
                 onUpdate: (() => indicatorKey.currentState?.show())),
           ]),
         ],

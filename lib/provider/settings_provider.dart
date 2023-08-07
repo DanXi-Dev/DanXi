@@ -78,6 +78,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_HIDDEN_NOTIFICATIONS = "hidden_notifications";
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
+  static const String KEY_VISITED_TIMETABLE = "visited_timetable";
 
   SettingsProvider._();
 
@@ -173,6 +174,18 @@ class SettingsProvider with ChangeNotifier {
 
   set isAdEnabled(bool value) {
     preferences!.setBool(KEY_AD_ENABLED, value);
+    notifyListeners();
+  }
+
+  bool get hasVisitedTimeTable {
+    if (preferences!.containsKey(KEY_VISITED_TIMETABLE)) {
+      return preferences!.getBool(KEY_VISITED_TIMETABLE)!;
+    }
+    return false;
+  }
+
+  set hasVisitedTimeTable(bool value) {
+    preferences!.setBool(KEY_VISITED_TIMETABLE, value);
     notifyListeners();
   }
 
