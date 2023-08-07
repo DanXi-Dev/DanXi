@@ -55,10 +55,10 @@
 
 ```shell
 $ flutter --version
-Flutter 3.10.5 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 796c8ef792 (2 weeks ago) • 2023-06-13 15:51:02 -0700
-Engine • revision 45f6e00911
-Tools • Dart 3.0.5 • DevTools 2.23.1
+Flutter 3.10.6 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision f468f3366c (3 weeks ago) • 2023-07-12 15:19:05 -0700
+Engine • revision cdbeda788a
+Tools • Dart 3.0.6 • DevTools 2.23.1
 ```
 
 ## 编译说明
