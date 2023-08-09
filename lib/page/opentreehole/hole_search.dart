@@ -180,8 +180,8 @@ Widget searchByText(BuildContext context, String searchKeyword) {
               await showPlatformDialog(
                   context: context, builder: (_) => const CareDialog());
             }
-              smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
-                  arguments: {"searchKeyword": searchKeyword});
+            smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
+                arguments: {"searchKeyword": searchKeyword});
           },
         );
       });
