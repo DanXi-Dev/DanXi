@@ -104,19 +104,18 @@ class _OTSearchPageState extends State<OTSearchPage> {
   /// Build a list of search suggestion or search history if no input.
   Widget buildSearchSuggestion(BuildContext context) =>
       Consumer<TextEditingValue>(
-          builder: (context, value, child) => value.text.isEmpty
-              ? _buildSearchHistory(context)
-              : Expanded(
-                  child: ListView(
-                    primary: false,
-                    shrinkWrap: true,
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    children: suggestionProviders
-                        .map((e) => e.call(context, value.text))
-                        .toList(),
-                  ),
-                ));
+        builder: (context, value, child) => value.text.isEmpty
+            ? _buildSearchHistory(context)
+            : ListView(
+                primary: false,
+                shrinkWrap: true,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                children: suggestionProviders
+                    .map((e) => e.call(context, value.text))
+                    .toList(),
+              ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +146,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
             ),
             ValueListenableProvider.value(
                 value: _searchFieldController,
-                child: buildSearchSuggestion(context)),
+                child: Expanded(child: buildSearchSuggestion(context))),
           ],
         ),
       ),
@@ -177,8 +176,8 @@ Widget searchByText(BuildContext context, String searchKeyword) {
               await showPlatformDialog(
                   context: context, builder: (_) => const CareDialog());
             }
-              smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
-                  arguments: {"searchKeyword": searchKeyword});
+            smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
+                arguments: {"searchKeyword": searchKeyword});
           },
         );
       });
