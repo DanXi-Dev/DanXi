@@ -58,10 +58,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
   /// The text user inputs.
   final TextEditingController _searchFieldController = TextEditingController();
 
-  /// Use Expanded to avoid the uncertainty of column size,
-  /// thus solving Flexible overflow
-  Widget _buildSearchHistory(BuildContext context) => Expanded(
-      child: Column(
+  Widget _buildSearchHistory(BuildContext context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
@@ -102,7 +99,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
                     )),
           ),
         ],
-      ));
+      );
 
   /// Build a list of search suggestion or search history if no input.
   Widget buildSearchSuggestion(BuildContext context) =>
