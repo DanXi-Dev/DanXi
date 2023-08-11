@@ -330,6 +330,7 @@
   "push_notification_reg_failed": "Push Notification Registeration Failed",
   "push_notification_reg_failed_des": "You may not be able to receive notifications.\nError: {error}",
   "quote": "Quote",
+  "qr_code_terms_not_agreed": "To use QRCode, you must accept terms and conditions in webpage",
   "rank": "Rank",
   "rate": "Rate Us",
   "re_login": "Re-login",
