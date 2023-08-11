@@ -20,6 +20,8 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 
+class TermsNotAgreed implements Exception {}
+
 class QRCodeRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fworkflow1.fudan.edu.cn%2Fsite%2Flogin%2Fcas-login%3Fredirect_url%3Dhttps%253A%252F%252Fworkflow1.fudan.edu.cn%252Fopen%252Fconnection%252Findex%253Fapp_id%253Dc5gI0Ro%2526state%253D%2526redirect_url%253Dhttps%253A%252F%252Fecard.fudan.edu.cn%252Fepay%252Fwxpage%252Ffudan%252Fzfm%252Fqrcode%253Furl%253D0";
@@ -38,7 +40,15 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   Future<String?> _getQRCode() async {
     final res = await dio.get(QR_URL);
     BeautifulSoup soup = BeautifulSoup(res.data.toString());
-    return soup.find("#myText")!.attributes['value'];
+    try {
+      return soup.find("#myText")!.attributes['value'];
+    } catch (_) {
+      if (soup.find("#btn-agree-ok") != null) {
+        throw TermsNotAgreed();
+      } else {
+        rethrow;
+      }
+    }
   }
 
   @override
