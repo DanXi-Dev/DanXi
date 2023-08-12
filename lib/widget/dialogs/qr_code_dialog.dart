@@ -57,7 +57,7 @@ class QRDialog extends StatefulWidget {
 }
 
 class QRDialogState extends State<QRDialog> {
-  bool termsNotAllowed = false;
+  bool termsNotAgreed = false;
 
   @override
   Widget build(BuildContext context) => PlatformAlertDialog(
@@ -80,7 +80,7 @@ class QRDialogState extends State<QRDialog> {
                 errorBuilder:
                     (BuildContext context, AsyncSnapshot<String?> snapShot) {
                   if (snapShot.error is TermsNotAgreed) {
-                    termsNotAllowed = true;
+                    termsNotAgreed = true;
                     return Text(S.of(context).qr_code_terms_not_agreed);
                   } else {
                     return ErrorPageWidget.buildWidget(context, snapShot.error,
@@ -95,7 +95,7 @@ class QRDialogState extends State<QRDialog> {
               child: PlatformText(S.of(context).i_see),
               onPressed: () async {
                 Navigator.pop(context);
-                if (termsNotAllowed) {
+                if (termsNotAgreed) {
                   BrowserUtil.openUrl(
                       QRCodeRepository.QR_URL, context, null, true);
                 }
