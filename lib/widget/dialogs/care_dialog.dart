@@ -29,7 +29,7 @@ class _CareDialogState extends State<CareDialog> {
       actions: [
         PlatformDialogAction(
           child: Text(S.of(context).i_see),
-          onPressed: () => {Navigator.of(context).pop()},
+          onPressed: () => Navigator.of(context).pop(),
         )
       ],
     );
