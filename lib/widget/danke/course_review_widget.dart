@@ -27,6 +27,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/danke/review_vote_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -63,6 +64,9 @@ class CourseReviewWidget extends StatelessWidget {
       color: translucent
           ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
           : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(8.0)),
+      ),
       // credits group
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ListTile(
@@ -116,6 +120,75 @@ class CourseReviewWidget extends StatelessWidget {
         ),
         // rating and comment count
       ]),
+    );
+  }
+}
+
+class ReviewOperationBar extends StatefulWidget {
+  final CourseReview review;
+
+  const ReviewOperationBar({Key? key, required this.review}) : super(key: key);
+
+  @override
+  _ReviewOperationBarState createState() => _ReviewOperationBarState();
+}
+
+class _ReviewOperationBarState extends State<ReviewOperationBar> {
+  int _liked = 0;
+  int like = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // like button
+        Row(
+          children: [
+            ReviewVoteWidget(reviewVote: 1, reviewTotalVote: 10),
+            Text(
+              like.toString(),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyText1?.color,
+                  fontSize: 12),
+            ),
+          ],
+        ),
+        // comment button
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.comment,
+                color: Theme.of(context).hintColor,
+              ),
+              onPressed: () {
+                // todo comment
+              },
+            ),
+            Text(
+              "0",
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyText1?.color,
+                  fontSize: 12),
+            ),
+          ],
+        ),
+        // report button
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.flag,
+                color: Theme.of(context).hintColor,
+              ),
+              onPressed: () {
+                // todo report
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
