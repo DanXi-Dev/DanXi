@@ -29,7 +29,7 @@ import 'package:html/dom.dart' as dom;
 
 class DataCenterRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fmy.fudan.edu.cn%2Fsimple_list%2Fstqk";
+      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fmy.fudan.edu.cn%2Fsimple_list%2Fstqk";
   static const String DINING_DETAIL_URL =
       "https://my.fudan.edu.cn/simple_list/stqk";
   static const String SCORE_DETAIL_URL =
