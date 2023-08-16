@@ -87,9 +87,12 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     if (response.data.toString().contains("仅")) {
       throw UnsuitableTimeException();
     }
-    var dataString =
-        response.data!.between("}", "</script>", headGreedy: false)!;
-    var jsonExtraction = RegExp(r'\[.+\]').allMatches(dataString);
+    // Regex cannot match things like [..\n..], so replace it with '-'
+    // It also unifies delimiter in string for generateSummary
+    var dataString = response.data!
+        .between("<script>", "</script>", headGreedy: false)!
+        .replaceAll("\n", "-");
+    var jsonExtraction = RegExp(r'\[.+?\]').allMatches(dataString);
     List<dynamic> names = jsonDecode(
         jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("'", "\""));
     List<dynamic>? cur = jsonDecode(jsonExtraction
