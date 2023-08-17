@@ -71,23 +71,27 @@ class DiningHallCrowdednessFeature extends Feature {
         _trafficInfo!.forEach((keyUnprocessed, value) {
           if (value.current != 0) {
             //Ignore zero entries
-            var keyList = keyUnprocessed.split('\n');
+            var keyList = keyUnprocessed.split('-');
             var key = keyList[0];
             var keySubtitle = '';
             if (keyList.length > 1) keySubtitle = keyList[1];
             switch (key) {
               case '北区':
+              case '北区食堂':
                 crowdednessSum[0] += value.current / value.max;
                 break;
               case '南区':
+              case '南区食堂':
                 if (keySubtitle == '') {
                   crowdednessSum[1] += value.current / value.max;
                 } else {
                   switch (keySubtitle) {
                     case '南苑餐厅':
+                    case '南苑餐厅(东大)':
                       crowdednessSum[3] += value.current / value.max;
                       break;
                     case '教工快餐':
+                    case '教工快餐(东大)':
                       crowdednessSum[4] += value.current / value.max;
                       break;
                     default:
