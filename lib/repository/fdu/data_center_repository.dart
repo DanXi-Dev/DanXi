@@ -101,10 +101,12 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       throw UnsuitableTimeException();
     }
     // Regex cannot match things like [..\n..], so replace it with '-'
+    // Notice that we need to replace the exact word '\n' in the string,
+    // not the line break in the end of a line. So use r'\n' or '\\n', not '\n'
     // It also unifies delimiter in string for generateSummary
     var dataString = response.data!
         .between("<script>", "</script>", headGreedy: false)!
-        .replaceAll("\n", "-");
+        .replaceAll(r"\n", "-");
     var jsonExtraction = RegExp(r'\[.+?\]').allMatches(dataString);
     List<dynamic> names = jsonDecode(
         jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("'", "\""));
