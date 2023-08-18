@@ -373,9 +373,11 @@ class OTFloorWidget extends StatelessWidget {
     String? fullContent;
     String? subContent;
     // Use renderText to remove latex, image links and mentions
-    final bool foldLongFloor = searchKeyWord != null &&
-        floor.content != null &&
-        renderText(floor.content!, '', '').length > foldLimit;
+    if (searchKeyWord != null && floor.content != null) {
+      fullContent = renderText(floor.content!, '', '').replaceAll('\n', ' ');
+    }
+    final bool foldLongFloor =
+        fullContent != null && fullContent.length > foldLimit;
 
     void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
@@ -393,7 +395,6 @@ class OTFloorWidget extends StatelessWidget {
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
     if (foldLongFloor) {
-      fullContent = renderText(floor.content!, '', '').replaceAll('\n', ' ');
       final int keywordIndex = fullContent.indexOf(searchKeyWord!);
       int startIndex = keywordIndex - showCharCount;
       int endIndex = keywordIndex + searchKeyWord!.length + showCharCount;
